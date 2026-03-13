@@ -341,12 +341,56 @@ class ProductionOrchestrator:
     ) -> None:
         """Write pre-market results to Firebase."""
         try:
+            timestamp = datetime.now().isoformat()
             doc_id = f"{symbol}_{datetime.now().strftime('%Y%m%d')}"
             
+            # 1. Write bias output to Firestore
             self.firebase.write('bias_outputs', doc_id, {
                 **bias.to_dict(),
                 'symbol': symbol
             })
+            
+            # 2. Update Realtime DB - Live Market State Engine
+            self.firebase.update_realtime(f'/market/{symbol}', {
+                'regime': regime.regime_state,
+                'volatility': regime.volatility_level,
+                'liquidity': market_data.get('breadth', 1.0),
+                'momentum_score': bias.confidence,
+                'trend_strength': abs(bias.bias_direction),
+                'last_update': timestamp
+            })
+            
+            # 3. Publish Feature Monitoring Data
+            if hasattr(bias, 'feature_snapshot') and bias.feature_snapshot:
+                features = bias.feature_snapshot
+                self.firebase.update_realtime(f'/features/{symbol}', {
+                    'volatility_regime': features.get('volatility_regime', 0),
+                    'momentum_score': features.get('rsi_14', 50) / 100,
+                    'liquidity_score': features.get('market_breadth_ratio', 1.0),
+                    'trend_strength': features.get('trend_strength', 0),
+                    'feature_importance': features.get('feature_importance', {}),
+                    'last_update': timestamp
+                })
+            
+            # 4. Publish Explainability Data (SHAP values)
+            if hasattr(bias, 'rationale') and bias.rationale:
+                self.firebase.update_realtime(f'/explainability/{symbol}', {
+                    'decision_rationale': bias.rationale,
+                    'confidence': bias.confidence,
+                    'bias_direction': 'BULLISH' if bias.bias_direction > 0 else 'BEARISH' if bias.bias_direction < 0 else 'NEUTRAL',
+                    'feature_contributions': getattr(bias, 'feature_importance', {}),
+                    'last_update': timestamp
+                })
+            
+            # 5. Update system status
+            self.firebase.update_realtime('/system/status', {
+                'status': 'healthy',
+                'latency_ms': 0,
+                'last_update': timestamp,
+                'symbols_processed': 1
+            })
+            
+            logger.debug(f"Firebase state updated for {symbol}")
             
         except Exception as e:
             logger.error(f"Failed to write to Firebase: {e}")
