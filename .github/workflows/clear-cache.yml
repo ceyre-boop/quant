@@ -1,0 +1,29 @@
+name: Clear GitHub Pages Cache
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  clear-cache:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clear GitHub Pages cache
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const response = await github.rest.repos.requestPagesBuild({
+              owner: context.repo.owner,
+              repo: context.repo.repo
+            });
+            console.log('Pages build requested:', response.data);
+      
+      - name: Wait for deployment
+        run: sleep 30
+        
+      - name: Verify deployment
+        run: |
+          echo "GitHub Pages should now be updated"
+          echo "Check: https://live.taboost.me/creator-dashboard.html"

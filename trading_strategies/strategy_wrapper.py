@@ -207,10 +207,21 @@ class ICTAMDWrapper:
         """Write entry signal to Firebase."""
         try:
             signal_data = signal.to_dict()
+            timestamp = signal.timestamp
             
             # Write to entry_signals collection
-            doc_id = f"{signal.symbol}_{signal.timestamp.strftime('%Y%m%d_%H%M%S')}"
+            doc_id = f"{signal.symbol}_{timestamp.strftime('%Y%m%d_%H%M%S')}"
             self.firebase.write('entry_signals', doc_id, signal_data)
+            
+            # Archive in signal history (for later analysis)
+            history_path = f"signals_history/{timestamp.strftime('%Y-%m')}/{timestamp.strftime('%Y-%m-%d')}"
+            history_id = f"signal_{timestamp.strftime('%H%M%S')}_{signal.symbol}"
+            self.firebase.write(history_path, history_id, {
+                **signal_data,
+                'outcome': 'PENDING',
+                'realized_pnl': None,
+                'closed_at': None
+            })
             
             # Also update latest signal in Realtime DB
             self.firebase.update_realtime(f'/signals/{signal.symbol}/latest', {
@@ -222,9 +233,14 @@ class ICTAMDWrapper:
                 'position_size': signal.position_size,
                 'confidence': signal.confidence,
                 'rationale': signal.rationale,
-                'timestamp': signal.timestamp.isoformat(),
-                'status': 'PENDING_EXECUTION'
+                'timestamp': timestamp.isoformat(),
+                'status': 'PENDING_EXECUTION',
+                'signal_id': doc_id
             })
+            
+            # Update signal count
+            current_count = self.firebase.read_realtime(f'/signals/{signal.symbol}/count_today') or 0
+            self.firebase.update_realtime(f'/signals/{signal.symbol}/count_today', current_count + 1)
             
             self.logger.debug(f"Signal written to Firebase: {doc_id}")
             

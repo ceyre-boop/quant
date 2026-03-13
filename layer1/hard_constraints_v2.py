@@ -35,8 +35,10 @@ class HardConstraints:
         max_position_size_pct: float = 0.02,  # 2% max risk per trade
         trading_hours_start: str = "09:35",
         trading_hours_end: str = "15:55",
-        min_account_equity: float = 10000.0
+        min_account_equity: float = 10000.0,
+        firebase_client=None
     ):
+        self.firebase = firebase_client
         self.daily_loss_limit_pct = daily_loss_limit_pct
         self.max_positions = max_positions
         self.max_position_size_pct = max_position_size_pct
@@ -56,6 +58,11 @@ class HardConstraints:
         Returns:
             ConstraintCheck - fails if ANY constraint is violated
         """
+        # First check Firebase remote controls (emergency override)
+        firebase_check = self.check_firebase_controls()
+        if not firebase_check.passed:
+            return firebase_check
+        
         checks = [
             self.check_daily_loss_limit(account),
             self.check_max_positions(account),
@@ -200,6 +207,49 @@ class HardConstraints:
             )
         
         return ConstraintCheck(passed=True)
+    
+    def check_firebase_controls(self) -> ConstraintCheck:
+        """Check Firebase remote control switches.
+        
+        Allows instant shutdown from dashboard without code changes.
+        """
+        if self.firebase is None:
+            return ConstraintCheck(passed=True)  # No Firebase, skip this check
+        
+        try:
+            controls = self.firebase.read_realtime('/system_controls')
+            
+            if not controls:
+                return ConstraintCheck(passed=True)  # No controls set, allow trading
+            
+            # Check emergency stop
+            if controls.get('emergency_stop', False):
+                return ConstraintCheck(
+                    passed=False,
+                    reason="Emergency stop activated via Firebase",
+                    severity='error'
+                )
+            
+            # Check trading enabled flag
+            if not controls.get('trading_enabled', True):
+                return ConstraintCheck(
+                    passed=False,
+                    reason="Trading disabled via Firebase control",
+                    severity='error'
+                )
+            
+            # Check max daily loss from Firebase (overrides default)
+            firebase_max_loss = controls.get('max_daily_loss')
+            if firebase_max_loss is not None:
+                # Would need account balance to check this
+                pass
+            
+            return ConstraintCheck(passed=True)
+            
+        except Exception as e:
+            # If Firebase check fails, log but don't block trading
+            self.logger.error(f"Firebase control check failed: {e}")
+            return ConstraintCheck(passed=True)
     
     def get_constraint_status(self, account: AccountState) -> Dict[str, Any]:
         """Get status of all constraints."""

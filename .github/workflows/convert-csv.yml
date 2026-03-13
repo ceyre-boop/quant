@@ -1,0 +1,56 @@
+name: Convert CSV to JSON
+
+on:
+  push:
+    paths:
+      - 'data/*.csv'
+    branches: [main]
+
+jobs:
+  convert:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    
+    - name: Convert HISTORY.csv to creator_trends.json
+      run: |
+        if [ -f "data/HISTORY.csv" ]; then
+          python convert_history_csv.py data/HISTORY.csv data/creator_trends.json
+          echo "Converted HISTORY.csv to creator_trends.json"
+        else
+          echo "HISTORY.csv not found, skipping"
+        fi
+    
+    - name: Convert REWARDS.csv to rewards_data.json
+      run: |
+        if [ -f "data/Live_Data_-_Rewards.csv" ]; then
+          python convert_rewards_csv.py data/Live_Data_-_Rewards.csv data/rewards_data.json
+          echo "Converted Live_Data_-_Rewards.csv to rewards_data.json"
+        else
+          echo "Live_Data_-_Rewards.csv not found, skipping"
+        fi
+    
+    - name: Commit and push changes
+      run: |
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "GitHub Actions"
+        
+        # Check if there are changes
+        if git diff --quiet && git diff --staged --quiet; then
+          echo "No changes to commit"
+        else
+          git add data/
+          git commit -m "Auto-convert CSV files to JSON [skip ci]"
+          git push
+        fi

@@ -1,0 +1,47 @@
+name: Auto Convert CSV Files (DISABLED)
+
+on:
+  # DISABLED - Only run manually for now
+  # push:
+  #   paths:
+  #     - 'data/*.csv'
+  #   branches: [main]
+  workflow_dispatch:
+
+jobs:
+  convert:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    
+    - name: Convert Live Data CSV to data.js
+      run: |
+        if [ -f "data/Live_Data_-_Current.csv" ]; then
+          python convert_csv_to_datajs.py data/Live_Data_-_Current.csv js/data.js
+          echo "Converted Live_Data_-_Current.csv to data.js"
+        fi
+    
+    - name: Commit and push changes
+      run: |
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "GitHub Actions"
+        
+        git add js/data.js
+        
+        if git diff --staged --quiet; then
+          echo "No changes to commit"
+        else
+          git commit -m "Auto-convert CSV files [skip ci]"
+          git push
+        fi

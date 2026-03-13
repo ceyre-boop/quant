@@ -1,0 +1,23 @@
+{
+  "current_version": "v1.0",
+  "models": [
+    {
+      "version": "v1.0",
+      "path": "bias_engine_v1.0.pkl",
+      "trained_at": "2026-03-13",
+      "commit": "0e1b62b",
+      "metrics": {
+        "sharpe": null,
+        "win_rate": null,
+        "accuracy": null,
+        "note": "Initial deployment - awaiting paper trading data"
+      },
+      "status": "active"
+    }
+  ],
+  "registry_info": {
+    "description": "Model version registry for Clawd Trading bias engine",
+    "update_command": "python -m meta_evaluator.refit_scheduler --register-model",
+    "evaluation_command": "python -m backtest.backtest_runner --evaluate-model"
+  }
+}

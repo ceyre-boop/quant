@@ -1,0 +1,164 @@
+name: Nightly Model Retraining
+
+on:
+  schedule:
+    - cron: '0 7 * * 1-5'  # 7 AM EST Mon-Fri (2 AM PST)
+  workflow_dispatch:  # Manual trigger
+
+jobs:
+  retrain:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Full history for model comparison
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install xgboost shap scikit-learn pandas numpy
+    
+    - name: Fetch latest data
+      env:
+        POLYGON_API_KEY: ${{ secrets.POLYGON_API_KEY }}
+      run: |
+        python -c "
+        from data.pipeline import DataPipeline
+        pipeline = DataPipeline()
+        results = pipeline.run_premarket(['NAS100', 'US30', 'SPX500'])
+        print(f'Fetched data for {len(results)} symbols')
+        "
+    
+    - name: Run meta-evaluator
+      run: |
+        python -m meta_evaluator.refit_scheduler --check-drift --auto-report
+    
+    - name: Evaluate if retraining needed
+      id: check_drift
+      run: |
+        python -c "
+        import json
+        from meta_evaluator.analyzer import PerformanceAnalyzer
+        
+        analyzer = PerformanceAnalyzer()
+        drift_report = analyzer.check_feature_drift()
+        
+        needs_refit = drift_report.get('needs_refit', False)
+        print(f'Drift detected: {needs_refit}')
+        
+        with open('needs_refit.json', 'w') as f:
+            json.dump({'needs_refit': needs_refit}, f)
+        "
+    
+    - name: Train new model (if needed)
+      if: fromJSON(steps.check_drift.outputs.needs_refit)
+      run: |
+        echo "Retraining model due to drift detection..."
+        python -m layer1.train_model --output models/bias_engine_temp.pkl
+        
+    - name: Evaluate new model
+      if: fromJSON(steps.check_drift.outputs.needs_refit)
+      run: |
+        python -m backtest.backtest_runner \
+          --model models/bias_engine_temp.pkl \
+          --start 2025-01-01 \
+          --end 2026-03-01 \
+          --output evaluation_report.json
+    
+    - name: Compare performance
+      if: fromJSON(steps.check_drift.outputs.needs_refit)
+      id: compare
+      run: |
+        python -c "
+        import json
+        
+        # Load evaluation report
+        with open('evaluation_report.json', 'r') as f:
+            report = json.load(f)
+        
+        # Get current model metrics
+        with open('models/registry.json', 'r') as f:
+            registry = json.load(f)
+        
+        current_metrics = registry['models'][-1].get('metrics', {})
+        new_metrics = report.get('metrics', {})
+        
+        # Compare Sharpe ratios
+        current_sharpe = current_metrics.get('sharpe', 0)
+        new_sharpe = new_metrics.get('sharpe', 0)
+        
+        improved = new_sharpe > current_sharpe * 1.05  # 5% improvement threshold
+        
+        print(f'Current Sharpe: {current_sharpe:.2f}')
+        print(f'New Sharpe: {new_sharpe:.2f}')
+        print(f'Improved: {improved}')
+        
+        with open('improved.json', 'w') as f:
+            json.dump({'improved': improved, 'new_sharpe': new_sharpe}, f)
+        "
+    
+    - name: Commit new model (if improved)
+      if: fromJSON(steps.compare.outputs.improved)
+      run: |
+        # Move temp model to versioned file
+        VERSION="v$(date +%Y%m%d)"
+        mv models/bias_engine_temp.pkl models/bias_engine_${VERSION}.pkl
+        
+        # Update registry
+        python -c "
+        import json
+        from datetime import datetime
+        
+        with open('evaluation_report.json', 'r') as f:
+            report = json.load(f)
+        
+        with open('models/registry.json', 'r') as f:
+            registry = json.load(f)
+        
+        # Archive current model
+        for model in registry['models']:
+            model['status'] = 'archived'
+        
+        # Add new model
+        version = '${{ steps.date.outputs.version }}'
+        new_model = {
+            'version': version,
+            'path': f'models/bias_engine_{version}.pkl',
+            'trained_at': datetime.now().strftime('%Y-%m-%d'),
+            'commit': '${{ github.sha }}',
+            'metrics': report.get('metrics', {}),
+            'status': 'active'
+        }
+        
+        registry['models'].append(new_model)
+        registry['current_version'] = version
+        
+        with open('models/registry.json', 'w') as f:
+            json.dump(registry, f, indent=2)
+        "
+        
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add models/
+        git commit -m "model: auto-retrained $(date +%Y-%m-%d) - Sharpe: $(python -c \"import json; print(json.load(open('evaluation_report.json'))['metrics']['sharpe'])\")"
+        git push
+    
+    - name: Upload evaluation report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: evaluation-report
+        path: evaluation_report.json
+    
+    - name: Send notification
+      if: always()
+      run: |
+        echo "Model retraining cycle complete"
+        echo "Check evaluation report in artifacts"
