@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Clawd Trading</title>
+    <style>
+        body { font-family: sans-serif; background: #1a1a2e; color: #fff; margin: 0; }
+        .topbar { background: #0d0d1a; padding: 15px 25px; display: flex; align-items: center; }
+        .logo { color: #a5b4fc; font-weight: bold; font-size: 18px; }
+        .main { padding: 30px; }
+        .card { background: #252542; border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+        .metric { display: inline-block; background: #1a1a2e; padding: 15px 25px; border-radius: 6px; margin-right: 15px; }
+        .metric-label { font-size: 12px; color: #888; }
+        .metric-value { font-size: 28px; font-weight: bold; color: #3fb950; }
+        .up { color: #3fb950; } .down { color: #f85149; }
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <div class="logo">CLAWD_TRADING</div>
+    </div>
+    <div class="main">
+        <div class="card">
+            <h2>Live Trading State</h2>
+            <div class="metric">
+                <div class="metric-label">Direction</div>
+                <div class="metric-value up">LONG</div>
+            </div>
+            <div class="metric">
+                <div class="metric-label">Confidence</div>
+                <div class="metric-value">71%</div>
+            </div>
+            <div class="metric">
+                <div class="metric-label">P&L Today</div>
+                <div class="metric-value up">+$312</div>
+            </div>
+        </div>
+        <div class="card">
+            <h3>Dashboard Connected!</h3>
+            <p>Edit <code>dashboard/index.html</code> to customize.</p>
+            <p>Workflow will auto-deploy on push.</p>
+        </div>
+    </div>
+</body>
+</html>
