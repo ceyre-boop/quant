@@ -1,8 +1,10 @@
 """
 Firebase Demo Publisher
 Pushes sample trading data to Firebase Realtime DB
+Can run locally or in GitHub Actions
 """
 import json
+import os
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -17,26 +19,42 @@ except ImportError:
     subprocess.check_call([sys.executable, "-m", "pip", "install", "firebase-admin", "-q"])
     from firebase_admin import credentials, initialize_app, db
 
-# Initialize Firebase (uses default credentials or env vars)
+
 def init_firebase():
+    """Initialize Firebase with service account from env or file"""
     try:
-        # Try to initialize with default (works in Cloud Functions)
-        initialize_app(options={
+        # Try to get credentials from environment variable
+        cred_json = os.environ.get('FIREBASE_SERVICE_ACCOUNT')
+        cred_path = os.environ.get('GOOGLE_APPLICATION_CREDENTIALS')
+        
+        if cred_json:
+            # Parse JSON from env var
+            cred_dict = json.loads(cred_json)
+            cred = credentials.Certificate(cred_dict)
+        elif cred_path and Path(cred_path).exists():
+            # Load from file path
+            cred = credentials.Certificate(cred_path)
+        else:
+            # Try to use default (Cloud Functions / App Engine)
+            cred = None
+            
+        initialize_app(cred, options={
             'databaseURL': 'https://clawd-trading-7b8de-default-rtdb.firebaseio.com'
         })
         print("✅ Firebase initialized")
+        return True
+        
     except Exception as e:
-        print(f"Firebase init error: {e}")
-        print("Make sure you have FIREBASE_SERVICE_ACCOUNT env var set")
+        print(f"❌ Firebase init error: {e}")
+        print("Make sure FIREBASE_SERVICE_ACCOUNT env var is set")
         return False
-    return True
+
 
 def push_demo_data():
     """Push demo trading state to Firebase"""
     
     timestamp = datetime.now(timezone.utc).isoformat()
     
-    # Three-layer state
     state = {
         "bias": {
             "direction": 1,
@@ -127,9 +145,9 @@ def push_demo_data():
     # Push to Firebase
     ref = db.reference('trading_state')
     ref.set(state)
-    print(f"✅ Data pushed at {timestamp}")
+    print(f"✅ Trading state pushed at {timestamp}")
     
-    # Also push session_controls
+    # Push session controls
     controls_ref = db.reference('session_controls')
     controls_ref.set({
         "trading_enabled": True,
@@ -140,18 +158,36 @@ def push_demo_data():
     })
     print("✅ Controls pushed")
     
+    # Push liquidity map
+    liquidity_ref = db.reference('liquidity_map/NAS100')
+    liquidity_data = {}
+    for pool in state["liquidity_pools"]:
+        if pool["type"] != "price":
+            liquidity_data[f"price_{int(pool['price'])}"] = pool["prob"]
+    liquidity_ref.set(liquidity_data)
+    print("✅ Liquidity map pushed")
+    
+    # Push signal to history
+    signal_id = f"NAS100_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}"
+    signal_ref = db.reference(f'signals_history/{signal_id}')
+    signal_ref.set(state["signals"][0])
+    print(f"✅ Signal archived: {signal_id}")
+    
     return True
+
 
 if __name__ == "__main__":
     print("="*60)
-    print("CLAWD TRADING - FIREBASE DEMO PUBLISHER")
+    print("CLAWD TRADING - FIREBASE PUBLISHER")
     print("="*60)
     
     if init_firebase():
         if push_demo_data():
             print("\n✅ All data published to Firebase!")
-            print("Dashboard should now show live data")
+            print("Dashboard should show live data now")
         else:
             print("\n❌ Failed to push data")
+            sys.exit(1)
     else:
         print("\n❌ Firebase not initialized")
+        sys.exit(1)
