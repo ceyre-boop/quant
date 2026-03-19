@@ -6,6 +6,17 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+URGENCY_LEVELS = {
+    'LOW': 1,
+    'MEDIUM': 2,
+    'HIGH': 3,
+}
+
+
+def _max_urgency(a: str, b: str) -> str:
+    """Return the more severe urgency between two values."""
+    return a if URGENCY_LEVELS.get(a, 0) >= URGENCY_LEVELS.get(b, 0) else b
+
 
 class RefitScheduler:
     """Schedule and track model retraining based on performance metrics."""
@@ -45,7 +56,7 @@ class RefitScheduler:
         sharpe = performance_metrics.get('sharpe', 0)
         if sharpe < self.sharpe_threshold:
             reasons.append(f"Sharpe {sharpe:.2f} below threshold {self.sharpe_threshold:.2f}")
-            urgency = max(urgency, 'MEDIUM')
+            urgency = _max_urgency(urgency, 'MEDIUM')
         
         # Check feature drift
         if drift_detected:
@@ -67,7 +78,7 @@ class RefitScheduler:
             days_since = (datetime.now() - self.last_refit).days
             if days_since >= self.max_days_between_refits:
                 reasons.append(f"{days_since} days since last refit (max: {self.max_days_between_refits})")
-                urgency = max(urgency, 'MEDIUM')
+                urgency = _max_urgency(urgency, 'MEDIUM')
         
         should_refit = len(reasons) > 0 and urgency in ['HIGH', 'MEDIUM']
         
@@ -118,7 +129,7 @@ class RefitScheduler:
             'model_version': model_version,
             'scheduled_time': scheduled_time.isoformat(),
             'reasons': evaluation_result['reasons'],
-            'urgency': evaluation_result['urgency'],
+            'urgency': evaluation_result.get('urgency', 'MEDIUM'),
             'estimated_duration_minutes': 30,
             'status': 'PENDING'
         }

@@ -69,10 +69,10 @@ class WeeklyAnalyzer:
 class FeatureGroupTracker:
     """Track feature importance and detect drift."""
     
-    def __init__(self):
+    def __init__(self, drift_threshold: float = 0.2):
         self.baseline_importance = {}
         self.current_importance = {}
-        self.drift_threshold = 0.2  # 20% change triggers alert
+        self.drift_threshold = drift_threshold
     
     def set_baseline(self, feature_importance: Dict[str, float]):
         """Set baseline feature importance from training."""
@@ -91,6 +91,14 @@ class FeatureGroupTracker:
         """
         if not self.baseline_importance:
             return {'status': 'NO_BASELINE', 'drift_detected': False}
+
+        if not self.current_importance:
+            return {
+                'status': 'NO_DATA',
+                'drift_detected': False,
+                'feature_details': [],
+                'feature_drifts': []
+            }
         
         drift_report = {
             'timestamp': datetime.now().isoformat(),
@@ -115,8 +123,12 @@ class FeatureGroupTracker:
                     })
         
         if drift_report['drift_detected']:
-            drift_report['status'] = 'DRIFT_DETECTED'
+            high_count = sum(1 for d in drift_report['feature_drifts'] if d['severity'] == 'HIGH')
+            drift_report['status'] = 'CRITICAL' if high_count > 0 else 'WARNING'
             logger.warning(f"Feature drift detected in {len(drift_report['feature_drifts'])} groups")
+
+        # Backward-compatible alias expected by tests/older callers.
+        drift_report['feature_details'] = drift_report['feature_drifts']
         
         return drift_report
     
@@ -127,10 +139,10 @@ class FeatureGroupTracker:
             key=lambda x: x[1],
             reverse=True
         )
-        return [
-            {'feature_group': name, 'importance': round(val, 4)}
-            for name, val in sorted_features[:n]
-        ]
+        ranked = []
+        for idx, (name, val) in enumerate(sorted_features[:n], start=1):
+            ranked.append({'rank': idx, 'feature_group': name, 'importance': round(val, 4)})
+        return ranked
 
 
 class RefitScheduler:
