@@ -310,6 +310,200 @@ class FirebaseBroadcaster:
         except Exception as e:
             logger.error(f"Failed to clear signal for {symbol}: {e}")
     
+    def broadcast_features(
+        self,
+        symbol: str,
+        features: Dict[str, Any],
+        layer: str = 'all'
+    ):
+        """Broadcast feature values for monitoring.
+        
+        Path: `/features/{symbol}/`
+        
+        Args:
+            symbol: Trading symbol
+            features: Dict of feature_name -> value
+            layer: Which layer ('layer1', 'layer2', 'layer3', or 'all')
+        """
+        try:
+            feature_data = {
+                'timestamp': datetime.now(timezone.utc).isoformat(),
+                'symbol': symbol,
+                'layer': layer,
+                'values': {k: round(v, 6) if isinstance(v, float) else v 
+                          for k, v in features.items()}
+            }
+            
+            # Push to features path
+            self.client.rtdb_update(f'/features/{symbol}/current', feature_data)
+            
+            # Also push to history (limited)
+            self.client.rtdb_push(f'/features/{symbol}/history', feature_data)
+            
+            logger.debug(f"Broadcast features for {symbol}: {len(features)} features")
+            
+        except Exception as e:
+            logger.error(f"Failed to broadcast features for {symbol}: {e}")
+    
+    def broadcast_explainability(
+        self,
+        symbol: str,
+        model_name: str,
+        prediction: float,
+        shap_values: Optional[Dict[str, float]] = None,
+        feature_importance: Optional[Dict[str, float]] = None,
+        top_positive: Optional[List[str]] = None,
+        top_negative: Optional[List[str]] = None
+    ):
+        """Broadcast model explainability data (SHAP values).
+        
+        Path: `/explainability/{symbol}/`
+        
+        Args:
+            symbol: Trading symbol
+            model_name: Name of the model (e.g., 'bias_engine')
+            prediction: Model prediction value
+            shap_values: SHAP values per feature
+            feature_importance: Feature importance scores
+            top_positive: Top features pushing prediction up
+            top_negative: Top features pushing prediction down
+        """
+        try:
+            explain_data = {
+                'timestamp': datetime.now(timezone.utc).isoformat(),
+                'symbol': symbol,
+                'model': model_name,
+                'prediction': round(prediction, 4),
+                'shap_values': shap_values or {},
+                'feature_importance': feature_importance or {},
+                'top_positive_features': top_positive or [],
+                'top_negative_features': top_negative or [],
+                'summary': self._create_shap_summary(
+                    shap_values, top_positive, top_negative
+                )
+            }
+            
+            self.client.rtdb_update(f'/explainability/{symbol}/current', explain_data)
+            self.client.rtdb_push(f'/explainability/{symbol}/history', explain_data)
+            
+            logger.debug(f"Broadcast explainability for {symbol}: {model_name}")
+            
+        except Exception as e:
+            logger.error(f"Failed to broadcast explainability for {symbol}: {e}")
+    
+    def _create_shap_summary(
+        self,
+        shap_values: Optional[Dict[str, float]],
+        top_positive: Optional[List[str]],
+        top_negative: Optional[List[str]]
+    ) -> str:
+        """Create human-readable SHAP summary."""
+        if not top_positive and not top_negative:
+            return "No significant feature influence"
+        
+        parts = []
+        if top_positive:
+            parts.append(f"Bullish factors: {', '.join(top_positive[:3])}")
+        if top_negative:
+            parts.append(f"Bearish factors: {', '.join(top_negative[:3])}")
+        
+        return " | ".join(parts)
+    
+    def broadcast_market_state(
+        self,
+        symbol: str,
+        regime: int,
+        vix: float,
+        liquidity_score: float,
+        momentum_score: float,
+        correlation_regime: str = 'normal'
+    ):
+        """Broadcast comprehensive market state.
+        
+        Path: `/market_state/{symbol}/`
+        
+        Args:
+            symbol: Trading symbol
+            regime: Volatility regime (1-5)
+            vix: VIX level
+            liquidity_score: 0-1 liquidity measure
+            momentum_score: -1 to 1 momentum
+            correlation_regime: Correlation state
+        """
+        try:
+            state_data = {
+                'timestamp': datetime.now(timezone.utc).isoformat(),
+                'symbol': symbol,
+                'volatility_regime': regime,
+                'regime_label': self._regime_label(regime),
+                'vix': round(vix, 2),
+                'liquidity_score': round(liquidity_score, 4),
+                'momentum_score': round(momentum_score, 4),
+                'correlation_regime': correlation_regime,
+                'trading_conditions': self._assess_conditions(
+                    regime, vix, liquidity_score
+                )
+            }
+            
+            self.client.rtdb_update(f'/market_state/{symbol}', state_data)
+            
+            logger.debug(f"Broadcast market state for {symbol}")
+            
+        except Exception as e:
+            logger.error(f"Failed to broadcast market state for {symbol}: {e}")
+    
+    def _regime_label(self, regime: int) -> str:
+        """Convert regime number to label."""
+        labels = {
+            1: 'EXTREME_FEAR',
+            2: 'FEAR',
+            3: 'NORMAL',
+            4: 'GREED',
+            5: 'EXTREME_GREED'
+        }
+        return labels.get(regime, 'UNKNOWN')
+    
+    def _assess_conditions(
+        self,
+        regime: int,
+        vix: float,
+        liquidity: float
+    ) -> str:
+        """Assess overall trading conditions."""
+        if regime <= 1 or vix > 30:
+            return 'HIGH_RISK'
+        if liquidity < 0.3:
+            return 'LOW_LIQUIDITY'
+        if regime >= 4:
+            return 'FAVORABLE'
+        return 'NORMAL'
+    
+    def broadcast_performance_snapshot(
+        self,
+        daily_pnl: float,
+        open_positions: int,
+        win_rate: float,
+        sharpe: float
+    ):
+        """Broadcast quick performance snapshot.
+        
+        Path: `/performance/snapshot/`
+        """
+        try:
+            snapshot = {
+                'timestamp': datetime.now(timezone.utc).isoformat(),
+                'daily_pnl': round(daily_pnl, 2),
+                'open_positions': open_positions,
+                'win_rate': round(win_rate, 3),
+                'sharpe_ratio': round(sharpe, 2),
+                'status': 'profitable' if daily_pnl > 0 else 'unprofitable' if daily_pnl < 0 else 'flat'
+            }
+            
+            self.client.rtdb_update('/performance/snapshot', snapshot)
+            
+        except Exception as e:
+            logger.error(f"Failed to broadcast performance snapshot: {e}")
+    
     def initialize_ui_state(self, symbols: List[str]):
         """Initialize UI state for all symbols.
         
@@ -323,6 +517,9 @@ class FirebaseBroadcaster:
         # Set session controls
         self.broadcast_session_control(trading_enabled=True, hard_logic_status='ACTIVE')
         
+        # Initialize system controls (guardrails)
+        self._initialize_guardrails()
+        
         # Initialize live state for each symbol
         for symbol in symbols:
             self.broadcast_live_state(symbol)
@@ -331,3 +528,24 @@ class FirebaseBroadcaster:
         self.broadcast_regime_state(vol_regime=2)  # NORMAL
         
         logger.info("UI state initialized")
+    
+    def _initialize_guardrails(self):
+        """Initialize default guardrail values in Firebase."""
+        try:
+            guardrail_defaults = {
+                'trading_enabled': True,
+                'emergency_stop': False,
+                'max_daily_loss': 2000.0,
+                'max_position_size': 5.0,
+                'max_positions_per_symbol': 1,
+                'allowed_symbols': ['NQ', 'ES', 'BTC'],
+                'max_trades_per_day': 10,
+                'risk_per_trade_pct': 1.0,
+                'last_updated': datetime.now(timezone.utc).isoformat()
+            }
+            
+            self.client.rtdb_update('/system_controls', guardrail_defaults)
+            logger.info("Guardrail defaults initialized")
+            
+        except Exception as e:
+            logger.error(f"Failed to initialize guardrails: {e}")
