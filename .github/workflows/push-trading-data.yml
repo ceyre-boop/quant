@@ -1,0 +1,39 @@
+name: Auto Push Trading Data to Firebase
+
+on:
+  schedule:
+    # Every 5 minutes during market hours (9:30-16:00 EST, Mon-Fri)
+    - cron: '*/5 13-20 * * 1-5'  # 13:00-20:00 UTC = 9:00-16:00 EDT
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  push-trading-data:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        
+    - name: Install dependencies
+      run: |
+        pip install firebase-admin
+        
+    - name: Create Firebase credentials
+      run: |
+        echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' > serviceAccountKey.json
+        
+    - name: Push trading data to Firebase
+      env:
+        GOOGLE_APPLICATION_CREDENTIALS: serviceAccountKey.json
+      run: |
+        python clawd_trading/examples/publish_to_firebase.py
+        
+    - name: Clean up credentials
+      if: always()
+      run: |
+        rm -f serviceAccountKey.json

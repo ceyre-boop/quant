@@ -1,0 +1,59 @@
+name: Weekly Performance Report
+
+on:
+  schedule:
+    # Friday at 5:00 PM EST (22:00 UTC)
+    - cron: '0 22 * * 5'
+  workflow_dispatch:
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        
+    - name: Install dependencies
+      run: |
+        pip install -r clawd_trading/requirements.txt
+        pip install firebase-admin matplotlib pandas
+        
+    - name: Create Firebase credentials
+      run: |
+        echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' > serviceAccountKey.json
+        
+    - name: Run meta-evaluator and generate report
+      env:
+        GOOGLE_APPLICATION_CREDENTIALS: serviceAccountKey.json
+        POLYGON_API_KEY: ${{ secrets.POLYGON_API_KEY }}
+      run: |
+        cd clawd_trading
+        python meta_evaluator/performance_monitor.py --weeks 1 --output weekly_report.json
+        python -c "
+import json
+with open('weekly_report.json') as f:
+    report = json.load(f)
+print('## Weekly Performance Report')
+print(f\"Week ending: {report.get('week_ending', 'N/A')}\")
+print(f\"Total P&L: ${report.get('total_pnl', 0):,.2f}\")
+print(f\"Win Rate: {report.get('win_rate', 0)*100:.1f}%\")
+print(f\"Sharpe Ratio: {report.get('sharpe', 0):.2f}\")
+print(f\"Max Drawdown: {report.get('max_drawdown', 0)*100:.1f}%\")
+"
+        
+    - name: Upload report artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: weekly-report
+        path: clawd_trading/weekly_report.json
+        
+    - name: Clean up credentials
+      if: always()
+      run: |
+        rm -f serviceAccountKey.json
