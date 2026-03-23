@@ -1,0 +1,2 @@
+web: gunicorn --bind 0.0.0.0:$PORT --workers 1 --threads 4 main:app
+worker: python main.py
