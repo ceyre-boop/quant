@@ -1,901 +1,436 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Clawd Trading — Live Dashboard</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js";
-window._fb = { initializeApp, getDatabase, ref, onValue };
-</script>
-<style>
-  :root {
-    --accent: #1a73e8;
-    --accent-muted: #e8f0fe;
-    --green: #1e8e3e;
-    --green-bg: #e6f4ea;
-    --red: #c5221f;
-    --red-bg: #fce8e6;
-    --amber: #b06000;
-    --amber-bg: #fef3e2;
-    --border: #e0e0e0;
-    --muted: #5f6368;
-    --surface: #f8f9fa;
-    --card-bg: #ffffff;
-    --text: #202124;
-    --mono: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', monospace;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: #f1f3f4;
-    color: var(--text);
-    font-size: 14px;
-    line-height: 1.5;
-  }
-
-  .topbar {
-    background: #1a1a2e;
-    color: #e8eaf6;
-    padding: 0 24px;
-    height: 52px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    border-bottom: 1px solid #2d2d4a;
-  }
-  .topbar-logo {
-    font-size: 16px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    color: #a5b4fc;
-    font-family: var(--mono);
-  }
-  .topbar-status {
-    margin-left: auto;
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    font-size: 12px;
-    color: #9e9eb5;
-  }
-  .status-dot {
-    width: 7px; height: 7px;
-    border-radius: 50%;
-    background: #34a853;
-    display: inline-block;
-    margin-right: 5px;
-    animation: pulse 2s ease-in-out infinite;
-  }
-  .status-dot.error { background: var(--red); animation: none; }
-  .status-dot.offline { background: #9e9eb5; animation: none; }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-
-  .shell { display: grid; grid-template-columns: 220px 1fr; min-height: calc(100vh - 52px); }
-
-  .sidebar {
-    background: #1a1a2e;
-    padding: 20px 0;
-    border-right: 1px solid #2d2d4a;
-  }
-  .nav-item {
-    display: flex; align-items: center; gap: 10px;
-    padding: 10px 20px;
-    font-size: 13px;
-    color: #9e9eb5;
-    cursor: pointer;
-    transition: background 0.15s, color 0.15s;
-    border-left: 3px solid transparent;
-  }
-  .nav-item:hover { background: #252542; color: #c5cae9; }
-  .nav-item.active { background: #252542; color: #a5b4fc; border-left-color: #a5b4fc; }
-  .nav-icon { font-size: 16px; width: 20px; text-align: center; }
-  .nav-section {
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 1.2px;
-    color: #454563;
-    padding: 16px 20px 6px;
-    text-transform: uppercase;
-  }
-
-  .main { padding: 24px; overflow-y: auto; }
-  .page { display: none; }
-  .page.active { display: block; }
-  .page-title {
-    font-size: 20px;
-    font-weight: 600;
-    color: var(--text);
-    margin-bottom: 20px;
-  }
-
-  .card {
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 16px 20px;
-    margin-bottom: 16px;
-  }
-  .card-title {
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 0.8px;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 14px;
-  }
-  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
-  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-
-  .metric {
-    background: var(--surface);
-    border-radius: 6px;
-    padding: 12px 16px;
-  }
-  .metric-label { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
-  .metric-value { font-size: 22px; font-weight: 600; font-family: var(--mono); }
-  .metric-sub { font-size: 11px; color: var(--muted); margin-top: 3px; }
-  .up { color: var(--green); }
-  .down { color: var(--red); }
-  .neutral { color: var(--muted); }
-
-  .badge {
-    display: inline-block;
-    font-size: 11px;
-    font-weight: 600;
-    padding: 2px 8px;
-    border-radius: 12px;
-    letter-spacing: 0.3px;
-  }
-  .badge-long { background: var(--green-bg); color: var(--green); }
-  .badge-short { background: var(--red-bg); color: var(--red); }
-  .badge-neutral { background: var(--surface); color: var(--muted); border: 1px solid var(--border); }
-  .badge-info { background: var(--accent-muted); color: var(--accent); }
-  .badge-warn { background: var(--amber-bg); color: var(--amber); }
-
-  .conf-bar-track {
-    background: var(--surface);
-    border-radius: 4px;
-    height: 6px;
-    width: 100%;
-    overflow: hidden;
-    margin-top: 4px;
-  }
-  .conf-bar-fill {
-    height: 100%;
-    border-radius: 4px;
-    background: var(--accent);
-    transition: width 0.4s ease;
-  }
-
-  .heatmap-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 4px;
-    font-size: 12px;
-  }
-  .heatmap-label { width: 70px; text-align: right; font-family: var(--mono); color: var(--muted); }
-  .heatmap-bar-track { flex: 1; height: 18px; background: var(--surface); border-radius: 3px; overflow: hidden; position: relative; }
-  .heatmap-bar { height: 100%; border-radius: 3px; display: flex; align-items: center; padding-left: 6px; font-size: 11px; font-weight: 600; transition: width 0.5s ease; }
-  .heatmap-pct { width: 38px; text-align: right; font-family: var(--mono); color: var(--muted); }
-  .pool-highs { background: rgba(197,34,31,0.15); color: var(--red); }
-  .pool-lows  { background: rgba(30,142,62,0.15); color: var(--green); }
-  .current-price-line {
-    position: relative;
-    display: flex; align-items: center; gap: 8px;
-    margin: 8px 0;
-    font-size: 11px; color: var(--muted); font-style: italic;
-  }
-  .current-price-line::before {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: repeating-linear-gradient(90deg, var(--accent) 0px, var(--accent) 4px, transparent 4px, transparent 8px);
-  }
-  .current-price-line::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: repeating-linear-gradient(90deg, var(--accent) 0px, var(--accent) 4px, transparent 4px, transparent 8px);
-  }
-
-  table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  th { text-align: left; font-size: 11px; font-weight: 600; letter-spacing: 0.5px; color: var(--muted); text-transform: uppercase; padding: 8px 12px; border-bottom: 1px solid var(--border); }
-  td { padding: 9px 12px; border-bottom: 1px solid #f0f0f0; }
-  tr:hover td { background: #fafafa; }
-  .outcome-win { color: var(--green); font-weight: 600; }
-  .outcome-loss { color: var(--red); font-weight: 600; }
-  .outcome-open { color: var(--amber); font-style: italic; }
-
-  .form-row { display: flex; gap: 12px; align-items: flex-end; margin-bottom: 12px; flex-wrap: wrap; }
-  .form-group { display: flex; flex-direction: column; gap: 4px; }
-  .form-group label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
-  input[type=text], input[type=date], select {
-    height: 34px;
-    padding: 0 10px;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    font-size: 13px;
-    color: var(--text);
-    background: var(--card-bg);
-    outline: none;
-  }
-  input[type=text]:focus, input[type=date]:focus, select:focus { border-color: var(--accent); }
-  input[type=range] { width: 160px; accent-color: var(--accent); }
-  .btn {
-    height: 34px;
-    padding: 0 18px;
-    border: none;
-    border-radius: 6px;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: opacity 0.15s, transform 0.1s;
-  }
-  .btn:active { transform: scale(0.97); }
-  .btn-primary { background: var(--accent); color: white; }
-  .btn-primary:hover { opacity: 0.9; }
-  .btn-secondary { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
-  .btn-secondary:hover { background: #ebebeb; }
-  .btn-danger { background: var(--red-bg); color: var(--red); border: 1px solid #f5c6c5; }
-
-  .terminal {
-    background: #0d1117;
-    border-radius: 6px;
-    padding: 14px 16px;
-    font-family: var(--mono);
-    font-size: 12px;
-    color: #58a6ff;
-    max-height: 220px;
-    overflow-y: auto;
-    line-height: 1.7;
-  }
-  .log-ok { color: #3fb950; }
-  .log-warn { color: #d29922; }
-  .log-err { color: #f85149; }
-  .log-info { color: #58a6ff; }
-  .log-muted { color: #6e7681; }
-
-  .model-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f0f0f0; }
-  .model-row:last-child { border-bottom: none; }
-  .model-key { font-size: 12px; color: var(--muted); }
-  .model-val { font-size: 13px; font-weight: 500; font-family: var(--mono); }
-
-  .layer-block {
-    background: var(--surface);
-    border-radius: 6px;
-    padding: 12px 16px;
-    margin-bottom: 8px;
-  }
-  .layer-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-  .layer-name { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
-  .layer-value { font-size: 13px; font-weight: 500; }
-  .layer-detail { font-size: 11px; color: var(--muted); line-height: 1.6; }
-
-  .feat-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-  .feat-name { width: 140px; font-size: 12px; color: var(--muted); }
-  .feat-track { flex: 1; height: 14px; background: var(--surface); border-radius: 3px; overflow: hidden; }
-  .feat-fill { height: 100%; background: var(--accent); border-radius: 3px; }
-  .feat-pct { width: 36px; text-align: right; font-size: 11px; font-family: var(--mono); color: var(--muted); }
-
-  .config-banner {
-    background: var(--amber-bg);
-    border: 1px solid #f9a825;
-    border-radius: 6px;
-    padding: 10px 16px;
-    font-size: 12px;
-    color: var(--amber);
-    margin-bottom: 16px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .config-banner code {
-    background: rgba(0,0,0,0.08);
-    padding: 1px 5px;
-    border-radius: 3px;
-    font-family: var(--mono);
-    font-size: 11px;
-  }
-
-  .chart-wrap { position: relative; height: 200px; }
-  .chart-wrap canvas { max-height: 200px; }
-  
-  .connection-error {
-    background: var(--red-bg);
-    border: 1px solid var(--red);
-    border-radius: 6px;
-    padding: 12px 16px;
-    margin-bottom: 16px;
-    color: var(--red);
-    font-size: 13px;
-  }
-  
-  .loading {
-    color: var(--muted);
-    font-style: italic;
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Colin's Command Center</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0a0f;
+            --surface: #13131a;
+            --surface-2: #1a1a25;
+            --border: #2a2a3a;
+            --text: #f0f0f5;
+            --text-muted: #6b6b7b;
+            --accent: #6366f1;
+            --accent-light: #818cf8;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--surface) 0%, var(--surface-2) 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 24px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-light), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .header-meta {
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 24px;
+        }
+        
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            transition: all 0.2s ease;
+        }
+        .card:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        .card-icon.taboost { background: rgba(255, 0, 68, 0.1); color: #ff0044; }
+        .card-icon.quant { background: rgba(99, 102, 241, 0.1); color: var(--accent-light); }
+        .card-icon.shop { background: rgba(34, 197, 94, 0.1); color: var(--success); }
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        .card-subtitle {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .status-badge.online { background: rgba(34, 197, 94, 0.1); color: var(--success); }
+        .status-badge.offline { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
+        .status-badge.checking { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+        .status-dot.pulse { animation: pulse 2s ease-in-out infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+        
+        .link-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .link-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: var(--surface-2);
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--text);
+            font-size: 14px;
+            transition: background 0.15s;
+        }
+        .link-item:hover {
+            background: var(--border);
+        }
+        .link-item span:first-child { display: flex; align-items: center; gap: 10px; }
+        .link-arrow { color: var(--text-muted); }
+        
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-top: 24px;
+        }
+        .btn {
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--surface-2);
+            color: var(--text);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn:hover {
+            border-color: var(--accent);
+            background: var(--surface);
+        }
+        .btn-primary {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+        .btn-primary:hover {
+            background: var(--accent-light);
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-top: 16px;
+        }
+        .info-item {
+            text-align: center;
+            padding: 16px;
+            background: var(--surface-2);
+            border-radius: 8px;
+        }
+        .info-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent-light);
+        }
+        .info-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 4px;
+        }
+        
+        .logs {
+            background: var(--surface-2);
+            border-radius: 8px;
+            padding: 16px;
+            font-family: 'SF Mono', monospace;
+            font-size: 12px;
+            line-height: 1.8;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 16px;
+        }
+        .log-entry { display: flex; gap: 12px; }
+        .log-time { color: var(--text-muted); }
+        .log-info { color: var(--accent-light); }
+        .log-success { color: var(--success); }
+        .log-warning { color: var(--warning); }
+        .log-error { color: var(--danger); }
+        
+        footer {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-muted);
+            font-size: 13px;
+            border-top: 1px solid var(--border);
+            margin-top: 40px;
+        }
+    </style>
 </head>
 <body>
-
-<!-- Firebase Config -->
-<script>
-const FIREBASE_CONFIG = {
-  apiKey: "AIzaSyB4kM62IkwV8n2IgRh5eI7I15dtnNCvYbc",
-  authDomain: "clawd-trading-7b8de.firebaseapp.com",
-  databaseURL: "https://clawd-trading-7b8de-default-rtdb.firebaseio.com",
-  projectId: "clawd-trading-7b8de",
-  storageBucket: "clawd-trading-7b8de.firebasestorage.app",
-  messagingSenderId: "407183241024",
-  appId: "1:407183241024:web:185f9744b9eeaaa8cc14a5"
-};
-const SYMBOL = "NAS100";
-</script>
-
-<!-- Topbar -->
-<div class="topbar">
-  <span class="topbar-logo">CLAWD_TRADING</span>
-  <span style="font-size:12px;color:#454563;font-family:var(--mono)">▸</span>
-  <span id="topbar-symbol" style="font-size:13px;color:#a5b4fc;font-family:var(--mono)">NAS100</span>
-  <div class="topbar-status">
-    <span><span class="status-dot" id="status-dot"></span><span id="topbar-mode">CONNECTING...</span></span>
-    <span id="topbar-time" style="font-family:var(--mono)"></span>
-    <span id="topbar-trading-status" class="badge badge-neutral" style="font-size:11px;">PAPER</span>
-  </div>
-</div>
-
-<div class="shell">
-  <nav class="sidebar">
-    <div class="nav-section">Live</div>
-    <div class="nav-item active" data-page="live"><span class="nav-icon">◉</span> Live State</div>
-    <div class="nav-item" data-page="liquidity"><span class="nav-icon">≋</span> Liquidity Map</div>
-    <div class="nav-item" data-page="signals"><span class="nav-icon">⚡</span> Signal History</div>
-    <div class="nav-section">Research</div>
-    <div class="nav-item" data-page="backtest"><span class="nav-icon">↺</span> Backtester</div>
-    <div class="nav-item" data-page="model"><span class="nav-icon">◈</span> Model Training</div>
-    <div class="nav-item" data-page="explain"><span class="nav-icon">◇</span> Explainability</div>
-    <div class="nav-section">System</div>
-    <div class="nav-item" data-page="controls"><span class="nav-icon">⊞</span> Risk Controls</div>
-    <div class="nav-item" data-page="logs"><span class="nav-icon">≡</span> System Logs</div>
-  </nav>
-
-  <div class="main">
-    <!-- Live State Page -->
-    <div class="page active" id="page-live">
-      <div class="page-title">Live trading state</div>
-      
-      <div id="connection-error" class="connection-error" style="display:none">
-        ⚠ Connection error - Check Firebase configuration
-      </div>
-
-      <div class="grid-4" style="margin-bottom:16px;">
-        <div class="metric">
-          <div class="metric-label">Direction</div>
-          <div class="metric-value" id="m-direction">—</div>
-          <div class="metric-sub">Layer 1 bias</div>
-        </div>
-        <div class="metric">
-          <div class="metric-label">Confidence</div>
-          <div class="metric-value" id="m-confidence">—</div>
-          <div class="conf-bar-track"><div class="conf-bar-fill" id="m-conf-bar" style="width:0%"></div></div>
-        </div>
-        <div class="metric">
-          <div class="metric-label">Session P&amp;L</div>
-          <div class="metric-value" id="m-pnl">—</div>
-          <div class="metric-sub" id="m-pnl-sub">—</div>
-        </div>
-        <div class="metric">
-          <div class="metric-label">Position</div>
-          <div class="metric-value" id="m-position">FLAT</div>
-          <div class="metric-sub" id="m-position-sub">no open trade</div>
-        </div>
-      </div>
-
-      <div class="grid-2">
+    <div class="header">
         <div>
-          <div class="card">
-            <div class="card-title">Three-layer status</div>
-            <div class="layer-block" id="layer1-block">
-              <div class="layer-header">
-                <span class="layer-name">Layer 1 — AI bias engine</span>
-                <span class="badge badge-neutral" id="layer1-badge">—</span>
-              </div>
-              <div class="layer-detail" id="layer1-detail">Waiting for data...</div>
+            <h1>Colin's Command Center</h1>
+            <div class="header-meta">Project Dashboard & Deployment Hub</div>
+        </div>
+        <div class="header-meta" id="last-updated">Last updated: Now</div>
+    </div>
+    
+    <div class="container">
+        <div class="grid">
+            <!-- TABOOST Platform -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon taboost">📊</div>
+                    <div>
+                        <div class="card-title">TABOOST Platform</div>
+                        <div class="card-subtitle">Creator Management System</div>
+                    </div>
+                    <span class="status-badge online" style="margin-left: auto;">
+                        <span class="status-dot pulse"></span> LIVE
+                    </span>
+                </div>
+                
+                <div class="link-list">
+                    <a class="link-item" href="https://live.taboost.me" target="_blank">
+                        <span>🌐 Main Site</span>
+                        <span class="link-arrow">→</span>
+                    </a>
+                    <a class="link-item" href="https://live.taboost.me/creator-dashboard.html" target="_blank">
+                        <span>👤 Creator Dashboard</span>
+                        <span class="link-arrow">→</span>
+                    </a>
+                    <a class="link-item" href="https://live.taboost.me/firebase-login.html" target="_blank">
+                        <span>🔐 Login</span>
+                        <span class="link-arrow">→</span>
+                    </a>
+                    <a class="link-item" href="https://live.taboost.me/bulk-import-new.html" target="_blank">
+                        <span>⬆️ Bulk Import Tool</span>
+                        <span class="link-arrow">→</span>
+                    </a>
+                </div>
+                
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-value">826</div>
+                        <div class="info-label">Creators</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-value">Daily</div>
+                        <div class="info-label">Sync</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-value">✓</div>
+                        <div class="info-label">Status</div>
+                    </div>
+                </div>
             </div>
-            <div class="layer-block" id="layer2-block">
-              <div class="layer-header">
-                <span class="layer-name">Layer 2 — quant risk model</span>
-                <span class="badge badge-neutral" id="layer2-badge">—</span>
-              </div>
-              <div class="layer-detail" id="layer2-detail">Waiting for data...</div>
+            
+            <!-- TABOOST Shop -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon shop">🛒</div>
+                    <div>
+                        <div class="card-title">TABOOST Shop</div>
+                        <div class="card-subtitle">Product Marketplace</div>
+                    </div>
+                    <span class="status-badge online" style="margin-left: auto;">
+                        <span class="status-dot pulse"></span> LIVE
+                    </span>
+                </div>
+                
+                <div class="link-list">
+                    <a class="link-item" href="https://ceyre-boop.github.io/TABOOST-Shop/" target="_blank">
+                        <span>🌐 Shop Site</span>
+                        <span class="link-arrow">→</span>
+                    </a>
+                    <a class="link-item" href="https://github.com/ceyre-boop/TABOOST-Shop" target="_blank">
+                        <span>📁 GitHub Repo</span>
+                        <span class="link-arrow">→</span>
+                    </a>
+                </div>
+                
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-value">1000+</div>
+                        <div class="info-label">Products</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-value">Auto</div>
+                        <div class="info-label">Sync</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-value">✓</div>
+                        <div class="info-label">Status</div>
+                    </div>
+                </div>
             </div>
-            <div class="layer-block" id="layer3-block">
-              <div class="layer-header">
-                <span class="layer-name">Layer 3 — game-theoretic engine</span>
-                <span class="badge badge-neutral" id="layer3-badge">—</span>
-              </div>
-              <div class="layer-detail" id="layer3-detail">Waiting for data...</div>
+            
+            <!-- Quant Trading -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon quant">📈</div>
+                    <div>
+                        <div class="card-title">Quant Trading</div>
+                        <div class="card-subtitle">clawd_trading Dashboard</div>
+                    </div>
+                    <span class="status-badge checking" style="margin-left: auto;">
+                        <span class="status-dot pulse"></span> DEV
+                    </span>
+                </div>
+                
+                <div class="link-list">
+                    <a class="link-item" href="./clawd_trading/index.html" target="_blank">
+                        <span>📊 Trading Dashboard</span>
+                        <span class="link-arrow">→</span>
+                    </a>
+                    <a class="link-item" href="./clawd_trading/dashboard.html" target="_blank">
+                        <span>🎯 Live State View</span>
+                        <span class="link-arrow">→</span>
+                    </a>
+                    <a class="link-item" href="https://github.com/ceyre-boop/quant" target="_blank">
+                        <span>📁 GitHub Repo</span>
+                        <span class="link-arrow">→</span>
+                    </a>
+                </div>
+                
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-value">NAS100</div>
+                        <div class="info-label">Symbol</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-value">3L</div>
+                        <div class="info-label">Layers</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-value">●</div>
+                        <div class="info-label">Firebase</div>
+                    </div>
+                </div>
             </div>
-          </div>
-        </div>
-        <div>
-          <div class="card">
-            <div class="card-title">Regime snapshot</div>
-            <div id="regime-rows" style="font-size:13px;">
-              <div class="loading">Waiting for data...</div>
+            
+            <!-- Quick Actions -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon quant">⚡</div>
+                    <div>
+                        <div class="card-title">Quick Actions</div>
+                        <div class="card-subtitle">One-click operations</div>
+                    </div>
+                </div>
+                
+                <div class="quick-actions">
+                    <button class="btn btn-primary" onclick="alert('This would trigger a deployment workflow')">
+                        🚀 Deploy TABOOST
+                    </button>
+                    <button class="btn" onclick="alert('This would check data sync status')">
+                        📊 Check Sync
+                    </button>
+                    <button class="btn" onclick="alert('This would open bulk import')">
+                        ⬆️ Import Creators
+                    </button>
+                    <button class="btn" onclick="alert('This would check all site health')">
+                        🏥 Health Check
+                    </button>
+                </div>
+                
+                <div class="logs">
+                    <div class="log-entry">
+                        <span class="log-time">10:12:03</span>
+                        <span class="log-success">✓ Dashboard deployed successfully</span>
+                    </div>
+                    <div class="log-entry">
+                        <span class="log-time">10:11:45</span>
+                        <span class="log-info">ℹ Checking repository status...</span>
+                    </div>
+                    <div class="log-entry">
+                        <span class="log-time">10:11:30</span>
+                        <span class="log-info">ℹ Initializing command center</span>
+                    </div>
+                </div>
             </div>
-          </div>
-          <div class="card">
-            <div class="card-title">Session performance</div>
-            <div class="chart-wrap"><canvas id="pnl-chart"></canvas></div>
-          </div>
         </div>
-      </div>
     </div>
-
-    <!-- Liquidity Map Page -->
-    <div class="page" id="page-liquidity">
-      <div class="page-title">Liquidity pool heatmap</div>
-      <div class="card">
-        <div class="card-title">NAS100 — unswept liquidity pools</div>
-        <div style="font-size:11px;color:var(--muted);margin-bottom:14px;">
-          Bar width = draw probability. Red = buy stops above (equal highs). Green = sell stops below (equal lows).
-        </div>
-        <div id="heatmap-container">
-          <div style="color:var(--muted);font-size:13px;">Waiting for data...</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Signal History Page -->
-    <div class="page" id="page-signals">
-      <div class="page-title">Signal history</div>
-      <div class="card" style="padding:0;">
-        <table>
-          <thead>
-            <tr>
-              <th>Date / time</th>
-              <th>Direction</th>
-              <th>Confidence</th>
-              <th>Entry</th>
-              <th>Stop</th>
-              <th>TP1</th>
-              <th>EV</th>
-              <th>Outcome</th>
-            </tr>
-          </thead>
-          <tbody id="signals-tbody">
-            <tr><td colspan="8" style="color:var(--muted);padding:20px;">Waiting for data...</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Backtester Page -->
-    <div class="page" id="page-backtest">
-      <div class="page-title">Backtest runner</div>
-      <div class="card">
-        <div class="card-title">Run parameters</div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>Symbol</label>
-            <select id="bt-symbol" style="width:120px;">
-              <option>NAS100</option>
-              <option>SPY</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Start date</label>
-            <input type="date" id="bt-start" value="2024-01-01">
-          </div>
-          <div class="form-group">
-            <label>End date</label>
-            <input type="date" id="bt-end" value="2024-12-31">
-          </div>
-          <div class="form-group" style="justify-content:flex-end;">
-            <button class="btn btn-primary" onclick="runBacktest()">Run backtest</button>
-          </div>
-        </div>
-      </div>
-      <div class="card" id="bt-results" style="display:none;">
-        <div class="card-title">Results</div>
-        <div class="grid-4" style="margin-bottom:16px;">
-          <div class="metric"><div class="metric-label">Sharpe ratio</div><div class="metric-value" id="bt-sharpe">—</div></div>
-          <div class="metric"><div class="metric-label">Win rate</div><div class="metric-value" id="bt-winrate">—</div></div>
-          <div class="metric"><div class="metric-label">Max drawdown</div><div class="metric-value" id="bt-dd">—</div></div>
-          <div class="metric"><div class="metric-label">Total trades</div><div class="metric-value" id="bt-trades">—</div></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Model Training Page -->
-    <div class="page" id="page-model">
-      <div class="page-title">Model training &amp; registry</div>
-      <div class="card">
-        <div class="card-title">Current model</div>
-        <div class="model-row"><span class="model-key">Version</span><span class="model-val" id="model-ver">—</span></div>
-        <div class="model-row"><span class="model-key">OOS accuracy</span><span class="model-val" id="model-acc">—</span></div>
-        <div class="model-row"><span class="model-key">Trained at</span><span class="model-val" id="model-date">—</span></div>
-      </div>
-    </div>
-
-    <!-- Explainability Page -->
-    <div class="page" id="page-explain">
-      <div class="page-title">Feature explainability</div>
-      <div class="card">
-        <div class="card-title">Feature group importance</div>
-        <div id="feat-bars">
-          <div style="color:var(--muted);font-size:13px;">Waiting for data...</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Risk Controls Page -->
-    <div class="page" id="page-controls">
-      <div class="page-title">Risk controls</div>
-      <div class="card">
-        <div class="card-title">System controls</div>
-        <div class="model-row">
-          <span class="model-key">Trading enabled</span>
-          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
-            <input type="checkbox" id="ctrl-trading" onchange="updateControl('trading_enabled',this.checked)" checked>
-            <span id="ctrl-trading-label" style="font-size:13px;font-weight:500;color:var(--green);">ON</span>
-          </label>
-        </div>
-        <div class="model-row">
-          <span class="model-key">Hard-logic status</span>
-          <span class="model-val" id="ctrl-hard-logic">CLEAR</span>
-        </div>
-        <div class="model-row">
-          <span class="model-key">Open positions</span>
-          <span class="model-val" id="ctrl-positions">0</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- System Logs Page -->
-    <div class="page" id="page-logs">
-      <div class="page-title">System logs</div>
-      <div class="card">
-        <div class="terminal" id="sys-log"></div>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-<script>
-// Navigation
-document.querySelectorAll('.nav-item').forEach(el => {
-  el.addEventListener('click', () => {
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    el.classList.add('active');
-    document.getElementById('page-' + el.dataset.page).classList.add('active');
-  });
-});
-
-// Clock
-function updateClock() {
-  const now = new Date();
-  document.getElementById('topbar-time').textContent =
-    now.toLocaleTimeString('en-US', {hour:'2-digit',minute:'2-digit',second:'2-digit',timeZone:'America/New_York'}) + ' EST';
-}
-setInterval(updateClock, 1000);
-updateClock();
-
-// Firebase State
-let app = null;
-let db = null;
-let isConnected = false;
-
-// System logs
-const sysLogs = [];
-function addSysLog(level, msg) {
-  const ts = new Date().toLocaleTimeString();
-  sysLogs.unshift({ ts, level, msg });
-  if (sysLogs.length > 100) sysLogs.pop();
-  renderLogs();
-}
-
-function renderLogs() {
-  const el = document.getElementById('sys-log');
-  const cls = { INFO: 'log-info', WARNING: 'log-warn', ERROR: 'log-err', DEBUG: 'log-muted' };
-  el.innerHTML = sysLogs.map(l =>
-    `<span class="${cls[l.level]||'log-info'}">[${l.ts}] [${l.level}] ${l.msg}</span>`
-  ).join('\n') || '<span class="log-muted">No logs yet...</span>';
-}
-
-// UI Update Functions
-function updateLiveState(data) {
-  const bias = data.bias || data.current_bias || {};
-  const risk = data.risk || data.open_position || {};
-  const game = data.game || data.game_state || {};
-  const regime = data.regime || data.current_regime || {};
-  const session = data.session || {};
-  
-  // Direction
-  const dir = bias.direction || 0;
-  const dirLabel = dir === 1 ? 'LONG' : dir === -1 ? 'SHORT' : 'NEUTRAL';
-  const dirEl = document.getElementById('m-direction');
-  dirEl.textContent = dirLabel;
-  dirEl.className = 'metric-value ' + (dir===1?'up':dir===-1?'down':'neutral');
-  
-  // Confidence
-  const conf = (bias.confidence || 0) * 100;
-  document.getElementById('m-confidence').textContent = conf.toFixed(1) + '%';
-  document.getElementById('m-conf-bar').style.width = conf + '%';
-  
-  // P&L
-  const pnl = session.pnl || data.session_pnl || 0;
-  const pnlEl = document.getElementById('m-pnl');
-  pnlEl.textContent = (pnl >= 0 ? '+' : '') + '$' + Math.abs(pnl).toFixed(0);
-  pnlEl.className = 'metric-value ' + (pnl>=0?'up':'down');
-  document.getElementById('m-pnl-sub').textContent = 'today';
-  
-  // Position
-  const pos = session.position || data.position_state || 'FLAT';
-  document.getElementById('m-position').textContent = pos;
-  document.getElementById('m-position-sub').textContent = pos !== 'FLAT' ? 'entry @ ' + (session.entry || 0).toFixed(1) : 'no open trade';
-  
-  // Layer 1
-  const l1 = document.getElementById('layer1-badge');
-  l1.textContent = dirLabel;
-  l1.className = 'badge ' + (dir===1?'badge-long':dir===-1?'badge-short':'badge-neutral');
-  const rationale = (bias.rationale || []).join(', ');
-  document.getElementById('layer1-detail').innerHTML = 
-    `Confidence: ${conf.toFixed(1)}% | Rationale: ${rationale || 'N/A'} | Model: ${bias.model_version || 'unknown'}`;
-  
-  // Layer 2
-  const l2ok = risk.ev_positive;
-  const l2 = document.getElementById('layer2-badge');
-  l2.textContent = l2ok ? 'EV POSITIVE' : 'EV NEGATIVE';
-  l2.className = 'badge ' + (l2ok?'badge-info':'badge-warn');
-  document.getElementById('layer2-detail').innerHTML = 
-    `Stop: ${(risk.stop_price || 0).toFixed(1)} | TP1: ${(risk.tp1_price || 0).toFixed(1)} | EV: ${(risk.expected_value || 0).toFixed(2)}R`;
-  
-  // Layer 3
-  const l3ok = game.game_state_aligned;
-  const advRisk = game.adversarial_risk || 'LOW';
-  const l3 = document.getElementById('layer3-badge');
-  l3.textContent = advRisk;
-  l3.className = 'badge ' + (advRisk==='LOW'?'badge-info':advRisk==='EXTREME'?'badge-short':'badge-warn');
-  document.getElementById('layer3-detail').innerHTML = 
-    `${game.game_state_summary || 'N/A'} | Forced move P: ${((game.forced_move_probability || 0)*100).toFixed(0)}% | Kyle λ: ${(game.kyle_lambda || 0).toFixed(4)}`;
-  
-  // Regime
-  document.getElementById('regime-rows').innerHTML = `
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:13px;">
-      <div style="padding:8px;background:var(--surface);border-radius:5px;">
-        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Volatility</div>
-        <div>${regime.volatility || 'N/A'}</div>
-      </div>
-      <div style="padding:8px;background:var(--surface);border-radius:5px;">
-        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Trend</div>
-        <div>${regime.trend || 'N/A'}</div>
-      </div>
-      <div style="padding:8px;background:var(--surface);border-radius:5px;">
-        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Risk appetite</div>
-        <div>${regime.risk_appetite || 'N/A'}</div>
-      </div>
-      <div style="padding:8px;background:var(--surface);border-radius:5px;">
-        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">Event risk</div>
-        <div>${regime.event_risk || 'N/A'}</div>
-      </div>
-    </div>
-  `;
-}
-
-function updateLiquidityMap(pools) {
-  const container = document.getElementById('heatmap-container');
-  if (!pools || Object.keys(pools).length === 0) {
-    container.innerHTML = '<div style="color:var(--muted);font-size:13px;">No liquidity data available</div>';
-    return;
-  }
-  
-  // Convert to array and sort by price
-  const poolArray = Object.entries(pools)
-    .filter(([k, v]) => k.startsWith('price_'))
-    .map(([k, v]) => ({
-      price: parseInt(k.replace('price_', '')),
-      prob: v
-    }))
-    .sort((a, b) => b.price - a.price);
-  
-  let html = '';
-  const midPrice = poolArray.length > 0 ? poolArray[Math.floor(poolArray.length/2)].price : 0;
-  
-  poolArray.forEach(p => {
-    if (p.price === midPrice) {
-      html += `<div class="current-price-line">Current price: ${p.price.toLocaleString()}</div>`;
-      return;
-    }
-    const isHigh = p.price > midPrice;
-    const pct = Math.round(p.prob * 100);
-    html += `
-      <div class="heatmap-row">
-        <span class="heatmap-label">${p.price.toLocaleString()}</span>
-        <div class="heatmap-bar-track">
-          <div class="heatmap-bar ${isHigh?'pool-highs':'pool-lows'}" style="width:${pct}%">${pct}%</div>
-        </div>
-      </div>`;
-  });
-  
-  container.innerHTML = html;
-}
-
-function updateControls(controls) {
-  if (!controls) return;
-  document.getElementById('ctrl-hard-logic').textContent = controls.hard_logic_status || 'CLEAR';
-  document.getElementById('ctrl-positions').textContent = controls.open_positions || 0;
-  
-  const tradingEnabled = controls.trading_enabled !== false;
-  document.getElementById('ctrl-trading').checked = tradingEnabled;
-  const label = document.getElementById('ctrl-trading-label');
-  label.textContent = tradingEnabled ? 'ON' : 'OFF';
-  label.style.color = tradingEnabled ? 'var(--green)' : 'var(--red)';
-}
-
-function updateExplainability(data) {
-  if (!data || !data.feature_importance) return;
-  
-  const sorted = Object.entries(data.feature_importance)
-    .sort((a, b) => b[1] - a[1]);
-  
-  const container = document.getElementById('feat-bars');
-  container.innerHTML = sorted.map(([name, val]) => `
-    <div class="feat-row">
-      <span class="feat-name">${name}</span>
-      <div class="feat-track"><div class="feat-fill" style="width:${(val*100).toFixed(0)}%"></div></div>
-      <span class="feat-pct">${(val*100).toFixed(0)}%</span>
-    </div>
-  `).join('');
-}
-
-// Firebase Initialization
-function initFirebase() {
-  const { initializeApp, getDatabase, ref, onValue } = window._fb;
-  
-  try {
-    app = initializeApp(FIREBASE_CONFIG);
-    db = getDatabase(app);
     
-    // Subscribe to live state
-    onValue(ref(db, `live_state/${SYMBOL}`), snap => {
-      const data = snap.val();
-      if (data) {
-        updateLiveState(data);
-        isConnected = true;
-        updateConnectionStatus();
-        addSysLog('INFO', `Live state updated for ${SYMBOL}`);
-      }
-    });
+    <footer>
+        Colin's Command Center • All systems operational • <span id="footer-time"></span>
+    </footer>
     
-    // Subscribe to session controls
-    onValue(ref(db, 'session_controls'), snap => {
-      const data = snap.val();
-      if (data) {
-        updateControls(data);
-      }
-    });
-    
-    // Subscribe to liquidity map
-    onValue(ref(db, `liquidity_map/${SYMBOL}`), snap => {
-      const data = snap.val();
-      if (data) {
-        updateLiquidityMap(data);
-      }
-    });
-    
-    // Subscribe to explainability
-    onValue(ref(db, `explainability/${SYMBOL}/current`), snap => {
-      const data = snap.val();
-      if (data) {
-        updateExplainability(data);
-      }
-    });
-    
-    // Subscribe to signals (limited)
-    onValue(ref(db, 'entry_signals'), snap => {
-      const data = snap.val();
-      if (data) {
-        updateSignalHistory(data);
-      }
-    });
-    
-    isConnected = true;
-    updateConnectionStatus();
-    addSysLog('INFO', 'Firebase connected successfully');
-    
-  } catch (e) {
-    console.error('Firebase init error:', e);
-    isConnected = false;
-    updateConnectionStatus();
-    document.getElementById('connection-error').style.display = 'flex';
-    addSysLog('ERROR', 'Firebase connection failed: ' + e.message);
-  }
-}
-
-function updateConnectionStatus() {
-  const dot = document.getElementById('status-dot');
-  const mode = document.getElementById('topbar-mode');
-  
-  if (isConnected) {
-    dot.className = 'status-dot';
-    mode.textContent = 'LIVE';
-    document.getElementById('connection-error').style.display = 'none';
-  } else {
-    dot.className = 'status-dot offline';
-    mode.textContent = 'OFFLINE';
-  }
-}
-
-function updateSignalHistory(signals) {
-  const tbody = document.getElementById('signals-tbody');
-  const entries = Object.entries(signals)
-    .sort((a, b) => new Date(b[1].timestamp || 0) - new Date(a[1].timestamp || 0))
-    .slice(0, 20);
-  
-  if (entries.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="8" style="color:var(--muted);padding:20px;">No signals yet</td></tr>';
-    return;
-  }
-  
-  tbody.innerHTML = entries.map(([id, s]) => {
-    const dirLabel = s.direction === 'LONG' || s.direction === 1 
-      ? '<span class="badge badge-long">LONG</span>' 
-      : '<span class="badge badge-short">SHORT</span>';
-    return `<tr>
-      <td style="font-family:var(--mono);font-size:12px;color:var(--muted);">${new Date(s.timestamp).toLocaleString()}</td>
-      <td>${dirLabel}</td>
-      <td style="font-family:var(--mono);">${(s.confidence || 0).toFixed(1)}%</td>
-      <td style="font-family:var(--mono);">${(s.entry_price || 0).toFixed(1)}</td>
-      <td style="font-family:var(--mono);color:var(--red);">${(s.stop_loss || 0).toFixed(1)}</td>
-      <td style="font-family:var(--mono);color:var(--green);">${(s.tp1 || s.tp1_price || 0).toFixed(1)}</td>
-      <td style="font-family:var(--mono);">${(s.expected_value || s.ev || 0).toFixed(2)}R</td>
-      <td><span class="outcome-open">${s.status || 'ACTIVE'}</span></td>
-    </tr>`;
-  }).join('');
-}
-
-function updateControl(key, value) {
-  addSysLog('INFO', `Control updated: ${key} = ${value}`);
-}
-
-function runBacktest() {
-  addSysLog('INFO', 'Backtest started (demo mode)');
-  setTimeout(() => {
-    document.getElementById('bt-results').style.display = 'block';
-    document.getElementById('bt-sharpe').textContent = '1.42';
-    document.getElementById('bt-winrate').textContent = '58.7%';
-    document.getElementById('bt-dd').textContent = '-3.8%';
-    document.getElementById('bt-trades').textContent = '142';
-    addSysLog('INFO', 'Backtest complete');
-  }, 1000);
-}
-
-// Initialize
-document.addEventListener('DOMContentLoaded', () => {
-  addSysLog('INFO', 'Dashboard initialized');
-  addSysLog('INFO', 'Connecting to Firebase...');
-  
-  // Wait for Firebase SDK to load
-  setTimeout(() => {
-    if (window._fb) {
-      initFirebase();
-    } else {
-      addSysLog('ERROR', 'Firebase SDK not loaded');
-    }
-  }, 500);
-});
-</script>
+    <script>
+        // Update times
+        function updateTimes() {
+            const now = new Date();
+            document.getElementById('last-updated').textContent = 
+                'Last updated: ' + now.toLocaleTimeString();
+            document.getElementById('footer-time').textContent = 
+                now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
+        }
+        updateTimes();
+        setInterval(updateTimes, 1000);
+    </script>
 </body>
 </html>
