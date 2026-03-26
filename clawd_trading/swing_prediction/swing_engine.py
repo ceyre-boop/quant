@@ -33,38 +33,56 @@ class SwingDirection(Enum):
 
 @dataclass
 class SwingBias:
-    """Output object for swing prediction layer."""
+    """
+    Output object for swing prediction layer.
+    
+    Schema per spec:
+    - symbol: str
+    - scan_date: ISO8601 monthly scan date
+    - direction: LONG | SHORT | NEUTRAL
+    - composite_score: 0.0-1.0
+    - conviction: 'LOW' | 'MEDIUM' | 'HIGH' | 'EXTREME'
+    - tradeable: bool (False = intraday system skips)
+    - block_reason: populated if tradeable=False
+    - layer_scores: dict of 5 layer scores
+    - layer_signals: full result objects
+    - expected_move_pct: from base rate lookup
+    - base_rate_winpct: historical win %
+    - base_rate_n: sample size
+    - valid_until: next scan date (+30 days)
+    - created_at: ISO8601
+    """
     symbol: str
-    timestamp: datetime
+    scan_date: str  # ISO8601
+    direction: str  # 'LONG' | 'SHORT' | 'NEUTRAL'
+    composite_score: float  # 0.0-1.0
+    conviction: str  # 'LOW' | 'MEDIUM' | 'HIGH' | 'EXTREME'
     tradeable: bool
-    direction: SwingDirection
-    composite_score: float
-    confidence: float
-    base_rate: Optional[float]
-    avg_return_20d: Optional[float]
-    avg_return_40d: Optional[float]
-    avg_return_60d: Optional[float]
-    max_drawdown: Optional[float]
-    layers_aligned: int
-    layer_scores: Dict[str, float]
     block_reason: Optional[str]
+    layer_scores: Dict[str, float]
+    layer_signals: Dict[str, Any]
+    expected_move_pct: Optional[float]
+    base_rate_winpct: Optional[float]
+    base_rate_n: Optional[int]
+    valid_until: str  # ISO8601
+    created_at: str  # ISO8601
     
     def to_dict(self) -> Dict[str, Any]:
         return {
             "symbol": self.symbol,
-            "timestamp": self.timestamp.isoformat(),
-            "tradeable": self.tradeable,
-            "direction": self.direction.value,
+            "scan_date": self.scan_date,
+            "direction": self.direction,
             "composite_score": round(self.composite_score, 4),
-            "confidence": round(self.confidence, 4) if self.confidence else None,
-            "base_rate": round(self.base_rate, 4) if self.base_rate else None,
-            "avg_return_20d": round(self.avg_return_20d, 4) if self.avg_return_20d else None,
-            "avg_return_40d": round(self.avg_return_40d, 4) if self.avg_return_40d else None,
-            "avg_return_60d": round(self.avg_return_60d, 4) if self.avg_return_60d else None,
-            "max_drawdown": round(self.max_drawdown, 4) if self.max_drawdown else None,
-            "layers_aligned": self.layers_aligned,
+            "conviction": self.conviction,
+            "tradeable": self.tradeable,
+            "block_reason": self.block_reason,
             "layer_scores": {k: round(v, 4) for k, v in self.layer_scores.items()},
-            "block_reason": self.block_reason
+            "layer_signals": self.layer_signals,
+            "expected_move_pct": round(self.expected_move_pct, 4) if self.expected_move_pct else None,
+            "base_rate_winpct": round(self.base_rate_winpct, 4) if self.base_rate_winpct else None,
+            "base_rate_n": self.base_rate_n,
+            "valid_until": self.valid_until,
+            "created_at": self.created_at
         }
 
 
@@ -312,6 +330,25 @@ class SwingEngine:
             "asset_class": asset_class,
             "timestamp": datetime.now().isoformat()
         }
+    
+    def _map_conviction(self, score: float) -> str:
+        """
+        Map composite score to conviction level.
+        
+        conviction_map:
+        - score < 0.45: 'LOW'
+        - score < 0.60: 'MEDIUM'
+        - score < 0.75: 'HIGH'
+        - score >= 0.75: 'EXTREME'
+        """
+        if score < 0.45:
+            return 'LOW'
+        elif score < 0.60:
+            return 'MEDIUM'
+        elif score < 0.75:
+            return 'HIGH'
+        else:
+            return 'EXTREME'
     
     def _determine_tradeability(
         self, 
