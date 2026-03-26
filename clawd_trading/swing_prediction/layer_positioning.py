@@ -22,11 +22,50 @@ class PositioningLayer:
     """
     Layer B: Positioning Data
     Commercial Hedgers (smart money) vs Speculators (dumb money)
+    
+    COT Index Formula:
+    COT Index = percentile rank of current net commercial position over trailing N weeks
+    commercial_net = commercial_longs - commercial_shorts
+    cot_index = percentile_rank(commercial_net, trailing_window)
+    
+    Data source: CFTC Commitment of Traders report
+    Primary: https://publicreporting.cftc.gov
+    Fallback: Quandl/Nasdaq Data Link CFTC dataset
     """
     
     def __init__(self, config: Dict):
         self.logger = logging.getLogger(__name__)
         self.config = config["layer_b_positioning"]
+    
+    def compute_cot_index(self, cot_data: Dict) -> float:
+        """
+        Compute COT Index from raw CFTC COT data.
+        
+        Args:
+            cot_data: dict with keys:
+                - commercial_longs: int
+                - commercial_shorts: int
+                - history: list of commercial_net values for trailing window
+        
+        Returns:
+            COT Index (0-100 percentile)
+        """
+        if not all(k in cot_data for k in ["commercial_longs", "commercial_shorts"]):
+            return 50.0  # Neutral if no data
+        
+        commercial_net = cot_data["commercial_longs"] - cot_data["commercial_shorts"]
+        
+        # Get trailing window (default 156 weeks = 3 years)
+        history = cot_data.get("history", [])
+        if len(history) < 20:  # Need minimum data
+            return 50.0
+        
+        # Calculate percentile rank
+        # Percentile = (number of values < current) / total * 100
+        below_current = sum(1 for h in history if h < commercial_net)
+        cot_index = (below_current / len(history)) * 100
+        
+        return round(cot_index, 2)
     
     async def compute(self, symbol: str, data: Dict[str, Any]) -> PositioningResult:
         """Compute positioning score from multiple sources."""
