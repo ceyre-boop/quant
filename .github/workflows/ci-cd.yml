@@ -4,12 +4,14 @@ on:
   push:
     branches: [main, develop]
     paths:
-      - 'quant/clawd_trading/**'
+      - '**/*.py'
+      - 'requirements.txt'
       - '.github/workflows/ci-cd.yml'
   pull_request:
     branches: [main]
     paths:
-      - 'quant/clawd_trading/**'
+      - '**/*.py'
+      - 'requirements.txt'
 
 env:
   PYTHON_VERSION: '3.11'
@@ -19,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./quant/clawd_trading
+        working-directory: .
     
     steps:
       - name: Checkout repository
@@ -43,10 +45,10 @@ jobs:
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
       
       - name: Format check with black
-        run: black --check . || true
+        run: black --check .
       
       - name: Type check with mypy
-        run: mypy . --ignore-missing-imports || true
+        run: mypy . --ignore-missing-imports
       
       - name: Run tests with pytest
         run: |
@@ -56,7 +58,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report-${{ github.run_id }}
-          path: quant/clawd_trading/htmlcov/
+          path: htmlcov/
           retention-days: 7
 
   deploy-firebase:
@@ -78,7 +80,7 @@ jobs:
       
       - name: Deploy Firebase Functions
         run: |
-          cd quant/clawd_trading/firebase/functions
+          cd firebase/functions
           npm install
           firebase deploy --only functions --token ${{ secrets.FIREBASE_TOKEN }}
         env:

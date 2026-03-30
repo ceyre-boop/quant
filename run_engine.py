@@ -60,7 +60,6 @@ def configure_logging() -> None:
 def load_environment() -> None:
     """Load environment variables and verify required configuration."""
     load_dotenv(".env")
-    load_dotenv(".enf")
     load_dotenv()
 
     required_vars = ["POLYGON_API_KEY", "FIREBASE_PROJECT_ID"]

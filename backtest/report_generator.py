@@ -164,7 +164,7 @@ class ReportGenerator:
                 ts = datetime.fromisoformat(point['timestamp'].replace('Z', '+00:00'))
                 timestamps.append(ts)
                 equities.append(point['equity'])
-            except:
+            except (KeyError, ValueError, AttributeError):
                 continue
         
         if not timestamps:
@@ -230,7 +230,7 @@ class ReportGenerator:
                 ts = datetime.fromisoformat(point['timestamp'].replace('Z', '+00:00'))
                 timestamps.append(ts)
                 equities.append(point['equity'])
-            except:
+            except (KeyError, ValueError, AttributeError):
                 continue
         
         if not timestamps:

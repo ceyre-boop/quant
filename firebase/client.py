@@ -7,6 +7,7 @@ All writes are validated before commit to prevent invalid data.
 import os
 import json
 import logging
+import threading
 from typing import Dict, Any, Optional, List
 from datetime import datetime
 from pathlib import Path
@@ -37,11 +38,13 @@ class FirebaseClient:
     
     _instance = None
     _initialized = False
+    _lock = threading.Lock()
     
     def __new__(cls, *args, **kwargs):
         """Singleton pattern to ensure single Firebase initialization."""
-        if cls._instance is None:
-            cls._instance = super(FirebaseClient, cls).__new__(cls)
+        with cls._lock:
+            if cls._instance is None:
+                cls._instance = super(FirebaseClient, cls).__new__(cls)
         return cls._instance
     
     def __init__(

@@ -118,7 +118,7 @@ class PerformanceMonitor:
         # Get historical feature stats from Firebase
         try:
             historical = self.firebase.read_realtime('/features/historical_stats')
-        except:
+        except Exception:
             historical = None
         
         if not historical or not current_features:
