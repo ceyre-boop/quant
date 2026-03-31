@@ -13,6 +13,10 @@ from datetime import datetime, timedelta
 from typing import Dict, Any, Optional
 from zoneinfo import ZoneInfo
 
+# Load environment variables first
+from dotenv import load_dotenv
+load_dotenv('.env')
+
 from data.providers import DataProvider
 from integration.production_engine import ProductionEntryEngine, EnhancedEntrySignal
 from integration.firebase_broadcaster import FirebaseBroadcaster
