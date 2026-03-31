@@ -144,6 +144,44 @@ class FirebaseBroadcaster:
             logger.error(f"Failed to publish regime for {symbol}: {e}")
             return False
     
+    def publish_signal_realtime(
+        self,
+        symbol: str,
+        signal_data: Dict[str, Any]
+    ) -> bool:
+        """Publish signal directly to Realtime Database for dashboard.
+        
+        Args:
+            symbol: Trading symbol
+            signal_data: Raw signal data dict
+            
+        Returns:
+            True if published successfully
+        """
+        if not self._enabled:
+            logger.debug("Broadcaster disabled, skipping realtime publish")
+            return False
+        
+        try:
+            # Publish to /signals/{symbol}/latest
+            latest_ref = self._get_rtdb_ref(f'signals/{symbol}/latest')
+            if latest_ref:
+                latest_ref.set(signal_data)
+                logger.info(f"Published realtime signal for {symbol}")
+            
+            # Also publish to history
+            ts = datetime.utcnow()
+            history_key = ts.strftime('%Y%m%d_%H%M%S')
+            history_ref = self._get_rtdb_ref(f'signals/{symbol}/history/{history_key}')
+            if history_ref:
+                history_ref.set(signal_data)
+            
+            return True
+            
+        except Exception as e:
+            logger.error(f"Failed to publish realtime signal for {symbol}: {e}")
+            return False
+    
     def publish_health(
         self,
         status: str = "healthy",
