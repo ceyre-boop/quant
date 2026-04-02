@@ -1,0 +1,116 @@
+{
+  "symbol_universe": {
+    "equities": [
+      "SPY",
+      "QQQ",
+      "DIA",
+      "IWM",
+      "AAPL",
+      "MSFT",
+      "NVDA",
+      "TSLA",
+      "AMZN",
+      "GOOGL",
+      "META"
+    ],
+    "forex": [
+      "EURUSD",
+      "GBPUSD",
+      "USDJPY"
+    ],
+    "commodities": [
+      "XAUUSD",
+      "GLD",
+      "USO",
+      "SLV"
+    ],
+    "crypto": [
+      "BTCUSD",
+      "ETHUSD"
+    ]
+  },
+  "layer_a_fair_value": {
+    "z_score_thresholds": {
+      "weak": 0.5,
+      "moderate": 1.0,
+      "strong": 1.5,
+      "extreme": 2.0
+    },
+    "equity_weights": {
+      "ma200w_deviation": 0.5,
+      "fed_model_spread": 0.3,
+      "pe_zscore": 0.2
+    }
+  },
+  "layer_b_positioning": {
+    "weights": {
+      "cot_index": 0.35,
+      "put_call": 0.25,
+      "options_skew": 0.25,
+      "fear_greed": 0.15
+    },
+    "cot_index": {
+      "extreme_long": 85,
+      "notable_long": 70,
+      "notable_short": 30,
+      "extreme_short": 15
+    }
+  },
+  "layer_c_regime": {
+    "hurst_window": 252,
+    "hmm_states": 3
+  },
+  "layer_d_options": {
+    "weights": {
+      "gex": 0.3,
+      "vix_term": 0.3,
+      "iv_rank": 0.2,
+      "iv_rv_spread": 0.2
+    },
+    "gex": {
+      "extreme_negative": -2000000000,
+      "extreme_positive": 5000000000
+    }
+  },
+  "layer_e_timing": {
+    "weights": {
+      "opex": 0.3,
+      "fomc": 0.35,
+      "quarter_end": 0.2,
+      "earnings": 0.15
+    },
+    "opex": {
+      "before_score": -0.5,
+      "during_score": 0.0,
+      "after_score": 1.0
+    }
+  },
+  "composite_scoring": {
+    "layer_weights": {
+      "fair_value": 0.3,
+      "positioning": 0.25,
+      "regime": 0.2,
+      "options": 0.15,
+      "timing": 0.1
+    },
+    "thresholds": {
+      "strong_long": 0.7,
+      "moderate_long": 0.55,
+      "neutral": 0.45,
+      "moderate_short": -0.55,
+      "strong_short": -0.7
+    }
+  },
+  "base_rates": {
+    "lookback_years": 10,
+    "min_occurrences": 15,
+    "min_win_rate": 0.52
+  },
+  "prediction_scrutiny": {
+    "chi_squared_alpha": 0.05,
+    "min_sample_size": 30,
+    "min_chi_squared_pvalue": 0.05,
+    "max_prediction_error_pct": 0.15,
+    "require_base_rate_validation": true
+  }
+}

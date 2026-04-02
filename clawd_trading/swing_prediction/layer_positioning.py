@@ -4,7 +4,7 @@ COT Index, Put/Call ratios, Options Skew, Sentiment
 """
 
 import logging
-from typing import Dict, Any
+from typing import Dict, Any, Optional, Optional
 from dataclasses import dataclass
 
 

@@ -4,6 +4,8 @@ GEX, VIX term structure, IV/RV spread
 """
 
 import logging
+import numpy as np
+import numpy as np
 from typing import Dict, Any
 from dataclasses import dataclass
 
