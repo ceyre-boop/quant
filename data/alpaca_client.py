@@ -34,14 +34,44 @@ class AlpacaDataClient:
         'ZN': 'TLT',        # 10Y Treasuries -> TLT ETF
     }
     
-    # Major assets to track
-    MAJOR_ASSETS = [
-        'SPY', 'QQQ', 'IWM', 'DIA', 'VTI',  # Equity ETFs
-        'GLD', 'SLV', 'USO', 'UNG',          # Commodities
-        'TLT', 'LQD', 'HYG', 'VGIT',          # Bonds
-        'VIXY', 'UVXY', 'SQQQ', 'SPXL',       # Volatility/Leveraged
-        'AAPL', 'MSFT', 'AMZN', 'GOOGL', 'META', 'TSLA', 'NVDA',  # Mega caps
-    ]
+    # Expanded asset universe organized by sector/theme
+    ASSET_UNIVERSE = {
+        "etf_core": [
+            "SPY", "QQQ", "IWM", "DIA", "VTI",
+            "TLT", "LQD", "HYG", "VGIT",
+            "VIXY", "UVXY", "SQQQ", "SPXL",
+            "GLD", "SLV", "USO", "UNG"
+        ],
+        "ai_semis": [
+            "NVDA", "AMD", "SMCI", "ARM", "PLTR", "SOUN", "MSFT", "GOOGL", "META"
+        ],
+        "mega_cap": [
+            "AAPL", "AMZN", "TSLA", "MSFT", "GOOGL", "META"
+        ],
+        "healthcare": [
+            "UNH", "JNJ", "PFE", "XBI", "IBB"
+        ],
+        "energy": [
+            "XLE", "XOM", "CVX", "OXY"
+        ],
+        "financials": [
+            "XLF", "JPM", "BAC", "GS"
+        ],
+        "real_estate": [
+            "VNQ", "SPG"
+        ],
+        "volatility_inverse": [
+            "VXX", "UVXY", "SQQQ", "SPXU"
+        ],
+    }
+    
+    # Flat list for batch fetch - deduplicated
+    ALL_SYMBOLS = list(dict.fromkeys(
+        [s for group in ASSET_UNIVERSE.values() for s in group]
+    ))
+    
+    # Legacy compatibility
+    MAJOR_ASSETS = ALL_SYMBOLS
     
     def __init__(self, api_key: Optional[str] = None, secret_key: Optional[str] = None, paper: bool = True):
         """
@@ -197,6 +227,11 @@ class AlpacaDataClient:
         """Fetch all major assets"""
         return self.get_multiple_assets(self.MAJOR_ASSETS, timeframe, days)
     
+    def get_all_assets(self, timeframe: str = '1D', days: int = 365) -> dict:
+        """Fetch the full expanded asset universe (57 unique symbols)"""
+        print(f"[Alpaca] Fetching {len(self.ALL_SYMBOLS)} assets ({timeframe}, {days} days)...")
+        return self.get_multiple_assets(self.ALL_SYMBOLS, timeframe, days)
+    
     def get_latest_price(self, symbol: str) -> Optional[float]:
         """Get latest price for a symbol"""
         df = self.get_historical_bars(symbol, timeframe='1H', days=1)
@@ -246,6 +281,13 @@ def test_client():
     data = client.get_multiple_assets(['SPY', 'QQQ', 'IWM'], timeframe='1D', days=30)
     for sym, df in data.items():
         print(f"{sym}: {len(df)} bars")
+    
+    # Test expanded universe (57 symbols)
+    print(f"\n=== Test 5: Full Asset Universe ({len(client.ALL_SYMBOLS)} symbols, 90 days) ===")
+    print("Groups:", list(client.ASSET_UNIVERSE.keys()))
+    all_data = client.get_all_assets(timeframe='1D', days=90)
+    print(f"Successfully fetched: {len(all_data)}/{len(client.ALL_SYMBOLS)} assets")
+    print(f"Total bars: {sum(len(df) for df in all_data.values())}")
 
 
 if __name__ == '__main__':
