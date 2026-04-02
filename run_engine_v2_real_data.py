@@ -16,6 +16,7 @@ from dotenv import load_dotenv
 from integration.production_engine import ProductionEntryEngine, EnhancedEntrySignal
 from integration.firebase_broadcaster import FirebaseBroadcaster
 from execution.paper_trading import PaperTradingEngine
+from config.settings import get_starting_equity
 from meta_evaluator.auto_documenter import log_backtest_result, compare_performance
 from contracts.types import AccountState
 from layer1.hard_constraints_v2 import HardConstraints
@@ -106,7 +107,7 @@ class LiveTradingEngineV2:
             except Exception as e:
                 self.logger.warning(f"Firebase not available: {e}")
         
-        self.paper_trading = PaperTradingEngine(starting_equity=100000.0)
+        self.paper_trading = PaperTradingEngine(starting_equity=get_starting_equity())
         self.logger = logging.getLogger(__name__)
         self.symbols = get_symbols()
         

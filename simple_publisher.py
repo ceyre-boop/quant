@@ -17,6 +17,7 @@ from dotenv import load_dotenv
 from data.providers import DataProvider
 from integration.production_engine import ProductionEntryEngine
 from execution.paper_trading import PaperTradingEngine
+from config.settings import get_starting_equity
 from contracts.types import AccountState
 
 load_dotenv('.env')
@@ -39,7 +40,7 @@ class SimpleFirebasePublisher:
     def __init__(self):
         self.data = DataProvider()
         self.engine = ProductionEntryEngine()
-        self.paper = PaperTradingEngine(starting_equity=100000.0)
+        self.paper = PaperTradingEngine(starting_equity=get_starting_equity())
         
         # Firebase config
         self.project_id = os.getenv('FIREBASE_PROJECT_ID')

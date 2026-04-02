@@ -50,6 +50,7 @@ print("-" * 50)
 
 from integration.production_engine import ProductionEntryEngine
 from contracts.types import AccountState
+from config.settings import get_starting_equity
 
 engine = ProductionEntryEngine()
 
@@ -87,13 +88,13 @@ if market_data:
     
     account = AccountState(
         account_id="test",
-        equity=100000,
-        balance=100000,
+        equity=get_starting_equity(),
+        balance=get_starting_equity(),
         open_positions=0,
         daily_pnl=0,
         daily_loss_pct=0,
         margin_used=0,
-        margin_available=100000,
+        margin_available=get_starting_equity(),
         timestamp=datetime.now(),
     )
     

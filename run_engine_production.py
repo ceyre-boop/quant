@@ -222,7 +222,7 @@ class ProductionTradingEngine:
             
             if account_data:
                 return AccountState(
-                    equity=account_data.get("equity", 100000),
+                    equity=account_data.get("equity", get_starting_equity()),
                     daily_loss_pct=account_data.get("daily_loss_pct", 0),
                     open_positions=account_data.get("open_positions", 0),
                 )
@@ -231,7 +231,7 @@ class ProductionTradingEngine:
         
         # Default account state
         return AccountState(
-            equity=100000,
+            equity=get_starting_equity(),
             daily_loss_pct=0,
             open_positions=0,
         )

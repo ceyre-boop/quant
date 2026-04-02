@@ -21,6 +21,7 @@ from data.providers import DataProvider
 from integration.production_engine import ProductionEntryEngine, EnhancedEntrySignal
 from integration.firebase_broadcaster import FirebaseBroadcaster
 from execution.paper_trading import PaperTradingEngine
+from config.settings import get_starting_equity
 from contracts.types import AccountState
 from clawd_trading.participants import classify_participants, extract_from_layer1_context, calculate_participant_risk_limits
 from clawd_trading.risk import classify_regime_from_layer1
@@ -44,7 +45,7 @@ class RealtimeFirebasePublisher:
         self.data = DataProvider()
         self.engine = ProductionEntryEngine()
         self.firebase = None
-        self.paper = PaperTradingEngine(starting_equity=100000.0)
+        self.paper = PaperTradingEngine(starting_equity=get_starting_equity())
         
         # Try to connect to Firebase
         try:

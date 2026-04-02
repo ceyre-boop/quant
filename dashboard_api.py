@@ -16,6 +16,8 @@ from data.providers import DataProvider
 from integration.production_engine import ProductionEntryEngine
 from contracts.types import AccountState
 from execution.paper_trading import PaperTradingEngine
+from config.settings import get_starting_equity
+from config.settings import get_starting_equity
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -26,7 +28,7 @@ CORS(app)  # Allow frontend to call API
 # Initialize real components
 data_provider = DataProvider()
 entry_engine = ProductionEntryEngine()
-paper_trading = PaperTradingEngine(starting_equity=100000.0)
+paper_trading = PaperTradingEngine(starting_equity=get_starting_equity())
 
 # Cache for latest data
 cache = {
