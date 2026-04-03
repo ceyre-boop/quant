@@ -8,6 +8,7 @@ Implements walk-forward analysis:
 This prevents look-ahead bias and gives realistic out-of-sample performance.
 """
 
+import json
 import logging
 from typing import Dict, Any, Optional, List, Callable, Tuple
 from datetime import datetime, timedelta
