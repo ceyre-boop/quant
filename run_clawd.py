@@ -10,7 +10,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 
-from clawd_brain_v31 import ClawdBrain
+from clawd_brain import ClawdBrain
 from ai_trading_bridge import AITradingBridge
 
 
