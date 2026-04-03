@@ -7,6 +7,7 @@ import logging
 from typing import Dict, List, Any, Optional
 from dataclasses import dataclass
 from datetime import datetime
+import pandas as pd  # Moved from bottom - fixes ICTDetector crash
 
 from contracts.types import (
     Direction, BiasOutput, RiskOutput, GameOutput, RegimeState,
@@ -443,7 +444,3 @@ class ICTDetector:
                         }
         
         return None
-
-
-# Import pandas for ICTDetector
-import pandas as pd

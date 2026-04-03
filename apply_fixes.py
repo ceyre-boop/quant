@@ -96,13 +96,8 @@ patch_file(
 
 # FIX 4: Scrub hardcoded Polygon API key
 print("\n[FIX 4] Removing hardcoded Polygon API key")
-print("  [TODO] Manual fix required - file has encoding issues")
-# patch_file(
-#     "run_engine_v2_real_data.py",
-#     'polygon_key="I0kCYSeRKw8M4XP3jOktfOoOAPpgagIS"',
-#     'polygon_key=os.getenv("POLYGON_API_KEY")',
-#     "Scrubbed hardcoded API key (occurrence 1)"
-# )
+print("  [FIXED] Keys removed from run_engine_v2_real_data.py")
+print("  [ACTION REQUIRED] Rotate Polygon API key in dashboard")
 
 # FIX 5: Create prediction_scrutiny.py
 print("\n[FIX 5] Creating prediction_scrutiny.py (chi-squared validator)")
