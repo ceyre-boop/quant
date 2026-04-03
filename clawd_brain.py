@@ -416,7 +416,20 @@ class ClawdBrain(AIBrain):  # v3.1 - Canonical
         if len(df) < 30:
             return None
         
-        features_df = self.feature_gen.generate_features(df)
+        # Fetch cross-asset data for market features
+        all_market_data = {symbol: df}
+        cross_assets = ['SPY', 'VIXY', 'SQQQ', 'SPXU', 'GLD', 'TLT']
+        
+        for asset in cross_assets:
+            if asset != symbol:
+                try:
+                    asset_df = self.alpaca_client.get_historical_bars(asset, timeframe='1D', days=60)
+                    if not asset_df.empty:
+                        all_market_data[asset] = asset_df
+                except Exception as e:
+                    print(f"[ClawdBrain] Warning: Could not fetch {asset}: {e}")
+        
+        features_df = self.feature_gen.generate_features(df, all_market_data)
         if features_df.empty:
             return None
         
