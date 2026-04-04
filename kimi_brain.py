@@ -15,6 +15,10 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).parent))
 
+# Load env vars before imports that need them
+from dotenv import load_dotenv
+load_dotenv(Path(__file__).parent / '.env')
+
 import requests
 import pandas as pd
 import numpy as np
@@ -48,7 +52,7 @@ class KimiBrain(AIBrain):
     def __init__(
         self,
         api_key: Optional[str] = None,
-        model: str = "kimi-latest",
+        model: str = "moonshot-v1-8k",  # Kimi model name
         temperature: float = 0.3,  # Lower = more consistent
         max_tokens: int = 2000,
         learning_mode: bool = True
@@ -57,8 +61,10 @@ class KimiBrain(AIBrain):
         if not self.api_key:
             raise ValueError("KIMI_API_KEY required")
         
-        self.base_url = os.getenv("KIMI_BASE_URL", "https://api.moonshot.cn/v1")
-        self.model = model
+        # Kimi API base URL (without /v1 - that's part of the endpoint path)
+        self.base_url = os.getenv("KIMI_BASE_URL", "https://api.moonshot.cn")
+        # Kimi model name - use official model identifier
+        self.model = model  # Try: "moonshot-v1-8k" or "moonshot-v1-32k"
         self.temperature = temperature
         self.max_tokens = max_tokens
         self.learning_mode = learning_mode
@@ -169,10 +175,15 @@ Rules:
     
     def _call_kimi(self, prompt: str) -> Dict[str, Any]:
         """Call Kimi API"""
+        # Kimi uses standard Bearer token auth
         headers = {
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json"
         }
+        
+        # Debug: Show key prefix (safely)
+        key_preview = self.api_key[:10] + "..." if len(self.api_key) > 10 else "invalid"
+        print(f"[KimiBrain] Using API key: {key_preview}")
         
         payload = {
             "model": self.model,
@@ -185,12 +196,18 @@ Rules:
         }
         
         try:
+            # Correct Kimi API endpoint - includes /v1 in path
+            url = f"{self.base_url}/v1/chat/completions"
+            print(f"[KimiBrain] Calling API: {url}")
             response = requests.post(
-                f"{self.base_url}/chat/completions",
+                url,
                 headers=headers,
                 json=payload,
                 timeout=30
             )
+            print(f"[KimiBrain] Response status: {response.status_code}")
+            if response.status_code != 200:
+                print(f"[KimiBrain] Response body: {response.text[:200]}")
             response.raise_for_status()
             return response.json()
         except Exception as e:

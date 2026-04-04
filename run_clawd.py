@@ -91,7 +91,7 @@ def main():
         print("\n✓ Orders submitted to Alpaca!")
         print("  Check your Alpaca dashboard for status.")
     else:
-        print("\n○ No trades executed this cycle.")
+        print("\n[No trades executed this cycle.]")
         print("  (Signals filtered by 3-layer validation)")
 
 

@@ -10,7 +10,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 
-from kimibrain import KimiBrain
+from kimi_brain import KimiBrain
 from ai_trading_bridge import AITradingBridge
 
 
