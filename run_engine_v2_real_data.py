@@ -68,9 +68,9 @@ def load_environment() -> None:
     load_dotenv(".env")
     load_dotenv()
     
-    # Set Polygon key if not in env
+    # Polygon key must be in env - no hardcoded fallback
     if not os.getenv("POLYGON_API_KEY"):
-        os.environ["POLYGON_API_KEY"] = "I0kCYSeRKw8M4XP3jOktfOoOAPpgagIS"
+        print("WARNING: POLYGON_API_KEY not set - Polygon data feed disabled")
 
 
 def get_symbols() -> list[str]:
@@ -376,9 +376,13 @@ def main() -> None:
     symbols = get_symbols()
     
     # Initialize with REAL data provider
+    import os
+    polygon_key = os.getenv("POLYGON_API_KEY", "")
+    if not polygon_key:
+        print("WARNING: POLYGON_API_KEY not set - using Alpaca only")
     engine = LiveTradingEngineV2(
         paper_mode=True,
-        polygon_key="I0kCYSeRKw8M4XP3jOktfOoOAPpgagIS"
+        polygon_key=polygon_key
     )
     
     # Log baseline backtest
