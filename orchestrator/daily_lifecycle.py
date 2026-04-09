@@ -18,7 +18,9 @@ from enum import Enum
 from contracts.types import (
     BiasOutput, RiskOutput, GameOutput, RegimeState,
     FeatureRecord, EntrySignal, PositionState, AccountState,
-    MarketData, Direction, ThreeLayerContext
+    MarketData, Direction, ThreeLayerContext,
+    VolRegime, TrendRegime, RiskAppetite, MomentumRegime, EventRisk,
+    Magnitude, AdversarialRisk
 )
 from firebase.client import FirebaseClient
 from integration.firebase_broadcaster import FirebaseBroadcaster
@@ -432,11 +434,11 @@ class DailyLifecycle:
     def _get_default_regime(self) -> RegimeState:
         """Get default regime state."""
         return RegimeState(
-            volatility=contracts.types.VolRegime.NORMAL,
-            trend=contracts.types.TrendRegime.RANGING,
-            risk_appetite=contracts.types.RiskAppetite.NEUTRAL,
-            momentum=contracts.types.MomentumRegime.STEADY,
-            event_risk=contracts.types.EventRisk.CLEAR,
+            volatility=VolRegime.NORMAL,
+            trend=TrendRegime.RANGING,
+            risk_appetite=RiskAppetite.NEUTRAL,
+            momentum=MomentumRegime.STEADY,
+            event_risk=EventRisk.CLEAR,
             composite_score=0.5
         )
     
@@ -551,11 +553,11 @@ def _mock_feature_builder(symbol: str, market_data: MarketData):
             self.symbol = symbol
             self.features = {"atr": 45.0, "rsi": 55.0}
             self.regime = RegimeState(
-                volatility=contracts.types.VolRegime.NORMAL,
-                trend=contracts.types.TrendRegime.STRONG_TREND,
-                risk_appetite=contracts.types.RiskAppetite.RISK_ON,
-                momentum=contracts.types.MomentumRegime.ACCELERATING,
-                event_risk=contracts.types.EventRisk.CLEAR,
+                volatility=VolRegime.NORMAL,
+                trend=TrendRegime.STRONG_TREND,
+                risk_appetite=RiskAppetite.RISK_ON,
+                momentum=MomentumRegime.ACCELERATING,
+                event_risk=EventRisk.CLEAR,
                 composite_score=0.75
             )
     return MockFeatures()

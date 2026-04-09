@@ -20,6 +20,7 @@ from zoneinfo import ZoneInfo
 from typing import Dict, Any, Optional
 
 from dotenv import load_dotenv
+from config.settings import get_starting_equity
 
 # Import production components
 from integration.production_engine import ProductionEntryEngine, EnhancedEntrySignal
