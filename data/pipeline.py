@@ -17,6 +17,7 @@ from data.sentiment_engine import SentimentEngine
 from data.order_flow_fetcher import OrderFlowFetcher
 from data.tradelocker_client import TradeLockerClient
 from data.validator import DataValidator
+from layer3.macro_imbalance import MacroImbalanceFramework
 from contracts.types import FeatureRecord
 
 logger = logging.getLogger(__name__)
@@ -42,6 +43,7 @@ class DataPipeline:
         self.order_flow_fetcher = OrderFlowFetcher(self.polygon)
 
         self.validator = DataValidator()
+        self.macro_framework = MacroImbalanceFramework()
 
     def run_premarket(
         self, symbols: List[str], include_all_features: bool = True
@@ -110,6 +112,40 @@ class DataPipeline:
             logger.error(f"Failed to compute breadth: {e}")
             breadth = None
 
+        # 4b. Run MacroImbalanceFramework (08:00 pre-market build)
+        try:
+            macro_features = self.macro_framework.compute(
+                {
+                    "vix": vix_value,
+                    "yield_10yr": index_data.get("TNX", {})
+                    .get("latest", {})
+                    .get("value", 4.0),
+                    "yield_2yr": index_data.get("IRX2", {})
+                    .get("latest", {})
+                    .get("value", 4.5),
+                    "yield_3m": index_data.get("IRX", {})
+                    .get("latest", {})
+                    .get("value", 5.0),
+                    "hy_spread": index_data.get("HYG_SPREAD", {})
+                    .get("latest", {})
+                    .get("value", 3.5),
+                    "vol_of_vol": index_data.get("VVIX", {})
+                    .get("latest", {})
+                    .get("value", 90.0),
+                    "equity_drawdown": index_data.get("SPY_DRAWDOWN", {})
+                    .get("latest", {})
+                    .get("value", 0.0),
+                }
+            )
+            logger.info("Macro features: %s", macro_features)
+        except Exception as e:
+            logger.error(f"Failed to compute macro features: {e}")
+            macro_features = {
+                "hmm_regime_stress": 0.1,
+                "pca_mahalanobis": 1.0,
+                "recession_prob_12m": 0.1,
+            }
+
         # 5. Build FeatureRecord for each symbol
         for symbol in symbols:
             try:
@@ -123,6 +159,8 @@ class DataPipeline:
                     event_risk=event_risk,
                     breadth=breadth,
                 )
+                # Inject macro-regime stress features (Petroulas Gate inputs)
+                features.update(macro_features)
 
                 # Get latest bar for raw_data
                 latest_bar = (
@@ -143,6 +181,7 @@ class DataPipeline:
                         "data_sources": ["polygon"],
                         "vix_regime": vix_regime,
                         "event_risk": event_risk,
+                        "macro": macro_features,
                     },
                 )
 
