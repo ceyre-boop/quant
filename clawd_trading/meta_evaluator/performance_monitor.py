@@ -134,7 +134,7 @@ class PerformanceMonitor:
             try:
                 baseline = self.firebase.rtdb_get("/performance/baseline_accuracy")
                 self._baseline_accuracy = baseline or 0.55  # Default 55%
-            except:
+            except Exception:
                 self._baseline_accuracy = 0.55
 
         # Need predictions vs actuals - simplified for now
