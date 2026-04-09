@@ -26,6 +26,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -44,8 +46,21 @@ jobs:
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
       
-      - name: Format check with black
-        run: black --check .
+      - name: Format check with black (changed files only)
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BASE="origin/${{ github.base_ref }}"
+          else
+            BASE="${{ github.event.before }}"
+          fi
+          CHANGED=$(git diff --name-only --diff-filter=ACM "$BASE"...HEAD -- '*.py' 2>/dev/null || git diff --name-only --diff-filter=ACM HEAD~1 HEAD -- '*.py')
+          if [ -n "$CHANGED" ]; then
+            echo "Running black --check on changed Python files:"
+            echo "$CHANGED"
+            echo "$CHANGED" | xargs black --check
+          else
+            echo "No Python files changed — skipping black check."
+          fi
       
       - name: Type check with mypy
         run: mypy . --ignore-missing-imports

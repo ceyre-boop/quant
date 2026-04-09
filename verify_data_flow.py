@@ -4,30 +4,33 @@ DATA FLOW VERIFICATION
 This script shows the TRUE data flow from Yahoo Finance → Python → Output
 No Firebase needed to verify data is real.
 """
+
 import logging
 from datetime import datetime
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s | %(levelname)s | %(message)s'
+    level=logging.INFO, format="%(asctime)s | %(levelname)s | %(message)s"
 )
 logger = logging.getLogger(__name__)
 
-print("="*70)
+print("=" * 70)
 print("DATA FLOW VERIFICATION - TRUTH ABOUT WHAT'S WORKING")
-print("="*70)
+print("=" * 70)
 
 # Step 1: Data Provider (Yahoo Finance)
 print("\n[STEP 1] Data Provider - Yahoo Finance")
 print("-" * 50)
 
 from data.providers import DataProvider
+
 d = DataProvider()
 
-for symbol in ['SPY', 'QQQ', 'DIA']:
+for symbol in ["SPY", "QQQ", "DIA"]:
     data = d.get_market_data(symbol)
     if data:
-        print(f"{symbol}: ${data.close:.2f} | Change: {data.change_percent:+.2%} | Vol: {data.volume:,}")
+        print(
+            f"{symbol}: ${data.close:.2f} | Change: {data.change_percent:+.2%} | Vol: {data.volume:,}"
+        )
     else:
         print(f"{symbol}: FAILED")
 
@@ -35,12 +38,12 @@ for symbol in ['SPY', 'QQQ', 'DIA']:
 print("\n[STEP 2] Historical Data - For Backtesting")
 print("-" * 50)
 
-hist = d.get_historical_data('SPY', period='1mo', interval='1h')
+hist = d.get_historical_data("SPY", period="1mo", interval="1h")
 if hist is not None:
     print(f"SPY Hourly Data: {len(hist)} bars")
     print(f"Date range: {hist.index[0]} to {hist.index[-1]}")
     print(f"Sample:")
-    print(hist[['open', 'high', 'low', 'close']].head(3).to_string())
+    print(hist[["open", "high", "low", "close"]].head(3).to_string())
 else:
     print("FAILED to get historical data")
 
@@ -55,24 +58,40 @@ from config.settings import get_starting_equity
 engine = ProductionEntryEngine()
 
 # Get real data for SPY
-market_data = d.get_market_data('SPY')
+market_data = d.get_market_data("SPY")
 if market_data:
     # Build layers from REAL data
     layer1 = {
         "symbol": "SPY",
-        "direction": 1 if market_data.change_percent > 0.005 else -1 if market_data.change_percent < -0.005 else 0,
+        "direction": (
+            1
+            if market_data.change_percent > 0.005
+            else -1 if market_data.change_percent < -0.005 else 0
+        ),
         "confidence": min(0.5 + abs(market_data.change_percent) * 20, 0.95),
-        "trend_regime": "uptrend" if market_data.change_percent > 0.005 else "downtrend" if market_data.change_percent < -0.005 else "neutral",
-        "volatility_regime": "high" if (market_data.high - market_data.low) / market_data.close > 0.02 else "normal",
+        "trend_regime": (
+            "uptrend"
+            if market_data.change_percent > 0.005
+            else "downtrend" if market_data.change_percent < -0.005 else "neutral"
+        ),
+        "volatility_regime": (
+            "high"
+            if (market_data.high - market_data.low) / market_data.close > 0.02
+            else "normal"
+        ),
         "current_price": market_data.close,
-        "features": {"change_pct": market_data.change_percent, "volume": market_data.volume},
-        "fvg_detected": (market_data.high - market_data.low) / market_data.close > 0.015,
+        "features": {
+            "change_pct": market_data.change_percent,
+            "volume": market_data.volume,
+        },
+        "fvg_detected": (market_data.high - market_data.low) / market_data.close
+        > 0.015,
         "liquidity_sweep": abs(market_data.change_percent) > 0.01,
         "order_block": False,
         "ict_setup": {},
         "session": "RTH",
     }
-    
+
     layer2 = {
         "ev": (layer1["confidence"] - 0.5) * 4 * layer1["direction"],
         "win_prob": 0.5 + (layer1["confidence"] - 0.5) * 0.6,
@@ -80,12 +99,12 @@ if market_data:
         "stop_loss": market_data.close * 0.99,
         "take_profit": market_data.close * 1.02,
     }
-    
+
     layer3 = {
         "adversarial_risk": "LOW",
         "game_state_aligned": layer1["direction"] != 0,
     }
-    
+
     account = AccountState(
         account_id="test",
         equity=get_starting_equity(),
@@ -97,11 +116,15 @@ if market_data:
         margin_available=get_starting_equity(),
         timestamp=datetime.now(),
     )
-    
-    print(f"Layer 1: Direction={layer1['direction']}, Confidence={layer1['confidence']:.2f}, Trend={layer1['trend_regime']}")
+
+    print(
+        f"Layer 1: Direction={layer1['direction']}, Confidence={layer1['confidence']:.2f}, Trend={layer1['trend_regime']}"
+    )
     print(f"Layer 2: EV={layer2['ev']:.2f}, Win Prob={layer2['win_prob']:.2%}")
-    print(f"Layer 3: Adversarial={layer3['adversarial_risk']}, Aligned={layer3['game_state_aligned']}")
-    
+    print(
+        f"Layer 3: Adversarial={layer3['adversarial_risk']}, Aligned={layer3['game_state_aligned']}"
+    )
+
     # Generate signal
     signal = engine.generate_signal(
         symbol="SPY",
@@ -110,7 +133,7 @@ if market_data:
         layer3_output=layer3,
         account=account,
     )
-    
+
     if signal:
         print(f"\nSIGNAL GENERATED:")
         print(f"   Direction: {signal.direction_str}")
@@ -125,9 +148,9 @@ else:
     print("FAILED - No market data")
 
 # Step 4: Summary
-print("\n" + "="*70)
+print("\n" + "=" * 70)
 print("SUMMARY - WHAT'S ACTUALLY WORKING")
-print("="*70)
+print("=" * 70)
 print("WORKING: Data Provider - Yahoo Finance REAL prices")
 print("WORKING: Historical Data - REAL OHLCV for backtesting")
 print("WORKING: Production Engine - 3-layer analysis")
@@ -137,7 +160,7 @@ print("WORKING: Entry Scoring - 4 models scored")
 print("WORKING: 12-Gate Validation - All gates running")
 print("")
 print("NOT WORKING: Firebase - NOT CONFIGURED")
-print("   Your frontend expects Firebase data at:");
+print("   Your frontend expects Firebase data at:")
 print("   /live_state/{symbol}")
 print("   /entry_signals/{symbol}")
 print("   /session_controls")
@@ -147,4 +170,4 @@ print("  Yahoo Finance -> DataProvider [WORKING]")
 print("  DataProvider -> ProductionEngine [WORKING]")
 print("  ProductionEngine -> Signal [WORKING]")
 print("  Signal -> Firebase -> Frontend [NEEDS FIREBASE_PROJECT_ID]")
-print("="*70)
+print("=" * 70)

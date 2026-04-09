@@ -1,6 +1,7 @@
 """
 Tests for Risk Module
 """
+
 import pytest
 
 from clawd_trading.risk import (
@@ -78,7 +79,7 @@ def test_regime_bias_adjustment():
     """Should adjust bias based on regime."""
     adj = get_regime_bias_adjustment(RegimeCluster.NEWS_SHOCK_EXPLOSION)
     assert adj["confidence_adjustment"] < 0  # Reduces confidence
-    
+
     adj = get_regime_bias_adjustment(RegimeCluster.VOLATILITY_BREAKOUT)
     assert adj["confidence_adjustment"] > 0  # Increases confidence
 
@@ -86,27 +87,25 @@ def test_regime_bias_adjustment():
 def test_combined_risk_with_participants():
     """Test combined participant + regime risk."""
     from clawd_trading.participants import ParticipantLikelihood, ParticipantType
-    
+
     likelihoods = [
         ParticipantLikelihood(
-            type=ParticipantType.RETAIL,
-            probability=0.8,
-            evidence={}
+            type=ParticipantType.RETAIL, probability=0.8, evidence={}
         ),
     ]
-    
+
     base_limits = {
         "max_position_size": 1.0,
         "max_concurrent_risk": 3.0,
         "max_daily_risk": 5.0,
     }
-    
+
     combined = calculate_combined_risk_limits(
         participant_likelihoods=likelihoods,
         regime=RegimeCluster.EXPANSIVE_TREND,
         base_limits=base_limits,
     )
-    
+
     assert "risk_multipliers" in combined
     assert combined["risk_multipliers"]["combined_size"] <= 0.9
 
@@ -114,18 +113,18 @@ def test_combined_risk_with_participants():
 def test_combined_risk_blocks_on_news():
     """Combined risk should block during news shock."""
     from clawd_trading.participants import ParticipantLikelihood, ParticipantType
-    
-    likelihoods = [ParticipantLikelihood(
-        type=ParticipantType.RETAIL, probability=1.0, evidence={}
-    )]
-    
+
+    likelihoods = [
+        ParticipantLikelihood(type=ParticipantType.RETAIL, probability=1.0, evidence={})
+    ]
+
     base_limits = {"max_position_size": 1.0, "allow_entry": True}
-    
+
     combined = calculate_combined_risk_limits(
         participant_likelihoods=likelihoods,
         regime=RegimeCluster.NEWS_SHOCK_EXPLOSION,
         base_limits=base_limits,
     )
-    
+
     assert combined["allow_entry"] == False
     assert "regime_news_shock" in combined["block_reason"]

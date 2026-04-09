@@ -7,7 +7,6 @@ from zoneinfo import ZoneInfo
 
 from dotenv import load_dotenv
 
-
 LOG_FORMAT = "%(asctime)s | %(levelname)s | %(message)s"
 TZ_NY = ZoneInfo("America/New_York")
 SLEEP_SECONDS = 20
@@ -139,8 +138,14 @@ def run_premarket_build(symbols: list[str]) -> None:
 
         pipeline = DataPipeline()
         records = pipeline.run_premarket(symbols=symbols, include_all_features=True)
-        valid_count = sum(1 for record in records.values() if getattr(record, "is_valid", False))
-        logging.info("Premarket feature build complete: %s/%s valid records", valid_count, len(records))
+        valid_count = sum(
+            1 for record in records.values() if getattr(record, "is_valid", False)
+        )
+        logging.info(
+            "Premarket feature build complete: %s/%s valid records",
+            valid_count,
+            len(records),
+        )
     except Exception as exc:
         logging.exception("Premarket feature build failed: %s", exc)
 
@@ -166,7 +171,9 @@ def run_eod_shutdown() -> None:
         from integration.firebase_broadcaster import FirebaseBroadcaster
 
         broadcaster = FirebaseBroadcaster()
-        broadcaster.publish_health(status="healthy", components={"lifecycle": "eod_shutdown"})
+        broadcaster.publish_health(
+            status="healthy", components={"lifecycle": "eod_shutdown"}
+        )
     except Exception as exc:
         logging.warning("EOD health publish skipped: %s", exc)
 
@@ -212,10 +219,14 @@ def run_weekly_refit_check(now_et: datetime) -> None:
         }
         drift_detected = os.getenv("WEEKLY_DRIFT_DETECTED", "false").lower() == "true"
 
-        evaluation = scheduler.evaluate_refit_need(metrics, drift_detected=drift_detected)
+        evaluation = scheduler.evaluate_refit_need(
+            metrics, drift_detected=drift_detected
+        )
 
         if evaluation.get("should_refit"):
-            schedule = scheduler.schedule_refit(evaluation, model_version=f"weekly-{now_et.date().isoformat()}")
+            schedule = scheduler.schedule_refit(
+                evaluation, model_version=f"weekly-{now_et.date().isoformat()}"
+            )
             logging.info("Weekly refit scheduled: %s", schedule)
         else:
             logging.info("No weekly refit scheduled: %s", evaluation.get("reasons", []))
@@ -227,7 +238,9 @@ def reset_daily_state(state: RuntimeState, now_et: datetime) -> RuntimeState:
     """Reset one-time daily markers at the start of a new calendar day."""
     if state.run_date == now_et.date():
         return state
-    return RuntimeState(run_date=now_et.date(), weekly_refit_week_key=state.weekly_refit_week_key)
+    return RuntimeState(
+        run_date=now_et.date(), weekly_refit_week_key=state.weekly_refit_week_key
+    )
 
 
 def main() -> None:
@@ -244,7 +257,9 @@ def main() -> None:
     logging.info("Environment loaded")
     logging.info("Engine initialized for timezone: America/New_York")
     logging.info("Symbols: %s", symbols)
-    logging.info("Schedule: 08:00 premarket | 09:30-16:00 loop | 16:05 shutdown | weekly refit")
+    logging.info(
+        "Schedule: 08:00 premarket | 09:30-16:00 loop | 16:05 shutdown | weekly refit"
+    )
     push_heartbeat(status="initialized")
 
     while True:
@@ -258,11 +273,17 @@ def main() -> None:
                 eod_shutdown_dt = combine_today(now_et, EOD_SHUTDOWN_TIME)
                 weekly_refit_dt = combine_today(now_et, WEEKLY_REFIT_TIME)
 
-                if time_in_range(now_et, PREMARKET_TIME, MARKET_OPEN_TIME) and not state.premarket_done:
+                if (
+                    time_in_range(now_et, PREMARKET_TIME, MARKET_OPEN_TIME)
+                    and not state.premarket_done
+                ):
                     run_premarket_build(symbols)
                     state.premarket_done = True
 
-                if time_in_range(now_et, MARKET_OPEN_TIME, MARKET_CLOSE_TIME) and not state.market_open_logged:
+                if (
+                    time_in_range(now_et, MARKET_OPEN_TIME, MARKET_CLOSE_TIME)
+                    and not state.market_open_logged
+                ):
                     logging.info("09:30 market open: starting live engine")
                     state.market_open_logged = True
                     state.next_signal_due = market_open_dt
@@ -275,11 +296,16 @@ def main() -> None:
                         run_signal_cycle(symbol=primary_symbol)
                         state.next_signal_due = state.next_signal_due + SIGNAL_INTERVAL
 
-                if time_in_range(now_et, EOD_SHUTDOWN_TIME, SESSION_END_TIME) and not state.eod_done:
+                if (
+                    time_in_range(now_et, EOD_SHUTDOWN_TIME, SESSION_END_TIME)
+                    and not state.eod_done
+                ):
                     run_eod_shutdown()
                     state.eod_done = True
 
-                week_key = f"{now_et.isocalendar().year}-W{now_et.isocalendar().week:02d}"
+                week_key = (
+                    f"{now_et.isocalendar().year}-W{now_et.isocalendar().week:02d}"
+                )
                 if (
                     now_et.weekday() == 4
                     and time_in_range(now_et, WEEKLY_REFIT_TIME, SESSION_END_TIME)
