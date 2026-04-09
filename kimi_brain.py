@@ -199,10 +199,6 @@ Rules:
             "Content-Type": "application/json",
         }
 
-        # Debug: Show key prefix (safely)
-        key_preview = self.api_key[:10] + "..." if len(self.api_key) > 10 else "invalid"
-        logger.debug("[KimiBrain] Using API key: %s", key_preview)
-
         payload = {
             "model": self.model,
             "messages": [

@@ -1,5 +1,8 @@
 """
 Simple test of Kimi API key
+
+WARNING: Debug/developer script only. Do NOT run in CI or production.
+Key preview prints are intentional for manual debugging; never share output.
 """
 
 import os

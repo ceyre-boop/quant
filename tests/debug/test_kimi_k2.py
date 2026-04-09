@@ -1,3 +1,5 @@
+# WARNING: Debug/developer script only. Do NOT run in CI or production.
+# Key preview prints are intentional for manual debugging; never share output.
 import requests
 import os
 from dotenv import load_dotenv
