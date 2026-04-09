@@ -88,9 +88,7 @@ class ICTAMDWrapper:
         # Gate 1: Three-layer agreement check
         if not three_layer_context.all_aligned():
             reason = three_layer_context.block_reason()
-            self._log_blocked_signal(
-                "THREE_LAYER_MISMATCH", reason, three_layer_context
-            )
+            self._log_blocked_signal("THREE_LAYER_MISMATCH", reason, three_layer_context)
             self.logger.info(f"Strategy blocked: {reason}")
             return None
 
@@ -105,32 +103,21 @@ class ICTAMDWrapper:
 
         # Gate 3: ICT pattern validation (if provided)
         if ict_setup and not ict_setup.get("valid", False):
-            self._log_blocked_signal(
-                "ICT_PATTERN_INVALID", "Pattern validation failed", three_layer_context
-            )
+            self._log_blocked_signal("ICT_PATTERN_INVALID", "Pattern validation failed", three_layer_context)
             return None
 
         # Gate 4: Layer 3 adversarial check (EXTREME risk blocks)
-        if (
-            three_layer_context.game.adversarial_risk == "EXTREME"
-            and not three_layer_context.game.game_state_aligned
-        ):
-            self._log_blocked_signal(
-                "LAYER3_VETO", "EXTREME adversarial risk", three_layer_context
-            )
+        if three_layer_context.game.adversarial_risk == "EXTREME" and not three_layer_context.game.game_state_aligned:
+            self._log_blocked_signal("LAYER3_VETO", "EXTREME adversarial risk", three_layer_context)
             return None
 
         # All gates passed - build entry signal
-        signal = self._build_entry_signal(
-            h4_data, daily_data, three_layer_context, current_price, ict_setup
-        )
+        signal = self._build_entry_signal(h4_data, daily_data, three_layer_context, current_price, ict_setup)
 
         # Write to Firebase
         self._write_signal_to_firebase(signal)
 
-        self.logger.info(
-            f"ENTRY SIGNAL GENERATED: {signal.symbol} {signal.direction.name}"
-        )
+        self.logger.info(f"ENTRY SIGNAL GENERATED: {signal.symbol} {signal.direction.name}")
         return signal
 
     def _build_entry_signal(
@@ -184,9 +171,7 @@ class ICTAMDWrapper:
             layer_context=context,
         )
 
-    def _build_rationale(
-        self, context: ThreeLayerContext, ict_setup: Optional[Dict]
-    ) -> List[str]:
+    def _build_rationale(self, context: ThreeLayerContext, ict_setup: Optional[Dict]) -> List[str]:
         """Build comprehensive rationale for the signal."""
         rationale = []
 
@@ -261,22 +246,15 @@ class ICTAMDWrapper:
             )
 
             # Update signal count
-            current_count = (
-                self.firebase.read_realtime(f"/signals/{signal.symbol}/count_today")
-                or 0
-            )
-            self.firebase.update_realtime(
-                f"/signals/{signal.symbol}/count_today", current_count + 1
-            )
+            current_count = self.firebase.read_realtime(f"/signals/{signal.symbol}/count_today") or 0
+            self.firebase.update_realtime(f"/signals/{signal.symbol}/count_today", current_count + 1)
 
             self.logger.debug(f"Signal written to Firebase: {doc_id}")
 
         except Exception as e:
             self.logger.error(f"Failed to write signal to Firebase: {e}")
 
-    def _log_blocked_signal(
-        self, reason_code: str, reason_detail: str, context: ThreeLayerContext
-    ) -> None:
+    def _log_blocked_signal(self, reason_code: str, reason_detail: str, context: ThreeLayerContext) -> None:
         """Log blocked signal to Firebase for analysis."""
         try:
             log_entry = {

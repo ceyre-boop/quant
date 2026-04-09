@@ -29,9 +29,7 @@ from data.alpaca_client import AlpacaDataClient
 from scipy import stats
 
 
-def validate_prediction_against_outcomes(
-    prediction: Dict, outcomes: List[bool], expected_wr: float, alpha: float = 0.05
-):
+def validate_prediction_against_outcomes(prediction: Dict, outcomes: List[bool], expected_wr: float, alpha: float = 0.05):
     """Chi-squared test: (O-E)²/E"""
     n = len(outcomes)
     if n < 30:
@@ -46,9 +44,7 @@ def validate_prediction_against_outcomes(
     exp_wins = expected_wr * n
     exp_loss = (1 - expected_wr) * n
 
-    chi_sq = (obs_wins - exp_wins) ** 2 / max(exp_wins, 0.001) + (
-        obs_loss - exp_loss
-    ) ** 2 / max(exp_loss, 0.001)
+    chi_sq = (obs_wins - exp_wins) ** 2 / max(exp_wins, 0.001) + (obs_loss - exp_loss) ** 2 / max(exp_loss, 0.001)
     p_val = 1 - stats.chi2.cdf(chi_sq, df=1)
 
     passed = p_val >= alpha
@@ -262,19 +258,13 @@ class ChiSquaredGate:
             preds, acts = zip(*data)
             expected_wr = np.mean(preds)
 
-            result = validate_prediction_against_outcomes(
-                {"id": bucket_name}, list(acts), expected_wr, self.alpha
-            )
+            result = validate_prediction_against_outcomes({"id": bucket_name}, list(acts), expected_wr, self.alpha)
 
             if result.passed:
                 self.validated_buckets.add(bucket_name)
-                print(
-                    f"[Chi2Gate] ✓ Bucket {bucket_name} validated (p={result.p_value:.3f})"
-                )
+                print(f"[Chi2Gate] ✓ Bucket {bucket_name} validated (p={result.p_value:.3f})")
             else:
-                print(
-                    f"[Chi2Gate] ✗ Bucket {bucket_name} rejected (p={result.p_value:.3f})"
-                )
+                print(f"[Chi2Gate] ✗ Bucket {bucket_name} rejected (p={result.p_value:.3f})")
 
     def check(self, confidence: float) -> Tuple[bool, str]:
         """Check if confidence bucket is validated"""
@@ -311,16 +301,12 @@ class EntryGates:
         self.daily_pnl = 0
         self.chi2_gate = ChiSquaredGate() if use_chi2 else None
 
-    def check(
-        self, layer1: Layer1Output, layer2: Layer2Output, current_equity: float
-    ) -> Layer3Output:
+    def check(self, layer1: Layer1Output, layer2: Layer2Output, current_equity: float) -> Layer3Output:
         """Run all 6 entry gates"""
 
         # Gate 1: Confidence check
         if layer1.confidence < self.min_confidence:
-            return self._reject(
-                f"Confidence {layer1.confidence:.2f} < {self.min_confidence}", layer1
-            )
+            return self._reject(f"Confidence {layer1.confidence:.2f} < {self.min_confidence}", layer1)
 
         # Gate 2: Kelly fraction check
         if layer2.kelly_fraction < self.min_kelly_fraction:
@@ -328,9 +314,7 @@ class EntryGates:
 
         # Gate 3: Game theory check
         if layer2.game_theory_score < 0.3:
-            return self._reject(
-                f"GT score {layer2.game_theory_score:.2f} too low", layer1
-            )
+            return self._reject(f"GT score {layer2.game_theory_score:.2f} too low", layer1)
 
         # Gate 4: Position limit
         if self.current_positions >= self.max_positions:
@@ -381,9 +365,7 @@ class GameTheoryValidator:
 
         scores = []
         returns_5d = (df["close"].iloc[-1] / df["close"].iloc[-5]) - 1
-        momentum_aligned = (direction == "LONG" and returns_5d > 0) or (
-            direction == "SHORT" and returns_5d < 0
-        )
+        momentum_aligned = (direction == "LONG" and returns_5d > 0) or (direction == "SHORT" and returns_5d < 0)
         scores.append(1.0 if momentum_aligned else 0.3)
 
         volatility = df["close"].pct_change().rolling(20).std().iloc[-1]
@@ -408,14 +390,10 @@ class ClawdBrain(AIBrain):  # v3.1 - Canonical
         use_chi2: bool = True,
     ):
 
-        self.model_path = (
-            model_path or Path(__file__).parent / "training" / "xgb_model.pkl"
-        )
+        self.model_path = model_path or Path(__file__).parent / "training" / "xgb_model.pkl"
         self.paper = paper
 
-        self.kelly = KellyCalculator(
-            fraction=kelly_fraction, max_position_pct=max_position_pct
-        )
+        self.kelly = KellyCalculator(fraction=kelly_fraction, max_position_pct=max_position_pct)
         self.kelly.load_history()  # Load previous trade stats
 
         self.game_theory = GameTheoryValidator()
@@ -448,16 +426,12 @@ class ClawdBrain(AIBrain):  # v3.1 - Canonical
             from alpaca.trading.client import TradingClient
             import os
 
-            trading = TradingClient(
-                os.getenv("ALPACA_API_KEY"), os.getenv("ALPACA_SECRET_KEY"), paper=True
-            )
+            trading = TradingClient(os.getenv("ALPACA_API_KEY"), os.getenv("ALPACA_SECRET_KEY"), paper=True)
             equity = float(trading.get_account().equity)
             print(f"[ClawdBrain] Equity fetched: ${equity:,.2f}")
             return equity
         except Exception as e:
-            print(
-                f"[ClawdBrain] WARNING: Failed to fetch equity ({e}), using default $100k"
-            )
+            print(f"[ClawdBrain] WARNING: Failed to fetch equity ({e}), using default $100k")
             return 100000.0
 
     def _layer1_predict(self, symbol: str, df: pd.DataFrame):
@@ -473,9 +447,7 @@ class ClawdBrain(AIBrain):  # v3.1 - Canonical
         for asset in cross_assets:
             if asset != symbol:
                 try:
-                    asset_df = self.alpaca_client.get_historical_bars(
-                        asset, timeframe="1D", days=60
-                    )
+                    asset_df = self.alpaca_client.get_historical_bars(asset, timeframe="1D", days=60)
                     if not asset_df.empty:
                         all_market_data[asset] = asset_df
                 except Exception as e:
@@ -486,10 +458,7 @@ class ClawdBrain(AIBrain):  # v3.1 - Canonical
             return None
 
         latest = features_df.iloc[-1]
-        feature_values = [
-            latest.get(col, 0) if not pd.isna(latest.get(col, 0)) else 0
-            for col in self.feature_cols
-        ]
+        feature_values = [latest.get(col, 0) if not pd.isna(latest.get(col, 0)) else 0 for col in self.feature_cols]
 
         X = np.array(feature_values).reshape(1, -1)
         prob = self.model.predict_proba(X)[0]
@@ -509,9 +478,7 @@ class ClawdBrain(AIBrain):  # v3.1 - Canonical
             win_prob=layer1.win_prob, equity=equity, current_price=current_price
         )
 
-        gt_score, edge, _ = self.game_theory.analyze(
-            layer1.symbol, df, layer1.direction, layer1.bias
-        )
+        gt_score, edge, _ = self.game_theory.analyze(layer1.symbol, df, layer1.direction, layer1.bias)
 
         return Layer2Output(
             symbol=layer1.symbol,
@@ -547,9 +514,7 @@ class ClawdBrain(AIBrain):  # v3.1 - Canonical
             print(
                 f"  Layer 2: Kelly {layer2.kelly_fraction:.3f} | GT {layer2.game_theory_score:.2f} | Shares: {layer2.recommended_shares}"
             )
-            print(
-                f"           (using avg_win={layer2.avg_win:.3f}, avg_loss={layer2.avg_loss:.3f})"
-            )
+            print(f"           (using avg_win={layer2.avg_win:.3f}, avg_loss={layer2.avg_loss:.3f})")
 
             layer3 = self.gates.check(layer1, layer2, equity)
 
@@ -582,9 +547,7 @@ if __name__ == "__main__":
     print("=" * 70)
 
     brain = ClawdBrain(use_chi2=True)
-    bridge = AITradingBridge(
-        brain=brain, symbols=["SPY", "QQQ"], timeframe="1D", paper=True
-    )
+    bridge = AITradingBridge(brain=brain, symbols=["SPY", "QQQ"], timeframe="1D", paper=True)
     result = bridge.run_cycle()
 
     print(f"\nSignals: {result['signals']}")

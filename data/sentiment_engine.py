@@ -82,9 +82,7 @@ class SentimentEngine:
                 "article_count": len(feed),
                 "bullish_count": len([s for s in sentiment_scores if s > 0.25]),
                 "bearish_count": len([s for s in sentiment_scores if s < -0.25]),
-                "neutral_count": len(
-                    [s for s in sentiment_scores if -0.25 <= s <= 0.25]
-                ),
+                "neutral_count": len([s for s in sentiment_scores if -0.25 <= s <= 0.25]),
                 "raw_feed": feed[:5],  # Keep only first 5 for storage
             }
 

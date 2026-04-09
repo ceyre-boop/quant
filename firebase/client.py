@@ -64,18 +64,14 @@ class FirebaseClient:
             return
 
         if not FIREBASE_AVAILABLE:
-            logger.warning(
-                "firebase_admin not installed. Firebase features will be disabled."
-            )
+            logger.warning("firebase_admin not installed. Firebase features will be disabled.")
             self.db = None
             self.rtdb = None
             FirebaseClient._initialized = True
             return
 
         self.project_id = project_id or os.getenv("FIREBASE_PROJECT_ID")
-        self.service_account_path = service_account_path or os.getenv(
-            "FIREBASE_SERVICE_ACCOUNT_PATH"
-        )
+        self.service_account_path = service_account_path or os.getenv("FIREBASE_SERVICE_ACCOUNT_PATH")
         self.rtdb_url = rtdb_url or os.getenv("FIREBASE_RTDB_URL")
 
         if not self.project_id:
@@ -98,17 +94,11 @@ class FirebaseClient:
             if self.service_account_path and Path(self.service_account_path).exists():
                 cred = credentials.Certificate(self.service_account_path)
                 firebase_admin.initialize_app(cred, {"databaseURL": self.rtdb_url})
-                logger.info(
-                    f"Firebase initialized with service account for project {self.project_id}"
-                )
+                logger.info(f"Firebase initialized with service account for project {self.project_id}")
             else:
                 # Try application default credentials (for GCP/GKE environments)
-                firebase_admin.initialize_app(
-                    {"projectId": self.project_id, "databaseURL": self.rtdb_url}
-                )
-                logger.info(
-                    f"Firebase initialized with default credentials for project {self.project_id}"
-                )
+                firebase_admin.initialize_app({"projectId": self.project_id, "databaseURL": self.rtdb_url})
+                logger.info(f"Firebase initialized with default credentials for project {self.project_id}")
 
         self.db = firestore.client()
         self.rtdb = db
@@ -116,9 +106,7 @@ class FirebaseClient:
     def _check_db(self):
         """Check if Firestore is available."""
         if not FIREBASE_AVAILABLE or self.db is None:
-            raise RuntimeError(
-                "Firebase not initialized. Check FIREBASE_PROJECT_ID and credentials."
-            )
+            raise RuntimeError("Firebase not initialized. Check FIREBASE_PROJECT_ID and credentials.")
 
     # ========================================================================
     # Firestore Write Methods
@@ -132,9 +120,7 @@ class FirebaseClient:
         self._check_db()
 
         if validate and not record.is_valid:
-            raise ValueError(
-                f"Cannot write invalid feature record: {record.validation_errors}"
-            )
+            raise ValueError(f"Cannot write invalid feature record: {record.validation_errors}")
 
         doc_id = f"{record.symbol}_{record.timeframe}_{record.timestamp.strftime('%Y%m%d_%H%M%S')}"
         data = record.to_dict()
@@ -245,9 +231,7 @@ class FirebaseClient:
         logger.info(f"Wrote trade record: {trade_id}")
         return trade_id
 
-    def write_regime_history(
-        self, symbol: str, regime: RegimeState, timestamp: datetime
-    ) -> str:
+    def write_regime_history(self, symbol: str, regime: RegimeState, timestamp: datetime) -> str:
         """Write regime classification to history."""
         self._check_db()
 
@@ -311,9 +295,7 @@ class FirebaseClient:
         if game:
             updates["game_state"] = game.to_dict()
         if position:
-            updates["position_state"] = (
-                position.direction.name if position.status == "OPEN" else "FLAT"
-            )
+            updates["position_state"] = position.direction.name if position.status == "OPEN" else "FLAT"
             updates["open_position"] = position.to_dict()
         if session_pnl is not None:
             updates["session_pnl"] = session_pnl
@@ -403,9 +385,7 @@ class FirebaseClient:
             doc_ids.append(doc_id)
         return doc_ids
 
-    def batch_write_risk_structures(
-        self, structures: Dict[str, RiskOutput], bias_ids: Dict[str, str]
-    ) -> List[str]:
+    def batch_write_risk_structures(self, structures: Dict[str, RiskOutput], bias_ids: Dict[str, str]) -> List[str]:
         """Batch write risk structures for multiple symbols."""
         doc_ids = []
         for symbol, risk in structures.items():

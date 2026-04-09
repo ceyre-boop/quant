@@ -200,9 +200,7 @@ class TestMetaEvaluator:
             "TREND_STRENGTH": 0.30,
         }
 
-        report = meta.run_weekly_evaluation(
-            trades, feature_importance, datetime(2024, 1, 1)
-        )
+        report = meta.run_weekly_evaluation(trades, feature_importance, datetime(2024, 1, 1))
 
         assert "performance" in report
         assert "feature_analysis" in report

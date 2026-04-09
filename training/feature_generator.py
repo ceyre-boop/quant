@@ -90,12 +90,8 @@ class FeatureGenerator:
         df["bb_upper"] = df["bb_middle"] + (df["bb_std"] * 2)
         df["bb_lower"] = df["bb_middle"] - (df["bb_std"] * 2)
         bb_range = df["bb_upper"] - df["bb_lower"]
-        df["bb_position"] = np.where(
-            bb_range > 0, (df["close"] - df["bb_lower"]) / bb_range, 0.5
-        )
-        df["bb_width"] = np.where(
-            df["bb_middle"] > 0, (df["bb_upper"] - df["bb_lower"]) / df["bb_middle"], 0
-        )
+        df["bb_position"] = np.where(bb_range > 0, (df["close"] - df["bb_lower"]) / bb_range, 0.5)
+        df["bb_width"] = np.where(df["bb_middle"] > 0, (df["bb_upper"] - df["bb_lower"]) / df["bb_middle"], 0)
 
         # ATR (normalized)
         high_low = df["high"] - df["low"]
@@ -108,9 +104,7 @@ class FeatureGenerator:
 
         # Volume
         df["volume_sma_20"] = df["volume"].rolling(20, min_periods=10).mean()
-        df["volume_ratio"] = np.where(
-            df["volume_sma_20"] > 0, df["volume"] / df["volume_sma_20"], 1.0
-        )
+        df["volume_ratio"] = np.where(df["volume_sma_20"] > 0, df["volume"] / df["volume_sma_20"], 1.0)
 
         # Daily range
         df["daily_range_pct"] = (df["high"] - df["low"]) / df["close"]
@@ -168,18 +162,14 @@ class FeatureGenerator:
 
         return df
 
-    def build_training_dataset(
-        self, timeframe: str = "1D", days: int = 365
-    ) -> pd.DataFrame:
+    def build_training_dataset(self, timeframe: str = "1D", days: int = 365) -> pd.DataFrame:
         """
         Build complete training dataset for all assets
 
         Returns:
             DataFrame with all features and labels
         """
-        print(
-            f"[FeatureGen] Fetching data for {len(self.client.ALL_SYMBOLS)} assets..."
-        )
+        print(f"[FeatureGen] Fetching data for {len(self.client.ALL_SYMBOLS)} assets...")
         all_data = self.client.get_all_assets(timeframe=timeframe, days=days)
 
         print(f"[FeatureGen] Generating features...")
@@ -194,9 +184,7 @@ class FeatureGenerator:
             features_df["symbol"] = symbol
 
             # Generate label (next day return direction)
-            features_df["next_day_return"] = (
-                features_df["close"].shift(-1) / features_df["close"] - 1
-            )
+            features_df["next_day_return"] = features_df["close"].shift(-1) / features_df["close"] - 1
             features_df["target"] = (features_df["next_day_return"] > 0).astype(int)
 
             all_features.append(features_df)
@@ -222,13 +210,9 @@ class FeatureGenerator:
         ]
         combined = combined.dropna(subset=feature_cols + ["target"])
 
-        print(
-            f"[FeatureGen] Training dataset: {len(combined)} samples x {len(feature_cols)} features"
-        )
+        print(f"[FeatureGen] Training dataset: {len(combined)} samples x {len(feature_cols)} features")
         print(f"[FeatureGen] Symbols: {combined['symbol'].nunique()}")
-        print(
-            f"[FeatureGen] Target distribution: {combined['target'].value_counts().to_dict()}"
-        )
+        print(f"[FeatureGen] Target distribution: {combined['target'].value_counts().to_dict()}")
 
         return combined, feature_cols
 

@@ -273,17 +273,13 @@ class ProductionOrchestrator:
         # 6. Run Layer 2 - Risk Engine
         account = self._get_account_state()
         market = self._convert_market_data(market_data)
-        risk = self.risk_engine.compute_risk_structure(
-            bias=bias, regime=regime, market_data=market, account_state=account
-        )
+        risk = self.risk_engine.compute_risk_structure(bias=bias, regime=regime, market_data=market, account_state=account)
 
         # 7. Build three-layer context
         context = ThreeLayerContext(bias=bias, risk=risk, game=game, regime=regime)
 
         # 8. Run hard constraint checks
-        constraint_check = self.hard_constraints.check_all_constraints(
-            account=account, risk=risk
-        )
+        constraint_check = self.hard_constraints.check_all_constraints(account=account, risk=risk)
 
         if not constraint_check.passed:
             logger.info(f"Hard constraint blocked {symbol}: {constraint_check.reason}")
@@ -329,18 +325,14 @@ class ProductionOrchestrator:
             "breadth": 1.0,
         }
 
-    def _write_to_firebase(
-        self, symbol: str, bias: BiasOutput, regime: RegimeState, market_data: Dict
-    ) -> None:
+    def _write_to_firebase(self, symbol: str, bias: BiasOutput, regime: RegimeState, market_data: Dict) -> None:
         """Write pre-market results to Firebase."""
         try:
             timestamp = datetime.now().isoformat()
             doc_id = f"{symbol}_{datetime.now().strftime('%Y%m%d')}"
 
             # 1. Write bias output to Firestore
-            self.firebase.write(
-                "bias_outputs", doc_id, {**bias.to_dict(), "symbol": symbol}
-            )
+            self.firebase.write("bias_outputs", doc_id, {**bias.to_dict(), "symbol": symbol})
 
             # 2. Update Realtime DB - Live Market State Engine
             self.firebase.update_realtime(
@@ -378,13 +370,9 @@ class ProductionOrchestrator:
                         "decision_rationale": bias.rationale,
                         "confidence": bias.confidence,
                         "bias_direction": (
-                            "BULLISH"
-                            if bias.bias_direction > 0
-                            else "BEARISH" if bias.bias_direction < 0 else "NEUTRAL"
+                            "BULLISH" if bias.bias_direction > 0 else "BEARISH" if bias.bias_direction < 0 else "NEUTRAL"
                         ),
-                        "feature_contributions": getattr(
-                            bias, "feature_importance", {}
-                        ),
+                        "feature_contributions": getattr(bias, "feature_importance", {}),
                         "last_update": timestamp,
                     },
                 )

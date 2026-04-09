@@ -100,9 +100,9 @@ def train_model(timeframe: str = "1D", days: int = 365, n_splits: int = 5):
     final_model.fit(X, y)
 
     # Feature importance
-    importance = pd.DataFrame(
-        {"feature": feature_cols, "importance": final_model.feature_importances_}
-    ).sort_values("importance", ascending=False)
+    importance = pd.DataFrame({"feature": feature_cols, "importance": final_model.feature_importances_}).sort_values(
+        "importance", ascending=False
+    )
 
     print("\nTop 10 Feature Importances:")
     print(importance.head(10).to_string(index=False))

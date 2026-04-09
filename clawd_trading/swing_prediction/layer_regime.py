@@ -67,9 +67,7 @@ class RegimeLayer:
             Hurst exponent H
         """
         if len(prices) < window:
-            self.logger.warning(
-                f"Insufficient data for Hurst: {len(prices)} < {window}"
-            )
+            self.logger.warning(f"Insufficient data for Hurst: {len(prices)} < {window}")
             return 0.5
 
         # Use last 'window' prices
@@ -206,9 +204,7 @@ class RegimeLayer:
         hmm_confidence = 0.5
         if "returns" in data:
             returns = np.array(data["returns"])
-            hmm_result = self.fit_hmm_regime(
-                returns, n_states=self.config.get("hmm_states", 3)
-            )
+            hmm_result = self.fit_hmm_regime(returns, n_states=self.config.get("hmm_states", 3))
             hmm_state = hmm_result["state_label"]
             hmm_confidence = hmm_result["state_probability"]
 
@@ -275,9 +271,7 @@ class RegimeLayer:
         # Need at least 2 years of data (assuming 252 trading days/year)
         min_samples = 504
         if len(returns) < min_samples:
-            self.logger.warning(
-                f"Insufficient data for HMM: {len(returns)} < {min_samples}"
-            )
+            self.logger.warning(f"Insufficient data for HMM: {len(returns)} < {min_samples}")
             return {
                 "current_state": 1,
                 "state_label": "NORMAL",
@@ -290,9 +284,7 @@ class RegimeLayer:
         X = returns.reshape(-1, 1)
 
         # Fit HMM
-        model = hmm.GaussianHMM(
-            n_components=n_states, covariance_type="full", n_iter=100, random_state=42
-        )
+        model = hmm.GaussianHMM(n_components=n_states, covariance_type="full", n_iter=100, random_state=42)
 
         try:
             model.fit(X)
@@ -346,9 +338,7 @@ class RegimeLayer:
             "regime_duration": regime_duration,
         }
 
-    def classify_composite_regime(
-        self, hurst: float, adx_regime: str, hmm_state: str
-    ) -> str:
+    def classify_composite_regime(self, hurst: float, adx_regime: str, hmm_state: str) -> str:
         """
         Composite regime logic:
 
@@ -358,15 +348,9 @@ class RegimeLayer:
                      OR hmm_state == 'HIGH_VOL_CRISIS'
         NEUTRAL: everything else
         """
-        favorable = (
-            hurst < 0.5
-            and adx_regime in ["MEAN_REVERT", "TRANSITIONAL"]
-            and hmm_state != "HIGH_VOL_CRISIS"
-        )
+        favorable = hurst < 0.5 and adx_regime in ["MEAN_REVERT", "TRANSITIONAL"] and hmm_state != "HIGH_VOL_CRISIS"
 
-        unfavorable = (
-            hurst > 0.6 or adx_regime == "BREAKOUT" or hmm_state == "HIGH_VOL_CRISIS"
-        )
+        unfavorable = hurst > 0.6 or adx_regime == "BREAKOUT" or hmm_state == "HIGH_VOL_CRISIS"
 
         if favorable:
             return "FAVORABLE"

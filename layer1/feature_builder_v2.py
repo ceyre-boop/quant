@@ -180,9 +180,7 @@ class FeatureBuilder:
         # Moving averages
         features.price_vs_sma_20 = self._price_vs_ma(close, 20)
         features.price_vs_sma_50 = self._price_vs_ma(close, 50)
-        features.price_vs_sma_200 = (
-            self._price_vs_ma(close, 200) if len(close) >= 200 else 0.0
-        )
+        features.price_vs_sma_200 = self._price_vs_ma(close, 200) if len(close) >= 200 else 0.0
         features.price_vs_ema_12 = self._price_vs_ema(close, 12)
         features.price_vs_ema_26 = self._price_vs_ema(close, 26)
 
@@ -207,44 +205,30 @@ class FeatureBuilder:
         features.volatility_regime = self._volatility_regime(features.atr_percent_14)
 
         # Trend strength (ADX)
-        features.adx_14, features.dmi_plus, features.dmi_minus = self._calculate_adx(
-            high, low, close, 14
-        )
+        features.adx_14, features.dmi_plus, features.dmi_minus = self._calculate_adx(high, low, close, 14)
 
         # MACD
-        features.macd_line, features.macd_signal, features.macd_histogram = (
-            self._calculate_macd(close)
-        )
+        features.macd_line, features.macd_signal, features.macd_histogram = self._calculate_macd(close)
 
         # RSI
         features.rsi_14 = self._calculate_rsi(close, 14)
         features.rsi_slope_5 = self._calculate_slope(features.rsi_14, close, 5)
 
         # Stochastic
-        features.stochastic_k, features.stochastic_d = self._calculate_stochastic(
-            high, low, close, 14, 3
-        )
+        features.stochastic_k, features.stochastic_d = self._calculate_stochastic(high, low, close, 14, 3)
 
         # CCI
         features.cci_20 = self._calculate_cci(high, low, close, 20)
 
         # Volume
-        features.volume_sma_ratio = (
-            volume[-1] / np.mean(volume[-20:]) if len(volume) >= 20 else 1.0
-        )
+        features.volume_sma_ratio = volume[-1] / np.mean(volume[-20:]) if len(volume) >= 20 else 1.0
         features.obv_slope = self._calculate_obv_slope(close, volume, 10)
         features.vwap_deviation = self._vwap_deviation(close, volume)
 
         # Structure
-        features.swing_high_20, features.swing_low_20 = self._find_swing_levels(
-            high, low, 20
-        )
-        features.distance_to_resistance = self._distance_to_level(
-            close[-1], features.swing_high_20
-        )
-        features.distance_to_support = self._distance_to_level(
-            close[-1], features.swing_low_20
-        )
+        features.swing_high_20, features.swing_low_20 = self._find_swing_levels(high, low, 20)
+        features.distance_to_resistance = self._distance_to_level(close[-1], features.swing_high_20)
+        features.distance_to_support = self._distance_to_level(close[-1], features.swing_low_20)
         features.higher_highs_5d = self._count_higher_highs(high, 5)
         features.higher_lows_5d = self._count_higher_lows(low, 5)
 
@@ -276,9 +260,7 @@ class FeatureBuilder:
         ema = pd.Series(prices).ewm(span=period).mean().iloc[-1]
         return (prices[-1] - ema) / ema if ema > 0 else 0.0
 
-    def _price_position(
-        self, high: np.ndarray, low: np.ndarray, close: np.ndarray
-    ) -> float:
+    def _price_position(self, high: np.ndarray, low: np.ndarray, close: np.ndarray) -> float:
         """Price position within daily range (0-1)."""
         if len(high) < 1 or len(low) < 1:
             return 0.5
@@ -306,9 +288,7 @@ class FeatureBuilder:
         width = (upper - lower) / sma if sma > 0 else 0
         return position, width
 
-    def _keltner_position(
-        self, high: np.ndarray, low: np.ndarray, close: np.ndarray, period: int
-    ) -> float:
+    def _keltner_position(self, high: np.ndarray, low: np.ndarray, close: np.ndarray, period: int) -> float:
         """Position within Keltner Channels."""
         if len(close) < period:
             return 0.5
@@ -321,9 +301,7 @@ class FeatureBuilder:
             return 0.5
         return (close[-1] - lower) / (upper - lower)
 
-    def _calculate_atr(
-        self, high: np.ndarray, low: np.ndarray, close: np.ndarray, period: int
-    ) -> float:
+    def _calculate_atr(self, high: np.ndarray, low: np.ndarray, close: np.ndarray, period: int) -> float:
         """Calculate Average True Range."""
         if len(close) < period + 1:
             return 0.0
@@ -353,9 +331,7 @@ class FeatureBuilder:
         else:
             return 4.0  # EXTREME
 
-    def _calculate_adx(
-        self, high: np.ndarray, low: np.ndarray, close: np.ndarray, period: int
-    ) -> tuple:
+    def _calculate_adx(self, high: np.ndarray, low: np.ndarray, close: np.ndarray, period: int) -> tuple:
         """Calculate ADX and DMI."""
         if len(close) < period + 2:
             return 25.0, 20.0, 20.0
@@ -377,11 +353,7 @@ class FeatureBuilder:
         plus_di = 100 * np.mean(plus_dm[-period:]) / atr if atr > 0 else 0
         minus_di = 100 * np.mean(minus_dm[-period:]) / atr if atr > 0 else 0
 
-        dx = (
-            100 * abs(plus_di - minus_di) / (plus_di + minus_di)
-            if (plus_di + minus_di) > 0
-            else 0
-        )
+        dx = 100 * abs(plus_di - minus_di) / (plus_di + minus_di) if (plus_di + minus_di) > 0 else 0
         adx = dx  # Simplified - should be smoothed
 
         return adx, plus_di, minus_di
@@ -450,9 +422,7 @@ class FeatureBuilder:
 
         return k, d
 
-    def _calculate_cci(
-        self, high: np.ndarray, low: np.ndarray, close: np.ndarray, period: int
-    ) -> float:
+    def _calculate_cci(self, high: np.ndarray, low: np.ndarray, close: np.ndarray, period: int) -> float:
         """Calculate Commodity Channel Index."""
         if len(close) < period:
             return 0.0
@@ -466,9 +436,7 @@ class FeatureBuilder:
 
         return (typical_price[-1] - sma_tp) / (0.015 * mean_dev)
 
-    def _calculate_obv_slope(
-        self, close: np.ndarray, volume: np.ndarray, period: int
-    ) -> float:
+    def _calculate_obv_slope(self, close: np.ndarray, volume: np.ndarray, period: int) -> float:
         """Calculate OBV slope."""
         if len(close) < period + 1:
             return 0.0
@@ -494,9 +462,7 @@ class FeatureBuilder:
         vwap = np.sum(close * volume) / np.sum(volume)
         return (close[-1] - vwap) / vwap if vwap > 0 else 0.0
 
-    def _find_swing_levels(
-        self, high: np.ndarray, low: np.ndarray, period: int
-    ) -> tuple:
+    def _find_swing_levels(self, high: np.ndarray, low: np.ndarray, period: int) -> tuple:
         """Find swing high and low."""
         if len(high) < period:
             return high[-1], low[-1]

@@ -138,9 +138,7 @@ class HardConstraints:
             )
         return ConstraintCheck(passed=True)
 
-    def check_position_size(
-        self, risk: RiskOutput, account: AccountState
-    ) -> ConstraintCheck:
+    def check_position_size(self, risk: RiskOutput, account: AccountState) -> ConstraintCheck:
         """Check position size limits."""
         max_position = account.equity * self.MAX_POSITION_SIZE_PCT
 
@@ -164,15 +162,11 @@ class HardConstraints:
 
         # Block pre-market (before 9:30 AM EST)
         if hour < 9 or (hour == 9 and minute < 30):
-            return ConstraintCheck(
-                passed=False, reason="Pre-market - no new positions", severity="BLOCK"
-            )
+            return ConstraintCheck(passed=False, reason="Pre-market - no new positions", severity="BLOCK")
 
         # Block after 3 PM
         if hour >= 15:
-            return ConstraintCheck(
-                passed=False, reason="After 3 PM - no new positions", severity="BLOCK"
-            )
+            return ConstraintCheck(passed=False, reason="After 3 PM - no new positions", severity="BLOCK")
 
         return ConstraintCheck(passed=True)
 
@@ -201,9 +195,7 @@ class HardConstraints:
     def check_bias_neutral(self, bias: BiasOutput) -> ConstraintCheck:
         """Check that bias is not neutral."""
         if bias.direction == Direction.NEUTRAL:
-            return ConstraintCheck(
-                passed=False, reason="Bias is NEUTRAL", severity="BLOCK"
-            )
+            return ConstraintCheck(passed=False, reason="Bias is NEUTRAL", severity="BLOCK")
         return ConstraintCheck(passed=True)
 
     def _log_block(self, check: ConstraintCheck):

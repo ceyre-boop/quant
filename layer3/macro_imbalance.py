@@ -180,9 +180,7 @@ class MacroImbalanceFramework:
         rng = np.random.default_rng(day_seed)
 
         # HMM stress: VIX-driven with mild noise
-        vix_stress = np.clip(
-            (vix_level - _VIX_CALM) / (_VIX_CRISIS - _VIX_CALM), 0.0, 1.0
-        )
+        vix_stress = np.clip((vix_level - _VIX_CALM) / (_VIX_CRISIS - _VIX_CALM), 0.0, 1.0)
         # Realised-vol boost when return data is available
         if recent_returns and len(recent_returns) >= 5:
             rv_window = recent_returns[-min(len(recent_returns), 20) :]
@@ -191,9 +189,7 @@ class MacroImbalanceFramework:
         else:
             rv_stress = 0.0
         hmm_noise = rng.uniform(-0.05, 0.05)
-        hmm_stress = float(
-            np.clip(0.6 * vix_stress + 0.4 * rv_stress + hmm_noise, 0.0, 1.0)
-        )
+        hmm_stress = float(np.clip(0.6 * vix_stress + 0.4 * rv_stress + hmm_noise, 0.0, 1.0))
 
         # Synthetic yield spread: mild inversion during high-VIX regimes
         if yield_spread is None:

@@ -57,9 +57,7 @@ class TestBacktestConfig:
         assert config.initial_capital == 50000.0
 
     def test_string_dates(self):
-        config = BacktestConfig(
-            symbol="NAS100", start_date="2024-01-01", end_date="2024-01-31"
-        )
+        config = BacktestConfig(symbol="NAS100", start_date="2024-01-01", end_date="2024-01-31")
         assert isinstance(config.start_date, datetime)
         assert config.start_date.year == 2024
 
@@ -321,9 +319,7 @@ class TestRunSimpleBacktest:
     """Test run_simple_backtest function."""
 
     def test_simple_backtest(self):
-        result = run_simple_backtest(
-            symbol="NAS100", start_date="2024-01-01", end_date="2024-01-05"
-        )
+        result = run_simple_backtest(symbol="NAS100", start_date="2024-01-01", end_date="2024-01-05")
 
         assert isinstance(result, BacktestResult)
         assert result.config.symbol == "NAS100"
@@ -359,9 +355,7 @@ class TestExecutionConfig:
         assert config.fixed_slippage_pips == 0.5
 
     def test_custom_config(self):
-        config = ExecutionConfig(
-            slippage_model=SlippageModel.FIXED, fill_probability=0.9
-        )
+        config = ExecutionConfig(slippage_model=SlippageModel.FIXED, fill_probability=0.9)
         assert config.slippage_model == SlippageModel.FIXED
         assert config.fill_probability == 0.9
 
@@ -422,20 +416,14 @@ class TestExecutionSimulator:
         config = ExecutionConfig(slippage_model=SlippageModel.NONE)
         simulator = ExecutionSimulator(config)
 
-        slippage = simulator._calculate_slippage(
-            Direction.LONG, 1.0, {"close": 100}, None
-        )
+        slippage = simulator._calculate_slippage(Direction.LONG, 1.0, {"close": 100}, None)
         assert slippage == 0.0
 
     def test_calculate_slippage_fixed(self):
-        config = ExecutionConfig(
-            slippage_model=SlippageModel.FIXED, fixed_slippage_pips=1.0
-        )
+        config = ExecutionConfig(slippage_model=SlippageModel.FIXED, fixed_slippage_pips=1.0)
         simulator = ExecutionSimulator(config)
 
-        slippage = simulator._calculate_slippage(
-            Direction.LONG, 1.0, {"close": 100}, None
-        )
+        slippage = simulator._calculate_slippage(Direction.LONG, 1.0, {"close": 100}, None)
         assert slippage == 1.0
 
     def test_calculate_commission(self, simulator):
@@ -455,9 +443,7 @@ class TestExecutionSimulator:
         assert result.slippage == 50.0
 
     def test_estimate_market_impact(self, simulator):
-        impact = simulator.estimate_market_impact(
-            position_size=100, daily_volume=10000, volatility=0.02
-        )
+        impact = simulator.estimate_market_impact(position_size=100, daily_volume=10000, volatility=0.02)
         assert impact > 0
 
 

@@ -43,17 +43,13 @@ def calculate_combined_risk_limits(
     regime_limits = get_regime_risk_limits(regime)
 
     # Combine multipliers (multiplicative for conservative sizing)
-    combined_size_multiplier = (
-        participant_limits.max_size_multiplier * regime_limits.max_per_trade_R
-    )
+    combined_size_multiplier = participant_limits.max_size_multiplier * regime_limits.max_per_trade_R
 
     combined_concurrent_multiplier = participant_limits.max_concurrent_risk * (
         regime_limits.max_concurrent_R / 3.0
     )  # Normalize to 0-1
 
-    combined_daily_multiplier = participant_limits.max_daily_risk * (
-        regime_limits.max_daily_R / 5.0
-    )  # Normalize to 0-1
+    combined_daily_multiplier = participant_limits.max_daily_risk * (regime_limits.max_daily_R / 5.0)  # Normalize to 0-1
 
     # Check for trade blocks
     block_reasons = []
@@ -186,9 +182,7 @@ def validate_entry_with_combined_risk(
         "action": "ALLOW",
         "adjusted_limits": combined_limits,
         "risk_metadata": {
-            "participant_dominant": max(
-                participant_likelihoods, key=lambda x: x.probability
-            ).type.name,
+            "participant_dominant": max(participant_likelihoods, key=lambda x: x.probability).type.name,
             "regime": regime.value,
             "size_multiplier": combined_limits["risk_multipliers"]["combined_size"],
         },

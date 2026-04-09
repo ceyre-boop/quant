@@ -15,9 +15,7 @@ class OrderFlowFetcher:
     def __init__(self, polygon_client: Optional[PolygonRestClient] = None):
         self.client = polygon_client or PolygonRestClient()
 
-    def fetch_recent_trades(
-        self, symbol: str, limit: int = 1000
-    ) -> List[Dict[str, Any]]:
+    def fetch_recent_trades(self, symbol: str, limit: int = 1000) -> List[Dict[str, Any]]:
         """Fetch recent trade ticks.
 
         Args:

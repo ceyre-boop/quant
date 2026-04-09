@@ -139,16 +139,12 @@ class LiveTradingEngineV2:
         poly_ok = test_results["polygon"]["status"] == "OK"
 
         if yahoo_ok:
-            self.logger.info(
-                f"✅ Yahoo Finance: Connected (SPY @ ${test_results['yahoo']['price']:.2f})"
-            )
+            self.logger.info(f"✅ Yahoo Finance: Connected (SPY @ ${test_results['yahoo']['price']:.2f})")
         else:
             self.logger.warning("❌ Yahoo Finance: Connection failed")
 
         if poly_ok:
-            self.logger.info(
-                f"✅ Polygon.io: Connected (SPY @ ${test_results['polygon']['price']:.2f})"
-            )
+            self.logger.info(f"✅ Polygon.io: Connected (SPY @ ${test_results['polygon']['price']:.2f})")
         else:
             self.logger.warning("❌ Polygon.io: Connection failed")
 
@@ -165,11 +161,7 @@ class LiveTradingEngineV2:
             return None
 
         # Calculate additional metrics
-        volatility = (
-            (market_data.high - market_data.low) / market_data.close
-            if market_data.close > 0
-            else 0
-        )
+        volatility = (market_data.high - market_data.low) / market_data.close if market_data.close > 0 else 0
 
         return {
             "symbol": symbol,
@@ -182,16 +174,10 @@ class LiveTradingEngineV2:
             "change_percent": market_data.change_percent,
             "volatility": volatility,
             "timestamp": market_data.timestamp,
-            "source": (
-                "yahoo"
-                if self.data.yahoo.get_current_price(symbol) == market_data.close
-                else "polygon"
-            ),
+            "source": ("yahoo" if self.data.yahoo.get_current_price(symbol) == market_data.close else "polygon"),
         }
 
-    def build_layer1_from_real_data(
-        self, symbol: str, data: Dict[str, Any]
-    ) -> Optional[Dict[str, Any]]:
+    def build_layer1_from_real_data(self, symbol: str, data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         """Build Layer 1 analysis from REAL market data."""
         price = data.get("price", 0)
         change_pct = data.get("change_percent", 0)
@@ -239,11 +225,7 @@ class LiveTradingEngineV2:
             "fvg_detected": fvg_detected,
             "fvg_level": price * 0.995 if fvg_detected else price,
             "liquidity_sweep": liquidity_sweep,
-            "sweep_level": (
-                data.get("low", price)
-                if trend == "uptrend"
-                else data.get("high", price)
-            ),
+            "sweep_level": (data.get("low", price) if trend == "uptrend" else data.get("high", price)),
             "order_block": False,
             "ict_setup": {},
             "session": self._get_session(),
@@ -289,12 +271,8 @@ class LiveTradingEngineV2:
             "win_prob": 0.5 + (confidence - 0.5) * 0.6,
             "risk_reward": 2.0,
             "max_position_size": min(confidence * 0.5, 0.25),
-            "stop_loss": (
-                price - stop_distance if direction == 1 else price + stop_distance
-            ),
-            "take_profit": (
-                price + tp_distance if direction == 1 else price - tp_distance
-            ),
+            "stop_loss": (price - stop_distance if direction == 1 else price + stop_distance),
+            "take_profit": (price + tp_distance if direction == 1 else price - tp_distance),
         }
 
     def build_layer3(self, symbol: str, layer1: Dict[str, Any]) -> Dict[str, Any]:
@@ -384,9 +362,7 @@ class LiveTradingEngineV2:
 
         for pos in closed:
             emoji = "✅" if pos.pnl > 0 else "❌"
-            self.logger.info(
-                f"Position closed: {pos.trade_id} PnL: ${pos.pnl:,.2f} {emoji}"
-            )
+            self.logger.info(f"Position closed: {pos.trade_id} PnL: ${pos.pnl:,.2f} {emoji}")
 
     def _broadcast_signal(self, signal: EnhancedEntrySignal) -> bool:
         """Broadcast to Firebase."""
@@ -394,9 +370,7 @@ class LiveTradingEngineV2:
             return False
 
         try:
-            self.firebase.publish_signal_realtime(
-                symbol=signal.symbol, signal_data=signal.to_firebase_dict()
-            )
+            self.firebase.publish_signal_realtime(symbol=signal.symbol, signal_data=signal.to_firebase_dict())
             return True
         except Exception as e:
             self.logger.error(f"Broadcast failed: {e}")

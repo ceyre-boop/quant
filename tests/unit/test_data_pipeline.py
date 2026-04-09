@@ -54,9 +54,7 @@ class TestDataPipeline:
     @pytest.fixture
     def pipeline(self, mock_polygon, mock_tradelocker):
         """Create DataPipeline with mocked clients."""
-        return DataPipeline(
-            polygon_client=mock_polygon, tradelocker_client=mock_tradelocker
-        )
+        return DataPipeline(polygon_client=mock_polygon, tradelocker_client=mock_tradelocker)
 
     def test_run_premarket_returns_valid_records(self, pipeline):
         """Test that premarket pipeline returns valid feature records."""
@@ -152,9 +150,7 @@ class TestDataFetchers:
         from data.daily_fetcher import DailyFetcher
 
         mock_client = Mock()
-        mock_client.get_aggregates.return_value = {
-            "results": [{"c": 20000, "h": 20100, "l": 19900, "o": 19950, "v": 1000000}]
-        }
+        mock_client.get_aggregates.return_value = {"results": [{"c": 20000, "h": 20100, "l": 19900, "o": 19950, "v": 1000000}]}
 
         fetcher = DailyFetcher(mock_client)
         results = fetcher.fetch_daily_bars("NAS100", 30)
@@ -167,9 +163,7 @@ class TestDataFetchers:
         from data.index_fetcher import IndexFetcher
 
         mock_client = Mock()
-        mock_client.get_aggregates.return_value = {
-            "results": [{"c": 18.5, "h": 19.0, "l": 18.0, "o": 18.2, "v": 0}]
-        }
+        mock_client.get_aggregates.return_value = {"results": [{"c": 18.5, "h": 19.0, "l": 18.0, "o": 18.2, "v": 0}]}
 
         fetcher = IndexFetcher(mock_client)
 
@@ -184,9 +178,7 @@ class TestDataFetchers:
         from data.breadth_engine import BreadthEngine
 
         mock_client = Mock()
-        mock_client.get_previous_close.return_value = {
-            "results": [{"c": 20100, "o": 20000}]
-        }
+        mock_client.get_previous_close.return_value = {"results": [{"c": 20100, "o": 20000}]}
 
         engine = BreadthEngine(mock_client)
         metrics = engine.compute_breadth_metrics(["XLK", "XLF"])
@@ -265,9 +257,7 @@ class TestTradeLockerClient:
         """Test that demo mode doesn't place real orders."""
         from data.tradelocker_client import TradeLockerClient
 
-        client = TradeLockerClient(
-            api_key="test_key", account_id="test_account", env="demo"
-        )
+        client = TradeLockerClient(api_key="test_key", account_id="test_account", env="demo")
 
         result = client.place_order("NAS100", "buy", 1.0)
 
@@ -278,9 +268,7 @@ class TestTradeLockerClient:
         """Test close position in demo mode."""
         from data.tradelocker_client import TradeLockerClient
 
-        client = TradeLockerClient(
-            api_key="test_key", account_id="test_account", env="demo"
-        )
+        client = TradeLockerClient(api_key="test_key", account_id="test_account", env="demo")
 
         result = client.close_position("pos_001")
 

@@ -153,9 +153,7 @@ class ProductionTradingEngine:
             self.logger.error(f"Layer 1 fetch failed for {symbol}: {e}")
             return self._generate_fallback_layer1(symbol)
 
-    def fetch_layer2_analysis(
-        self, symbol: str, layer1: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    def fetch_layer2_analysis(self, symbol: str, layer1: Dict[str, Any]) -> Dict[str, Any]:
         """Fetch Layer 2 analysis (EV, risk, game)."""
         try:
             # Calculate EV based on Layer 1 features
@@ -190,9 +188,7 @@ class ProductionTradingEngine:
                 "max_position_size": 0.5,
             }
 
-    def fetch_layer3_analysis(
-        self, symbol: str, layer1: Dict[str, Any], layer2: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    def fetch_layer3_analysis(self, symbol: str, layer1: Dict[str, Any], layer2: Dict[str, Any]) -> Dict[str, Any]:
         """Fetch Layer 3 analysis (game theory)."""
         try:
             # Check adversarial conditions
@@ -272,9 +268,7 @@ class ProductionTradingEngine:
         """Broadcast signal to Firebase."""
         try:
             # Publish to Realtime DB for dashboard
-            self.firebase.publish_signal_realtime(
-                symbol=signal.symbol, signal_data=signal.to_firebase_dict()
-            )
+            self.firebase.publish_signal_realtime(symbol=signal.symbol, signal_data=signal.to_firebase_dict())
 
             # Publish to Firestore for history
             self.firebase.publish_signal(
@@ -323,9 +317,7 @@ def run_premarket_build(symbols: list[str]) -> None:
 
         pipeline = DataPipeline()
         records = pipeline.run_premarket(symbols=symbols, include_all_features=True)
-        valid_count = sum(
-            1 for record in records.values() if getattr(record, "is_valid", False)
-        )
+        valid_count = sum(1 for record in records.values() if getattr(record, "is_valid", False))
         logging.info(
             "Premarket feature build complete: %s/%s valid records",
             valid_count,
@@ -366,14 +358,10 @@ def run_weekly_refit_check(now_et: datetime) -> None:
         }
         drift_detected = os.getenv("WEEKLY_DRIFT_DETECTED", "false").lower() == "true"
 
-        evaluation = scheduler.evaluate_refit_need(
-            metrics, drift_detected=drift_detected
-        )
+        evaluation = scheduler.evaluate_refit_need(metrics, drift_detected=drift_detected)
 
         if evaluation.get("should_refit"):
-            schedule = scheduler.schedule_refit(
-                evaluation, model_version=f"weekly-{now_et.date().isoformat()}"
-            )
+            schedule = scheduler.schedule_refit(evaluation, model_version=f"weekly-{now_et.date().isoformat()}")
             logging.info("Weekly refit scheduled: %s", schedule)
         else:
             logging.info("No weekly refit scheduled: %s", evaluation.get("reasons", []))
@@ -381,9 +369,7 @@ def run_weekly_refit_check(now_et: datetime) -> None:
         logging.exception("Weekly refit check failed: %s", exc)
 
 
-def push_heartbeat(
-    status: str, engine: Optional[ProductionTradingEngine] = None
-) -> None:
+def push_heartbeat(status: str, engine: Optional[ProductionTradingEngine] = None) -> None:
     """Push engine heartbeat to Firebase."""
     payload = {
         "status": status,
@@ -415,9 +401,7 @@ def reset_daily_state(state: RuntimeState, now_et: datetime) -> RuntimeState:
     """Reset daily markers at start of new day."""
     if state.run_date == now_et.date():
         return state
-    return RuntimeState(
-        run_date=now_et.date(), weekly_refit_week_key=state.weekly_refit_week_key
-    )
+    return RuntimeState(run_date=now_et.date(), weekly_refit_week_key=state.weekly_refit_week_key)
 
 
 def main() -> None:
@@ -439,12 +423,8 @@ def main() -> None:
 
     logging.info("Environment loaded")
     logging.info("Symbols: %s", symbols)
-    logging.info(
-        "Schedule: 08:00 premarket | 09:30-16:00 live signals | 16:05 shutdown"
-    )
-    logging.info(
-        "Components: Participant Analysis | Regime Risk | Entry Scoring | 12-Gate Validation"
-    )
+    logging.info("Schedule: 08:00 premarket | 09:30-16:00 live signals | 16:05 shutdown")
+    logging.info("Components: Participant Analysis | Regime Risk | Entry Scoring | 12-Gate Validation")
 
     push_heartbeat(status="initialized", engine=engine)
 
@@ -461,18 +441,12 @@ def main() -> None:
                     weekly_refit_dt = combine_today(now_et, WEEKLY_REFIT_TIME)
 
                     # 08:00 - Premarket build
-                    if (
-                        time_in_range(now_et, PREMARKET_TIME, MARKET_OPEN_TIME)
-                        and not state.premarket_done
-                    ):
+                    if time_in_range(now_et, PREMARKET_TIME, MARKET_OPEN_TIME) and not state.premarket_done:
                         run_premarket_build(symbols)
                         state.premarket_done = True
 
                     # 09:30 - Market open
-                    if (
-                        time_in_range(now_et, MARKET_OPEN_TIME, MARKET_CLOSE_TIME)
-                        and not state.market_open_logged
-                    ):
+                    if time_in_range(now_et, MARKET_OPEN_TIME, MARKET_CLOSE_TIME) and not state.market_open_logged:
                         logging.info("09:30 market open: production engine starting")
                         state.market_open_logged = True
                         state.next_signal_due = market_open_dt
@@ -495,22 +469,15 @@ def main() -> None:
                             else:
                                 logging.info("No signal generated this cycle")
 
-                            state.next_signal_due = (
-                                state.next_signal_due + SIGNAL_INTERVAL
-                            )
+                            state.next_signal_due = state.next_signal_due + SIGNAL_INTERVAL
 
                     # 16:05 - EOD shutdown
-                    if (
-                        time_in_range(now_et, EOD_SHUTDOWN_TIME, SESSION_END_TIME)
-                        and not state.eod_done
-                    ):
+                    if time_in_range(now_et, EOD_SHUTDOWN_TIME, SESSION_END_TIME) and not state.eod_done:
                         run_eod_shutdown(firebase)
                         state.eod_done = True
 
                     # Weekly refit (Fridays at 16:10)
-                    week_key = (
-                        f"{now_et.isocalendar().year}-W{now_et.isocalendar().week:02d}"
-                    )
+                    week_key = f"{now_et.isocalendar().year}-W{now_et.isocalendar().week:02d}"
                     if (
                         now_et.weekday() == 4
                         and time_in_range(now_et, WEEKLY_REFIT_TIME, SESSION_END_TIME)

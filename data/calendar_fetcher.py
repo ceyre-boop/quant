@@ -22,9 +22,7 @@ class CalendarFetcher:
         self.api_key = api_key or os.getenv("TRADING_ECON_API_KEY")
         self.base_url = base_url
 
-    def fetch_events(
-        self, country: str = "united states", days_ahead: int = 7
-    ) -> List[Dict[str, Any]]:
+    def fetch_events(self, country: str = "united states", days_ahead: int = 7) -> List[Dict[str, Any]]:
         """Fetch economic calendar events.
 
         Args:
@@ -56,9 +54,7 @@ class CalendarFetcher:
             filtered_events = []
             for event in events:
                 try:
-                    event_date = datetime.strptime(
-                        event.get("Date", ""), "%Y-%m-%dT%H:%M:%S"
-                    ).date()
+                    event_date = datetime.strptime(event.get("Date", ""), "%Y-%m-%dT%H:%M:%S").date()
                     if today <= event_date <= end_date:
                         filtered_events.append(event)
                 except (ValueError, TypeError):
@@ -70,9 +66,7 @@ class CalendarFetcher:
             logger.error(f"Failed to fetch calendar events: {e}")
             return self._get_mock_events()
 
-    def get_high_impact_events(
-        self, events: List[Dict[str, Any]]
-    ) -> List[Dict[str, Any]]:
+    def get_high_impact_events(self, events: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Filter for high impact events.
 
         High impact events include:

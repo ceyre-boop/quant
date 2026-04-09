@@ -155,16 +155,10 @@ class FrontendAPI:
 
             return {
                 "status": health.get("status", "unknown") if health else "unknown",
-                "trading_enabled": (
-                    controls.get("trading_enabled", False) if controls else False
-                ),
+                "trading_enabled": (controls.get("trading_enabled", False) if controls else False),
                 "open_positions": controls.get("open_positions", 0) if controls else 0,
                 "daily_pnl": controls.get("daily_pnl", 0.0) if controls else 0.0,
-                "hard_logic_status": (
-                    controls.get("hard_logic_status", "unknown")
-                    if controls
-                    else "unknown"
-                ),
+                "hard_logic_status": (controls.get("hard_logic_status", "unknown") if controls else "unknown"),
                 "last_update": health.get("timestamp") if health else None,
                 "components": health.get("components", {}) if health else {},
             }
@@ -173,9 +167,7 @@ class FrontendAPI:
             self.logger.error(f"Failed to get system status: {e}")
             return {"status": "error", "error": str(e)}
 
-    def _format_dashboard_signal(
-        self, symbol: str, latest: Dict, context: Optional[Dict]
-    ) -> Optional[DashboardSignal]:
+    def _format_dashboard_signal(self, symbol: str, latest: Dict, context: Optional[Dict]) -> Optional[DashboardSignal]:
         """Format raw signal data for dashboard."""
         try:
             # Calculate risk/reward
@@ -197,11 +189,7 @@ class FrontendAPI:
 
             # Determine direction string
             direction_val = latest.get("direction", 0)
-            direction_str = (
-                "LONG"
-                if direction_val == 1
-                else "SHORT" if direction_val == -1 else "NEUTRAL"
-            )
+            direction_str = "LONG" if direction_val == 1 else "SHORT" if direction_val == -1 else "NEUTRAL"
 
             return DashboardSignal(
                 symbol=symbol,
@@ -226,9 +214,7 @@ class FrontendAPI:
             self.logger.error(f"Failed to format dashboard signal: {e}")
             return None
 
-    def _check_agreement(
-        self, bias: Optional[Dict], risk: Optional[Dict], game: Optional[Dict]
-    ) -> Dict[str, Any]:
+    def _check_agreement(self, bias: Optional[Dict], risk: Optional[Dict], game: Optional[Dict]) -> Dict[str, Any]:
         """Check three-layer agreement."""
         if not bias or not risk or not game:
             return {"aligned": False, "reason": "Missing layer data"}
@@ -240,10 +226,7 @@ class FrontendAPI:
         l2_ok = risk.get("ev_positive", False)
 
         # Check Layer 3
-        l3_ok = (
-            game.get("game_state_aligned", False)
-            or game.get("adversarial_risk", "LOW") != "EXTREME"
-        )
+        l3_ok = game.get("game_state_aligned", False) or game.get("adversarial_risk", "LOW") != "EXTREME"
 
         aligned = l1_ok and l2_ok and l3_ok
 

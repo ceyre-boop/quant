@@ -44,12 +44,8 @@ class TestFeatureBuilder:
 
         # Ensure high >= low
         for i in range(n):
-            data["high"][i] = max(
-                data["high"][i], data["low"][i], data["close"][i], data["open"][i]
-            )
-            data["low"][i] = min(
-                data["low"][i], data["high"][i], data["close"][i], data["open"][i]
-            )
+            data["high"][i] = max(data["high"][i], data["low"][i], data["close"][i], data["open"][i])
+            data["low"][i] = min(data["low"][i], data["high"][i], data["close"][i], data["open"][i])
 
         return pd.DataFrame(data)
 
@@ -190,16 +186,12 @@ class TestBiasEngine:
         engine = BiasEngine()
 
         # Bullish features
-        bullish_features = FeatureVector(
-            price_vs_sma_20=0.05, rsi_14=65, macd_histogram=100
-        )
+        bullish_features = FeatureVector(price_vs_sma_20=0.05, rsi_14=65, macd_histogram=100)
         direction, confidence = engine._predict_direction(bullish_features)
         assert direction in [Direction.LONG, Direction.NEUTRAL]
 
         # Bearish features
-        bearish_features = FeatureVector(
-            price_vs_sma_20=-0.05, rsi_14=35, macd_histogram=-100
-        )
+        bearish_features = FeatureVector(price_vs_sma_20=-0.05, rsi_14=35, macd_histogram=-100)
         direction, confidence = engine._predict_direction(bearish_features)
         assert direction in [Direction.SHORT, Direction.NEUTRAL]
 
@@ -339,16 +331,12 @@ class TestHardConstraints:
             composite_score=0.75,
         )
 
-    def test_all_constraints_pass(
-        self, sample_bias, sample_risk, sample_regime, sample_account
-    ):
+    def test_all_constraints_pass(self, sample_bias, sample_risk, sample_regime, sample_account):
         """Test that valid inputs pass all constraints."""
         constraints = HardConstraints()
         # Use a valid trading time (10:30 AM)
         trading_time = datetime(2024, 1, 15, 10, 30)
-        check = constraints.check_all_constraints(
-            sample_bias, sample_risk, sample_regime, sample_account, trading_time
-        )
+        check = constraints.check_all_constraints(sample_bias, sample_risk, sample_regime, sample_account, trading_time)
 
         assert check.passed is True
 
@@ -393,9 +381,7 @@ class TestHardConstraints:
         check = constraints.check_position_size(sample_risk, sample_account)
         assert check.passed is False
 
-    def test_trading_hours_pre_market(
-        self, sample_bias, sample_risk, sample_regime, sample_account
-    ):
+    def test_trading_hours_pre_market(self, sample_bias, sample_risk, sample_regime, sample_account):
         """Test pre-market trading block."""
         constraints = HardConstraints()
 
@@ -404,9 +390,7 @@ class TestHardConstraints:
         check = constraints.check_trading_hours(pre_market)
         assert check.passed is False
 
-    def test_trading_hours_after_hours(
-        self, sample_bias, sample_risk, sample_regime, sample_account
-    ):
+    def test_trading_hours_after_hours(self, sample_bias, sample_risk, sample_regime, sample_account):
         """Test after-hours trading block."""
         constraints = HardConstraints()
 
@@ -439,17 +423,13 @@ class TestHardConstraints:
         check = constraints.check_bias_neutral(sample_bias)
         assert check.passed is False
 
-    def test_block_history(
-        self, sample_bias, sample_risk, sample_regime, sample_account
-    ):
+    def test_block_history(self, sample_bias, sample_risk, sample_regime, sample_account):
         """Test block history tracking."""
         constraints = HardConstraints()
 
         # Trigger a block
         sample_account.daily_loss_pct = 0.05
-        constraints.check_all_constraints(
-            sample_bias, sample_risk, sample_regime, sample_account
-        )
+        constraints.check_all_constraints(sample_bias, sample_risk, sample_regime, sample_account)
 
         history = constraints.get_block_history()
         assert len(history) > 0

@@ -50,9 +50,7 @@ class PerformanceMonitor:
         self.archive = signal_archive or SignalArchive()
         self._baseline_accuracy: Optional[float] = None
 
-    def run_weekly_analysis(
-        self, days_back: int = 7, push_to_firebase: bool = True
-    ) -> PerformanceMetrics:
+    def run_weekly_analysis(self, days_back: int = 7, push_to_firebase: bool = True) -> PerformanceMetrics:
         """Run complete weekly performance analysis.
 
         Args:
@@ -101,9 +99,7 @@ class PerformanceMonitor:
 
         return metrics
 
-    def _get_trades_for_period(
-        self, start_date: str, end_date: str
-    ) -> List[Dict[str, Any]]:
+    def _get_trades_for_period(self, start_date: str, end_date: str) -> List[Dict[str, Any]]:
         """Get completed trades for a date range."""
         signals = self.archive.get_signals_for_range(start_date, end_date)
 
@@ -203,9 +199,7 @@ class PerformanceMonitor:
         end_date = datetime.now()
         start_date = end_date - timedelta(days=30)
 
-        trades = self._get_trades_for_period(
-            start_date.strftime("%Y-%m-%d"), end_date.strftime("%Y-%m-%d")
-        )
+        trades = self._get_trades_for_period(start_date.strftime("%Y-%m-%d"), end_date.strftime("%Y-%m-%d"))
 
         drift_detected, accuracy = self._check_drift(trades)
 
@@ -252,9 +246,7 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser(description="Performance Monitor")
-    parser.add_argument(
-        "--period", choices=["daily", "weekly", "monthly"], default="weekly"
-    )
+    parser.add_argument("--period", choices=["daily", "weekly", "monthly"], default="weekly")
     parser.add_argument("--output", help="Output file path")
     parser.add_argument("--no-push", action="store_true", help="Skip Firebase push")
 
@@ -265,9 +257,7 @@ def main():
     days = days_map[args.period]
 
     monitor = PerformanceMonitor()
-    metrics = monitor.run_weekly_analysis(
-        days_back=days, push_to_firebase=not args.no_push
-    )
+    metrics = monitor.run_weekly_analysis(days_back=days, push_to_firebase=not args.no_push)
 
     # Print summary
     print(f"\n{'='*50}")

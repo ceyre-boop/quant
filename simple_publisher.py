@@ -23,9 +23,7 @@ from contracts.types import AccountState
 
 load_dotenv(".env")
 
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s | %(levelname)s | %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s | %(levelname)s | %(message)s")
 logger = logging.getLogger(__name__)
 
 TZ_NY = ZoneInfo("America/New_York")
@@ -73,9 +71,7 @@ class SimpleFirebasePublisher:
             if response.status_code == 200:
                 return True
             else:
-                logger.error(
-                    f"Firebase write failed: {response.status_code} - {response.text}"
-                )
+                logger.error(f"Firebase write failed: {response.status_code}")
                 return False
         except Exception as e:
             logger.error(f"Firebase write error: {e}")
@@ -153,11 +149,7 @@ class SimpleFirebasePublisher:
                 },
                 # Regime
                 "regime": {
-                    "volatility": (
-                        "HIGH"
-                        if volatility > 0.02
-                        else "NORMAL" if volatility > 0.01 else "LOW"
-                    ),
+                    "volatility": ("HIGH" if volatility > 0.02 else "NORMAL" if volatility > 0.01 else "LOW"),
                     "trend": trend.upper(),
                     "risk_appetite": "ELEVATED" if volatility > 0.02 else "NORMAL",
                     "event_risk": "NONE",
@@ -167,19 +159,13 @@ class SimpleFirebasePublisher:
                 "session": {
                     "pnl": self.paper.daily_pnl,
                     "position": "LONG" if symbol in self.paper.positions else "FLAT",
-                    "entry": (
-                        list(self.paper.positions.values())[0].entry_price
-                        if symbol in self.paper.positions
-                        else 0
-                    ),
+                    "entry": (list(self.paper.positions.values())[0].entry_price if symbol in self.paper.positions else 0),
                 },
             }
 
             # Publish to Firebase
             if self._firebase_put(f"live_state/{symbol}", live_state):
-                logger.info(
-                    f"Published {symbol}: ${market_data.close:.2f} | {trend.upper()} | Conf: {confidence:.2f}"
-                )
+                logger.info(f"Published {symbol}: ${market_data.close:.2f} | {trend.upper()} | Conf: {confidence:.2f}")
                 return True
             else:
                 return False
@@ -198,20 +184,12 @@ class SimpleFirebasePublisher:
             # Build layers
             layer1 = {
                 "symbol": symbol,
-                "direction": (
-                    1
-                    if market_data.change_percent > 0.005
-                    else -1 if market_data.change_percent < -0.005 else 0
-                ),
+                "direction": (1 if market_data.change_percent > 0.005 else -1 if market_data.change_percent < -0.005 else 0),
                 "confidence": min(0.5 + abs(market_data.change_percent) * 20, 0.95),
                 "trend_regime": (
                     "uptrend"
                     if market_data.change_percent > 0.005
-                    else (
-                        "downtrend"
-                        if market_data.change_percent < -0.005
-                        else "neutral"
-                    )
+                    else ("downtrend" if market_data.change_percent < -0.005 else "neutral")
                 ),
                 "current_price": market_data.close,
                 "features": {"change_pct": market_data.change_percent},
@@ -279,9 +257,7 @@ class SimpleFirebasePublisher:
                         f'entry_signals/{symbol}/history/{signal_data["signal_id"]}',
                         signal_data,
                     )
-                    logger.info(
-                        f"SIGNAL: {signal.direction_str} {symbol} @ ${signal.entry_price:.2f}"
-                    )
+                    logger.info(f"SIGNAL: {signal.direction_str} {symbol} @ ${signal.entry_price:.2f}")
                     return True
 
             return False

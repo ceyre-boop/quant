@@ -58,11 +58,7 @@ class SystemControls:
             allowed_symbols=data.get("allowed_symbols", []),
             max_open_positions=data.get("max_open_positions", 5),
             max_positions_per_symbol=data.get("max_positions_per_symbol", 1),
-            updated_at=(
-                datetime.fromisoformat(data["updated_at"])
-                if data.get("updated_at")
-                else None
-            ),
+            updated_at=(datetime.fromisoformat(data["updated_at"]) if data.get("updated_at") else None),
         )
 
     def to_dict(self) -> Dict[str, Any]:
@@ -107,9 +103,7 @@ class ExecutionGuardrails:
     # Default allowed symbols
     DEFAULT_SYMBOLS = ["NAS100", "US30", "SPX500", "EURUSD", "GBPUSD", "XAUUSD"]
 
-    def __init__(
-        self, firebase_client: Optional[FirebaseClient] = None, demo_mode: bool = True
-    ):
+    def __init__(self, firebase_client: Optional[FirebaseClient] = None, demo_mode: bool = True):
         """Initialize execution guardrails.
 
         Args:
@@ -135,9 +129,7 @@ class ExecutionGuardrails:
             if data:
                 self._controls = SystemControls.from_dict(data)
                 self._last_refresh = datetime.utcnow()
-                logger.debug(
-                    f"Refreshed system controls: trading_enabled={self._controls.trading_enabled}"
-                )
+                logger.debug(f"Refreshed system controls: trading_enabled={self._controls.trading_enabled}")
             else:
                 # Use defaults if no data in Firebase
                 if self._controls is None:
@@ -145,17 +137,13 @@ class ExecutionGuardrails:
                         trading_enabled=False,  # Default to OFF for safety
                         allowed_symbols=self.DEFAULT_SYMBOLS,
                     )
-                    logger.warning(
-                        "No system controls found in Firebase, using safe defaults"
-                    )
+                    logger.warning("No system controls found in Firebase, using safe defaults")
 
         except Exception as e:
             logger.error(f"Failed to refresh system controls: {e}")
             # Keep existing controls or use defaults
             if self._controls is None:
-                self._controls = SystemControls(
-                    trading_enabled=False, allowed_symbols=self.DEFAULT_SYMBOLS
-                )
+                self._controls = SystemControls(trading_enabled=False, allowed_symbols=self.DEFAULT_SYMBOLS)
 
         return self._controls
 
@@ -164,8 +152,7 @@ class ExecutionGuardrails:
         if (
             self._controls is None
             or self._last_refresh is None
-            or (datetime.utcnow() - self._last_refresh).total_seconds()
-            > self._cache_ttl_seconds
+            or (datetime.utcnow() - self._last_refresh).total_seconds() > self._cache_ttl_seconds
         ):
             return self._refresh_controls()
         return self._controls
@@ -291,9 +278,7 @@ class ExecutionGuardrails:
 
         # Check max open positions if current positions provided
         if current_positions is not None:
-            open_count = len(
-                [p for p in current_positions.values() if p.get("status") == "OPEN"]
-            )
+            open_count = len([p for p in current_positions.values() if p.get("status") == "OPEN"])
             if open_count >= controls.max_open_positions:
                 return GuardrailResult(
                     status=GuardrailStatus.FAIL,
@@ -310,9 +295,7 @@ class ExecutionGuardrails:
             details=details,
         )
 
-    def check_daily_loss(
-        self, daily_pnl: float, starting_equity: float
-    ) -> GuardrailResult:
+    def check_daily_loss(self, daily_pnl: float, starting_equity: float) -> GuardrailResult:
         """Check if daily loss limit has been reached.
 
         Args:
@@ -399,42 +382,26 @@ class ExecutionGuardrails:
 
         if failed_checks:
             failed_names = [name for name, _ in failed_checks]
-            failed_messages = [
-                f"{name}: {result.message}" for name, result in failed_checks
-            ]
+            failed_messages = [f"{name}: {result.message}" for name, result in failed_checks]
 
             # Check if any is emergency stop
-            is_emergency = any(
-                result.status == GuardrailStatus.EMERGENCY_STOP
-                for _, result in failed_checks
-            )
+            is_emergency = any(result.status == GuardrailStatus.EMERGENCY_STOP for _, result in failed_checks)
 
             return GuardrailResult(
-                status=(
-                    GuardrailStatus.EMERGENCY_STOP
-                    if is_emergency
-                    else GuardrailStatus.FAIL
-                ),
+                status=(GuardrailStatus.EMERGENCY_STOP if is_emergency else GuardrailStatus.FAIL),
                 passed=False,
                 message=f"Trade validation failed: {'; '.join(failed_names)}",
                 details={
                     "failed_checks": failed_names,
                     "messages": failed_messages,
                     "all_results": {
-                        name: (
-                            result.to_dict()
-                            if hasattr(result, "to_dict")
-                            else str(result)
-                        )
-                        for name, result in checks
+                        name: (result.to_dict() if hasattr(result, "to_dict") else str(result)) for name, result in checks
                     },
                 },
             )
 
         # Aggregate warnings
-        warnings = [
-            name for name, result in checks if result.status == GuardrailStatus.WARNING
-        ]
+        warnings = [name for name, result in checks if result.status == GuardrailStatus.WARNING]
         status = GuardrailStatus.WARNING if warnings else GuardrailStatus.PASS
 
         return GuardrailResult(
@@ -445,10 +412,7 @@ class ExecutionGuardrails:
                 "checks_passed": [name for name, _ in checks],
                 "warnings": warnings,
                 "all_results": {
-                    name: (
-                        result.to_dict() if hasattr(result, "to_dict") else str(result)
-                    )
-                    for name, result in checks
+                    name: (result.to_dict() if hasattr(result, "to_dict") else str(result)) for name, result in checks
                 },
             },
         )
@@ -467,9 +431,7 @@ class ExecutionGuardrails:
             self.client.rtdb_set("/system_controls", controls.to_dict())
             self._controls = controls
             self._last_refresh = controls.updated_at
-            logger.info(
-                f"Updated system controls: trading_enabled={controls.trading_enabled}"
-            )
+            logger.info(f"Updated system controls: trading_enabled={controls.trading_enabled}")
             return True
         except Exception as e:
             logger.error(f"Failed to update system controls: {e}")

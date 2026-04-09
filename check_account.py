@@ -10,9 +10,7 @@ load_dotenv()
 
 from alpaca.trading.client import TradingClient
 
-client = TradingClient(
-    os.getenv("ALPACA_API_KEY"), os.getenv("ALPACA_SECRET_KEY"), paper=True
-)
+client = TradingClient(os.getenv("ALPACA_API_KEY"), os.getenv("ALPACA_SECRET_KEY"), paper=True)
 
 print("=" * 60)
 print("ALPACA PAPER ACCOUNT STATUS")
@@ -34,9 +32,7 @@ positions = client.get_all_positions()
 if positions:
     for p in positions:
         print(f"{p.symbol}: {p.qty} shares @ ${float(p.avg_entry_price):.2f}")
-        print(
-            f"  Market: ${float(p.market_value):,.2f} | P&L: ${float(p.unrealized_pl):,.2f}"
-        )
+        print(f"  Market: ${float(p.market_value):,.2f} | P&L: ${float(p.unrealized_pl):,.2f}")
 else:
     print("No open positions")
 print()

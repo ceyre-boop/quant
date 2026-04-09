@@ -116,9 +116,7 @@ class ExecutionSimulator:
             base_price = bid  # Sell at bid
 
         # Calculate slippage
-        slippage_pips = self._calculate_slippage(
-            direction, position_size, market_data, atr
-        )
+        slippage_pips = self._calculate_slippage(direction, position_size, market_data, atr)
 
         # Apply slippage
         if direction == Direction.LONG:
@@ -195,10 +193,7 @@ class ExecutionSimulator:
         else:
             slippage_multiplier = 1.0
 
-        slippage_pips = (
-            self._calculate_slippage(direction, position_size, market_data, atr)
-            * slippage_multiplier
-        )
+        slippage_pips = self._calculate_slippage(direction, position_size, market_data, atr) * slippage_multiplier
 
         # Apply slippage (opposite direction for exit)
         if direction == Direction.LONG:
@@ -262,9 +257,7 @@ class ExecutionSimulator:
 
         elif self.config.slippage_model == SlippageModel.RANDOM:
             # Random slippage with normal distribution
-            slippage = np.random.normal(
-                self.config.fixed_slippage_pips, self.config.slippage_std_dev
-            )
+            slippage = np.random.normal(self.config.fixed_slippage_pips, self.config.slippage_std_dev)
             return max(0, min(slippage, self.config.max_slippage_pips))
 
         elif self.config.slippage_model == SlippageModel.MARKET_IMPACT:
@@ -365,9 +358,7 @@ class ExecutionSimulator:
             reject_reason=None,
         )
 
-    def estimate_market_impact(
-        self, position_size: float, daily_volume: float, volatility: float
-    ) -> float:
+    def estimate_market_impact(self, position_size: float, daily_volume: float, volatility: float) -> float:
         """Estimate market impact using square root law.
 
         Args:
@@ -380,9 +371,7 @@ class ExecutionSimulator:
         """
         # Square root law: impact ∝ sqrt(order_size / daily_volume)
         participation_rate = position_size / daily_volume if daily_volume > 0 else 0
-        impact = (
-            volatility * np.sqrt(participation_rate) * self.config.market_impact_factor
-        )
+        impact = volatility * np.sqrt(participation_rate) * self.config.market_impact_factor
 
         return impact
 

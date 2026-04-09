@@ -121,9 +121,7 @@ class RiskManager:
             max_account_risk_pct: Maximum total account risk
             demo_mode: Whether to run in demo mode
         """
-        self.guardrails = guardrails or ExecutionGuardrails(
-            firebase_client=firebase_client, demo_mode=demo_mode
-        )
+        self.guardrails = guardrails or ExecutionGuardrails(firebase_client=firebase_client, demo_mode=demo_mode)
         self.max_total_risk_pct = max_total_risk_pct
         self.max_account_risk_pct = max_account_risk_pct
 
@@ -160,10 +158,7 @@ class RiskManager:
         """
         positions_dict = None
         if current_positions:
-            positions_dict = {
-                k: v.to_dict() if hasattr(v, "to_dict") else v
-                for k, v in current_positions.items()
-            }
+            positions_dict = {k: v.to_dict() if hasattr(v, "to_dict") else v for k, v in current_positions.items()}
 
         return self.guardrails.check_position_limits(
             position_size=position_size, symbol=symbol, current_positions=positions_dict
@@ -183,9 +178,7 @@ class RiskManager:
         if starting_equity <= 0:
             starting_equity = account_state.equity
 
-        return self.guardrails.check_daily_loss(
-            daily_pnl=account_state.daily_pnl, starting_equity=starting_equity
-        )
+        return self.guardrails.check_daily_loss(daily_pnl=account_state.daily_pnl, starting_equity=starting_equity)
 
     def calculate_position_risk(
         self,
@@ -238,9 +231,7 @@ class RiskManager:
         if equity <= 0:
             return float("inf")
 
-        risk_amount = self.calculate_position_risk(
-            entry_price, stop_loss, direction, position_size
-        )
+        risk_amount = self.calculate_position_risk(entry_price, stop_loss, direction, position_size)
 
         return risk_amount / equity
 
@@ -279,10 +270,7 @@ class RiskManager:
             position_size=position_size,
             daily_pnl=account_state.daily_pnl,
             starting_equity=account_state.equity - account_state.daily_pnl,
-            current_positions={
-                k: v.to_dict() if hasattr(v, "to_dict") else v
-                for k, v in (current_positions or {}).items()
-            },
+            current_positions={k: v.to_dict() if hasattr(v, "to_dict") else v for k, v in (current_positions or {}).items()},
         )
 
         system_check = RiskCheck(

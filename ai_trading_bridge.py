@@ -208,17 +208,13 @@ class AITradingBridge:
 
         if not logger.handlers:
             handler = logging.StreamHandler()
-            formatter = logging.Formatter(
-                "%(asctime)s | %(name)s | %(levelname)s | %(message)s"
-            )
+            formatter = logging.Formatter("%(asctime)s | %(name)s | %(levelname)s | %(message)s")
             handler.setFormatter(formatter)
             logger.addHandler(handler)
 
             # File handler
             os.makedirs("logs", exist_ok=True)
-            file_handler = logging.FileHandler(
-                f"logs/bridge_{self.brain.name.lower()}.log"
-            )
+            file_handler = logging.FileHandler(f"logs/bridge_{self.brain.name.lower()}.log")
             file_handler.setFormatter(formatter)
             logger.addHandler(file_handler)
 
@@ -230,16 +226,12 @@ class AITradingBridge:
 
     def fetch_data(self) -> Dict[str, Any]:
         """Fetch market data for all symbols"""
-        self.logger.info(
-            f"Fetching {len(self.symbols)} symbols ({self.timeframe}, {self.lookback_days}d)"
-        )
+        self.logger.info(f"Fetching {len(self.symbols)} symbols ({self.timeframe}, {self.lookback_days}d)")
 
         data = {}
         for symbol in self.symbols:
             try:
-                df = self.data_client.get_historical_bars(
-                    symbol, timeframe=self.timeframe, days=self.lookback_days
-                )
+                df = self.data_client.get_historical_bars(symbol, timeframe=self.timeframe, days=self.lookback_days)
                 if not df.empty:
                     data[symbol] = df
             except Exception as e:
@@ -251,9 +243,7 @@ class AITradingBridge:
     def execute_signal(self, signal: Signal) -> bool:
         """Execute a signal via Alpaca"""
         if signal.confidence < self.min_confidence:
-            self.logger.info(
-                f"Skipping {signal.symbol} (confidence {signal.confidence:.2f} < {self.min_confidence})"
-            )
+            self.logger.info(f"Skipping {signal.symbol} (confidence {signal.confidence:.2f} < {self.min_confidence})")
             return False
 
         if signal.direction == "FLAT":
@@ -315,9 +305,7 @@ class AITradingBridge:
         # 3. Execute trades
         executed = 0
         for signal in signals:
-            self.logger.info(
-                f"  Signal: {signal.symbol} {signal.direction} (conf: {signal.confidence:.2f})"
-            )
+            self.logger.info(f"  Signal: {signal.symbol} {signal.direction} (conf: {signal.confidence:.2f})")
             if self.execute_signal(signal):
                 executed += 1
 

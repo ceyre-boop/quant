@@ -54,25 +54,17 @@ def extract_participant_features(
 
     # Sweep intensity: large market orders hitting multiple levels
     sweep_events = tick_data.get("sweep_events", [])
-    sweep_intensity = sum(e.get("size", 0) for e in sweep_events) / max(
-        time_window, 1e-9
-    )
+    sweep_intensity = sum(e.get("size", 0) for e in sweep_events) / max(time_window, 1e-9)
 
     # Absorption ratio: passive fills / aggressive volume
-    passive_fill_volume = sum(
-        t.get("size", 0) for t in trades if not t.get("aggressive", False)
-    )
-    aggressive_volume = sum(
-        t.get("size", 0) for t in trades if t.get("aggressive", False)
-    )
+    passive_fill_volume = sum(t.get("size", 0) for t in trades if not t.get("aggressive", False))
+    aggressive_volume = sum(t.get("size", 0) for t in trades if t.get("aggressive", False))
     absorption_ratio = passive_fill_volume / max(aggressive_volume, 1e-9)
 
     # Spread pressure
     bid_pressure = sum(b.get("size", 0) for b in bids[:3])
     ask_pressure = sum(a.get("size", 0) for a in asks[:3])
-    spread_pressure = (bid_pressure - ask_pressure) / max(
-        abs(bid_pressure) + abs(ask_pressure), 1e-9
-    )
+    spread_pressure = (bid_pressure - ask_pressure) / max(abs(bid_pressure) + abs(ask_pressure), 1e-9)
 
     # Liquidity removal rate
     book_depletion = tick_data.get("book_depletion", 0.0)
@@ -90,14 +82,8 @@ def extract_participant_features(
         spread_pressure=float(spread_pressure),
         liquidity_removal_rate=float(liquidity_removal_rate),
         volatility_reaction=float(volatility_reaction),
-        time_of_day_bias=(
-            time_of_day
-            if time_of_day in {"open", "mid", "close", "all_day"}
-            else "all_day"
-        ),
-        news_window_behavior=(
-            news_window if news_window in {"pre", "during", "post", "none"} else "none"
-        ),
+        time_of_day_bias=(time_of_day if time_of_day in {"open", "mid", "close", "all_day"} else "all_day"),
+        news_window_behavior=(news_window if news_window in {"pre", "during", "post", "none"} else "none"),
         metadata={"source": "clawd_trading", "ticks_processed": len(trades)},
     )
 

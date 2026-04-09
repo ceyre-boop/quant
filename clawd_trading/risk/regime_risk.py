@@ -198,9 +198,7 @@ def get_regime_risk_limits(cluster: RegimeCluster) -> RegimeRiskLimits:
             _GLOBAL_MAX_DAILY_R,
         ),
         allowed_action_types=ov.get("allowed_action_types", base.allowed_action_types),
-        allowed_pattern_families=ov.get(
-            "allowed_pattern_families", base.allowed_pattern_families
-        ),
+        allowed_pattern_families=ov.get("allowed_pattern_families", base.allowed_pattern_families),
         news_rules=ov.get("news_rules", base.news_rules),
         metadata={"source": "regime_risk_limits", "regime": cluster.value},
     )

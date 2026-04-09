@@ -111,9 +111,7 @@ class FirebaseBroadcaster:
             logger.error(f"Failed to publish signal for {symbol}: {e}")
             return False
 
-    def publish_regime(
-        self, symbol: str, regime: RegimeState, timestamp: Optional[datetime] = None
-    ) -> bool:
+    def publish_regime(self, symbol: str, regime: RegimeState, timestamp: Optional[datetime] = None) -> bool:
         """Publish regime state to /system/regime/{symbol}.
 
         Args:
@@ -219,9 +217,7 @@ class FirebaseBroadcaster:
             logger.error(f"Failed to publish health: {e}")
             return False
 
-    def publish_position(
-        self, position: PositionState, timestamp: Optional[datetime] = None
-    ) -> bool:
+    def publish_position(self, position: PositionState, timestamp: Optional[datetime] = None) -> bool:
         """Publish position state to /session/positions/{symbol}.
 
         Args:
@@ -249,18 +245,14 @@ class FirebaseBroadcaster:
                 "unrealized_pnl": position.unrealized_pnl,
                 "realized_pnl": position.realized_pnl,
                 "status": position.status,
-                "opened_at": (
-                    position.opened_at.isoformat() if position.opened_at else None
-                ),
+                "opened_at": (position.opened_at.isoformat() if position.opened_at else None),
                 "updated_at": ts.isoformat() + "Z",
             }
 
             ref = self._get_rtdb_ref(f"session/positions/{position.symbol}")
             if ref:
                 ref.set(position_data)
-                logger.info(
-                    f"Published position for {position.symbol}: {position.status}"
-                )
+                logger.info(f"Published position for {position.symbol}: {position.status}")
 
             return True
 
@@ -268,9 +260,7 @@ class FirebaseBroadcaster:
             logger.error(f"Failed to publish position: {e}")
             return False
 
-    def publish_account(
-        self, account: AccountState, timestamp: Optional[datetime] = None
-    ) -> bool:
+    def publish_account(self, account: AccountState, timestamp: Optional[datetime] = None) -> bool:
         """Publish account state to /account/equity and /account/pnl.
 
         Args:

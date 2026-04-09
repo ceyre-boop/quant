@@ -8,9 +8,7 @@ No Firebase needed to verify data is real.
 import logging
 from datetime import datetime
 
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s | %(levelname)s | %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s | %(levelname)s | %(message)s")
 logger = logging.getLogger(__name__)
 
 print("=" * 70)
@@ -28,9 +26,7 @@ d = DataProvider()
 for symbol in ["SPY", "QQQ", "DIA"]:
     data = d.get_market_data(symbol)
     if data:
-        print(
-            f"{symbol}: ${data.close:.2f} | Change: {data.change_percent:+.2%} | Vol: {data.volume:,}"
-        )
+        print(f"{symbol}: ${data.close:.2f} | Change: {data.change_percent:+.2%} | Vol: {data.volume:,}")
     else:
         print(f"{symbol}: FAILED")
 
@@ -63,29 +59,20 @@ if market_data:
     # Build layers from REAL data
     layer1 = {
         "symbol": "SPY",
-        "direction": (
-            1
-            if market_data.change_percent > 0.005
-            else -1 if market_data.change_percent < -0.005 else 0
-        ),
+        "direction": (1 if market_data.change_percent > 0.005 else -1 if market_data.change_percent < -0.005 else 0),
         "confidence": min(0.5 + abs(market_data.change_percent) * 20, 0.95),
         "trend_regime": (
             "uptrend"
             if market_data.change_percent > 0.005
             else "downtrend" if market_data.change_percent < -0.005 else "neutral"
         ),
-        "volatility_regime": (
-            "high"
-            if (market_data.high - market_data.low) / market_data.close > 0.02
-            else "normal"
-        ),
+        "volatility_regime": ("high" if (market_data.high - market_data.low) / market_data.close > 0.02 else "normal"),
         "current_price": market_data.close,
         "features": {
             "change_pct": market_data.change_percent,
             "volume": market_data.volume,
         },
-        "fvg_detected": (market_data.high - market_data.low) / market_data.close
-        > 0.015,
+        "fvg_detected": (market_data.high - market_data.low) / market_data.close > 0.015,
         "liquidity_sweep": abs(market_data.change_percent) > 0.01,
         "order_block": False,
         "ict_setup": {},
@@ -117,13 +104,9 @@ if market_data:
         timestamp=datetime.now(),
     )
 
-    print(
-        f"Layer 1: Direction={layer1['direction']}, Confidence={layer1['confidence']:.2f}, Trend={layer1['trend_regime']}"
-    )
+    print(f"Layer 1: Direction={layer1['direction']}, Confidence={layer1['confidence']:.2f}, Trend={layer1['trend_regime']}")
     print(f"Layer 2: EV={layer2['ev']:.2f}, Win Prob={layer2['win_prob']:.2%}")
-    print(
-        f"Layer 3: Adversarial={layer3['adversarial_risk']}, Aligned={layer3['game_state_aligned']}"
-    )
+    print(f"Layer 3: Adversarial={layer3['adversarial_risk']}, Aligned={layer3['game_state_aligned']}")
 
     # Generate signal
     signal = engine.generate_signal(

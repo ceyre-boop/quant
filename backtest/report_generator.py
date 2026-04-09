@@ -54,9 +54,7 @@ class ReportGenerator:
         self.output_path = Path(self.config.output_dir)
         self.output_path.mkdir(parents=True, exist_ok=True)
 
-    def generate(
-        self, result: BacktestResult, name: Optional[str] = None
-    ) -> Dict[str, str]:
+    def generate(self, result: BacktestResult, name: Optional[str] = None) -> Dict[str, str]:
         """Generate all report files.
 
         Args:
@@ -90,9 +88,7 @@ class ReportGenerator:
             generated_files["equity_chart"] = str(chart_path)
 
             # Generate drawdown chart
-            dd_chart_path = (
-                self.output_path / f"{name}_drawdown.{self.config.chart_format}"
-            )
+            dd_chart_path = self.output_path / f"{name}_drawdown.{self.config.chart_format}"
             self._generate_drawdown_chart(result, dd_chart_path)
             generated_files["drawdown_chart"] = str(dd_chart_path)
 
@@ -101,9 +97,7 @@ class ReportGenerator:
         self._generate_text_summary(result, summary_path)
         generated_files["summary"] = str(summary_path)
 
-        logger.info(
-            f"Generated {len(generated_files)} report files in {self.output_path}"
-        )
+        logger.info(f"Generated {len(generated_files)} report files in {self.output_path}")
 
         return generated_files
 
@@ -165,9 +159,7 @@ class ReportGenerator:
             logger.warning("No equity data for chart")
             return
 
-        fig, (ax1, ax2) = plt.subplots(
-            2, 1, figsize=(12, 8), gridspec_kw={"height_ratios": [3, 1]}
-        )
+        fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 8), gridspec_kw={"height_ratios": [3, 1]})
 
         # Parse equity data
         timestamps = []
@@ -194,9 +186,7 @@ class ReportGenerator:
         )
 
         # Formatting
-        ax1.set_title(
-            f"Equity Curve - {result.config.symbol}", fontsize=14, fontweight="bold"
-        )
+        ax1.set_title(f"Equity Curve - {result.config.symbol}", fontsize=14, fontweight="bold")
         ax1.set_ylabel("Equity ($)", fontsize=11)
         ax1.legend(loc="upper left")
         ax1.grid(True, alpha=0.3)
@@ -311,9 +301,7 @@ class ReportGenerator:
         lines.append(f"  End Date:          {result.config.end_date.date()}")
         lines.append(f"  Timeframe:         {result.config.timeframe}")
         lines.append(f"  Initial Capital:   ${result.config.initial_capital:,.2f}")
-        lines.append(
-            f"  Commission:        ${result.config.commission_per_trade:.2f}/trade"
-        )
+        lines.append(f"  Commission:        ${result.config.commission_per_trade:.2f}/trade")
         lines.append("")
         lines.append("-" * 70)
         lines.append("PERFORMANCE METRICS:")
@@ -325,9 +313,7 @@ class ReportGenerator:
         lines.append(f"  Win Rate:          {result.win_rate*100:.1f}%")
         lines.append(f"  Profit Factor:     {result.profit_factor:.2f}")
         lines.append(f"  Sharpe Ratio:      {result.sharpe_ratio:.2f}")
-        lines.append(
-            f"  Max Drawdown:      ${result.max_drawdown:,.2f} ({result.max_drawdown_pct:.1f}%)"
-        )
+        lines.append(f"  Max Drawdown:      ${result.max_drawdown:,.2f} ({result.max_drawdown_pct:.1f}%)")
         lines.append("")
 
         if result.trades:
@@ -363,9 +349,7 @@ class ReportGenerator:
 
         lines.append("")
         lines.append("=" * 70)
-        lines.append(
-            f"Report Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
-        )
+        lines.append(f"Report Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         lines.append("=" * 70)
 
         with open(filepath, "w") as f:
@@ -373,9 +357,7 @@ class ReportGenerator:
 
         logger.debug(f"Text summary saved to {filepath}")
 
-    def generate_comparison_report(
-        self, results: List[BacktestResult], name: str = "comparison"
-    ) -> str:
+    def generate_comparison_report(self, results: List[BacktestResult], name: str = "comparison") -> str:
         """Generate comparison report for multiple backtests.
 
         Args:
@@ -393,12 +375,8 @@ class ReportGenerator:
         lines.append("## Summary Table\n")
 
         # Table header
-        lines.append(
-            "| Symbol | Return | Trades | Win Rate | Profit Factor | Sharpe | Max DD |"
-        )
-        lines.append(
-            "|--------|--------|--------|----------|---------------|--------|--------|"
-        )
+        lines.append("| Symbol | Return | Trades | Win Rate | Profit Factor | Sharpe | Max DD |")
+        lines.append("|--------|--------|--------|----------|---------------|--------|--------|")
 
         # Table rows
         for result in results:
@@ -421,9 +399,7 @@ class ReportGenerator:
         return str(filepath)
 
 
-def quick_report(
-    result: BacktestResult, output_dir: str = "backtest_results"
-) -> Dict[str, str]:
+def quick_report(result: BacktestResult, output_dir: str = "backtest_results") -> Dict[str, str]:
     """Generate a quick report from backtest results.
 
     Args:
@@ -454,16 +430,11 @@ def print_trade_list(result: BacktestResult, limit: int = 10):
     print("\n" + "=" * 100)
     print(f"TRADE LIST - Last {limit} trades")
     print("=" * 100)
-    print(
-        f"{'ID':<12} {'Dir':<6} {'Entry Time':<20} {'Entry':<10} {'Exit':<10} "
-        f"{'PnL':<12} {'Reason':<15}"
-    )
+    print(f"{'ID':<12} {'Dir':<6} {'Entry Time':<20} {'Entry':<10} {'Exit':<10} " f"{'PnL':<12} {'Reason':<15}")
     print("-" * 100)
 
     for trade in result.trades[-limit:]:
-        exit_time = (
-            trade.exit_time.strftime("%m-%d %H:%M") if trade.exit_time else "OPEN"
-        )
+        exit_time = trade.exit_time.strftime("%m-%d %H:%M") if trade.exit_time else "OPEN"
         exit_price = f"{trade.exit_price:.2f}" if trade.exit_price else "---"
         pnl = f"${trade.realized_pnl:,.2f}" if trade.exit_price else "---"
 

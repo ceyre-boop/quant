@@ -87,17 +87,11 @@ class SymbolContext:
             "current_bias": self.current_bias.to_dict() if self.current_bias else None,
             "current_risk": self.current_risk.to_dict() if self.current_risk else None,
             "current_game": self.current_game.to_dict() if self.current_game else None,
-            "current_position": (
-                self.current_position.to_dict() if self.current_position else None
-            ),
+            "current_position": (self.current_position.to_dict() if self.current_position else None),
             "pending_entry": self.pending_entry,
             "entry_count": self.entry_count,
-            "last_entry_time": (
-                self.last_entry_time.isoformat() if self.last_entry_time else None
-            ),
-            "last_exit_time": (
-                self.last_exit_time.isoformat() if self.last_exit_time else None
-            ),
+            "last_entry_time": (self.last_entry_time.isoformat() if self.last_entry_time else None),
+            "last_exit_time": (self.last_exit_time.isoformat() if self.last_exit_time else None),
             "total_trades": self.total_trades,
             "winning_trades": self.winning_trades,
             "total_pnl": self.total_pnl,
@@ -182,10 +176,7 @@ class SymbolStateMachine:
         context = self.get_context(symbol)
 
         if not self.can_transition(symbol, new_state):
-            logger.warning(
-                f"Invalid transition for {symbol}: "
-                f"{context.state.value} -> {new_state.value}"
-            )
+            logger.warning(f"Invalid transition for {symbol}: " f"{context.state.value} -> {new_state.value}")
             return False
 
         old_state = context.state
@@ -202,9 +193,7 @@ class SymbolStateMachine:
             }
         )
 
-        logger.info(
-            f"{symbol} state: {old_state.value} -> {new_state.value} ({reason})"
-        )
+        logger.info(f"{symbol} state: {old_state.value} -> {new_state.value} ({reason})")
 
         # Call transition handlers
         self._call_transition_handlers(symbol, old_state, new_state)
@@ -249,9 +238,7 @@ class SymbolStateMachine:
 
         if position:
             context.position_phase = PositionPhase.OPEN
-            logger.info(
-                f"{symbol} position set: {position.direction.name} @ {position.entry_price}"
-            )
+            logger.info(f"{symbol} position set: {position.direction.name} @ {position.entry_price}")
         else:
             context.position_phase = PositionPhase.NONE
             logger.info(f"{symbol} position cleared")
@@ -286,9 +273,7 @@ class SymbolStateMachine:
         context = self.get_context(symbol)
 
         if context.state not in [SymbolState.SCANNING, SymbolState.IDLE]:
-            logger.warning(
-                f"{symbol} ignoring entry signal in {context.state.value} state"
-            )
+            logger.warning(f"{symbol} ignoring entry signal in {context.state.value} state")
             return False
 
         context.pending_entry = entry_signal
@@ -306,9 +291,7 @@ class SymbolStateMachine:
         context = self.get_context(symbol)
 
         if context.state != SymbolState.ENTRY_PENDING:
-            logger.warning(
-                f"{symbol} unexpected entry confirmation in {context.state.value} state"
-            )
+            logger.warning(f"{symbol} unexpected entry confirmation in {context.state.value} state")
 
         context.current_position = position
         context.entry_count += 1
@@ -328,9 +311,7 @@ class SymbolStateMachine:
         context = self.get_context(symbol)
 
         if context.state != SymbolState.IN_POSITION:
-            logger.warning(
-                f"{symbol} ignoring exit signal in {context.state.value} state"
-            )
+            logger.warning(f"{symbol} ignoring exit signal in {context.state.value} state")
             return
 
         self.transition(symbol, SymbolState.EXIT_PENDING, exit_reason)
@@ -356,9 +337,7 @@ class SymbolStateMachine:
         context.position_phase = PositionPhase.CLOSED
         context.pending_entry = None
 
-        self.transition(
-            symbol, SymbolState.COOLDOWN, f"exit_confirmed_pnl_{realized_pnl:.2f}"
-        )
+        self.transition(symbol, SymbolState.COOLDOWN, f"exit_confirmed_pnl_{realized_pnl:.2f}")
 
         logger.info(f"{symbol} exit confirmed: PnL={realized_pnl:.2f} @ {exit_price}")
 
@@ -377,15 +356,11 @@ class SymbolStateMachine:
 
     def on_be_stop_activated(self, symbol: str):
         """Handle breakeven stop activation."""
-        self.set_position_phase(
-            symbol, PositionPhase.BE_STOP, "breakeven_stop_activated"
-        )
+        self.set_position_phase(symbol, PositionPhase.BE_STOP, "breakeven_stop_activated")
 
     def on_trail_activated(self, symbol: str):
         """Handle trailing stop activation."""
-        self.set_position_phase(
-            symbol, PositionPhase.TRAILING, "trailing_stop_activated"
-        )
+        self.set_position_phase(symbol, PositionPhase.TRAILING, "trailing_stop_activated")
 
     def release_from_cooldown(self, symbol: str):
         """Release symbol from cooldown to scanning."""
@@ -410,9 +385,7 @@ class SymbolStateMachine:
         self.transition(symbol, SymbolState.IDLE, "error_cleared")
         self.get_context(symbol).error_message = None
 
-    def register_transition_handler(
-        self, from_state: SymbolState, to_state: SymbolState, handler: callable
-    ):
+    def register_transition_handler(self, from_state: SymbolState, to_state: SymbolState, handler: callable):
         """Register a handler for a specific transition.
 
         Args:
@@ -425,9 +398,7 @@ class SymbolStateMachine:
             self._transition_handlers[key] = []
         self._transition_handlers[key].append(handler)
 
-    def _call_transition_handlers(
-        self, symbol: str, from_state: SymbolState, to_state: SymbolState
-    ):
+    def _call_transition_handlers(self, symbol: str, from_state: SymbolState, to_state: SymbolState):
         """Call all registered handlers for a transition."""
         key = (from_state, to_state)
         handlers = self._transition_handlers.get(key, [])
@@ -444,11 +415,7 @@ class SymbolStateMachine:
 
     def get_active_positions(self) -> List[SymbolContext]:
         """Get contexts with active positions."""
-        return [
-            ctx
-            for ctx in self._contexts.values()
-            if ctx.state == SymbolState.IN_POSITION
-        ]
+        return [ctx for ctx in self._contexts.values() if ctx.state == SymbolState.IN_POSITION]
 
     def get_symbols_in_state(self, state: SymbolState) -> List[str]:
         """Get all symbols in a specific state."""

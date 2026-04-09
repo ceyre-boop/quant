@@ -40,9 +40,7 @@ def test_sweep_bot_detection():
     )
 
     likelihoods = classify_participants(features)
-    sweep_likelihood = next(
-        l for l in likelihoods if l.type == ParticipantType.SWEEP_BOT
-    )
+    sweep_likelihood = next(l for l in likelihoods if l.type == ParticipantType.SWEEP_BOT)
 
     assert sweep_likelihood.probability > 0.2  # Should be elevated
     assert sweep_likelihood.evidence["high_sweep_intensity"] == True
@@ -63,9 +61,7 @@ def test_market_maker_detection():
     )
 
     likelihoods = classify_participants(features)
-    mm_likelihood = next(
-        l for l in likelihoods if l.type == ParticipantType.MARKET_MAKER
-    )
+    mm_likelihood = next(l for l in likelihoods if l.type == ParticipantType.MARKET_MAKER)
 
     assert mm_likelihood.evidence["high_absorption_ratio"] == True
     assert mm_likelihood.evidence["low_sweep_intensity"] == True
@@ -79,9 +75,7 @@ def test_news_algo_blocks_trade():
             probability=0.20,  # Above threshold
             evidence={"news_during_and_high_volatility": True},
         ),
-        ParticipantLikelihood(
-            type=ParticipantType.RETAIL, probability=0.80, evidence={}
-        ),
+        ParticipantLikelihood(type=ParticipantType.RETAIL, probability=0.80, evidence={}),
     ]
 
     limits = calculate_participant_risk_limits(likelihoods)
@@ -97,9 +91,7 @@ def test_sweep_bot_reduces_size():
             probability=0.20,  # Above threshold
             evidence={"high_sweep_intensity": True},
         ),
-        ParticipantLikelihood(
-            type=ParticipantType.RETAIL, probability=0.80, evidence={}
-        ),
+        ParticipantLikelihood(type=ParticipantType.RETAIL, probability=0.80, evidence={}),
     ]
 
     limits = calculate_participant_risk_limits(likelihoods)
@@ -125,9 +117,7 @@ def test_gate12_integration():
     # Create limits with SWEEP_BOT
     participant_limits = calculate_participant_risk_limits(
         [
-            ParticipantLikelihood(
-                type=ParticipantType.SWEEP_BOT, probability=0.20, evidence={}
-            ),
+            ParticipantLikelihood(type=ParticipantType.SWEEP_BOT, probability=0.20, evidence={}),
         ]
     )
 
@@ -144,9 +134,7 @@ def test_gate12_blocks_on_news():
 
     participant_limits = calculate_participant_risk_limits(
         [
-            ParticipantLikelihood(
-                type=ParticipantType.NEWS_ALGO, probability=0.20, evidence={}
-            ),
+            ParticipantLikelihood(type=ParticipantType.NEWS_ALGO, probability=0.20, evidence={}),
         ]
     )
 
@@ -159,9 +147,7 @@ def test_gate12_blocks_on_news():
 def test_dominant_participant():
     """Should return participant with highest probability."""
     likelihoods = [
-        ParticipantLikelihood(
-            type=ParticipantType.RETAIL, probability=0.1, evidence={}
-        ),
+        ParticipantLikelihood(type=ParticipantType.RETAIL, probability=0.1, evidence={}),
         ParticipantLikelihood(type=ParticipantType.FUND, probability=0.6, evidence={}),
         ParticipantLikelihood(type=ParticipantType.ALGO, probability=0.3, evidence={}),
     ]

@@ -58,9 +58,7 @@ def test_classify_regime_volatility_breakout():
 def test_apply_regime_risk_blocks_news():
     """Should block entry during news shock."""
     base_limits = {"max_position_size": 1.0, "allow_entry": True}
-    adjusted = apply_regime_risk_to_gate12(
-        base_limits, RegimeCluster.NEWS_SHOCK_EXPLOSION
-    )
+    adjusted = apply_regime_risk_to_gate12(base_limits, RegimeCluster.NEWS_SHOCK_EXPLOSION)
     assert adjusted["allow_entry"] == False
     assert "news_shock" in adjusted["block_reason"]
 
@@ -68,9 +66,7 @@ def test_apply_regime_risk_blocks_news():
 def test_apply_regime_risk_reduces_size():
     """Should reduce size in choppy regime."""
     base_limits = {"max_position_size": 1.0}
-    adjusted = apply_regime_risk_to_gate12(
-        base_limits, RegimeCluster.CHOPPY_MANIPULATION
-    )
+    adjusted = apply_regime_risk_to_gate12(base_limits, RegimeCluster.CHOPPY_MANIPULATION)
     assert adjusted["max_position_size"] < 1.0
     assert adjusted["max_position_size"] == 0.6
 
@@ -89,9 +85,7 @@ def test_combined_risk_with_participants():
     from clawd_trading.participants import ParticipantLikelihood, ParticipantType
 
     likelihoods = [
-        ParticipantLikelihood(
-            type=ParticipantType.RETAIL, probability=0.8, evidence={}
-        ),
+        ParticipantLikelihood(type=ParticipantType.RETAIL, probability=0.8, evidence={}),
     ]
 
     base_limits = {
@@ -114,9 +108,7 @@ def test_combined_risk_blocks_on_news():
     """Combined risk should block during news shock."""
     from clawd_trading.participants import ParticipantLikelihood, ParticipantType
 
-    likelihoods = [
-        ParticipantLikelihood(type=ParticipantType.RETAIL, probability=1.0, evidence={})
-    ]
+    likelihoods = [ParticipantLikelihood(type=ParticipantType.RETAIL, probability=1.0, evidence={})]
 
     base_limits = {"max_position_size": 1.0, "allow_entry": True}
 

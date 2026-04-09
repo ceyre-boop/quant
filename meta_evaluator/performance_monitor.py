@@ -34,11 +34,7 @@ class PerformanceMonitor:
             return self._empty_metrics()
 
         # Extract PnL values
-        pnls = [
-            t.get("realized_pnl", 0)
-            for t in trades
-            if t.get("realized_pnl") is not None
-        ]
+        pnls = [t.get("realized_pnl", 0) for t in trades if t.get("realized_pnl") is not None]
 
         if not pnls:
             return self._empty_metrics()
@@ -111,9 +107,7 @@ class PerformanceMonitor:
             "computed_at": datetime.now().isoformat(),
         }
 
-    def check_feature_drift(
-        self, current_features: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+    def check_feature_drift(self, current_features: Optional[Dict] = None) -> Dict[str, Any]:
         """Check for feature drift that might indicate model needs retraining.
 
         Args:
@@ -154,16 +148,12 @@ class PerformanceMonitor:
         return {
             "needs_refit": needs_refit,
             "drift_score": avg_drift,
-            "feature_drifts": (
-                dict(zip(current_features.keys(), drift_scores)) if drift_scores else {}
-            ),
+            "feature_drifts": (dict(zip(current_features.keys(), drift_scores)) if drift_scores else {}),
             "threshold": 2.0,
             "checked_at": datetime.now().isoformat(),
         }
 
-    def publish_weekly_metrics(
-        self, metrics: Dict[str, Any], week: Optional[str] = None
-    ) -> None:
+    def publish_weekly_metrics(self, metrics: Dict[str, Any], week: Optional[str] = None) -> None:
         """Publish weekly metrics to Firebase.
 
         Args:
@@ -175,9 +165,7 @@ class PerformanceMonitor:
 
         try:
             # Write to performance history
-            self.firebase.write(
-                f"performance/weekly_metrics/{week}", "metrics", metrics
-            )
+            self.firebase.write(f"performance/weekly_metrics/{week}", "metrics", metrics)
 
             # Update latest metrics in Realtime DB
             self.firebase.update_realtime(

@@ -18,9 +18,7 @@ from training.feature_generator import FeatureGenerator
 from data.alpaca_client import AlpacaDataClient
 
 
-def chi_squared_test(
-    predictions: np.ndarray, actuals: np.ndarray, confidence_buckets: int = 5
-) -> Dict:
+def chi_squared_test(predictions: np.ndarray, actuals: np.ndarray, confidence_buckets: int = 5) -> Dict:
     """
     Perform chi-squared test on prediction confidence buckets.
 
@@ -37,10 +35,7 @@ def chi_squared_test(
     """
     # Create confidence buckets
     bucket_edges = np.linspace(0, 1, confidence_buckets + 1)
-    bucket_labels = [
-        f"{(bucket_edges[i]*100):.0f}-{(bucket_edges[i+1]*100):.0f}%"
-        for i in range(confidence_buckets)
-    ]
+    bucket_labels = [f"{(bucket_edges[i]*100):.0f}-{(bucket_edges[i+1]*100):.0f}%" for i in range(confidence_buckets)]
 
     # Assign each prediction to bucket
     bucket_indices = np.digitize(predictions, bucket_edges[1:-1])
@@ -156,9 +151,7 @@ def walk_forward_validation(
     feature_cols = [c for c in features_df.columns if c not in exclude_cols]
 
     # Create target: did price go up next day?
-    features_df["target"] = (
-        features_df["close"].shift(-1) > features_df["close"]
-    ).astype(int)
+    features_df["target"] = (features_df["close"].shift(-1) > features_df["close"]).astype(int)
 
     # Drop NaN
     features_df = features_df.dropna()
@@ -193,12 +186,8 @@ def walk_forward_validation(
             break
 
         print(f"--- Fold {fold} ---")
-        print(
-            f"  Train: {train_df.index[0]} to {train_df.index[-1]} ({len(train_df)} samples)"
-        )
-        print(
-            f"  Test:  {test_df.index[0]} to {test_df.index[-1]} ({len(test_df)} samples)"
-        )
+        print(f"  Train: {train_df.index[0]} to {train_df.index[-1]} ({len(train_df)} samples)")
+        print(f"  Test:  {test_df.index[0]} to {test_df.index[-1]} ({len(test_df)} samples)")
 
         # Prepare matrices
         X_train = train_df[feature_cols].fillna(0).values

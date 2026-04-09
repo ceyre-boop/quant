@@ -164,11 +164,7 @@ class LiveTradingEngine:
                 volume = day_data.get("v", 0)
 
                 # Calculate some features
-                daily_return = (
-                    (price - prev_day.get("c", price)) / prev_day.get("c", price)
-                    if prev_day.get("c")
-                    else 0
-                )
+                daily_return = (price - prev_day.get("c", price)) / prev_day.get("c", price) if prev_day.get("c") else 0
 
                 return {
                     "symbol": symbol,
@@ -200,9 +196,7 @@ class LiveTradingEngine:
             "error": "API unavailable",
         }
 
-    def run_layer1_with_real_data(
-        self, symbol: str, market_data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    def run_layer1_with_real_data(self, symbol: str, market_data: Dict[str, Any]) -> Dict[str, Any]:
         """Run Layer 1 analysis with REAL market data."""
         price = market_data.get("price", 0)
 
@@ -212,19 +206,13 @@ class LiveTradingEngine:
 
         # Calculate trend from daily return
         daily_return = market_data.get("daily_return", 0)
-        trend = (
-            "uptrend"
-            if daily_return > 0.005
-            else "downtrend" if daily_return < -0.005 else "neutral"
-        )
+        trend = "uptrend" if daily_return > 0.005 else "downtrend" if daily_return < -0.005 else "neutral"
 
         # Detect volatility from high-low range
         high = market_data.get("high", price)
         low = market_data.get("low", price)
         volatility = (high - low) / price if price > 0 else 0
-        vol_regime = (
-            "high" if volatility > 0.02 else "normal" if volatility > 0.01 else "low"
-        )
+        vol_regime = "high" if volatility > 0.02 else "normal" if volatility > 0.01 else "low"
 
         # Simulate some ICT pattern detection based on price action
         fvg_detected = volatility > 0.015  # High volatility often creates FVGs
@@ -233,9 +221,7 @@ class LiveTradingEngine:
         layer1 = {
             "symbol": symbol,
             "direction": 1 if trend == "uptrend" else -1 if trend == "downtrend" else 0,
-            "confidence": min(
-                0.5 + abs(daily_return) * 20, 0.9
-            ),  # Higher confidence with bigger moves
+            "confidence": min(0.5 + abs(daily_return) * 20, 0.9),  # Higher confidence with bigger moves
             "trend_regime": trend,
             "volatility_regime": vol_regime,
             "current_price": price,
@@ -254,10 +240,7 @@ class LiveTradingEngine:
             "session": self._get_session(),
         }
 
-        self.logger.info(
-            f"Layer 1: {symbol} {trend} @ {price:.2f} "
-            f"(Conf: {layer1['confidence']:.2f}, Vol: {vol_regime})"
-        )
+        self.logger.info(f"Layer 1: {symbol} {trend} @ {price:.2f} " f"(Conf: {layer1['confidence']:.2f}, Vol: {vol_regime})")
 
         return layer1
 
@@ -273,9 +256,7 @@ class LiveTradingEngine:
         else:
             return "CLOSE"
 
-    def run_layer2_analysis(
-        self, symbol: str, layer1: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    def run_layer2_analysis(self, symbol: str, layer1: Dict[str, Any]) -> Dict[str, Any]:
         """Run Layer 2 (EV/Risk) analysis."""
         confidence = layer1.get("confidence", 0.5)
         direction = layer1.get("direction", 0)
@@ -294,19 +275,13 @@ class LiveTradingEngine:
             "win_prob": 0.5 + (confidence - 0.5) * 0.6,
             "risk_reward": 2.0,
             "max_position_size": min(confidence, 0.5),  # Cap at 50% of equity
-            "stop_loss": (
-                price - stop_distance if direction == 1 else price + stop_distance
-            ),
-            "take_profit": (
-                price + tp_distance if direction == 1 else price - tp_distance
-            ),
+            "stop_loss": (price - stop_distance if direction == 1 else price + stop_distance),
+            "take_profit": (price + tp_distance if direction == 1 else price - tp_distance),
         }
 
         return layer2
 
-    def run_layer3_analysis(
-        self, symbol: str, layer1: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    def run_layer3_analysis(self, symbol: str, layer1: Dict[str, Any]) -> Dict[str, Any]:
         """Run Layer 3 (Game Theory) analysis."""
         vol_regime = layer1.get("volatility_regime", "normal")
         session = layer1.get("session", "RTH")
@@ -365,13 +340,10 @@ class LiveTradingEngine:
         if signal:
             # Step 4: Execute paper trade (or live trade if not paper mode)
             if self.paper_mode:
-                position = self.paper_trading.execute_signal(
-                    signal, market_data["price"]
-                )
+                position = self.paper_trading.execute_signal(signal, market_data["price"])
                 if position:
                     self.logger.info(
-                        f"PAPER TRADE EXECUTED: {position.trade_id} "
-                        f"Expected R: {signal.entry_model_expected_r:.2f}"
+                        f"PAPER TRADE EXECUTED: {position.trade_id} " f"Expected R: {signal.entry_model_expected_r:.2f}"
                     )
 
             # Step 5: Broadcast to Firebase
@@ -380,9 +352,7 @@ class LiveTradingEngine:
             # Step 6: Update performance comparison
             comparison = compare_performance()
             if "error" not in comparison:
-                self.logger.info(
-                    f"Live vs Backtest: Win rate diff {comparison.get('win_rate_diff', 0):+.1%}"
-                )
+                self.logger.info(f"Live vs Backtest: Win rate diff {comparison.get('win_rate_diff', 0):+.1%}")
 
             return signal
 
@@ -391,9 +361,7 @@ class LiveTradingEngine:
     def _broadcast_signal(self, signal: EnhancedEntrySignal) -> bool:
         """Broadcast signal to Firebase dashboard."""
         try:
-            self.firebase.publish_signal_realtime(
-                symbol=signal.symbol, signal_data=signal.to_firebase_dict()
-            )
+            self.firebase.publish_signal_realtime(symbol=signal.symbol, signal_data=signal.to_firebase_dict())
             return True
         except Exception as e:
             self.logger.error(f"Failed to broadcast: {e}")
@@ -413,9 +381,7 @@ class LiveTradingEngine:
 
         if closed:
             for pos in closed:
-                self.logger.info(
-                    f"Position closed: {pos.trade_id} PnL: ${pos.pnl:,.2f}"
-                )
+                self.logger.info(f"Position closed: {pos.trade_id} PnL: ${pos.pnl:,.2f}")
 
         # Reset daily counters if needed
         self.paper_trading.reset_daily()
@@ -505,9 +471,7 @@ def main() -> None:
 
     logging.info("Symbols: %s", symbols)
     logging.info("Schedule: 08:00 premarket | 09:30-16:00 live | 16:05 EOD")
-    logging.info(
-        "Features: REAL Polygon data | 3-layer system | Paper trading | Auto-doc"
-    )
+    logging.info("Features: REAL Polygon data | 3-layer system | Paper trading | Auto-doc")
 
     # Log the proven backtest result as baseline
     log_backtest_result(
@@ -530,18 +494,12 @@ def main() -> None:
             try:
                 if is_trading_day(now_et):
                     # 08:00 - Premarket
-                    if (
-                        time_in_range(now_et, PREMARKET_TIME, MARKET_OPEN_TIME)
-                        and not state.premarket_done
-                    ):
+                    if time_in_range(now_et, PREMARKET_TIME, MARKET_OPEN_TIME) and not state.premarket_done:
                         run_premarket_check(symbols, engine)
                         state.premarket_done = True
 
                     # 09:30 - Market open
-                    if (
-                        time_in_range(now_et, MARKET_OPEN_TIME, MARKET_CLOSE_TIME)
-                        and not state.market_open_logged
-                    ):
+                    if time_in_range(now_et, MARKET_OPEN_TIME, MARKET_CLOSE_TIME) and not state.market_open_logged:
                         logging.info("🔔 09:30 MARKET OPEN - Live trading begins")
                         state.market_open_logged = True
                         state.next_signal_due = combine_today(now_et, MARKET_OPEN_TIME)
@@ -549,9 +507,7 @@ def main() -> None:
                     # Live trading hours
                     if time_in_range(now_et, MARKET_OPEN_TIME, MARKET_CLOSE_TIME):
                         if state.next_signal_due is None:
-                            state.next_signal_due = combine_today(
-                                now_et, MARKET_OPEN_TIME
-                            )
+                            state.next_signal_due = combine_today(now_et, MARKET_OPEN_TIME)
 
                         # Update positions (check stops/TPs)
                         engine.update_positions()
@@ -569,15 +525,10 @@ def main() -> None:
                             else:
                                 logging.info("⏸️ No signal this cycle")
 
-                            state.next_signal_due = (
-                                state.next_signal_due + SIGNAL_INTERVAL
-                            )
+                            state.next_signal_due = state.next_signal_due + SIGNAL_INTERVAL
 
                     # 16:05 - EOD
-                    if (
-                        time_in_range(now_et, EOD_SHUTDOWN_TIME, SESSION_END_TIME)
-                        and not state.eod_done
-                    ):
+                    if time_in_range(now_et, EOD_SHUTDOWN_TIME, SESSION_END_TIME) and not state.eod_done:
                         run_eod_summary(engine, firebase)
                         state.eod_done = True
 

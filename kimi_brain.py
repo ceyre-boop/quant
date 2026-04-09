@@ -126,18 +126,12 @@ class KimiBrain(AIBrain):
         price_5d_ago = df["close"].iloc[-5] if len(df) >= 5 else df["close"].iloc[0]
         price_20d_ago = df["close"].iloc[-20] if len(df) >= 20 else df["close"].iloc[0]
 
-        return_1d = (
-            (current_price / df["close"].iloc[-2] - 1) * 100 if len(df) >= 2 else 0
-        )
+        return_1d = (current_price / df["close"].iloc[-2] - 1) * 100 if len(df) >= 2 else 0
         return_5d = (current_price / price_5d_ago - 1) * 100
         return_20d = (current_price / price_20d_ago - 1) * 100
 
         volatility = df["close"].pct_change().std() * 100
-        volume_trend = (
-            df["volume"].iloc[-5:].mean() / df["volume"].iloc[-20:].mean()
-            if len(df) >= 20
-            else 1.0
-        )
+        volume_trend = df["volume"].iloc[-5:].mean() / df["volume"].iloc[-20:].mean() if len(df) >= 20 else 1.0
 
         # Market context
         spy_return = market_context.get("SPY", {}).get("return_1d", 0)
@@ -271,8 +265,7 @@ Rules:
             if len(df) >= 2:
                 market_context[symbol] = {
                     "price": df["close"].iloc[-1],
-                    "return_1d": (df["close"].iloc[-1] / df["close"].iloc[-2] - 1)
-                    * 100,
+                    "return_1d": (df["close"].iloc[-1] / df["close"].iloc[-2] - 1) * 100,
                 }
 
         for symbol, df in data.items():
@@ -295,9 +288,9 @@ Rules:
             content = response["choices"][0]["message"]["content"]
             parsed = self._parse_response(content)
 
-            logger.info("  Decision: %s", parsed['decision'])
-            logger.info("  Confidence: %.2f", parsed['confidence'])
-            logger.debug("  Reasoning: %s", parsed['reasoning'][:80])
+            logger.info("  Decision: %s", parsed["decision"])
+            logger.info("  Confidence: %.2f", parsed["confidence"])
+            logger.debug("  Reasoning: %s", parsed["reasoning"][:80])
 
             # Store in memory
             memory = KimiTradeMemory(
@@ -364,9 +357,7 @@ Rules:
 
         # Generate learning feedback
         if mem.won:
-            mem.feedback = (
-                f"Successful {predicted_direction} trade. Trust similar setups."
-            )
+            mem.feedback = f"Successful {predicted_direction} trade. Trust similar setups."
         else:
             mem.feedback = f"Failed {predicted_direction} trade. {predicted_direction} bias was wrong - consider opposite signal next time."
 
@@ -392,15 +383,13 @@ def test_kimi_brain():
     try:
         brain = KimiBrain(learning_mode=True)
 
-        bridge = AITradingBridge(
-            brain=brain, symbols=["SPY", "QQQ"], timeframe="1D", paper=True
-        )
+        bridge = AITradingBridge(brain=brain, symbols=["SPY", "QQQ"], timeframe="1D", paper=True)
 
         result = bridge.run_cycle()
 
         logger.info("=" * 60)
-        logger.info("Signals: %s", result['signals'])
-        logger.info("Executed: %s", result['executed'])
+        logger.info("Signals: %s", result["signals"])
+        logger.info("Executed: %s", result["executed"])
 
     except Exception as e:
         logger.error("Error: %s", e)

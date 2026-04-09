@@ -33,9 +33,7 @@ class BiasEngine:
         # Feature group mapping for rationale
         self.feature_to_group = self._build_feature_group_mapping()
 
-    def get_daily_bias(
-        self, symbol: str, features: FeatureVector, regime: RegimeState
-    ) -> BiasOutput:
+    def get_daily_bias(self, symbol: str, features: FeatureVector, regime: RegimeState) -> BiasOutput:
         """Generate daily bias prediction.
 
         Args:
@@ -93,9 +91,7 @@ class BiasEngine:
             + feature_dict.get("macd_histogram", 0) / 100 * 0.3
         )
 
-        momentum_score = (
-            feature_dict.get("rsi_14", 50) - 50
-        ) / 50 * 0.3 + feature_dict.get("rsi_slope_5", 0) * 0.1
+        momentum_score = (feature_dict.get("rsi_14", 50) - 50) / 50 * 0.3 + feature_dict.get("rsi_slope_5", 0) * 0.1
 
         # Combine scores
         total_score = trend_score + momentum_score
@@ -113,9 +109,7 @@ class BiasEngine:
 
         return direction, confidence
 
-    def _determine_magnitude(
-        self, confidence: float, features: FeatureVector
-    ) -> Magnitude:
+    def _determine_magnitude(self, confidence: float, features: FeatureVector) -> Magnitude:
         """Determine bias magnitude."""
         adx = features.adx_14
 
@@ -154,10 +148,7 @@ class BiasEngine:
         if abs(features.rsi_slope_5) > 3:
             rationale.append(FeatureGroup.MOMENTUM_SHIFT.value)
 
-        if (
-            abs(features.distance_to_support) < features.atr_14
-            or abs(features.distance_to_resistance) < features.atr_14
-        ):
+        if abs(features.distance_to_support) < features.atr_14 or abs(features.distance_to_resistance) < features.atr_14:
             rationale.append(FeatureGroup.SUPPORT_RESISTANCE.value)
 
         if features.market_breadth_ratio > 1.5 or features.market_breadth_ratio < 0.7:
@@ -209,9 +200,7 @@ class SHAPExplainer:
     def __init__(self):
         self.logger = logging.getLogger(__name__)
 
-    def explain_prediction(
-        self, features: FeatureVector, prediction: Direction
-    ) -> Dict[str, float]:
+    def explain_prediction(self, features: FeatureVector, prediction: Direction) -> Dict[str, float]:
         """Generate SHAP-like feature importance.
 
         Returns:
@@ -233,9 +222,7 @@ class SHAPExplainer:
         }
 
         for group, feature_names in groups.items():
-            group_importance = sum(
-                abs(feature_dict.get(f, 0)) for f in feature_names
-            ) / len(feature_names)
+            group_importance = sum(abs(feature_dict.get(f, 0)) for f in feature_names) / len(feature_names)
             importances[group] = group_importance
 
         # Normalize

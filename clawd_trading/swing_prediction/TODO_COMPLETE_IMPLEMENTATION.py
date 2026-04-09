@@ -72,9 +72,7 @@ class OptionsResult:
     vix_spot: float
     vix_term_spread: float
     vix_term_percentile: float
-    vix_signal: (
-        str  # 'CONTANGO' | 'BACKWARDATION' | 'EXTREME_FEAR' | 'EXTREME_COMPLACENCY'
-    )
+    vix_signal: str  # 'CONTANGO' | 'BACKWARDATION' | 'EXTREME_FEAR' | 'EXTREME_COMPLACENCY'
     iv_rank: float
     iv_signal: str  # 'EXPENSIVE' | 'CHEAP' | 'FAIR'
     iv_rv_spread: float
@@ -150,9 +148,7 @@ class OptionsLayer:
         composite = np.mean(scores) if scores else 0.0
         normalized_score = (composite + 3) / 6  # Scale to 0-1
 
-        direction = (
-            "LONG" if composite < -1 else "SHORT" if composite > 1 else "NEUTRAL"
-        )
+        direction = "LONG" if composite < -1 else "SHORT" if composite > 1 else "NEUTRAL"
 
         return OptionsResult(
             symbol=symbol,
@@ -233,9 +229,7 @@ class OptionsLayer:
 
         return {"gex": gex_billions, "percentile": percentile, "signal": signal}
 
-    def compute_vix_term_structure(
-        self, vix_spot: float, vix_3m: float, vix_history: list
-    ) -> Dict:
+    def compute_vix_term_structure(self, vix_spot: float, vix_3m: float, vix_history: list) -> Dict:
         """
         Compute VIX term structure analysis.
 
@@ -272,9 +266,7 @@ class OptionsLayer:
             "signal": signal,
         }
 
-    def compute_iv_analysis(
-        self, atm_iv: float, realized_vol: float, iv_rank_history: list
-    ) -> Dict:
+    def compute_iv_analysis(self, atm_iv: float, realized_vol: float, iv_rank_history: list) -> Dict:
         """
         Analyze implied vs realized volatility.
         """
@@ -648,14 +640,10 @@ class BaseRateCalculator:
             return self._empty_result(symbol, conditions)
 
         # Find historical occurrences
-        occurrences = self._find_occurrences(
-            symbol, conditions, price_hist, indicator_history
-        )
+        occurrences = self._find_occurrences(symbol, conditions, price_hist, indicator_history)
 
         if len(occurrences) < min_occurrences:
-            self.logger.info(
-                f"Insufficient occurrences for {symbol}: {len(occurrences)}"
-            )
+            self.logger.info(f"Insufficient occurrences for {symbol}: {len(occurrences)}")
             return self._empty_result(symbol, conditions)
 
         # Calculate forward returns for each window
@@ -666,9 +654,7 @@ class BaseRateCalculator:
 
         # Determine if edge is confirmed
         win_rate_40d = results["forward_40d"]["win_rate"]
-        edge_confirmed = (
-            win_rate_40d > min_win_rate and len(occurrences) >= min_occurrences
-        )
+        edge_confirmed = win_rate_40d > min_win_rate and len(occurrences) >= min_occurrences
 
         # Generate conditions hash
         conditions_hash = self._hash_conditions(conditions)
@@ -705,9 +691,7 @@ class BaseRateCalculator:
         for date in price_hist.index[252:]:
             try:
                 # Check if conditions match at this date
-                if self._check_conditions_at_date(
-                    conditions, date, price_hist, indicator_hist
-                ):
+                if self._check_conditions_at_date(conditions, date, price_hist, indicator_hist):
                     occurrences.append(date)
             except Exception as e:
                 self.logger.debug(f"Error checking {date}: {e}")
@@ -747,9 +731,7 @@ class BaseRateCalculator:
         else:
             return price > ma_200 * 1.05  # 5% above 200 MA
 
-    def _calculate_forward_stats(
-        self, price_hist: pd.DataFrame, occurrences: List[datetime], window: int
-    ) -> Dict[str, float]:
+    def _calculate_forward_stats(self, price_hist: pd.DataFrame, occurrences: List[datetime], window: int) -> Dict[str, float]:
         """Calculate forward return statistics for given window."""
         returns = []
         drawdowns = []
@@ -795,9 +777,7 @@ class BaseRateCalculator:
 
         # Calculate Sharpe (annualized)
         if len(returns_arr) > 1 and np.std(returns_arr) > 0:
-            sharpe = (np.mean(returns_arr) / np.std(returns_arr)) * np.sqrt(
-                252 / window
-            )
+            sharpe = (np.mean(returns_arr) / np.std(returns_arr)) * np.sqrt(252 / window)
         else:
             sharpe = 0.0
 
@@ -846,9 +826,7 @@ class BaseRateCalculator:
             computed_at=datetime.now().isoformat(),
         )
 
-    async def get_base_rate(
-        self, symbol: str, layer_scores: Dict, direction: str
-    ) -> Optional[Dict]:
+    async def get_base_rate(self, symbol: str, layer_scores: Dict, direction: str) -> Optional[Dict]:
         """Get cached base rate or compute new one."""
         # TODO: Check Firebase cache first
         # If not cached or stale, call compute_base_rates
@@ -999,9 +977,7 @@ class FirebaseWriter:
             query = (
                 self.db.collection(collection)
                 .where("tradeable", "==", True)
-                .where(
-                    "created_at", ">=", (datetime.now() - timedelta(days=7)).isoformat()
-                )
+                .where("created_at", ">=", (datetime.now() - timedelta(days=7)).isoformat())
             )
 
             docs = query.get()
@@ -1070,9 +1046,7 @@ class FirebaseWriter:
             self.logger.error(f"Failed to write base rate: {e}")
             return False
 
-    async def get_cached_base_rate(
-        self, symbol: str, conditions_hash: str
-    ) -> Optional[Dict]:
+    async def get_cached_base_rate(self, symbol: str, conditions_hash: str) -> Optional[Dict]:
         """Get cached base rate if not stale."""
         try:
             if not self.db:
@@ -1087,9 +1061,7 @@ class FirebaseWriter:
                 data = doc.to_dict()
 
                 # Check if stale (> 30 days old)
-                computed = datetime.fromisoformat(
-                    data.get("computed_at", "").replace("Z", "+00:00")
-                )
+                computed = datetime.fromisoformat(data.get("computed_at", "").replace("Z", "+00:00"))
                 if datetime.now() - computed > timedelta(days=30):
                     return None  # Stale, needs recalculation
 

@@ -69,9 +69,7 @@ class EntryEngine:
         failed = [g for g in gates if not g.passed]
 
         if failed:
-            self.logger.info(
-                f"Entry blocked at gate {failed[0].gate_number}: {failed[0].reason}"
-            )
+            self.logger.info(f"Entry blocked at gate {failed[0].gate_number}: {failed[0].reason}")
             return None
 
         # All gates passed - create entry signal
@@ -133,9 +131,7 @@ class EntryEngine:
             gate_number=1,
             name="Layer1_Confidence",
             passed=passed,
-            reason=(
-                None if passed else f"Confidence {context.bias.confidence:.2f} < 0.55"
-            ),
+            reason=(None if passed else f"Confidence {context.bias.confidence:.2f} < 0.55"),
         )
 
     def _gate_2_direction(self, context: ThreeLayerContext) -> GateCheck:
@@ -158,9 +154,7 @@ class EntryEngine:
             reason=None if passed else f"EV {context.risk.expected_value:.4f} <= 0",
         )
 
-    def _gate_4_risk_structure(
-        self, context: ThreeLayerContext, entry_price: float
-    ) -> GateCheck:
+    def _gate_4_risk_structure(self, context: ThreeLayerContext, entry_price: float) -> GateCheck:
         """Gate 4: Valid risk structure."""
         stop_distance = abs(entry_price - context.risk.stop_price)
         stop_pct = stop_distance / entry_price if entry_price > 0 else 0
@@ -177,10 +171,7 @@ class EntryEngine:
 
     def _gate_5_game_state(self, context: ThreeLayerContext) -> GateCheck:
         """Gate 5: Layer 3 not EXTREME adversarial (unless aligned)."""
-        if (
-            context.game.adversarial_risk == "EXTREME"
-            and not context.game.game_state_aligned
-        ):
+        if context.game.adversarial_risk == "EXTREME" and not context.game.game_state_aligned:
             passed = False
             reason = "EXTREME adversarial risk without alignment"
         else:
@@ -189,9 +180,7 @@ class EntryEngine:
 
         return GateCheck(gate_number=5, name="Game_State", passed=passed, reason=reason)
 
-    def _gate_6_daily_loss(
-        self, context: ThreeLayerContext, account: AccountState
-    ) -> GateCheck:
+    def _gate_6_daily_loss(self, context: ThreeLayerContext, account: AccountState) -> GateCheck:
         """Gate 6: Daily loss limit."""
         check = self.constraints.check_daily_loss_limit(account)
         return GateCheck(
@@ -211,9 +200,7 @@ class EntryEngine:
             reason=check.reason,
         )
 
-    def _gate_8_position_size(
-        self, context: ThreeLayerContext, account: AccountState
-    ) -> GateCheck:
+    def _gate_8_position_size(self, context: ThreeLayerContext, account: AccountState) -> GateCheck:
         """Gate 8: Position size limit."""
         check = self.constraints.check_position_size(context.risk, account)
         return GateCheck(
@@ -243,17 +230,13 @@ class EntryEngine:
             passed = True
             reason = None
 
-        return GateCheck(
-            gate_number=10, name="Regime_Override", passed=passed, reason=reason
-        )
+        return GateCheck(gate_number=10, name="Regime_Override", passed=passed, reason=reason)
 
     def _gate_11_ict_pattern(self, ict_setup: Optional[Dict]) -> GateCheck:
         """Gate 11: ICT pattern validation."""
         if ict_setup is None:
             # ICT pattern not required
-            return GateCheck(
-                gate_number=11, name="ICT_Pattern", passed=True, reason=None
-            )
+            return GateCheck(gate_number=11, name="ICT_Pattern", passed=True, reason=None)
 
         # Check if pattern is valid
         pattern_valid = ict_setup.get("valid", False)
@@ -304,9 +287,7 @@ class ICTDetector:
     def __init__(self):
         self.logger = logging.getLogger(__name__)
 
-    def detect_amd_pattern(
-        self, ohlcv: pd.DataFrame, opening_range_minutes: int = 60
-    ) -> Dict[str, Any]:
+    def detect_amd_pattern(self, ohlcv: pd.DataFrame, opening_range_minutes: int = 60) -> Dict[str, Any]:
         """Detect AMD (Accumulation, Manipulation, Distribution) pattern.
 
         Returns:
@@ -353,9 +334,7 @@ class ICTDetector:
             "manipulation_down": manipulation_down,
         }
 
-    def detect_fvg(
-        self, ohlcv: pd.DataFrame, lookback: int = 10
-    ) -> List[Dict[str, Any]]:
+    def detect_fvg(self, ohlcv: pd.DataFrame, lookback: int = 10) -> List[Dict[str, Any]]:
         """Detect Fair Value Gaps (FVGs).
 
         An FVG occurs when:
@@ -399,9 +378,7 @@ class ICTDetector:
 
         return fvgs
 
-    def detect_order_block(
-        self, ohlcv: pd.DataFrame, lookback: int = 20
-    ) -> Optional[Dict[str, Any]]:
+    def detect_order_block(self, ohlcv: pd.DataFrame, lookback: int = 20) -> Optional[Dict[str, Any]]:
         """Detect Order Block (OB).
 
         An OB is the last opposing candle before a strong move.
@@ -414,10 +391,7 @@ class ICTDetector:
         # Look for strong bullish move
         for i in range(3, len(recent)):
             # Check for 3+ consecutive up bars
-            if all(
-                recent.iloc[j]["close"] > recent.iloc[j]["open"]
-                for j in range(i - 3, i)
-            ):
+            if all(recent.iloc[j]["close"] > recent.iloc[j]["open"] for j in range(i - 3, i)):
                 # The last down bar before the move is the bullish OB
                 for j in range(i - 4, -1, -1):
                     if recent.iloc[j]["close"] < recent.iloc[j]["open"]:
@@ -430,10 +404,7 @@ class ICTDetector:
 
         # Look for strong bearish move
         for i in range(3, len(recent)):
-            if all(
-                recent.iloc[j]["close"] < recent.iloc[j]["open"]
-                for j in range(i - 3, i)
-            ):
+            if all(recent.iloc[j]["close"] < recent.iloc[j]["open"] for j in range(i - 3, i)):
                 for j in range(i - 4, -1, -1):
                     if recent.iloc[j]["close"] > recent.iloc[j]["open"]:
                         return {

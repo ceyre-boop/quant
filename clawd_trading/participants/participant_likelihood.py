@@ -55,12 +55,8 @@ def classify_participants(
         evidence[ParticipantType.MARKET_MAKER]["high_absorption_ratio"] = True
         evidence[ParticipantType.MARKET_MAKER]["low_sweep_intensity"] = True
     else:
-        evidence[ParticipantType.MARKET_MAKER]["high_absorption_ratio"] = (
-            features.absorption_ratio > 1.5
-        )
-        evidence[ParticipantType.MARKET_MAKER]["low_sweep_intensity"] = (
-            features.sweep_intensity < 2.0
-        )
+        evidence[ParticipantType.MARKET_MAKER]["high_absorption_ratio"] = features.absorption_ratio > 1.5
+        evidence[ParticipantType.MARKET_MAKER]["low_sweep_intensity"] = features.sweep_intensity < 2.0
 
     # ALGO: high orderflow_velocity, high volatility_reaction
     if features.orderflow_velocity > 4.0 and features.volatility_reaction > 1.5:
@@ -68,21 +64,15 @@ def classify_participants(
         evidence[ParticipantType.ALGO]["high_orderflow_velocity"] = True
         evidence[ParticipantType.ALGO]["high_volatility_reaction"] = True
     else:
-        evidence[ParticipantType.ALGO]["high_orderflow_velocity"] = (
-            features.orderflow_velocity > 4.0
-        )
-        evidence[ParticipantType.ALGO]["high_volatility_reaction"] = (
-            features.volatility_reaction > 1.5
-        )
+        evidence[ParticipantType.ALGO]["high_orderflow_velocity"] = features.orderflow_velocity > 4.0
+        evidence[ParticipantType.ALGO]["high_volatility_reaction"] = features.volatility_reaction > 1.5
 
     # LIQUIDITY_HUNTER: high liquidity_removal_rate
     if features.liquidity_removal_rate > 3.0:
         scores[ParticipantType.LIQUIDITY_HUNTER] += 2.0
         evidence[ParticipantType.LIQUIDITY_HUNTER]["high_liquidity_removal_rate"] = True
     else:
-        evidence[ParticipantType.LIQUIDITY_HUNTER][
-            "high_liquidity_removal_rate"
-        ] = False
+        evidence[ParticipantType.LIQUIDITY_HUNTER]["high_liquidity_removal_rate"] = False
 
     # RETAIL: open, low volatility
     if features.time_of_day_bias == "open" and features.volatility_reaction < 1.2:
@@ -99,8 +89,7 @@ def classify_participants(
         evidence[ParticipantType.NEWS_ALGO]["news_during_and_high_volatility"] = True
     else:
         evidence[ParticipantType.NEWS_ALGO]["news_during_and_high_volatility"] = (
-            features.news_window_behavior == "during"
-            and features.volatility_reaction > 1.5
+            features.news_window_behavior == "during" and features.volatility_reaction > 1.5
         )
 
     # FUND: mid, neutral vol
@@ -109,8 +98,7 @@ def classify_participants(
         evidence[ParticipantType.FUND]["mid_neutral_vol"] = True
     else:
         evidence[ParticipantType.FUND]["mid_neutral_vol"] = (
-            features.time_of_day_bias == "mid"
-            and 0.8 < features.volatility_reaction < 1.3
+            features.time_of_day_bias == "mid" and 0.8 < features.volatility_reaction < 1.3
         )
 
     # Normalize to probabilities
@@ -122,9 +110,7 @@ def classify_participants(
 
     # Build output, sorted by ParticipantType name
     likelihoods = [
-        ParticipantLikelihood(
-            type=ptype, probability=norm_scores[ptype], evidence=evidence[ptype]
-        )
+        ParticipantLikelihood(type=ptype, probability=norm_scores[ptype], evidence=evidence[ptype])
         for ptype in sorted(ParticipantType, key=lambda x: x.name)
     ]
     return likelihoods

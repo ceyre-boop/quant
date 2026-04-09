@@ -71,9 +71,7 @@ class RefitScheduler:
                 return True, f"{days_since} days since last training"
 
         # Check 3: New trade threshold
-        new_trades = (
-            self.firebase.rtdb_get("/performance/new_trades_since_training") or 0
-        )
+        new_trades = self.firebase.rtdb_get("/performance/new_trades_since_training") or 0
         if new_trades >= 50:
             return True, f"{new_trades} new trades since training"
 
@@ -86,9 +84,7 @@ class RefitScheduler:
 
         return False, "No refit needed"
 
-    def run_scheduled_refit(
-        self, model_types: list = None, commit_results: bool = False
-    ) -> Dict[str, Any]:
+    def run_scheduled_refit(self, model_types: list = None, commit_results: bool = False) -> Dict[str, Any]:
         """Run scheduled model refitting.
 
         Args:
@@ -116,9 +112,7 @@ class RefitScheduler:
         results["completed_at"] = datetime.now().isoformat()
 
         # Update Firebase
-        self.firebase.rtdb_update(
-            "/models/last_training_date", datetime.now().isoformat()
-        )
+        self.firebase.rtdb_update("/models/last_training_date", datetime.now().isoformat())
         self.firebase.rtdb_update("/models/last_refit_results", results)
 
         return results
@@ -136,9 +130,7 @@ class RefitScheduler:
         logger.info(f"Refitting {model_type}...")
 
         # 1. Fetch training data
-        training_data = self.pipeline.fetch_training_data(
-            symbols=["NQ", "ES", "BTC"], lookback_days=90
-        )
+        training_data = self.pipeline.fetch_training_data(symbols=["NQ", "ES", "BTC"], lookback_days=90)
 
         # 2. Prepare features and labels
         X, y = self._prepare_training_data(training_data, model_type)
@@ -222,9 +214,7 @@ def main():
     parser = argparse.ArgumentParser(description="Model Refit Scheduler")
     parser.add_argument("--model", default="bias_engine", help="Model to retrain")
     parser.add_argument("--check", action="store_true", help="Check if refit needed")
-    parser.add_argument(
-        "--commit", action="store_true", help="Commit results to registry"
-    )
+    parser.add_argument("--commit", action="store_true", help="Commit results to registry")
 
     args = parser.parse_args()
 
@@ -235,9 +225,7 @@ def main():
         print(f"Should refit: {should_refit}")
         print(f"Reason: {reason}")
     else:
-        results = scheduler.run_scheduled_refit(
-            model_types=[args.model], commit_results=args.commit
-        )
+        results = scheduler.run_scheduled_refit(model_types=[args.model], commit_results=args.commit)
         print(json.dumps(results, indent=2))
 
 

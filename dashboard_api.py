@@ -107,11 +107,7 @@ def generate_real_live_state(symbol: str) -> Dict[str, Any]:
         },
         # Regime
         "regime": {
-            "volatility": (
-                "HIGH"
-                if volatility > 0.02
-                else "NORMAL" if volatility > 0.01 else "LOW"
-            ),
+            "volatility": ("HIGH" if volatility > 0.02 else "NORMAL" if volatility > 0.01 else "LOW"),
             "trend": trend.upper(),
             "risk_appetite": "ELEVATED" if volatility > 0.02 else "NORMAL",
             "event_risk": "NONE",
@@ -121,11 +117,7 @@ def generate_real_live_state(symbol: str) -> Dict[str, Any]:
         "session": {
             "pnl": paper_trading.daily_pnl,
             "position": "LONG" if paper_trading.positions else "FLAT",
-            "entry": (
-                list(paper_trading.positions.values())[0].entry_price
-                if paper_trading.positions
-                else 0
-            ),
+            "entry": (list(paper_trading.positions.values())[0].entry_price if paper_trading.positions else 0),
         },
         # Metadata
         "data_source": "yahoo",
@@ -142,29 +134,20 @@ def generate_signal_from_engine(symbol: str) -> Optional[Dict[str, Any]]:
     # Build layer outputs
     layer1 = {
         "symbol": symbol,
-        "direction": (
-            1
-            if market_data.change_percent > 0.005
-            else -1 if market_data.change_percent < -0.005 else 0
-        ),
+        "direction": (1 if market_data.change_percent > 0.005 else -1 if market_data.change_percent < -0.005 else 0),
         "confidence": min(0.5 + abs(market_data.change_percent) * 20, 0.95),
         "trend_regime": (
             "uptrend"
             if market_data.change_percent > 0.005
             else "downtrend" if market_data.change_percent < -0.005 else "neutral"
         ),
-        "volatility_regime": (
-            "high"
-            if (market_data.high - market_data.low) / market_data.close > 0.02
-            else "normal"
-        ),
+        "volatility_regime": ("high" if (market_data.high - market_data.low) / market_data.close > 0.02 else "normal"),
         "current_price": market_data.close,
         "features": {
             "change_pct": market_data.change_percent,
             "volume": market_data.volume,
         },
-        "fvg_detected": (market_data.high - market_data.low) / market_data.close
-        > 0.015,
+        "fvg_detected": (market_data.high - market_data.low) / market_data.close > 0.015,
         "liquidity_sweep": abs(market_data.change_percent) > 0.01,
         "order_block": False,
         "ict_setup": {},
@@ -190,11 +173,7 @@ def generate_signal_from_engine(symbol: str) -> Optional[Dict[str, Any]]:
         balance=paper_trading.current_equity,
         open_positions=len(paper_trading.positions),
         daily_pnl=paper_trading.daily_pnl,
-        daily_loss_pct=(
-            paper_trading.daily_pnl / paper_trading.current_equity
-            if paper_trading.current_equity > 0
-            else 0
-        ),
+        daily_loss_pct=(paper_trading.daily_pnl / paper_trading.current_equity if paper_trading.current_equity > 0 else 0),
         margin_used=0,
         margin_available=paper_trading.current_equity,
         timestamp=datetime.now(),

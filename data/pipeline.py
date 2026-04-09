@@ -50,9 +50,7 @@ class DataPipeline:
         """Extract a scalar value from nested index data dicts."""
         return index_data.get(key, {}).get("latest", {}).get("value", default)
 
-    def run_premarket(
-        self, symbols: List[str], include_all_features: bool = True
-    ) -> Dict[str, FeatureRecord]:
+    def run_premarket(self, symbols: List[str], include_all_features: bool = True) -> Dict[str, FeatureRecord]:
         """Run pre-market data pipeline.
 
         Runs at 08:00 EST. Builds all feature vectors for the session.
@@ -92,9 +90,7 @@ class DataPipeline:
         try:
             index_data = self.index_fetcher.fetch_all_indices(lookback_days=30)
             vix_value = index_data.get("VIX", {}).get("latest", {}).get("value", 20)
-            vix_regime = (
-                self.index_fetcher.get_vix_regime(vix_value) if vix_value else "NORMAL"
-            )
+            vix_regime = self.index_fetcher.get_vix_regime(vix_value) if vix_value else "NORMAL"
         except Exception as e:
             logger.error(f"Failed to fetch index data: {e}")
             index_data = {}
@@ -125,13 +121,9 @@ class DataPipeline:
                     "yield_10yr": self._extract_index_value(index_data, "TNX", 4.0),
                     "yield_2yr": self._extract_index_value(index_data, "IRX2", 4.5),
                     "yield_3m": self._extract_index_value(index_data, "IRX", 5.0),
-                    "hy_spread": self._extract_index_value(
-                        index_data, "HYG_SPREAD", 3.5
-                    ),
+                    "hy_spread": self._extract_index_value(index_data, "HYG_SPREAD", 3.5),
                     "vol_of_vol": self._extract_index_value(index_data, "VVIX", 90.0),
-                    "equity_drawdown": self._extract_index_value(
-                        index_data, "SPY_DRAWDOWN", 0.0
-                    ),
+                    "equity_drawdown": self._extract_index_value(index_data, "SPY_DRAWDOWN", 0.0),
                 }
             )
             logger.info("Macro features: %s", macro_features)
@@ -160,9 +152,7 @@ class DataPipeline:
                 features.update(macro_features)
 
                 # Get latest bar for raw_data
-                latest_bar = (
-                    daily_data.get(symbol, [{}])[-1] if daily_data.get(symbol) else {}
-                )
+                latest_bar = daily_data.get(symbol, [{}])[-1] if daily_data.get(symbol) else {}
 
                 # Create FeatureRecord
                 record = FeatureRecord(
@@ -187,9 +177,7 @@ class DataPipeline:
                 if not validation.is_valid:
                     record.is_valid = False
                     record.validation_errors = validation.errors
-                    logger.warning(
-                        f"Feature record validation failed for {symbol}: {validation.errors}"
-                    )
+                    logger.warning(f"Feature record validation failed for {symbol}: {validation.errors}")
 
                 results[symbol] = record
 
@@ -236,9 +224,7 @@ class DataPipeline:
                 # Build incremental features
                 features = {
                     "kyle_lambda": order_flow.get("kyle_lambda", 0),
-                    "volume_imbalance": order_flow.get("volume_imbalance", {}).get(
-                        "imbalance_ratio", 1.0
-                    ),
+                    "volume_imbalance": order_flow.get("volume_imbalance", {}).get("imbalance_ratio", 1.0),
                     "timestamp": timestamp.isoformat(),
                 }
 

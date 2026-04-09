@@ -71,9 +71,7 @@ def backtest_signals():
 
     # Baseline: buy and hold every day
     baseline_return = returns_val.mean()
-    print(
-        f"Baseline (buy every day): {baseline_return:.4f} ({baseline_return*100:.2f}% avg daily)"
-    )
+    print(f"Baseline (buy every day): {baseline_return:.4f} ({baseline_return*100:.2f}% avg daily)")
 
     # Strategy: only trade when model predicts UP
     signal_mask = signals == 1
@@ -86,9 +84,7 @@ def backtest_signals():
         hit_rate = (signal_returns > 0).mean()
 
         print(f"\nStrategy (model says BUY):")
-        print(
-            f"  Trades taken: {signal_mask.sum()}/{len(X_val)} ({signal_mask.mean()*100:.1f}%)"
-        )
+        print(f"  Trades taken: {signal_mask.sum()}/{len(X_val)} ({signal_mask.mean()*100:.1f}%)")
         print(f"  Avg return: {signal_mean:.4f} ({signal_mean*100:.2f}%)")
         print(f"  Hit rate: {hit_rate:.1%}")
         print(f"  Sharpe (daily): {signal_sharpe:.2f}")

@@ -22,9 +22,7 @@ class Config:
     # Alpaca
     ALPACA_API_KEY: Optional[str] = os.getenv("ALPACA_API_KEY")
     ALPACA_SECRET_KEY: Optional[str] = os.getenv("ALPACA_SECRET_KEY")
-    ALPACA_BASE_URL: str = os.getenv(
-        "ALPACA_BASE_URL", "https://paper-api.alpaca.markets"
-    )
+    ALPACA_BASE_URL: str = os.getenv("ALPACA_BASE_URL", "https://paper-api.alpaca.markets")
 
     # Polygon
     POLYGON_API_KEY: Optional[str] = os.getenv("POLYGON_API_KEY")

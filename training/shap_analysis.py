@@ -84,9 +84,7 @@ def analyze_model():
         shap_values = shap_values[1]
 
     mean_shap = np.abs(shap_values).mean(axis=0)
-    shap_importance = pd.DataFrame(
-        {"feature": feature_cols, "mean_shap": mean_shap}
-    ).sort_values("mean_shap", ascending=False)
+    shap_importance = pd.DataFrame({"feature": feature_cols, "mean_shap": mean_shap}).sort_values("mean_shap", ascending=False)
 
     print("\nTop 10 Features by SHAP Importance:")
     print(shap_importance.head(10).to_string(index=False))
@@ -117,12 +115,8 @@ def analyze_model():
         "dist_",
     ]
 
-    noise_count = sum(
-        1 for f in top_features if any(nf in f.lower() for nf in noise_features)
-    )
-    real_count = sum(
-        1 for f in top_features if any(rf in f.lower() for rf in real_features)
-    )
+    noise_count = sum(1 for f in top_features if any(nf in f.lower() for nf in noise_features))
+    real_count = sum(1 for f in top_features if any(rf in f.lower() for rf in real_features))
 
     if real_count >= 3:
         print("✅ MODEL LEARNED REAL PATTERNS")

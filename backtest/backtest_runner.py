@@ -139,9 +139,7 @@ class BacktestResult:
 
         self.winning_trades = len(winning)
         self.losing_trades = len(losing)
-        self.win_rate = (
-            self.winning_trades / len(closed_trades) if closed_trades else 0.0
-        )
+        self.win_rate = self.winning_trades / len(closed_trades) if closed_trades else 0.0
 
         self.avg_win = np.mean([t.realized_pnl for t in winning]) if winning else 0.0
         self.avg_loss = np.mean([t.realized_pnl for t in losing]) if losing else 0.0
@@ -149,9 +147,7 @@ class BacktestResult:
         # Profit factor
         gross_profit = sum(t.realized_pnl for t in winning)
         gross_loss = abs(sum(t.realized_pnl for t in losing))
-        self.profit_factor = (
-            gross_profit / gross_loss if gross_loss > 0 else float("inf")
-        )
+        self.profit_factor = gross_profit / gross_loss if gross_loss > 0 else float("inf")
 
         # Total return
         total_pnl = sum(t.realized_pnl for t in closed_trades)
@@ -248,16 +244,10 @@ class BacktestRunner:
         np.random.seed(42)
 
         # Generate date range
-        dates = pd.date_range(
-            start=self.config.start_date, end=self.config.end_date, freq="5min"
-        )
+        dates = pd.date_range(start=self.config.start_date, end=self.config.end_date, freq="5min")
 
         # Filter trading hours (9:30 - 16:00 EST)
-        dates = dates[
-            (dates.hour >= 9)
-            & (dates.hour < 16)
-            & (~dates.weekday.isin([5, 6]))  # Exclude weekends
-        ]
+        dates = dates[(dates.hour >= 9) & (dates.hour < 16) & (~dates.weekday.isin([5, 6]))]  # Exclude weekends
 
         n = len(dates)
 
@@ -302,10 +292,7 @@ class BacktestRunner:
         self.result.calculate_metrics()
         self._calculate_sharpe_and_drawdown()
 
-        logger.info(
-            f"Backtest complete: {self.result.total_trades} trades, "
-            f"{self.result.win_rate*100:.1f}% win rate"
-        )
+        logger.info(f"Backtest complete: {self.result.total_trades} trades, " f"{self.result.win_rate*100:.1f}% win rate")
 
         return self.result
 
@@ -360,11 +347,7 @@ class BacktestRunner:
 
             # Check for valid entry
             if bias and risk and game:
-                if (
-                    bias.confidence >= 0.55
-                    and risk.ev_positive
-                    and game.adversarial_risk.value != "EXTREME"
-                ):
+                if bias.confidence >= 0.55 and risk.ev_positive and game.adversarial_risk.value != "EXTREME":
 
                     self._open_position(timestamp, bar, bias, risk, game)
 
@@ -524,9 +507,7 @@ class BacktestRunner:
         if len(equity_values) > 1:
             returns = pd.Series(equity_values).pct_change().dropna()
             if len(returns) > 0 and returns.std() > 0:
-                self.result.sharpe_ratio = (returns.mean() / returns.std()) * np.sqrt(
-                    252
-                )
+                self.result.sharpe_ratio = (returns.mean() / returns.std()) * np.sqrt(252)
 
         self.result.equity_curve = self.equity_history
 
@@ -548,9 +529,7 @@ class BacktestRunner:
         print("\n" + "=" * 60)
         print(f"BACKTEST RESULTS: {self.config.symbol}")
         print("=" * 60)
-        print(
-            f"Period: {self.config.start_date.date()} to {self.config.end_date.date()}"
-        )
+        print(f"Period: {self.config.start_date.date()} to {self.config.end_date.date()}")
         print(f"Initial Capital: ${self.config.initial_capital:,.2f}")
         print("-" * 60)
         print("PERFORMANCE METRICS:")
@@ -561,15 +540,11 @@ class BacktestRunner:
         print(f"  Avg Loss:          ${self.result.avg_loss:,.2f}")
         print(f"  Profit Factor:     {self.result.profit_factor:.2f}")
         print(f"  Sharpe Ratio:      {self.result.sharpe_ratio:.2f}")
-        print(
-            f"  Max Drawdown:      ${self.result.max_drawdown:,.2f} ({self.result.max_drawdown_pct:.1f}%)"
-        )
+        print(f"  Max Drawdown:      ${self.result.max_drawdown:,.2f} ({self.result.max_drawdown_pct:.1f}%)")
         print("=" * 60 + "\n")
 
 
-def run_simple_backtest(
-    symbol: str, start_date: str, end_date: str, data: Optional[pd.DataFrame] = None
-) -> BacktestResult:
+def run_simple_backtest(symbol: str, start_date: str, end_date: str, data: Optional[pd.DataFrame] = None) -> BacktestResult:
     """Run a simple backtest with mock engines.
 
     Args:
@@ -640,9 +615,7 @@ def run_simple_backtest(
 
     runner = BacktestRunner(
         config=config,
-        data_loader=lambda s, start, end, tf: (
-            data if data is not None else pd.DataFrame()
-        ),
+        data_loader=lambda s, start, end, tf: (data if data is not None else pd.DataFrame()),
         bias_engine=mock_bias_engine,
         risk_engine=mock_risk_engine,
         game_engine=mock_game_engine,

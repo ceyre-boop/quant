@@ -51,9 +51,7 @@ class CompositeScorer:
         else:
             return "neutral"
 
-    def confidence_from_alignment(
-        self, layers_aligned: int, base_rate: float = None
-    ) -> float:
+    def confidence_from_alignment(self, layers_aligned: int, base_rate: float = None) -> float:
         """
         Calculate confidence based on layer alignment and base rate.
         """

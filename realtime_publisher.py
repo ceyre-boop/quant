@@ -32,9 +32,7 @@ from clawd_trading.participants import (
 )
 from clawd_trading.risk import classify_regime_from_layer1
 
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s | %(levelname)s | %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s | %(levelname)s | %(message)s")
 logger = logging.getLogger(__name__)
 
 TZ_NY = ZoneInfo("America/New_York")
@@ -101,11 +99,7 @@ class RealtimeFirebasePublisher:
                 "direction": direction,
                 "confidence": confidence,
                 "trend_regime": trend,
-                "volatility_regime": (
-                    "high"
-                    if volatility > 0.02
-                    else "normal" if volatility > 0.01 else "low"
-                ),
+                "volatility_regime": ("high" if volatility > 0.02 else "normal" if volatility > 0.01 else "low"),
                 "current_price": market_data.close,
                 "open": market_data.open,
                 "high": market_data.high,
@@ -183,11 +177,7 @@ class RealtimeFirebasePublisher:
                 "game_state": layer3_output,
                 # Regime
                 "regime": {
-                    "volatility": (
-                        "HIGH"
-                        if volatility > 0.02
-                        else "NORMAL" if volatility > 0.01 else "LOW"
-                    ),
+                    "volatility": ("HIGH" if volatility > 0.02 else "NORMAL" if volatility > 0.01 else "LOW"),
                     "trend": trend.upper(),
                     "risk_appetite": "ELEVATED" if volatility > 0.02 else "NORMAL",
                     "event_risk": "NONE",
@@ -201,11 +191,7 @@ class RealtimeFirebasePublisher:
                 "session": {
                     "pnl": self.paper.daily_pnl,
                     "position": "LONG" if symbol in self.paper.positions else "FLAT",
-                    "entry": (
-                        list(self.paper.positions.values())[0].entry_price
-                        if symbol in self.paper.positions
-                        else 0
-                    ),
+                    "entry": (list(self.paper.positions.values())[0].entry_price if symbol in self.paper.positions else 0),
                 },
                 "session_pnl": self.paper.daily_pnl,
                 "position_state": "LONG" if symbol in self.paper.positions else "FLAT",
@@ -214,9 +200,7 @@ class RealtimeFirebasePublisher:
             # 6. PUBLISH TO FIREBASE
             if self.firebase and self.firebase._enabled:
                 self._publish_to_firebase(symbol, live_state)
-                logger.info(
-                    f"📡 Published {symbol}: ${market_data.close:.2f} | {trend.upper()} | Conf: {confidence:.2f}"
-                )
+                logger.info(f"📡 Published {symbol}: ${market_data.close:.2f} | {trend.upper()} | Conf: {confidence:.2f}")
                 return True
             else:
                 logger.error("Firebase not available")
@@ -259,33 +243,20 @@ class RealtimeFirebasePublisher:
             # Build layer outputs
             layer1 = {
                 "symbol": symbol,
-                "direction": (
-                    1
-                    if market_data.change_percent > 0.005
-                    else -1 if market_data.change_percent < -0.005 else 0
-                ),
+                "direction": (1 if market_data.change_percent > 0.005 else -1 if market_data.change_percent < -0.005 else 0),
                 "confidence": min(0.5 + abs(market_data.change_percent) * 20, 0.95),
                 "trend_regime": (
                     "uptrend"
                     if market_data.change_percent > 0.005
-                    else (
-                        "downtrend"
-                        if market_data.change_percent < -0.005
-                        else "neutral"
-                    )
+                    else ("downtrend" if market_data.change_percent < -0.005 else "neutral")
                 ),
-                "volatility_regime": (
-                    "high"
-                    if (market_data.high - market_data.low) / market_data.close > 0.02
-                    else "normal"
-                ),
+                "volatility_regime": ("high" if (market_data.high - market_data.low) / market_data.close > 0.02 else "normal"),
                 "current_price": market_data.close,
                 "features": {
                     "change_pct": market_data.change_percent,
                     "volume": market_data.volume,
                 },
-                "fvg_detected": (market_data.high - market_data.low) / market_data.close
-                > 0.015,
+                "fvg_detected": (market_data.high - market_data.low) / market_data.close > 0.015,
                 "liquidity_sweep": abs(market_data.change_percent) > 0.01,
                 "order_block": False,
                 "ict_setup": {},
@@ -311,11 +282,7 @@ class RealtimeFirebasePublisher:
                 balance=self.paper.current_equity,
                 open_positions=len(self.paper.positions),
                 daily_pnl=self.paper.daily_pnl,
-                daily_loss_pct=(
-                    self.paper.daily_pnl / self.paper.current_equity
-                    if self.paper.current_equity > 0
-                    else 0
-                ),
+                daily_loss_pct=(self.paper.daily_pnl / self.paper.current_equity if self.paper.current_equity > 0 else 0),
                 margin_used=0,
                 margin_available=self.paper.current_equity,
                 timestamp=datetime.now(),
@@ -342,8 +309,7 @@ class RealtimeFirebasePublisher:
                     "stop_loss": signal.stop_loss,
                     "tp1": signal.take_profit_1,
                     "tp2": signal.take_profit_2,
-                    "confidence": signal.confidence
-                    * 100,  # Frontend expects percentage
+                    "confidence": signal.confidence * 100,  # Frontend expects percentage
                     "expected_value": signal.expected_value,
                     "ev": signal.expected_value,
                     "status": "ACTIVE",
@@ -365,9 +331,7 @@ class RealtimeFirebasePublisher:
                     ref.set(signal_data)
 
                     # Also add to history
-                    history_ref = client.rtdb.reference(
-                        f'entry_signals/{symbol}/history/{signal_data["signal_id"]}'
-                    )
+                    history_ref = client.rtdb.reference(f'entry_signals/{symbol}/history/{signal_data["signal_id"]}')
                     history_ref.set(signal_data)
 
                 logger.info(
