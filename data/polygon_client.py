@@ -21,7 +21,8 @@ class PolygonRestClient:
 
     def __init__(self, api_key: Optional[str] = None, base_url: Optional[str] = None):
         self.api_key: Optional[str] = api_key or os.getenv("POLYGON_API_KEY")
-        self.base_url: str = base_url or os.getenv("POLYGON_BASE_URL", "https://api.polygon.io") or "https://api.polygon.io"
+        # os.getenv with a default always returns str, but we annotate explicitly for mypy
+        self.base_url: str = base_url or os.getenv("POLYGON_BASE_URL", "https://api.polygon.io")  # type: ignore[assignment]
 
         if not self.api_key:
             raise ValueError("POLYGON_API_KEY not set")

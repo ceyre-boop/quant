@@ -24,7 +24,8 @@ class TradeLockerClient:
     ):
         self.api_key = api_key or os.getenv("TRADELOCKER_API_KEY")
         self.account_id = account_id or os.getenv("TRADELOCKER_ACCOUNT_ID")
-        self.base_url: str = base_url or os.getenv("TRADELOCKER_BASE_URL", "https://api.tradelocker.com") or "https://api.tradelocker.com"
+        # os.getenv with a default always returns str, but we annotate explicitly for mypy
+        self.base_url: str = base_url or os.getenv("TRADELOCKER_BASE_URL", "https://api.tradelocker.com")  # type: ignore[assignment]
         self.env = env or os.getenv("TRADELOCKER_ENV", "demo")
 
         self.ws: Optional[WebSocketApp] = None
