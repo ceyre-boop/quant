@@ -2,6 +2,9 @@
 """
 Fix hardcoded $100k equity values across all files.
 Replaces hardcoded 100000.0 with config-driven values.
+
+ARCHIVED: One-off migration script for Windows development environment.
+Not intended to be run in production. Preserved for historical reference only.
 """
 
 import os

@@ -37,8 +37,8 @@ def get_working_dir():
         return current
     if (current / "02-Trading").exists():
         return current / "02-Trading"
-    # Fallback to hardcoded path (for backwards compatibility)
-    return Path(r"C:\Users\Admin\clawd\02-Trading")
+    # Fallback to current working directory
+    return Path.cwd()
 
 
 WORKING_DIR = get_working_dir()

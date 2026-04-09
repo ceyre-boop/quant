@@ -28,6 +28,8 @@ import numpy as np
 from ai_trading_bridge import AIBrain, Signal, AITradingBridge
 from data.alpaca_client import AlpacaDataClient
 
+logger = logging.getLogger(__name__)
+
 
 @dataclass
 class KimiTradeMemory:
@@ -90,7 +92,7 @@ class KimiBrain(AIBrain):
             with open(memory_path, "r") as f:
                 data = json.load(f)
                 self.memory = [KimiTradeMemory(**m) for m in data]
-            print(f"[KimiBrain] Loaded {len(self.memory)} trade memories")
+            logger.info("[KimiBrain] Loaded %d trade memories", len(self.memory))
 
     def _save_memory(self):
         """Save trade memories to disk"""
@@ -197,10 +199,6 @@ Rules:
             "Content-Type": "application/json",
         }
 
-        # Debug: Show key prefix (safely)
-        key_preview = self.api_key[:10] + "..." if len(self.api_key) > 10 else "invalid"
-        print(f"[KimiBrain] Using API key: {key_preview}")
-
         payload = {
             "model": self.model,
             "messages": [
@@ -217,15 +215,15 @@ Rules:
         try:
             # Correct Kimi API endpoint - includes /v1 in path
             url = f"{self.base_url}/v1/chat/completions"
-            print(f"[KimiBrain] Calling API: {url}")
+            logger.debug("[KimiBrain] Calling API: %s", url)
             response = requests.post(url, headers=headers, json=payload, timeout=30)
-            print(f"[KimiBrain] Response status: {response.status_code}")
+            logger.debug("[KimiBrain] Response status: %d", response.status_code)
             if response.status_code != 200:
-                print(f"[KimiBrain] Response body: {response.text[:200]}")
+                logger.warning("[KimiBrain] Response body: %s", response.text[:200])
             response.raise_for_status()
             return response.json()
         except Exception as e:
-            print(f"[KimiBrain] API error: {e}")
+            logger.error("[KimiBrain] API error: %s", e)
             return None
 
     def _parse_response(self, content: str) -> Dict[str, Any]:
@@ -244,7 +242,7 @@ Rules:
             elif line.startswith("CONFIDENCE:"):
                 try:
                     result["confidence"] = float(line.split(":", 1)[1].strip())
-                except:
+                except ValueError:
                     pass
             elif line.startswith("REASONING:"):
                 result["reasoning"] = line.split(":", 1)[1].strip()
@@ -265,7 +263,7 @@ Rules:
         """
         signals = []
 
-        print(f"[KimiBrain] Analyzing {len(data)} symbols with LLM...")
+        logger.info("[KimiBrain] Analyzing %d symbols with LLM...", len(data))
 
         # Build market context
         market_context = {}
@@ -278,10 +276,10 @@ Rules:
                 }
 
         for symbol, df in data.items():
-            print(f"\n--- Analyzing {symbol} ---")
+            logger.debug("\n--- Analyzing %s ---", symbol)
 
             if len(df) < 20:
-                print(f"  Insufficient data ({len(df)} bars)")
+                logger.debug("  Insufficient data (%d bars)", len(df))
                 continue
 
             # Build prompt
@@ -290,16 +288,16 @@ Rules:
             # Call Kimi
             response = self._call_kimi(prompt)
             if not response:
-                print(f"  API call failed")
+                logger.warning("  API call failed for %s", symbol)
                 continue
 
             # Parse response
             content = response["choices"][0]["message"]["content"]
             parsed = self._parse_response(content)
 
-            print(f"  Decision: {parsed['decision']}")
-            print(f"  Confidence: {parsed['confidence']:.2f}")
-            print(f"  Reasoning: {parsed['reasoning'][:80]}...")
+            logger.info("  Decision: %s", parsed['decision'])
+            logger.info("  Confidence: %.2f", parsed['confidence'])
+            logger.debug("  Reasoning: %s", parsed['reasoning'][:80])
 
             # Store in memory
             memory = KimiTradeMemory(
@@ -337,7 +335,7 @@ Rules:
         # Save memories
         self._save_memory()
 
-        print(f"\n[KimiBrain] Generated {len(signals)} signals")
+        logger.info("\n[KimiBrain] Generated %d signals", len(signals))
         return signals
 
     def learn_from_outcome(
@@ -373,8 +371,12 @@ Rules:
             mem.feedback = f"Failed {predicted_direction} trade. {predicted_direction} bias was wrong - consider opposite signal next time."
 
         self._save_memory()
-        print(
-            f"[KimiBrain] Learned: {symbol} {predicted_direction} → {'WON' if mem.won else 'LOSS'} ({actual_return:+.2f}%)"
+        logger.info(
+            "[KimiBrain] Learned: %s %s → %s (%.2f%%)",
+            symbol,
+            predicted_direction,
+            "WON" if mem.won else "LOSS",
+            actual_return,
         )
 
 
@@ -382,9 +384,10 @@ def test_kimi_brain():
     """Test KimiBrain"""
     from ai_trading_bridge import AITradingBridge
 
-    print("=" * 60)
-    print("TESTING KIMIBRAIN")
-    print("=" * 60)
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s | %(levelname)s | %(message)s")
+    logger.info("=" * 60)
+    logger.info("TESTING KIMIBRAIN")
+    logger.info("=" * 60)
 
     try:
         brain = KimiBrain(learning_mode=True)
@@ -395,12 +398,12 @@ def test_kimi_brain():
 
         result = bridge.run_cycle()
 
-        print("\n" + "=" * 60)
-        print(f"Signals: {result['signals']}")
-        print(f"Executed: {result['executed']}")
+        logger.info("=" * 60)
+        logger.info("Signals: %s", result['signals'])
+        logger.info("Executed: %s", result['executed'])
 
     except Exception as e:
-        print(f"Error: {e}")
+        logger.error("Error: %s", e)
 
 
 if __name__ == "__main__":

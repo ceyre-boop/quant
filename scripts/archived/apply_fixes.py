@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """
 Apply 8 critical fixes to CLAWD Trading System
+
+ARCHIVED: One-off migration script for Windows development environment.
+Not intended to be run in production. Preserved for historical reference only.
 """
 
 import os
