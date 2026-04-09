@@ -45,6 +45,11 @@ class DataPipeline:
         self.validator = DataValidator()
         self.macro_framework = MacroImbalanceFramework()
 
+    @staticmethod
+    def _extract_index_value(index_data: Dict, key: str, default: float) -> float:
+        """Extract a scalar value from nested index data dicts."""
+        return index_data.get(key, {}).get("latest", {}).get("value", default)
+
     def run_premarket(
         self, symbols: List[str], include_all_features: bool = True
     ) -> Dict[str, FeatureRecord]:
@@ -117,24 +122,16 @@ class DataPipeline:
             macro_features = self.macro_framework.compute(
                 {
                     "vix": vix_value,
-                    "yield_10yr": index_data.get("TNX", {})
-                    .get("latest", {})
-                    .get("value", 4.0),
-                    "yield_2yr": index_data.get("IRX2", {})
-                    .get("latest", {})
-                    .get("value", 4.5),
-                    "yield_3m": index_data.get("IRX", {})
-                    .get("latest", {})
-                    .get("value", 5.0),
-                    "hy_spread": index_data.get("HYG_SPREAD", {})
-                    .get("latest", {})
-                    .get("value", 3.5),
-                    "vol_of_vol": index_data.get("VVIX", {})
-                    .get("latest", {})
-                    .get("value", 90.0),
-                    "equity_drawdown": index_data.get("SPY_DRAWDOWN", {})
-                    .get("latest", {})
-                    .get("value", 0.0),
+                    "yield_10yr": self._extract_index_value(index_data, "TNX", 4.0),
+                    "yield_2yr": self._extract_index_value(index_data, "IRX2", 4.5),
+                    "yield_3m": self._extract_index_value(index_data, "IRX", 5.0),
+                    "hy_spread": self._extract_index_value(
+                        index_data, "HYG_SPREAD", 3.5
+                    ),
+                    "vol_of_vol": self._extract_index_value(index_data, "VVIX", 90.0),
+                    "equity_drawdown": self._extract_index_value(
+                        index_data, "SPY_DRAWDOWN", 0.0
+                    ),
                 }
             )
             logger.info("Macro features: %s", macro_features)

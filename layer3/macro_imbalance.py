@@ -38,6 +38,10 @@ _VIX_CALM = 15.0
 _VIX_STRESS = 30.0
 _VIX_CRISIS = 40.0
 
+# Numerical stability constants
+_MIN_STD_THRESHOLD = 1e-10
+_COV_REGULARIZATION = 1e-6
+
 
 # ---------------------------------------------------------------------------
 # Helper – standard-normal CDF (avoids scipy dependency at import time)
@@ -170,8 +174,9 @@ class MacroImbalanceFramework:
         dict with keys:
             ``hmm_regime_stress``, ``pca_mahalanobis``, ``recession_prob_12m``
         """
-        # Deterministic seed based on date
-        day_seed = (date.year * 10000 + date.month * 100 + date.day) % (2**31 - 1)
+        # Deterministic seed: use hash of individual date components to avoid
+        # cross-year correlation artifacts (e.g. 2020-01-15 vs 2021-01-15).
+        day_seed = abs(hash((date.year, date.month, date.day))) % (2**31 - 1)
         rng = np.random.default_rng(day_seed)
 
         # HMM stress: VIX-driven with mild noise
@@ -180,11 +185,8 @@ class MacroImbalanceFramework:
         )
         # Realised-vol boost when return data is available
         if recent_returns and len(recent_returns) >= 5:
-            rv = float(
-                np.std(recent_returns[-20:])
-                if len(recent_returns) >= 20
-                else np.std(recent_returns)
-            ) * math.sqrt(252)
+            rv_window = recent_returns[-min(len(recent_returns), 20) :]
+            rv = float(np.std(rv_window)) * math.sqrt(252)
             rv_stress = np.clip((rv - 0.10) / 0.40, 0.0, 1.0)
         else:
             rv_stress = 0.0
@@ -275,15 +277,15 @@ class MacroImbalanceFramework:
         if len(self._history) < len(vec) + 2:
             # Still too few samples for a full covariance; use diagonal
             std = history_array.std(axis=0)
-            std = np.where(std < 1e-10, 1e-10, std)
+            std = np.where(std < _MIN_STD_THRESHOLD, _MIN_STD_THRESHOLD, std)
             return float(np.linalg.norm(centered / std))
 
         try:
-            cov = np.cov(history_array.T) + np.eye(len(vec)) * 1e-6
+            cov = np.cov(history_array.T) + np.eye(len(vec)) * _COV_REGULARIZATION
             cov_inv = np.linalg.inv(cov)
             dist_sq = float(centered @ cov_inv @ centered)
             return float(math.sqrt(max(dist_sq, 0.0)))
         except np.linalg.LinAlgError:
             std = history_array.std(axis=0)
-            std = np.where(std < 1e-10, 1e-10, std)
+            std = np.where(std < _MIN_STD_THRESHOLD, _MIN_STD_THRESHOLD, std)
             return float(np.linalg.norm(centered / std))
