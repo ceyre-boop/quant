@@ -161,11 +161,7 @@ class BiasOutput:
             rationale=data["rationale"],
             model_version=data["model_version"],
             feature_snapshot=data["feature_snapshot"],
-            timestamp=(
-                datetime.fromisoformat(data["timestamp"])
-                if data.get("timestamp")
-                else None
-            ),
+            timestamp=(datetime.fromisoformat(data["timestamp"]) if data.get("timestamp") else None),
         )
 
 
@@ -222,11 +218,7 @@ class RiskOutput:
             expected_value=data["expected_value"],
             ev_positive=data["ev_positive"],
             size_breakdown=data["size_breakdown"],
-            timestamp=(
-                datetime.fromisoformat(data["timestamp"])
-                if data.get("timestamp")
-                else None
-            ),
+            timestamp=(datetime.fromisoformat(data["timestamp"]) if data.get("timestamp") else None),
         )
 
 
@@ -319,18 +311,10 @@ class GameOutput:
     def to_dict(self) -> Dict[str, Any]:
         return {
             "liquidity_map": {
-                "equal_highs": [
-                    p.to_dict() for p in self.liquidity_map.get("equal_highs", [])
-                ],
-                "equal_lows": [
-                    p.to_dict() for p in self.liquidity_map.get("equal_lows", [])
-                ],
+                "equal_highs": [p.to_dict() for p in self.liquidity_map.get("equal_highs", [])],
+                "equal_lows": [p.to_dict() for p in self.liquidity_map.get("equal_lows", [])],
             },
-            "nearest_unswept_pool": (
-                self.nearest_unswept_pool.to_dict()
-                if self.nearest_unswept_pool
-                else None
-            ),
+            "nearest_unswept_pool": (self.nearest_unswept_pool.to_dict() if self.nearest_unswept_pool else None),
             "trapped_positions": self.trapped_positions.to_dict(),
             "forced_move_probability": self.forced_move_probability,
             "nash_zones": [z.to_dict() for z in self.nash_zones],
@@ -345,20 +329,10 @@ class GameOutput:
     def from_dict(cls, data: Dict[str, Any]) -> "GameOutput":
         return cls(
             liquidity_map={
-                "equal_highs": [
-                    LiquidityPool(**p)
-                    for p in data["liquidity_map"].get("equal_highs", [])
-                ],
-                "equal_lows": [
-                    LiquidityPool(**p)
-                    for p in data["liquidity_map"].get("equal_lows", [])
-                ],
+                "equal_highs": [LiquidityPool(**p) for p in data["liquidity_map"].get("equal_highs", [])],
+                "equal_lows": [LiquidityPool(**p) for p in data["liquidity_map"].get("equal_lows", [])],
             },
-            nearest_unswept_pool=(
-                LiquidityPool(**data["nearest_unswept_pool"])
-                if data.get("nearest_unswept_pool")
-                else None
-            ),
+            nearest_unswept_pool=(LiquidityPool(**data["nearest_unswept_pool"]) if data.get("nearest_unswept_pool") else None),
             trapped_positions=TrappedPositions(**data["trapped_positions"]),
             forced_move_probability=data["forced_move_probability"],
             nash_zones=[NashZone(**z) for z in data.get("nash_zones", [])],
@@ -366,11 +340,7 @@ class GameOutput:
             game_state_aligned=data["game_state_aligned"],
             game_state_summary=data["game_state_summary"],
             adversarial_risk=AdversarialRisk(data["adversarial_risk"]),
-            timestamp=(
-                datetime.fromisoformat(data["timestamp"])
-                if data.get("timestamp")
-                else None
-            ),
+            timestamp=(datetime.fromisoformat(data["timestamp"]) if data.get("timestamp") else None),
         )
 
 
@@ -401,10 +371,7 @@ class ThreeLayerContext:
             self.bias.direction != Direction.NEUTRAL
             and self.bias.confidence >= 0.55
             and self.risk.ev_positive
-            and not (
-                not self.game.game_state_aligned
-                and self.game.adversarial_risk == AdversarialRisk.EXTREME
-            )
+            and not (not self.game.game_state_aligned and self.game.adversarial_risk == AdversarialRisk.EXTREME)
         )
 
     def block_reason(self) -> Optional[str]:
@@ -415,10 +382,7 @@ class ThreeLayerContext:
             return "CONFIDENCE_TOO_LOW"
         if not self.risk.ev_positive:
             return "EV_NEGATIVE"
-        if (
-            not self.game.game_state_aligned
-            and self.game.adversarial_risk == AdversarialRisk.EXTREME
-        ):
+        if not self.game.game_state_aligned and self.game.adversarial_risk == AdversarialRisk.EXTREME:
             return "LAYER3_VETO"
         return None
 

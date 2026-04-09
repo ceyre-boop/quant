@@ -18,9 +18,7 @@ class WeeklyAnalyzer:
         self.firebase = firebase_client
         self.performance_history = []
 
-    def analyze_week(
-        self, trade_records: List[Dict], start_date: datetime
-    ) -> Dict[str, Any]:
+    def analyze_week(self, trade_records: List[Dict], start_date: datetime) -> Dict[str, Any]:
         """Analyze one week of trading performance.
 
         Returns:
@@ -45,9 +43,7 @@ class WeeklyAnalyzer:
         # Calculate Sharpe (simplified)
         returns = [t.get("realized_pnl", 0) for t in trade_records]
         avg_return = sum(returns) / len(returns) if returns else 0
-        variance = (
-            sum((r - avg_return) ** 2 for r in returns) / len(returns) if returns else 0
-        )
+        variance = sum((r - avg_return) ** 2 for r in returns) / len(returns) if returns else 0
         std_dev = variance**0.5
         sharpe = (avg_return / std_dev) if std_dev > 0 else 0
 
@@ -59,23 +55,13 @@ class WeeklyAnalyzer:
             "win_rate": round(win_rate, 4),
             "profit_loss": round(total_pnl, 2),
             "sharpe": round(sharpe, 2),
-            "avg_win": (
-                round(sum(t.get("realized_pnl", 0) for t in wins) / len(wins), 2)
-                if wins
-                else 0
-            ),
-            "avg_loss": (
-                round(sum(t.get("realized_pnl", 0) for t in losses) / len(losses), 2)
-                if losses
-                else 0
-            ),
+            "avg_win": (round(sum(t.get("realized_pnl", 0) for t in wins) / len(wins), 2) if wins else 0),
+            "avg_loss": (round(sum(t.get("realized_pnl", 0) for t in losses) / len(losses), 2) if losses else 0),
             "status": "HEALTHY" if win_rate > 0.5 and sharpe > 0.5 else "DEGRADED",
         }
 
         self.performance_history.append(analysis)
-        logger.info(
-            f"Weekly analysis: {analysis['win_rate']:.1%} win rate, PnL: ${analysis['profit_loss']:.2f}"
-        )
+        logger.info(f"Weekly analysis: {analysis['win_rate']:.1%} win rate, PnL: ${analysis['profit_loss']:.2f}")
 
         return analysis
 
@@ -139,13 +125,9 @@ class FeatureGroupTracker:
                     )
 
         if drift_report["drift_detected"]:
-            high_count = sum(
-                1 for d in drift_report["feature_drifts"] if d["severity"] == "HIGH"
-            )
+            high_count = sum(1 for d in drift_report["feature_drifts"] if d["severity"] == "HIGH")
             drift_report["status"] = "CRITICAL" if high_count > 0 else "WARNING"
-            logger.warning(
-                f"Feature drift detected in {len(drift_report['feature_drifts'])} groups"
-            )
+            logger.warning(f"Feature drift detected in {len(drift_report['feature_drifts'])} groups")
 
         # Backward-compatible alias expected by tests/older callers.
         drift_report["feature_details"] = drift_report["feature_drifts"]
@@ -154,14 +136,10 @@ class FeatureGroupTracker:
 
     def get_top_features(self, n: int = 5) -> List[Dict]:
         """Get top N most important features currently."""
-        sorted_features = sorted(
-            self.current_importance.items(), key=lambda x: x[1], reverse=True
-        )
+        sorted_features = sorted(self.current_importance.items(), key=lambda x: x[1], reverse=True)
         ranked = []
         for idx, (name, val) in enumerate(sorted_features[:n], start=1):
-            ranked.append(
-                {"rank": idx, "feature_group": name, "importance": round(val, 4)}
-            )
+            ranked.append({"rank": idx, "feature_group": name, "importance": round(val, 4)})
         return ranked
 
 
@@ -186,26 +164,18 @@ class RefitScheduler:
         # Check performance degradation
         if weekly_analysis.get("win_rate", 1) < self.performance_threshold:
             should_refit = True
-            reasons.append(
-                f"Win rate {weekly_analysis['win_rate']:.1%} below threshold {self.performance_threshold:.1%}"
-            )
+            reasons.append(f"Win rate {weekly_analysis['win_rate']:.1%} below threshold {self.performance_threshold:.1%}")
 
         # Check feature drift
         if drift_report.get("drift_detected"):
             should_refit = True
-            high_drifts = [
-                d
-                for d in drift_report.get("feature_drifts", [])
-                if d["severity"] == "HIGH"
-            ]
+            high_drifts = [d for d in drift_report.get("feature_drifts", []) if d["severity"] == "HIGH"]
             reasons.append(f"{len(high_drifts)} high-severity feature drifts detected")
 
         # Check minimum trade count
         if weekly_analysis.get("total_trades", 0) < self.min_trades_for_refit:
             should_refit = False
-            reasons.append(
-                f"Insufficient trades ({weekly_analysis['total_trades']} < {self.min_trades_for_refit})"
-            )
+            reasons.append(f"Insufficient trades ({weekly_analysis['total_trades']} < {self.min_trades_for_refit})")
 
         # Check time since last refit (max 30 days)
         if self.last_refit:
@@ -218,9 +188,7 @@ class RefitScheduler:
             "should_refit": should_refit and len(reasons) > 0,
             "timestamp": datetime.now().isoformat(),
             "reasons": reasons,
-            "confidence": (
-                "HIGH" if len([r for r in reasons if "drift" in r]) > 0 else "MEDIUM"
-            ),
+            "confidence": ("HIGH" if len([r for r in reasons if "drift" in r]) > 0 else "MEDIUM"),
             "weekly_win_rate": weekly_analysis.get("win_rate"),
             "drift_detected": drift_report.get("drift_detected"),
         }
@@ -230,9 +198,7 @@ class RefitScheduler:
 
         return recommendation
 
-    def record_refit(
-        self, model_version: str, performance_before: Dict, performance_after: Dict
-    ):
+    def record_refit(self, model_version: str, performance_before: Dict, performance_after: Dict):
         """Record a completed model refit."""
         self.last_refit = datetime.now()
 
@@ -243,21 +209,17 @@ class RefitScheduler:
             "performance_after": performance_after,
             "improvement": {
                 "win_rate_delta": round(
-                    performance_after.get("win_rate", 0)
-                    - performance_before.get("win_rate", 0),
+                    performance_after.get("win_rate", 0) - performance_before.get("win_rate", 0),
                     4,
                 ),
                 "sharpe_delta": round(
-                    performance_after.get("sharpe", 0)
-                    - performance_before.get("sharpe", 0),
+                    performance_after.get("sharpe", 0) - performance_before.get("sharpe", 0),
                     2,
                 ),
             },
         }
 
-        logger.info(
-            f"Refit recorded: {model_version}, improvement: {refit_record['improvement']}"
-        )
+        logger.info(f"Refit recorded: {model_version}, improvement: {refit_record['improvement']}")
 
         if self.firebase:
             self.firebase.write("refit_history", refit_record)
@@ -293,9 +255,7 @@ class MetaEvaluator:
         drift_report = self.feature_tracker.detect_drift()
 
         # Step 3: Check if refit is needed
-        refit_recommendation = self.refit_scheduler.should_refit(
-            weekly_analysis, drift_report
-        )
+        refit_recommendation = self.refit_scheduler.should_refit(weekly_analysis, drift_report)
 
         # Compile full report
         full_report = {
@@ -318,8 +278,6 @@ class MetaEvaluator:
         if self.firebase:
             self.firebase.write("meta_evaluations", full_report)
 
-        logger.info(
-            f"Weekly evaluation complete. Action required: {full_report['action_required']}"
-        )
+        logger.info(f"Weekly evaluation complete. Action required: {full_report['action_required']}")
 
         return full_report

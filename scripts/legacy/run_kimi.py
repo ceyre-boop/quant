@@ -60,9 +60,7 @@ def main():
     # Create KimiBrain
     print("[Setup] Initializing KimiBrain...")
     try:
-        brain = KimiBrain(
-            learning_mode=args.learn, temperature=0.3  # Lower = more consistent
-        )
+        brain = KimiBrain(learning_mode=args.learn, temperature=0.3)  # Lower = more consistent
     except ValueError as e:
         print(f"[ERROR] {e}")
         print("Make sure KIMI_API_KEY is set in your .env file")

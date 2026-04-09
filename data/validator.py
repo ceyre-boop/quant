@@ -50,9 +50,7 @@ class DataValidator:
             "invalid_count": 0,
         }
 
-    def validate_feature_record(
-        self, data: Dict[str, Any], strict: bool = True
-    ) -> ValidationResult:
+    def validate_feature_record(self, data: Dict[str, Any], strict: bool = True) -> ValidationResult:
         """Validate a feature record against schema.
 
         Args:
@@ -178,9 +176,7 @@ class DataValidator:
             self.validation_stats["invalid_count"] += 1
             return ValidationResult(False, errors)
 
-    def validate_json_file(
-        self, filepath: Union[str, Path], record_type: str = "feature_record"
-    ) -> ValidationResult:
+    def validate_json_file(self, filepath: Union[str, Path], record_type: str = "feature_record") -> ValidationResult:
         """Validate a JSON file containing a record.
 
         Args:
@@ -295,9 +291,7 @@ def validate_game_output(data: Dict[str, Any]) -> ValidationResult:
     return validator.validate_game_output(data)
 
 
-def validate_json_file(
-    filepath: Union[str, Path], record_type: str = "feature_record"
-) -> ValidationResult:
+def validate_json_file(filepath: Union[str, Path], record_type: str = "feature_record") -> ValidationResult:
     """Quick validation of JSON file."""
     validator = DataValidator()
     return validator.validate_json_file(filepath, record_type)

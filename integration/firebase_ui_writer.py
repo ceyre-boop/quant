@@ -33,9 +33,7 @@ def format_magnitude(magnitude: Magnitude) -> int:
     return magnitude.value
 
 
-def format_rationale(
-    rationale: List[str], feature_snapshot: Optional[Dict[str, Any]] = None
-) -> List[Dict[str, str]]:
+def format_rationale(rationale: List[str], feature_snapshot: Optional[Dict[str, Any]] = None) -> List[Dict[str, str]]:
     """Format rationale with SHAP-like values.
 
     Args:
@@ -62,9 +60,7 @@ def format_rationale(
     return formatted
 
 
-def format_bias_for_ui(
-    bias: BiasOutput, feature_snapshot: Optional[Dict[str, Any]] = None
-) -> Dict[str, Any]:
+def format_bias_for_ui(bias: BiasOutput, feature_snapshot: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     """Convert Layer 1 BiasOutput to frontend format.
 
     Args:
@@ -196,31 +192,13 @@ def format_regime_for_ui(regime: RegimeState) -> Dict[str, str]:
         Frontend-ready regime dict
     """
     return {
-        "volatility": (
-            regime.volatility.value
-            if isinstance(regime.volatility, VolRegime)
-            else str(regime.volatility)
-        ),
-        "trend": (
-            regime.trend.value
-            if isinstance(regime.trend, TrendRegime)
-            else str(regime.trend)
-        ),
+        "volatility": (regime.volatility.value if isinstance(regime.volatility, VolRegime) else str(regime.volatility)),
+        "trend": (regime.trend.value if isinstance(regime.trend, TrendRegime) else str(regime.trend)),
         "risk_appetite": (
-            regime.risk_appetite.value
-            if isinstance(regime.risk_appetite, RiskAppetite)
-            else str(regime.risk_appetite)
+            regime.risk_appetite.value if isinstance(regime.risk_appetite, RiskAppetite) else str(regime.risk_appetite)
         ),
-        "momentum": (
-            regime.momentum.value
-            if isinstance(regime.momentum, MomentumRegime)
-            else str(regime.momentum)
-        ),
-        "event_risk": (
-            regime.event_risk.value
-            if isinstance(regime.event_risk, EventRisk)
-            else str(regime.event_risk)
-        ),
+        "momentum": (regime.momentum.value if isinstance(regime.momentum, MomentumRegime) else str(regime.momentum)),
+        "event_risk": (regime.event_risk.value if isinstance(regime.event_risk, EventRisk) else str(regime.event_risk)),
     }
 
 

@@ -98,11 +98,7 @@ Auto-generated performance tracking.
             results_md.write_text(header)
 
         # Append latest result
-        sig_indicator = (
-            "✅ SIGNIFICANT"
-            if result.statistical_significance
-            else "❌ Not significant"
-        )
+        sig_indicator = "✅ SIGNIFICANT" if result.statistical_significance else "❌ Not significant"
 
         entry = f"""### {result.timestamp}
 
@@ -123,12 +119,8 @@ Auto-generated performance tracking.
         # Prepend to file (latest first)
         current_content = results_md.read_text()
         # Find insertion point after "## Latest Backtest Results"
-        insert_point = current_content.find("## Latest Backtest Results\n\n") + len(
-            "## Latest Backtest Results\n\n"
-        )
-        new_content = (
-            current_content[:insert_point] + entry + current_content[insert_point:]
-        )
+        insert_point = current_content.find("## Latest Backtest Results\n\n") + len("## Latest Backtest Results\n\n")
+        new_content = current_content[:insert_point] + entry + current_content[insert_point:]
         results_md.write_text(new_content)
 
     def log_live_trade(self, trade: LiveTrade) -> None:
@@ -197,9 +189,7 @@ Auto-generated performance tracking.
         """Generate a full performance report."""
         comparison = self.compare_live_vs_backtest()
 
-        report_path = (
-            self.results_dir / f"report_{datetime.now().strftime('%Y%m%d')}.md"
-        )
+        report_path = self.results_dir / f"report_{datetime.now().strftime('%Y%m%d')}.md"
 
         report = f"""# Performance Report - {datetime.now().strftime('%Y-%m-%d')}
 
@@ -217,9 +207,7 @@ Auto-generated performance tracking.
             report += "- No live trading data available yet.\n"
         else:
             report += f"- **Live Win Rate:** {comparison['live_win_rate']:.1%}\n"
-            report += (
-                f"- **Backtest Win Rate:** {comparison['backtest_win_rate']:.1%}\n"
-            )
+            report += f"- **Backtest Win Rate:** {comparison['backtest_win_rate']:.1%}\n"
             report += f"- **Difference:** {comparison['win_rate_diff']:+.1%}\n"
             report += f"\n**Assessment:** {comparison['assessment']}\n"
 

@@ -15,9 +15,7 @@ class DailyFetcher:
     def __init__(self, polygon_client: Optional[PolygonRestClient] = None):
         self.client = polygon_client or PolygonRestClient()
 
-    def fetch_daily_bars(
-        self, symbol: str, lookback_days: int = 252
-    ) -> List[Dict[str, Any]]:
+    def fetch_daily_bars(self, symbol: str, lookback_days: int = 252) -> List[Dict[str, Any]]:
         """Fetch daily bars for a symbol.
 
         Args:
@@ -28,9 +26,7 @@ class DailyFetcher:
             List of daily OHLCV bars
         """
         end_date = datetime.now()
-        start_date = end_date - timedelta(
-            days=lookback_days * 1.5
-        )  # Extra for weekends
+        start_date = end_date - timedelta(days=lookback_days * 1.5)  # Extra for weekends
 
         try:
             response = self.client.get_aggregates(
@@ -50,9 +46,7 @@ class DailyFetcher:
             logger.error(f"Failed to fetch daily bars for {symbol}: {e}")
             return []
 
-    def fetch_multiple_symbols(
-        self, symbols: List[str], lookback_days: int = 252
-    ) -> Dict[str, List[Dict[str, Any]]]:
+    def fetch_multiple_symbols(self, symbols: List[str], lookback_days: int = 252) -> Dict[str, List[Dict[str, Any]]]:
         """Fetch daily bars for multiple symbols.
 
         Returns:

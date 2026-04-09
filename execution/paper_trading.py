@@ -67,9 +67,7 @@ class PaperTradingEngine:
         self.logger = logging.getLogger(__name__)
         self.logger.info(f"Paper trading initialized: ${starting_equity:,.2f}")
 
-    def execute_signal(
-        self, signal: EnhancedEntrySignal, current_price: float
-    ) -> Optional[PaperPosition]:
+    def execute_signal(self, signal: EnhancedEntrySignal, current_price: float) -> Optional[PaperPosition]:
         """
         Execute a paper trade from an entry signal.
 
@@ -89,9 +87,7 @@ class PaperTradingEngine:
         trade_id = f"PAPER_{uuid.uuid4().hex[:8].upper()}"
 
         # Calculate position size in dollars
-        position_value = (
-            self.current_equity * signal.position_size * 0.02
-        )  # 2% risk per trade max
+        position_value = self.current_equity * signal.position_size * 0.02  # 2% risk per trade max
 
         # Create position
         position = PaperPosition(
@@ -201,9 +197,7 @@ class PaperTradingEngine:
 
         return closed
 
-    def _close_position(
-        self, symbol: str, exit_price: float, reason: str
-    ) -> Optional[PaperPosition]:
+    def _close_position(self, symbol: str, exit_price: float, reason: str) -> Optional[PaperPosition]:
         """Close a position and record P&L."""
         if symbol not in self.positions:
             return None
@@ -216,13 +210,9 @@ class PaperTradingEngine:
 
         # Calculate final P&L
         if position.direction == "LONG":
-            position.pnl_pct = (
-                exit_price - position.entry_price
-            ) / position.entry_price
+            position.pnl_pct = (exit_price - position.entry_price) / position.entry_price
         else:
-            position.pnl_pct = (
-                position.entry_price - exit_price
-            ) / position.entry_price
+            position.pnl_pct = (position.entry_price - exit_price) / position.entry_price
 
         position.pnl = position.position_size * position.pnl_pct
 
@@ -301,8 +291,6 @@ class PaperTradingEngine:
             self.last_reset = today
             self.logger.info("Daily counters reset")
 
-    def manual_close(
-        self, symbol: str, exit_price: float, reason: str = "MANUAL"
-    ) -> Optional[PaperPosition]:
+    def manual_close(self, symbol: str, exit_price: float, reason: str = "MANUAL") -> Optional[PaperPosition]:
         """Manually close a position."""
         return self._close_position(symbol, exit_price, reason)

@@ -87,12 +87,8 @@ class WindowResult:
                 "start": self.test_start.isoformat(),
                 "end": self.test_end.isoformat(),
             },
-            "train_metrics": (
-                self.train_result.to_dict()["metrics"] if self.train_result else None
-            ),
-            "test_metrics": (
-                self.test_result.to_dict()["metrics"] if self.test_result else None
-            ),
+            "train_metrics": (self.train_result.to_dict()["metrics"] if self.train_result else None),
+            "test_metrics": (self.test_result.to_dict()["metrics"] if self.test_result else None),
             "model_version": self.model_version,
         }
 
@@ -140,9 +136,7 @@ class WalkForwardTester:
             else:
                 train_start = current
 
-            train_end = train_start + timedelta(
-                days=30 * self.config.train_window_months
-            )
+            train_end = train_start + timedelta(days=30 * self.config.train_window_months)
             test_start = train_end
             test_end = test_start + timedelta(days=30 * self.config.test_window_months)
 
@@ -242,9 +236,7 @@ class WalkForwardTester:
         if self.model_trainer:
             logger.info(f"Training model for window {window_num}...")
             try:
-                model_info = self.model_trainer(
-                    self.config.symbol, train_start, train_end
-                )
+                model_info = self.model_trainer(self.config.symbol, train_start, train_end)
                 result.model_version = model_info.get("version")
                 result.model_metrics = model_info.get("metrics")
             except Exception as e:
@@ -253,9 +245,7 @@ class WalkForwardTester:
         # Run backtest on training period (in-sample)
         if not skip_training and self.backtest_config_factory:
             try:
-                train_config = self.backtest_config_factory(
-                    self.config.symbol, train_start, train_end
-                )
+                train_config = self.backtest_config_factory(self.config.symbol, train_start, train_end)
                 train_runner = BacktestRunner(train_config)
                 result.train_result = train_runner.run()
 
@@ -269,15 +259,12 @@ class WalkForwardTester:
         # Run backtest on test period (out-of-sample)
         if self.backtest_config_factory:
             try:
-                test_config = self.backtest_config_factory(
-                    self.config.symbol, test_start, test_end
-                )
+                test_config = self.backtest_config_factory(self.config.symbol, test_start, test_end)
                 test_runner = BacktestRunner(test_config)
                 result.test_result = test_runner.run()
 
                 logger.info(
-                    f"Test period: {result.test_result.total_trades} trades, "
-                    f"{result.test_result.total_return:.2f}% return"
+                    f"Test period: {result.test_result.total_trades} trades, " f"{result.test_result.total_return:.2f}% return"
                 )
             except Exception as e:
                 logger.error(f"Test backtest failed: {e}")
@@ -346,9 +333,7 @@ class WalkForwardTester:
         if not self.windows:
             return 0.0
 
-        test_returns = [
-            w.test_result.total_return for w in self.windows if w.test_result
-        ]
+        test_returns = [w.test_result.total_return for w in self.windows if w.test_result]
 
         if len(test_returns) < 2:
             return 50.0  # Neutral score for insufficient data
@@ -360,13 +345,9 @@ class WalkForwardTester:
 
         consistency_score = max(0, 100 - np.std(test_returns) * 10)
         positive_return_score = 100 if np.mean(test_returns) > 0 else 0
-        win_rate_score = (
-            sum(1 for r in test_returns if r > 0) / len(test_returns)
-        ) * 100
+        win_rate_score = (sum(1 for r in test_returns if r > 0) / len(test_returns)) * 100
 
-        return (
-            consistency_score * 0.3 + positive_return_score * 0.3 + win_rate_score * 0.4
-        )
+        return consistency_score * 0.3 + positive_return_score * 0.3 + win_rate_score * 0.4
 
     def generate_report(self, output_dir: str = "walkforward_results") -> str:
         """Generate comprehensive walk-forward report.
@@ -402,12 +383,8 @@ class WalkForwardTester:
         if self.aggregated_result and "out_of_sample" in self.aggregated_result:
             oos = self.aggregated_result["out_of_sample"]
             lines.append("## Out-of-Sample Performance\n")
-            lines.append(
-                f"- **Total Windows:** {self.aggregated_result['total_windows']}\n"
-            )
-            lines.append(
-                f"- **Robustness Score:** {self.aggregated_result['robustness_score']:.1f}/100\n"
-            )
+            lines.append(f"- **Total Windows:** {self.aggregated_result['total_windows']}\n")
+            lines.append(f"- **Robustness Score:** {self.aggregated_result['robustness_score']:.1f}/100\n")
             lines.append(f"\n")
 
             lines.append("### Returns\n")
@@ -432,18 +409,10 @@ class WalkForwardTester:
         for window in self.windows:
             train_period = f"{window.train_start.strftime('%Y-%m')} to {window.train_end.strftime('%Y-%m')}"
             test_period = f"{window.test_start.strftime('%Y-%m')} to {window.test_end.strftime('%Y-%m')}"
-            test_return = (
-                f"{window.test_result.total_return:.2f}%"
-                if window.test_result
-                else "N/A"
-            )
-            trades = (
-                str(window.test_result.total_trades) if window.test_result else "N/A"
-            )
+            test_return = f"{window.test_result.total_return:.2f}%" if window.test_result else "N/A"
+            trades = str(window.test_result.total_trades) if window.test_result else "N/A"
 
-            lines.append(
-                f"| {window.window_number} | {train_period} | {test_period} | {test_return} | {trades} |\n"
-            )
+            lines.append(f"| {window.window_number} | {train_period} | {test_period} | {test_return} | {trades} |\n")
 
         with open(report_file, "w") as f:
             f.writelines(lines)
@@ -522,9 +491,7 @@ def create_default_walkforward(
     return WalkForwardTester(config, backtest_config_factory=config_factory)
 
 
-def run_quick_walkforward(
-    symbol: str, start_date: str, end_date: str
-) -> Dict[str, Any]:
+def run_quick_walkforward(symbol: str, start_date: str, end_date: str) -> Dict[str, Any]:
     """Run a quick walk-forward analysis.
 
     Args:

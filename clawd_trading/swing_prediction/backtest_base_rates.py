@@ -28,9 +28,7 @@ class BaseRateCalculator:
         self.logger = logging.getLogger(__name__)
         self.config = config["base_rates"]
 
-    async def get_base_rate(
-        self, symbol: str, layer_scores: Dict[str, float], direction: str
-    ) -> Optional[Dict]:
+    async def get_base_rate(self, symbol: str, layer_scores: Dict[str, float], direction: str) -> Optional[Dict]:
         """
         Get historical base rate for this signal combination.
 
@@ -69,9 +67,7 @@ class BaseRateCalculator:
             "confidence": rates["win_rate"],
         }
 
-    async def calculate_historical_rates(
-        self, symbol: str, lookback_years: int = 10
-    ) -> Dict:
+    async def calculate_historical_rates(self, symbol: str, lookback_years: int = 10) -> Dict:
         """
         Calculate base rates from historical data.
         This would run periodically to update the base rate tables.

@@ -34,9 +34,7 @@ class FairValueLayer:
         self.logger = logging.getLogger(__name__)
         self.config = config["layer_a_fair_value"]
 
-    async def compute(
-        self, symbol: str, asset_class: str, data: Dict[str, Any]
-    ) -> FairValueResult:
+    async def compute(self, symbol: str, asset_class: str, data: Dict[str, Any]) -> FairValueResult:
         """
         Compute fair value z-score based on asset class.
         """
@@ -51,9 +49,7 @@ class FairValueLayer:
         elif asset_class == "crypto":
             return self._compute_crypto_fv(symbol, data)
         else:
-            self.logger.warning(
-                f"Unknown asset class {asset_class}, using equity model"
-            )
+            self.logger.warning(f"Unknown asset class {asset_class}, using equity model")
             return self._compute_equity_fv(symbol, data)
 
     def _calculate_signal_strength(self, z_score: float) -> tuple[str, float]:
@@ -136,9 +132,7 @@ class FairValueLayer:
 
             # Z-score of spread vs 5-year history
             if "spread_history_mean" in data and "spread_history_std" in data:
-                spread_z = (spread - data["spread_history_mean"]) / data[
-                    "spread_history_std"
-                ]
+                spread_z = (spread - data["spread_history_mean"]) / data["spread_history_std"]
                 z_scores.append(spread_z)
                 weights.append(self.config["equity_weights"]["fed_model_spread"])
                 methods_used.append("fed_model_spread")
@@ -146,12 +140,8 @@ class FairValueLayer:
                 raw_values["fed_spread_zscore"] = spread_z
 
         # Method 3: P/E z-score
-        if all(
-            k in data for k in ["current_pe", "sector_pe_mean_5yr", "sector_pe_std_5yr"]
-        ):
-            pe_z = (data["current_pe"] - data["sector_pe_mean_5yr"]) / data[
-                "sector_pe_std_5yr"
-            ]
+        if all(k in data for k in ["current_pe", "sector_pe_mean_5yr", "sector_pe_std_5yr"]):
+            pe_z = (data["current_pe"] - data["sector_pe_mean_5yr"]) / data["sector_pe_std_5yr"]
             z_scores.append(pe_z)
             weights.append(self.config["equity_weights"]["pe_zscore"])
             methods_used.append("pe_zscore")
@@ -283,12 +273,8 @@ class FairValueLayer:
         # Method 2: Inventory vs seasonal norm
         # inventory_deviation = (current - seasonal_mean) / seasonal_std
         # z_score = -1 * deviation (low inventory = price support = long signal)
-        if all(
-            k in data for k in ["current_inventory", "seasonal_mean", "seasonal_std"]
-        ):
-            deviation = (data["current_inventory"] - data["seasonal_mean"]) / data[
-                "seasonal_std"
-            ]
+        if all(k in data for k in ["current_inventory", "seasonal_mean", "seasonal_std"]):
+            deviation = (data["current_inventory"] - data["seasonal_mean"]) / data["seasonal_std"]
             inv_z = -1 * deviation  # Invert: low inventory = bullish
             z_scores.append(inv_z)
             weights.append(0.4)  # Exact weight from spec

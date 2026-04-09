@@ -24,6 +24,4 @@ print(f"Total bars: {sum(len(df) for df in results.values())}")
 for sym in ["SPY", "QQQ", "NVDA", "XLE"]:
     if sym in results:
         df = results[sym]
-        print(
-            f"{sym}: {len(df)} bars | {df.index[0].strftime('%Y-%m-%d')} to {df.index[-1].strftime('%Y-%m-%d')}"
-        )
+        print(f"{sym}: {len(df)} bars | {df.index[0].strftime('%Y-%m-%d')} to {df.index[-1].strftime('%Y-%m-%d')}")

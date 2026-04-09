@@ -101,9 +101,7 @@ def train_xgboost(X: pd.DataFrame, y: pd.Series) -> xgb.XGBClassifier:
     print(f"\n[TRAIN] Training XGBoost on {len(X)} samples...")
 
     # Split data
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, random_state=42, stratify=y
-    )
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
 
     # Create model
     model = xgb.XGBClassifier(
@@ -132,9 +130,9 @@ def train_xgboost(X: pd.DataFrame, y: pd.Series) -> xgb.XGBClassifier:
     print(f"  Avg Prob:  {y_prob.mean():.3f}")
 
     # Feature importance
-    importance = pd.DataFrame(
-        {"feature": X.columns, "importance": model.feature_importances_}
-    ).sort_values("importance", ascending=False)
+    importance = pd.DataFrame({"feature": X.columns, "importance": model.feature_importances_}).sort_values(
+        "importance", ascending=False
+    )
 
     print(f"\n[TRAIN] Top Features:")
     for _, row in importance.head(5).iterrows():
@@ -193,12 +191,8 @@ def save_model(
 
 def main():
     parser = argparse.ArgumentParser(description="Train XGBoost from backtest signals")
-    parser.add_argument(
-        "--signals", required=True, help="Path to signals CSV from backtest"
-    )
-    parser.add_argument(
-        "--output", default="layer1/bias_model", help="Output directory for model"
-    )
+    parser.add_argument("--signals", required=True, help="Path to signals CSV from backtest")
+    parser.add_argument("--output", default="layer1/bias_model", help="Output directory for model")
 
     args = parser.parse_args()
 

@@ -36,9 +36,7 @@ class IndexFetcher:
         """
         ticker = self.INDICES.get(index.upper())
         if not ticker:
-            raise ValueError(
-                f"Unknown index: {index}. Available: {list(self.INDICES.keys())}"
-            )
+            raise ValueError(f"Unknown index: {index}. Available: {list(self.INDICES.keys())}")
 
         end_date = datetime.now()
         start_date = end_date - timedelta(days=lookback_days)

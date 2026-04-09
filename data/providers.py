@@ -159,9 +159,7 @@ class YahooFinanceProvider:
             self.logger.error(f"Yahoo market data error for {symbol}: {e}")
             return None
 
-    def get_historical_data(
-        self, symbol: str, period: str = "1y", interval: str = "1h"
-    ) -> Optional[pd.DataFrame]:
+    def get_historical_data(self, symbol: str, period: str = "1y", interval: str = "1h") -> Optional[pd.DataFrame]:
         """
         Get historical OHLCV data for backtesting.
 
@@ -177,9 +175,7 @@ class YahooFinanceProvider:
             ticker = self.get_ticker(symbol)
             stock = yf.Ticker(ticker)
 
-            self.logger.info(
-                f"Fetching {period} {interval} data for {symbol} ({ticker})"
-            )
+            self.logger.info(f"Fetching {period} {interval} data for {symbol} ({ticker})")
 
             hist = stock.history(period=period, interval=interval)
 
@@ -267,9 +263,7 @@ class PolygonProvider:
             if response.status_code == 200:
                 return response.json()
             else:
-                self.logger.error(
-                    f"Polygon API error {response.status_code}: {response.text}"
-                )
+                self.logger.error(f"Polygon API error {response.status_code}: {response.text}")
                 return None
 
         except Exception as e:
@@ -318,9 +312,7 @@ class PolygonProvider:
                 close=float(result.get("c", 0)),
                 volume=int(result.get("v", 0)),
                 change=float(result.get("c", 0) - result.get("o", 0)),
-                change_percent=float(
-                    (result.get("c", 0) - result.get("o", 0)) / result.get("o", 1)
-                ),
+                change_percent=float((result.get("c", 0) - result.get("o", 0)) / result.get("o", 1)),
             )
 
         except Exception as e:
@@ -350,16 +342,12 @@ class PolygonProvider:
             start_str = start_date.strftime("%Y-%m-%d")
             end_str = end_date.strftime("%Y-%m-%d")
 
-            self.logger.info(
-                f"Fetching {days} days of {timespan} data from Polygon for {symbol}"
-            )
+            self.logger.info(f"Fetching {days} days of {timespan} data from Polygon for {symbol}")
 
             # Build endpoint
             endpoint = f"/aggs/ticker/{ticker}/range/{multiplier}/{timespan}/{start_str}/{end_str}"
 
-            data = self._make_request(
-                endpoint, params={"adjusted": "true", "sort": "asc"}
-            )
+            data = self._make_request(endpoint, params={"adjusted": "true", "sort": "asc"})
 
             if not data or "results" not in data:
                 self.logger.warning(f"No data from Polygon for {symbol}")
@@ -443,9 +431,7 @@ class DataProvider:
         self.logger.info(f"Falling back to Polygon for {symbol}")
         return self.polygon.get_market_data(symbol)
 
-    def get_historical_data(
-        self, symbol: str, period: str = "1y", interval: str = "1h"
-    ) -> Optional[pd.DataFrame]:
+    def get_historical_data(self, symbol: str, period: str = "1y", interval: str = "1h") -> Optional[pd.DataFrame]:
         """
         Get historical data for backtesting.
 
@@ -487,9 +473,7 @@ class DataProvider:
         days = period_days.get(period, 365)
         timespan_info = interval_map.get(interval, ("hour", 1))
 
-        return self.polygon.get_historical_data(
-            symbol, days=days, multiplier=timespan_info[1], timespan=timespan_info[0]
-        )
+        return self.polygon.get_historical_data(symbol, days=days, multiplier=timespan_info[1], timespan=timespan_info[0])
 
     def get_intraday_data(self, symbol: str, days: int = 5) -> Optional[pd.DataFrame]:
         """Get intraday data (Yahoo primary, Polygon backup)."""
@@ -501,13 +485,9 @@ class DataProvider:
         self.logger.info(f"Falling back to Polygon for {symbol} intraday")
 
         if days <= 7:
-            return self.polygon.get_historical_data(
-                symbol, days=days, multiplier=1, timespan="minute"
-            )
+            return self.polygon.get_historical_data(symbol, days=days, multiplier=1, timespan="minute")
         else:
-            return self.polygon.get_historical_data(
-                symbol, days=min(days, 30), multiplier=5, timespan="minute"
-            )
+            return self.polygon.get_historical_data(symbol, days=min(days, 30), multiplier=5, timespan="minute")
 
     def test_connection(self, symbol: str = "SPY") -> Dict[str, Any]:
         """Test data provider connections."""

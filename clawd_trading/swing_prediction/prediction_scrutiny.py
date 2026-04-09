@@ -67,9 +67,7 @@ def validate_prediction_against_outcomes(
     expected_losses = (1 - expected_win_rate) * n
 
     # Chi-squared: (O - E)² / E
-    chi_sq = (observed_wins - expected_wins) ** 2 / expected_wins + (
-        observed_losses - expected_losses
-    ) ** 2 / expected_losses
+    chi_sq = (observed_wins - expected_wins) ** 2 / expected_wins + (observed_losses - expected_losses) ** 2 / expected_losses
 
     # Degrees of freedom = 1 (wins vs losses)
     p_value = 1 - stats.chi2.cdf(chi_sq, df=1)
@@ -81,10 +79,7 @@ def validate_prediction_against_outcomes(
     else:
         rejection_reason = ""
 
-    logger.info(
-        f"Prediction {prediction.get('id', 'unknown')}: "
-        f"chi²={chi_sq:.4f}, p={p_value:.4f}, passed={passed}"
-    )
+    logger.info(f"Prediction {prediction.get('id', 'unknown')}: " f"chi²={chi_sq:.4f}, p={p_value:.4f}, passed={passed}")
 
     return ScrutinyResult(
         prediction_id=prediction.get("id", "unknown"),
@@ -112,9 +107,7 @@ class PredictionScrutinyGate:
         """
         expected_wr = prediction.get("expected_win_rate", 0.5)
 
-        result = validate_prediction_against_outcomes(
-            prediction, outcomes, expected_wr, self.alpha
-        )
+        result = validate_prediction_against_outcomes(prediction, outcomes, expected_wr, self.alpha)
 
         if not result.passed:
             self.logger.warning(f"Prediction BLOCKED: {result.rejection_reason}")

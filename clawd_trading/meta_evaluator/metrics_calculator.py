@@ -51,9 +51,7 @@ class PerformanceMetrics:
     end_date: str
 
 
-def calculate_sharpe(
-    returns: List[float], risk_free_rate: float = 0.02, periods_per_year: int = 252
-) -> float:
+def calculate_sharpe(returns: List[float], risk_free_rate: float = 0.02, periods_per_year: int = 252) -> float:
     """Calculate annualized Sharpe ratio.
 
     Args:
@@ -90,9 +88,7 @@ def calculate_sharpe(
         return 0.0
 
 
-def calculate_sortino(
-    returns: List[float], risk_free_rate: float = 0.02, periods_per_year: int = 252
-) -> float:
+def calculate_sortino(returns: List[float], risk_free_rate: float = 0.02, periods_per_year: int = 252) -> float:
     """Calculate Sortino ratio (uses downside deviation only).
 
     Args:
@@ -229,11 +225,7 @@ def detect_model_drift(
 
     try:
         # Calculate recent accuracy
-        correct = sum(
-            1
-            for p, a in zip(recent_predictions, recent_actuals)
-            if (p > 0.5 and a > 0) or (p <= 0.5 and a <= 0)
-        )
+        correct = sum(1 for p, a in zip(recent_predictions, recent_actuals) if (p > 0.5 and a > 0) or (p <= 0.5 and a <= 0))
         current_accuracy = correct / len(recent_predictions)
 
         # Check if degraded beyond threshold
@@ -241,8 +233,7 @@ def detect_model_drift(
 
         if drift_detected:
             logger.warning(
-                f"Model drift detected: accuracy dropped from "
-                f"{baseline_accuracy:.2%} to {current_accuracy:.2%}"
+                f"Model drift detected: accuracy dropped from " f"{baseline_accuracy:.2%} to {current_accuracy:.2%}"
             )
 
         return drift_detected, round(current_accuracy, 3)
@@ -350,9 +341,7 @@ def calculate_all_metrics(
             daily_returns.append(ret)
 
     avg_daily_ret = np.mean(daily_returns) if daily_returns else 0.0
-    volatility = (
-        np.std(daily_returns, ddof=1) * np.sqrt(252) * 100 if daily_returns else 0.0
-    )
+    volatility = np.std(daily_returns, ddof=1) * np.sqrt(252) * 100 if daily_returns else 0.0
 
     # Sharpe and Sortino
     sharpe = calculate_sharpe(daily_returns)
@@ -389,8 +378,6 @@ def calculate_all_metrics(
         avg_trade_pnl=round(avg_trade, 2),
         model_drift_detected=drift_detected,
         prediction_accuracy=accuracy,
-        start_date=(
-            start_date[:10] if isinstance(start_date, str) else str(start_date)[:10]
-        ),
+        start_date=(start_date[:10] if isinstance(start_date, str) else str(start_date)[:10]),
         end_date=end_date[:10] if isinstance(end_date, str) else str(end_date)[:10],
     )

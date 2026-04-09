@@ -209,9 +209,7 @@ model, metadata = registry.load_model('bias_engine', version=3)
             json.dump(metadata.to_dict(), f, indent=2)
 
         logger.info(
-            f"Model saved: {name} v{version} "
-            f"(Sharpe: {metadata.sharpe_ratio:.2f}, "
-            f"Win: {metadata.win_rate:.1%})"
+            f"Model saved: {name} v{version} " f"(Sharpe: {metadata.sharpe_ratio:.2f}, " f"Win: {metadata.win_rate:.1%})"
         )
 
         # Update README
@@ -219,9 +217,7 @@ model, metadata = registry.load_model('bias_engine', version=3)
 
         return metadata
 
-    def load_model(
-        self, name: str, version: Optional[int] = None, date: Optional[str] = None
-    ) -> tuple[Any, ModelMetadata]:
+    def load_model(self, name: str, version: Optional[int] = None, date: Optional[str] = None) -> tuple[Any, ModelMetadata]:
         """Load a model by name and optional version/date.
 
         Args:
@@ -363,19 +359,11 @@ model, metadata = registry.load_model('bias_engine', version=3)
 
         best_sharpe = max(models, key=lambda m: m.sharpe_ratio)
         best_win_rate = max(models, key=lambda m: m.win_rate)
-        most_recent = max(
-            models, key=lambda m: datetime.strptime(m.training_date, "%Y-%m-%d")
-        )
+        most_recent = max(models, key=lambda m: datetime.strptime(m.training_date, "%Y-%m-%d"))
 
-        comparison["best_sharpe"] = (
-            f"v{best_sharpe.version} ({best_sharpe.sharpe_ratio:.2f})"
-        )
-        comparison["best_win_rate"] = (
-            f"v{best_win_rate.version} ({best_win_rate.win_rate:.1%})"
-        )
-        comparison["most_recent"] = (
-            f"v{most_recent.version} ({most_recent.training_date})"
-        )
+        comparison["best_sharpe"] = f"v{best_sharpe.version} ({best_sharpe.sharpe_ratio:.2f})"
+        comparison["best_win_rate"] = f"v{best_win_rate.version} ({best_win_rate.win_rate:.1%})"
+        comparison["most_recent"] = f"v{most_recent.version} ({most_recent.training_date})"
 
         for m in models:
             comparison["versions"].append(

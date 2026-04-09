@@ -83,15 +83,9 @@ class EnhancedEntrySignal(EntrySignal):
         # Flatten for Firebase
         return {
             **base,
-            "timestamp": (
-                self.timestamp.isoformat()
-                if isinstance(self.timestamp, datetime)
-                else self.timestamp
-            ),
+            "timestamp": (self.timestamp.isoformat() if isinstance(self.timestamp, datetime) else self.timestamp),
             "direction_str": (
-                "LONG"
-                if self.direction == Direction.LONG
-                else "SHORT" if self.direction == Direction.SHORT else "NEUTRAL"
+                "LONG" if self.direction == Direction.LONG else "SHORT" if self.direction == Direction.SHORT else "NEUTRAL"
             ),
         }
 
@@ -139,10 +133,7 @@ class ProductionEntryEngine:
         participant_limits = calculate_participant_risk_limits(participant_likelihoods)
         dominant = max(participant_likelihoods, key=lambda x: x.probability)
 
-        self.logger.info(
-            f"Participant analysis: {dominant.type.name} "
-            f"({dominant.probability:.1%} confidence)"
-        )
+        self.logger.info(f"Participant analysis: {dominant.type.name} " f"({dominant.probability:.1%} confidence)")
 
         # Step 2: Regime Classification
         regime = classify_regime_from_layer1(layer1_output)
@@ -152,9 +143,7 @@ class ProductionEntryEngine:
 
         # Step 3: Check for trade blocks
         if participant_limits.no_trade:
-            self.logger.warning(
-                f"Trade blocked: NEWS_ALGO detected (size: {participant_limits.max_size_multiplier})"
-            )
+            self.logger.warning(f"Trade blocked: NEWS_ALGO detected (size: {participant_limits.max_size_multiplier})")
             return None
 
         if regime_limits.news_rules.get("block_fresh_entry"):
@@ -172,30 +161,20 @@ class ProductionEntryEngine:
         selected_model = best_entry["selected"]
         model_score = best_entry["score"]
 
-        self.logger.info(
-            f"Selected entry model: {selected_model} "
-            f"(Expected R: {model_score['expected_R']:.2f})"
-        )
+        self.logger.info(f"Selected entry model: {selected_model} " f"(Expected R: {model_score['expected_R']:.2f})")
 
         # Step 5: Build ThreeLayerContext for entry engine
         context = self._build_context(layer1_output, layer2_output, layer3_output)
 
         # Step 6: Calculate entry price from selected model
-        entry_price = self._calculate_entry_price(
-            selected_model, layer1_output, market_data
-        )
+        entry_price = self._calculate_entry_price(selected_model, layer1_output, market_data)
 
         # Step 7: Run 12-gate validation
-        gate_results = self._run_gates_with_enhanced_logging(
-            symbol, context, account, entry_price
-        )
+        gate_results = self._run_gates_with_enhanced_logging(symbol, context, account, entry_price)
 
         failed_gates = [g for g in gate_results if not g.passed]
         if failed_gates:
-            self.logger.info(
-                f"Entry blocked at gate {failed_gates[0].gate_number}: "
-                f"{failed_gates[0].reason}"
-            )
+            self.logger.info(f"Entry blocked at gate {failed_gates[0].gate_number}: " f"{failed_gates[0].reason}")
             return None
 
         # Step 8: Combined Risk Validation (Gate 12 equivalent)
@@ -209,21 +188,13 @@ class ProductionEntryEngine:
             layer1_output=layer1_output,
             base_risk_limits=base_risk_limits,
             current_exposure={
-                "concurrent_risk": (
-                    account.concurrent_risk
-                    if hasattr(account, "concurrent_risk")
-                    else 0
-                ),
-                "daily_risk": (
-                    account.daily_risk if hasattr(account, "daily_risk") else 0
-                ),
+                "concurrent_risk": (account.concurrent_risk if hasattr(account, "concurrent_risk") else 0),
+                "daily_risk": (account.daily_risk if hasattr(account, "daily_risk") else 0),
             },
         )
 
         if not combined_validation.get("valid"):
-            self.logger.warning(
-                f"Combined risk validation failed: {combined_validation.get('reason')}"
-            )
+            self.logger.warning(f"Combined risk validation failed: {combined_validation.get('reason')}")
             return None
 
         # Step 9: Build enhanced signal
@@ -260,21 +231,13 @@ class ProductionEntryEngine:
             direction=(
                 Direction.LONG
                 if layer1.get("direction") == 1
-                else (
-                    Direction.SHORT
-                    if layer1.get("direction") == -1
-                    else Direction.NEUTRAL
-                )
+                else (Direction.SHORT if layer1.get("direction") == -1 else Direction.NEUTRAL)
             ),
             confidence=layer1.get("confidence", 0.5),
             regime=(
                 RegimeState.TREND
                 if layer1.get("trend_regime") == "uptrend"
-                else (
-                    RegimeState.RANGE
-                    if layer1.get("trend_regime") == "range"
-                    else RegimeState.VOLATILITY
-                )
+                else (RegimeState.RANGE if layer1.get("trend_regime") == "range" else RegimeState.VOLATILITY)
             ),
             features=layer1.get("features", {}),
         )
@@ -349,11 +312,7 @@ class ProductionEntryEngine:
                 gate_number=1,
                 name="Layer 1 Confidence",
                 passed=context.bias.confidence >= 0.55,
-                reason=(
-                    None
-                    if context.bias.confidence >= 0.55
-                    else f"confidence {context.bias.confidence:.2f} < 0.55"
-                ),
+                reason=(None if context.bias.confidence >= 0.55 else f"confidence {context.bias.confidence:.2f} < 0.55"),
             )
         )
 
@@ -363,11 +322,7 @@ class ProductionEntryEngine:
                 gate_number=2,
                 name="Direction",
                 passed=context.bias.direction != Direction.NEUTRAL,
-                reason=(
-                    None
-                    if context.bias.direction != Direction.NEUTRAL
-                    else "direction is NEUTRAL"
-                ),
+                reason=(None if context.bias.direction != Direction.NEUTRAL else "direction is NEUTRAL"),
             )
         )
 
@@ -377,11 +332,7 @@ class ProductionEntryEngine:
                 gate_number=3,
                 name="Positive EV",
                 passed=context.risk.expected_value > 0,
-                reason=(
-                    None
-                    if context.risk.expected_value > 0
-                    else f"EV {context.risk.expected_value:.2f} <= 0"
-                ),
+                reason=(None if context.risk.expected_value > 0 else f"EV {context.risk.expected_value:.2f} <= 0"),
             )
         )
 
@@ -401,14 +352,10 @@ class ProductionEntryEngine:
             GateCheck(
                 gate_number=5,
                 name="Game State",
-                passed=context.game.adversarial_risk != "EXTREME"
-                or context.game.game_state_aligned,
+                passed=context.game.adversarial_risk != "EXTREME" or context.game.game_state_aligned,
                 reason=(
                     None
-                    if (
-                        context.game.adversarial_risk != "EXTREME"
-                        or context.game.game_state_aligned
-                    )
+                    if (context.game.adversarial_risk != "EXTREME" or context.game.game_state_aligned)
                     else "extreme adversarial risk"
                 ),
             )
@@ -427,9 +374,7 @@ class ProductionEntryEngine:
 
         # Add remaining gates as passed (simplified for now)
         for i in range(7, 13):
-            gates.append(
-                GateCheck(gate_number=i, name=f"Gate {i}", passed=True, reason=None)
-            )
+            gates.append(GateCheck(gate_number=i, name=f"Gate {i}", passed=True, reason=None))
 
         return gates
 
@@ -437,8 +382,7 @@ class ProductionEntryEngine:
         """Extract risk limits from context."""
         return {
             "max_position_size": context.risk.max_position_size,
-            "max_risk_per_trade_usd": context.risk.max_position_size
-            * 100000,  # Assuming $100k account
+            "max_risk_per_trade_usd": context.risk.max_position_size * 100000,  # Assuming $100k account
             "allow_entry": True,
         }
 
@@ -465,9 +409,7 @@ class ProductionEntryEngine:
 
         # Calculate position size with combined risk
         combined_multiplier = (
-            combined_validation.get("adjusted_limits", {})
-            .get("risk_multipliers", {})
-            .get("combined_size", 1.0)
+            combined_validation.get("adjusted_limits", {}).get("risk_multipliers", {}).get("combined_size", 1.0)
         )
 
         position_size = context.risk.max_position_size * combined_multiplier

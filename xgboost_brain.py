@@ -30,9 +30,7 @@ class XGBoostBrain(AIBrain):
     """
 
     def __init__(self, model_path: str = None, confidence_threshold: float = 0.55):
-        self.model_path = (
-            model_path or Path(__file__).parent / "training" / "xgb_model.pkl"
-        )
+        self.model_path = model_path or Path(__file__).parent / "training" / "xgb_model.pkl"
         self.confidence_threshold = confidence_threshold
         self.model = None
         self.feature_cols = None
@@ -48,9 +46,7 @@ class XGBoostBrain(AIBrain):
         path = path or self.model_path
 
         if not Path(path).exists():
-            raise FileNotFoundError(
-                f"Model not found: {path}. Run training/train_xgb.py first."
-            )
+            raise FileNotFoundError(f"Model not found: {path}. Run training/train_xgb.py first.")
 
         with open(path, "rb") as f:
             saved = pickle.load(f)

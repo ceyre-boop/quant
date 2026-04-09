@@ -24,9 +24,7 @@ class TradeLockerClient:
     ):
         self.api_key = api_key or os.getenv("TRADELOCKER_API_KEY")
         self.account_id = account_id or os.getenv("TRADELOCKER_ACCOUNT_ID")
-        self.base_url = base_url or os.getenv(
-            "TRADELOCKER_BASE_URL", "https://api.tradelocker.com"
-        )
+        self.base_url = base_url or os.getenv("TRADELOCKER_BASE_URL", "https://api.tradelocker.com")
         self.env = env or os.getenv("TRADELOCKER_ENV", "demo")
 
         self.ws: Optional[WebSocketApp] = None
@@ -52,9 +50,7 @@ class TradeLockerClient:
     def get_positions(self) -> list:
         """Get open positions."""
         try:
-            url = urljoin(
-                self.base_url, f"/api/v1/accounts/{self.account_id}/positions"
-            )
+            url = urljoin(self.base_url, f"/api/v1/accounts/{self.account_id}/positions")
             response = self.session.get(url, timeout=30)
             response.raise_for_status()
             return response.json().get("positions", [])

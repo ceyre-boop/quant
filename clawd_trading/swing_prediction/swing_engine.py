@@ -79,12 +79,8 @@ class SwingBias:
             "block_reason": self.block_reason,
             "layer_scores": {k: round(v, 4) for k, v in self.layer_scores.items()},
             "layer_signals": self.layer_signals,
-            "expected_move_pct": (
-                round(self.expected_move_pct, 4) if self.expected_move_pct else None
-            ),
-            "base_rate_winpct": (
-                round(self.base_rate_winpct, 4) if self.base_rate_winpct else None
-            ),
+            "expected_move_pct": (round(self.expected_move_pct, 4) if self.expected_move_pct else None),
+            "base_rate_winpct": (round(self.base_rate_winpct, 4) if self.base_rate_winpct else None),
             "base_rate_n": self.base_rate_n,
             "valid_until": self.valid_until,
             "created_at": self.created_at,
@@ -171,9 +167,7 @@ class SwingEngine:
 
         return results
 
-    async def run_weekly_rescore(
-        self, symbols: Optional[List[str]] = None
-    ) -> List[SwingBias]:
+    async def run_weekly_rescore(self, symbols: Optional[List[str]] = None) -> List[SwingBias]:
         """
         Run weekly rescore for specified symbols (or all if None).
         Lighter weight than monthly - only updates dynamic layers.
@@ -232,18 +226,11 @@ class SwingEngine:
 
         # Check base rates if we have enough signal
         base_rate_data = None
-        if (
-            layers_aligned
-            >= self.config["composite_scoring"]["min_layers_for_tradeable"]
-        ):
-            base_rate_data = await self.base_rate_calc.get_base_rate(
-                symbol, layer_scores, direction
-            )
+        if layers_aligned >= self.config["composite_scoring"]["min_layers_for_tradeable"]:
+            base_rate_data = await self.base_rate_calc.get_base_rate(symbol, layer_scores, direction)
 
         # Determine if tradeable
-        tradeable, block_reason = self._determine_tradeability(
-            composite, layers_aligned, base_rate_data
-        )
+        tradeable, block_reason = self._determine_tradeability(composite, layers_aligned, base_rate_data)
 
         # Build SwingBias object
         bias = SwingBias(
@@ -254,15 +241,9 @@ class SwingEngine:
             composite_score=composite,
             confidence=base_rate_data.get("confidence") if base_rate_data else None,
             base_rate=base_rate_data.get("win_rate") if base_rate_data else None,
-            avg_return_20d=(
-                base_rate_data.get("avg_return_20d") if base_rate_data else None
-            ),
-            avg_return_40d=(
-                base_rate_data.get("avg_return_40d") if base_rate_data else None
-            ),
-            avg_return_60d=(
-                base_rate_data.get("avg_return_60d") if base_rate_data else None
-            ),
+            avg_return_20d=(base_rate_data.get("avg_return_20d") if base_rate_data else None),
+            avg_return_40d=(base_rate_data.get("avg_return_40d") if base_rate_data else None),
+            avg_return_60d=(base_rate_data.get("avg_return_60d") if base_rate_data else None),
             max_drawdown=base_rate_data.get("max_drawdown") if base_rate_data else None,
             layers_aligned=layers_aligned,
             layer_scores=layer_scores,
@@ -297,9 +278,7 @@ class SwingEngine:
         direction = self.scorer.direction_from_score(composite)
         layers_aligned = sum(1 for s in layer_scores.values() if abs(s) >= 0.5)
 
-        tradeable, block_reason = self._determine_tradeability(
-            composite, layers_aligned, None
-        )
+        tradeable, block_reason = self._determine_tradeability(composite, layers_aligned, None)
 
         return SwingBias(
             symbol=symbol,
@@ -387,9 +366,7 @@ class SwingEngine:
             return False, f"Composite score {composite:.2f} too close to neutral"
 
         if base_rate_data:
-            min_confidence = self.config["composite_scoring"][
-                "min_confidence_for_tradeable"
-            ]
+            min_confidence = self.config["composite_scoring"]["min_confidence_for_tradeable"]
             if base_rate_data.get("confidence", 0) < min_confidence:
                 return (
                     False,

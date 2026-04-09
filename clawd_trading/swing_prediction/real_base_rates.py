@@ -63,9 +63,7 @@ class BaseRateCalculator:
         """
         try:
             # Fetch historical data
-            hist = self.data.get_historical_data(
-                symbol, period=f"{lookback_years}y", interval="1d"
-            )
+            hist = self.data.get_historical_data(symbol, period=f"{lookback_years}y", interval="1d")
 
             if hist is None or len(hist) < 252:  # Need at least 1 year
                 self.logger.warning(f"Insufficient data for {symbol}")
@@ -92,12 +90,8 @@ class BaseRateCalculator:
             max_dd = self._calculate_max_drawdown(trades)
 
             # Confidence interval (95%)
-            ci_lower = win_rate - 1.96 * np.sqrt(
-                win_rate * (1 - win_rate) / len(trades)
-            )
-            ci_upper = win_rate + 1.96 * np.sqrt(
-                win_rate * (1 - win_rate) / len(trades)
-            )
+            ci_lower = win_rate - 1.96 * np.sqrt(win_rate * (1 - win_rate) / len(trades))
+            ci_upper = win_rate + 1.96 * np.sqrt(win_rate * (1 - win_rate) / len(trades))
 
             return BaseRateResult(
                 setup_name=setup_condition or f"{symbol}_baseline",

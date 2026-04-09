@@ -32,9 +32,7 @@ class RefitScheduler:
         self.sharpe_threshold = self.config.get("sharpe_threshold", 0.5)
         self.max_days_between_refits = self.config.get("max_days", 30)
 
-    def evaluate_refit_need(
-        self, performance_metrics: Dict[str, Any], drift_detected: bool = False
-    ) -> Dict[str, Any]:
+    def evaluate_refit_need(self, performance_metrics: Dict[str, Any], drift_detected: bool = False) -> Dict[str, Any]:
         """Evaluate if model retraining is needed.
 
         Args:
@@ -50,17 +48,13 @@ class RefitScheduler:
         # Check win rate
         win_rate = performance_metrics.get("win_rate", 0)
         if win_rate < self.win_rate_threshold:
-            reasons.append(
-                f"Win rate {win_rate:.1%} below threshold {self.win_rate_threshold:.1%}"
-            )
+            reasons.append(f"Win rate {win_rate:.1%} below threshold {self.win_rate_threshold:.1%}")
             urgency = "HIGH"
 
         # Check Sharpe ratio
         sharpe = performance_metrics.get("sharpe", 0)
         if sharpe < self.sharpe_threshold:
-            reasons.append(
-                f"Sharpe {sharpe:.2f} below threshold {self.sharpe_threshold:.2f}"
-            )
+            reasons.append(f"Sharpe {sharpe:.2f} below threshold {self.sharpe_threshold:.2f}")
             urgency = _max_urgency(urgency, "MEDIUM")
 
         # Check feature drift
@@ -73,9 +67,7 @@ class RefitScheduler:
         if total_trades < self.min_trades_for_refit:
             return {
                 "should_refit": False,
-                "reasons": [
-                    f"Insufficient trade history ({total_trades} < {self.min_trades_for_refit})"
-                ],
+                "reasons": [f"Insufficient trade history ({total_trades} < {self.min_trades_for_refit})"],
                 "urgency": "LOW",
                 "can_schedule": False,
             }
@@ -84,9 +76,7 @@ class RefitScheduler:
         if self.last_refit:
             days_since = (datetime.now() - self.last_refit).days
             if days_since >= self.max_days_between_refits:
-                reasons.append(
-                    f"{days_since} days since last refit (max: {self.max_days_between_refits})"
-                )
+                reasons.append(f"{days_since} days since last refit (max: {self.max_days_between_refits})")
                 urgency = _max_urgency(urgency, "MEDIUM")
 
         should_refit = len(reasons) > 0 and urgency in ["HIGH", "MEDIUM"]
@@ -103,9 +93,7 @@ class RefitScheduler:
             },
         }
 
-    def schedule_refit(
-        self, evaluation_result: Dict[str, Any], model_version: str
-    ) -> Dict[str, Any]:
+    def schedule_refit(self, evaluation_result: Dict[str, Any], model_version: str) -> Dict[str, Any]:
         """Schedule a model refit if recommended.
 
         Returns:
@@ -144,18 +132,14 @@ class RefitScheduler:
             "status": "PENDING",
         }
 
-        logger.info(
-            f"Refit scheduled for {schedule['scheduled_time']}: {model_version}"
-        )
+        logger.info(f"Refit scheduled for {schedule['scheduled_time']}: {model_version}")
 
         if self.firebase:
             self.firebase.write("refit_schedule", schedule)
 
         return schedule
 
-    def record_refit_completed(
-        self, model_version: str, old_performance: Dict, new_performance: Dict
-    ) -> Dict[str, Any]:
+    def record_refit_completed(self, model_version: str, old_performance: Dict, new_performance: Dict) -> Dict[str, Any]:
         """Record completion of a model refit.
 
         Returns:
@@ -163,12 +147,8 @@ class RefitScheduler:
         """
         self.last_refit = datetime.now()
 
-        win_rate_improvement = new_performance.get("win_rate", 0) - old_performance.get(
-            "win_rate", 0
-        )
-        sharpe_improvement = new_performance.get("sharpe", 0) - old_performance.get(
-            "sharpe", 0
-        )
+        win_rate_improvement = new_performance.get("win_rate", 0) - old_performance.get("win_rate", 0)
+        sharpe_improvement = new_performance.get("sharpe", 0) - old_performance.get("sharpe", 0)
 
         record = {
             "timestamp": self.last_refit.isoformat(),
@@ -182,10 +162,7 @@ class RefitScheduler:
             },
         }
 
-        logger.info(
-            f"Refit completed: {model_version}, "
-            f"win_rate improvement: {win_rate_improvement:+.1%}"
-        )
+        logger.info(f"Refit completed: {model_version}, " f"win_rate improvement: {win_rate_improvement:+.1%}")
 
         if self.firebase:
             self.firebase.write("refit_history", record)

@@ -47,9 +47,7 @@ class SignalAnalyzer:
         end = datetime.now()
         start = end - timedelta(days=days_back)
 
-        signals = self.archive.get_signals_for_range(
-            start.strftime("%Y-%m-%d"), end.strftime("%Y-%m-%d")
-        )
+        signals = self.archive.get_signals_for_range(start.strftime("%Y-%m-%d"), end.strftime("%Y-%m-%d"))
 
         # Group by regime
         regimes = defaultdict(lambda: {"trades": [], "pnl": 0})
@@ -93,9 +91,7 @@ class SignalAnalyzer:
         end = datetime.now()
         start = end - timedelta(days=days_back)
 
-        signals = self.archive.get_signals_for_range(
-            start.strftime("%Y-%m-%d"), end.strftime("%Y-%m-%d")
-        )
+        signals = self.archive.get_signals_for_range(start.strftime("%Y-%m-%d"), end.strftime("%Y-%m-%d"))
 
         # Group by hour
         hours = defaultdict(lambda: {"trades": [], "pnl": 0})
@@ -137,9 +133,7 @@ class SignalAnalyzer:
         end = datetime.now()
         start = end - timedelta(days=days_back)
 
-        signals = self.archive.get_signals_for_range(
-            start.strftime("%Y-%m-%d"), end.strftime("%Y-%m-%d")
-        )
+        signals = self.archive.get_signals_for_range(start.strftime("%Y-%m-%d"), end.strftime("%Y-%m-%d"))
 
         symbols = defaultdict(lambda: {"trades": [], "pnl": 0})
 
@@ -181,18 +175,14 @@ class SignalAnalyzer:
         # Find best regime
         best_regime = max(
             regime_stats.items(),
-            key=lambda x: (
-                x[1].get("win_rate", 0) if x[1].get("total_trades", 0) >= 5 else 0
-            ),
+            key=lambda x: (x[1].get("win_rate", 0) if x[1].get("total_trades", 0) >= 5 else 0),
             default=(None, {}),
         )
 
         # Find best hour (with at least 5 trades)
         best_hour = max(
             hour_stats.items(),
-            key=lambda x: (
-                x[1].get("win_rate", 0) if x[1].get("total_trades", 0) >= 5 else 0
-            ),
+            key=lambda x: (x[1].get("win_rate", 0) if x[1].get("total_trades", 0) >= 5 else 0),
             default=(None, {}),
         )
 
@@ -207,16 +197,10 @@ class SignalAnalyzer:
         parts = []
 
         if best_regime[0] and best_regime[1].get("win_rate", 0) > 0.6:
-            parts.append(
-                f"Focus on {best_regime[0]} regime "
-                f"({best_regime[1]['win_rate']:.0%} win rate)"
-            )
+            parts.append(f"Focus on {best_regime[0]} regime " f"({best_regime[1]['win_rate']:.0%} win rate)")
 
         if best_hour[0] is not None and best_hour[1].get("win_rate", 0) > 0.6:
-            parts.append(
-                f"Best performance at {best_hour[0]:02d}:00 "
-                f"({best_hour[1]['win_rate']:.0%} win rate)"
-            )
+            parts.append(f"Best performance at {best_hour[0]:02d}:00 " f"({best_hour[1]['win_rate']:.0%} win rate)")
 
         return " | ".join(parts) if parts else "No clear patterns identified yet"
 
@@ -258,15 +242,11 @@ def main():
     print(f"Period: Last {args.days} days")
     print(f"\nPerformance by Regime:")
     for regime, stats in report["by_regime"].items():
-        print(
-            f"  {regime}: {stats['win_rate']:.1%} win rate ({stats['total_trades']} trades)"
-        )
+        print(f"  {regime}: {stats['win_rate']:.1%} win rate ({stats['total_trades']} trades)")
 
     print(f"\nPerformance by Symbol:")
     for symbol, stats in report["by_symbol"].items():
-        print(
-            f"  {symbol}: {stats['win_rate']:.1%} win rate (${stats['total_pnl']:+.2f})"
-        )
+        print(f"  {symbol}: {stats['win_rate']:.1%} win rate (${stats['total_pnl']:+.2f})")
 
     print(f"\nRecommendation: {report['best_setup']['recommendation']}")
     print(f"{'='*60}\n")

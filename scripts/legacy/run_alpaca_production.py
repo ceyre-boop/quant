@@ -95,25 +95,19 @@ class AlpacaProductionEngine:
         # Verify connection
         account = self.trading_client.get_account()
         self.logger.info(f"Alpaca connected: {account.id}")
-        self.logger.info(
-            f"Equity: ${account.equity} | Buying Power: ${account.buying_power}"
-        )
+        self.logger.info(f"Equity: ${account.equity} | Buying Power: ${account.buying_power}")
 
         self.symbols = os.getenv("TRADE_SYMBOLS", ",".join(DEFAULT_SYMBOLS)).split(",")
         self.symbols = [s.strip().upper() for s in self.symbols]
 
     def get_market_data(self, timeframe: str = "1H", days: int = 30) -> Dict[str, Any]:
         """Fetch latest market data for all symbols"""
-        self.logger.info(
-            f"Fetching data for {len(self.symbols)} symbols ({timeframe}, {days}d)"
-        )
+        self.logger.info(f"Fetching data for {len(self.symbols)} symbols ({timeframe}, {days}d)")
 
         data = {}
         for symbol in self.symbols:
             try:
-                df = self.data_client.get_historical_bars(
-                    symbol, timeframe=timeframe, days=days
-                )
+                df = self.data_client.get_historical_bars(symbol, timeframe=timeframe, days=days)
                 if not df.empty:
                     data[symbol] = df
             except Exception as e:
@@ -163,9 +157,7 @@ class AlpacaProductionEngine:
             )
 
             result = self.trading_client.submit_order(order)
-            self.logger.info(
-                f"Order submitted: {result.id} | {signal['symbol']} {signal['direction']}"
-            )
+            self.logger.info(f"Order submitted: {result.id} | {signal['symbol']} {signal['direction']}")
             return True
 
         except Exception as e:
@@ -175,9 +167,7 @@ class AlpacaProductionEngine:
     def run_cycle(self) -> Dict[str, Any]:
         """Run one trading cycle"""
         self.logger.info("=" * 60)
-        self.logger.info(
-            f"Trading Cycle | {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
-        )
+        self.logger.info(f"Trading Cycle | {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         self.logger.info("=" * 60)
 
         # 1. Get market data

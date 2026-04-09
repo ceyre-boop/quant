@@ -21,9 +21,7 @@ class PolygonRestClient:
 
     def __init__(self, api_key: Optional[str] = None, base_url: Optional[str] = None):
         self.api_key = api_key or os.getenv("POLYGON_API_KEY")
-        self.base_url = base_url or os.getenv(
-            "POLYGON_BASE_URL", "https://api.polygon.io"
-        )
+        self.base_url = base_url or os.getenv("POLYGON_BASE_URL", "https://api.polygon.io")
 
         if not self.api_key:
             raise ValueError("POLYGON_API_KEY not set")
@@ -70,9 +68,7 @@ class PolygonRestClient:
         params = {"adjusted": str(adjusted).lower(), "sort": sort, "limit": limit}
         return self._get(endpoint, params)
 
-    def get_daily_open_close(
-        self, ticker: str, date: str  # YYYY-MM-DD
-    ) -> Dict[str, Any]:
+    def get_daily_open_close(self, ticker: str, date: str) -> Dict[str, Any]:  # YYYY-MM-DD
         """Get daily open/close for a ticker."""
         endpoint = f"/v1/open-close/{ticker}/{date}"
         return self._get(endpoint)
@@ -87,9 +83,7 @@ class PolygonRestClient:
         endpoint = f"/v2/snapshot/locale/us/markets/stocks/tickers/{ticker}"
         return self._get(endpoint)
 
-    def get_grouped_daily(
-        self, date: str, adjusted: bool = True  # YYYY-MM-DD
-    ) -> Dict[str, Any]:
+    def get_grouped_daily(self, date: str, adjusted: bool = True) -> Dict[str, Any]:  # YYYY-MM-DD
         """Get daily aggregates for all tickers in a group."""
         endpoint = f"/v2/aggs/grouped/locale/us/market/stocks/{date}"
         params = {"adjusted": str(adjusted).lower()}
@@ -149,11 +143,7 @@ class PolygonWebSocketClient:
         ws.send(json.dumps({"action": "auth", "params": self.api_key}))
         # Subscribe to channels
         if self.subscriptions:
-            ws.send(
-                json.dumps(
-                    {"action": "subscribe", "params": ",".join(self.subscriptions)}
-                )
-            )
+            ws.send(json.dumps({"action": "subscribe", "params": ",".join(self.subscriptions)}))
 
     def connect(
         self,
@@ -198,23 +188,17 @@ class PolygonWebSocketClient:
     def subscribe(self, channels: List[str]):
         """Subscribe to additional channels."""
         if self.ws and self.ws.sock and self.ws.sock.connected:
-            self.ws.send(
-                json.dumps({"action": "subscribe", "params": ",".join(channels)})
-            )
+            self.ws.send(json.dumps({"action": "subscribe", "params": ",".join(channels)}))
             self.subscriptions.extend(channels)
 
     def unsubscribe(self, channels: List[str]):
         """Unsubscribe from channels."""
         if self.ws and self.ws.sock and self.ws.sock.connected:
-            self.ws.send(
-                json.dumps({"action": "unsubscribe", "params": ",".join(channels)})
-            )
+            self.ws.send(json.dumps({"action": "unsubscribe", "params": ",".join(channels)}))
             self.subscriptions = [s for s in self.subscriptions if s not in channels]
 
 
-def fetch_nas100_ohlcv(
-    client: PolygonRestClient, timeframe: str = "1h", lookback_days: int = 30
-) -> List[Dict[str, Any]]:
+def fetch_nas100_ohlcv(client: PolygonRestClient, timeframe: str = "1h", lookback_days: int = 30) -> List[Dict[str, Any]]:
     """Fetch NAS100 OHLCV data.
 
     Args:

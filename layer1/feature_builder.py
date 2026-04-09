@@ -107,9 +107,7 @@ class FeatureVector:
             "vwap_deviation": self.vwap_deviation,
             "volume_profile_poc_dist": self.volume_profile_poc_dist,
             "volume_trend_5d": self.volume_trend_5d,
-            "swing_high_20": (
-                self.swing_high_20 if self.swing_high_20 is not None else 0.0
-            ),
+            "swing_high_20": (self.swing_high_20 if self.swing_high_20 is not None else 0.0),
             "swing_low_20": self.swing_low_20 if self.swing_low_20 is not None else 0.0,
             "distance_to_resistance": self.distance_to_resistance,
             "distance_to_support": self.distance_to_support,
@@ -175,9 +173,7 @@ class FeatureBuilder:
 
         return features
 
-    def _build_price_features(
-        self, features: FeatureVector, data: pd.DataFrame
-    ) -> FeatureVector:
+    def _build_price_features(self, features: FeatureVector, data: pd.DataFrame) -> FeatureVector:
         """Build price-based features."""
         close = data["close"]
 
@@ -214,15 +210,11 @@ class FeatureBuilder:
             latest = data.iloc[-1]
             range_size = latest["high"] - latest["low"]
             if range_size > 0:
-                features.price_position_daily_range = (
-                    latest["close"] - latest["low"]
-                ) / range_size
+                features.price_position_daily_range = (latest["close"] - latest["low"]) / range_size
 
         return features
 
-    def _build_volatility_features(
-        self, features: FeatureVector, data: pd.DataFrame
-    ) -> FeatureVector:
+    def _build_volatility_features(self, features: FeatureVector, data: pd.DataFrame) -> FeatureVector:
         """Build volatility features."""
         high = data["high"]
         low = data["low"]
@@ -243,23 +235,13 @@ class FeatureBuilder:
             std20 = close.rolling(20).std()
             upper = sma20 + 2 * std20
             lower = sma20 - 2 * std20
-            features.bollinger_position = (
-                (close.iloc[-1] - sma20.iloc[-1]) / (2 * std20.iloc[-1])
-                if std20.iloc[-1] > 0
-                else 0
-            )
-            features.bollinger_width = (
-                (upper.iloc[-1] - lower.iloc[-1]) / sma20.iloc[-1]
-                if sma20.iloc[-1] > 0
-                else 0
-            )
+            features.bollinger_position = (close.iloc[-1] - sma20.iloc[-1]) / (2 * std20.iloc[-1]) if std20.iloc[-1] > 0 else 0
+            features.bollinger_width = (upper.iloc[-1] - lower.iloc[-1]) / sma20.iloc[-1] if sma20.iloc[-1] > 0 else 0
 
         # Historical volatility
         if len(close) >= 21:
             log_returns = np.log(close / close.shift(1))
-            features.historical_volatility_20d = log_returns.rolling(20).std().iloc[
-                -1
-            ] * np.sqrt(252)
+            features.historical_volatility_20d = log_returns.rolling(20).std().iloc[-1] * np.sqrt(252)
 
         # Realized volatility (5-day)
         if len(close) >= 6:
@@ -278,9 +260,7 @@ class FeatureBuilder:
 
         return features
 
-    def _build_momentum_features(
-        self, features: FeatureVector, data: pd.DataFrame
-    ) -> FeatureVector:
+    def _build_momentum_features(self, features: FeatureVector, data: pd.DataFrame) -> FeatureVector:
         """Build momentum features."""
         high = data["high"]
         low = data["low"]
@@ -292,9 +272,7 @@ class FeatureBuilder:
 
             # RSI slope
             if len(close) >= 20:
-                rsi_series = close.rolling(14).apply(
-                    lambda x: self._calculate_rsi(x, 14)
-                )
+                rsi_series = close.rolling(14).apply(lambda x: self._calculate_rsi(x, 14))
                 features.rsi_slope_5 = (rsi_series.iloc[-1] - rsi_series.iloc[-6]) / 5
 
         # MACD
@@ -307,18 +285,14 @@ class FeatureBuilder:
 
         # ADX
         if len(data) >= 15:
-            features.adx_14, features.dmi_plus, features.dmi_minus = (
-                self._calculate_adx(data, 14)
-            )
+            features.adx_14, features.dmi_plus, features.dmi_minus = self._calculate_adx(data, 14)
 
         # Stochastic
         if len(data) >= 15:
             lowest_low = low.rolling(14).min()
             highest_high = high.rolling(14).max()
             features.stochastic_k = (
-                100
-                * (close.iloc[-1] - lowest_low.iloc[-1])
-                / (highest_high.iloc[-1] - lowest_low.iloc[-1])
+                100 * (close.iloc[-1] - lowest_low.iloc[-1]) / (highest_high.iloc[-1] - lowest_low.iloc[-1])
                 if (highest_high.iloc[-1] - lowest_low.iloc[-1]) > 0
                 else 50
             )
@@ -329,17 +303,11 @@ class FeatureBuilder:
             tp = (high + low + close) / 3
             sma_tp = tp.rolling(20).mean()
             mean_dev = tp.rolling(20).apply(lambda x: np.abs(x - x.mean()).mean())
-            features.cci_20 = (
-                (tp.iloc[-1] - sma_tp.iloc[-1]) / (0.015 * mean_dev.iloc[-1])
-                if mean_dev.iloc[-1] > 0
-                else 0
-            )
+            features.cci_20 = (tp.iloc[-1] - sma_tp.iloc[-1]) / (0.015 * mean_dev.iloc[-1]) if mean_dev.iloc[-1] > 0 else 0
 
         return features
 
-    def _build_volume_features(
-        self, features: FeatureVector, data: pd.DataFrame
-    ) -> FeatureVector:
+    def _build_volume_features(self, features: FeatureVector, data: pd.DataFrame) -> FeatureVector:
         """Build volume features."""
         volume = data["volume"]
         close = data["close"]
@@ -347,9 +315,7 @@ class FeatureBuilder:
         # Volume SMA ratio
         if len(volume) >= 20:
             vol_sma20 = volume.rolling(20).mean().iloc[-1]
-            features.volume_sma_ratio = (
-                volume.iloc[-1] / vol_sma20 if vol_sma20 > 0 else 1.0
-            )
+            features.volume_sma_ratio = volume.iloc[-1] / vol_sma20 if vol_sma20 > 0 else 1.0
 
         # OBV slope
         if len(volume) >= 6:
@@ -358,9 +324,7 @@ class FeatureBuilder:
 
         return features
 
-    def _build_structure_features(
-        self, features: FeatureVector, data: pd.DataFrame
-    ) -> FeatureVector:
+    def _build_structure_features(self, features: FeatureVector, data: pd.DataFrame) -> FeatureVector:
         """Build market structure features."""
         high = data["high"]
         low = data["low"]
@@ -379,12 +343,8 @@ class FeatureBuilder:
             highs = high.iloc[-6:-1].values
             lows = low.iloc[-6:-1].values
 
-            features.higher_highs_5d = sum(
-                1 for i in range(1, len(highs)) if highs[i] > highs[i - 1]
-            )
-            features.higher_lows_5d = sum(
-                1 for i in range(1, len(lows)) if lows[i] > lows[i - 1]
-            )
+            features.higher_highs_5d = sum(1 for i in range(1, len(highs)) if highs[i] > highs[i - 1])
+            features.higher_lows_5d = sum(1 for i in range(1, len(lows)) if lows[i] > lows[i - 1])
 
         return features
 
@@ -421,9 +381,7 @@ class FeatureBuilder:
         plus_dm[plus_dm < minus_dm] = 0
         minus_dm[minus_dm < plus_dm] = 0
 
-        tr = pd.concat(
-            [high - low, abs(high - close.shift(1)), abs(low - close.shift(1))], axis=1
-        ).max(axis=1)
+        tr = pd.concat([high - low, abs(high - close.shift(1)), abs(low - close.shift(1))], axis=1).max(axis=1)
 
         atr = tr.rolling(period).mean()
 

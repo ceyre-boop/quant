@@ -344,9 +344,7 @@ class TestValidationStats:
         assert stats["invalid_count"] == 0
 
         # Validate some records
-        validator.validate_feature_record(
-            {"symbol": "NAS100", "timeframe": "1h", "features": {}}
-        )  # Invalid
+        validator.validate_feature_record({"symbol": "NAS100", "timeframe": "1h", "features": {}})  # Invalid
 
         # Load valid fixture for valid test
         with open(FIXTURES_DIR / "sample_feature_record.json") as f:

@@ -95,9 +95,7 @@ class HardConstraints:
 
         # Warning at 80% of limit
         if account.daily_loss_pct >= self.daily_loss_limit_pct * 0.8:
-            self.logger.warning(
-                f"Approaching daily loss limit: {account.daily_loss_pct:.2%}"
-            )
+            self.logger.warning(f"Approaching daily loss limit: {account.daily_loss_pct:.2%}")
 
         return ConstraintCheck(passed=True)
 
@@ -112,14 +110,10 @@ class HardConstraints:
 
         return ConstraintCheck(passed=True)
 
-    def check_position_size(
-        self, risk: RiskOutput, account: AccountState
-    ) -> ConstraintCheck:
+    def check_position_size(self, risk: RiskOutput, account: AccountState) -> ConstraintCheck:
         """Check if position size exceeds maximum allowed."""
         if account.equity <= 0:
-            return ConstraintCheck(
-                passed=False, reason="Invalid account equity", severity="error"
-            )
+            return ConstraintCheck(passed=False, reason="Invalid account equity", severity="error")
 
         position_risk_pct = risk.position_size * abs(account.equity / account.equity)
 
@@ -171,15 +165,11 @@ class HardConstraints:
     def check_weekend_trading(self, timestamp: datetime) -> ConstraintCheck:
         """Block trading on weekends."""
         if timestamp.weekday() >= 5:  # Saturday = 5, Sunday = 6
-            return ConstraintCheck(
-                passed=False, reason="Weekend trading blocked", severity="error"
-            )
+            return ConstraintCheck(passed=False, reason="Weekend trading blocked", severity="error")
 
         return ConstraintCheck(passed=True)
 
-    def check_holiday(
-        self, timestamp: datetime, holidays: Optional[list] = None
-    ) -> ConstraintCheck:
+    def check_holiday(self, timestamp: datetime, holidays: Optional[list] = None) -> ConstraintCheck:
         """Block trading on market holidays."""
         if holidays is None:
             # Default US market holidays (simplified)
@@ -197,9 +187,7 @@ class HardConstraints:
 
         date_str = timestamp.strftime("%Y-%m-%d")
         if date_str in holidays:
-            return ConstraintCheck(
-                passed=False, reason=f"Market holiday: {date_str}", severity="error"
-            )
+            return ConstraintCheck(passed=False, reason=f"Market holiday: {date_str}", severity="error")
 
         return ConstraintCheck(passed=True)
 
@@ -253,19 +241,13 @@ class HardConstraints:
                 "current": account.daily_loss_pct,
                 "limit": self.daily_loss_limit_pct,
                 "remaining": max(0, self.daily_loss_limit_pct - account.daily_loss_pct),
-                "status": (
-                    "BLOCKED"
-                    if account.daily_loss_pct >= self.daily_loss_limit_pct
-                    else "OK"
-                ),
+                "status": ("BLOCKED" if account.daily_loss_pct >= self.daily_loss_limit_pct else "OK"),
             },
             "max_positions": {
                 "current": account.open_positions,
                 "limit": self.max_positions,
                 "remaining": self.max_positions - account.open_positions,
-                "status": (
-                    "BLOCKED" if account.open_positions >= self.max_positions else "OK"
-                ),
+                "status": ("BLOCKED" if account.open_positions >= self.max_positions else "OK"),
             },
             "trading_hours": {
                 "start": self.trading_hours_start.isoformat(),
@@ -275,9 +257,7 @@ class HardConstraints:
             "equity": {
                 "current": account.equity,
                 "minimum": self.min_account_equity,
-                "status": (
-                    "OK" if account.equity >= self.min_account_equity else "BLOCKED"
-                ),
+                "status": ("OK" if account.equity >= self.min_account_equity else "BLOCKED"),
             },
         }
 

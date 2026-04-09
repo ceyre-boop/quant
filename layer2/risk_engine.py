@@ -27,9 +27,7 @@ class PositionSizing:
     def __init__(self, default_risk_pct: float = 0.005):
         self.default_risk_pct = default_risk_pct
 
-    def calculate_kelly_fraction(
-        self, win_rate: float, avg_win: float, avg_loss: float
-    ) -> float:
+    def calculate_kelly_fraction(self, win_rate: float, avg_win: float, avg_loss: float) -> float:
         """Calculate Kelly criterion fraction.
 
         Kelly = (p*b - q) / b
@@ -189,9 +187,7 @@ class StopCalculator:
 class TargetCalculator:
     """Calculate profit targets."""
 
-    def calculate_targets(
-        self, entry_price: float, stop_price: float, direction: int
-    ) -> Dict[str, float]:
+    def calculate_targets(self, entry_price: float, stop_price: float, direction: int) -> Dict[str, float]:
         """Calculate R-based profit targets.
 
         TP1 = 1R (1:1 risk/reward)
@@ -231,9 +227,7 @@ class TargetCalculator:
 class ExpectedValueCalculator:
     """Calculate expected value of trades."""
 
-    def calculate_ev(
-        self, win_rate: float, avg_win_r: float, avg_loss_r: float
-    ) -> Dict[str, float]:
+    def calculate_ev(self, win_rate: float, avg_win_r: float, avg_loss_r: float) -> Dict[str, float]:
         """Calculate expected value in R multiples.
 
         EV = (p_win * avg_win) - (p_loss * avg_loss)
@@ -310,15 +304,9 @@ class RiskEngine:
         swing_high = strategy_params.get("swing_high", entry_price * 1.02)
 
         # Calculate stops
-        atr_stop = self.stop_calculator.calculate_atr_stop(
-            entry_price, atr_14, direction, regime
-        )
-        structural_stop = self.stop_calculator.calculate_structural_stop(
-            entry_price, direction, swing_low, swing_high, atr_14
-        )
-        stop_price, stop_method = self.stop_calculator.calculate_final_stop(
-            entry_price, direction, atr_stop, structural_stop
-        )
+        atr_stop = self.stop_calculator.calculate_atr_stop(entry_price, atr_14, direction, regime)
+        structural_stop = self.stop_calculator.calculate_structural_stop(entry_price, direction, swing_low, swing_high, atr_14)
+        stop_price, stop_method = self.stop_calculator.calculate_final_stop(entry_price, direction, atr_stop, structural_stop)
 
         # Calculate position size
         stop_distance = abs(entry_price - stop_price)
@@ -328,19 +316,13 @@ class RiskEngine:
             self.default_win_rate, self.default_avg_win_r, self.default_avg_loss_r
         )
 
-        sizing = self.position_sizing.calculate_position_size(
-            account_state.equity, stop_distance, kelly_fraction=kelly
-        )
+        sizing = self.position_sizing.calculate_position_size(account_state.equity, stop_distance, kelly_fraction=kelly)
 
         # Calculate targets
-        targets = self.target_calculator.calculate_targets(
-            entry_price, stop_price, direction
-        )
+        targets = self.target_calculator.calculate_targets(entry_price, stop_price, direction)
 
         # Calculate EV
-        ev = self.ev_calculator.calculate_ev(
-            self.default_win_rate, self.default_avg_win_r, self.default_avg_loss_r
-        )
+        ev = self.ev_calculator.calculate_ev(self.default_win_rate, self.default_avg_win_r, self.default_avg_loss_r)
 
         return RiskOutput(
             position_size=sizing["position_size"],

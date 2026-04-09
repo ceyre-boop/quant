@@ -151,9 +151,7 @@ def main():
         broadcaster.set_connection_status("LIVE")
 
         # Update session controls
-        broadcaster.broadcast_session_control(
-            trading_enabled=True, hard_logic_status="CLEAR"
-        )
+        broadcaster.broadcast_session_control(trading_enabled=True, hard_logic_status="CLEAR")
 
         print("\n✅ Signal successfully written to Firebase!")
         print("\n📊 Data written to:")

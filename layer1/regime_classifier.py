@@ -48,9 +48,7 @@ class RegimeClassifier:
         event = self._classify_event_risk(event_risk)
 
         # Composite score (0.0 to 1.0)
-        composite = self._calculate_composite(
-            volatility, trend, risk_appetite, momentum, event
-        )
+        composite = self._calculate_composite(volatility, trend, risk_appetite, momentum, event)
 
         return RegimeState(
             volatility=volatility,
@@ -61,9 +59,7 @@ class RegimeClassifier:
             composite_score=composite,
         )
 
-    def _classify_volatility(
-        self, features: FeatureVector, vix_value: float
-    ) -> VolRegime:
+    def _classify_volatility(self, features: FeatureVector, vix_value: float) -> VolRegime:
         """Classify volatility regime."""
         # Use VIX and historical volatility
         if vix_value < 15 and features.volatility_regime == 1:
@@ -96,9 +92,7 @@ class RegimeClassifier:
         else:
             return TrendRegime.RANGING
 
-    def _classify_risk_appetite(
-        self, features: FeatureVector, market_breadth: float
-    ) -> RiskAppetite:
+    def _classify_risk_appetite(self, features: FeatureVector, market_breadth: float) -> RiskAppetite:
         """Classify risk appetite."""
         # Use VIX, breadth, and momentum
         vix_regime = features.vix_regime

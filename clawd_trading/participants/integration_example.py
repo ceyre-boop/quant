@@ -55,9 +55,7 @@ def example_layer1_to_participant_analysis(layer1_output: dict) -> dict:
     }
 
 
-def example_gate12_integration(
-    base_risk_limits: dict, participant_analysis: dict
-) -> dict:
+def example_gate12_integration(base_risk_limits: dict, participant_analysis: dict) -> dict:
     """
     Example: Apply participant risk to Gate 12 (Entry Engine).
 
@@ -66,9 +64,7 @@ def example_gate12_integration(
     risk_limits = participant_analysis["risk_limits"]
 
     # Apply participant adjustments to base limits
-    adjusted_limits = apply_participant_risk_to_gate12(
-        base_risk_limits=base_risk_limits, participant_limits=risk_limits
-    )
+    adjusted_limits = apply_participant_risk_to_gate12(base_risk_limits=base_risk_limits, participant_limits=risk_limits)
 
     # Check if trade should be blocked
     if adjusted_limits.get("no_trade"):

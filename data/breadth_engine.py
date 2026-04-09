@@ -41,9 +41,7 @@ class BreadthEngine:
     def __init__(self, polygon_client: Optional[PolygonRestClient] = None):
         self.client = polygon_client or PolygonRestClient()
 
-    def compute_breadth_metrics(
-        self, symbols: Optional[List[str]] = None
-    ) -> BreadthMetrics:
+    def compute_breadth_metrics(self, symbols: Optional[List[str]] = None) -> BreadthMetrics:
         """Compute breadth metrics for a universe of stocks.
 
         Args:
@@ -123,9 +121,7 @@ class BreadthEngine:
         if not sector_performance:
             return {"leading": [], "lagging": [], "neutral": []}
 
-        sorted_sectors = sorted(
-            sector_performance.items(), key=lambda x: x[1], reverse=True
-        )
+        sorted_sectors = sorted(sector_performance.items(), key=lambda x: x[1], reverse=True)
 
         n = len(sorted_sectors)
         leading = [s[0] for s in sorted_sectors[: max(1, n // 3)]]

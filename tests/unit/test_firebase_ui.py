@@ -559,16 +559,12 @@ class TestFirebaseBroadcaster:
         assert result is True
 
     def test_publish_controls(self, broadcaster, mock_client):
-        result = broadcaster.publish_controls(
-            trading_enabled=True, daily_loss_pct=0.0, open_positions=1
-        )
+        result = broadcaster.publish_controls(trading_enabled=True, daily_loss_pct=0.0, open_positions=1)
         assert result is True
         mock_client.rtdb.reference.assert_called_with("session/controls")
 
     def test_update_model_status(self, broadcaster, mock_client):
-        result = broadcaster.update_model_status(
-            model_name="bias", version="v1.0", status="active", accuracy=0.75
-        )
+        result = broadcaster.update_model_status(model_name="bias", version="v1.0", status="active", accuracy=0.75)
         assert result is True
         mock_client.rtdb.reference.assert_called_with("system/models/bias")
 
@@ -608,9 +604,7 @@ class TestFirebaseBroadcasterDisabled:
             return FirebaseBroadcaster()
 
     def test_publish_signal_disabled(self, disabled_broadcaster):
-        result = disabled_broadcaster.publish_signal(
-            "NAS100", Mock(), Mock(), Mock(), Mock()
-        )
+        result = disabled_broadcaster.publish_signal("NAS100", Mock(), Mock(), Mock(), Mock())
         assert result is False
 
     def test_publish_regime_disabled(self, disabled_broadcaster):

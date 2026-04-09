@@ -26,9 +26,7 @@ df = pd.DataFrame(
 market_data = {"SPY": df, "VIXY": df, "SQQQ": df, "SPXU": df, "GLD": df, "TLT": df}
 gen = FeatureGenerator()
 result = gen.generate_features(df, market_data)
-feature_cols = [
-    c for c in result.columns if c not in ["open", "high", "low", "close", "volume"]
-]
+feature_cols = [c for c in result.columns if c not in ["open", "high", "low", "close", "volume"]]
 print(f"Generator produces {len(feature_cols)} features with cross-asset data")
 
 # Check match

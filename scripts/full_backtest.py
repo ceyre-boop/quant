@@ -110,9 +110,7 @@ class StatisticalBacktest:
 
         for symbol in self.symbols:
             try:
-                df = self.client.get_historical_bars(
-                    symbol, timeframe=self.timeframe, days=days
-                )
+                df = self.client.get_historical_bars(symbol, timeframe=self.timeframe, days=days)
                 # Filter to date range
                 df = df[(df.index >= self.start_date) & (df.index <= self.end_date)]
                 if len(df) > 50:
@@ -224,11 +222,7 @@ class StatisticalBacktest:
         latest = features_df.iloc[-1]
 
         # Build feature vector (simplified - would use actual feature cols)
-        feature_cols = [
-            c
-            for c in features_df.columns
-            if c not in ["open", "high", "low", "close", "volume"]
-        ]
+        feature_cols = [c for c in features_df.columns if c not in ["open", "high", "low", "close", "volume"]]
 
         X = latest[feature_cols].fillna(0).values.reshape(1, -1)
 
@@ -248,9 +242,7 @@ class StatisticalBacktest:
 
         return self.chi2_gate.allow_trade(signal["confidence"], signal["direction"])
 
-    def _simulate_trade(
-        self, symbol: str, signal: Dict, df: pd.DataFrame, entry_idx: int
-    ) -> float:
+    def _simulate_trade(self, symbol: str, signal: Dict, df: pd.DataFrame, entry_idx: int) -> float:
         """Simulate a trade and return P&L"""
         # Simplified: 1-day hold for now
         entry_price = df["close"].iloc[entry_idx]
@@ -281,9 +273,7 @@ class StatisticalBacktest:
             return {"error": "Insufficient returns data"}
 
         # Risk metrics
-        sharpe = (
-            np.sqrt(252) * (returns.mean() / returns.std()) if returns.std() > 0 else 0
-        )
+        sharpe = np.sqrt(252) * (returns.mean() / returns.std()) if returns.std() > 0 else 0
 
         # Max drawdown
         peak = np.maximum.accumulate(equity)

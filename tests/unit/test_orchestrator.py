@@ -127,9 +127,7 @@ class TestDailyLifecycle:
         mock_fetcher = Mock()
         mock_builder = Mock()
 
-        lifecycle.register_components(
-            data_fetcher=mock_fetcher, feature_builder=mock_builder
-        )
+        lifecycle.register_components(data_fetcher=mock_fetcher, feature_builder=mock_builder)
 
         assert lifecycle.data_fetcher == mock_fetcher
         assert lifecycle.feature_builder == mock_builder
@@ -632,9 +630,7 @@ class TestSymbolStateMachine:
             assert from_state == SymbolState.IDLE
             assert to_state == SymbolState.SCANNING
 
-        machine.register_transition_handler(
-            SymbolState.IDLE, SymbolState.SCANNING, handler
-        )
+        machine.register_transition_handler(SymbolState.IDLE, SymbolState.SCANNING, handler)
 
         machine.transition("NAS100", SymbolState.SCANNING)
 

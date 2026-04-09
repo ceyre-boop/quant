@@ -26,9 +26,7 @@ print()
 # Test trading client
 from alpaca.trading.client import TradingClient
 
-trading = TradingClient(
-    os.getenv("ALPACA_API_KEY"), os.getenv("ALPACA_SECRET_KEY"), paper=True
-)
+trading = TradingClient(os.getenv("ALPACA_API_KEY"), os.getenv("ALPACA_SECRET_KEY"), paper=True)
 account = trading.get_account()
 print(f"Account ID: {account.id}")
 print(f"Equity: ${account.equity}")

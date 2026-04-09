@@ -246,9 +246,7 @@ class DailyLifecycle:
         if self._last_intraday_run:
             elapsed = (now - self._last_intraday_run).total_seconds() / 60
             if elapsed < self.config.intraday_interval_minutes:
-                logger.debug(
-                    f"Skipping intraday cycle, {elapsed:.1f} min since last run"
-                )
+                logger.debug(f"Skipping intraday cycle, {elapsed:.1f} min since last run")
                 return {"skipped": True, "minutes_since_last": elapsed}
 
         logger.info("-" * 60)
@@ -271,9 +269,7 @@ class DailyLifecycle:
                     # Check for entry signals
                     if result.get("entry_signal"):
                         entry_signals.append(result["entry_signal"])
-                        logger.info(
-                            f"ENTRY SIGNAL for {symbol}: {result['entry_signal']}"
-                        )
+                        logger.info(f"ENTRY SIGNAL for {symbol}: {result['entry_signal']}")
 
                 except Exception as e:
                     logger.error(f"Exception processing {symbol}: {e}")
@@ -389,10 +385,7 @@ class DailyLifecycle:
                 bias = self.bias_engine(symbol, features, regime)
                 result["bias"] = bias
                 logger.debug(
-                    f"{symbol} bias: {bias.direction.name if bias else 'None'} "
-                    f"conf={bias.confidence:.2f}"
-                    if bias
-                    else ""
+                    f"{symbol} bias: {bias.direction.name if bias else 'None'} " f"conf={bias.confidence:.2f}" if bias else ""
                 )
             except Exception as e:
                 logger.error(f"Bias engine error for {symbol}: {e}")
@@ -404,9 +397,7 @@ class DailyLifecycle:
             try:
                 game = self.game_engine(symbol, market_data, bias)
                 result["game"] = game
-                logger.debug(
-                    f"{symbol} game: aligned={game.game_state_aligned if game else 'None'}"
-                )
+                logger.debug(f"{symbol} game: aligned={game.game_state_aligned if game else 'None'}")
             except Exception as e:
                 logger.error(f"Game engine error for {symbol}: {e}")
                 result["game_error"] = str(e)
@@ -419,9 +410,7 @@ class DailyLifecycle:
                 market = market_data if isinstance(market_data, MarketData) else None
                 risk = self.risk_engine(symbol, bias, features, account, market)
                 result["risk"] = risk
-                logger.debug(
-                    f"{symbol} risk: EV={risk.expected_value:.2f}" if risk else ""
-                )
+                logger.debug(f"{symbol} risk: EV={risk.expected_value:.2f}" if risk else "")
             except Exception as e:
                 logger.error(f"Risk engine error for {symbol}: {e}")
                 result["risk_error"] = str(e)
@@ -441,11 +430,7 @@ class DailyLifecycle:
         if bias and risk and game:
             try:
                 regime = self._get_default_regime()
-                current_price = (
-                    market_data.current_price
-                    if isinstance(market_data, MarketData)
-                    else None
-                )
+                current_price = market_data.current_price if isinstance(market_data, MarketData) else None
 
                 self.broadcaster.publish_signal(
                     symbol=symbol,
@@ -501,9 +486,7 @@ class DailyLifecycle:
                 phase = self.get_current_phase()
 
                 if phase != self._current_phase:
-                    logger.info(
-                        f"Phase transition: {self._current_phase.value} -> {phase.value}"
-                    )
+                    logger.info(f"Phase transition: {self._current_phase.value} -> {phase.value}")
                     self._handle_phase_transition(phase)
 
                 # Run intraday cycle during regular hours
@@ -668,11 +651,7 @@ def _mock_game_engine(symbol: str, market_data, bias):
 
 def _mock_entry_validator(symbol: str, bias, risk, game):
     """Mock entry validator."""
-    if (
-        bias.confidence >= 0.55
-        and risk.ev_positive
-        and game.adversarial_risk != AdversarialRisk.EXTREME
-    ):
+    if bias.confidence >= 0.55 and risk.ev_positive and game.adversarial_risk != AdversarialRisk.EXTREME:
         return {
             "symbol": symbol,
             "direction": bias.direction.value,

@@ -25,17 +25,13 @@ class FirebaseRESTClient:
         self.project_id = os.getenv("FIREBASE_PROJECT_ID")
 
         if not all([self.api_key, self.database_url]):
-            logger.error(
-                "Firebase configuration missing. Check FIREBASE_API_KEY and FIREBASE_RTDB_URL"
-            )
+            logger.error("Firebase configuration missing. Check FIREBASE_API_KEY and FIREBASE_RTDB_URL")
             self._enabled = False
         else:
             self._enabled = True
             logger.info(f"Firebase REST client initialized for {self.project_id}")
 
-    def _make_request(
-        self, method: str, path: str, data: Dict = None
-    ) -> Optional[Dict]:
+    def _make_request(self, method: str, path: str, data: Dict = None) -> Optional[Dict]:
         """Make HTTP request to Firebase RTDB."""
         if not self._enabled:
             return None
@@ -56,9 +52,7 @@ class FirebaseRESTClient:
             if response.status_code in [200, 201]:
                 return response.json() if response.text else {}
             else:
-                logger.error(
-                    f"Firebase {method} failed: {response.status_code} - {response.text[:200]}"
-                )
+                logger.error(f"Firebase {method} failed: {response.status_code} - {response.text[:200]}")
                 return None
 
         except Exception as e:

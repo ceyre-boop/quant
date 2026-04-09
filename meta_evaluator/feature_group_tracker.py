@@ -33,11 +33,7 @@ class FeatureGroupTracker:
         Args:
             feature_importance: Dict mapping feature group names to importance scores
         """
-        self.baseline_importance = {
-            k: float(v)
-            for k, v in feature_importance.items()
-            if k in self.FEATURE_GROUPS
-        }
+        self.baseline_importance = {k: float(v) for k, v in feature_importance.items() if k in self.FEATURE_GROUPS}
         logger.info(f"Baseline set for {len(self.baseline_importance)} feature groups")
 
     def update_current(self, feature_importance: Dict[str, float]):
@@ -46,11 +42,7 @@ class FeatureGroupTracker:
         Args:
             feature_importance: Dict mapping feature group names to importance scores
         """
-        self.current_importance = {
-            k: float(v)
-            for k, v in feature_importance.items()
-            if k in self.FEATURE_GROUPS
-        }
+        self.current_importance = {k: float(v) for k, v in feature_importance.items() if k in self.FEATURE_GROUPS}
 
         # Add to history
         self.importance_history.append(
@@ -108,9 +100,7 @@ class FeatureGroupTracker:
 
                 if relative_change > self.drift_threshold:
                     drift_entry["drift_detected"] = True
-                    drift_entry["severity"] = (
-                        "HIGH" if relative_change > 0.5 else "MEDIUM"
-                    )
+                    drift_entry["severity"] = "HIGH" if relative_change > 0.5 else "MEDIUM"
                     drifted_features.append(drift_entry)
                     total_drift_score += relative_change
                 else:
@@ -146,16 +136,11 @@ class FeatureGroupTracker:
             status = "HEALTHY"
 
         return {
-            "drift_detected": len(
-                [f for f in drifted_features if f.get("drift_detected")]
-            )
-            > 0,
+            "drift_detected": len([f for f in drifted_features if f.get("drift_detected")]) > 0,
             "status": status,
             "drift_score": round(total_drift_score, 2),
             "features_analyzed": len(self.FEATURE_GROUPS),
-            "features_drifted": len(
-                [f for f in drifted_features if f.get("drift_detected")]
-            ),
+            "features_drifted": len([f for f in drifted_features if f.get("drift_detected")]),
             "high_severity_count": len(high_severity),
             "medium_severity_count": len(medium_severity),
             "feature_details": drifted_features,
@@ -168,11 +153,7 @@ class FeatureGroupTracker:
         Returns:
             List of {date, importance} dicts
         """
-        recent_history = (
-            self.importance_history[-days:]
-            if len(self.importance_history) > days
-            else self.importance_history
-        )
+        recent_history = self.importance_history[-days:] if len(self.importance_history) > days else self.importance_history
 
         return [
             {
@@ -182,9 +163,7 @@ class FeatureGroupTracker:
             for entry in recent_history
         ]
 
-    def get_top_features(
-        self, n: int = 5, use_current: bool = True
-    ) -> List[Dict[str, Any]]:
+    def get_top_features(self, n: int = 5, use_current: bool = True) -> List[Dict[str, Any]]:
         """Get top N most important features.
 
         Args:
@@ -215,17 +194,11 @@ class FeatureGroupTracker:
             "report_date": datetime.now().isoformat(),
             "drift_analysis": drift,
             "current_top_features": self.get_top_features(5, use_current=True),
-            "baseline_top_features": (
-                self.get_top_features(5, use_current=False)
-                if self.baseline_importance
-                else []
-            ),
+            "baseline_top_features": (self.get_top_features(5, use_current=False) if self.baseline_importance else []),
             "summary": {
                 "total_features_tracked": len(self.FEATURE_GROUPS),
                 "baseline_established": bool(self.baseline_importance),
                 "days_of_history": len(self.importance_history),
-                "recommendation": (
-                    "REFIT" if drift["status"] in ["CRITICAL", "WARNING"] else "MONITOR"
-                ),
+                "recommendation": ("REFIT" if drift["status"] in ["CRITICAL", "WARNING"] else "MONITOR"),
             },
         }

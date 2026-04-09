@@ -76,9 +76,7 @@ class AlpacaDataClient:
     }
 
     # Flat list for batch fetch - deduplicated
-    ALL_SYMBOLS = list(
-        dict.fromkeys([s for group in ASSET_UNIVERSE.values() for s in group])
-    )
+    ALL_SYMBOLS = list(dict.fromkeys([s for group in ASSET_UNIVERSE.values() for s in group]))
 
     # Legacy compatibility
     MAJOR_ASSETS = ALL_SYMBOLS
@@ -134,9 +132,7 @@ class AlpacaDataClient:
         """
         # Map futures symbols to ETF proxies
         if symbol in self.FUTURES_PROXIES:
-            print(
-                f"[Alpaca] Mapping {symbol} -> {self.FUTURES_PROXIES[symbol]} (futures proxy)"
-            )
+            print(f"[Alpaca] Mapping {symbol} -> {self.FUTURES_PROXIES[symbol]} (futures proxy)")
             symbol = self.FUTURES_PROXIES[symbol]
 
         # Calculate date range
@@ -224,9 +220,7 @@ class AlpacaDataClient:
             .dropna()
         )
 
-    def get_multiple_assets(
-        self, symbols: List[str], timeframe: str = "1H", days: int = 90
-    ) -> dict:
+    def get_multiple_assets(self, symbols: List[str], timeframe: str = "1H", days: int = 90) -> dict:
         """
         Get data for multiple assets.
 
@@ -251,9 +245,7 @@ class AlpacaDataClient:
 
     def get_all_assets(self, timeframe: str = "1D", days: int = 365) -> dict:
         """Fetch the full expanded asset universe (57 unique symbols)"""
-        print(
-            f"[Alpaca] Fetching {len(self.ALL_SYMBOLS)} assets ({timeframe}, {days} days)..."
-        )
+        print(f"[Alpaca] Fetching {len(self.ALL_SYMBOLS)} assets ({timeframe}, {days} days)...")
         return self.get_multiple_assets(self.ALL_SYMBOLS, timeframe, days)
 
     def get_latest_price(self, symbol: str) -> Optional[float]:
@@ -308,9 +300,7 @@ def test_client():
         print(f"{sym}: {len(df)} bars")
 
     # Test expanded universe (57 symbols)
-    print(
-        f"\n=== Test 5: Full Asset Universe ({len(client.ALL_SYMBOLS)} symbols, 90 days) ==="
-    )
+    print(f"\n=== Test 5: Full Asset Universe ({len(client.ALL_SYMBOLS)} symbols, 90 days) ===")
     print("Groups:", list(client.ASSET_UNIVERSE.keys()))
     all_data = client.get_all_assets(timeframe="1D", days=90)
     print(f"Successfully fetched: {len(all_data)}/{len(client.ALL_SYMBOLS)} assets")

@@ -203,19 +203,14 @@ def select_best_entry_model(
     qualified = {
         model_id: score
         for model_id, score in scores.items()
-        if score["confidence"] >= min_confidence
-        and score["expected_R"] >= min_expected_r
+        if score["confidence"] >= min_confidence and score["expected_R"] >= min_expected_r
     }
 
     if not qualified:
         return {
             "selected": None,
             "reason": "no_models_meet_thresholds",
-            "best_attempt": (
-                max(scores.items(), key=lambda x: x[1]["expected_R"])[0]
-                if scores
-                else None
-            ),
+            "best_attempt": (max(scores.items(), key=lambda x: x[1]["expected_R"])[0] if scores else None),
         }
 
     # Select by expected R weighted by confidence

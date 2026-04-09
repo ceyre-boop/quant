@@ -55,9 +55,7 @@ class LiquidityMap:
     def __init__(self, tolerance_atr_pct: float = 0.15):
         self.tolerance_atr_pct = tolerance_atr_pct
 
-    def build_liquidity_map(
-        self, ohlcv: pd.DataFrame, atr: float
-    ) -> Dict[str, List[LiquidityPool]]:
+    def build_liquidity_map(self, ohlcv: pd.DataFrame, atr: float) -> Dict[str, List[LiquidityPool]]:
         """Build liquidity map from OHLCV data.
 
         Args:
@@ -142,9 +140,7 @@ class LiquidityMap:
 
         return clusters
 
-    def _is_swept(
-        self, price: float, ohlcv: pd.DataFrame, atr: float, level_type: str
-    ) -> bool:
+    def _is_swept(self, price: float, ohlcv: pd.DataFrame, atr: float, level_type: str) -> bool:
         """Check if a liquidity pool has been swept."""
         if len(ohlcv) < 4:
             return False
@@ -164,9 +160,7 @@ class LiquidityMap:
 
         return False
 
-    def compute_draw_probability(
-        self, pool: LiquidityPool, bias: BiasOutput, current_price: float
-    ) -> float:
+    def compute_draw_probability(self, pool: LiquidityPool, bias: BiasOutput, current_price: float) -> float:
         """Compute probability of price being drawn to pool.
 
         Uses sigmoid function based on:
@@ -197,9 +191,7 @@ class LiquidityMap:
 class TrappedPositionDetector:
     """Detect trapped positions and estimate forced moves."""
 
-    def detect_trapped_longs(
-        self, ohlcv: pd.DataFrame, vwap_history: Optional[List[float]] = None
-    ) -> List[TrappedPosition]:
+    def detect_trapped_longs(self, ohlcv: pd.DataFrame, vwap_history: Optional[List[float]] = None) -> List[TrappedPosition]:
         """Detect trapped long positions.
 
         Longs are trapped when:
@@ -232,9 +224,7 @@ class TrappedPositionDetector:
 
         return trapped
 
-    def detect_trapped_shorts(
-        self, ohlcv: pd.DataFrame, vwap_history: Optional[List[float]] = None
-    ) -> List[TrappedPosition]:
+    def detect_trapped_shorts(self, ohlcv: pd.DataFrame, vwap_history: Optional[List[float]] = None) -> List[TrappedPosition]:
         """Detect trapped short positions."""
         if ohlcv.empty:
             return []
@@ -281,9 +271,7 @@ class TrappedPositionDetector:
 class AdversarialLevelModel:
     """Nash equilibrium zone detection."""
 
-    def compute_nash_zones(
-        self, ohlcv: pd.DataFrame, volume_profile: Optional[Dict] = None
-    ) -> List[NashZone]:
+    def compute_nash_zones(self, ohlcv: pd.DataFrame, volume_profile: Optional[Dict] = None) -> List[NashZone]:
         """Compute Nash equilibrium zones.
 
         Zones are where multiple strategies converge:
@@ -394,9 +382,7 @@ class GameEngine:
         self.nash_model = AdversarialLevelModel()
         self.order_flow = OrderFlowAnalyzer()
 
-    def analyze(
-        self, ohlcv: pd.DataFrame, bias: BiasOutput, current_price: float
-    ) -> Dict[str, Any]:
+    def analyze(self, ohlcv: pd.DataFrame, bias: BiasOutput, current_price: float) -> Dict[str, Any]:
         """Run complete game-theoretic analysis.
 
         Returns:
@@ -414,37 +400,27 @@ class GameEngine:
         # Calculate draw probabilities
         for pool_list in liquidity_map.values():
             for pool in pool_list:
-                pool.draw_probability = self.liquidity_mapper.compute_draw_probability(
-                    pool, bias, current_price
-                )
+                pool.draw_probability = self.liquidity_mapper.compute_draw_probability(pool, bias, current_price)
 
         # Find nearest unswept pool
         all_pools = liquidity_map["equal_highs"] + liquidity_map["equal_lows"]
         unswept = [p for p in all_pools if not p.swept]
-        nearest_unswept = (
-            max(unswept, key=lambda p: p.draw_probability) if unswept else None
-        )
+        nearest_unswept = max(unswept, key=lambda p: p.draw_probability) if unswept else None
 
         # Detect trapped positions
         trapped_longs = self.trapped_detector.detect_trapped_longs(ohlcv)
         trapped_shorts = self.trapped_detector.detect_trapped_shorts(ohlcv)
 
-        squeeze_prob = self.trapped_detector.calculate_squeeze_probability(
-            trapped_longs, trapped_shorts
-        )
+        squeeze_prob = self.trapped_detector.calculate_squeeze_probability(trapped_longs, trapped_shorts)
 
         # Find Nash zones
         nash_zones = self.nash_model.compute_nash_zones(ohlcv)
 
         # Determine game state alignment
-        game_aligned = self._check_alignment(
-            bias, liquidity_map, trapped_longs, trapped_shorts
-        )
+        game_aligned = self._check_alignment(bias, liquidity_map, trapped_longs, trapped_shorts)
 
         # Determine adversarial risk
-        adversarial_risk = self._calculate_adversarial_risk(
-            squeeze_prob, len(trapped_longs) + len(trapped_shorts)
-        )
+        adversarial_risk = self._calculate_adversarial_risk(squeeze_prob, len(trapped_longs) + len(trapped_shorts))
 
         return {
             "liquidity_map": liquidity_map,
@@ -458,9 +434,7 @@ class GameEngine:
             "nash_zones": nash_zones,
             "kyle_lambda": 0.0,  # Would need trade data
             "game_state_aligned": game_aligned,
-            "game_state_summary": self._generate_summary(
-                liquidity_map, trapped_longs, trapped_shorts
-            ),
+            "game_state_summary": self._generate_summary(liquidity_map, trapped_longs, trapped_shorts),
             "adversarial_risk": adversarial_risk,
         }
 
@@ -486,19 +460,13 @@ class GameEngine:
     ) -> bool:
         """Check if game state aligns with bias."""
         # Aligned if bias direction matches trapped positions
-        if (
-            bias.direction.value == 1 and trapped_shorts
-        ):  # Long bias + trapped shorts = aligned
+        if bias.direction.value == 1 and trapped_shorts:  # Long bias + trapped shorts = aligned
             return True
-        if (
-            bias.direction.value == -1 and trapped_longs
-        ):  # Short bias + trapped longs = aligned
+        if bias.direction.value == -1 and trapped_longs:  # Short bias + trapped longs = aligned
             return True
         return False
 
-    def _calculate_adversarial_risk(
-        self, squeeze_prob: float, trapped_count: int
-    ) -> str:
+    def _calculate_adversarial_risk(self, squeeze_prob: float, trapped_count: int) -> str:
         """Calculate adversarial risk level."""
         if squeeze_prob > 0.65 or trapped_count > 5:
             return AdversarialRisk.EXTREME.value
@@ -508,9 +476,7 @@ class GameEngine:
             return AdversarialRisk.MEDIUM.value
         return AdversarialRisk.LOW.value
 
-    def _generate_summary(
-        self, liquidity_map: Dict, trapped_longs: List, trapped_shorts: List
-    ) -> str:
+    def _generate_summary(self, liquidity_map: Dict, trapped_longs: List, trapped_shorts: List) -> str:
         """Generate human-readable summary."""
         parts = []
 
@@ -519,12 +485,8 @@ class GameEngine:
         if trapped_longs:
             parts.append("LONGS_TRAPPED")
 
-        unswept_highs = sum(
-            1 for p in liquidity_map.get("equal_highs", []) if not p.swept
-        )
-        unswept_lows = sum(
-            1 for p in liquidity_map.get("equal_lows", []) if not p.swept
-        )
+        unswept_highs = sum(1 for p in liquidity_map.get("equal_highs", []) if not p.swept)
+        unswept_lows = sum(1 for p in liquidity_map.get("equal_lows", []) if not p.swept)
 
         if unswept_highs > 0:
             parts.append(f"{unswept_highs}_UNSWEPT_HIGHS")

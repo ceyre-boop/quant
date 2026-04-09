@@ -153,26 +153,16 @@ class BacktestLifecycle:
                 spread=0.02,
                 volume_24h=current_bar["volume"],
                 atr_14=self._calculate_atr(bars, i),
-                timestamp=(
-                    current_bar.name if hasattr(current_bar, "name") else datetime.now()
-                ),
+                timestamp=(current_bar.name if hasattr(current_bar, "name") else datetime.now()),
             )
 
             # Build features
-            features = self.feature_builder.build(
-                symbol, market_data, bars.iloc[: i + 1]
-            )
+            features = self.feature_builder.build(symbol, market_data, bars.iloc[: i + 1])
 
             # Inject macro-regime stress features
-            bar_date = (
-                current_bar.name if hasattr(current_bar, "name") else datetime.now()
-            )
+            bar_date = current_bar.name if hasattr(current_bar, "name") else datetime.now()
             recent_returns = bars["close"].pct_change().dropna().tolist()
-            vix_level = (
-                features.features.get("vix_level", 20.0)
-                if hasattr(features, "features")
-                else 20.0
-            )
+            vix_level = features.features.get("vix_level", 20.0) if hasattr(features, "features") else 20.0
             macro_features = self._get_daily_macro(bar_date, recent_returns, vix_level)
             if hasattr(features, "features"):
                 features.features.update(macro_features)
@@ -186,9 +176,7 @@ class BacktestLifecycle:
 
             # Layer 2: Risk (simplified account)
             account = self._create_mock_account()
-            risk = self.risk_engine.calculate(
-                symbol, bias, features, account, market_data
-            )
+            risk = self.risk_engine.calculate(symbol, bias, features, account, market_data)
 
             # Layer 3: Game Theory
             game = self.game_engine.analyze(symbol, bias, risk, market_data)
@@ -197,18 +185,12 @@ class BacktestLifecycle:
             signal = {
                 "date": market_data.timestamp,
                 "symbol": symbol,
-                "direction": (
-                    bias.direction.value
-                    if hasattr(bias.direction, "value")
-                    else str(bias.direction)
-                ),
+                "direction": (bias.direction.value if hasattr(bias.direction, "value") else str(bias.direction)),
                 "confidence": bias.confidence,
                 "entry_price": market_data.current_price,
                 "stop_price": risk.stop_price,
                 "tp1_price": risk.tp1_price,
-                "game_score": (
-                    game.composite_score if hasattr(game, "composite_score") else 0.5
-                ),
+                "game_score": (game.composite_score if hasattr(game, "composite_score") else 0.5),
                 "features": features.features if hasattr(features, "features") else {},
                 **macro_features,
             }
@@ -229,24 +211,16 @@ class BacktestLifecycle:
                 trade = BacktestTrade(
                     symbol=symbol,
                     entry_date=market_data.timestamp,
-                    exit_date=(
-                        next_bar.name if hasattr(next_bar, "name") else datetime.now()
-                    ),
+                    exit_date=(next_bar.name if hasattr(next_bar, "name") else datetime.now()),
                     entry_price=market_data.current_price,
                     exit_price=exit_price,
                     direction=bias.direction,
-                    position_size=(
-                        risk.position_size if hasattr(risk, "position_size") else 1.0
-                    ),
+                    position_size=(risk.position_size if hasattr(risk, "position_size") else 1.0),
                     pnl=pnl,
                     pnl_pct=pnl_pct,
                     features=features.features if hasattr(features, "features") else {},
                     bias_confidence=bias.confidence,
-                    game_score=(
-                        game.composite_score
-                        if hasattr(game, "composite_score")
-                        else 0.5
-                    ),
+                    game_score=(game.composite_score if hasattr(game, "composite_score") else 0.5),
                 )
                 self.trades.append(trade)
 
@@ -349,9 +323,7 @@ class BacktestLifecycle:
 
         return stats
 
-    def _calculate_sharpe(
-        self, returns: List[float], risk_free_rate: float = 0.0
-    ) -> float:
+    def _calculate_sharpe(self, returns: List[float], risk_free_rate: float = 0.0) -> float:
         """Calculate Sharpe ratio."""
         if not returns:
             return 0.0

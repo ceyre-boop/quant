@@ -72,11 +72,7 @@ class XGBoostEntrySignal:
             if prediction == 1:  # Model predicts UP
                 # Calculate entry parameters
                 current_price = df["close"].iloc[-1]
-                atr = (
-                    features_df["atr_pct"].iloc[-1]
-                    if "atr_pct" in features_df
-                    else 0.02
-                )
+                atr = features_df["atr_pct"].iloc[-1] if "atr_pct" in features_df else 0.02
 
                 # Risk-based stop (1R = 1x ATR)
                 stop_distance = current_price * atr
@@ -101,9 +97,7 @@ class XGBoostEntrySignal:
                     "model": "XGBoost_v1",
                 }
                 signals.append(signal)
-                print(
-                    f"[SIGNAL] {symbol} LONG @ ${current_price:.2f} (prob: {proba:.2%})"
-                )
+                print(f"[SIGNAL] {symbol} LONG @ ${current_price:.2f} (prob: {proba:.2%})")
 
         print(f"[XGBBridge] Generated {len(signals)} signals")
         return signals
@@ -204,9 +198,7 @@ class XGBoostPaperTrader:
         self.paper_engine.daily_trades += 1
 
         print(f"[EXECUTED] {symbol} LONG {shares} shares @ ${entry_price:.2f}")
-        print(
-            f"           Stop: ${stop_loss:.2f} | TP1: ${signal['take_profit_1']:.2f}"
-        )
+        print(f"           Stop: ${stop_loss:.2f} | TP1: ${signal['take_profit_1']:.2f}")
 
     def update_positions(self):
         """Update all positions with current prices and check exits"""

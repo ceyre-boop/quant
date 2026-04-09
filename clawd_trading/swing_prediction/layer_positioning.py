@@ -42,9 +42,7 @@ class PositioningLayer:
         self.logger = logging.getLogger(__name__)
         self.config = config["layer_b_positioning"]
 
-    def compute_equity_positioning(
-        self, symbol: str, options_data: dict, sentiment_data: dict
-    ) -> dict:
+    def compute_equity_positioning(self, symbol: str, options_data: dict, sentiment_data: dict) -> dict:
         """
         For equity indices (no COT equivalent), use three proxies:
 
@@ -112,18 +110,14 @@ class PositioningLayer:
 
         # Weighted composite
         if scores:
-            composite = sum(
-                s * w for s, w in zip(scores, weights[: len(scores)])
-            ) / sum(weights[: len(scores)])
+            composite = sum(s * w for s, w in zip(scores, weights[: len(scores)])) / sum(weights[: len(scores)])
         else:
             composite = 0
 
         return {
             "symbol": symbol,
             "composite_score": round((composite + 3) / 6, 4),  # Normalize to 0-1
-            "direction_bias": (
-                "LONG" if composite < -1 else "SHORT" if composite > 1 else "NEUTRAL"
-            ),
+            "direction_bias": ("LONG" if composite < -1 else "SHORT" if composite > 1 else "NEUTRAL"),
             "signal_strength": self._get_signal_strength(abs(composite)),
             "details": details,
             "timestamp": datetime.now().isoformat(),
@@ -187,9 +181,7 @@ class PositioningLayer:
             options_data = data.get("options", {})
             sentiment_data = data.get("sentiment", {})
 
-            result = self.compute_equity_positioning(
-                symbol, options_data, sentiment_data
-            )
+            result = self.compute_equity_positioning(symbol, options_data, sentiment_data)
 
             return PositioningResult(
                 symbol=symbol,
@@ -232,9 +224,7 @@ class PositioningLayer:
 
         # Weighted composite
         total_weight = sum(w for _, w in signals)
-        composite = (
-            sum(s * w for s, w in signals) / total_weight if total_weight > 0 else 0
-        )
+        composite = sum(s * w for s, w in signals) / total_weight if total_weight > 0 else 0
 
         # Determine direction (contrarian interpretation)
         if composite <= -1.5:

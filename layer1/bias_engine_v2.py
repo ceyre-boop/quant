@@ -166,9 +166,7 @@ class XGBoostBiasModel:
         """Extract features in model's expected order."""
         return [features.get(name, 0.0) for name in self.FEATURE_NAMES]
 
-    def _fallback_prediction(
-        self, features: Dict[str, float]
-    ) -> Tuple[Direction, float]:
+    def _fallback_prediction(self, features: Dict[str, float]) -> Tuple[Direction, float]:
         """Fallback heuristic prediction when XGBoost unavailable."""
         # Simple trend + momentum heuristic
         trend_score = (
@@ -177,9 +175,7 @@ class XGBoostBiasModel:
             + features.get("macd_histogram", 0) / 100 * 0.3
         )
 
-        momentum_score = (features.get("rsi_14", 50) - 50) / 50 * 0.3 + features.get(
-            "rsi_slope_5", 0
-        ) * 0.1
+        momentum_score = (features.get("rsi_14", 50) - 50) / 50 * 0.3 + features.get("rsi_slope_5", 0) * 0.1
 
         total_score = trend_score + momentum_score
 
@@ -197,9 +193,7 @@ class XGBoostBiasModel:
 
         try:
             importance = self.model.feature_importances_
-            return {
-                name: float(imp) for name, imp in zip(self.FEATURE_NAMES, importance)
-            }
+            return {name: float(imp) for name, imp in zip(self.FEATURE_NAMES, importance)}
         except Exception as e:
             logger.error(f"Failed to get feature importance: {e}")
             return {}
@@ -224,9 +218,7 @@ class SHAPExplainer:
             return self._fallback_explanation(features)
 
         try:
-            feature_vector = [
-                features.get(name, 0.0) for name in XGBoostBiasModel.FEATURE_NAMES
-            ]
+            feature_vector = [features.get(name, 0.0) for name in XGBoostBiasModel.FEATURE_NAMES]
             X = np.array([feature_vector])
 
             shap_values = self.explainer.shap_values(X)
@@ -236,10 +228,7 @@ class SHAPExplainer:
                 shap_values = shap_values[0]  # Binary classification case
 
             # Map to feature names and group by category
-            feature_shap = {
-                name: float(val)
-                for name, val in zip(XGBoostBiasModel.FEATURE_NAMES, shap_values[0])
-            }
+            feature_shap = {name: float(val) for name, val in zip(XGBoostBiasModel.FEATURE_NAMES, shap_values[0])}
 
             # Group into feature groups
             return self._group_by_category(feature_shap)
@@ -261,9 +250,7 @@ class SHAPExplainer:
 
         importances = {}
         for group, feature_names in groups.items():
-            group_importance = sum(
-                abs(features.get(f, 0)) for f in feature_names
-            ) / len(feature_names)
+            group_importance = sum(abs(features.get(f, 0)) for f in feature_names) / len(feature_names)
             importances[group] = group_importance
 
         # Normalize
@@ -327,9 +314,7 @@ class BiasEngineV2:
         self.model_version = self.model.model_version
         self.logger = logging.getLogger(__name__)
 
-    def get_daily_bias(
-        self, symbol: str, features: Dict[str, float], regime: RegimeState
-    ) -> BiasOutput:
+    def get_daily_bias(self, symbol: str, features: Dict[str, float], regime: RegimeState) -> BiasOutput:
         """Generate daily bias prediction using XGBoost.
 
         Args:
@@ -373,9 +358,7 @@ class BiasEngineV2:
             feature_snapshot=feature_snapshot,
         )
 
-    def _determine_magnitude(
-        self, confidence: float, features: Dict[str, float]
-    ) -> Magnitude:
+    def _determine_magnitude(self, confidence: float, features: Dict[str, float]) -> Magnitude:
         """Determine bias magnitude."""
         adx = features.get("adx_14", 0)
 
@@ -394,16 +377,12 @@ class BiasEngineV2:
             return True
         return False
 
-    def _generate_rationale(
-        self, shap_importance: Dict[str, float], features: Dict[str, float]
-    ) -> List[str]:
+    def _generate_rationale(self, shap_importance: Dict[str, float], features: Dict[str, float]) -> List[str]:
         """Generate rationale from SHAP importance."""
         rationale = []
 
         # Sort by importance
-        sorted_groups = sorted(
-            shap_importance.items(), key=lambda x: x[1], reverse=True
-        )
+        sorted_groups = sorted(shap_importance.items(), key=lambda x: x[1], reverse=True)
 
         # Include top 3 feature groups
         for group_name, importance in sorted_groups[:3]:
@@ -424,11 +403,9 @@ class BiasEngineV2:
             "MOMENTUM_SHIFT": abs(features.get("rsi_slope_5", 0)) > 3,
             "SUPPORT_RESISTANCE": (
                 features.get("distance_to_support", 999) < features.get("atr_14", 1)
-                or features.get("distance_to_resistance", 999)
-                < features.get("atr_14", 1)
+                or features.get("distance_to_resistance", 999) < features.get("atr_14", 1)
             ),
-            "MARKET_BREADTH": features.get("market_breadth_ratio", 1) > 1.5
-            or features.get("market_breadth_ratio", 1) < 0.7,
+            "MARKET_BREADTH": features.get("market_breadth_ratio", 1) > 1.5 or features.get("market_breadth_ratio", 1) < 0.7,
             "SENTIMENT_EXTREME": features.get("vix_level", 20) > 25,
         }
 
