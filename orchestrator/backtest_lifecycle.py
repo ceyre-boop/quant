@@ -26,6 +26,7 @@ from layer1.bias_engine import BiasEngine
 from layer1.feature_builder import FeatureBuilder
 from layer2.risk_engine import RiskEngine
 from layer3.game_engine import GameEngine
+from layer3.macro_imbalance import MacroImbalanceFramework
 from contracts.types import MarketData, Direction, BiasOutput, RiskOutput, GameOutput
 
 
@@ -81,6 +82,7 @@ class BacktestLifecycle:
         self.feature_builder = FeatureBuilder()
         self.risk_engine = RiskEngine()
         self.game_engine = GameEngine()
+        self.macro_framework = MacroImbalanceFramework()
 
         # Results storage
         self.trades: List[BacktestTrade] = []
@@ -161,6 +163,20 @@ class BacktestLifecycle:
                 symbol, market_data, bars.iloc[: i + 1]
             )
 
+            # Inject macro-regime stress features
+            bar_date = (
+                current_bar.name if hasattr(current_bar, "name") else datetime.now()
+            )
+            recent_returns = bars["close"].pct_change().dropna().tolist()
+            vix_level = (
+                features.features.get("vix_level", 20.0)
+                if hasattr(features, "features")
+                else 20.0
+            )
+            macro_features = self._get_daily_macro(bar_date, recent_returns, vix_level)
+            if hasattr(features, "features"):
+                features.features.update(macro_features)
+
             # Layer 1: Bias
             bias = self.bias_engine.predict(symbol, features, features.regime)
 
@@ -194,6 +210,7 @@ class BacktestLifecycle:
                     game.composite_score if hasattr(game, "composite_score") else 0.5
                 ),
                 "features": features.features if hasattr(features, "features") else {},
+                **macro_features,
             }
             self.signals.append(signal)
 
@@ -232,6 +249,43 @@ class BacktestLifecycle:
                     ),
                 )
                 self.trades.append(trade)
+
+    def _get_daily_macro(
+        self,
+        date: datetime,
+        recent_returns: List[float],
+        vix_level: float = 20.0,
+    ) -> dict:
+        """Simulate dynamic macro conditions for a backtest bar.
+
+        Uses :class:`~layer3.macro_imbalance.MacroImbalanceFramework` in
+        simulation mode to generate plausible values for:
+            - ``hmm_regime_stress``
+            - ``pca_mahalanobis``
+            - ``recession_prob_12m``
+
+        These are injected into the daily feature vector so XGBoost can learn
+        that certain setups fail more frequently during high stress states.
+
+        Parameters
+        ----------
+        date : datetime
+            The date of the current bar.
+        recent_returns : list[float]
+            Recent daily close-to-close returns for realised-vol estimation.
+        vix_level : float
+            VIX level from the feature record (default 20.0).
+
+        Returns
+        -------
+        dict
+            ``{hmm_regime_stress, pca_mahalanobis, recession_prob_12m}``
+        """
+        return self.macro_framework.simulate_macro(
+            date=date,
+            recent_returns=recent_returns,
+            vix_level=vix_level,
+        )
 
     def _calculate_atr(self, bars: pd.DataFrame, idx: int, period: int = 14) -> float:
         """Calculate ATR for a given bar."""

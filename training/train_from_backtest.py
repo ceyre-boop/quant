@@ -61,6 +61,16 @@ def prepare_features(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.Series]:
         df["entry_price_norm"] = df["entry_price"] / df["entry_price"].mean()
         feature_cols.append("entry_price_norm")
 
+    # Macro-regime stress features (injected by backtest lifecycle)
+    # These allow XGBoost to learn that setups fail more often during
+    # high HMM stress states or elevated recession probability.
+    for macro_col in ("hmm_regime_stress", "pca_mahalanobis", "recession_prob_12m"):
+        if macro_col in df.columns:
+            feature_cols.append(macro_col)
+            print(f"[TRAIN] Macro feature '{macro_col}' detected — including in model.")
+        else:
+            print(f"[TRAIN] Macro feature '{macro_col}' not found — skipping.")
+
     # Create target: simulate outcome
     # For simplicity, use random outcome with bias toward direction
     # In real backtest, you'd have actual next-day returns
