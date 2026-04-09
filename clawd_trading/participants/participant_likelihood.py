@@ -4,6 +4,7 @@ Participant Likelihood Model for Clawd Trading
 Classifies market participants based on microstructure features.
 Returns probability distribution over participant types.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -16,21 +17,24 @@ from .participant_features import ParticipantFeatureVector
 @dataclass(frozen=True)
 class ParticipantLikelihood:
     """Likelihood of a specific participant type being active."""
+
     type: ParticipantType
     probability: float
     evidence: Dict[str, Any]
 
 
-def classify_participants(features: ParticipantFeatureVector) -> List[ParticipantLikelihood]:
+def classify_participants(
+    features: ParticipantFeatureVector,
+) -> List[ParticipantLikelihood]:
     """
     Classify participant type likelihoods from feature vector.
-    
+
     Uses deterministic rule-based scoring (no ML required).
     Returns sorted list of ParticipantLikelihood objects.
-    
+
     Args:
         features: ParticipantFeatureVector from extract_participant_features()
-    
+
     Returns:
         List of ParticipantLikelihood, sorted by ParticipantType name
     """
@@ -51,8 +55,12 @@ def classify_participants(features: ParticipantFeatureVector) -> List[Participan
         evidence[ParticipantType.MARKET_MAKER]["high_absorption_ratio"] = True
         evidence[ParticipantType.MARKET_MAKER]["low_sweep_intensity"] = True
     else:
-        evidence[ParticipantType.MARKET_MAKER]["high_absorption_ratio"] = features.absorption_ratio > 1.5
-        evidence[ParticipantType.MARKET_MAKER]["low_sweep_intensity"] = features.sweep_intensity < 2.0
+        evidence[ParticipantType.MARKET_MAKER]["high_absorption_ratio"] = (
+            features.absorption_ratio > 1.5
+        )
+        evidence[ParticipantType.MARKET_MAKER]["low_sweep_intensity"] = (
+            features.sweep_intensity < 2.0
+        )
 
     # ALGO: high orderflow_velocity, high volatility_reaction
     if features.orderflow_velocity > 4.0 and features.volatility_reaction > 1.5:
@@ -60,15 +68,21 @@ def classify_participants(features: ParticipantFeatureVector) -> List[Participan
         evidence[ParticipantType.ALGO]["high_orderflow_velocity"] = True
         evidence[ParticipantType.ALGO]["high_volatility_reaction"] = True
     else:
-        evidence[ParticipantType.ALGO]["high_orderflow_velocity"] = features.orderflow_velocity > 4.0
-        evidence[ParticipantType.ALGO]["high_volatility_reaction"] = features.volatility_reaction > 1.5
+        evidence[ParticipantType.ALGO]["high_orderflow_velocity"] = (
+            features.orderflow_velocity > 4.0
+        )
+        evidence[ParticipantType.ALGO]["high_volatility_reaction"] = (
+            features.volatility_reaction > 1.5
+        )
 
     # LIQUIDITY_HUNTER: high liquidity_removal_rate
     if features.liquidity_removal_rate > 3.0:
         scores[ParticipantType.LIQUIDITY_HUNTER] += 2.0
         evidence[ParticipantType.LIQUIDITY_HUNTER]["high_liquidity_removal_rate"] = True
     else:
-        evidence[ParticipantType.LIQUIDITY_HUNTER]["high_liquidity_removal_rate"] = False
+        evidence[ParticipantType.LIQUIDITY_HUNTER][
+            "high_liquidity_removal_rate"
+        ] = False
 
     # RETAIL: open, low volatility
     if features.time_of_day_bias == "open" and features.volatility_reaction < 1.2:
@@ -76,7 +90,8 @@ def classify_participants(features: ParticipantFeatureVector) -> List[Participan
         evidence[ParticipantType.RETAIL]["open_and_low_volatility"] = True
     else:
         evidence[ParticipantType.RETAIL]["open_and_low_volatility"] = (
-            features.time_of_day_bias == "open" and features.volatility_reaction < 1.2)
+            features.time_of_day_bias == "open" and features.volatility_reaction < 1.2
+        )
 
     # NEWS_ALGO: news window during, high volatility
     if features.news_window_behavior == "during" and features.volatility_reaction > 1.5:
@@ -84,7 +99,9 @@ def classify_participants(features: ParticipantFeatureVector) -> List[Participan
         evidence[ParticipantType.NEWS_ALGO]["news_during_and_high_volatility"] = True
     else:
         evidence[ParticipantType.NEWS_ALGO]["news_during_and_high_volatility"] = (
-            features.news_window_behavior == "during" and features.volatility_reaction > 1.5)
+            features.news_window_behavior == "during"
+            and features.volatility_reaction > 1.5
+        )
 
     # FUND: mid, neutral vol
     if features.time_of_day_bias == "mid" and 0.8 < features.volatility_reaction < 1.3:
@@ -92,7 +109,9 @@ def classify_participants(features: ParticipantFeatureVector) -> List[Participan
         evidence[ParticipantType.FUND]["mid_neutral_vol"] = True
     else:
         evidence[ParticipantType.FUND]["mid_neutral_vol"] = (
-            features.time_of_day_bias == "mid" and 0.8 < features.volatility_reaction < 1.3)
+            features.time_of_day_bias == "mid"
+            and 0.8 < features.volatility_reaction < 1.3
+        )
 
     # Normalize to probabilities
     total = sum(scores.values())
@@ -104,22 +123,22 @@ def classify_participants(features: ParticipantFeatureVector) -> List[Participan
     # Build output, sorted by ParticipantType name
     likelihoods = [
         ParticipantLikelihood(
-            type=ptype, 
-            probability=norm_scores[ptype], 
-            evidence=evidence[ptype]
+            type=ptype, probability=norm_scores[ptype], evidence=evidence[ptype]
         )
         for ptype in sorted(ParticipantType, key=lambda x: x.name)
     ]
     return likelihoods
 
 
-def get_dominant_participant(likelihoods: List[ParticipantLikelihood]) -> ParticipantLikelihood:
+def get_dominant_participant(
+    likelihoods: List[ParticipantLikelihood],
+) -> ParticipantLikelihood:
     """
     Get the participant type with highest probability.
-    
+
     Args:
         likelihoods: List from classify_participants()
-    
+
     Returns:
         ParticipantLikelihood with max probability
     """
@@ -127,18 +146,18 @@ def get_dominant_participant(likelihoods: List[ParticipantLikelihood]) -> Partic
 
 
 def has_participant_type(
-    likelihoods: List[ParticipantLikelihood], 
+    likelihoods: List[ParticipantLikelihood],
     ptype: ParticipantType,
-    threshold: float = 0.15
+    threshold: float = 0.15,
 ) -> bool:
     """
     Check if a participant type exceeds probability threshold.
-    
+
     Args:
         likelihoods: List from classify_participants()
         ptype: ParticipantType to check
         threshold: Minimum probability (default 0.15)
-    
+
     Returns:
         True if participant type probability >= threshold
     """

@@ -2,10 +2,12 @@
 """
 Apply 8 critical fixes to CLAWD Trading System
 """
+
 import os
 import json
 
 BASE = r"C:\Users\Admin\clawd\quant"
+
 
 def write_file(rel_path, content):
     path = os.path.join(BASE, rel_path)
@@ -13,6 +15,7 @@ def write_file(rel_path, content):
     with open(path, "w") as f:
         f.write(content)
     print(f"  [OK] {rel_path}")
+
 
 def patch_file(rel_path, old, new, description=""):
     path = os.path.join(BASE, rel_path)
@@ -22,47 +25,96 @@ def patch_file(rel_path, old, new, description=""):
     except FileNotFoundError:
         print(f"  [WARN] {rel_path}: file not found")
         return False
-    
+
     if old not in content:
         print(f"  [WARN] {rel_path}: pattern not found for '{description}'")
         return False
-    
+
     content = content.replace(old, new, 1)
     with open(path, "w") as f:
         f.write(content)
     print(f"  [OK] {rel_path}: {description}")
     return True
 
+
 # FIX 1: Create config/swing_params.json
 print("\n[FIX 1] Creating config/swing_params.json")
 
 swing_params = {
     "symbol_universe": {
-        "equities": ["SPY", "QQQ", "DIA", "IWM", "AAPL", "MSFT", "NVDA", "TSLA", "AMZN", "GOOGL", "META"],
+        "equities": [
+            "SPY",
+            "QQQ",
+            "DIA",
+            "IWM",
+            "AAPL",
+            "MSFT",
+            "NVDA",
+            "TSLA",
+            "AMZN",
+            "GOOGL",
+            "META",
+        ],
         "forex": ["EURUSD", "GBPUSD", "USDJPY"],
         "commodities": ["XAUUSD", "GLD", "USO", "SLV"],
-        "crypto": ["BTCUSD", "ETHUSD"]
+        "crypto": ["BTCUSD", "ETHUSD"],
     },
     "layer_a_fair_value": {
-        "z_score_thresholds": {"weak": 0.5, "moderate": 1.0, "strong": 1.5, "extreme": 2.0},
-        "equity_weights": {"ma200w_deviation": 0.5, "fed_model_spread": 0.3, "pe_zscore": 0.2}
+        "z_score_thresholds": {
+            "weak": 0.5,
+            "moderate": 1.0,
+            "strong": 1.5,
+            "extreme": 2.0,
+        },
+        "equity_weights": {
+            "ma200w_deviation": 0.5,
+            "fed_model_spread": 0.3,
+            "pe_zscore": 0.2,
+        },
     },
     "layer_b_positioning": {
-        "weights": {"cot_index": 0.35, "put_call": 0.25, "options_skew": 0.25, "fear_greed": 0.15},
-        "cot_index": {"extreme_long": 85, "notable_long": 70, "notable_short": 30, "extreme_short": 15}
+        "weights": {
+            "cot_index": 0.35,
+            "put_call": 0.25,
+            "options_skew": 0.25,
+            "fear_greed": 0.15,
+        },
+        "cot_index": {
+            "extreme_long": 85,
+            "notable_long": 70,
+            "notable_short": 30,
+            "extreme_short": 15,
+        },
     },
     "layer_c_regime": {"hurst_window": 252, "hmm_states": 3},
     "layer_d_options": {
-        "weights": {"gex": 0.30, "vix_term": 0.30, "iv_rank": 0.20, "iv_rv_spread": 0.20},
-        "gex": {"extreme_negative": -2000000000, "extreme_positive": 5000000000}
+        "weights": {
+            "gex": 0.30,
+            "vix_term": 0.30,
+            "iv_rank": 0.20,
+            "iv_rv_spread": 0.20,
+        },
+        "gex": {"extreme_negative": -2000000000, "extreme_positive": 5000000000},
     },
     "layer_e_timing": {
         "weights": {"opex": 0.30, "fomc": 0.35, "quarter_end": 0.20, "earnings": 0.15},
-        "opex": {"before_score": -0.5, "during_score": 0.0, "after_score": 1.0}
+        "opex": {"before_score": -0.5, "during_score": 0.0, "after_score": 1.0},
     },
     "composite_scoring": {
-        "layer_weights": {"fair_value": 0.30, "positioning": 0.25, "regime": 0.20, "options": 0.15, "timing": 0.10},
-        "thresholds": {"strong_long": 0.70, "moderate_long": 0.55, "neutral": 0.45, "moderate_short": -0.55, "strong_short": -0.70}
+        "layer_weights": {
+            "fair_value": 0.30,
+            "positioning": 0.25,
+            "regime": 0.20,
+            "options": 0.15,
+            "timing": 0.10,
+        },
+        "thresholds": {
+            "strong_long": 0.70,
+            "moderate_long": 0.55,
+            "neutral": 0.45,
+            "moderate_short": -0.55,
+            "strong_short": -0.70,
+        },
     },
     "base_rates": {"lookback_years": 10, "min_occurrences": 15, "min_win_rate": 0.52},
     "prediction_scrutiny": {
@@ -70,8 +122,8 @@ swing_params = {
         "min_sample_size": 30,
         "min_chi_squared_pvalue": 0.05,
         "max_prediction_error_pct": 0.15,
-        "require_base_rate_validation": True
-    }
+        "require_base_rate_validation": True,
+    },
 }
 
 write_file("config/swing_params.json", json.dumps(swing_params, indent=2))
@@ -82,16 +134,16 @@ patch_file(
     "clawd_trading/swing_prediction/layer_positioning.py",
     "from typing import Dict, Any",
     "from typing import Dict, Any, Optional",
-    "Added Optional import"
+    "Added Optional import",
 )
 
-# FIX 3: Add missing numpy import to layer_options.py  
+# FIX 3: Add missing numpy import to layer_options.py
 print("\n[FIX 3] Adding missing numpy import to layer_options.py")
 patch_file(
     "clawd_trading/swing_prediction/layer_options.py",
     "import logging",
     "import logging\nimport numpy as np",
-    "Added numpy import"
+    "Added numpy import",
 )
 
 # FIX 4: Scrub hardcoded Polygon API key
@@ -367,9 +419,9 @@ class BaseRateCalculator:
 
 write_file("clawd_trading/swing_prediction/real_base_rates.py", real_base_rates)
 
-print("\n" + "="*60)
+print("\n" + "=" * 60)
 print("ALL 8 FIXES APPLIED!")
-print("="*60)
+print("=" * 60)
 print("\nSummary:")
 print("  [OK] Created config/swing_params.json")
 print("  [OK] Added Optional import to layer_positioning.py")
@@ -382,4 +434,4 @@ print("  [TODO] SwingBias dataclass - needs manual reconciliation")
 print("  [TODO] DataProvider wiring to SwingEngine - needs manual integration")
 print("\nIMPORTANT: Rotate your Polygon API key at polygon.io")
 print("   The old key is in git history!")
-print("="*60)
+print("=" * 60)

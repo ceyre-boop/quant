@@ -4,6 +4,7 @@ Participant Taxonomy for Clawd Trading
 Market participant classification system ported from trading-stockfish.
 Identifies 7 participant types with signatures for risk adjustment.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -13,6 +14,7 @@ from typing import Any, Dict
 
 class ParticipantType(Enum):
     """Types of market participants."""
+
     RETAIL = "RETAIL"
     ALGO = "ALGO"
     MARKET_MAKER = "MARKET_MAKER"
@@ -25,6 +27,7 @@ class ParticipantType(Enum):
 @dataclass(frozen=True)
 class ParticipantSignature:
     """Signature describing participant behavior."""
+
     type: ParticipantType
     speed: str
     size_profile: str
@@ -62,7 +65,7 @@ def _sig(
 def get_participant_signatures() -> Dict[ParticipantType, ParticipantSignature]:
     """
     Get all participant signatures.
-    
+
     Deterministic, hard-coded taxonomy consistent with intuitive behaviors.
     Used for risk envelope adjustments and bias calculations.
     """
@@ -75,7 +78,9 @@ def get_participant_signatures() -> Dict[ParticipantType, ParticipantSignature]:
             absorption_behavior="hits_liquidity",
             time_of_day_bias="all_day",
             volatility_sensitivity="avoids_vol",
-            metadata={"description": "Discretionary/retail flow; smaller clips; avoids volatility"},
+            metadata={
+                "description": "Discretionary/retail flow; smaller clips; avoids volatility"
+            },
         ),
         ParticipantType.ALGO: _sig(
             ParticipantType.ALGO,
@@ -85,7 +90,9 @@ def get_participant_signatures() -> Dict[ParticipantType, ParticipantSignature]:
             absorption_behavior="hits_liquidity",
             time_of_day_bias="all_day",
             volatility_sensitivity="neutral",
-            metadata={"description": "Generic execution algos; balanced speed and size"},
+            metadata={
+                "description": "Generic execution algos; balanced speed and size"
+            },
         ),
         ParticipantType.MARKET_MAKER: _sig(
             ParticipantType.MARKET_MAKER,
@@ -95,7 +102,9 @@ def get_participant_signatures() -> Dict[ParticipantType, ParticipantSignature]:
             absorption_behavior="provides_liquidity",
             time_of_day_bias="all_day",
             volatility_sensitivity="avoids_vol",
-            metadata={"description": "Quotes both sides, provides liquidity, throttles in high vol"},
+            metadata={
+                "description": "Quotes both sides, provides liquidity, throttles in high vol"
+            },
         ),
         ParticipantType.FUND: _sig(
             ParticipantType.FUND,
@@ -105,7 +114,9 @@ def get_participant_signatures() -> Dict[ParticipantType, ParticipantSignature]:
             absorption_behavior="hits_liquidity",
             time_of_day_bias="mid",
             volatility_sensitivity="neutral",
-            metadata={"description": "Larger portfolio rebalances; mid-day bias; block trades"},
+            metadata={
+                "description": "Larger portfolio rebalances; mid-day bias; block trades"
+            },
         ),
         ParticipantType.NEWS_ALGO: _sig(
             ParticipantType.NEWS_ALGO,
@@ -125,7 +136,9 @@ def get_participant_signatures() -> Dict[ParticipantType, ParticipantSignature]:
             absorption_behavior="pulls_liquidity",
             time_of_day_bias="open",
             volatility_sensitivity="seeks_vol",
-            metadata={"description": "Seeks hidden/large liquidity; aggressive when available"},
+            metadata={
+                "description": "Seeks hidden/large liquidity; aggressive when available"
+            },
         ),
         ParticipantType.SWEEP_BOT: _sig(
             ParticipantType.SWEEP_BOT,
@@ -135,7 +148,9 @@ def get_participant_signatures() -> Dict[ParticipantType, ParticipantSignature]:
             absorption_behavior="hits_liquidity",
             time_of_day_bias="close",
             volatility_sensitivity="seeks_vol",
-            metadata={"description": "Executes rapid sweeps across venues; close/volatility oriented"},
+            metadata={
+                "description": "Executes rapid sweeps across venues; close/volatility oriented"
+            },
         ),
     }
 
@@ -143,7 +158,7 @@ def get_participant_signatures() -> Dict[ParticipantType, ParticipantSignature]:
 def get_participant_risk_multiplier(participant_type: ParticipantType) -> float:
     """
     Get risk multiplier for a participant type.
-    
+
     Used to adjust position sizing based on dominant participant.
     """
     multipliers = {

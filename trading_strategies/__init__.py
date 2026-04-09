@@ -8,12 +8,12 @@ from trading_strategies.strategy_wrapper import (
     ICTAMDWrapper,
     StrategyIntegration,
     ICTPattern,
-    create_integration_layer
+    create_integration_layer,
 )
 
 __all__ = [
-    'ICTAMDWrapper',
-    'StrategyIntegration', 
-    'ICPattern',
-    'create_integration_layer'
+    "ICTAMDWrapper",
+    "StrategyIntegration",
+    "ICPattern",
+    "create_integration_layer",
 ]

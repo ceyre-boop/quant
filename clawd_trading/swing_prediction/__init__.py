@@ -16,16 +16,16 @@ from .backtest_base_rates import BaseRateCalculator
 from .firebase_writer import FirebaseWriter
 
 __all__ = [
-    'SwingEngine',
-    'SwingBias',
-    'SwingDirection',
-    'get_swing_engine',
-    'FairValueLayer',
-    'PositioningLayer',
-    'RegimeLayer',
-    'OptionsLayer',
-    'TimingLayer',
-    'CompositeScorer',
-    'BaseRateCalculator',
-    'FirebaseWriter',
+    "SwingEngine",
+    "SwingBias",
+    "SwingDirection",
+    "get_swing_engine",
+    "FairValueLayer",
+    "PositioningLayer",
+    "RegimeLayer",
+    "OptionsLayer",
+    "TimingLayer",
+    "CompositeScorer",
+    "BaseRateCalculator",
+    "FirebaseWriter",
 ]

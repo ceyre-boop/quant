@@ -34,22 +34,22 @@ from .participant_risk import (
 
 __all__ = [
     # Taxonomy
-    'ParticipantType',
-    'ParticipantSignature',
-    'get_participant_signatures',
-    'get_participant_risk_multiplier',
+    "ParticipantType",
+    "ParticipantSignature",
+    "get_participant_signatures",
+    "get_participant_risk_multiplier",
     # Features
-    'ParticipantFeatureVector',
-    'extract_participant_features',
-    'extract_from_layer1_context',
+    "ParticipantFeatureVector",
+    "extract_participant_features",
+    "extract_from_layer1_context",
     # Likelihood
-    'ParticipantLikelihood',
-    'classify_participants',
-    'get_dominant_participant',
-    'has_participant_type',
+    "ParticipantLikelihood",
+    "classify_participants",
+    "get_dominant_participant",
+    "has_participant_type",
     # Risk
-    'ParticipantRiskLimits',
-    'calculate_participant_risk_limits',
-    'apply_participant_risk_to_gate12',
-    'get_participant_bias_adjustment',
+    "ParticipantRiskLimits",
+    "calculate_participant_risk_limits",
+    "apply_participant_risk_to_gate12",
+    "get_participant_bias_adjustment",
 ]

@@ -3,6 +3,7 @@ Auto-Documentation Module for Clawd Trading
 
 Automatically logs backtest results, live performance, and generates reports.
 """
+
 import json
 import logging
 from typing import Dict, Any, Optional
@@ -19,6 +20,7 @@ RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 @dataclass
 class BacktestResult:
     """Backtest result data."""
+
     timestamp: str
     sharpe_ratio: float
     win_rate: float
@@ -28,7 +30,7 @@ class BacktestResult:
     r_squared: Optional[float] = None
     chi_squared: Optional[float] = None
     notes: str = ""
-    
+
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
 
@@ -36,6 +38,7 @@ class BacktestResult:
 @dataclass
 class LiveTrade:
     """Single live trade record."""
+
     trade_id: str
     timestamp: str
     symbol: str
@@ -50,39 +53,39 @@ class LiveTrade:
     dominant_participant: str
     regime: str
     gates_passed: int
-    
+
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
 
 
 class AutoDocumenter:
     """Automatically document trading results and performance."""
-    
+
     def __init__(self):
         self.results_dir = RESULTS_DIR
         self.results_dir.mkdir(parents=True, exist_ok=True)
         logger.info(f"AutoDocumenter initialized: {self.results_dir}")
-    
+
     def log_backtest_result(self, result: BacktestResult) -> str:
         """Log backtest result to docs/results/."""
         # Save as JSON
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         filename = f"backtest_{timestamp}.json"
         filepath = self.results_dir / filename
-        
-        with open(filepath, 'w') as f:
+
+        with open(filepath, "w") as f:
             json.dump(result.to_dict(), f, indent=2)
-        
+
         # Update RESULTS.md
         self._update_results_md(result)
-        
+
         logger.info(f"Backtest result logged: {filepath}")
         return str(filepath)
-    
+
     def _update_results_md(self, result: BacktestResult) -> None:
         """Update docs/RESULTS.md with latest backtest."""
         results_md = Path("docs/RESULTS.md")
-        
+
         # Create header if file doesn't exist
         if not results_md.exists():
             header = """# Clawd Trading Results
@@ -93,10 +96,14 @@ Auto-generated performance tracking.
 
 """
             results_md.write_text(header)
-        
+
         # Append latest result
-        sig_indicator = "✅ SIGNIFICANT" if result.statistical_significance else "❌ Not significant"
-        
+        sig_indicator = (
+            "✅ SIGNIFICANT"
+            if result.statistical_significance
+            else "❌ Not significant"
+        )
+
         entry = f"""### {result.timestamp}
 
 | Metric | Value | Assessment |
@@ -112,49 +119,53 @@ Auto-generated performance tracking.
 ---
 
 """
-        
+
         # Prepend to file (latest first)
         current_content = results_md.read_text()
         # Find insertion point after "## Latest Backtest Results"
-        insert_point = current_content.find("## Latest Backtest Results\n\n") + len("## Latest Backtest Results\n\n")
-        new_content = current_content[:insert_point] + entry + current_content[insert_point:]
+        insert_point = current_content.find("## Latest Backtest Results\n\n") + len(
+            "## Latest Backtest Results\n\n"
+        )
+        new_content = (
+            current_content[:insert_point] + entry + current_content[insert_point:]
+        )
         results_md.write_text(new_content)
-    
+
     def log_live_trade(self, trade: LiveTrade) -> None:
         """Log a live trade to the trades database."""
         trades_file = self.results_dir / "live_trades.jsonl"
-        
-        with open(trades_file, 'a') as f:
-            f.write(json.dumps(trade.to_dict()) + '\n')
-        
+
+        with open(trades_file, "a") as f:
+            f.write(json.dumps(trade.to_dict()) + "\n")
+
         logger.info(f"Live trade logged: {trade.trade_id}")
-    
+
     def compare_live_vs_backtest(self) -> Dict[str, Any]:
         """Compare live performance vs backtest expectations."""
         trades_file = self.results_dir / "live_trades.jsonl"
-        
+
         if not trades_file.exists():
             return {"error": "No live trades yet"}
-        
+
         # Load all trades
         trades = []
-        with open(trades_file, 'r') as f:
+        with open(trades_file, "r") as f:
             for line in f:
                 if line.strip():
                     trades.append(json.loads(line))
-        
+
         if not trades:
             return {"error": "No live trades yet"}
-        
+
         # Calculate live metrics
-        closed_trades = [t for t in trades if t['status'] == 'CLOSED']
+        closed_trades = [t for t in trades if t["status"] == "CLOSED"]
         if not closed_trades:
             return {"error": "No closed trades yet"}
-        
-        wins = sum(1 for t in closed_trades if t.get('pnl', 0) > 0)
+
+        wins = sum(1 for t in closed_trades if t.get("pnl", 0) > 0)
         live_win_rate = wins / len(closed_trades)
-        live_pnl = sum(t.get('pnl', 0) for t in closed_trades)
-        
+        live_pnl = sum(t.get("pnl", 0) for t in closed_trades)
+
         # Load latest backtest for comparison
         backtest_files = sorted(self.results_dir.glob("backtest_*.json"))
         if not backtest_files:
@@ -162,28 +173,34 @@ Auto-generated performance tracking.
                 "live_trades": len(closed_trades),
                 "live_win_rate": live_win_rate,
                 "live_pnl": live_pnl,
-                "backtest_comparison": "No backtest data available"
+                "backtest_comparison": "No backtest data available",
             }
-        
-        with open(backtest_files[-1], 'r') as f:
+
+        with open(backtest_files[-1], "r") as f:
             backtest = json.load(f)
-        
+
         return {
             "live_trades": len(closed_trades),
             "live_win_rate": live_win_rate,
-            "backtest_win_rate": backtest['win_rate'],
-            "win_rate_diff": live_win_rate - backtest['win_rate'],
+            "backtest_win_rate": backtest["win_rate"],
+            "win_rate_diff": live_win_rate - backtest["win_rate"],
             "live_pnl": live_pnl,
-            "backtest_sharpe": backtest['sharpe_ratio'],
-            "assessment": "Live performance tracking on track" if abs(live_win_rate - backtest['win_rate']) < 0.1 else "Deviation detected"
+            "backtest_sharpe": backtest["sharpe_ratio"],
+            "assessment": (
+                "Live performance tracking on track"
+                if abs(live_win_rate - backtest["win_rate"]) < 0.1
+                else "Deviation detected"
+            ),
         }
-    
+
     def generate_performance_report(self) -> str:
         """Generate a full performance report."""
         comparison = self.compare_live_vs_backtest()
-        
-        report_path = self.results_dir / f"report_{datetime.now().strftime('%Y%m%d')}.md"
-        
+
+        report_path = (
+            self.results_dir / f"report_{datetime.now().strftime('%Y%m%d')}.md"
+        )
+
         report = f"""# Performance Report - {datetime.now().strftime('%Y-%m-%d')}
 
 ## Live vs Backtest Comparison
@@ -195,25 +212,28 @@ Auto-generated performance tracking.
 ## Key Insights
 
 """
-        
+
         if "error" in comparison:
             report += "- No live trading data available yet.\n"
         else:
             report += f"- **Live Win Rate:** {comparison['live_win_rate']:.1%}\n"
-            report += f"- **Backtest Win Rate:** {comparison['backtest_win_rate']:.1%}\n"
+            report += (
+                f"- **Backtest Win Rate:** {comparison['backtest_win_rate']:.1%}\n"
+            )
             report += f"- **Difference:** {comparison['win_rate_diff']:+.1%}\n"
             report += f"\n**Assessment:** {comparison['assessment']}\n"
-        
+
         report += f"\n---\n*Generated: {datetime.now().isoformat()}*\n"
-        
+
         report_path.write_text(report)
         logger.info(f"Performance report generated: {report_path}")
-        
+
         return str(report_path)
 
 
 # Global instance
 _auto_doc = None
+
 
 def get_auto_documenter() -> AutoDocumenter:
     """Get or create global AutoDocumenter instance."""
@@ -229,7 +249,7 @@ def log_backtest_result(
     max_drawdown: float,
     total_trades: int,
     statistical_significance: bool = False,
-    notes: str = ""
+    notes: str = "",
 ) -> str:
     """Quick function to log backtest result."""
     doc = get_auto_documenter()
@@ -240,7 +260,7 @@ def log_backtest_result(
         max_drawdown=max_drawdown,
         total_trades=total_trades,
         statistical_significance=statistical_significance,
-        notes=notes
+        notes=notes,
     )
     return doc.log_backtest_result(result)
 

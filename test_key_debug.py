@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-key = os.getenv('KIMI_API_KEY')
+key = os.getenv("KIMI_API_KEY")
 
 print("Key Diagnostics:")
 print(f"  Length: {len(key)}")
