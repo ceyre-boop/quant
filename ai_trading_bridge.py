@@ -32,7 +32,7 @@ class Signal:
     direction: str  # "LONG" | "SHORT" | "FLAT"
     confidence: float  # 0.0 to 1.0
     size: int = 10  # Number of shares
-    metadata: Dict[str, Any] = None  # Extra info (model version, features used, etc.)
+    metadata: Optional[Dict[str, Any]] = None  # Extra info (model version, features used, etc.)
 
     def __post_init__(self):
         if self.metadata is None:

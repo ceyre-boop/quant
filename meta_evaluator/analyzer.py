@@ -100,7 +100,7 @@ class FeatureGroupTracker:
                 "feature_drifts": [],
             }
 
-        drift_report = {
+        drift_report: Dict[str, Any] = {
             "timestamp": datetime.now().isoformat(),
             "drift_detected": False,
             "feature_drifts": [],

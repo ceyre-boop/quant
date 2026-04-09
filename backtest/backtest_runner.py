@@ -6,7 +6,7 @@ Replays historical market data through the trading pipeline to evaluate strategy
 import os
 import json
 import logging
-from typing import Dict, Any, Optional, List, Callable, Tuple
+from typing import Dict, Any, Optional, List, Callable, Tuple, Union
 from datetime import datetime, timedelta
 from dataclasses import dataclass, field
 from enum import Enum
@@ -329,6 +329,10 @@ class BacktestRunner:
         if not all([self.bias_engine, self.risk_engine, self.game_engine]):
             return
 
+        assert self.bias_engine is not None
+        assert self.risk_engine is not None
+        assert self.game_engine is not None
+
         try:
             # Create market data snapshot
             market_data = {
@@ -431,6 +435,7 @@ class BacktestRunner:
                 exit_reason = "tp1"
 
         if exit_triggered:
+            assert exit_price is not None
             self._close_position(timestamp, exit_price, exit_reason)
 
     def _close_position(self, timestamp: datetime, exit_price: float, exit_reason: str):
@@ -556,7 +561,11 @@ def run_simple_backtest(symbol: str, start_date: str, end_date: str, data: Optio
     Returns:
         BacktestResult
     """
-    config = BacktestConfig(symbol=symbol, start_date=start_date, end_date=end_date)
+    config = BacktestConfig(
+        symbol=symbol,
+        start_date=datetime.fromisoformat(start_date) if isinstance(start_date, str) else start_date,
+        end_date=datetime.fromisoformat(end_date) if isinstance(end_date, str) else end_date,
+    )
 
     def mock_bias_engine(symbol, market_data):
         import random

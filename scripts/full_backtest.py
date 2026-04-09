@@ -7,7 +7,7 @@ Runs 3-layer + 5-layer stack through history with chi-squared validation.
 import pandas as pd
 import numpy as np
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Optional
 from dataclasses import dataclass
 import sys
 
@@ -121,7 +121,7 @@ class StatisticalBacktest:
 
         return data
 
-    def run_backtest(self) -> Dict:
+    def run_backtest(self) -> Optional[Dict]:
         """
         Run full backtest.
 
@@ -161,7 +161,7 @@ class StatisticalBacktest:
             if i % 50 == 0:
                 print(f"  Day {i}/{len(trading_days)}: ${capital:,.2f}")
 
-            daily_pnl = 0
+            daily_pnl: float = 0.0
 
             # Check each symbol
             for symbol, df in data.items():
@@ -210,7 +210,7 @@ class StatisticalBacktest:
             print("No model found - would need to train")
             return None
 
-    def _generate_signal(self, symbol: str, df: pd.DataFrame, model) -> Dict:
+    def _generate_signal(self, symbol: str, df: pd.DataFrame, model) -> Optional[Dict]:
         """Generate trading signal"""
         # Generate features
         features_df = self.feature_gen.generate_features(df)

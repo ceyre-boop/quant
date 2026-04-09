@@ -6,7 +6,7 @@ REST and WebSocket client for Polygon.io market data.
 import json
 import os
 import logging
-from typing import Optional, Dict, List, Any
+from typing import Callable, Optional, Dict, List, Any
 from datetime import datetime, timedelta
 from urllib.parse import urljoin
 
@@ -20,8 +20,8 @@ class PolygonRestClient:
     """Polygon.io REST API client."""
 
     def __init__(self, api_key: Optional[str] = None, base_url: Optional[str] = None):
-        self.api_key = api_key or os.getenv("POLYGON_API_KEY")
-        self.base_url = base_url or os.getenv("POLYGON_BASE_URL", "https://api.polygon.io")
+        self.api_key: Optional[str] = api_key or os.getenv("POLYGON_API_KEY")
+        self.base_url: str = base_url or os.getenv("POLYGON_BASE_URL", "https://api.polygon.io") or "https://api.polygon.io"
 
         if not self.api_key:
             raise ValueError("POLYGON_API_KEY not set")
@@ -113,9 +113,9 @@ class PolygonWebSocketClient:
         self.api_key = api_key or os.getenv("POLYGON_API_KEY")
         self.ws: Optional[WebSocketApp] = None
         self.subscriptions: List[str] = []
-        self.on_message_callback: Optional[callable] = None
-        self.on_error_callback: Optional[callable] = None
-        self.on_close_callback: Optional[callable] = None
+        self.on_message_callback: Optional[Callable] = None
+        self.on_error_callback: Optional[Callable] = None
+        self.on_close_callback: Optional[Callable] = None
 
     def on_message(self, ws, message):
         """Handle incoming message."""
@@ -148,9 +148,9 @@ class PolygonWebSocketClient:
     def connect(
         self,
         subscriptions: List[str],
-        on_message: Optional[callable] = None,
-        on_error: Optional[callable] = None,
-        on_close: Optional[callable] = None,
+        on_message: Optional[Callable] = None,
+        on_error: Optional[Callable] = None,
+        on_close: Optional[Callable] = None,
     ):
         """Connect to WebSocket.
 

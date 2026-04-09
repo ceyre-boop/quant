@@ -3,9 +3,9 @@
 from .bias_engine import BiasEngine
 from .bias_engine_v2 import BiasEngineV2, create_bias_engine
 from .feature_builder import FeatureBuilder
-from .feature_builder_v2 import FeatureBuilderV2
+from .feature_builder_v2 import FeatureBuilder as FeatureBuilderV2
 from .hard_constraints import HardConstraints
-from .hard_constraints_v2 import HardConstraintsV2
+from .hard_constraints_v2 import HardConstraints as HardConstraintsV2
 from .regime_classifier import RegimeClassifier
 
 __all__ = [

@@ -87,7 +87,7 @@ class ICTAMDWrapper:
         """
         # Gate 1: Three-layer agreement check
         if not three_layer_context.all_aligned():
-            reason = three_layer_context.block_reason()
+            reason = three_layer_context.block_reason() or "no reason"
             self._log_blocked_signal("THREE_LAYER_MISMATCH", reason, three_layer_context)
             self.logger.info(f"Strategy blocked: {reason}")
             return None

@@ -10,7 +10,7 @@ This prevents look-ahead bias and gives realistic out-of-sample performance.
 
 import json
 import logging
-from typing import Dict, Any, Optional, List, Callable, Tuple
+from typing import Dict, Any, Optional, List, Callable, Tuple, Union
 from datetime import datetime, timedelta
 from dataclasses import dataclass
 from enum import Enum
@@ -472,8 +472,8 @@ def create_default_walkforward(
     """
     config = WalkForwardConfig(
         symbol=symbol,
-        start_date=start_date,
-        end_date=end_date,
+        start_date=datetime.fromisoformat(start_date) if isinstance(start_date, str) else start_date,
+        end_date=datetime.fromisoformat(end_date) if isinstance(end_date, str) else end_date,
         train_window_months=train_months,
         test_window_months=test_months,
         step_months=test_months,

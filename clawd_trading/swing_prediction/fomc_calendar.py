@@ -5,7 +5,7 @@ Provides real FOMC meeting dates and calculates timing scores.
 """
 
 from datetime import datetime, timedelta
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 import logging
 
 logger = logging.getLogger(__name__)
@@ -36,7 +36,7 @@ class FOMCCalendar:
         # For other years, would need to fetch from external source
         return []
 
-    def get_next_meeting(self, from_date: datetime = None) -> datetime:
+    def get_next_meeting(self, from_date: datetime = None) -> Optional[datetime]:
         """Get the next FOMC meeting from a given date."""
         if from_date is None:
             from_date = datetime.now()

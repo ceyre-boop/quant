@@ -94,7 +94,7 @@ class XGBoostBiasModel:
 
         # Model paths
         self.model_dir = Path("layer1/bias_model")
-        self.model_path = model_path or self.model_dir / "model_v1.pkl"
+        self.model_path: Path = Path(model_path) if model_path else self.model_dir / "model_v1.pkl"
         self.registry_path = self.model_dir / "model_registry.json"
 
         # Load or initialize model

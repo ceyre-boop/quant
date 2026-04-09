@@ -4,7 +4,7 @@ Provides analysis tools for understanding signal quality and patterns.
 """
 
 import logging
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, DefaultDict, Optional
 from collections import defaultdict
 from datetime import datetime, timedelta
 
@@ -50,7 +50,7 @@ class SignalAnalyzer:
         signals = self.archive.get_signals_for_range(start.strftime("%Y-%m-%d"), end.strftime("%Y-%m-%d"))
 
         # Group by regime
-        regimes = defaultdict(lambda: {"trades": [], "pnl": 0})
+        regimes: DefaultDict[str, Dict[str, Any]] = defaultdict(lambda: {"trades": [], "pnl": 0})
 
         for s in signals:
             outcome = s.get("outcome")
@@ -94,7 +94,7 @@ class SignalAnalyzer:
         signals = self.archive.get_signals_for_range(start.strftime("%Y-%m-%d"), end.strftime("%Y-%m-%d"))
 
         # Group by hour
-        hours = defaultdict(lambda: {"trades": [], "pnl": 0})
+        hours: DefaultDict[int, Dict[str, Any]] = defaultdict(lambda: {"trades": [], "pnl": 0})
 
         for s in signals:
             outcome = s.get("outcome")
@@ -135,7 +135,7 @@ class SignalAnalyzer:
 
         signals = self.archive.get_signals_for_range(start.strftime("%Y-%m-%d"), end.strftime("%Y-%m-%d"))
 
-        symbols = defaultdict(lambda: {"trades": [], "pnl": 0})
+        symbols: DefaultDict[str, Dict[str, Any]] = defaultdict(lambda: {"trades": [], "pnl": 0})
 
         for s in signals:
             outcome = s.get("outcome")

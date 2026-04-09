@@ -47,6 +47,9 @@ class FirebaseClient:
     _initialized = False
     _lock = threading.Lock()
 
+    db: Any
+    rtdb: Any
+
     def __new__(cls, *args, **kwargs):
         """Singleton pattern to ensure single Firebase initialization."""
         with cls._lock:
@@ -137,7 +140,7 @@ class FirebaseClient:
         """
         self._check_db()
 
-        doc_id = f"{symbol}_{bias.timestamp.strftime('%Y%m%d_%H%M%S')}"
+        doc_id = f"{symbol}_{(bias.timestamp or datetime.utcnow()).strftime('%Y%m%d_%H%M%S')}"
         data = bias.to_dict()
         data["symbol"] = symbol
         data["created_at"] = firestore.SERVER_TIMESTAMP
@@ -153,7 +156,7 @@ class FirebaseClient:
         """
         self._check_db()
 
-        doc_id = f"{symbol}_{risk.timestamp.strftime('%Y%m%d_%H%M%S')}"
+        doc_id = f"{symbol}_{(risk.timestamp or datetime.utcnow()).strftime('%Y%m%d_%H%M%S')}"
         data = risk.to_dict()
         data["symbol"] = symbol
         data["bias_id"] = bias_id
@@ -170,7 +173,7 @@ class FirebaseClient:
         """
         self._check_db()
 
-        doc_id = f"{symbol}_{game.timestamp.strftime('%Y%m%d_%H%M%S')}"
+        doc_id = f"{symbol}_{(game.timestamp or datetime.utcnow()).strftime('%Y%m%d_%H%M%S')}"
         data = game.to_dict()
         data["symbol"] = symbol
         data["created_at"] = firestore.SERVER_TIMESTAMP
@@ -286,7 +289,7 @@ class FirebaseClient:
 
         ref = self.rtdb.reference(f"live_state/{symbol}")
 
-        updates = {"updated_at": datetime.utcnow().isoformat()}
+        updates: Dict[str, Any] = {"updated_at": datetime.utcnow().isoformat()}
 
         if bias:
             updates["current_bias"] = bias.to_dict()
@@ -317,7 +320,7 @@ class FirebaseClient:
 
         ref = self.rtdb.reference("session_controls")
 
-        updates = {}
+        updates: Dict[str, Any] = {}
         if trading_enabled is not None:
             updates["trading_enabled"] = trading_enabled
         if daily_loss_pct is not None:
@@ -393,3 +396,64 @@ class FirebaseClient:
             doc_id = self.write_risk_structure(symbol, risk, bias_id)
             doc_ids.append(doc_id)
         return doc_ids
+
+    # ========================================================================
+    # Generic CRUD helpers used by callers
+    # ========================================================================
+
+    def write(self, collection: str, doc_id: Optional[str], data: Dict[str, Any]) -> Optional[str]:
+        """Write a document to Firestore. If doc_id is None, auto-generate one."""
+        if not FIREBASE_AVAILABLE or self.db is None:
+            return None
+        data["updated_at"] = firestore.SERVER_TIMESTAMP
+        if doc_id:
+            self.db.collection(collection).document(doc_id).set(data, merge=True)
+            return doc_id
+        ref = self.db.collection(collection).document()
+        ref.set(data)
+        return ref.id
+
+    def read(self, collection: str, doc_id: str) -> Optional[Dict[str, Any]]:
+        """Read a single document from Firestore."""
+        if not FIREBASE_AVAILABLE or self.db is None:
+            return None
+        doc = self.db.collection(collection).document(doc_id).get()
+        return doc.to_dict() if doc.exists else None
+
+    def query(
+        self,
+        collection: str,
+        filters: Optional[List] = None,
+        order_by: Optional[str] = None,
+        direction: Optional[str] = None,
+        limit: Optional[int] = None,
+    ) -> List[Dict[str, Any]]:
+        """Query a Firestore collection."""
+        if not FIREBASE_AVAILABLE or self.db is None:
+            return []
+        q = self.db.collection(collection)
+        if filters:
+            for f in filters:
+                q = q.where(*f)
+        if order_by:
+            q = q.order_by(order_by)
+        if limit:
+            q = q.limit(limit)
+        return [doc.to_dict() for doc in q.stream()]
+
+    def update_realtime(self, path: str, data: Any) -> None:
+        """Write/update data in the Realtime Database at the given path."""
+        if not FIREBASE_AVAILABLE or self.rtdb is None:
+            return
+        ref = self.rtdb.reference(path)
+        if isinstance(data, dict):
+            ref.update(data)
+        else:
+            ref.set(data)
+
+    def read_realtime(self, path: str) -> Any:
+        """Read data from the Realtime Database at the given path."""
+        if not FIREBASE_AVAILABLE or self.rtdb is None:
+            return None
+        return self.rtdb.reference(path).get()
+

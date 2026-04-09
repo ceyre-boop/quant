@@ -55,7 +55,7 @@ class RefitScheduler:
             (should_refit: bool, reason: str)
         """
         # Check 1: Model drift
-        health = self.monitor.check_model_health()
+        health = self.monitor.check_model_health()  # type: ignore[attr-defined]
         if health.get("drift_detected"):
             return (
                 True,
@@ -99,7 +99,7 @@ class RefitScheduler:
 
         logger.info(f"Starting scheduled refit for: {model_types}")
 
-        results = {"started_at": datetime.now().isoformat(), "models": {}}
+        results: Dict[str, Any] = {"started_at": datetime.now().isoformat(), "models": {}}
 
         for model_type in model_types:
             try:
@@ -130,7 +130,7 @@ class RefitScheduler:
         logger.info(f"Refitting {model_type}...")
 
         # 1. Fetch training data
-        training_data = self.pipeline.fetch_training_data(symbols=["NQ", "ES", "BTC"], lookback_days=90)
+        training_data = self.pipeline.fetch_training_data(symbols=["NQ", "ES", "BTC"], lookback_days=90)  # type: ignore[attr-defined]
 
         # 2. Prepare features and labels
         X, y = self._prepare_training_data(training_data, model_type)

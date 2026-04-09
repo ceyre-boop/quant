@@ -8,7 +8,7 @@ import pickle
 import pandas as pd
 import numpy as np
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Optional
 import sys
 
 sys.path.insert(0, str(Path(__file__).parent))
@@ -30,10 +30,10 @@ class XGBoostBrain(AIBrain):
     """
 
     def __init__(self, model_path: str = None, confidence_threshold: float = 0.55):
-        self.model_path = model_path or Path(__file__).parent / "training" / "xgb_model.pkl"
+        self.model_path: Path = Path(model_path) if model_path else Path(__file__).parent / "training" / "xgb_model.pkl"
         self.confidence_threshold = confidence_threshold
         self.model = None
-        self.feature_cols = None
+        self.feature_cols: Optional[List] = None
         self.feature_gen = FeatureGenerator()
         self._model_name = "XGBoostBrain-v1"
 
@@ -43,17 +43,17 @@ class XGBoostBrain(AIBrain):
 
     def load_model(self, path: str = None):
         """Load trained XGBoost model"""
-        path = path or self.model_path
+        model_path: Path = Path(path) if path else self.model_path
 
-        if not Path(path).exists():
-            raise FileNotFoundError(f"Model not found: {path}. Run training/train_xgb.py first.")
+        if not model_path.exists():
+            raise FileNotFoundError(f"Model not found: {model_path}. Run training/train_xgb.py first.")
 
-        with open(path, "rb") as f:
+        with open(model_path, "rb") as f:
             saved = pickle.load(f)
             self.model = saved["model"]
             self.feature_cols = saved["features"]
 
-        print(f"[XGBoostBrain] Loaded model from {path}")
+        print(f"[XGBoostBrain] Loaded model from {model_path}")
         print(f"[XGBoostBrain] Features: {len(self.feature_cols)}")
         return self
 
@@ -78,6 +78,9 @@ class XGBoostBrain(AIBrain):
         """
         if self.model is None:
             self.train_if_needed()
+
+        assert self.model is not None
+        assert self.feature_cols is not None
 
         signals = []
 

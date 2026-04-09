@@ -21,8 +21,8 @@ class CompositeScorer:
         """
         weights = self.config["layer_weights"]
 
-        composite = 0
-        total_weight = 0
+        composite: float = 0.0
+        total_weight: float = 0.0
 
         for layer, score in layer_scores.items():
             if layer in weights:

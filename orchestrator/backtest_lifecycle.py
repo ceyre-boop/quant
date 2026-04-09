@@ -119,7 +119,7 @@ class BacktestLifecycle:
 
         # Fetch historical bars
         try:
-            bars = self.alpaca.get_bars(
+            bars = self.alpaca.get_bars(  # type: ignore[attr-defined]
                 symbol=symbol,
                 start=self.start_date,
                 end=self.end_date,
@@ -157,7 +157,7 @@ class BacktestLifecycle:
             )
 
             # Build features
-            features = self.feature_builder.build(symbol, market_data, bars.iloc[: i + 1])
+            features = self.feature_builder.build(symbol, market_data, bars.iloc[: i + 1])  # type: ignore[attr-defined]
 
             # Inject macro-regime stress features
             bar_date = current_bar.name if hasattr(current_bar, "name") else datetime.now()
@@ -168,7 +168,7 @@ class BacktestLifecycle:
                 features.features.update(macro_features)
 
             # Layer 1: Bias
-            bias = self.bias_engine.predict(symbol, features, features.regime)
+            bias = self.bias_engine.predict(symbol, features, features.regime)  # type: ignore[attr-defined]
 
             # Skip if no confidence
             if bias.confidence < 0.5:
@@ -176,10 +176,10 @@ class BacktestLifecycle:
 
             # Layer 2: Risk (simplified account)
             account = self._create_mock_account()
-            risk = self.risk_engine.calculate(symbol, bias, features, account, market_data)
+            risk = self.risk_engine.calculate(symbol, bias, features, account, market_data)  # type: ignore[attr-defined]
 
             # Layer 3: Game Theory
-            game = self.game_engine.analyze(symbol, bias, risk, market_data)
+            game = self.game_engine.analyze(symbol, bias, risk, market_data)  # type: ignore[call-arg]
 
             # Record signal
             signal = {

@@ -180,7 +180,7 @@ def get_participant_bias_adjustment(
     probs = {l.type: l.probability for l in likelihoods}
     dominant = get_dominant_participant(likelihoods)
 
-    adjustments = {"bias_shift": 0.0, "confidence_adjustment": 0.0, "metadata": {}}
+    adjustments: Dict[str, Any] = {"bias_shift": 0.0, "confidence_adjustment": 0.0, "metadata": {}}
 
     # SWEEP_BOT: reduce confidence, add caution
     if probs.get(ParticipantType.SWEEP_BOT, 0.0) >= 0.20:

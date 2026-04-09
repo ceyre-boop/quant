@@ -8,7 +8,7 @@ import pandas as pd
 import numpy as np
 import pickle
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 from scipy import stats
 import sys
 
@@ -105,7 +105,7 @@ def walk_forward_validation(
     test_days: int = 63,
     step_days: int = 21,
     years: int = 5,
-) -> Dict:
+) -> Optional[Dict]:
     """
     Walk-forward validation: Train on past, test on future, step forward.
 

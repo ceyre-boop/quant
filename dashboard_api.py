@@ -132,7 +132,7 @@ def generate_signal_from_engine(symbol: str) -> Optional[Dict[str, Any]]:
         return None
 
     # Build layer outputs
-    layer1 = {
+    layer1: Dict[str, Any] = {
         "symbol": symbol,
         "direction": (1 if market_data.change_percent > 0.005 else -1 if market_data.change_percent < -0.005 else 0),
         "confidence": min(0.5 + abs(market_data.change_percent) * 20, 0.95),
@@ -193,12 +193,12 @@ def generate_signal_from_engine(symbol: str) -> Optional[Dict[str, Any]]:
             "signal_id": f"SIG_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
             "timestamp": datetime.now().isoformat(),
             "symbol": signal.symbol,
-            "direction": signal.direction_str,
+            "direction": signal.direction_str,  # type: ignore[attr-defined]
             "entry_price": signal.entry_price,
             "stop_loss": signal.stop_loss,
-            "take_profit_1": signal.take_profit_1,
+            "take_profit_1": signal.take_profit_1,  # type: ignore[attr-defined]
             "confidence": signal.confidence,
-            "expected_value": signal.expected_value,
+            "expected_value": signal.expected_value,  # type: ignore[attr-defined]
             "status": "ACTIVE",
             # Enhanced data
             "entry_model": signal.entry_model,

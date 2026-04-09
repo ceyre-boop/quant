@@ -7,7 +7,7 @@ import os
 import json
 import logging
 import pickle
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, Any, List, cast
 from datetime import datetime
 from dataclasses import dataclass, asdict
 
@@ -349,7 +349,7 @@ model, metadata = registry.load_model('bias_engine', version=3)
         if len(models) < 2:
             return {"error": "Need at least 2 versions to compare"}
 
-        comparison = {
+        comparison: Dict[str, Any] = {
             "model_name": name,
             "versions": [],
             "best_sharpe": None,

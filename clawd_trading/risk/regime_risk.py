@@ -310,7 +310,7 @@ def get_regime_bias_adjustment(regime: RegimeCluster) -> Dict[str, Any]:
 
     Returns adjustments for Layer 2 bias calculations.
     """
-    adjustments = {
+    adjustments: Dict[str, Any] = {
         "bias_shift": 0.0,
         "confidence_adjustment": 0.0,
         "metadata": {"regime": regime.value},

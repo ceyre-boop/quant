@@ -36,7 +36,7 @@ class SentimentEngine:
                 "function": "NEWS_SENTIMENT",
                 "tickers": symbol,
                 "apikey": self.api_key,
-                "limit": limit,
+                "limit": str(limit),
             }
 
             response = requests.get(url, params=params, timeout=30)

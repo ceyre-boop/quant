@@ -4,7 +4,7 @@ Manages per-symbol state transitions and trading lifecycle.
 """
 
 import logging
-from typing import Dict, Any, Optional, List
+from typing import Dict, Any, Optional, List, Callable
 from datetime import datetime
 from dataclasses import dataclass, field
 from enum import Enum
@@ -133,7 +133,7 @@ class SymbolStateMachine:
     def __init__(self):
         """Initialize state machine."""
         self._contexts: Dict[str, SymbolContext] = {}
-        self._transition_handlers: Dict[tuple, List[callable]] = {}
+        self._transition_handlers: Dict[tuple, List[Callable]] = {}
 
     def get_context(self, symbol: str) -> SymbolContext:
         """Get or create context for symbol.
@@ -385,7 +385,7 @@ class SymbolStateMachine:
         self.transition(symbol, SymbolState.IDLE, "error_cleared")
         self.get_context(symbol).error_message = None
 
-    def register_transition_handler(self, from_state: SymbolState, to_state: SymbolState, handler: callable):
+    def register_transition_handler(self, from_state: SymbolState, to_state: SymbolState, handler: Callable):
         """Register a handler for a specific transition.
 
         Args:

@@ -491,7 +491,7 @@ class DataProvider:
 
     def test_connection(self, symbol: str = "SPY") -> Dict[str, Any]:
         """Test data provider connections."""
-        results = {
+        results: Dict[str, Any] = {
             "symbol": symbol,
             "yahoo": {},
             "polygon": {},

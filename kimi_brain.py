@@ -185,7 +185,7 @@ Rules:
 
         return prompt
 
-    def _call_kimi(self, prompt: str) -> Dict[str, Any]:
+    def _call_kimi(self, prompt: str) -> Optional[Dict[str, Any]]:
         """Call Kimi API"""
         # Kimi uses standard Bearer token auth
         headers = {

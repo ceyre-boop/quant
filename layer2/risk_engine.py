@@ -227,7 +227,7 @@ class TargetCalculator:
 class ExpectedValueCalculator:
     """Calculate expected value of trades."""
 
-    def calculate_ev(self, win_rate: float, avg_win_r: float, avg_loss_r: float) -> Dict[str, float]:
+    def calculate_ev(self, win_rate: float, avg_win_r: float, avg_loss_r: float) -> Dict[str, Any]:
         """Calculate expected value in R multiples.
 
         EV = (p_win * avg_win) - (p_loss * avg_loss)

@@ -86,7 +86,7 @@ class RegimeClassifier:
         elif adx > 25 and ma_alignment < 0.4:
             return TrendRegime.STRONG_TREND  # Strong downtrend
         elif adx > 20:
-            return TrendRegime.WAK_TREND
+            return TrendRegime.WEAK_TREND
         elif adx < 15:
             return TrendRegime.CHOPPY
         else:

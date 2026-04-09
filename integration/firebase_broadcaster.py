@@ -332,7 +332,7 @@ class FirebaseBroadcaster:
             return False
 
         try:
-            controls_data = {"updated_at": datetime.utcnow().isoformat() + "Z"}
+            controls_data: Dict[str, Any] = {"updated_at": datetime.utcnow().isoformat() + "Z"}
 
             if trading_enabled is not None:
                 controls_data["trading_enabled"] = trading_enabled
@@ -381,7 +381,7 @@ class FirebaseBroadcaster:
 
         try:
             ts = datetime.utcnow()
-            model_data = {
+            model_data: Dict[str, Any] = {
                 "version": version,
                 "status": status,
                 "updated_at": ts.isoformat() + "Z",

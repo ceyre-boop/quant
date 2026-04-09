@@ -97,8 +97,8 @@ class PaperTradingEngine:
             entry_price=current_price,  # Use current market price
             position_size=position_value,
             stop_loss=signal.stop_loss,
-            take_profit_1=signal.take_profit_1,
-            take_profit_2=signal.take_profit_2,
+            take_profit_1=signal.take_profit_1,  # type: ignore[attr-defined]
+            take_profit_2=signal.take_profit_2,  # type: ignore[attr-defined]
             entry_time=datetime.now(),
             status=TradeStatus.OPEN,
             entry_model=signal.entry_model,
@@ -167,7 +167,7 @@ class PaperTradingEngine:
             # Check for exit conditions
             exit_triggered = False
             exit_price = price
-            close_reason = None
+            close_reason: str = ""
 
             # Stop loss hit
             if position.direction == "LONG" and price <= position.stop_loss:

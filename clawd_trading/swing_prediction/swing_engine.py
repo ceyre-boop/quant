@@ -130,7 +130,7 @@ class SwingEngine:
         results = []
 
         scan_start = datetime.now()
-        scan_log = {
+        scan_log: Dict[str, Any] = {
             "scan_type": "monthly",
             "start_time": scan_start.isoformat(),
             "symbols_scanned": len(symbols),
@@ -233,7 +233,7 @@ class SwingEngine:
         tradeable, block_reason = self._determine_tradeability(composite, layers_aligned, base_rate_data)
 
         # Build SwingBias object
-        bias = SwingBias(
+        bias = SwingBias(  # type: ignore[call-arg]
             symbol=symbol,
             timestamp=datetime.now(),
             tradeable=tradeable,
@@ -280,7 +280,7 @@ class SwingEngine:
 
         tradeable, block_reason = self._determine_tradeability(composite, layers_aligned, None)
 
-        return SwingBias(
+        return SwingBias(  # type: ignore[call-arg]
             symbol=symbol,
             timestamp=datetime.now(),
             tradeable=tradeable,

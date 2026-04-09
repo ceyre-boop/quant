@@ -445,7 +445,7 @@ class ClawdBrain(AIBrain):  # v3.1 - Canonical
         cross_assets = ["SPY", "VIXY", "SQQQ", "SPXU", "GLD", "TLT"]
 
         for asset in cross_assets:
-            if asset != symbol:
+            if asset != symbol and self.alpaca_client is not None:
                 try:
                     asset_df = self.alpaca_client.get_historical_bars(asset, timeframe="1D", days=60)
                     if not asset_df.empty:
@@ -457,6 +457,8 @@ class ClawdBrain(AIBrain):  # v3.1 - Canonical
         if features_df.empty:
             return None
 
+        assert self.feature_cols is not None
+        assert self.model is not None
         latest = features_df.iloc[-1]
         feature_values = [latest.get(col, 0) if not pd.isna(latest.get(col, 0)) else 0 for col in self.feature_cols]
 

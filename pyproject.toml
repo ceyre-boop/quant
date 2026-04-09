@@ -29,6 +29,16 @@ python_version = "3.11"
 ignore_missing_imports = true
 explicit_package_bases = true
 warn_unused_ignores = false
+no_implicit_optional = false
+disable_error_code = ["var-annotated"]
+exclude = [
+    "scripts/legacy/.*",
+    "tests/debug/.*",
+    "examples/.*",
+    "verify_data_flow\\.py",
+    "simple_publisher\\.py",
+    "clawd_trading/swing_prediction/TODO_COMPLETE_IMPLEMENTATION\\.py",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

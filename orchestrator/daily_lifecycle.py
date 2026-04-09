@@ -61,7 +61,7 @@ class LifecycleConfig:
     market_close_time: str = "16:00"  # EST
     eod_cleanup_time: str = "16:05"  # EST
     intraday_interval_minutes: int = 5
-    symbols: List[str] = None
+    symbols: Optional[List[str]] = None
 
     def __post_init__(self):
         if self.symbols is None:
@@ -191,7 +191,7 @@ class DailyLifecycle:
                 components={"lifecycle": "pre_market", "data": "fetching"},
             )
 
-            for symbol in self.config.symbols:
+            for symbol in (self.config.symbols or []):
                 try:
                     logger.info(f"Processing {symbol}...")
                     result = self._process_symbol(symbol)
@@ -260,7 +260,7 @@ class DailyLifecycle:
         entry_signals = []
 
         try:
-            for symbol in self.config.symbols:
+            for symbol in (self.config.symbols or []):
                 try:
                     logger.info(f"Processing {symbol}...")
                     result = self._process_symbol(symbol)
@@ -360,7 +360,7 @@ class DailyLifecycle:
         Returns:
             Dict with processing results
         """
-        result = {"symbol": symbol}
+        result: Dict[str, Any] = {"symbol": symbol}
 
         # 1. Fetch market data
         if self.data_fetcher:

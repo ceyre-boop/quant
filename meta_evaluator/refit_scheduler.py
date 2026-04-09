@@ -24,7 +24,7 @@ class RefitScheduler:
     def __init__(self, firebase_client=None, config: Optional[Dict] = None):
         self.firebase = firebase_client
         self.config = config or {}
-        self.last_refit = None
+        self.last_refit: Optional[datetime] = None
 
         # Default thresholds
         self.min_trades_for_refit = self.config.get("min_trades", 50)
