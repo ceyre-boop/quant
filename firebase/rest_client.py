@@ -52,7 +52,7 @@ class FirebaseRESTClient:
             if response.status_code in [200, 201]:
                 return response.json() if response.text else {}
             else:
-                logger.error(f"Firebase {method} failed: {response.status_code} - {response.text[:200]}")
+                logger.error(f"Firebase {method} failed: {response.status_code}")
                 return None
 
         except Exception as e:

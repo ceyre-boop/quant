@@ -71,7 +71,7 @@ class SimpleFirebasePublisher:
             if response.status_code == 200:
                 return True
             else:
-                logger.error(f"Firebase write failed: {response.status_code} - {response.text}")
+                logger.error(f"Firebase write failed: {response.status_code}")
                 return False
         except Exception as e:
             logger.error(f"Firebase write error: {e}")
