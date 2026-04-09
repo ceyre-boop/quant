@@ -15,13 +15,12 @@ import sys
 import argparse
 import pandas as pd
 from datetime import datetime, timedelta
+from pathlib import Path
 from typing import List, Dict, Any
 from dataclasses import dataclass
 
 # Add parent to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
-
-from pathlib import Path
 from data.alpaca_client import AlpacaDataClient
 from layer1.bias_engine import BiasEngine
 from layer1.feature_builder import FeatureBuilder
