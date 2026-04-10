@@ -506,3 +506,7 @@ class FeatureBuilder:
 def create_feature_builder() -> FeatureBuilder:
     """Factory function to create feature builder."""
     return FeatureBuilder()
+
+
+# Alias for backwards-compatible import in layer1/__init__.py
+FeatureBuilderV2 = FeatureBuilder

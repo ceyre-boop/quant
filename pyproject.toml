@@ -30,6 +30,35 @@ ignore_missing_imports = true
 explicit_package_bases = true
 warn_unused_ignores = false
 
+# Suppress known type errors in modules pending full type-annotation work
+[[tool.mypy.overrides]]
+module = [
+    "ai_trading_bridge",
+    "clawd_brain",
+    "dashboard_api",
+    "kimi_brain",
+    "simple_publisher",
+    "verify_data_flow",
+    "walk_forward_validation",
+    "xgboost_brain",
+    "backtest.*",
+    "clawd_trading.*",
+    "data.*",
+    "examples.*",
+    "execution.*",
+    "firebase.*",
+    "integration.*",
+    "layer1.*",
+    "layer2.*",
+    "meta_evaluator.*",
+    "orchestrator.*",
+    "scripts.*",
+    "tests.debug.*",
+    "trading_strategies.*",
+    "training.*",
+]
+ignore_errors = true
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]

@@ -265,3 +265,7 @@ class HardConstraints:
 def create_hard_constraints() -> HardConstraints:
     """Factory function to create hard constraints."""
     return HardConstraints()
+
+
+# Alias for backwards-compatible import in layer1/__init__.py
+HardConstraintsV2 = HardConstraints
