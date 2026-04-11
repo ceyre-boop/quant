@@ -1,0 +1,111 @@
+//@fract
+//@version=6
+indicator("Fractal Corridors", overlay=true, max_lines_count=500)
+
+//Inputs{
+depthBase   = input.int(10,  "Base Depth", minval=1)
+factor      = input.int(5, "Scaling Factor", 2, 10)
+fractDens   = input.string("Internal", "Structural Fill Type", ["Internal", "External"])
+col         = input.color(#000000, "Color", inline = "st")
+lineWidth   = input.int(2, "Line Width", [1, 2, 3, 4], inline = "st")
+depth2      = depthBase * factor
+depth3      = depth2 * factor
+//}
+
+//Pivot Detection {
+pvts(src, len, isHigh) =>
+    p = nz(src[len])
+    isValid = true
+    for i = 0 to len - 1
+        isValid := isValid and (isHigh ? src[i] <= p : src[i] >= p)
+    for i = len + 1 to 2 * len
+        isValid := isValid and (isHigh ? src[i] < p : src[i] > p)
+    [isValid and 2 * len <= bar_index ? bar_index[len] : na, isValid ? p : na]
+//}
+// Base Depth Processing {
+var float prevH1 = na
+var float prevL1 = na
+var int previH1 = na 
+var int previL1 = na
+var line lineH1 = na
+var line lineL1 = na
+
+[iH1, pH1] = pvts(high, depthBase, true)
+[iL1, pL1] = pvts(low, depthBase, false)
+
+if not na(iH1)
+    if not na(prevH1)
+        lineH1 := line.new(previH1, prevH1, iH1, pH1, xloc.bar_index, color=col, width=lineWidth, style=fractDens == "Internal"?line.style_solid:line.style_dotted)
+    prevH1 := pH1
+    previH1 := iH1
+
+if not na(iL1)
+    if not na(prevL1)
+        lineL1 := line.new(previL1, prevL1, iL1, pL1, xloc.bar_index, color=col, width=lineWidth, style=fractDens == "Internal"?line.style_solid:line.style_dotted)
+    prevL1 := pL1
+    previL1 := iL1
+//}
+// Depth II Processing{
+var float prevH2 = na
+var float prevL2 = na
+var int previH2 = na 
+var int previL2 = na
+var line lineH2 = na
+var line lineL2 = na
+
+[iH2, pH2] = pvts(high, depth2, true)
+[iL2, pL2] = pvts(low, depth2, false)
+
+if not na(iH2)
+    if not na(prevH2)
+        lineH2 := line.new(previH2, prevH2, iH2, pH2, xloc.bar_index, color=col, width=lineWidth, style=fractDens == "Internal"?line.style_solid:line.style_dotted)
+    prevH2 := pH2
+    previH2 := iH2
+
+if not na(iL2)
+    if not na(prevL2)
+        lineL2 := line.new(previL2, prevL2, iL2, pL2, xloc.bar_index, color=col, width=lineWidth, style=fractDens == "Internal"?line.style_solid:line.style_dotted)
+    prevL2 := pL2
+    previL2 := iL2
+//}
+// Depth III Processing{
+var float prevH3 = na
+var float prevL3 = na
+var int previH3 = na 
+var int previL3 = na
+var line lineH3 = na
+var line lineL3 = na
+
+[iH3, pH3] = pvts(high, depth3, true)
+[iL3, pL3] = pvts(low, depth3, false)
+
+if not na(iH3)
+    if not na(prevH3)
+        lineH3 := line.new(previH3, prevH3, iH3, pH3, xloc.bar_index, color=col, width=lineWidth, style=fractDens == "Internal"?line.style_solid:line.style_dotted)
+    prevH3 := pH3
+    previH3 := iH3
+
+if not na(iL3)
+    if not na(prevL3)
+        lineL3 := line.new(previL3, prevL3, iL3, pL3, xloc.bar_index, color=col, width=lineWidth, style=fractDens == "Internal"?line.style_solid:line.style_dotted)
+    prevL3 := pL3
+    previL3 := iL3
+//}
+// Structural Density Exposure{
+if fractDens == "Internal"
+    if not na(lineH1) and not na(lineL1)
+        linefill.new(lineH1, lineL1, color=color.new(col, 95))
+    if not na(lineH2) and not na(lineL2)
+        linefill.new(lineH2, lineL2, color=color.new(col, 95))
+    if not na(lineH3) and not na(lineL3)
+        linefill.new(lineH3, lineL3, color=color.new(col, 95))
+else
+    if not na(lineH1) and not na(lineH2)
+        linefill.new(lineH1, lineH2, color=color.new(col, 95))
+    if not na(lineL1) and not na(lineL2)
+        linefill.new(lineL1, lineL2, color=color.new(col, 95))
+    if not na(lineH2) and not na(lineH3)
+        linefill.new(lineH3, lineH2, color=color.new(col, 95))
+    if not na(lineL2) and not na(lineL3)
+        linefill.new(lineL2, lineL3, color=color.new(col, 95))
+//}
