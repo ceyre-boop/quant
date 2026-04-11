@@ -173,18 +173,20 @@ class ProductionEntryEngine:
             selected_model, layer1_output, market_data
         )
         
-        # Step 7: Run 12-gate validation
-        gate_results = self._run_gates_with_enhanced_logging(
-            symbol, context, account, entry_price
+        # Step 7: Run ICT Structural Validation & Constraints
+        # Extract historical bars from market_data if available
+        bars_df = market_data.get("bars") if market_data else None
+        
+        signal = self.entry_engine.validate_entry(
+            symbol, context, account, entry_price, timestamp=datetime.now(), df=bars_df
         )
         
-        failed_gates = [g for g in gate_results if not g.passed]
-        if failed_gates:
-            self.logger.info(
-                f"Entry blocked at gate {failed_gates[0].gate_number}: "
-                f"{failed_gates[0].reason}"
-            )
+        if not signal:
             return None
+            
+        # Extract the gates for legacy reporting if needed
+        # (Though we now use the ICT Checklist Result)
+        gate_results = []
         
         # Step 8: Combined Risk Validation (Gate 12 equivalent)
         base_risk_limits = self._extract_risk_limits(context)

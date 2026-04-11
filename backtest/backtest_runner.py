@@ -17,7 +17,7 @@ import numpy as np
 
 from contracts.types import (
     BiasOutput, RiskOutput, GameOutput, RegimeState,
-    PositionState, EntrySignal, Direction
+    PositionState, EntrySignal, Direction, Magnitude, AdversarialRisk
 )
 
 logger = logging.getLogger(__name__)

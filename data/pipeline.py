@@ -17,6 +17,7 @@ from data.sentiment_engine import SentimentEngine
 from data.order_flow_fetcher import OrderFlowFetcher
 from data.tradelocker_client import TradeLockerClient
 from data.validator import DataValidator
+from layer3.macro_imbalance import MacroImbalanceFramework
 from contracts.types import FeatureRecord
 
 logger = logging.getLogger(__name__)
@@ -40,7 +41,7 @@ class DataPipeline:
         self.calendar_fetcher = CalendarFetcher()
         self.sentiment_engine = SentimentEngine()
         self.order_flow_fetcher = OrderFlowFetcher(self.polygon)
-        
+        self.imbalance_engine = MacroImbalanceFramework()
         self.validator = DataValidator()
     
     def run_premarket(
@@ -109,6 +110,22 @@ class DataPipeline:
         except Exception as e:
             logger.error(f"Failed to compute breadth: {e}")
             breadth = None
+            
+        # 4.5 Run Imbalance Engine (Global Macro)
+        try:
+            # Prepare inputs from data sources
+            macro_input = {
+                'cape': 32.0, 
+                'bond_yield_10yr': 4.25,
+                'vix': vix_value,
+                'spy_returns_1m': self._extract_index_value(index_data, 'SPY', 'perf_30d', 0),
+                'spread_3m_10yr': self._extract_index_value(index_data, '3M10Y', 'value', -0.2),
+                'credit_spread': self._extract_index_value(index_data, 'LQD', 'spread', 1.0)
+            }
+            macro_result = self.imbalance_engine.compute(macro_input)
+        except Exception as e:
+            logger.error(f"Imbalance Engine failed: {e}")
+            macro_result = None
         
         # 5. Build FeatureRecord for each symbol
         for symbol in symbols:
@@ -121,7 +138,8 @@ class DataPipeline:
                     vix_value=vix_value,
                     vix_regime=vix_regime,
                     event_risk=event_risk,
-                    breadth=breadth
+                    breadth=breadth,
+                    macro_result=macro_result
                 )
                 
                 # Get latest bar for raw_data
@@ -237,15 +255,22 @@ class DataPipeline:
         vix_value: float,
         vix_regime: str,
         event_risk: str,
-        breadth: Any
+        breadth: Any,
+        macro_result: Any = None
     ) -> Dict[str, float]:
-        """Build feature vector for a symbol.
-        
-        This is a simplified implementation. The full feature_builder.py
-        in Layer 1 will contain all 43 features with proper calculations.
-        """
+        """Build feature vector for a symbol."""
         features = {}
         
+        # Inject macro imbalance features
+        if macro_result:
+            features['hmm_regime_stress'] = macro_result.get('hmm_regime_stress', 0.0)
+            features['pca_mahalanobis'] = macro_result.get('pca_mahalanobis', 0.0)
+            features['recession_prob_12m'] = macro_result.get('recession_prob_12m', 0.0)
+        else:
+            features['hmm_regime_stress'] = 0.0
+            features['pca_mahalanobis'] = 0.0
+            features['recession_prob_12m'] = 0.0
+            
         if not daily_data:
             return features
         
@@ -339,3 +364,10 @@ class DataPipeline:
                 features[key] = 0.0
         
         return features
+
+    def _extract_index_value(self, data: dict, key: str, subkey: str, default: float) -> float:
+        """Helper to safely extract nested index values."""
+        try:
+            return data.get(key, {}).get('latest', {}).get(subkey, default)
+        except Exception:
+            return default

@@ -11,6 +11,8 @@ from datetime import datetime
 from pathlib import Path
 
 import numpy as np
+import pickle
+import pandas as pd
 
 from contracts.types import (
     Direction, Magnitude, BiasOutput, FeatureGroup, RegimeState
@@ -34,10 +36,41 @@ class BiasEngine:
         
         # Load or create model
         self.model = None
-        self.model_path = model_path or 'layer1/bias_model/model_v1.pkl'
+        self.feature_names = None
+        self.model_path = model_path or 'training/xgb_model.pkl'
+        
+        self._load_model()
         
         # Feature group mapping for rationale
         self.feature_to_group = self._build_feature_group_mapping()
+    
+    def _load_model(self):
+        """Load XGBoost model and metadata if they exist."""
+        if os.path.exists(self.model_path):
+            try:
+                with open(self.model_path, 'rb') as f:
+                    data = pickle.load(f)
+                
+                # Handle dictionary format (from training/train_xgb.py)
+                if isinstance(data, dict) and 'model' in data:
+                    self.model = data['model']
+                    self.feature_names = data.get('features')
+                    logger.info(f"Loaded XGBoost model dictionary from {self.model_path}")
+                else:
+                    # Handle raw model format
+                    self.model = data
+                    
+                    # Try to load metadata if separate
+                    meta_path = self.model_path.replace('.pkl', '_metadata.json')
+                    if os.path.exists(meta_path):
+                        with open(meta_path, 'r') as f:
+                            meta = json.load(f)
+                            self.feature_names = meta.get('feature_names')
+                    
+                    logger.info(f"Loaded raw XGBoost model from {self.model_path}")
+            except Exception as e:
+                logger.error(f"Failed to load XGBoost model: {e}")
+                self.model = None
     
     def get_daily_bias(
         self,
@@ -62,7 +95,7 @@ class BiasEngine:
         magnitude = self._determine_magnitude(confidence, features)
         
         # Check for regime override
-        regime_override = self._check_regime_override(regime)
+        regime_override = self._check_regime_override(regime, features)
         
         # Generate rationale (feature group names)
         rationale = self._generate_rationale(features)
@@ -96,9 +129,31 @@ class BiasEngine:
         """
         feature_dict = features.to_dict()
         
-        # Simplified heuristic model (replace with actual XGBoost)
-        # Weighted combination of trend, momentum, and mean reversion signals
+        # Use XGBoost model if available
+        if self.model is not None and self.feature_names is not None:
+            try:
+                # Prepare input dataframe
+                X = pd.DataFrame([feature_dict])[self.feature_names].fillna(0)
+                
+                # Predict probability of win (target=1)
+                prob = self.model.predict_proba(X)[0, 1]
+                
+                # Map prob to direction and confidence
+                if prob > 0.55:
+                    direction = Direction.LONG
+                    confidence = prob
+                elif prob < 0.45:
+                    direction = Direction.SHORT
+                    confidence = 1 - prob
+                else:
+                    direction = Direction.NEUTRAL
+                    confidence = 0.5
+                    
+                return direction, confidence
+            except Exception as e:
+                logger.error(f"Inference error: {e}")
         
+        # Fallback to heuristic model
         trend_score = (
             feature_dict.get('price_vs_sma_20', 0) * 0.3 +
             feature_dict.get('price_vs_sma_50', 0) * 0.2 +
@@ -141,14 +196,16 @@ class BiasEngine:
         else:
             return Magnitude.SMALL
     
-    def _check_regime_override(self, regime: RegimeState) -> bool:
+    def _check_regime_override(self, regime: RegimeState, features: FeatureVector) -> bool:
         """Check if regime requires model override.
         
         Override conditions:
+        - ATR% > 4.0% (Structural Noise Gate)
         - EXTREME volatility + trend uncertainty
         - HIGH/EXTREME event risk
-        - RISK_OFF with strong bearish signals
         """
+        if features.atr_percent_14 > 0.04:  # 4% daily ATR is often structural chaos
+            return True
         if regime.event_risk.value in ['HIGH', 'EXTREME']:
             return True
         if regime.volatility.value == 'EXTREME':

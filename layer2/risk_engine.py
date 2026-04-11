@@ -11,6 +11,7 @@ import numpy as np
 
 from contracts.types import RiskOutput, BiasOutput, RegimeState, AccountState, MarketData
 from layer1.feature_builder import FeatureVector
+from layer2.dynamic_rr_engine import DynamicRREngine
 
 logger = logging.getLogger(__name__)
 
@@ -283,6 +284,7 @@ class RiskEngine:
         self.stop_calculator = StopCalculator()
         self.target_calculator = TargetCalculator()
         self.ev_calculator = ExpectedValueCalculator()
+        self.dynamic_engine = DynamicRREngine()
         
         self.default_win_rate = default_win_rate
         self.default_avg_win_r = default_avg_win_r
@@ -294,7 +296,8 @@ class RiskEngine:
         regime: RegimeState,
         market_data: MarketData,
         account_state: AccountState,
-        strategy_params: Optional[Dict] = None
+        strategy_params: Optional[Dict] = None,
+        ict_result: Optional[Any] = None
     ) -> RiskOutput:
         """Compute complete risk structure.
         
@@ -308,29 +311,49 @@ class RiskEngine:
         Returns:
             RiskOutput with sizing, stops, targets, EV
         """
-        strategy_params = strategy_params or {}
+        # 1. Base Risk Percentage (Adjusted by ICT Grade)
+        base_risk = self.position_sizing.default_risk_pct
+        grade_multiplier = 1.0
         
-        entry_price = market_data.current_price
-        direction = bias.direction.value
-        atr_14 = market_data.atr_14
+        if ict_result:
+            score = getattr(ict_result, 'score', 5.0)
+            if score >= 8.5: # A+
+                grade_multiplier = 1.5
+            elif score >= 7.0: # A
+                grade_multiplier = 1.0
+            elif score >= 5.5: # B
+                grade_multiplier = 0.5
+            else: # C
+                grade_multiplier = 0.25
         
-        # Get swing levels from strategy params or estimate
-        swing_low = strategy_params.get('swing_low', entry_price * 0.98)
-        swing_high = strategy_params.get('swing_high', entry_price * 1.02)
+        risk_pct = base_risk * grade_multiplier
         
-        # Calculate stops
-        atr_stop = self.stop_calculator.calculate_atr_stop(
-            entry_price, atr_14, direction, regime
+        # 2. Dynamic RR Engine Call (ICT-First Stops, Asset Profiles)
+        ict_structure = {
+            'swing_low': getattr(ict_result, 'swing_low', None),
+            'swing_high': getattr(ict_result, 'swing_high', None),
+            'orderblock_low': getattr(ict_result, 'orderblock_low', None),
+            'orderblock_high': getattr(ict_result, 'orderblock_high', None),
+            'fvg_low': getattr(ict_result, 'fvg_low', None),
+            'fvg_high': getattr(ict_result, 'fvg_high', None),
+            'tp1_target': getattr(ict_result, 'liquidity_target', None)
+        }
+        
+        dyn_struct = self.dynamic_engine.build_risk_structure(
+            market_data.symbol,
+            market_data.current_price,
+            bias.direction,
+            market_data,
+            regime,
+            ict_structure
         )
-        structural_stop = self.stop_calculator.calculate_structural_stop(
-            entry_price, direction, swing_low, swing_high, atr_14
-        )
-        stop_price, stop_method = self.stop_calculator.calculate_final_stop(
-            entry_price, direction, atr_stop, structural_stop
-        )
         
-        # Calculate position size
-        stop_distance = abs(entry_price - stop_price)
+        stop_price = dyn_struct['stop_price']
+        tp1 = dyn_struct['tp1']
+        tp2 = dyn_struct['tp2']
+        
+        # 3. Position Sizing
+        stop_distance = abs(market_data.current_price - stop_price)
         
         # Calculate Kelly fraction
         kelly = self.position_sizing.calculate_kelly_fraction(
@@ -342,12 +365,8 @@ class RiskEngine:
         sizing = self.position_sizing.calculate_position_size(
             account_state.equity,
             stop_distance,
+            risk_pct=risk_pct,
             kelly_fraction=kelly
-        )
-        
-        # Calculate targets
-        targets = self.target_calculator.calculate_targets(
-            entry_price, stop_price, direction
         )
         
         # Calculate EV
@@ -361,10 +380,10 @@ class RiskEngine:
             position_size=sizing['position_size'],
             kelly_fraction=kelly,
             stop_price=stop_price,
-            stop_method=stop_method,
-            tp1_price=targets['tp1'],
-            tp2_price=targets['tp2'],
-            trail_config={'atr_multiple': 1.5},
+            stop_method=dyn_struct['stop_method'],
+            tp1_price=tp1,
+            tp2_price=tp2,
+            trail_config={'atr_multiple': dyn_struct['profile'].trail_atr_mult},
             expected_value=ev['expected_value_r'],
             ev_positive=ev['ev_positive'],
             size_breakdown=sizing

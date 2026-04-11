@@ -1,0 +1,40 @@
+# Institutional Execution Constraints V2.2
+# Locked via Governance (Pillar 10)
+# Created: 2026-04-10
+
+stagnation_shock_exit:
+  enabled: true
+  min_time_threshold_hours: 24
+  max_mae_atr_threshold: 2.5
+  max_mfe_r_ceiling: 1.0
+  action: "MARKET_EXIT"
+  reason: "EFFICIENCY_TRAP_TRIGGERED"
+
+commodity_mean_reversion_profile:
+  symbols: ["GOLD", "GLD", "SILVER", "SLV", "OIL", "USO", "UNG"]
+  s_vector_tag: "Commodity_MeanRevert"
+  enforced_stop_atr_range: [6.0, 7.5]
+  entry_delay_post_spike_bars: 3
+  action: "WIDEN_STOP_OR_DELAY_ENTRY"
+
+verticality_filter:
+  enabled: true
+  tier_restriction: 3
+  sigma_threshold: 2.0
+  lookback_bars: 20
+  action: "BLOCK_SIGNAL"
+  reason: "MOMENTUM_EXHAUSTION_CLIMAX"
+
+indices_risk_lock:
+  symbols: ["SPY", "QQQ", "DIA", "IWM"]
+  s_vector_tag: "StableTrend_Index"
+  freeze_stop_multiple: true
+  freeze_target_multiple: true
+  max_variance_limit: 0.05
+  action: "LOCKED_PARAMETERS"
+
+ml_coupler_guardrails:
+  max_drawdown_ceiling: -0.044
+  tail_loss_99th_var: -0.03
+  min_win_rate_threshold: 0.466
+  bunker_mode_retention: true

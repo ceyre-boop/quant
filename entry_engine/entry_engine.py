@@ -13,7 +13,9 @@ from contracts.types import (
     Direction, BiasOutput, RiskOutput, GameOutput, RegimeState,
     AccountState, EntrySignal, ThreeLayerContext, FeatureGroup
 )
+from governance.policy_engine import GOVERNANCE
 from layer1.hard_constraints import HardConstraints, ConstraintCheck
+from entry_engine.ict_decision_tree import ICTDecisionTree, ICTChecklistResult
 
 logger = logging.getLogger(__name__)
 
@@ -32,6 +34,7 @@ class EntryEngine:
     
     def __init__(self):
         self.constraints = HardConstraints()
+        self.ict_tree = ICTDecisionTree()
         self.logger = logging.getLogger(__name__)
     
     def validate_entry(
@@ -40,79 +43,82 @@ class EntryEngine:
         context: ThreeLayerContext,
         account: AccountState,
         entry_price: float,
+        timestamp: Optional[datetime] = None,
+        df: Optional[pd.DataFrame] = None,
         ict_setup: Optional[Dict] = None
     ) -> Optional[EntrySignal]:
-        """Validate entry through all 12 gates.
+        """Validate entry through hard constraints + ICT Decision Tree.
         
         Args:
             symbol: Trading symbol
             context: ThreeLayerContext with all layers
             account: Account state
             entry_price: Proposed entry price
+            df: Historical price data (required for structural confirmation)
             ict_setup: Optional ICT pattern detection results
         
         Returns:
             EntrySignal if all gates pass, None otherwise
         """
-        # Run all 12 gates
-        gates = self._run_all_gates(symbol, context, account, entry_price, ict_setup)
+        # 1. Check Hard Constraints (Safety First)
+        # We use the index or a passed timestamp to check Kill Zones and Hours
+        check_time = timestamp if timestamp else (df.index[-1] if df is not None and not df.empty else datetime.utcnow())
         
-        # Check for failures
-        failed = [g for g in gates if not g.passed]
-        
-        if failed:
-            self.logger.info(f"Entry blocked at gate {failed[0].gate_number}: {failed[0].reason}")
+        hard_gates = self._run_hard_gates(symbol, context, account, entry_price, check_time)
+        failed_hard = [g for g in hard_gates if not g.passed]
+        if failed_hard:
+            self.logger.info(f"Entry blocked by Safety Gate {failed_hard[0].gate_number}: {failed_hard[0].reason}")
             return None
+
+        # 2. Level 1: Confidence Check (Pillar 6)
+        threshold = GOVERNANCE.parameters['bias_engine']['confidence_threshold']
+        if context.bias.confidence < threshold:
+            self.logger.info(f"Entry blocked: Confidence {context.bias.confidence:.2f} < {threshold}")
+            return None
+
+        # 3. Level 2: Structural ICT Confirmation (The "Timing" piece)
+        if df is not None:
+            # We use the index or a passed timestamp to check Kill Zones
+            check_time = timestamp if timestamp else (df.index[-1] if not df.empty else datetime.utcnow())
+            ict_result = self.ict_tree.evaluate(df, context.bias.direction, entry_price, check_time)
+            
+            if not ict_result.passed:
+                self.logger.info(f"Entry blocked by ICT Checklist (Grade: {ict_result.grade}, Score: {ict_result.score:.1f}/10): Missing {ict_result.missing}")
+                return None
+            
+            self.logger.info(f"ICT Confirmation Passed (Grade: {ict_result.grade}, Score: {ict_result.score:.1f}/10): {ict_result.confirmations}")
+            # Use ICT-suggested levels if provided
+            entry_price = ict_result.entry_price or entry_price
         
-        # All gates passed - create entry signal
-        return self._create_entry_signal(symbol, context, entry_price, gates)
+        # 4. Final Agreement (Layer Alignment)
+        if not context.all_aligned():
+            self.logger.info(f"Entry blocked: Layer misalignment - {context.block_reason()}")
+            return None
+        # ICT Confirmation Passed - create entry signal
+        return self._create_entry_signal(symbol, context, entry_price, ict_result)
     
-    def _run_all_gates(
+    def _run_hard_gates(
         self,
         symbol: str,
         context: ThreeLayerContext,
         account: AccountState,
         entry_price: float,
-        ict_setup: Optional[Dict]
+        timestamp: datetime
     ) -> List[GateCheck]:
-        """Run all 12 entry gates."""
+        """Run safety and risk hard gates."""
         gates = []
         
-        # Gate 1: Layer 1 confidence >= 0.55
-        gates.append(self._gate_1_confidence(context))
-        
-        # Gate 2: Bias direction != NEUTRAL
-        gates.append(self._gate_2_direction(context))
-        
-        # Gate 3: Layer 2 positive EV
-        gates.append(self._gate_3_positive_ev(context))
-        
-        # Gate 4: Valid risk structure (stop within volatility band)
-        gates.append(self._gate_4_risk_structure(context, entry_price))
-        
-        # Gate 5: Layer 3 not EXTREME adversarial (unless aligned)
-        gates.append(self._gate_5_game_state(context))
-        
-        # Gate 6: Hard constraint - daily loss limit
+        # Gate 6: Daily loss limit
         gates.append(self._gate_6_daily_loss(context, account))
         
-        # Gate 7: Hard constraint - max positions
+        # Gate 7: Max positions
         gates.append(self._gate_7_max_positions(account))
         
-        # Gate 8: Hard constraint - position size limit
+        # Gate 8: Position size limit
         gates.append(self._gate_8_position_size(context, account))
         
         # Gate 9: Trading hours
-        gates.append(self._gate_9_trading_hours())
-        
-        # Gate 10: Regime override check
-        gates.append(self._gate_10_regime_override(context))
-        
-        # Gate 11: ICT pattern validation (if provided)
-        gates.append(self._gate_11_ict_pattern(ict_setup))
-        
-        # Gate 12: Final agreement gate
-        gates.append(self._gate_12_agreement(context))
+        gates.append(self._gate_9_trading_hours(timestamp))
         
         return gates
     
@@ -219,9 +225,9 @@ class EntryEngine:
             reason=check.reason
         )
     
-    def _gate_9_trading_hours(self) -> GateCheck:
+    def _gate_9_trading_hours(self, dt: datetime) -> GateCheck:
         """Gate 9: Trading hours."""
-        check = self.constraints.check_trading_hours(datetime.utcnow())
+        check = self.constraints.check_trading_hours(dt)
         return GateCheck(
             gate_number=9,
             name='Trading_Hours',
@@ -282,21 +288,47 @@ class EntryEngine:
         symbol: str,
         context: ThreeLayerContext,
         entry_price: float,
-        gates: List[GateCheck]
+        ict_result: Optional[ICTChecklistResult] = None
     ) -> EntrySignal:
-        """Create entry signal from validated context."""
+        """Create entry signal from validated context and ICT confirmation."""
+        # Standard rationale from ICT result
+        rationale = ict_result.confirmations if ict_result else ["Manual/Layer Alignment"]
+        grade = ict_result.grade if ict_result else "C"
+        score = ict_result.score if ict_result else 0.0
+        
+        # Determine targets and stops
+        stop_loss = (ict_result.stop_loss if ict_result and ict_result.stop_loss 
+                     else context.risk.stop_price)
+        tp1 = (ict_result.take_profit if ict_result and ict_result.take_profit 
+               else context.risk.tp1_price)
+        
+        # Position Scaling based on Grade (Phase 6 Alignment)
+        size_multiplier = 1.0
+        if grade == "A+":
+            size_multiplier = 1.5
+        elif grade == "A":
+            size_multiplier = 1.0
+        elif grade in ["B", "C"]:
+            # These were already filtered by 'passed=True/False' in ict_tree,
+            # but we set size to 0 for safety if it somehow reached here.
+            size_multiplier = 0.0
+            
+        position_size = context.risk.position_size * size_multiplier
+        
         return EntrySignal(
             symbol=symbol,
             direction=context.bias.direction,
             entry_price=entry_price,
-            position_size=context.risk.position_size,
-            stop_loss=context.risk.stop_price,
-            tp1=context.risk.tp1_price,
+            position_size=position_size,
+            stop_loss=stop_loss,
+            tp1=tp1,
             tp2=context.risk.tp2_price,
             confidence=context.bias.confidence,
-            rationale=[g.name for g in gates if g.passed],
+            rationale=rationale,
             timestamp=datetime.utcnow(),
-            layer_context=context
+            layer_context=context,
+            grade=grade,
+            score=score
         )
 
 

@@ -460,6 +460,8 @@ class EntrySignal:
     rationale: List[str]
     timestamp: datetime
     layer_context: ThreeLayerContext
+    grade: str = "C" # Default
+    score: float = 0.0
     
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -473,7 +475,9 @@ class EntrySignal:
             'confidence': self.confidence,
             'rationale': self.rationale,
             'timestamp': self.timestamp.isoformat(),
-            'layer_context': self.layer_context.to_dict()
+            'layer_context': self.layer_context.to_dict(),
+            'grade': self.grade,
+            'score': self.score
         }
 
 

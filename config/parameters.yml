@@ -1,0 +1,61 @@
+# CLAWD Trading Desk - Institutional Parameter Store
+# Hash-locked and versioned. All runtime parameters must be defined here.
+
+# --- Versioning ---
+version: "2.1.0"
+environment: "RESEARCH_OOS"
+last_updated: "2026-04-10"
+
+# --- Pillar 1: Deterministic Foundations ---
+random_seed: 42
+
+# --- Pillar 6: Parameter Governance ---
+
+# Layer 1: Bias Engine
+bias_engine:
+  confidence_threshold: 0.52
+  atr_volatility_gate: 0.04  # 4.0%
+  lookback_period: 20
+
+# Layer 2: Position Sizing
+risk_engine:
+  base_risk_pct: 0.005  # 0.5%
+  grade_multipliers:
+    aplus: 1.5
+    a: 1.0
+    b: 0.5
+    c: 0.25
+  kelly_fraction: 0.25 # Aggressive but managed
+
+# Layer 2: Asset Profiles (Dynamic RR V2.1)
+asset_profiles:
+  _DEFAULT:
+    stop_atr_multiplier: 3.5
+    tp_min_r: 1.5
+    tp_target_r: 4.5
+    trail_activation_r: 1.0
+    trail_atr_mult: 3.5
+    shock_exit_atr_mult: 4.5
+    max_stop_pct: 0.10
+    min_stop_atr: 1.5
+  
+  ARM:
+    stop_atr_multiplier: 4.5
+    shock_exit_atr_mult: 5.0
+    tp_target_r: 6.0
+  
+  AAPL:
+    stop_atr_multiplier: 2.5
+    shock_exit_atr_mult: 3.5
+    tp_target_r: 4.0
+  
+  NVDA:
+    stop_atr_multiplier: 4.0
+    shock_exit_atr_mult: 4.5
+    tp_target_r: 6.0
+
+# Layer 2: Trade Monitoring
+execution:
+  max_hold_days: 7
+  lookahead_skip_bars: 1
+  slippage_buffer_pct: 0.0005 # 5bps slip assumption

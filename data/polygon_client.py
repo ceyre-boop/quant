@@ -4,6 +4,7 @@ REST and WebSocket client for Polygon.io market data.
 """
 
 import os
+import json
 import logging
 from typing import Optional, Dict, List, Any
 from datetime import datetime, timedelta

@@ -26,6 +26,7 @@ from integration.production_engine import ProductionEntryEngine, EnhancedEntrySi
 from integration.firebase_broadcaster import FirebaseBroadcaster
 from contracts.types import AccountState
 from layer1.hard_constraints_v2 import HardConstraints
+from config.settings import get_starting_equity
 
 LOG_FORMAT = "%(asctime)s | %(levelname)s | %(message)s"
 TZ_NY = ZoneInfo("America/New_York")

@@ -1,0 +1,36 @@
+{
+    "hypotheses": [
+        {
+            "id": "HYP-001",
+            "name": "Yield Curve Impulse",
+            "tier": 1,
+            "state": "PAPER_TRADE",
+            "description": "Fed 10Y-3M spread inversion as a 12-month lead for recession-regime bias.",
+            "metrics": {"hit_rate": 0.85, "sample_size": 7},
+            "last_transition": "2026-03-01"
+        },
+        {
+            "id": "HYP-002",
+            "name": "FOMC Semantic Drift",
+            "tier": 2,
+            "state": "IN_SAMPLE",
+            "description": "Measuring cosine similarity drift in FOMC statements via Ollama/Embeddings.",
+            "metrics": {"r_squared": 0.42},
+            "last_transition": "2026-04-09"
+        },
+        {
+            "id": "HYP-006",
+            "name": "Logistic ODE Accumulation",
+            "tier": 3,
+            "state": "FORMATION",
+            "description": "Applying non-linear population growth ODE constants to ICT accumulation phases.",
+            "metrics": {},
+            "last_transition": "2026-04-09"
+        }
+    ],
+    "research_config": {
+        "execution_influence": false,
+        "logging_level": "VERBOSE",
+        "oos_lock_date": "2026-06-01"
+    }
+}
