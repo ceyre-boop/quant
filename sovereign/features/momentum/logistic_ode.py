@@ -95,14 +95,14 @@ def _fit_logistic(volume_anomaly: np.ndarray) -> dict:
 
 
 def compute_logistic_features(df: pd.DataFrame,
-                              window: int = 60,
+                              window: int = 20,
                               step: int = 5) -> pd.DataFrame:
     """
     Compute Logistic ODE features from OHLCV data.
 
     Args:
         df:     DataFrame with 'close' and 'volume' columns
-        window: Rolling window for logistic fitting (default 60 bars)
+        window: Rolling window for logistic fitting (default 20 bars)
         step:   Fit every N bars to reduce computation (default 5)
 
     Output columns:

@@ -84,7 +84,7 @@ def compute_hurst_features(df: pd.DataFrame) -> pd.DataFrame:
 
     # Velocity: how fast is the Hurst reading changing?
     # Rising = regime strengthening. Falling = regime weakening.
-    hurst_velocity = hurst_90.diff(5)
+    hurst_velocity = hurst_90.diff(10)
 
     result = pd.DataFrame({
         'hurst_60':       hurst_60,

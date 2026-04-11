@@ -49,9 +49,9 @@ class HMMRegimeDetector:
         self.n_states = n_states
         self.lookback = lookback
 
-    def compute(self, price_series: pd.Series) -> pd.DataFrame:
+    def compute(self, df: pd.DataFrame) -> pd.DataFrame:
         """
-        Compute HMM regime features from a price series.
+        Compute HMM regime features from an OHLCV DataFrame.
 
         Uses expanding window for first `lookback` bars,
         then rolling window of `lookback` bars.
@@ -62,14 +62,18 @@ class HMMRegimeDetector:
           - bars_since_regime_change: Bars since last regime switch
         """
         from hmmlearn.hmm import GaussianHMM
-
+        
+        price_series = df['close']
         returns = price_series.pct_change().fillna(0).values
+        volume = df['volume'].values
+        vol_returns = np.diff(np.log(volume + 1), prepend=np.log(volume[0] + 1))
         n = len(returns)
 
-        # Features for HMM: [return, abs_return (volatility proxy)]
+        # Features for HMM: [return, abs_return, volume_change]
         X_full = np.column_stack([
             returns,
             np.abs(returns),
+            vol_returns
         ])
 
         states = np.full(n, np.nan)
@@ -194,4 +198,4 @@ def compute_hmm_features(df: pd.DataFrame,
     Cache the results.
     """
     detector = HMMRegimeDetector(lookback=lookback)
-    return detector.compute(df['close'])
+    return detector.compute(df)

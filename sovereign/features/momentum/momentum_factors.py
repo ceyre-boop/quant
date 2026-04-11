@@ -101,18 +101,34 @@ def compute_adx(df: pd.DataFrame, period: int = 14) -> pd.DataFrame:
     }, index=df.index)
 
 
+def compute_rsi(price_series: pd.Series, period: int = 14) -> pd.Series:
+    """Standard RSI calculation."""
+    delta = price_series.diff()
+    gain = (delta.where(delta > 0, 0)).rolling(window=period).mean()
+    loss = (-delta.where(delta < 0, 0)).rolling(window=period).mean()
+    
+    rs = gain / loss.replace(0, np.nan)
+    rsi = 100 - (100 / (1 + rs))
+    return rsi
+
+
 def compute_momentum_features(df: pd.DataFrame) -> pd.DataFrame:
     """
     Compute all momentum/trend-strength features needed by the Router.
 
     Input: DataFrame with OHLCV columns.
     Output: DataFrame with columns:
-      - adx_14:     Average Directional Index (14-bar)
-      - adx_zscore: ADX z-score vs 90-day history
-      - atr_14:     Average True Range (used by risk engine too)
-
-    All columns have the same index as the input.
+      - adx_14:          Average Directional Index (14-bar)
+      - adx_zscore:      ADX z-score vs 90-day history
+      - atr_14:          Average True Range
+      - momentum_12_1:   12-month return skip 1 month (approx 252 days skip 21)
+      - roc_5:           5-bar rate of change
+      - roc_10:          10-bar rate of change
+      - rsi_14:          Standard RSI
+      - rsi_divergence:  RSI minus its 5-bar lag
     """
+    close = df['close']
+    
     # ADX
     adx_df = compute_adx(df, period=14)
     adx_14 = adx_df['adx']
@@ -122,13 +138,32 @@ def compute_momentum_features(df: pd.DataFrame) -> pd.DataFrame:
     adx_std = adx_14.rolling(90, min_periods=30).std()
     adx_zscore = (adx_14 - adx_mean) / adx_std.replace(0, np.nan)
 
-    # ATR (needed downstream by risk engine and specialists)
+    # ATR
     atr_14 = compute_atr(df, period=14)
+    
+    # Momentum 12_1 (assuming 1-hour bars, approx 252*7 bars in 1yr)
+    # 252 * 7 = 1764 bars. 1 month = 21 * 7 = 147 bars.
+    lookback_12m = 252 * 7
+    skip_1m = 21 * 7
+    momentum_12_1 = (close.shift(skip_1m) / close.shift(lookback_12m)) - 1
+    
+    # ROC
+    roc_5 = close.pct_change(5)
+    roc_10 = close.pct_change(10)
+    
+    # RSI
+    rsi_14 = compute_rsi(close, period=14)
+    rsi_divergence = rsi_14 - rsi_14.shift(5)
 
     result = pd.DataFrame({
-        'adx_14':     adx_14,
-        'adx_zscore': adx_zscore,
-        'atr_14':     atr_14,
+        'adx_14':         adx_14,
+        'adx_zscore':     adx_zscore,
+        'atr_14':         atr_14,
+        'momentum_12_1':  momentum_12_1,
+        'roc_5':          roc_5,
+        'roc_10':         roc_10,
+        'rsi_14':         rsi_14,
+        'rsi_divergence': rsi_divergence,
     }, index=df.index)
 
     return result
