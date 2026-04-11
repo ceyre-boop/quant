@@ -4,7 +4,7 @@ on:
   push:
     paths:
       - 'data/*.csv'
-    branches: [main]
+    branches: [master]
 
 jobs:
   convert:
