@@ -12,7 +12,7 @@ Wires up the full 3-layer system with:
 """
 import logging
 from typing import Dict, Any, Optional, List
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass, asdict, field
 from datetime import datetime
 
 from contracts.types import (
@@ -48,26 +48,26 @@ logger = logging.getLogger(__name__)
 class EnhancedEntrySignal(EntrySignal):
     """Entry signal with enhanced metadata from all systems."""
     # Participant analysis
-    dominant_participant: str
-    participant_confidence: float
-    participant_risk_multiplier: float
+    dominant_participant: str = ""
+    participant_confidence: float = 0.0
+    participant_risk_multiplier: float = 1.0
     
     # Regime analysis
-    regime: str
-    regime_risk_multiplier: float
+    regime: str = ""
+    regime_risk_multiplier: float = 1.0
     
     # Entry model selection
-    entry_model: str
-    entry_model_confidence: float
-    entry_model_expected_r: float
+    entry_model: str = ""
+    entry_model_confidence: float = 0.0
+    entry_model_expected_r: float = 0.0
     
     # Gate results
-    gates_passed: int
-    gates_total: int
-    gate_details: List[Dict[str, Any]]
+    gates_passed: int = 0
+    gates_total: int = 0
+    gate_details: List[Dict[str, Any]] = field(default_factory=list)
     
     # Combined risk
-    combined_size_multiplier: float
+    combined_size_multiplier: float = 1.0
     
     def to_firebase_dict(self) -> Dict[str, Any]:
         """Convert to Firebase-compatible dict."""

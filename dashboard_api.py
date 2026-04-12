@@ -17,13 +17,14 @@ from integration.production_engine import ProductionEntryEngine
 from contracts.types import AccountState
 from execution.paper_trading import PaperTradingEngine
 from config.settings import get_starting_equity
-from config.settings import get_starting_equity
+from sovereign.api.dashboard_endpoints import sovereign_bp
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 CORS(app)  # Allow frontend to call API
+app.register_blueprint(sovereign_bp, url_prefix='/api/sovereign')
 
 # Initialize real components
 data_provider = DataProvider()
