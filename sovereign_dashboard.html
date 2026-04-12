@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOVEREIGN — Correction Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #03040b;
+            --surface: #0a0c14;
+            --surface-hover: #111420;
+            --accent: #6366f1;
+            --accent-glow: rgba(99, 102, 241, 0.15);
+            --green: #10b981;
+            --red: #ef4444;
+            --grey: #94a3b8;
+            --border: rgba(255, 255, 255, 0.08);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --font-main: 'Inter', sans-serif;
+            --font-title: 'Outfit', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: var(--bg);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 50% 0%, var(--accent-glow) 0%, transparent 50%),
+                radial-gradient(circle at 0% 100%, rgba(99, 102, 241, 0.05) 0%, transparent 30%);
+            min-height: 100vh;
+        }
+
+        header {
+            padding: 2rem 4rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(20px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-family: var(--font-title);
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--accent);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 99px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--green);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--green);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        main {
+            padding: 2rem 4rem;
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 2rem;
+        }
+
+        .panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .panel:hover {
+            border-color: var(--accent);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .panel-title {
+            font-family: var(--font-title);
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .panel-subtitle {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        /* Panel 1: Scorecard */
+        .scorecard {
+            grid-column: span 12;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+        }
+
+        .metric-card {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-secondary);
+        }
+
+        .metric-value {
+            font-family: var(--font-title);
+            font-size: 2.5rem;
+            font-weight: 600;
+        }
+
+        .metric-trend {
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .pass-badge { color: var(--green); }
+        .fail-badge { color: var(--red); }
+
+        /* Panel 2: Regime Map */
+        .regime-map {
+            grid-column: span 5;
+            min-height: 480px;
+        }
+
+        .asset-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .asset-row {
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .asset-row:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: var(--border);
+        }
+
+        .asset-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .asset-name {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .asset-hurst {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .regime-pill {
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .regime-momentum { background: rgba(16, 185, 129, 0.1); color: var(--green); border: 1px solid rgba(16, 185, 129, 0.2); }
+        .regime-reversion { background: rgba(239, 68, 68, 0.1); color: var(--red); border: 1px solid rgba(239, 68, 68, 0.2); }
+        .regime-dead { background: rgba(148, 163, 184, 0.1); color: var(--grey); border: 1px solid rgba(148, 163, 184, 0.2); }
+
+        /* Panel 3: Failure Autopsy */
+        .autopsy {
+            grid-column: span 7;
+            min-height: 480px;
+        }
+
+        .failure-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .failure-table th {
+            text-align: left;
+            padding: 1rem;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .failure-table td {
+            padding: 1rem;
+            font-size: 0.875rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .failure-reason {
+            color: var(--red);
+            font-weight: 500;
+        }
+
+        .feature-tag {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--accent);
+            padding: 0.125rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-family: var(--font-mono);
+            margin-right: 0.25rem;
+        }
+
+        /* Controls */
+        .controls {
+            grid-column: span 12;
+            display: flex;
+            gap: 1rem;
+            background: var(--surface);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            border: 1px solid var(--border);
+            align-items: center;
+        }
+
+        .btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+            transform: scale(0.98);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--surface-hover);
+        }
+
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap: 2rem;
+            z-index: 1000;
+        }
+
+        .loader {
+            width: 48px;
+            height: 48px;
+            border: 5px solid var(--accent);
+            border-bottom-color: transparent;
+            border-radius: 50%;
+            animation: rotation 1s linear infinite;
+        }
+
+        @keyframes rotation {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <div class="logo-icon">S</div>
+            SOVEREIGN
+        </div>
+        <div class="status-badge">
+            <div class="status-dot"></div>
+            System Active
+        </div>
+    </header>
+
+    <main>
+        <div class="controls">
+            <input type="text" id="tickers" value="SPY,QQQ,AAPL,MSFT,TSLA" style="background:rgba(255,255,255,0.05); border:1px solid var(--border); color:white; padding: 0.75rem; border-radius: 0.75rem; flex: 1; min-width: 200px;">
+            <button class="btn" onclick="runSimulation()">
+                RUN SIMULATION
+            </button>
+            <button class="btn btn-secondary" onclick="refreshData()">
+                REFRESH
+            </button>
+        </div>
+
+        <div class="panel scorecard">
+            <div class="metric-card">
+                <div class="metric-label">Win Rate (HC)</div>
+                <div class="metric-value" id="win-rate-hc">0.0%</div>
+                <div class="metric-trend" id="win-rate-status">Target: 63%</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Avg Expectancy</div>
+                <div class="metric-value" id="expectancy">0.0</div>
+                <div class="metric-trend">R per trade</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">HC Trade Count</div>
+                <div class="metric-value" id="trade-count">0</div>
+                <div class="metric-trend">Min: 30</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Status</div>
+                <div class="metric-value" id="pass-status">—</div>
+                <div class="metric-trend" id="iteration-label">Iteration 0</div>
+            </div>
+        </div>
+
+        <div class="panel regime-map">
+            <div class="panel-header">
+                <div>
+                    <h2 class="panel-title">Regime Map</h2>
+                    <p class="panel-subtitle">Market segmentation by Hurst exponent</p>
+                </div>
+            </div>
+            <div class="asset-list" id="asset-list">
+                <p style="color:var(--text-secondary)">Run simulation to see regime map</p>
+            </div>
+        </div>
+
+        <div class="panel autopsy">
+            <div class="panel-header">
+                <div>
+                    <h2 class="panel-title">Failure Autopsy</h2>
+                    <p class="panel-subtitle">Post-mortem analysis of recent losses</p>
+                </div>
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="failure-table">
+                    <thead>
+                        <tr>
+                            <th>Ticker</th>
+                            <th>Outcome</th>
+                            <th>Regime</th>
+                            <th>Features</th>
+                            <th>P(v)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="failure-list">
+                        <tr>
+                            <td colspan="5" style="text-align:center; color:var(--text-secondary)">No failures logged</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <div class="loading-overlay" id="loading">
+        <div class="loader"></div>
+        <p style="font-family: var(--font-title); font-weight: 500;">Simulating market cycles...</p>
+    </div>
+
+    <script>
+        const API_BASE = '/api/sovereign';
+
+        async function runSimulation() {
+            const tickers = document.getElementById('tickers').value;
+            document.getElementById('loading').style.display = 'flex';
+            
+            try {
+                const res = await fetch(`${API_BASE}/simulation/run?tickers=${tickers}`);
+                const data = await res.json();
+                updateUI(data);
+                await refreshRegimes(tickers);
+            } catch (e) {
+                console.error(e);
+                alert("Simulation failed. Check console for details.");
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+
+        async function refreshData() {
+            try {
+                const res = await fetch(`${API_BASE}/simulation/metrics`);
+                const data = await res.json();
+                if (data.iteration) {
+                    updateUI(data);
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        async function refreshRegimes(tickers) {
+            try {
+                const res = await fetch(`${API_BASE}/regime/current?tickers=${tickers}`);
+                const data = await res.json();
+                updateRegimeMap(data);
+            } catch (e) { console.error(e); }
+        }
+
+        function updateUI(data) {
+            document.getElementById('win-rate-hc').textContent = (data.win_rate_hc * 100).toFixed(1) + '%';
+            document.getElementById('expectancy').textContent = data.expectancy.toFixed(3);
+            document.getElementById('trade-count').textContent = data.hc_trade_count;
+            
+            const passStatus = document.getElementById('pass-status');
+            passStatus.textContent = data.pass ? 'PASS' : 'FAIL';
+            passStatus.className = 'metric-value ' + (data.pass ? 'pass-badge' : 'fail-badge');
+            
+            document.getElementById('iteration-label').textContent = `Iteration ${data.iteration}`;
+            
+            // Update Failures
+            const failureList = document.getElementById('failure-list');
+            if (data.raw_trades) {
+                const failures = data.raw_trades.filter(t => t.winner === 0).reverse().slice(0, 10);
+                failureList.innerHTML = failures.map(f => `
+                    <tr>
+                        <td style="font-weight:600">${f.ticker}</td>
+                        <td class="failure-reason">${f.outcome}</td>
+                        <td><span class="regime-pill regime-${f.regime}">${f.regime}</span></td>
+                        <td>${Object.entries(f).filter(([k,v]) => k.startsWith('feat_')).map(([k,v]) => `<span class="feature-tag">${k.replace('feat_','')}: ${typeof v === 'number' ? v.toFixed(2) : v}</span>`).join('')}</td>
+                        <td style="font-family:var(--font-mono)">${f.probability.toFixed(3)}</td>
+                    </tr>
+                `).join('');
+            }
+        }
+
+        function updateRegimeMap(regimes) {
+            const list = document.getElementById('asset-list');
+            list.innerHTML = Object.entries(regimes).map(([ticker, data]) => `
+                <div class="asset-row">
+                    <div class="asset-info">
+                        <span class="asset-name">${ticker}</span>
+                        <span class="asset-hurst">Hurst: ${data.hurst.toFixed(3)} | ADX: ${data.adx.toFixed(1)}</span>
+                    </div>
+                    <div>
+                        <span class="regime-pill regime-${data.regime}">${data.regime}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Initial load
+        refreshData();
+    </script>
+</body>
+</html>
