@@ -1,61 +1,106 @@
-# CLAWD Trading Desk - Institutional Parameter Store
-# Hash-locked and versioned. All runtime parameters must be defined here.
+# config/parameters.yml — ALL numerical thresholds live here
+# Single source of truth. No hardcoded values permitted in any .py file.
+# Last updated: Phase 1 unification
 
-# --- Versioning ---
-version: "2.1.0"
-environment: "RESEARCH_OOS"
-last_updated: "2026-04-10"
+regime:
+  hurst_mean_revert_threshold: 0.45   # H < this = mean-reverting
+  hurst_trending_threshold: 0.52      # H > this = trending
+  hurst_dead_zone: [0.45, 0.52]       # H in range = FLAT (no trade)
+  hurst_window_short: 60              # bars for short-window Hurst (sovereign/features)
+  hurst_window_long: 90               # bars for long-window Hurst
+  csd_threshold: 0.65                 # CSD score above this = regime exhaustion warning
+  csd_window: 60
+  csd_detrend_window: 20
+  adx_weak_threshold: 20              # ADX < 20 = no trend
+  adx_trend_threshold: 25             # ADX > 25 = established trend
+  hmm_states: 2                       # 2-state HMM (trending vs ranging)
+  hmm_lookback: 252                   # refit HMM every N bars
 
-# --- Pillar 1: Deterministic Foundations ---
-random_seed: 42
+bias:
+  min_confidence: 0.55                # BiasOutput.confidence must exceed this
+  min_win_rate: 0.60                  # specialist win probability threshold
+  min_training_samples: 200           # minimum regime-filtered samples to fit specialist
 
-# --- Pillar 6: Parameter Governance ---
+risk:
+  base_risk_pct: 0.005                # 0.5% per trade floor
+  kelly_fraction: 0.5                 # half-Kelly
+  atr_stop_multiplier: 1.5            # stop = entry ± 1.5 × ATR
+  atr_target_multiplier: 3.0          # target = entry ± 3.0 × ATR
+  trail_trigger_r: 2.0                # trailing stop activates at 2R
+  min_rr: 1.5                         # minimum Risk:Reward to proceed
+  grade_risk:
+    A_plus: 0.015                     # confidence >= 0.92
+    A: 0.010                          # confidence >= 0.78
+    B: 0.005                          # confidence >= 0.65
+    C: 0.0025                         # confidence < 0.65
 
-# Layer 1: Bias Engine
-bias_engine:
-  confidence_threshold: 0.52
-  atr_volatility_gate: 0.04  # 4.0%
-  lookback_period: 20
+hard_constraints:
+  max_daily_loss_pct: 0.02            # 2% daily loss limit
+  max_concurrent_positions: 5
+  vix_extreme_threshold: 35
+  min_ev_threshold: 0.0               # EV must be strictly positive
+  max_spread_pct: 0.002               # 0.2% max bid-ask spread
+  pre_market_minutes: 30              # block first 30 min
+  last_hour_cutoff_hour: 15           # no new positions after 3 PM ET
+  min_model_confidence: 0.55
 
-# Layer 2: Position Sizing
-risk_engine:
-  base_risk_pct: 0.005  # 0.5%
-  grade_multipliers:
-    aplus: 1.5
-    a: 1.0
-    b: 0.5
-    c: 0.25
-  kelly_fraction: 0.25 # Aggressive but managed
+petroulas:
+  yield_curve_inversion_threshold: -0.005   # T10Y-T2Y below this = inversion fault
+  m2_velocity_floor: 1.20                   # M2/GDP ratio floor
+  cape_z_extreme: 2.5                       # CAPE z-score beyond this = extreme
+  cape_mean: 16.8                           # 130-year historical mean
+  cape_std: 6.5                             # 130-year historical std
+  erp_floor: 0.02                           # equity risk premium floor (2%)
+  hyg_spread_threshold: 400                 # HYG OAS bps above this = credit stress
+  credit_spread_threshold: 200              # IG credit spread bps
+  hmm_transition_fault_threshold: 0.80     # P(regime change) above this = fault
+  fault_frameworks_required: 2             # how many frameworks must trigger to halt
 
-# Layer 2: Asset Profiles (Dynamic RR V2.1)
-asset_profiles:
-  _DEFAULT:
-    stop_atr_multiplier: 3.5
-    tp_min_r: 1.5
-    tp_target_r: 4.5
-    trail_activation_r: 1.0
-    trail_atr_mult: 3.5
-    shock_exit_atr_mult: 4.5
-    max_stop_pct: 0.10
-    min_stop_atr: 1.5
-  
-  ARM:
-    stop_atr_multiplier: 4.5
-    shock_exit_atr_mult: 5.0
-    tp_target_r: 6.0
-  
-  AAPL:
-    stop_atr_multiplier: 2.5
-    shock_exit_atr_mult: 3.5
-    tp_target_r: 4.0
-  
-  NVDA:
-    stop_atr_multiplier: 4.0
-    shock_exit_atr_mult: 4.5
-    tp_target_r: 6.0
+factor_zoo:
+  icir_threshold: 0.30              # update from Phase 0 diagnostic
+  icir_fallback_threshold: 0.15    # if 0.30 returns zero features
+  bonferroni: true
+  min_robust_features: 8
+  train_start: "2022-01-01"
+  train_end: "2024-01-01"
+  oos_start: "2025-01-01"
+  oos_end: "2026-01-01"
+  resolution: "1h"                  # UPDATE THIS from Phase 0 diagnostic results
 
-# Layer 2: Trade Monitoring
 execution:
-  max_hold_days: 7
-  lookahead_skip_bars: 1
-  slippage_buffer_pct: 0.0005 # 5bps slip assumption
+  max_gap_atr: 2.0                  # gap > 2× ATR = skip entry
+  t1_anchor: true                   # always enter at NEXT bar's open, not signal bar close
+
+atr_gate:
+  AAPL: 4.0
+  META: 4.0
+  AMD: 4.0
+  ARM: 5.5
+  NVDA: 5.0
+  TSLA: 6.0
+  PFE: 3.0
+  UNH: 3.0
+  SPY: 2.5
+  TLT: 2.0
+  NAS100: 4.0
+
+universe:
+  assets:
+    - "META"
+    - "AAPL"
+    - "NVDA"
+    - "TSLA"
+    - "AMD"
+    - "ARM"
+    - "MSFT"
+    - "GOOGL"
+    - "AMZN"
+    - "SPY"
+    - "QQQ"
+    - "TLT"
+    - "PFE"
+    - "UNH"
+    - "GLD"
+  trinity_assets: ["META", "PFE", "UNH"]
+  hurst_min_for_inclusion: 0.40
+  hurst_lookback_days: 90
