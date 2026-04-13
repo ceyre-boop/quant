@@ -50,6 +50,8 @@ class PaperPosition:
     expected_r: float = 0.0
 
 
+from execution.rr_engine import RREngine
+
 class PaperTradingEngine:
     """Paper trading engine - trades with fake money, real data."""
     
@@ -61,42 +63,41 @@ class PaperTradingEngine:
         self.daily_pnl = 0.0
         self.daily_trades = 0
         self.last_reset = datetime.now().date()
+        self.rr_engine = RREngine() # Initialize Dynamic RR
         
         self.logger = logging.getLogger(__name__)
-        self.logger.info(f"Paper trading initialized: ${starting_equity:,.2f}")
+        self.logger.info(f"Paper trading initialized: ${starting_equity:,.2f} with Dynamic RR")
     
-    def execute_signal(self, signal: EnhancedEntrySignal, current_price: float) -> Optional[PaperPosition]:
+    def execute_signal(self, signal: EnhancedEntrySignal, current_price: float, current_atr: float) -> Optional[PaperPosition]:
         """
-        Execute a paper trade from an entry signal.
-        
-        Args:
-            signal: The entry signal from production engine
-            current_price: Current market price
-        
-        Returns:
-            PaperPosition if executed, None if rejected
+        Execute a paper trade from an entry signal with Dynamic RR calculation.
         """
         # Check if we already have a position for this symbol
         if signal.symbol in self.positions:
             self.logger.info(f"Already have position in {signal.symbol}, skipping")
             return None
         
+        # Calculate brackets using Dynamic RR Engine
+        brackets = self.rr_engine.calculate_brackets(current_price, current_atr, signal.direction.value)
+        
         # Generate trade ID
         trade_id = f"PAPER_{uuid.uuid4().hex[:8].upper()}"
         
-        # Calculate position size in dollars
-        position_value = self.current_equity * signal.position_size * 0.02  # 2% risk per trade max
+        # Calculate position size in dollars (2% risk based on ATR stop)
+        risk_per_share = abs(current_price - brackets['sl'])
+        position_size_shares = (self.current_equity * 0.02) / risk_per_share
+        position_value = position_size_shares * current_price
         
         # Create position
         position = PaperPosition(
             trade_id=trade_id,
             symbol=signal.symbol,
             direction="LONG" if signal.direction.value == 1 else "SHORT",
-            entry_price=current_price,  # Use current market price
+            entry_price=current_price,
             position_size=position_value,
-            stop_loss=signal.stop_loss,
-            take_profit_1=signal.take_profit_1,
-            take_profit_2=signal.take_profit_2,
+            stop_loss=brackets['sl'],
+            take_profit_1=brackets['tp'],
+            take_profit_2=brackets['tp'], # Standardizing on single dynamic target
             entry_time=datetime.now(),
             status=TradeStatus.OPEN,
             entry_model=signal.entry_model,
@@ -126,25 +127,11 @@ class PaperTradingEngine:
         )
         
         self.daily_trades += 1
-        
-        self.logger.info(
-            f"PAPER TRADE OPENED: {trade_id} {signal.symbol} {position.direction} "
-            f"@{current_price:.2f} Size: ${position_value:,.2f} "
-            f"(Model: {signal.entry_model}, Expected R: {signal.entry_model_expected_r:.2f})"
-        )
-        
         return position
     
     def update_positions(self, market_data: Dict[str, float]) -> list:
         """
-        Update all open positions with current market prices.
-        Check for stop loss / take profit hits.
-        
-        Args:
-            market_data: Dict of symbol -> current_price
-        
-        Returns:
-            List of closed positions
+        Update all open positions. Includes Automated Trailing Stop management.
         """
         closed = []
         
@@ -153,15 +140,16 @@ class PaperTradingEngine:
                 continue
             
             position = self.positions[symbol]
+            direction_val = 1 if position.direction == "LONG" else -1
             
-            # Calculate unrealized P&L
-            if position.direction == "LONG":
-                unrealized_pct = (price - position.entry_price) / position.entry_price
-            else:
-                unrealized_pct = (position.entry_price - price) / position.entry_price
-            
-            unrealized_pnl = position.position_size * unrealized_pct
-            
+            # --- AUTO TRAILING LOGIC ---
+            old_sl = position.stop_loss
+            position.stop_loss = self.rr_engine.update_trailing_stop(
+                price, position.entry_price, position.stop_loss, direction_val
+            )
+            if position.stop_loss != old_sl:
+                self.logger.info(f"TRAILING STOP TRIGGERED for {symbol}: {old_sl:.2f} -> {position.stop_loss:.2f}")
+
             # Check for exit conditions
             exit_triggered = False
             exit_price = price
@@ -177,25 +165,24 @@ class PaperTradingEngine:
                 exit_price = position.stop_loss
                 close_reason = "STOP_LOSS"
             
-            # Take profit 1 hit
+            # Take profit hit
             elif position.direction == "LONG" and price >= position.take_profit_1:
                 exit_triggered = True
                 exit_price = position.take_profit_1
-                close_reason = "TP1"
+                close_reason = "TAKE_PROFIT"
             elif position.direction == "SHORT" and price <= position.take_profit_1:
                 exit_triggered = True
                 exit_price = position.take_profit_1
-                close_reason = "TP1"
+                close_reason = "TAKE_PROFIT"
             
             # Exit if triggered
             if exit_triggered:
-                closed_position = self._close_position(
-                    symbol, exit_price, close_reason
-                )
+                closed_position = self._close_position(symbol, exit_price, close_reason)
                 if closed_position:
                     closed.append(closed_position)
         
         return closed
+
     
     def _close_position(self, symbol: str, exit_price: float, reason: str) -> Optional[PaperPosition]:
         """Close a position and record P&L."""

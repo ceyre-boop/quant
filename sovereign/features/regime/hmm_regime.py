@@ -22,6 +22,7 @@ import numpy as np
 import pandas as pd
 import logging
 import warnings
+from config.loader import params
 
 logger = logging.getLogger(__name__)
 
@@ -40,14 +41,10 @@ class HMMRegimeDetector:
     has higher variance -- the HMM doesn't know the labels.)
     """
 
-    def __init__(self, n_states: int = 2, lookback: int = 252):
-        """
-        Args:
-            n_states: Number of hidden states (default 2)
-            lookback: Rolling window for HMM fitting (default 252 bars)
-        """
-        self.n_states = n_states
-        self.lookback = lookback
+    def __init__(self, n_states: Optional[int] = None, lookback: Optional[int] = None):
+        p = params['regime']
+        self.n_states = n_states if n_states is not None else p['hmm_states']
+        self.lookback = lookback if lookback is not None else p['hmm_lookback']
 
     def compute(self, df: pd.DataFrame) -> pd.DataFrame:
         """
@@ -186,16 +183,12 @@ class HMMRegimeDetector:
 
 
 def compute_hmm_features(df: pd.DataFrame,
-                         lookback: int = 252) -> pd.DataFrame:
+                         lookback: Optional[int] = None) -> pd.DataFrame:
     """
     Convenience function: compute HMM features from OHLCV DataFrame.
-
-    Input: DataFrame with 'close' column.
-    Output: DataFrame with hmm_state, hmm_transition_prob,
-            bars_since_regime_change.
-
-    Note: This is computationally expensive (~5-10s per asset).
-    Cache the results.
     """
-    detector = HMMRegimeDetector(lookback=lookback)
+    p = params['regime']
+    lb = lookback if lookback is not None else p['hmm_lookback']
+    
+    detector = HMMRegimeDetector(lookback=lb)
     return detector.compute(df)

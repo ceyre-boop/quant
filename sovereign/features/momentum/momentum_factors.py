@@ -23,6 +23,7 @@ is usually range-bound (high z).
 import numpy as np
 import pandas as pd
 import logging
+from config.loader import params
 
 logger = logging.getLogger(__name__)
 
@@ -40,16 +41,16 @@ def _compute_true_range(df: pd.DataFrame) -> pd.Series:
     return pd.concat([tr1, tr2, tr3], axis=1).max(axis=1)
 
 
-def compute_atr(df: pd.DataFrame, period: int = 14) -> pd.Series:
+def compute_atr(df: pd.DataFrame, period: Optional[int] = None) -> pd.Series:
     """
     Average True Range.
-    Uses Wilder's smoothing (exponential with alpha = 1/period).
     """
+    p = period if period is not None else 14
     tr = _compute_true_range(df)
-    return tr.ewm(alpha=1.0 / period, min_periods=period).mean()
+    return tr.ewm(alpha=1.0 / p, min_periods=p).mean()
 
 
-def compute_adx(df: pd.DataFrame, period: int = 14) -> pd.DataFrame:
+def compute_adx(df: pd.DataFrame, period: Optional[int] = None) -> pd.DataFrame:
     """
     Average Directional Index (Wilder's ADX).
 
@@ -115,19 +116,10 @@ def compute_rsi(price_series: pd.Series, period: int = 14) -> pd.Series:
 def compute_momentum_features(df: pd.DataFrame) -> pd.DataFrame:
     """
     Compute all momentum/trend-strength features needed by the Router.
-
-    Input: DataFrame with OHLCV columns.
-    Output: DataFrame with columns:
-      - adx_14:          Average Directional Index (14-bar)
-      - adx_zscore:      ADX z-score vs 90-day history
-      - atr_14:          Average True Range
-      - momentum_12_1:   12-month return skip 1 month (approx 252 days skip 21)
-      - roc_5:           5-bar rate of change
-      - roc_10:          10-bar rate of change
-      - rsi_14:          Standard RSI
-      - rsi_divergence:  RSI minus its 5-bar lag
     """
     close = df['close']
+    pm = params['momentum']
+    pr = params['regime']
     
     # ADX
     adx_df = compute_adx(df, period=14)
@@ -141,29 +133,23 @@ def compute_momentum_features(df: pd.DataFrame) -> pd.DataFrame:
     # ATR
     atr_14 = compute_atr(df, period=14)
     
-    # Momentum 12_1 (assuming 1-hour bars, approx 252*7 bars in 1yr)
-    # 252 * 7 = 1764 bars. 1 month = 21 * 7 = 147 bars.
-    lookback_12m = 252 * 7
-    skip_1m = 21 * 7
-    momentum_12_1 = (close.shift(skip_1m) / close.shift(lookback_12m)) - 1
-    
-    # ROC
-    roc_5 = close.pct_change(5)
-    roc_10 = close.pct_change(10)
+    # Jegadeesh-Titman 12-1 Momentum
+    # Standard: (Close_t1 / Close_t12) - 1. 
+    # Use config window.
+    window = pm['momentum_12_1_window']
+    skip = 21 # 1 month skip
+    jt_momentum = (close.shift(skip) / close.shift(window)) - 1
     
     # RSI
-    rsi_14 = compute_rsi(close, period=14)
-    rsi_divergence = rsi_14 - rsi_14.shift(5)
-
+    rsi_14 = compute_rsi(close, period=pm['rsi_window'])
+    
     result = pd.DataFrame({
-        'adx_14':         adx_14,
+        'adx':            adx_14,
         'adx_zscore':     adx_zscore,
-        'atr_14':         atr_14,
-        'momentum_12_1':  momentum_12_1,
-        'roc_5':          roc_5,
-        'roc_10':         roc_10,
-        'rsi_14':         rsi_14,
-        'rsi_divergence': rsi_divergence,
+        'atr':            atr_14,
+        'jt_momentum':    jt_momentum,
+        'rsi':            rsi_14,
+        'roc_5':          close.pct_change(5),
     }, index=df.index)
 
     return result

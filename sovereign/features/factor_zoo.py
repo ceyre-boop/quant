@@ -1,17 +1,19 @@
 """
-Sovereign Trading Intelligence -- Factor Zoo Scanner
-Phase 2: Feature Layer
+Sovereign Trading Intelligence — Factor Zoo Scanner
+Phase 0 Diagnostic (corrected)
 
-The Factor Zoo acts as a high-pass filter for signals. 
-It rigorously tests every feature against lookahead bias and statistical significance.
-Only features that clear the Bonferroni-corrected significance gate are allowed 
-to enter the Regime Router.
+Three fixes applied per operator review:
 
-Criteria:
-1. IC (Information Coefficient): Spearman rank correlation with forward returns.
-2. ICIR (IC Information Ratio): Stability of the IC over time (mean/std).
-3. Bonferroni Correction: Alpha adjusted for multiple testing (0.05 / n_features).
-4. Threshold: |ICIR| >= 0.30 is the 'is_real' floor.
+1. Multi-horizon forward returns (fast/slow/macro natural timescales)
+2. Benjamini-Hochberg FDR correction (Bonferroni over-penalizes correlated
+   financial features — hurst_short/long, hmm_state/csd_score are all correlated)
+3. Feature-horizon mapping: a feature only needs to pass at ONE of its natural
+   horizons, not arbitrary 1-bar. Tide gauges don't predict the next wave.
+
+Feature groups and their natural forward-return windows:
+  FAST:   volume_zscore, rsi, logistic_k, adx_zscore, roc_5   → 1, 3, 5 bars
+  SLOW:   hurst_short, hurst_long, csd_score, hmm_state, etc  → 10, 20, 40 bars
+  MACRO:  yield_curve_slope, erp, cape_zscore, cot_zscore      → 20, 60 bars
 """
 
 import numpy as np
@@ -30,160 +32,277 @@ from sovereign.features.momentum.volume_profile import compute_volume_profile_fe
 
 logger = logging.getLogger(__name__)
 
+# ─── Feature → horizon mapping ───────────────────────────────────────────────
+# Grouped by the timescale each feature actually measures.
+# A feature passes if it achieves ICIR ≥ threshold at ANY of its natural horizons.
+
+FEATURE_HORIZONS = {
+    "fast":  [1, 3, 5],    # 1–5 bars  → Specialists (daily entry)
+    "slow":  [10, 20, 40], # 2–8 weeks → Regime Router
+    "macro": [20, 60],     # 1–3 months → Petroulas Gate
+}
+
+FEATURE_GROUPS = {
+    # fast
+    "volume_zscore":           "fast",
+    "ofi_velocity":            "fast",
+    "rsi":                     "fast",
+    "roc_5":                   "fast",
+    "logistic_k":              "fast",
+    "logistic_acceleration":   "fast",
+    "adx_zscore":              "fast",
+    # slow — regime
+    "hurst_short":             "slow",
+    "hurst_long":              "slow",
+    "hurst_velocity":          "slow",
+    "csd_score":               "slow",
+    "csd_ar1":                 "slow",
+    "csd_variance_vel":        "slow",
+    "csd_recovery":            "slow",
+    "hmm_state":               "slow",
+    "hmm_transition_prob":     "slow",
+    "bars_since_regime_change":"slow",
+    "adx":                     "slow",
+    "jt_momentum":             "slow",
+    "atr":                     "fast",
+    # macro
+    "volume_entropy":          "fast",  # actually a fast information measure
+    "yield_curve_slope":       "macro",
+    "yield_curve_velocity":    "macro",
+    "erp":                     "macro",
+    "cape_zscore":             "macro",
+    "cot_zscore":              "macro",
+}
+
+ICIR_THRESHOLD = 0.30   # minimum ICIR to be considered "real"
+BH_ALPHA       = 0.10   # Benjamini-Hochberg FDR level (more lenient than 0.05 for finance)
+
 
 class FactorZooScanner:
     """
-    Validates features for statistical significance and regime robustness.
+    Validates features for statistical significance and horizon-adjusted
+    regime robustness. Uses Benjamini-Hochberg FDR correction.
     """
 
     def __init__(self, forward_return_period: int = 1):
+        # kept for backward compat; multi-horizon scanning replaces the single period
         self.forward_return_period = forward_return_period
         self.results = None
 
-    def build_feature_matrix(self, df: pd.DataFrame, macro_df: Optional[pd.DataFrame] = None) -> pd.DataFrame:
+    # ─── Public API ──────────────────────────────────────────────────────────
+
+    def build_feature_matrix(self, df: pd.DataFrame,
+                             macro_df: Optional[pd.DataFrame] = None) -> pd.DataFrame:
         """
         Aggregates all features from Phase 2 modules into a single matrix.
+        Does NOT add forward returns here — those are added per-horizon in scan().
         """
         logger.info(f"Building feature matrix for {len(df)} bars...")
-        
-        # Block A: Regime
-        hurst = compute_hurst_features(df)
-        csd = compute_csd_features(df)
-        hmm = compute_hmm_features(df)
-        
-        # Block B: Momentum
+
+        # Block A: Regime (slow timescale)
+        hurst   = compute_hurst_features(df)
+        csd     = compute_csd_features(df)
+        hmm     = compute_hmm_features(df)
+
+        # Block B: Momentum (fast timescale)
         logistic = compute_logistic_features(df)
         momentum = compute_momentum_features(df)
-        volume = compute_volume_profile_features(df)
-        
-        # Block C: Macro (if provided)
-        macro_features = None
+        volume   = compute_volume_profile_features(df)
+
+        # Block C: Macro (optional)
         if macro_df is not None:
             from sovereign.features.macro.yield_curve import compute_yield_curve_features
             from sovereign.features.macro.erp import compute_erp_features
             from sovereign.features.macro.cape import compute_cape_features
             from sovereign.features.macro.cot import compute_cot_features
-            
-            yc = compute_yield_curve_features(macro_df)
-            erp = compute_erp_features(macro_df)
+
+            yc   = compute_yield_curve_features(macro_df)
+            erp  = compute_erp_features(macro_df)
             cape = compute_cape_features(macro_df)
-            cot = compute_cot_features(macro_df)
-            
+            cot  = compute_cot_features(macro_df)
+
             macro_features = pd.concat([yc, erp, cape, cot], axis=1)
-            
-            # Ensure index is datetime for merging
-            df.index = pd.to_datetime(df.index)
-            macro_features.index = pd.to_datetime(macro_features.index)
-            
-            # Sort for merge_asof
-            df = df.sort_index()
-            macro_features = macro_features.sort_index()
-            
-            # merge_asof: Align daily macro data to hourly/minute bars
-            # This ensures no lookahead while providing the latest macro snapshot
-            merged = pd.merge_asof(
-                df, macro_features, 
-                left_index=True, right_index=True,
-                direction='backward'
-            )
+            df              = df.sort_index()
+            macro_features  = macro_features.sort_index()
+            merged = pd.merge_asof(df, macro_features,
+                                   left_index=True, right_index=True,
+                                   direction='backward')
             feature_df = merged
         else:
             feature_df = df.copy()
 
-        # Combine OHLCV-derived blocks
-        # (These are already aligned with df.index)
-        feature_df = pd.concat([
-            feature_df, hurst, csd, hmm, logistic, momentum, volume
-        ], axis=1)
-        
-        # Add forward returns for IC calculation (1-bar fwd)
-        feature_df['fwd_ret'] = df['close'].shift(-self.forward_return_period).pct_change(self.forward_return_period).shift(-self.forward_return_period)
-        
-        return feature_df.dropna()
+        feature_df = pd.concat(
+            [feature_df, hurst, csd, hmm, logistic, momentum, volume], axis=1
+        )
+
+        # Drop only rows that are NaN across ALL feature columns (not forward return)
+        feature_cols = [c for c in feature_df.columns
+                        if c not in ('open', 'high', 'low', 'close', 'volume',
+                                     'vwap', 'trade_count', 'fwd_ret')]
+        n_before = len(feature_df)
+        # Keep row if at least one feature is non-NaN (dropna will be per-horizon)
+        feature_df = feature_df.dropna(subset=feature_cols, how='all')
+        n_after = len(feature_df)
+        logger.info(f"Feature matrix: {n_before} → {n_after} rows "
+                    f"(removed {n_before - n_after} all-NaN rows)")
+
+        return feature_df
 
     def scan(self, feature_df: pd.DataFrame) -> pd.DataFrame:
         """
-        Runs the Factor Zoo scan on the feature matrix.
+        Multi-horizon scan with Benjamini-Hochberg correction.
+
+        For each feature:
+          1. Determine its group (fast/slow/macro) → get its natural horizons
+          2. Run Spearman IC + rolling ICIR at each horizon
+          3. Collect (feature, best_icir, best_horizon, bh_adjusted_p, is_real)
+        
+        Returns a DataFrame sorted by best_icir descending.
         """
-        features = [col for col in feature_df.columns if col not in ['close', 'volume', 'fwd_ret', 'high', 'low', 'open']]
-        n_tests = len(features)
-        target_alpha = 0.05 / n_tests  # Bonferroni correction
-        
-        logger.info(f"Scanning {n_tests} features with alpha {target_alpha:.6f}")
-        
-        scan_results = []
-        
-        for feature in features:
-            valid_mask = ~feature_df[feature].isna() & ~feature_df['fwd_ret'].isna()
-            f_data = feature_df.loc[valid_mask, feature]
-            r_data = feature_df.loc[valid_mask, 'fwd_ret']
+        close = feature_df['close'] if 'close' in feature_df.columns else None
+        if close is None:
+            logger.error("feature_df must contain 'close' column for forward return calculation")
+            return pd.DataFrame(columns=['feature', 'group', 'best_horizon',
+                                         'ic', 'p_value', 'icir', 'bh_p_value',
+                                         'is_real', 'passes_bh'])
+
+        feature_cols = [c for c in feature_df.columns
+                        if c not in ('open', 'high', 'low', 'close', 'volume',
+                                     'vwap', 'trade_count')]
+        logger.info(f"Scanning {len(feature_cols)} features across horizons")
+
+        # ─── Step 1: Collect per-feature, per-horizon IC / ICIR ─────────────
+        def _scan_feature(feat):
+            group = FEATURE_GROUPS.get(feat, "fast")
+            horizons = FEATURE_HORIZONS[group]
+            local_results = []
             
-            if len(f_data) < 60:
-                continue
+            for h in horizons:
+                fwd = close.shift(-h).pct_change(h)
+                valid = feature_df[feat].notna() & fwd.notna()
+                if valid.sum() < 60: continue
                 
-            # Global IC (Spearman)
-            ic, p_val = spearmanr(f_data, r_data)
-            
-            # Rolling IC for stability (ICIR)
-            # We use a 60-bar rolling window
-            rolling_ic = self._compute_rolling_ic(f_data, r_data, window=60)
-            icir = rolling_ic.mean() / rolling_ic.std() if rolling_ic.std() > 0 else 0
-            
-            is_real = (p_val < target_alpha) and (abs(icir) >= 0.30)
-            
-            scan_results.append({
-                'feature':         feature,
-                'ic':              ic,
-                'p_value':         p_val,
-                'icir':            icir,
-                'is_real':         is_real,
-                'passes_alpha':    p_val < target_alpha,
-            })
-            
-        self.results = pd.DataFrame(scan_results).sort_values(by='icir', ascending=False)
+                f_data = feature_df.loc[valid, feat]
+                r_data = fwd[valid]
+                
+                ic, p_val = spearmanr(f_data, r_data)
+                rolling_ic = self._compute_rolling_ic(f_data, r_data, window=60)
+                if len(rolling_ic) < 10: continue
+                
+                icir = float(rolling_ic.mean() / rolling_ic.std()) if rolling_ic.std() > 0 else 0.0
+                local_results.append({
+                    "feature": feat, "group": group, "horizon": h,
+                    "ic": float(ic), "p_value": float(p_val), "icir": float(icir)
+                })
+            return local_results
+
+        from joblib import Parallel, delayed
+        results_list = Parallel(n_jobs=-1)(delayed(_scan_feature)(feat) for feat in feature_cols)
+        raw_results = [item for sublist in results_list for item in sublist]
+
+        if not raw_results:
+
+            logger.warning("No feature/horizon combinations produced valid IC estimates")
+            return pd.DataFrame(columns=['feature', 'group', 'best_horizon',
+                                         'ic', 'p_value', 'icir', 'bh_p_value',
+                                         'is_real', 'passes_bh'])
+
+        raw_df = pd.DataFrame(raw_results)
+
+        # ─── Step 2: Per feature, take the BEST horizon (max |ICIR|) ─────────
+        # Note: apply(lambda x: x.abs().idxmax()) returns the index of the max absolute value in each group
+        best_idx_series = raw_df.groupby("feature")["icir"].apply(lambda x: x.abs().idxmax())
+        best_rows = raw_df.loc[best_idx_series.values].copy()
+        best_rows = best_rows.rename(columns={"horizon": "best_horizon"})
+
+        # ─── Step 3: Benjamini-Hochberg FDR correction on best p-values ──────
+        try:
+            from statsmodels.stats.multitest import multipletests
+            p_vals = best_rows["p_value"].values
+            rejected, p_adj, _, _ = multipletests(p_vals, alpha=BH_ALPHA, method="fdr_bh")
+            best_rows = best_rows.copy()
+            best_rows["bh_p_value"] = p_adj
+            best_rows["passes_bh"]  = rejected
+        except ImportError:
+            logger.warning("statsmodels not available — falling back to Bonferroni for BH step")
+            n = len(best_rows)
+            threshold = BH_ALPHA / max(n, 1)
+            best_rows = best_rows.copy()
+            best_rows["bh_p_value"] = best_rows["p_value"] * n
+            best_rows["passes_bh"]  = best_rows["p_value"] < threshold
+
+        # ─── Step 4: Apply ICIR gate ─────────────────────────────────────────
+        best_rows["is_real"] = (
+            best_rows["passes_bh"] &
+            (best_rows["icir"].abs() >= ICIR_THRESHOLD)
+        )
+
+        self.results = best_rows.sort_values("icir", key=abs, ascending=False).reset_index(drop=True)
+
+        # Log summary
+        n_real = int(self.results["is_real"].sum())
+        n_bh   = int(self.results["passes_bh"].sum())
+        logger.info(f"Scan complete: {len(self.results)} features | "
+                    f"{n_bh} pass BH | {n_real} robust (BH + ICIR≥{ICIR_THRESHOLD})")
+        if n_real > 0:
+            logger.info("Robust features:")
+            for _, row in self.results[self.results["is_real"]].iterrows():
+                logger.info(f"  {row['feature']:30s} "
+                            f"group={row['group']:6s} "
+                            f"horizon={row['best_horizon']:3d}  "
+                            f"ICIR={row['icir']:+.3f}  "
+                            f"BH_p={row['bh_p_value']:.4f}")
+        else:
+            # Still show the top-5 near-misses for diagnosis
+            logger.info("Zero robust. Top-5 by |ICIR| (near-misses):")
+            for _, row in self.results.head(5).iterrows():
+                logger.info(f"  {row['feature']:30s} "
+                            f"group={row['group']:6s} "
+                            f"horizon={row['best_horizon']:3d}  "
+                            f"ICIR={row['icir']:+.3f}  "
+                            f"p={row['p_value']:.4f}  "
+                            f"BH_p={row['bh_p_value']:.4f}")
+
         return self.results
+
+    # ─── Private helpers ─────────────────────────────────────────────────────
 
     @staticmethod
     def _compute_rolling_ic(f: pd.Series, r: pd.Series, window: int = 60) -> pd.Series:
-        """Computes rolling Spearman correlation."""
-        # Simple approximation: rolling pearson on ranks
+        """Rolling Spearman via rank-then-pearson approximation."""
         f_rank = f.rolling(window).rank()
         r_rank = r.rolling(window).rank()
         return f_rank.rolling(window).corr(r_rank).dropna()
 
 
-def run_phase2_gate(df_full: pd.DataFrame, ticker: str):
+# ─── Standalone test function ─────────────────────────────────────────────────
+
+def run_phase0_gate(df_full: pd.DataFrame, ticker: str):
     """
-    Executes the Phase 2 Gate: In-Sample and Out-Of-Sample scans.
+    Executes the Phase 0 Gate with multi-horizon scan.
+    Saves IS and OOS results to vault/{ticker}_*.csv.
     """
     scanner = FactorZooScanner()
-    
-    # Run 1: In-Sample (2022-2024)
-    df_is = df_full.loc['2022-01-01':'2024-12-31']
-    if not df_is.empty:
-        logger.info(f"Running IS scan (2022-2024) for {ticker}")
-        feat_is = scanner.build_feature_matrix(df_is)
-        res_is = scanner.scan(feat_is)
-        
-        os.makedirs('vault', exist_ok=True)
-        res_is.to_csv(f'vault/factor_zoo_is_{ticker}.csv', index=False)
-        
-        print(f"\nFACTOR ZOO - IN-SAMPLE ({ticker})")
-        print(res_is.to_string(index=False))
-        
-    # Run 2: OOS/Regime Robustness (2025-2026)
-    df_oos = df_full.loc['2025-01-01':]
-    if not df_oos.empty:
-        logger.info(f"Running OOS scan (2025-2026) for {ticker}")
-        feat_oos = scanner.build_feature_matrix(df_oos)
-        res_oos = scanner.scan(feat_oos)
-        res_oos.to_csv(f'vault/factor_zoo_oos_{ticker}.csv', index=False)
-        
-        print(f"\nFACTOR ZOO - OUT-OF-SAMPLE ({ticker})")
-        print(res_oos.to_string(index=False))
+
+    for period, start, end, label in [
+        ("IS",  "2022-01-01", "2024-12-31", "is"),
+        ("OOS", "2025-01-01", None,          "oos"),
+    ]:
+        df_slice = df_full.loc[start:end] if end else df_full.loc[start:]
+        if df_slice.empty:
+            logger.warning(f"No data for {period} period on {ticker}")
+            continue
+
+        logger.info(f"Running {period} scan ({start}–{end or 'present'}) for {ticker}")
+        feat   = scanner.build_feature_matrix(df_slice)
+        result = scanner.scan(feat)
+
+        os.makedirs("vault", exist_ok=True)
+        result.to_csv(f"vault/factor_zoo_{label}_{ticker}.csv", index=False)
+        print(f"\nFACTOR ZOO {period} — {ticker}")
+        print(result.to_string(index=False))
 
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
-    # This would typically be called with loaded data
-    print("FactorZooScanner module initialized. Run with data to execute gate.")
+    print("FactorZooScanner initialized. Run with data to execute gate.")

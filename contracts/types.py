@@ -574,3 +574,91 @@ class MarketData:
             'atr_14': self.atr_14,
             'timestamp': self.timestamp.isoformat()
         }
+
+# =============================================================================
+# Phase 2: Sovereign Features Dataclasses
+# =============================================================================
+
+@dataclass
+class RegimeFeatures:
+    """Output of sovereign/features/regime/ — all three detectors combined."""
+    hurst_short:         float    # short-window Hurst exponent
+    hurst_long:          float    # long-window Hurst exponent
+    hurst_signal:        str      # 'MEAN_REVERT' | 'NEUTRAL' | 'TRENDING'
+    csd_score:           float    # Critical Slowing Down score
+    csd_signal:          str      # 'EXHAUSTION' | 'NEUTRAL' | 'BUILDING'
+    hmm_state:           int      # 0, 1, or 2
+    hmm_state_label:     str      # 'LOW_VOL' | 'NORMAL' | 'HIGH_VOL_CRISIS'
+    hmm_confidence:      float
+    hmm_transition_prob: float    # P(regime change in next N bars)
+    adx:                 float
+    adx_signal:          str      # 'NO_TREND' | 'WEAK' | 'ESTABLISHED' | 'STRONG'
+
+
+@dataclass
+class MomentumFeatures:
+    """Output of sovereign/features/momentum/"""
+    logistic_ode_score:  float    # institutional accumulation ODE
+    jt_momentum_12_1:    float    # Jegadeesh-Titman 12-1 factor
+    volume_entropy:      float    # volume disorder measure
+    rsi_14:              float
+    rsi_signal:          str      # 'OVERSOLD' | 'NEUTRAL' | 'OVERBOUGHT'
+
+
+@dataclass
+class MacroFeatures:
+    """Output of sovereign/features/macro/"""
+    yield_curve_slope:   float
+    yield_curve_velocity: float
+    erp:                 float    # equity risk premium
+    cape_zscore:         float    # NaN if data unavailable
+    cot_zscore:          float    # NaN if data unavailable
+    m2_velocity:         float
+    hyg_spread_bps:      float
+    macro_signal:        str      # 'RISK_ON' | 'NEUTRAL' | 'RISK_OFF' | 'FAULT'
+
+
+@dataclass
+class PetrolausDecision:
+    """Output of sovereign/kimi/fault_detector.py"""
+    fault_detected:      bool
+    fault_reason:        Optional[str]   # None if no fault
+    fault_frameworks:    List[str]       # which of the 6 frameworks triggered
+    action:              str             # 'TRADE' | 'HALT' | 'CONCENTRATE'
+    macro_features:      MacroFeatures
+
+
+@dataclass
+class SovereignFeatureRecord:
+    """Complete feature record for one symbol at one timestamp."""
+    symbol:              str
+    timestamp:           str
+    regime:              RegimeFeatures
+    momentum:            MomentumFeatures
+    macro:               MacroFeatures
+    petroulas:           Optional[PetrolausDecision]
+    bar_ohlcv:           Dict[str, Any]  # raw OHLCV for the current bar
+    is_valid:            bool
+    validation_errors:   List[str]
+
+
+@dataclass
+class RouterOutput:
+    """Output of sovereign/router/regime_router.py"""
+    symbol:              str
+    timestamp:           str
+    regime:              str             # 'MOMENTUM' | 'REVERSION' | 'FLAT'
+    regime_confidence:   float
+    specialist_to_run:   Optional[str]   # 'momentum' | 'reversion' | None
+    feature_record:      SovereignFeatureRecord
+    router_version:      str
+
+
+@dataclass
+class VetoRecord:
+    """Entry in the veto ledger."""
+    timestamp:           str
+    symbol:              str
+    veto_stage:          str             # 'PETROULAS' | 'ROUTER' | 'SPECIALIST' | 'RISK' | 'GAME' | 'HARD_CONSTRAINT'
+    veto_reason:         str
+    signal_that_was_vetoed: Optional[Dict[str, Any]]

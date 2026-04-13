@@ -1,95 +1,100 @@
 """
-Sovereign Trading Intelligence -- Hurst Exponent Feature
-Phase 2: Feature Layer
-
-R/S (Rescaled Range) method, dual windows: 60 and 90 bars.
-Plus Hurst velocity (rate of change) for regime transition detection.
-
-This is the SAME R/S calculation validated in research/hurst_diagnostic.py
-and deployed in sovereign/data/universe.py. Wrapped as a feature producer
-to output the exact columns the Regime Router expects:
-  - hurst_60:       60-bar Hurst exponent
-  - hurst_90:       90-bar Hurst exponent (slower, more stable)
-  - hurst_velocity: 5-bar rate of change of hurst_90
-
-Interpretation:
-  H > 0.52 = trending (momentum regime)
-  H < 0.45 = mean reverting (reversion regime)
-  0.45-0.52 = dead zone (both specialists lose)
-  Rising velocity = regime strengthening
-  Falling velocity = regime weakening (watch for transition)
+Sovereign Trading Intelligence -- Hurst Exponent Feature (Warp Drive 2.1)
+Level 3 Optimization: Vectorized Sliding Window Matrix.
 """
-
 import numpy as np
 import pandas as pd
 import logging
+from numba import njit, prange
+from config.loader import params
 
 logger = logging.getLogger(__name__)
 
-
-def _hurst_rs(ts: np.ndarray) -> float:
+@njit(cache=True)
+def _hurst_rs_matrix(matrix):
     """
-    Single-window R/S Hurst calculation.
-    Exact copy from research/hurst_diagnostic.py.
-    Do not modify -- thresholds calibrated against this method.
+    Calculates Hurst exponent for an entire matrix of windows at once.
+    Matrix shape: (n_windows, window_size)
     """
-    n = len(ts)
-    if n < 30:
-        return 0.5  # Insufficient data -- assume random walk
-
-    returns = np.diff(np.log(ts))
-    n_ret = len(returns)
-
-    mean = np.mean(returns)
-    deviation = np.cumsum(returns - mean)
-    r = np.max(deviation) - np.min(deviation)
-    s = np.std(returns)
-
-    if s == 0 or r == 0:
-        return 0.5
-
-    return np.log(r / s) / np.log(n_ret)
-
-
-def compute_hurst(price_series: pd.Series, window: int = 90) -> pd.Series:
-    """
-    Rolling Hurst exponent via R/S analysis.
-
-    Args:
-        price_series: Close prices (must be > 0)
-        window:       Rolling window size
-
-    Returns:
-        pd.Series of Hurst exponents, NaN during warm-up.
-    """
-    return price_series.rolling(window).apply(_hurst_rs, raw=True)
-
+    n_windows, window_size = matrix.shape
+    log_matrix = np.log(matrix)
+    
+    # Vectorized Log Returns: (n_windows, window_size - 1)
+    returns = np.diff(log_matrix, axis=1)
+    n_ret = window_size - 1
+    
+    # Rescaled Range math across axis 1
+    means = np.zeros(n_windows)
+    for i in range(n_windows):
+        means[i] = np.mean(returns[i])
+        
+    # Standard deviation per window
+    stds = np.zeros(n_windows)
+    for i in range(n_windows):
+        stds[i] = np.std(returns[i])
+        
+    # Cumulative Max/Min deviations
+    # We do this iteratively within Numba to save memory overhead
+    results = np.full(n_windows, 0.5)
+    log_n_ret = np.log(n_ret)
+    
+    for i in range(n_windows):
+        if stds[i] == 0:
+            continue
+            
+        ret_window = returns[i]
+        curr_mean = means[i]
+        
+        # Inner loop for Rescaled Range
+        max_dev = -1e10
+        min_dev = 1e10
+        cum_sum = 0.0
+        for j in range(n_ret):
+            cum_sum += (ret_window[j] - curr_mean)
+            if cum_sum > max_dev: max_dev = cum_sum
+            if cum_sum < min_dev: min_dev = cum_sum
+            
+        r = max_dev - min_dev
+        if r > 0:
+            results[i] = np.log(r / stds[i]) / log_n_ret
+            
+    return results
 
 def compute_hurst_features(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Compute all Hurst features needed by the Regime Router.
-
-    Input: DataFrame with 'close' column.
-    Output: DataFrame with columns:
-      - hurst_60
-      - hurst_90
-      - hurst_velocity  (5-bar diff of hurst_90)
-
-    All columns have the same index as the input.
+    Compute all Hurst features with Level 3 Matrix Acceleration.
     """
-    close = df['close']
+    close = df['close'].values.astype(np.float64)
+    p = params['regime']
+    
+    def _get_rolling_matrix(arr, window):
+        # The 'Strisciando' Vectorization Trick
+        shape = (arr.size - window + 1, window)
+        strides = (arr.strides[0], arr.strides[0])
+        return np.lib.stride_tricks.as_strided(arr, shape=shape, strides=strides)
 
-    hurst_60 = compute_hurst(close, window=60)
-    hurst_90 = compute_hurst(close, window=90)
+    w_short = p['hurst_window_short']
+    w_long = p['hurst_window_long']
+    
+    # 1. Expand into matrices
+    mat_short = _get_rolling_matrix(close, w_short)
+    mat_long = _get_rolling_matrix(close, w_long)
+    
+    # 2. Compute via JIT matrix engine
+    h_short_vals = _hurst_rs_matrix(mat_short)
+    h_long_vals = _hurst_rs_matrix(mat_long)
+    
+    # 3. Realign with index
+    h_short = np.full(len(close), np.nan)
+    h_long = np.full(len(close), np.nan)
+    h_short[w_short-1:] = h_short_vals
+    h_long[w_long-1:] = h_long_vals
+    
+    h_long_series = pd.Series(h_long, index=df.index)
+    hurst_velocity = h_long_series.diff(10)
 
-    # Velocity: how fast is the Hurst reading changing?
-    # Rising = regime strengthening. Falling = regime weakening.
-    hurst_velocity = hurst_90.diff(10)
-
-    result = pd.DataFrame({
-        'hurst_60':       hurst_60,
-        'hurst_90':       hurst_90,
+    return pd.DataFrame({
+        'hurst_short':    h_short,
+        'hurst_long':     h_long,
         'hurst_velocity': hurst_velocity,
     }, index=df.index)
-
-    return result

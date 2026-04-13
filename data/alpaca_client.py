@@ -1,341 +1,111 @@
 """
-Alpaca Data Client for CLAWD Quant Trading
-Supports stocks, ETFs, and futures proxies (ES=F, NQ=F)
-Timeframes: 1H, 1D, 4H (via resampling)
-Historical range: 3 months to 5 years
+Alpaca Data Client (Warp Drive 2.0)
+High-performance batch fetching and parallel IO.
 """
 import os
 import pandas as pd
-from typing import Optional
+import numpy as np
+import logging
+from pathlib import Path
+from typing import Optional, List, Dict
 from datetime import datetime, timedelta, timezone
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from alpaca.data.historical import StockHistoricalDataClient
 from alpaca.data.requests import StockBarsRequest
 from alpaca.data.timeframe import TimeFrame
 from alpaca.data.enums import DataFeed
 
+logger = logging.getLogger(__name__)
 
 class AlpacaDataClient:
-    """
-    Alpaca Markets data client for historical and live data.
+    """Optimized Alpaca Data Client with Bulk-Fetch Capabilities."""
     
-    Note: Alpaca doesn't directly support futures (ES1!, NQ).
-    Use ES=F and NQ=F (Yahoo Finance symbols) as proxies via yfinance
-    for futures data, or use this client for stock/ETF data.
-    """
-    
-    # Symbol mappings for common futures proxies
-    FUTURES_PROXIES = {
-        'ES': 'SPY',        # E-mini S&P 500 alias
-        'ES1!': 'SPY',      # E-mini S&P 500 -> SPY ETF
-        'NQ': 'QQQ',        # E-mini Nasdaq alias
-        'NQ1!': 'QQQ',      # E-mini Nasdaq -> QQQ ETF
-        'YM': 'DIA',        # Dow Futures -> DIA ETF
-        'RTY': 'IWM',       # Russell 2000 -> IWM ETF
-        'CL': 'USO',        # Crude Oil -> USO ETF
-        'GC': 'GLD',        # Gold -> GLD ETF
-        'GOLD': 'GLD',      # Gold alias
-        'SI': 'SLV',        # Silver -> SLV ETF
-        'SILVER': 'SLV',    # Silver alias
-        'ZN': 'TLT',        # 10Y Treasuries -> TLT ETF
-    }
-    
-    # Expanded asset universe organized by sector/theme
     ASSET_UNIVERSE = {
-        "etf_core": [
-            "SPY", "QQQ", "IWM", "DIA", "VTI",
-            "TLT", "LQD", "HYG", "VGIT",
-            "GLD", "SLV", "USO", "UNG"
-        ],
-        "ai_semis": [
-            "NVDA", "AMD", "SMCI", "ARM", "PLTR", "SOUN", "MSFT", "GOOGL", "META"
-        ],
-        "mega_cap": [
-            "AAPL", "AMZN", "TSLA", "MSFT", "GOOGL", "META"
-        ],
-        "healthcare": [
-            "UNH", "JNJ", "PFE", "XBI", "IBB"
-        ],
-        "energy": [
-            "XLE", "XOM", "CVX", "OXY"
-        ],
-        "financials": [
-            "XLF", "JPM", "BAC", "GS"
-        ],
-        "real_estate": [
-            "VNQ", "SPG"
-        ],
+        "etf_core": ["SPY", "QQQ", "IWM", "DIA", "LQD", "HYG", "GLD", "SLV", "USO"],
+        "ai_semis": ["NVDA", "AMD", "SMCI", "ARM", "PLTR", "MSFT", "GOOGL", "META"],
+        "mega_cap": ["AAPL", "AMZN", "TSLA"],
+        "trinity": ["META", "PFE", "UNH"]
     }
     
-    # Flat list for batch fetch - deduplicated
-    ALL_SYMBOLS = list(dict.fromkeys(
-        [s for group in ASSET_UNIVERSE.values() for s in group]
-    ))
+    ALL_SYMBOLS = list(dict.fromkeys([s for group in ASSET_UNIVERSE.values() for s in group]))
     
-    # Legacy compatibility
-    MAJOR_ASSETS = ALL_SYMBOLS
-    
-    def __init__(self, api_key: Optional[str] = None, secret_key: Optional[str] = None, paper: bool = True):
-        """
-        Initialize Alpaca data client.
-        
-        Args:
-            api_key: Alpaca API key (or from ALPACA_API_KEY env var)
-            secret_key: Alpaca secret key (or from ALPACA_SECRET_KEY env var)
-            paper: Use paper trading endpoints (default True)
-        """
+    def __init__(self, api_key: Optional[str] = None, secret_key: Optional[str] = None):
         self.api_key = api_key or os.getenv('ALPACA_API_KEY')
         self.secret_key = secret_key or os.getenv('ALPACA_SECRET_KEY')
-        self.paper = paper
         
         if not self.api_key or not self.secret_key:
-            raise ValueError(
-                "Alpaca API credentials required. "
-                "Set ALPACA_API_KEY and ALPACA_SECRET_KEY env vars "
-                "or pass to constructor."
-            )
-        
-        # Initialize client (data works with both paper and live keys)
+            raise ValueError("Alpaca API credentials required.")
+            
         self.client = StockHistoricalDataClient(self.api_key, self.secret_key)
+        self.cache_dir = Path("sovereign/cache/ohlcv")
+        self.cache_dir.mkdir(parents=True, exist_ok=True)
+
+    def get_historical_bars(self, symbol_or_symbols, timeframe: str = '1Day', days: int = 365) -> pd.DataFrame:
+        """Fetch bars using Alpaca's bulk capability or single asset logic."""
         
-        # Pillar 1: High-Performance Cache Directory
-        self.cache_dir = os.path.join(os.path.dirname(__file__), "..", "data", "historical_cache")
-        os.makedirs(self.cache_dir, exist_ok=True)
+        # 1. Date Calibration
+        end = datetime.now(timezone.utc)
+        start = end - timedelta(days=days)
         
-        self.FUTURES_PROXIES = {
-            'ES': 'SPY',
-            'NQ': 'QQQ',
-            'GOLD': 'GLD',
-            'SILVER': 'SLV',
-            'OIL': 'USO',
-            'BTC': 'BITO',
-            'ETH': 'ETHE'
+        # 2. Timeframe Mapping
+        tf_map = {
+            '1Day': TimeFrame.Day,
+            '1Hour': TimeFrame.Hour,
+            '15Min': TimeFrame(15, TimeFrame.Minute)
         }
-
+        tf = tf_map.get(timeframe, TimeFrame.Day)
         
-    def get_historical_bars(
-        self,
-        symbol: str,
-        timeframe: str = '1H',
-        days: int = 90,
-        start: Optional[datetime] = None,
-        end: Optional[datetime] = None
-    ) -> pd.DataFrame:
-        """
-        Get historical OHLCV bars for a symbol.
-        
-        Args:
-            symbol: Stock/ETF symbol (e.g., 'SPY', 'QQQ')
-            timeframe: '1H', '1D', '4H' (4H via resampling)
-            days: Number of days to fetch (if start not specified)
-            start: Start datetime (optional)
-            end: End datetime (optional, defaults to now)
-            
-        Returns:
-            DataFrame with columns: timestamp, open, high, low, close, volume
-        """
-        # Map futures symbols to ETF proxies
-        if isinstance(symbol, list):
-            symbol = [self.FUTURES_PROXIES.get(s, s) for s in symbol]
-        elif symbol in self.FUTURES_PROXIES:
-            print(f"[Alpaca] Mapping {symbol} -> {self.FUTURES_PROXIES[symbol]} (futures proxy)")
-            symbol = self.FUTURES_PROXIES[symbol]
-        
-        # Pillar 3: Modular Architecture - Always try cache first
-        if isinstance(symbol, str):
-            cache_file = os.path.join(self.cache_dir, f"{symbol}_{timeframe}.parquet")
-            if os.path.exists(cache_file):
-                # Check for cached coverage (omitted for brevity)
-                pass
-
-        
-        # Calculate date range
-        if end is None:
-            end = datetime.now(timezone.utc)
-        if start is None:
-            start = end - timedelta(days=days)
-            
-        # Ensure we don't request more than 5 years
-        max_start = end - timedelta(days=365*5)
-        if start < max_start:
-            print(f"[Alpaca] Limiting to 5 years of data")
-            start = max_start
-            
-        # Map timeframe
-        if timeframe == '1H':
-            tf = TimeFrame.Hour
-        elif timeframe == '1D':
-            tf = TimeFrame.Day
-        elif timeframe == '15Min':
-            tf = TimeFrame(15, TimeFrame.Minute)
-        elif timeframe == '30Min':
-            tf = TimeFrame(30, TimeFrame.Minute)
-        else:
-            tf = TimeFrame.Hour
-            
-        # Request data
+        # 3. Request Generation
         request = StockBarsRequest(
-            symbol_or_symbols=symbol,
+            symbol_or_symbols=symbol_or_symbols,
             timeframe=tf,
             start=start,
             end=end,
-            feed=DataFeed.IEX  # Use IEX for free tier
+            feed=DataFeed.IEX # Free tier
         )
-        import time
-        max_retries = 3
-        bars = None
-        for attempt in range(max_retries):
-            try:
-                # Small mandatory delay for rate limit compliance (Free tier)
-                time.sleep(0.1)
-                bars = self.client.get_stock_bars(request)
-                break
-            except Exception as e:
-                if "429" in str(e) and attempt < max_retries - 1:
-                    wait_time = (attempt + 1) * 2
-                    print(f"[Alpaca] Rate limited. Waiting {wait_time}s... (Attempt {attempt+1}/{max_retries})")
-                    time.sleep(wait_time)
-                else:
-                    if attempt == max_retries - 1:
-                        print(f"[Alpaca] Error fetching {symbol}: {e}")
-                        return pd.DataFrame()
-                    continue
         
-        # Pillar 1: Bulk-Aware Data Extraction
-        if isinstance(symbol, list):
-            # For bulk requests, return the full multi-symbol DataFrame
-            return bars.df if bars else pd.DataFrame()
-
-
-        if not bars or not bars.data or symbol not in bars.data:
-            print(f"[Alpaca] No data returned for {symbol}")
+        try:
+            logger.info(f"[WarpDrive] Fetching {symbol_or_symbols} ({timeframe})...")
+            bars = self.client.get_stock_bars(request)
+            
+            if not bars or not hasattr(bars, 'df') or bars.df.empty:
+                return pd.DataFrame()
+                
+            # Alpaca returns MultiIndex (symbol, timestamp). We want friendly format.
+            df = bars.df.reset_index()
+            df = df.rename(columns={'timestamp': 'date'})
+            return df
+        except Exception as e:
+            logger.error(f"Alpaca Fetch Error: {e}")
             return pd.DataFrame()
-            
-        # Convert to DataFrame
-        data = []
-        for bar in bars.data[symbol]:
-            data.append({
-                'timestamp': bar.timestamp,
-                'open': bar.open,
-                'high': bar.high,
-                'low': bar.low,
-                'close': bar.close,
 
-                'volume': bar.volume,
-            })
-            
-        df = pd.DataFrame(data)
-        if not df.empty:
-            df.set_index('timestamp', inplace=True)
-            df.sort_index(inplace=True)
-        return df
+    def get_all_assets(self, timeframe: str = '1Day', days: int = 365) -> Dict[str, pd.DataFrame]:
+        """The 'Harvest' — Multi-threaded Asset Acquisition."""
+        symbols = self.ALL_SYMBOLS
+        logger.info(f"Warp Drive: Harvesting {len(symbols)} assets in parallel groups...")
         
-        # Resample to 4H if requested
-        if timeframe == '4H':
-            df = self._resample_to_4h(df)
-            
-        print(f"[Alpaca] Fetched {len(df)} bars for {symbol} ({timeframe})")
-        return df
-    
-    def _resample_to_4h(self, df: pd.DataFrame) -> pd.DataFrame:
-        """Resample 1H data to 4H bars"""
-        return df.resample('4H').agg({
-            'open': 'first',
-            'high': 'max',
-            'low': 'min',
-            'close': 'last',
-            'volume': 'sum'
-        }).dropna()
-    
-    def get_multiple_assets(
-        self,
-        symbols: List[str],
-        timeframe: str = '1H',
-        days: int = 90
-    ) -> dict:
-        """
-        Get data for multiple assets.
+        # Split symbols into batches to avoid extremely large response overhead
+        batch_size = 20
+        batches = [symbols[i:i + batch_size] for i in range(0, len(symbols), batch_size)]
         
-        Args:
-            symbols: List of symbols
-            timeframe: '1H', '4H', '1D'
-            days: Number of days to fetch
-            
-        Returns:
-            Dict mapping symbol -> DataFrame
-        """
-        results = {}
-        for symbol in symbols:
-            df = self.get_historical_bars(symbol, timeframe, days)
-            if not df.empty:
-                results[symbol] = df
-        return results
-    
-    def get_major_assets(self, timeframe: str = '1H', days: int = 90) -> dict:
-        """Fetch all major assets"""
-        return self.get_multiple_assets(self.MAJOR_ASSETS, timeframe, days)
-    
-    def get_all_assets(self, timeframe: str = '1D', days: int = 365) -> dict:
-        """Fetch the full expanded asset universe (57 unique symbols)"""
-        print(f"[Alpaca] Fetching {len(self.ALL_SYMBOLS)} assets ({timeframe}, {days} days)...")
-        return self.get_multiple_assets(self.ALL_SYMBOLS, timeframe, days)
-    
+        final_data = {}
+        
+        def fetch_batch(batch):
+            df = self.get_historical_bars(batch, timeframe, days)
+            if df.empty: return {}
+            return {s: df[df['symbol'] == s].set_index('date') for s in batch if s in df['symbol'].unique()}
+
+        with ThreadPoolExecutor(max_workers=5) as executor:
+            future_to_batch = {executor.submit(fetch_batch, b): b for b in batches}
+            for future in as_completed(future_to_batch):
+                batch_dict = future.result()
+                final_data.update(batch_dict)
+                
+        logger.info(f"Harvest Complete: Captured {len(final_data)} assets.")
+        return final_data
+
     def get_latest_price(self, symbol: str) -> Optional[float]:
-        """Get latest price for a symbol"""
-        df = self.get_historical_bars(symbol, timeframe='1H', days=1)
+        df = self.get_historical_bars(symbol, timeframe='1Day', days=3)
         if not df.empty:
-            return df['close'].iloc[-1]
+            return float(df['close'].iloc[-1])
         return None
-    
-    def get_quote(self, symbol: str) -> dict:
-        """Get current quote (requires different endpoint)"""
-        # Note: Real-time quotes require Market Data API subscription
-        # This returns last bar close as approximation
-        price = self.get_latest_price(symbol)
-        return {
-            'symbol': symbol,
-            'price': price,
-            'bid': price,  # Approximation
-            'ask': price,  # Approximation
-        }
-
-
-def test_client():
-    """Test the Alpaca client"""
-    from dotenv import load_dotenv
-    load_dotenv()
-    
-    client = AlpacaDataClient()
-    
-    # Test single symbol
-    print("\n=== Test 1: SPY 1H (5 days) ===")
-    spy = client.get_historical_bars('SPY', timeframe='1H', days=5)
-    print(spy.head())
-    print(f"Total bars: {len(spy)}")
-    
-    # Test futures proxy
-    print("\n=== Test 2: ES1! (maps to SPY) ===")
-    es = client.get_historical_bars('ES1!', timeframe='1H', days=5)
-    print(f"Total bars: {len(es)}")
-    
-    # Test 4H resampling
-    print("\n=== Test 3: QQQ 4H (30 days) ===")
-    qqq = client.get_historical_bars('QQQ', timeframe='4H', days=30)
-    print(qqq.head())
-    print(f"Total bars: {len(qqq)}")
-    
-    # Test multiple assets
-    print("\n=== Test 4: Multiple assets ===")
-    data = client.get_multiple_assets(['SPY', 'QQQ', 'IWM'], timeframe='1D', days=30)
-    for sym, df in data.items():
-        print(f"{sym}: {len(df)} bars")
-    
-    # Test expanded universe (57 symbols)
-    print(f"\n=== Test 5: Full Asset Universe ({len(client.ALL_SYMBOLS)} symbols, 90 days) ===")
-    print("Groups:", list(client.ASSET_UNIVERSE.keys()))
-    all_data = client.get_all_assets(timeframe='1D', days=90)
-    print(f"Successfully fetched: {len(all_data)}/{len(client.ALL_SYMBOLS)} assets")
-    print(f"Total bars: {sum(len(df) for df in all_data.values())}")
-
-
-if __name__ == '__main__':
-    test_client()

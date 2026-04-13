@@ -33,6 +33,7 @@ Implementation matches research/critical_slowing_detector.py exactly.
 import numpy as np
 import pandas as pd
 import logging
+from config.loader import params
 
 logger = logging.getLogger(__name__)
 
@@ -47,9 +48,10 @@ class CriticalSlowingDetector:
         features = detector.compute(df['close'])
     """
 
-    def __init__(self, window: int = 60, detrend_window: int = 20):
-        self.window = window
-        self.detrend_window = detrend_window
+    def __init__(self, window: Optional[int] = None, detrend_window: Optional[int] = None):
+        p = params['regime']
+        self.window = window if window is not None else p['csd_window']
+        self.detrend_window = detrend_window if detrend_window is not None else p['csd_detrend_window']
 
     def compute(self, price_series: pd.Series) -> pd.DataFrame:
         """
@@ -128,14 +130,17 @@ class CriticalSlowingDetector:
 
 
 def compute_csd_features(df: pd.DataFrame,
-                         window: int = 60,
-                         detrend_window: int = 20) -> pd.DataFrame:
+                         window: Optional[int] = None,
+                         detrend_window: Optional[int] = None) -> pd.DataFrame:
     """
     Convenience function: compute CSD features from an OHLCV DataFrame.
-
+    
     Input: DataFrame with 'close' column.
     Output: DataFrame with csd_score, csd_ar1, csd_variance_vel, csd_recovery.
     """
-    detector = CriticalSlowingDetector(window=window,
-                                       detrend_window=detrend_window)
+    p = params['regime']
+    w = window if window is not None else p['csd_window']
+    dw = detrend_window if detrend_window is not None else p['csd_detrend_window']
+    
+    detector = CriticalSlowingDetector(window=w, detrend_window=dw)
     return detector.compute(df['close'])

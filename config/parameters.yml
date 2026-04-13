@@ -1,6 +1,6 @@
 # config/parameters.yml — ALL numerical thresholds live here
 # Single source of truth. No hardcoded values permitted in any .py file.
-# Last updated: Phase 1 unification
+# Last updated: Phase 1 unification + Phase 0B Diagnostic + Layer 2 Alignment (Final)
 
 regime:
   hurst_mean_revert_threshold: 0.45   # H < this = mean-reverting
@@ -57,15 +57,17 @@ petroulas:
   fault_frameworks_required: 2             # how many frameworks must trigger to halt
 
 factor_zoo:
-  icir_threshold: 0.30              # update from Phase 0 diagnostic
-  icir_fallback_threshold: 0.15    # if 0.30 returns zero features
-  bonferroni: true
-  min_robust_features: 8
-  train_start: "2022-01-01"
-  train_end: "2024-01-01"
-  oos_start: "2025-01-01"
-  oos_end: "2026-01-01"
-  resolution: "1h"                  # UPDATE THIS from Phase 0 diagnostic results
+  correction_method: 'fdr_bh'       # Benjamini-Hochberg
+  alpha: 0.05
+  fast_features_window: 3
+  slow_features_window: 20
+  macro_features_window: 60
+  fast_passing_features: ['logistic_k', 'volume_entropy']
+  slow_passing_features: ['hurst_short', 'hurst_long', 'csd_score', 'adx']
+  macro_passing_features: []
+  last_run: '2026-04-13'
+  resolution: "1d"
+  icir_threshold: 0.30
 
 execution:
   max_gap_atr: 2.0                  # gap > 2× ATR = skip entry
@@ -104,3 +106,40 @@ universe:
   trinity_assets: ["META", "PFE", "UNH"]
   hurst_min_for_inclusion: 0.40
   hurst_lookback_days: 90
+
+momentum:
+  logistic_window: 20
+  logistic_step: 1
+  rsi_window: 14
+  rsi_overbought: 70
+  rsi_oversold: 30
+  momentum_12_1_window: 252  # 12 months (252 bars) minus 1 month (21 bars)
+
+asset_profiles:
+  _DEFAULT:
+    stop_atr_multiplier: 1.5
+    tp_min_r: 1.2
+    tp_target_r: 3.0
+    trail_activation_r: 1.5
+    trail_atr_mult: 1.5
+    shock_exit_atr_mult: 4.0
+    max_stop_pct: 0.08
+    min_stop_atr: 1.0
+  NVDA:
+    stop_atr_multiplier: 2.0
+    tp_min_r: 1.5
+    tp_target_r: 5.0
+    trail_activation_r: 2.0
+    trail_atr_mult: 2.0
+    shock_exit_atr_mult: 6.0
+    max_stop_pct: 0.12
+    min_stop_atr: 2.5
+  SPY:
+    stop_atr_multiplier: 1.2
+    tp_min_r: 1.0
+    tp_target_r: 2.5
+    trail_activation_r: 1.5
+    trail_atr_mult: 1.0
+    shock_exit_atr_mult: 3.0
+    max_stop_pct: 0.05
+    min_stop_atr: 0.5

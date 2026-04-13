@@ -91,7 +91,10 @@ def run_meta_labeling():
                     'timestamp': idx,
                     'ticker': s,
                     'label': label,
+                    'mom_ev': mom_ev,
+                    'rev_ev': rev_ev,
                     'hurst': active_df.loc[idx, 'hurst'],
+
                     'zscore': active_df.loc[idx, 'zscore_20'],
                     'csd': active_df.loc[idx, 'csd_score'],
                     'iv_spread': active_df.loc[idx, 'iv_spread'],

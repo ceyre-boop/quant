@@ -27,6 +27,8 @@ import pandas as pd
 from scipy.optimize import curve_fit
 import logging
 import warnings
+from config.loader import params
+from contracts.types import MomentumFeatures
 
 logger = logging.getLogger(__name__)
 warnings.filterwarnings('ignore', category=RuntimeWarning)
@@ -95,26 +97,21 @@ def _fit_logistic(volume_anomaly: np.ndarray) -> dict:
 
 
 def compute_logistic_features(df: pd.DataFrame,
-                              window: int = 20,
-                              step: int = 5) -> pd.DataFrame:
+                              window: Optional[int] = None,
+                              step: Optional[int] = None) -> pd.DataFrame:
     """
-    Compute Logistic ODE features from OHLCV data.
-
-    Args:
-        df:     DataFrame with 'close' and 'volume' columns
-        window: Rolling window for logistic fitting (default 20 bars)
-        step:   Fit every N bars to reduce computation (default 5)
-
-    Output columns:
-      - logistic_k:            Accumulation rate from fitted logistic
-      - logistic_acceleration: Second derivative of cumulative volume anomaly
+    Compute logistic ODE accumulation features from OHLCV data.
     """
+    p = params['momentum']
+    w = window if window is not None else p['logistic_window']
+    s = step if step is not None else p['logistic_step']
+
     close = df['close'].values
     volume = df['volume'].values
     n = len(df)
 
     # Volume anomaly: deviation from rolling mean volume
-    vol_mean = pd.Series(volume).rolling(window, min_periods=20).mean().values
+    vol_mean = pd.Series(volume).rolling(w, min_periods=20).mean().values
     vol_anomaly = np.where(vol_mean > 0, volume / vol_mean - 1.0, 0.0)
 
     # Direction-weighted volume anomaly:
@@ -125,14 +122,14 @@ def compute_logistic_features(df: pd.DataFrame,
 
     # Cumulative sum over rolling window
     cum_anomaly = pd.Series(directed_anomaly).rolling(
-        window, min_periods=20
+        w, min_periods=20
     ).sum().values
 
     # Fit logistic to rolling windows
     k_values = np.full(n, np.nan)
 
-    for i in range(window, n, step):
-        segment = cum_anomaly[i - window:i]
+    for i in range(w, n, s):
+        segment = cum_anomaly[i - w:i]
         if np.any(np.isnan(segment)):
             continue
 
