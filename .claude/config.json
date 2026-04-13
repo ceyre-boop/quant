@@ -1,0 +1,18 @@
+{
+  "context_server": {
+    "enabled": true,
+    "url": "http://localhost:37121",
+    "tools_path": "C:\\Users\\Admin\\clawdbot-vault\\Systems\\claude-code-tools-schema.json"
+  },
+  "guardrails": {
+    "max_chars_per_read": 5000,
+    "max_search_results": 10,
+    "forbid_bulk_reads": true,
+    "require_explicit_paths": true
+  },
+  "workflow": {
+    "discover_first": true,
+    "read_one_at_a_time": true,
+    "document_findings": true
+  }
+}
