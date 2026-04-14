@@ -1,7 +1,7 @@
 """
-Phase 4 — Petroulas Gate (V1.0)
-6-framework macro veto. Requires 2+ frameworks to confirm fault.
-Runs BEFORE the router. If fault: entire session halted.
+Phase 4 — Petroulas Gate (V2.0 — Demoted to Advisory)
+6-framework macro scanner. Returns warning signals.
+No longer blocks execution — logged for post-trade review only.
 """
 
 from contracts.types import PetrolausDecision, MacroFeatures

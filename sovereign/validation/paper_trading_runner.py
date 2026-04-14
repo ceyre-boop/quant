@@ -138,11 +138,7 @@ class PaperTradingRunner:
         today = datetime.utcnow().date()
         logger.info(f"\n--- DAILY CYCLE: {today} ---")
         
-        # 1. Pre-market health check
-        logger.info("Running pre-market veto diagnostic...")
-        veto_result = self.diagnostic.run_diagnostic(days=7)
-        
-        # 2. Count current stats
+        # 1. Count current stats
         trade_count = self._count_recent_trades(days=30)
         win_count = self._count_wins(days=30)
         daily_pnl = self._calculate_daily_pnl()
@@ -161,6 +157,19 @@ class PaperTradingRunner:
         if dd > self.state['max_drawdown']:
             self.state['max_drawdown'] = dd
         
+        # 2. Optional veto diagnostic (informational only, not a gate)
+        veto_score = None
+        try:
+            veto_result = self.diagnostic.run_diagnostic(days=7)
+            veto_score = veto_result.health_score
+            self.state['health_check_history'].append({
+                'date': str(today),
+                'health_score': veto_result.health_score,
+                'is_healthy': veto_result.is_healthy
+            })
+        except Exception as e:
+            logger.warning(f"Veto diagnostic failed (non-blocking): {e}")
+        
         # 3. Record daily summary
         summary = {
             'date': str(today),
@@ -170,22 +179,16 @@ class PaperTradingRunner:
             'total_pnl': self.state['total_pnl'],
             'current_equity': self.state['current_equity'],
             'win_rate': (win_count / max(trade_count, 1)),
-            'veto_health_score': veto_result.health_score,
-            'veto_is_healthy': veto_result.is_healthy,
+            'veto_health_score': veto_score,
             'max_drawdown': self.state['max_drawdown']
         }
         
         self.state['daily_summaries'].append(summary)
-        self.state['health_check_history'].append({
-            'date': str(today),
-            'health_score': veto_result.health_score,
-            'is_healthy': veto_result.is_healthy
-        })
         
         self._save_state()
         
         # 4. Log summary
-        self._log_daily_summary(summary, veto_result)
+        self._log_daily_summary(summary)
         
         # 5. Check live readiness
         if self._can_go_live():
@@ -278,21 +281,13 @@ class PaperTradingRunner:
         start = datetime.fromisoformat(self.state['started_at'])
         days_elapsed = (datetime.utcnow() - start).days
         
-        # Must meet ALL criteria
+        # Core criteria (per teardown: no veto diagnostic requirement)
         criteria = [
             days_elapsed >= self.MIN_DAYS_FOR_LIVE,
             self.state['total_trades'] >= self.MIN_TRADES_FOR_LIVE,
             self.state['total_pnl'] > 0,  # Positive equity curve
             self.state['max_drawdown'] < 0.10,  # <10% drawdown
         ]
-        
-        # Last 7 days of health checks must be healthy
-        recent_health = [
-            h for h in self.state.get('health_check_history', [])
-            if datetime.fromisoformat(h['date']) > datetime.utcnow() - timedelta(days=7)
-        ]
-        all_healthy = all(h['is_healthy'] for h in recent_health) if recent_health else False
-        criteria.append(all_healthy)
         
         return all(criteria)
     
@@ -337,7 +332,7 @@ class PaperTradingRunner:
             can_go_live=self._can_go_live()
         )
     
-    def _log_daily_summary(self, summary: Dict, veto_result):
+    def _log_daily_summary(self, summary: Dict):
         """Log daily summary."""
         logger.info("=" * 60)
         logger.info(f"DAILY SUMMARY: {summary['date']}")
@@ -349,7 +344,8 @@ class PaperTradingRunner:
         logger.info(f"Current Equity: ${summary['current_equity']:,.2f}")
         logger.info(f"Win Rate: {summary['win_rate']:.1%}")
         logger.info(f"Max Drawdown: {summary['max_drawdown']:.2%}")
-        logger.info(f"Veto Health: {veto_result.health_score:.0f}/100")
+        if summary.get('veto_health_score') is not None:
+            logger.info(f"Veto Health: {summary['veto_health_score']:.0f}/100")
         logger.info("=" * 60)
     
     def _generate_live_transition_report(self):

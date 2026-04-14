@@ -1,54 +1,118 @@
-"""Clawd Trading System
+# Clawd Trading — Sovereign Core
+
+**Stripped execution machine. No gates that don't make money.**
+
+---
+
+## What's Real
+
+The system is 6 stages:
+
+1. **Data** (Alpaca)
+2. **Regime Router** (Hurst-based: MOMENTUM / REVERSION / FLAT)
+3. **ATR Gate** (asset-specific thresholds)
+4. **Specialist Signal** (XGBoost momentum or reversion)
+5. **Grade-Based Sizing** (confidence → risk%)
+6. **Hard Constraints** → Execute → Log
+
+Everything else is optional diagnostic or logger.
+
+---
 
 ## Quick Start
 
-1. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
+### Install
+```bash
+pip install -r requirements.txt
+```
 
-2. Copy `.env.example` to `.env` and fill in your API keys:
-   ```bash
-   cp .env.example .env
-   ```
+### Train (One Time)
+```bash
+python -m sovereign.data.train_core
+```
 
-3. Run tests:
-   ```bash
-   pytest tests/
-   ```
+Or manually:
+```bash
+python
+>>> from sovereign.orchestrator import SovereignOrchestrator
+>>> orch = SovereignOrchestrator()
+>>> orch.train(records)  # your historical feature records
+>>> orch.save_models()
+```
 
-4. Start the system:
-   ```bash
-   python -m orchestrator.daily_lifecycle
-   ```
+### Run Daily Session
+```bash
+python execute_daily.py --mode paper
+```
 
-## Architecture
+### Run Specific Phase
+```bash
+python execute_daily.py --phase premarket
+python execute_daily.py --phase killzone
+python execute_daily.py --phase postsession
+```
 
-The system consists of three intelligence layers:
+### Automate (Windows)
+```bash
+# Run as Administrator
+python setup_task_scheduler.py
+```
 
-### Layer 1: AI Bias Engine
-- 43 engineered features
-- XGBoost classification model
-- 5-axis regime classification
-- SHAP explainability
+This creates:
+- **8:45 AM** — Pre-market checklist
+- **9:50 AM** — Kill zone execution
+- **4:35 PM** — Post-session report
 
-### Layer 2: Quant Risk Model
-- Kelly criterion position sizing
-- ATR and structural stop calculation
-- Expected value computation
-- Risk-adjusted return metrics
+---
 
-### Layer 3: Game-Theoretic Engine
-- Liquidity pool mapping
-- Trapped position detection
-- Nash equilibrium zones
-- Kyle lambda order flow analysis
+## Architecture (Teardown Compliant)
 
-## Data Sources
-- Polygon.io (primary market data)
-- TradeLocker (execution)
-- Alpha Vantage (news sentiment)
-- Trading Economics (economic calendar)
+### ✅ Kept
+
+| Component | Role |
+|-----------|------|
+| **Regime Router** | Hurst + XGBoost. Routes to momentum/reversion/flat. |
+| **Specialists** | XGBoost models for each regime. |
+| **Risk Engine** | Grade sizing + ATR gate. |
+| **Trade Ledger** | Logs every executed trade. |
+| **Veto Ledger** | Logs every rejection. |
+| **Hard Constraints** | Daily loss limit, max positions, VIX. |
+
+### ⚠️ Demoted (Logger / Advisory)
+
+| Component | Role |
+|-----------|------|
+| **Petroulas Gate** | Logs macro warnings. Does NOT block. |
+| **Layer 3 (Game Theory)** | Observes trades. Logs predictions. No veto. |
+| **Factor Zoo** | Optional diagnostic. Run anytime. Not a gate. |
+
+### ❌ Deleted
+
+| Component | Reason |
+|-----------|--------|
+| Walk-forward backtest as gate | 20 trades in a year is not meaningful. Paper trading IS the test. |
+| Veto Rate Diagnostic as phase | Ledger already shows this in real time. |
+| Swing Prediction Layer | Monthly macro filter on zero live trades = zero trades forever. |
+| Layer 3 in execution gate | Unvalidated component blocking validated ones. |
+
+---
+
+## The Only Gates That Block
+
+1. **Router/FLAT** — Hurst dead zone (0.45-0.52)
+2. **Specialist/NEUTRAL** — No directional signal
+3. **Risk/ATR** — Volatility too high for asset
+4. **Risk/EV** — Expected value negative
+5. **Hard Constraints** — Daily loss limit, max positions
+
+---
+
+## Live Transition
+
+After **200 paper trades** with positive expectancy, the system is live-ready.
+
+---
 
 ## License
-Proprietary - All rights reserved.
+
+Proprietary — All rights reserved.
