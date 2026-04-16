@@ -31,6 +31,13 @@ from sovereign.ledger.trade_ledger import TradeLedger
 from sovereign.ledger.veto_ledger import VetoLedger
 from config.loader import params
 
+# Stage 1 ML veto — loads from logs/failure_map.csv if present
+try:
+    from sovereign.risk.cluster_veto import ClusterVeto as _ClusterVeto
+    _CLUSTER_VETO_AVAILABLE = True
+except ImportError:
+    _CLUSTER_VETO_AVAILABLE = False
+
 logger = logging.getLogger(__name__)
 
 
@@ -61,9 +68,19 @@ class SovereignOrchestrator:
         # Unvalidated Layer 3 — logs only, does NOT block
         self.game_theory_logs = []
 
+        # Stage 1 ML veto — loaded from logs/failure_map.csv
+        self.cluster_veto = None
+        if _CLUSTER_VETO_AVAILABLE:
+            try:
+                self.cluster_veto = _ClusterVeto()
+                logger.info(f"[OK] ClusterVeto loaded: {self.cluster_veto.describe()}")
+            except Exception as e:
+                logger.warning(f"[ClusterVeto] Load failed (non-fatal): {e}")
+
     def run_session(self, symbol: str, feature_record: SovereignFeatureRecord,
                     current_price: float, atr: float, equity: float,
-                    game_output: Optional[GameOutput] = None) -> Optional[Dict[str, Any]]:
+                    game_output: Optional[GameOutput] = None,
+                    spy_week_return: float = 0.0) -> Optional[Dict[str, Any]]:
         """
         Execute one bar through the stripped Sovereign pipeline.
         
@@ -150,6 +167,27 @@ class SovereignOrchestrator:
             ))
             logger.warning(f"BLOCK: Risk gate fired. Reason: {reason}")
             return None
+
+        # ═══════════════════════════════════════════════════════════════
+        # 4b. CLUSTER VETO  (Stage 1 ML gate)
+        # ═══════════════════════════════════════════════════════════════
+        if self.cluster_veto is not None and self.cluster_veto.ready:
+            atr_pct = (atr / current_price * 100.0) if current_price > 0 else 0.0
+            blocked, block_reason = self.cluster_veto.should_block(
+                strategy_name=router_out.specialist_to_run,
+                regime=router_out.regime,
+                atr_pct=atr_pct,
+                spy_week_return=spy_week_return,
+            )
+            if blocked:
+                self.veto_ledger.log_veto(VetoRecord(
+                    timestamp=ts,
+                    symbol=symbol,
+                    veto_stage='CLUSTER_VETO',
+                    veto_reason=block_reason,
+                ))
+                logger.warning(f"BLOCK: {block_reason}")
+                return None
 
         # ═══════════════════════════════════════════════════════════════
         # 5. HARD CONSTRAINTS

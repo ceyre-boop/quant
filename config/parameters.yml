@@ -1,78 +1,75 @@
-# config/parameters.yml — ALL numerical thresholds live here
-# Single source of truth. No hardcoded values permitted in any .py file.
-# Last updated: Phase 1 unification + Phase 0B Diagnostic + Layer 2 Alignment (Final)
-
 regime:
-  hurst_mean_revert_threshold: 0.45   # H < this = mean-reverting
-  hurst_trending_threshold: 0.52      # H > this = trending
-  hurst_dead_zone: [0.45, 0.52]       # H in range = FLAT (no trade)
-  hurst_window_short: 60              # bars for short-window Hurst (sovereign/features)
-  hurst_window_long: 90               # bars for long-window Hurst
-  csd_threshold: 0.65                 # CSD score above this = regime exhaustion warning
+  hurst_mean_revert_threshold: 0.45
+  hurst_trending_threshold: 0.52
+  hurst_dead_zone:
+  - 0.45
+  - 0.52
+  hurst_window_short: 60
+  hurst_window_long: 90
+  csd_threshold: 0.65
   csd_window: 60
   csd_detrend_window: 20
-  adx_weak_threshold: 20              # ADX < 20 = no trend
-  adx_trend_threshold: 25             # ADX > 25 = established trend
-  hmm_states: 2                       # 2-state HMM (trending vs ranging)
-  hmm_lookback: 252                   # refit HMM every N bars
-
+  adx_weak_threshold: 20
+  adx_trend_threshold: 25
+  hmm_states: 2
+  hmm_lookback: 252
 bias:
-  min_confidence: 0.55                # BiasOutput.confidence must exceed this
-  min_win_rate: 0.60                  # specialist win probability threshold
-  min_training_samples: 200           # minimum regime-filtered samples to fit specialist
-
+  min_confidence: 0.55
+  min_win_rate: 0.6
+  min_training_samples: 200
 risk:
-  base_risk_pct: 0.005                # 0.5% per trade floor
-  kelly_fraction: 0.5                 # half-Kelly
-  atr_stop_multiplier: 1.5            # stop = entry ± 1.5 × ATR
-  atr_target_multiplier: 3.0          # target = entry ± 3.0 × ATR
-  trail_trigger_r: 2.0                # trailing stop activates at 2R
-  min_rr: 1.5                         # minimum Risk:Reward to proceed
+  base_risk_pct: 0.005
+  kelly_fraction: 0.5
+  atr_stop_multiplier: 1.5
+  atr_target_multiplier: 3.0
+  trail_trigger_r: 2.0
+  min_rr: 1.5
   grade_risk:
-    A_plus: 0.015                     # confidence >= 0.92
-    A: 0.010                          # confidence >= 0.78
-    B: 0.005                          # confidence >= 0.65
-    C: 0.0025                         # confidence < 0.65
-
+    A_plus: 0.015
+    A: 0.01
+    B: 0.005
+    C: 0.0025
 hard_constraints:
-  max_daily_loss_pct: 0.02            # 2% daily loss limit
+  max_daily_loss_pct: 0.02
   max_concurrent_positions: 5
   vix_extreme_threshold: 35
-  min_ev_threshold: 0.0               # EV must be strictly positive
-  max_spread_pct: 0.002               # 0.2% max bid-ask spread
-  pre_market_minutes: 30              # block first 30 min
-  last_hour_cutoff_hour: 15           # no new positions after 3 PM ET
+  min_ev_threshold: 0.0
+  max_spread_pct: 0.002
+  pre_market_minutes: 30
+  last_hour_cutoff_hour: 15
   min_model_confidence: 0.55
-
 petroulas:
-  yield_curve_inversion_threshold: -0.005   # T10Y-T2Y below this = inversion fault
-  m2_velocity_floor: 1.20                   # M2/GDP ratio floor
-  cape_z_extreme: 2.5                       # CAPE z-score beyond this = extreme
-  cape_mean: 16.8                           # 130-year historical mean
-  cape_std: 6.5                             # 130-year historical std
-  erp_floor: 0.02                           # equity risk premium floor (2%)
-  hyg_spread_threshold: 400                 # HYG OAS bps above this = credit stress
-  credit_spread_threshold: 200              # IG credit spread bps
-  hmm_transition_fault_threshold: 0.80     # P(regime change) above this = fault
-  fault_frameworks_required: 2             # how many frameworks must trigger to halt
-
+  yield_curve_inversion_threshold: -0.005
+  m2_velocity_floor: 1.2
+  cape_z_extreme: 2.5
+  cape_mean: 16.8
+  cape_std: 6.5
+  erp_floor: 0.02
+  hyg_spread_threshold: 400
+  credit_spread_threshold: 200
+  hmm_transition_fault_threshold: 0.8
+  fault_frameworks_required: 2
 factor_zoo:
-  correction_method: 'fdr_bh'       # Benjamini-Hochberg
+  correction_method: fdr_bh
   alpha: 0.05
   fast_features_window: 3
   slow_features_window: 20
   macro_features_window: 60
-  fast_passing_features: ['logistic_k', 'volume_entropy']
-  slow_passing_features: ['hurst_short', 'hurst_long', 'csd_score', 'adx']
+  fast_passing_features:
+  - logistic_k
+  - volume_entropy
+  slow_passing_features:
+  - hurst_short
+  - hurst_long
+  - csd_score
+  - adx
   macro_passing_features: []
   last_run: '2026-04-13'
-  resolution: "1d"
-  icir_threshold: 0.30
-
+  resolution: 1d
+  icir_threshold: 0.3
 execution:
-  max_gap_atr: 2.0                  # gap > 2× ATR = skip entry
-  t1_anchor: true                   # always enter at NEXT bar's open, not signal bar close
-
+  max_gap_atr: 2.0
+  t1_anchor: true
 atr_gate:
   AAPL: 4.0
   META: 4.0
@@ -85,36 +82,36 @@ atr_gate:
   SPY: 2.5
   TLT: 2.0
   NAS100: 4.0
-
 universe:
   assets:
-    - "META"
-    - "AAPL"
-    - "NVDA"
-    - "TSLA"
-    - "AMD"
-    - "ARM"
-    - "MSFT"
-    - "GOOGL"
-    - "AMZN"
-    - "SPY"
-    - "QQQ"
-    - "TLT"
-    - "PFE"
-    - "UNH"
-    - "GLD"
-  trinity_assets: ["META", "PFE", "UNH"]
-  hurst_min_for_inclusion: 0.40
+  - META
+  - AAPL
+  - NVDA
+  - TSLA
+  - AMD
+  - ARM
+  - MSFT
+  - GOOGL
+  - AMZN
+  - SPY
+  - QQQ
+  - TLT
+  - PFE
+  - UNH
+  - GLD
+  trinity_assets:
+  - META
+  - PFE
+  - UNH
+  hurst_min_for_inclusion: 0.4
   hurst_lookback_days: 90
-
 momentum:
   logistic_window: 20
   logistic_step: 1
   rsi_window: 14
   rsi_overbought: 70
   rsi_oversold: 30
-  momentum_12_1_window: 252  # 12 months (252 bars) minus 1 month (21 bars)
-
+  momentum_12_1_window: 252
 asset_profiles:
   _DEFAULT:
     stop_atr_multiplier: 1.5
@@ -143,3 +140,17 @@ asset_profiles:
     shock_exit_atr_mult: 3.0
     max_stop_pct: 0.05
     min_stop_atr: 0.5
+asset_params:
+  GOOGL:
+    atr_target_multiplier: 4.0
+  GLD:
+    atr_target_multiplier: 4.0
+  QQQ:
+    atr_target_multiplier: 4.0
+  TSLA:
+    atr_target_multiplier: 4.0
+regime_params:
+  REVERSION:
+    stop_atr_mult: 1.0
+    tp_rr: 1.5
+    fitted_on: '2026-04-15'

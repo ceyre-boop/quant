@@ -284,7 +284,14 @@ def main():
     )
     
     args = parser.parse_args()
-    
+
+    # ── Monthly re-optimisation (runs once per month, ~20s, non-blocking) ────
+    from sovereign.monthly_reopt import MonthlyReopt
+    reopt = MonthlyReopt()
+    if reopt.should_run():
+        reopt.run(symbols=['META', 'PFE', 'UNH', 'BLK', 'QQQ', 'ES=F', 'NQ=F'])
+    # ─────────────────────────────────────────────────────────────────────────
+
     if args.phase == 'premarket':
         pre_market_checklist()
     elif args.phase == 'killzone':

@@ -481,6 +481,16 @@ class BacktestLifecycle:
             pd.DataFrame(self.trades).to_csv(trades_file, index=False)
             logger.info(f"Saved {len(self.trades)} trades to {trades_file}")
 
+            # Mirror closed trades to unified ledger for enricher + cluster feedback loop
+            from datetime import datetime as _dt
+            _month_tag = _dt.now().strftime("%Y_%m")
+            _ledger_path = Path(f"data/ledger/trade_ledger_{_month_tag}.csv")
+            _ledger_path.parent.mkdir(parents=True, exist_ok=True)
+            _trades_df = pd.DataFrame(self.trades)
+            _write_header = not _ledger_path.exists()
+            _trades_df.to_csv(_ledger_path, mode='a', header=_write_header, index=False)
+            logger.info(f"Appended {len(self.trades)} trades to {_ledger_path}")
+
             
         # Automatic retraining if win rate > 55%
         if win_rate > 0.55:

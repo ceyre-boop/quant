@@ -30,6 +30,18 @@ from backtest.report_generator import (
     print_trade_list
 )
 
+from backtest.fast_engine import (
+    FastBacktestEngine,
+    DataArrays,
+    SweepParams,
+    FastResult,
+)
+
+from backtest.sweep import (
+    ParameterSweep,
+    quick_sweep,
+)
+
 __all__ = [
     # Backtest Runner
     'BacktestRunner',
@@ -52,4 +64,12 @@ __all__ = [
     'ReportConfig',
     'quick_report',
     'print_trade_list',
+    # Fast Engine
+    'FastBacktestEngine',
+    'DataArrays',
+    'SweepParams',
+    'FastResult',
+    # Sweep
+    'ParameterSweep',
+    'quick_sweep',
 ]
