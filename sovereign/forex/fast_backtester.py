@@ -148,6 +148,8 @@ def _compute_stats(
     win_rate = len(wins) / n
     gross_win = float(wins.sum()) if len(wins) else 0.0
     gross_loss = float(abs(losses.sum())) if len(losses) else 0.0
+    # Cap profit factor at 20 to avoid infinite values when there are no
+    # losing trades (e.g. in short backtests or synthetic flat-price runs).
     profit_factor = gross_win / gross_loss if gross_loss > 0 else (20.0 if gross_win > 0 else 1.0)
     avg_hold = float(hold_arr.mean()) if n else 0.0
 

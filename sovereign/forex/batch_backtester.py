@@ -255,6 +255,8 @@ def _make_synthetic_dataset(rng: np.random.Generator, n_bars: int) -> ForexArray
 
     signal = np.zeros(n_bars, dtype=np.float64)
     # Approximately monthly signals — one every ~21 bars
+    # Signal distribution: 25 % long, 25 % short, 50 % flat — mirrors realistic
+    # macro signal sparsity while still exercising both long and short paths.
     choices = np.array([-1.0, 0.0, 0.0, 1.0])
     for j in range(0, n_bars, 21):
         signal[j] = choices[rng.integers(0, 4)]

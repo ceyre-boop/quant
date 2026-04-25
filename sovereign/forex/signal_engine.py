@@ -83,6 +83,9 @@ def build_signal_arrays(
     quote_cpi_h = fetcher.get_cpi_history(quote_country, start="2014-01-01")
 
     # --- Compute monthly signals -----------------------------------------------
+    # BMS = Business Month Start: the first trading day of each calendar month.
+    # Macro signals are monthly because the underlying drivers (rate differentials,
+    # IRP deviations, PPP gaps) update on a monthly or slower cadence.
     monthly_dates = close.resample("BMS").first().index
     monthly_signals: dict = {}
 

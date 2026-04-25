@@ -12,8 +12,7 @@ Usage:
     python scripts/run_forex_scan.py --benchmark                  # preloaded serial
     python scripts/run_forex_scan.py --benchmark --workers 4      # preloaded parallel
     python scripts/run_forex_scan.py --synthetic-benchmark        # no-network hot path
-    python scripts/run_forex_scan.py --synthetic-benchmark \\
-        --pair-count 11 --bars 2500 --iterations 400 --workers 1
+    python scripts/run_forex_scan.py --synthetic-benchmark --pair-count 11 --bars 2500 --iterations 400 --workers 1
 """
 import argparse
 import logging
