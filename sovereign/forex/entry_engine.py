@@ -61,7 +61,8 @@ class ForexEntrySignal:
 class ForexEntryEngine:
 
     # Hard rules from ICT engine
-    MIN_RR = 2.0
+    MIN_RR = 1.5        # matches T1 target (entry + 1.5 × risk); prevents rejection
+                        # of any setup where T1 achieves the first partial target
     STOP_ATR_MIN = 0.5
     STOP_ATR_MAX = 2.5
     MAX_CONCURRENT = 2
