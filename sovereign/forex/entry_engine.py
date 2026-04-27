@@ -42,6 +42,8 @@ import yfinance as yf
 from sovereign.forex.macro_engine import ForexMacroEngine, ForexSignal
 from sovereign.forex.ict_engine import ICTEngine, ICTAnalysis
 from sovereign.forex.commodity_engine import CommodityEngine, COMMODITY_PAIRS
+from sovereign.forex.cot_engine import COTEngine
+from sovereign.forex.dxy_engine import DXYEngine
 from sovereign.forex.strategy import (
     CONVICTION_NEUTRAL_THRESHOLD,
     CONVICTION_FULL_SIZE,
@@ -240,6 +242,8 @@ class ForexEntryEngine:
         self._ict = ICTEngine()
         self._commodity = CommodityEngine()
         self._cb = CBEventTrigger()
+        self._cot = COTEngine()
+        self._dxy = DXYEngine()
         self._open_count = 0
 
     def evaluate(
@@ -374,6 +378,27 @@ class ForexEntryEngine:
         else:
             buffett_mod = 0.75
         size_mod = min(ict_size * buffett_mod, 1.5)
+
+        # ── COT positioning gate (Dalio Q3) ───────────────────────────── #
+        cot_mult = self._cot.gate_signal(target_direction, base_country or '')
+        if cot_mult < 1.0:
+            size_mod = round(size_mod * cot_mult, 3)
+            rationale.append(
+                f'COT: speculators crowded {target_direction} on '
+                f'{base_country} — size ×{cot_mult}'
+            )
+
+        # ── DXY smile overlay ─────────────────────────────────────────── #
+        try:
+            dxy_mult = self._dxy.get_modifier(pair, target_direction)
+            if dxy_mult != 1.0:
+                size_mod = round(min(size_mod * dxy_mult, 1.5), 3)
+                td = self._dxy.get_trend()
+                rationale.append(
+                    f'DXY: {td["trend"]} ({td["smile_regime"]}) — size ×{dxy_mult}'
+                )
+        except Exception:
+            pass
 
         # ── Entry, stop, targets ──────────────────────────────────────── #
         entry, stop = self._entry_stop(target_direction, ict)

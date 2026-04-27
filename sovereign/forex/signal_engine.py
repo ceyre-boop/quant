@@ -19,6 +19,7 @@ import pandas as pd
 
 from sovereign.forex.data_fetcher import FALLBACK_CPI, FALLBACK_RATES
 from sovereign.forex.calendar_signals import CalendarSignalEngine
+from sovereign.forex.cpi_engine import CPISurpriseEngine
 
 
 @dataclass(frozen=True)
@@ -34,6 +35,7 @@ class ForexSignalEngine:
         self._fetcher = fetcher
         self._cb = cb_trigger
         self._calendar = CalendarSignalEngine()
+        self._cpi = CPISurpriseEngine(fetcher=fetcher)
         self.config = config or SignalConfig()
 
     def build_signal_frame(
@@ -111,6 +113,29 @@ class ForexSignalEngine:
                 ev_hold = np.int32(ev['hold_days'])
                 existing = signals[idx]
                 # Calendar overrides macro; CB event will override calendar below
+                if existing == 0 or existing == signal_val:
+                    signals[idx] = signal_val
+                    hold_days[idx] = ev_hold
+
+        # ── Layer 1.5: CPI surprise fade (Edge 2, 5-day hold) ────────────── #
+        for country in (base_country, quote_country):
+            cpi_events = self._cpi.get_historical_surprises(
+                country=country,
+                start=pd.Timestamp(start),
+                end=pd.Timestamp(end),
+            )
+            for ev in cpi_events:
+                # Fade direction is relative to the currency in the pair
+                if country == base_country:
+                    signal_val = np.int8(1 if ev['direction'] == 'LONG' else -1)
+                else:
+                    # Quote currency: flip direction
+                    signal_val = np.int8(-1 if ev['direction'] == 'LONG' else 1)
+                ev_hold = np.int32(ev['hold_days'])
+                idx = int(all_dates.searchsorted(ev['signal_date'], side='left'))
+                if idx >= len(all_dates):
+                    continue
+                existing = signals[idx]
                 if existing == 0 or existing == signal_val:
                     signals[idx] = signal_val
                     hold_days[idx] = ev_hold
