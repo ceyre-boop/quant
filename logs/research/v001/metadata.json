@@ -1,0 +1,107 @@
+{
+  "version": "v001",
+  "label": "Baseline \u2014 Full 7-Edge Stack",
+  "date": "2026-04-27",
+  "git_commit": "9fc64f7",
+  "backtest_period": "2015-01-01 to 2024-12-31",
+  "metrics": {
+    "sharpe_by_pair": {
+      "EURUSD=X": 0.921,
+      "GBPUSD=X": 0.97,
+      "USDJPY=X": 0.27,
+      "USDCHF=X": -0.657,
+      "AUDUSD=X": 0.44,
+      "USDCAD=X": 0.048,
+      "NZDUSD=X": -0.204,
+      "EURGBP=X": -0.091,
+      "EURJPY=X": -0.485,
+      "GBPJPY=X": 0.284,
+      "AUDNZD=X": 0.467
+    },
+    "win_rate_by_pair": {
+      "EURUSD=X": 0.53,
+      "GBPUSD=X": 0.589,
+      "USDJPY=X": 0.515,
+      "USDCHF=X": 0.423,
+      "AUDUSD=X": 0.488,
+      "USDCAD=X": 0.458,
+      "NZDUSD=X": 0.492,
+      "EURGBP=X": 0.515,
+      "EURJPY=X": 0.503,
+      "GBPJPY=X": 0.552,
+      "AUDNZD=X": 0.536
+    },
+    "pf_by_pair": {
+      "EURUSD=X": 1.595,
+      "GBPUSD=X": 1.677,
+      "USDJPY=X": 1.193,
+      "USDCHF=X": 0.65,
+      "AUDUSD=X": 1.283,
+      "USDCAD=X": 1.042,
+      "NZDUSD=X": 0.927,
+      "EURGBP=X": 0.972,
+      "EURJPY=X": 0.78,
+      "GBPJPY=X": 1.189,
+      "AUDNZD=X": 1.331
+    },
+    "max_dd_by_pair": {
+      "EURUSD=X": -0.074,
+      "GBPUSD=X": -0.087,
+      "USDJPY=X": -0.146,
+      "USDCHF=X": -0.158,
+      "AUDUSD=X": -0.078,
+      "USDCAD=X": -0.119,
+      "NZDUSD=X": -0.132,
+      "EURGBP=X": -0.123,
+      "EURJPY=X": -0.144,
+      "GBPJPY=X": -0.158,
+      "AUDNZD=X": -0.056
+    },
+    "trades_by_pair": {
+      "EURUSD=X": 134,
+      "GBPUSD=X": 141,
+      "USDJPY=X": 136,
+      "USDCHF=X": 123,
+      "AUDUSD=X": 125,
+      "USDCAD=X": 120,
+      "NZDUSD=X": 132,
+      "EURGBP=X": 136,
+      "EURJPY=X": 145,
+      "GBPJPY=X": 145,
+      "AUDNZD=X": 112
+    },
+    "positive_sharpe_count": 7,
+    "total_pairs": 11,
+    "avg_sharpe": 0.1785,
+    "best_pair": "GBPUSD=X",
+    "best_sharpe": 0.97,
+    "worst_pair": "USDCHF=X",
+    "worst_sharpe": -0.657,
+    "total_trades_all": 1449
+  },
+  "signal_layers": [
+    "Layer 1: CB Event Trigger (post-decision drift)",
+    "Layer 1.5: CPI Surprise Fade (Edge 2)",
+    "Layer 2: Calendar Signals (QE rebalancing + March JPY)",
+    "Layer 3: Macro IRP + Real Rate Differential",
+    "Gate A: Buffett Conviction Threshold (0.35/0.70/0.85)",
+    "Gate B: COT Positioning (Dalio Q3)",
+    "Gate C: DXY Dollar Smile Overlay",
+    "Gate D: VIX Carry Unwind Override"
+  ],
+  "what_this_version_proved": [
+    "7/11 pairs positive Sharpe over 10 years",
+    "11/11 pairs at 30+ trades for statistical validity",
+    "GBP/USD 0.97 Sharpe, EUR/USD 0.92 Sharpe",
+    "All 7 edges from cause-effect map implemented",
+    "CPI fade (Edge 2) is the highest-impact layer for EUR/GBP pairs"
+  ],
+  "to_beat_in_v002": {
+    "target_metric": "avg_sharpe across all 11 pairs",
+    "current_value": 0.1785,
+    "minimum_improvement": 0.05,
+    "target_positive_pairs": 9,
+    "notes": "USDCHF (-0.66) and EURJPY (-0.48) are the weakest \u2014 focus there"
+  },
+  "chart": "chart_001_baseline.png"
+}

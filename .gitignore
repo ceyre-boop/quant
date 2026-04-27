@@ -52,8 +52,10 @@ htmlcov/
 .firebase/
 config/firebase_service_account.json
 
-# Logs
-logs/
+# Logs — raw logs ignored, research snapshots committed
+logs/*.log
+logs/charts/
+!logs/research/
 *.log
 
 # OS
