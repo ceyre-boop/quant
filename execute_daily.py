@@ -15,12 +15,16 @@ import sys
 from datetime import datetime, timedelta
 from pathlib import Path
 
+_ROOT = Path(__file__).parent
+_LOG_DIR = _ROOT / 'data' / 'logs'
+_LOG_DIR.mkdir(parents=True, exist_ok=True)
+
 # Setup logging first
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s | %(levelname)-8s | %(message)s',
     handlers=[
-        logging.FileHandler(f'data/logs/daily_{datetime.now().strftime("%Y%m%d")}.log'),
+        logging.FileHandler(str(_LOG_DIR / f'daily_{datetime.now().strftime("%Y%m%d")}.log')),
         logging.StreamHandler()
     ]
 )
@@ -116,8 +120,9 @@ def execute_killzone(mode='paper'):
     
     from sovereign.orchestrator import SovereignOrchestrator
     from sovereign.data.feeds.alpaca_feed import AlpacaFeed
-    
+
     orch = SovereignOrchestrator(mode=mode)
+    orch.load_models(base_path='models/sovereign')
     feed = AlpacaFeed()
     
     # Trinity assets from config
@@ -205,7 +210,7 @@ def execute_killzone(mode='paper'):
             equity = 100000.0  # Paper equity
             
             result = orch.run_session(
-                symbol=symbol,
+                symbol,
                 feature_record=record,
                 current_price=latest['close'],
                 atr=atr,
@@ -282,7 +287,12 @@ def main():
         default='full',
         help='Which phase to run (default: full)'
     )
-    
+    parser.add_argument(
+        '--date',
+        default=None,
+        help='Simulation date YYYY-MM-DD (default: today)'
+    )
+
     args = parser.parse_args()
 
     # ── Monthly re-optimisation (runs once per month, ~20s, non-blocking) ────
