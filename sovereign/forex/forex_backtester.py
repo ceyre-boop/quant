@@ -95,23 +95,52 @@ class ForexBacktester:
 
     def backtest_all(self) -> List[ForexBacktestResult]:
         results = []
+        all_trades: dict[str, list] = {}
+
         for pair in ALL_PAIRS:
             try:
-                r = self.backtest_pair(pair)
-                if r:
-                    results.append(r)
-                    print(
-                        f"  {pair:12s}  win={r.win_rate:.1%}  pf={r.profit_factor:.2f}"
-                        f"  sharpe={r.sharpe:.2f}  dd={r.max_drawdown:.1%}"
-                        f"  tpy={r.trades_per_year:.0f}"
-                    )
+                cfg = PAIR_CONFIG.get(pair)
+                if not cfg:
+                    continue
+                df = self._download_price(pair)
+                if df is None or len(df) < 252:
+                    continue
+                base_country  = CB_TO_COUNTRY[cfg.base_central_bank]
+                quote_country = CB_TO_COUNTRY[cfg.quote_central_bank]
+                signals = self._signals.build_signal_frame(
+                    prices=df, base_country=base_country,
+                    quote_country=quote_country,
+                    start=self.start, end=self.end, pair=pair,
+                )
+                trades = self._simulate_trades(df, signals)
+                if not trades:
+                    continue
+                r = self._compute_stats(pair, trades, len(df))
+                results.append(r)
+                all_trades[pair] = trades
+                print(
+                    f"  {pair:12s}  win={r.win_rate:.1%}  pf={r.profit_factor:.2f}"
+                    f"  sharpe={r.sharpe:.2f}  dd={r.max_drawdown:.1%}"
+                    f"  tpy={r.trades_per_year:.0f}"
+                )
             except Exception as e:
                 logger.warning(f"Backtest failed for {pair}: {e}")
 
         output = [asdict(r) for r in results]
         with open(RESULTS_PATH, 'w') as f:
             json.dump(output, f, indent=2)
-        logger.info(f"Results saved to {RESULTS_PATH}")
+
+        trades_path = RESULTS_PATH.parent / 'forex_backtest_trades.json'
+        with open(trades_path, 'w') as f:
+            # Serialise timestamps
+            serialisable = {}
+            for pair, trades in all_trades.items():
+                serialisable[pair] = [
+                    {k: (str(v) if hasattr(v, 'date') else v)
+                     for k, v in t.items()} for t in trades
+                ]
+            json.dump(serialisable, f, indent=2, default=str)
+
         return results
 
     def _simulate_trades(
