@@ -22,7 +22,7 @@ from dotenv import load_dotenv
 load_dotenv()
 logger = logging.getLogger(__name__)
 
-CACHE_DIR = Path(__file__).parents[3] / 'data' / 'cache' / 'macro'
+CACHE_DIR = Path(__file__).parents[2] / 'data' / 'cache' / 'macro'
 CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
 # FRED series IDs per country/metric
@@ -222,13 +222,23 @@ class ForexDataFetcher:
         cpi = FALLBACK_CPI.get(country, 2.0)
         gdp = FALLBACK_GDP_GROWTH.get(country, 1.0)
         trajectory = RATE_TRAJECTORY.get(country, [0, 0, 0])
+        synthetic_fields = ['rate', 'cpi_yoy', 'gdp_growth', 'rate_trajectory']
+        source_map = {
+            'rate': 'fallback_static',
+            'cpi_yoy': 'fallback_static',
+            'gdp_growth': 'fallback_static',
+            'rate_trajectory': 'manual_prior',
+        }
 
         if self._fred_ok:
             try:
                 rate = self._fred_latest(FRED_RATES.get(country, ''), rate)
+                source_map['rate'] = 'fred'
                 cpi = self._fred_yoy(FRED_CPI.get(country, ''), cpi, country)
+                source_map['cpi_yoy'] = 'fred'
                 if country in FRED_GDP:
                     gdp = self._fred_qoq(FRED_GDP[country], gdp)
+                    source_map['gdp_growth'] = 'fred'
             except Exception as e:
                 logger.warning(f"FRED fetch for {country}: {e}")
         else:
@@ -242,8 +252,20 @@ class ForexDataFetcher:
                         if hasattr(close, 'item'):
                             close = close.item()
                         rate = float(close)
+                        source_map['rate'] = 'yfinance_proxy'
                 except Exception:
                     pass
+
+        synthetic_fields = [
+            field for field, source in source_map.items()
+            if source in {'fallback_static', 'manual_prior'}
+        ]
+        if synthetic_fields:
+            logger.warning(
+                "ForexDataFetcher using synthetic macro state for %s: %s",
+                country,
+                ', '.join(synthetic_fields),
+            )
 
         return {
             'country': country,
@@ -252,6 +274,8 @@ class ForexDataFetcher:
             'gdp_growth': gdp,
             'real_rate': rate - cpi,
             'rate_trajectory': trajectory,
+            'source_map': source_map,
+            'synthetic_fields': synthetic_fields,
             'as_of': datetime.now().strftime('%Y-%m-%d'),
         }
 

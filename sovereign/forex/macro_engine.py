@@ -19,13 +19,18 @@ from typing import List, Optional
 
 import numpy as np
 import pandas as pd
-import yfinance as yf
-
 from sovereign.forex.pair_universe import ALL_PAIRS, PAIR_CONFIG, CB_TO_COUNTRY
 from sovereign.forex.data_fetcher import ForexDataFetcher
 from sovereign.forex.fair_value import FairValueModel
 from sovereign.forex.cycle_detector import CycleDetector
 from sovereign.forex.risk_sentiment import RiskSentimentEngine
+from sovereign.forex.strategy import (
+    CONVICTION_NEUTRAL_THRESHOLD,
+    CONVICTION_FULL_SIZE,
+    CONVICTION_MAX_SIZE,
+    conviction_from_score,
+    direction_from_score,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -36,12 +41,6 @@ WEIGHTS = {
     'ppp_z':              0.10,
     'hurst':              0.10,
 }
-
-# Buffett lens thresholds (from cause-effect map Part 10)
-CONVICTION_NEUTRAL_THRESHOLD = 0.35   # below this → NEUTRAL, no trade
-CONVICTION_FULL_SIZE          = 0.70   # at or above → full size
-CONVICTION_MAX_SIZE           = 0.85   # at or above → max size (1.5× normal)
-
 
 @dataclass
 class ForexSignal:
@@ -143,7 +142,7 @@ class ForexMacroEngine:
             + WEIGHTS['hurst']            * hurst_score
         )
 
-        conviction = min(abs(raw), 1.0)
+        conviction = conviction_from_score(raw)
 
         # Buffett lens: below conviction threshold = NEUTRAL (no noise trades)
         if conviction < CONVICTION_NEUTRAL_THRESHOLD and risk_override is None:
@@ -152,10 +151,8 @@ class ForexMacroEngine:
             # VIX carry unwind overrides macro entirely
             direction = risk_override
             conviction = min(conviction + 0.3, 1.0)  # risk override adds conviction
-        elif raw > 0:
-            direction = 'LONG'
         else:
-            direction = 'SHORT'
+            direction = direction_from_score(raw)
 
         # Skip if fair value models disagree
         if fv_signal.composite_direction == 'SKIP':

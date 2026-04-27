@@ -18,22 +18,191 @@ Buffett conviction gate:
   conviction > 0.85 → max size (1.5× modifier cap)
 
 Commodity boost: AUD/CAD/NZD pairs get commodity lag signal as extra conviction.
+
+CB_EVENT_TRIGGER (Edge 3 — Post-Decision Drift):
+  Source: data/cache/cb_decisions.json (built by scripts/build_cb_decisions.py)
+  Fires when: surprise_bps >= 25 AND within entry window (day +1 to +5)
+  Conviction: 0.50 + abs(surprise_bps) / 200  [capped at 0.90]
+  Hold: 10–20 days
+  Adds ~6-8 signals per pair per year historically.
 """
 from __future__ import annotations
 
+import json
 import logging
 from dataclasses import dataclass
+from datetime import timedelta
+from pathlib import Path
 from typing import Optional, Tuple
 
 import numpy as np
 import pandas as pd
 import yfinance as yf
 
-from sovereign.forex.macro_engine import ForexMacroEngine, ForexSignal, CONVICTION_NEUTRAL_THRESHOLD
+from sovereign.forex.macro_engine import ForexMacroEngine, ForexSignal
 from sovereign.forex.ict_engine import ICTEngine, ICTAnalysis
 from sovereign.forex.commodity_engine import CommodityEngine, COMMODITY_PAIRS
+from sovereign.forex.strategy import (
+    CONVICTION_NEUTRAL_THRESHOLD,
+    CONVICTION_FULL_SIZE,
+    CONVICTION_MAX_SIZE,
+    TARGET_RR_T1,
+    TARGET_RR_T2,
+    TARGET_RR_T3,
+)
+
+CB_DECISIONS_PATH = Path(__file__).parents[2] / 'data' / 'cache' / 'cb_decisions.json'
+CB_MIN_SURPRISE_BPS = 25
+CB_ENTRY_WINDOW_DAYS = 5   # entry valid for 5 business days after decision
 
 logger = logging.getLogger(__name__)
+
+
+class CBEventTrigger:
+    """
+    Edge 3 — Post-Decision Drift.
+
+    Loads cb_decisions.json and answers: given a pair and a date,
+    was there a central bank surprise in the last N days that generates
+    a directional signal for this pair?
+
+    Bank → country mapping determines which decisions affect which pairs.
+    """
+
+    # How each bank's surprise direction translates to pair direction:
+    # surprise > 0 (hawkish) → base currency LONG; surprise < 0 (dovish) → SHORT
+    BANK_TO_COUNTRY = {
+        'FED': 'US', 'ECB': 'EU', 'BOE': 'UK',
+        'BOJ': 'JP', 'SNB': 'CH', 'RBA': 'AU',
+        'BOC': 'CA', 'RBNZ': 'NZ',
+    }
+
+    def __init__(self):
+        self._decisions: list[dict] = []
+        self._loaded = False
+
+    def _load(self) -> None:
+        if self._loaded:
+            return
+        try:
+            with open(CB_DECISIONS_PATH) as f:
+                self._decisions = json.load(f)
+            self._loaded = True
+        except FileNotFoundError:
+            logger.warning(
+                f"cb_decisions.json not found at {CB_DECISIONS_PATH}. "
+                "Run scripts/build_cb_decisions.py to generate it."
+            )
+            self._loaded = True  # don't retry
+
+    def check(
+        self,
+        base_country: str,
+        quote_country: str,
+        as_of: pd.Timestamp,
+        window_days: int = CB_ENTRY_WINDOW_DAYS,
+    ) -> Optional[dict]:
+        """
+        Returns the strongest active CB surprise signal for this pair,
+        or None if no qualifying event in the window.
+
+        Returns:
+          {'direction': 'LONG'|'SHORT', 'conviction': float,
+           'surprise_bps': int, 'bank': str, 'date': str, 'hold_days': int}
+        """
+        self._load()
+        if not self._decisions:
+            return None
+
+        window_start = as_of - pd.Timedelta(days=window_days + 4)  # +4 for weekends
+
+        candidates = []
+        for d in self._decisions:
+            d_date = pd.Timestamp(d['date'])
+            if not (window_start <= d_date <= as_of):
+                continue
+            if abs(d['surprise_bps']) < CB_MIN_SURPRISE_BPS:
+                continue
+
+            country = self.BANK_TO_COUNTRY.get(d['bank'])
+            if country not in (base_country, quote_country):
+                continue
+
+            # Surprise direction: hawkish (+) strengthens the currency
+            surprise = d['surprise_bps']
+            if country == base_country:
+                raw_direction = 'LONG' if surprise > 0 else 'SHORT'
+            else:
+                # Quote currency hawkish → pair goes DOWN (base weakens relatively)
+                raw_direction = 'SHORT' if surprise > 0 else 'LONG'
+
+            conviction = min(0.50 + abs(float(surprise)) / 200.0, 0.90)
+            hold_days = int(10 + min(abs(float(surprise)) / 25.0, 2) * 5)  # 10–20 days
+
+            candidates.append({
+                'direction':    raw_direction,
+                'conviction':   conviction,
+                'surprise_bps': surprise,
+                'bank':         d['bank'],
+                'date':         d['date'],
+                'hold_days':    hold_days,
+            })
+
+        if not candidates:
+            return None
+
+        # Return the highest-conviction (largest surprise) event
+        return max(candidates, key=lambda c: abs(c['surprise_bps']))
+
+    def check_historical(
+        self,
+        base_country: str,
+        quote_country: str,
+        start: pd.Timestamp,
+        end: pd.Timestamp,
+        min_surprise_bps: int = CB_MIN_SURPRISE_BPS,
+    ) -> list[dict]:
+        """
+        Return all CB surprise events in [start, end] for this country pair.
+        Used by the backtester to generate historical entry signals.
+        Each event has 5-day entry window embedded as 'entry_start'/'entry_end'.
+        """
+        self._load()
+        if not self._decisions:
+            return []
+
+        results = []
+        for d in self._decisions:
+            d_date = pd.Timestamp(d['date'])
+            if not (start <= d_date <= end):
+                continue
+            if abs(d['surprise_bps']) < min_surprise_bps:
+                continue
+            country = self.BANK_TO_COUNTRY.get(d['bank'])
+            if country not in (base_country, quote_country):
+                continue
+
+            surprise = d['surprise_bps']
+            if country == base_country:
+                direction = 'LONG' if surprise > 0 else 'SHORT'
+            else:
+                direction = 'SHORT' if surprise > 0 else 'LONG'
+
+            conviction = min(0.50 + abs(float(surprise)) / 200.0, 0.90)
+            hold_days = int(10 + min(abs(float(surprise)) / 25.0, 2) * 5)
+
+            results.append({
+                'decision_date': d_date,
+                'entry_start':   d_date + pd.Timedelta(days=1),
+                'entry_end':     d_date + pd.Timedelta(days=CB_ENTRY_WINDOW_DAYS + 2),
+                'direction':     direction,
+                'conviction':    conviction,
+                'surprise_bps':  surprise,
+                'bank':          d['bank'],
+                'hold_days':     hold_days,
+            })
+
+        return results
 
 
 @dataclass
@@ -61,7 +230,7 @@ class ForexEntrySignal:
 class ForexEntryEngine:
 
     # Hard rules from ICT engine
-    MIN_RR = 2.0
+    MIN_RR = TARGET_RR_T1
     STOP_ATR_MIN = 0.5
     STOP_ATR_MAX = 2.5
     MAX_CONCURRENT = 2
@@ -70,6 +239,7 @@ class ForexEntryEngine:
         self._macro = ForexMacroEngine()
         self._ict = ICTEngine()
         self._commodity = CommodityEngine()
+        self._cb = CBEventTrigger()
         self._open_count = 0
 
     def evaluate(
@@ -108,9 +278,31 @@ class ForexEntryEngine:
                 macro_signal=macro_sig,
             )
 
+        # ── CB event trigger (Edge 3 — Post-Decision Drift) ─────────────── #
+        # Check if a CB surprise event is active for this pair RIGHT NOW.
+        # A CB surprise overrides the Buffett threshold — it's a direct causal event.
+        cfg = __import__('sovereign.forex.pair_universe', fromlist=['PAIR_CONFIG']).PAIR_CONFIG
+        from sovereign.forex.pair_universe import PAIR_CONFIG, CB_TO_COUNTRY
+        pair_cfg = PAIR_CONFIG.get(pair)
+        base_country = CB_TO_COUNTRY[pair_cfg.base_central_bank] if pair_cfg else None
+        quote_country = CB_TO_COUNTRY[pair_cfg.quote_central_bank] if pair_cfg else None
+
+        cb_event = None
+        if base_country and quote_country:
+            cb_event = self._cb.check(
+                base_country, quote_country, as_of=pd.Timestamp.utcnow()
+            )
+
         # ── Buffett conviction gate ───────────────────────────────────── #
-        # Below 0.35 = noise, not a structural edge (cause-effect map Part 10)
         effective_conviction = macro_sig.conviction
+
+        # CB event boost — takes precedence over everything
+        if cb_event:
+            # Post-decision drift: direction follows the surprise
+            # Only enter if it aligns with macro or overrides on large surprise
+            if (cb_event['direction'] == macro_sig.direction or
+                    abs(cb_event['surprise_bps']) >= 50):
+                effective_conviction = max(effective_conviction, cb_event['conviction'])
 
         # Commodity boost for AUD/CAD/NZD pairs
         if pair in COMMODITY_PAIRS:
@@ -118,12 +310,12 @@ class ForexEntryEngine:
                 comm_sig = self._commodity.score_pair(pair)
                 if (comm_sig and comm_sig.direction == macro_sig.direction
                         and comm_sig.lag_detected):
-                    boost = comm_sig.conviction * 0.15   # up to +12% conviction
+                    boost = comm_sig.conviction * 0.15
                     effective_conviction = min(effective_conviction + boost, 1.0)
             except Exception:
                 pass
 
-        if effective_conviction < CONVICTION_NEUTRAL_THRESHOLD:
+        if effective_conviction < CONVICTION_NEUTRAL_THRESHOLD and cb_event is None:
             return ForexEntrySignal(
                 pair=pair, direction='NO_TRADE', score=0,
                 size_modifier=0.0, entry_price=0, stop_price=0,
@@ -137,7 +329,10 @@ class ForexEntryEngine:
                 macro_signal=macro_sig,
             )
 
-        target_direction = macro_sig.direction  # LONG / SHORT
+        # CB event can override macro direction if surprise is large enough
+        target_direction = macro_sig.direction
+        if cb_event and abs(cb_event['surprise_bps']) >= 50:
+            target_direction = cb_event['direction']
 
         # ── ICT analysis ──────────────────────────────────────────────── #
         try:
@@ -148,6 +343,16 @@ class ForexEntryEngine:
 
         # ── 6-point checklist ─────────────────────────────────────────── #
         score, rationale = self._score_checklist(target_direction, macro_sig, ict)
+
+        if cb_event:
+            rationale.append(
+                f'★ CB Event: {cb_event["bank"]} {cb_event["surprise_bps"]:+d}bp surprise '
+                f'on {cb_event["date"]} → {cb_event["direction"]} '
+                f'(conv={cb_event["conviction"]:.2f}, hold={cb_event["hold_days"]}d)'
+            )
+            # CB event counts as a bonus criterion — lowers score requirement to 3
+            if score >= 3 and cb_event['direction'] == target_direction:
+                score = max(score, 4)  # floor to tradeable threshold
 
         if score < 4:
             return ForexEntrySignal(
@@ -162,9 +367,9 @@ class ForexEntryEngine:
         # ICT score determines base size; Buffett conviction tiers cap it
         ict_size = 1.0 if score == 6 else (0.75 if score == 5 else 0.5)
         # Buffett tiers: conviction > 0.85 → 1.5×, 0.70–0.85 → 1×, 0.35–0.70 → 0.75×
-        if effective_conviction >= 0.85:
+        if effective_conviction >= CONVICTION_MAX_SIZE:
             buffett_mod = 1.5
-        elif effective_conviction >= 0.70:
+        elif effective_conviction >= CONVICTION_FULL_SIZE:
             buffett_mod = 1.0
         else:
             buffett_mod = 0.75
@@ -199,15 +404,15 @@ class ForexEntryEngine:
             )
 
         if target_direction == 'LONG':
-            t1 = entry + 1.5 * risk
-            t2 = entry + 3.0 * risk
-            t3 = entry + 5.0 * risk
+            t1 = entry + TARGET_RR_T1 * risk
+            t2 = entry + TARGET_RR_T2 * risk
+            t3 = entry + TARGET_RR_T3 * risk
         else:
-            t1 = entry - 1.5 * risk
-            t2 = entry - 3.0 * risk
-            t3 = entry - 5.0 * risk
+            t1 = entry - TARGET_RR_T1 * risk
+            t2 = entry - TARGET_RR_T2 * risk
+            t3 = entry - TARGET_RR_T3 * risk
 
-        rr_t1 = 1.5
+        rr_t1 = TARGET_RR_T1
         if rr_t1 < self.MIN_RR:
             rationale.append(f'R:R {rr_t1:.1f} below 2:1 minimum — skipping')
             return ForexEntrySignal(
