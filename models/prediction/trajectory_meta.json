@@ -1,0 +1,50 @@
+{
+  "n_train": 276664,
+  "n_test": 69166,
+  "holdout_p50_corr": 0.5605,
+  "veto_rate_on_holdout": 0.1433,
+  "veto_accuracy": 0.92,
+  "top_features": [
+    [
+      "atr_pct",
+      0.7726
+    ],
+    [
+      "vix_level",
+      0.0975
+    ],
+    [
+      "adx_at_entry",
+      0.0417
+    ],
+    [
+      "hurst_at_entry",
+      0.0287
+    ],
+    [
+      "spy_5d_return",
+      0.0276
+    ],
+    [
+      "month",
+      0.0168
+    ],
+    [
+      "direction_enc",
+      0.0095
+    ],
+    [
+      "strategy_enc",
+      0.0042
+    ]
+  ],
+  "p50_train_mean": -2.5022,
+  "actual_train_mean": -3.1628,
+  "calibrated_thresholds": {
+    "veto_p50_below": -2.5851,
+    "half_size_p50_below": -2.9675,
+    "max_size_p50_above": -1.6909,
+    "p50_dist_median": -2.0218,
+    "p50_dist_mean": -2.5022
+  }
+}
