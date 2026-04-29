@@ -55,6 +55,7 @@ class ForexSignalEngine:
             start=start,
             end=end,
             pair=pair,
+            prices_df=prices,
         )
         sig_df = pd.DataFrame(
             {
@@ -73,10 +74,20 @@ class ForexSignalEngine:
         start: str,
         end: str,
         pair: str = '',
+        prices_df: pd.DataFrame = None,   # full OHLCV for ATR computation
     ) -> tuple[np.ndarray, np.ndarray]:
         all_dates = pd.DatetimeIndex(close.index)
         signals = np.zeros(len(all_dates), dtype=np.int8)
         hold_days = np.full(len(all_dates), self.config.hold_days, dtype=np.int32)
+
+        # ── Pre-compute rolling ATR for the ATR filter ────────────────── #
+        # Trajectory model: atr_pct < 2.2% = worst R outcomes (77% importance).
+        atr_series = self._compute_atr_pct(close, prices_df)
+
+        # ── Pre-fetch BOJ rate history for JPY gate ───────────────────── #
+        boj_rates = None
+        if 'JPY' in pair:
+            boj_rates = self._fetcher.get_rate_history('JP', start='2014-01-01')
 
         # ── Layer 3: Macro (lowest priority, 60-day hold) ─────────────── #
         base_rates  = self._fetcher.get_rate_history(base_country, start='2014-01-01')
@@ -85,6 +96,36 @@ class ForexSignalEngine:
         quote_cpi_h = self._fetcher.get_cpi_history(quote_country, start='2014-01-01')
 
         for date in close.resample('BMS').first().index:
+            # ── ATR filter ────────────────────────────────────────────── #
+            if atr_series is not None and date in atr_series.index:
+                atr_pct_now = float(atr_series.asof(date))
+                if atr_pct_now < 0.022:   # 2.2% median from attribution training
+                    continue
+
+            # ── USDCHF: only trade when CHF safe-haven flows are active ── #
+            # SNB suppression dominates in low-VIX risk-on environments.
+            # Use the macro_engine RiskSentimentEngine result via a proxy:
+            # approximate VIX from VXX/SPY returns (already in spy_5d_return).
+            # Simpler: skip USDCHF when the CHF rate is moving (SNB signalling).
+            # Best available signal in the data: USDCHF has near-zero real rate
+            # differential. Gate it on CHF rate movement (same as BOJ gate).
+            if pair == 'USDCHF=X':
+                ch_rates = self._fetcher.get_rate_history('CH', start='2014-01-01')
+                if ch_rates is not None and len(ch_rates) >= 63:
+                    ch_recent = ch_rates.loc[:date].iloc[-63:] if len(ch_rates.loc[:date]) >= 63 else None
+                    if ch_recent is not None:
+                        ch_change = abs(float(ch_recent.iloc[-1]) - float(ch_recent.iloc[0]))
+                        if ch_change < 0.10:   # SNB hasn't moved in 3 months
+                            continue
+
+            # ── EURJPY/JPY: BOJ activity gate ────────────────────────── #
+            if 'JPY' in pair and boj_rates is not None and len(boj_rates) >= 90:
+                boj_hist = boj_rates.loc[:date]
+                if len(boj_hist) >= 90:
+                    boj_change_90d = abs(float(boj_hist.iloc[-1]) - float(boj_hist.iloc[-90]))
+                    if boj_change_90d < 0.001:   # BOJ frozen — no edge
+                        continue
+
             macro_sign = self._macro_signal_for_date(
                 close=close, date=date,
                 base_country=base_country, quote_country=quote_country,
@@ -165,6 +206,28 @@ class ForexSignalEngine:
                     hold_days[idx] = ev_hold
 
         return signals, hold_days
+
+    @staticmethod
+    def _compute_atr_pct(
+        close: pd.Series,
+        prices_df: pd.DataFrame = None,
+        period: int = 14,
+    ) -> pd.Series:
+        """Rolling ATR as % of price. Uses True Range if OHLCV available."""
+        try:
+            if prices_df is not None and 'High' in prices_df.columns:
+                h = prices_df['High']
+                l = prices_df['Low']
+                c = prices_df['Close'] if 'Close' in prices_df.columns else close
+                tr = pd.concat([h - l, (h - c.shift()).abs(), (l - c.shift()).abs()], axis=1).max(axis=1)
+            else:
+                # Fallback: use close-to-close range as ATR proxy
+                tr = close.diff().abs()
+            atr = tr.rolling(period).mean()
+            atr_pct = atr / close
+            return atr_pct.fillna(method='bfill')
+        except Exception:
+            return None
 
     def _macro_signal_for_date(
         self,

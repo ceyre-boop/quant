@@ -1,0 +1,101 @@
+{
+  "version": "v002",
+  "label": "ATR 2.2% filter + USDCHF SNB gate + EURJPY BOJ activity gate",
+  "date": "2026-04-29 01:02",
+  "git_commit": "bb2cbff",
+  "backtest_period": "2015-01-01 to 2024-12-31",
+  "metrics": {
+    "sharpe_by_pair": {
+      "EURUSD=X": 0.982,
+      "GBPUSD=X": 1.094,
+      "USDJPY=X": 0.294,
+      "USDCHF=X": -0.445,
+      "AUDUSD=X": 0.896,
+      "USDCAD=X": 0.226,
+      "NZDUSD=X": 0.081,
+      "EURGBP=X": -0.04,
+      "EURJPY=X": -0.617,
+      "GBPJPY=X": 0.551,
+      "AUDNZD=X": 0.884
+    },
+    "win_rate_by_pair": {
+      "EURUSD=X": 0.545,
+      "GBPUSD=X": 0.594,
+      "USDJPY=X": 0.504,
+      "USDCHF=X": 0.441,
+      "AUDUSD=X": 0.525,
+      "USDCAD=X": 0.45,
+      "NZDUSD=X": 0.508,
+      "EURGBP=X": 0.515,
+      "EURJPY=X": 0.48,
+      "GBPJPY=X": 0.564,
+      "AUDNZD=X": 0.563
+    },
+    "pf_by_pair": {
+      "EURUSD=X": 1.618,
+      "GBPUSD=X": 1.762,
+      "USDJPY=X": 1.169,
+      "USDCHF=X": 0.77,
+      "AUDUSD=X": 1.556,
+      "USDCAD=X": 1.131,
+      "NZDUSD=X": 1.06,
+      "EURGBP=X": 0.999,
+      "EURJPY=X": 0.773,
+      "GBPJPY=X": 1.298,
+      "AUDNZD=X": 1.606
+    },
+    "max_dd_by_pair": {
+      "EURUSD=X": -0.068,
+      "GBPUSD=X": -0.104,
+      "USDJPY=X": -0.139,
+      "USDCHF=X": -0.102,
+      "AUDUSD=X": -0.078,
+      "USDCAD=X": -0.082,
+      "NZDUSD=X": -0.104,
+      "EURGBP=X": -0.115,
+      "EURJPY=X": -0.17,
+      "GBPJPY=X": -0.079,
+      "AUDNZD=X": -0.072
+    },
+    "trades_by_pair": {
+      "EURUSD=X": 123,
+      "GBPUSD=X": 133,
+      "USDJPY=X": 119,
+      "USDCHF=X": 118,
+      "AUDUSD=X": 118,
+      "USDCAD=X": 120,
+      "NZDUSD=X": 120,
+      "EURGBP=X": 136,
+      "EURJPY=X": 125,
+      "GBPJPY=X": 133,
+      "AUDNZD=X": 103
+    },
+    "positive_sharpe_count": 8,
+    "total_pairs": 11,
+    "avg_sharpe": 0.3551,
+    "best_pair": "GBPUSD=X",
+    "best_sharpe": 1.094,
+    "worst_pair": "EURJPY=X",
+    "worst_sharpe": -0.617,
+    "total_trades_all": 1348
+  },
+  "improvement_vs_prev": {
+    "prev_version": "v002",
+    "prev_avg_sharpe": null,
+    "delta_avg_sharpe": null
+  },
+  "to_beat_in_next": {
+    "target_metric": "avg_sharpe across all 11 pairs",
+    "current_value": 0.3551,
+    "minimum_improvement": 0.05,
+    "target_positive_pairs": 9,
+    "weakest_pairs": [
+      "EURJPY=X",
+      "USDCHF=X",
+      "EURGBP=X",
+      "NZDUSD=X"
+    ],
+    "notes": "Focus on EURJPY, USDCHF first"
+  },
+  "chart": "chart_v002.png"
+}

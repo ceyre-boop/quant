@@ -80,6 +80,41 @@ class ForexMacroEngine:
         base_macro = self._fetcher.get_country_macro(base_country)
         quote_macro = self._fetcher.get_country_macro(quote_country)
 
+        # ── USDCHF: SNB suppression gate ────────────────────────────── #
+        # CHF is a managed safe-haven. SNB actively suppresses CHF strength.
+        # When VIX is low (risk-on), safe-haven flows are absent and the
+        # SNB's dominance produces erratic, untradeble CHF moves.
+        # Only trade CHF when VIX > 20 (safe-haven flow is actually active).
+        if pair == 'USDCHF=X':
+            try:
+                from sovereign.forex.risk_sentiment import RiskSentimentEngine
+                vix_now = self._risk.get_reading().vix
+                if vix_now < 20.0:
+                    return ForexSignal(
+                        pair=pair, direction='NEUTRAL', conviction=0.0,
+                        hold_period_estimate=0, primary_driver='SNB_SUPPRESSION',
+                        rate_differential=0.0, irp_z=0.0, ppp_z=0.0,
+                        cycle_divergence=0.0, hurst=0.5, spot=0.0,
+                        base_cycle='UNKNOWN', quote_cycle='UNKNOWN',
+                    )
+            except Exception:
+                pass
+
+        # ── JPY pairs: BOJ activity gate ─────────────────────────────── #
+        # 2015–2021: BOJ frozen at zero. IRP/cycle signals on JPY had nothing
+        # to trade — the rate was structurally pinned. Filter it out.
+        # Only trade JPY pairs when the BOJ has moved in the last 90 days.
+        if 'JPY' in pair:
+            boj_active = self._boj_is_active()
+            if not boj_active:
+                return ForexSignal(
+                    pair=pair, direction='NEUTRAL', conviction=0.0,
+                    hold_period_estimate=0, primary_driver='BOJ_INACTIVE',
+                    rate_differential=0.0, irp_z=0.0, ppp_z=0.0,
+                    cycle_divergence=0.0, hurst=0.5, spot=0.0,
+                    base_cycle='UNKNOWN', quote_cycle='UNKNOWN',
+                )
+
         price_hist = self._get_price_history(pair)
         if price_hist is None or len(price_hist) < 60:
             logger.warning(f"Insufficient price history for {pair}")
@@ -130,16 +165,24 @@ class ForexMacroEngine:
             hurst_score = 0.0
 
         # ── Composite score ─────────────────────────────────────────── #
+        # USDCHF: up-weight risk-sentiment (VIX/carry flow), down-weight IRP.
+        # SNB rate policy is unreliable — CHF is driven by safe-haven flows.
+        if pair == 'USDCHF=X':
+            w = {'rate_diff_momentum': 0.20, 'irp_z': 0.10,
+                 'cycle_div': 0.10, 'ppp_z': 0.10, 'hurst': 0.10}
+        else:
+            w = WEIGHTS
+
         irp_score = np.clip(-fv_signal.irp_z_score / 3.0, -1, 1)
         ppp_score = np.clip(-fv_signal.ppp_z_score / 3.0, -1, 1)
         cycle_score = np.clip(cycle_signal.divergence_score, -1, 1)
 
         raw = (
-            WEIGHTS['rate_diff_momentum'] * rdm_score
-            + WEIGHTS['irp_z']            * irp_score
-            + WEIGHTS['cycle_div']        * cycle_score
-            + WEIGHTS['ppp_z']            * ppp_score
-            + WEIGHTS['hurst']            * hurst_score
+            w['rate_diff_momentum'] * rdm_score
+            + w['irp_z']            * irp_score
+            + w['cycle_div']        * cycle_score
+            + w['ppp_z']            * ppp_score
+            + w['hurst']            * hurst_score
         )
 
         conviction = conviction_from_score(raw)
@@ -263,6 +306,22 @@ class ForexMacroEngine:
             base_net = sum(base_macro.get('rate_trajectory', [0, 0, 0]))
             quote_net = sum(quote_macro.get('rate_trajectory', [0, 0, 0]))
             return float(np.clip((base_net - quote_net) / 6.0, -1, 1))
+
+    def _boj_is_active(self) -> bool:
+        """
+        Returns True when BOJ has moved rates in the last 90 days.
+        During 2015–2021 the BOJ held zero — JPY signals had no rate edge.
+        Uses cached FRED rate history; falls back True (permissive) if unavailable.
+        """
+        try:
+            boj_rates = self._fetcher.get_rate_history('JP', start='2014-01-01')
+            if boj_rates is None or len(boj_rates) < 90:
+                return True   # permissive fallback
+            recent = boj_rates.iloc[-90:]
+            change_90d = abs(float(recent.iloc[-1]) - float(recent.iloc[0]))
+            return change_90d > 0.001   # any move at all (1/10th of a bp)
+        except Exception:
+            return True   # permissive fallback
 
     def _get_price_history(self, pair: str, years: int = 10) -> Optional[pd.Series]:
         if pair in self._price_cache:

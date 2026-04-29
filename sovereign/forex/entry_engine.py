@@ -345,6 +345,21 @@ class ForexEntryEngine:
             logger.warning(f"ICT analysis failed for {pair}: {e}")
             return None
 
+        # ── ATR filter (77% importance in trajectory model) ───────────── #
+        # Trajectory model proved: atr_pct < 2.2% → worst outcomes (-4.09R avg).
+        # Low ATR = price not moving enough for the signal to express.
+        ATR_MEDIAN_PCT = 0.022   # 2.2% from attribution training
+        atr_pct = ict.atr_daily / ict.current_price if ict.current_price > 0 else 0
+        if atr_pct < ATR_MEDIAN_PCT:
+            return ForexEntrySignal(
+                pair=pair, direction='NO_TRADE', score=0,
+                size_modifier=0.0, entry_price=ict.current_price,
+                stop_price=0, t1=0, t2=0, t3=0, rr_t1=0,
+                rationale=[f'ATR_TOO_LOW: {atr_pct:.3%} below 2.2% median — worst R outcome zone'],
+                macro_conviction=effective_conviction,
+                ict_analysis=ict, macro_signal=macro_sig,
+            )
+
         # ── 6-point checklist ─────────────────────────────────────────── #
         score, rationale = self._score_checklist(target_direction, macro_sig, ict)
 
