@@ -160,3 +160,159 @@ Next milestone:   EURJPY/USDJPY SHORT when CHOCH confirms on daily
 *This file is the agent handshake. Both Claude Code and Codex 
 read it. It removes the human from routine task routing.*
 *Update CURRENT SYSTEM STATUS at the end of every session.*
+
+---
+
+## LEARNING SYSTEM
+
+This is the most important section. Every session must grow the vault. Do not skip this.
+
+---
+
+### 1. Session End Protocol (EVERY session, no exceptions)
+
+Before your final message, write a session note using the `obsidian-vault` MCP tool (`write_file`).
+
+**File:** `C:\Users\Admin\clawdbot-vault\Projects\clawd_trading\Sessions\YYYY-MM-DD-[topic].md`
+
+```
+# Session: [topic] — YYYY-MM-DD
+
+## What we worked on
+[Tasks completed, questions answered]
+
+## What changed in the system
+[Files modified, new modules, removed code]
+
+## Decisions made
+[Architecture choices, parameter changes, risk rule updates — and WHY]
+
+## Backtest / research results
+[Any numbers from this session — Sharpe, win rate, trade count, key findings]
+
+## Hypotheses
+[New hypotheses formed, existing ones updated, any falsified]
+
+## System state at end of session
+[Copy updated CURRENT SYSTEM STATUS here]
+
+## Next session
+[Highest priority items, open questions, what data is needed]
+```
+
+---
+
+### 2. Update CURRENT SYSTEM STATUS
+
+After every session, update the `## CURRENT SYSTEM STATUS` section at the top of this file to reflect the real current state. It should never be stale. This is the first thing Claude reads next session.
+
+---
+
+### 3. Hypothesis Tracking
+
+Every time a hypothesis is formed OR a result comes in, write to the vault.
+
+**File:** `C:\Users\Admin\clawdbot-vault\Projects\clawd_trading\Research\Hypotheses\HYP-NNN-[name].md`
+
+```
+# HYP-NNN: [Hypothesis Name]
+
+**Status:** Pending | Testing | Validated | Falsified | Archived
+**Formed:** YYYY-MM-DD
+**Closed:** YYYY-MM-DD (if applicable)
+
+## The Hypothesis
+[Clear statement of what we believe and why]
+
+## Test Method
+[How we tested it — which script, what data, what conditions]
+
+## Results
+[Numbers, charts description, raw outcome]
+
+## Conclusion
+[What this means for the system]
+
+## Impact
+[What changed in the system as a result — or why nothing changed]
+```
+
+Also update `Reality Bridge MOC.md` → `Current Active Hypotheses` section when status changes.
+
+---
+
+### 4. Backtest Result Logging
+
+After any meaningful backtest run, write results to the vault.
+
+**File:** `C:\Users\Admin\clawdbot-vault\Projects\clawd_trading\Research\Backtest-Results\YYYY-MM-DD-[description].md`
+
+```
+# Backtest: [description] — YYYY-MM-DD
+
+## What was tested
+[System version, parameters, universe, date range]
+
+## Results
+| Metric | Value |
+|--------|-------|
+| Sharpe | |
+| Win Rate | |
+| Trade Count | |
+| Max Drawdown | |
+| Avg R:R | |
+
+## Interpretation
+[What these numbers mean — is this good, bad, surprising?]
+
+## Action
+[What changes, if any, this result drives]
+```
+
+---
+
+### 5. Architecture Decisions
+
+When making a significant design decision (changing layers, adding/removing signals, modifying risk rules, new data source), write it down.
+
+**File:** `C:\Users\Admin\clawdbot-vault\Projects\clawd_trading\Architecture\Decisions\YYYY-MM-DD-[decision].md`
+
+```
+# Decision: [title] — YYYY-MM-DD
+
+## What changed
+[The architectural change]
+
+## Why
+[The reasoning — performance data, failure mode, new insight]
+
+## Alternatives considered
+[What else was evaluated and why it lost]
+
+## Risk
+[What could go wrong with this decision]
+```
+
+---
+
+### 6. Reality Bridge MOC Sync
+
+Update `C:\Users\Admin\clawdbot-vault\Reality Bridge MOC.md` whenever:
+- A hypothesis moves from Pending → Testing → Validated/Falsified
+- System state changes (equity live, forex automated, new circuit breaker, etc.)
+- A new blocker appears or is resolved
+- Stage gate passes (paper → live)
+
+Keep the `System State` and `Current Active Hypotheses` sections in that file accurate.
+
+---
+
+### 7. Pre-Session Vault Check
+
+At the START of every session, before doing anything else:
+1. Read today's date
+2. Check `Sessions/` for the most recent note — read it for context
+3. Read `Reality Bridge MOC.md` for current system state
+4. Read `CURRENT SYSTEM STATUS` in this file
+
+This means every session starts with full context from the last one, not a cold start.

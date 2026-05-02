@@ -1,13 +1,12 @@
 {
   "mcpServers": {
-    "obsidian-context-server": {
-      "command": "node",
+    "obsidian-vault": {
+      "command": "npx",
       "args": [
-        "C:\\Users\\Admin\\clawdbot-vault\\Systems\\obsidian-context-server\\dist\\server.js"
-      ],
-      "env": {
-        "VAULT_PATH": "C:\\Users\\Admin\\clawdbot-vault"
-      }
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "C:\Users\Admin\clawdbot-vault"
+      ]
     }
   }
 }
