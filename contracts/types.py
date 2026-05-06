@@ -662,3 +662,192 @@ class VetoRecord:
     veto_stage:          str             # 'PETROULAS' | 'ROUTER' | 'SPECIALIST' | 'RISK' | 'GAME' | 'HARD_CONSTRAINT'
     veto_reason:         str
     signal_that_was_vetoed: Optional[Dict[str, Any]]
+
+
+# =============================================================================
+# PresentState — The Six-Dimension Unified View
+# =============================================================================
+
+@dataclass
+class PriceRegimeState:
+    """Dimension 1: What price is doing right now."""
+    hurst_short:         float   # short-window Hurst (< 0.45 = reversion, > 0.55 = trend)
+    hurst_long:          float
+    hurst_signal:        str     # 'TRENDING' | 'MEAN_REVERT' | 'NEUTRAL'
+    hmm_state:           int     # 0 = low-vol/trend, 1 = high-vol/ranging
+    hmm_state_label:     str
+    hmm_transition_prob: float   # P(regime flip next bar)
+    adx:                 float
+    adx_signal:          str     # 'NO_TREND' | 'WEAK' | 'ESTABLISHED' | 'STRONG'
+    regime:              str     # Router output: 'MOMENTUM' | 'REVERSION' | 'FLAT'
+    regime_confidence:   float
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            'hurst_short': self.hurst_short, 'hurst_long': self.hurst_long,
+            'hurst_signal': self.hurst_signal, 'hmm_state': self.hmm_state,
+            'hmm_state_label': self.hmm_state_label,
+            'hmm_transition_prob': self.hmm_transition_prob,
+            'adx': self.adx, 'adx_signal': self.adx_signal,
+            'regime': self.regime, 'regime_confidence': self.regime_confidence,
+        }
+
+
+@dataclass
+class MacroRegimeState:
+    """Dimension 2: Why price is doing it (rates, inflation, CB policy)."""
+    yield_curve_slope:   float
+    yield_curve_velocity: float
+    erp:                 float   # equity risk premium
+    cape_zscore:         float
+    cot_zscore:          float
+    m2_velocity:         float
+    hyg_spread_bps:      float
+    macro_signal:        str     # 'RISK_ON' | 'NEUTRAL' | 'RISK_OFF' | 'FAULT'
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            'yield_curve_slope': self.yield_curve_slope,
+            'yield_curve_velocity': self.yield_curve_velocity,
+            'erp': self.erp, 'cape_zscore': self.cape_zscore,
+            'cot_zscore': self.cot_zscore, 'm2_velocity': self.m2_velocity,
+            'hyg_spread_bps': self.hyg_spread_bps, 'macro_signal': self.macro_signal,
+        }
+
+
+@dataclass
+class PositioningState:
+    """Dimension 3: Who is positioned how (COT, options skew)."""
+    cot_zscore:          float   # net commercial positioning z-score (3yr window)
+    cot_symbol:          str     # underlying futures symbol used ('NQ', 'ES', …)
+    positioning_bias:    str     # 'LONG_HEAVY' | 'SHORT_HEAVY' | 'NEUTRAL'
+    source:              str     # 'CFTC' | 'macro_features' | 'none'
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            'cot_zscore': self.cot_zscore,
+            'cot_symbol': self.cot_symbol,
+            'positioning_bias': self.positioning_bias,
+            'source': self.source,
+        }
+
+
+@dataclass
+class NarrativeState:
+    """Dimension 4: What the market believes (TradingAgents / Qwen3 / LLM layer).
+
+    Stub until TradingAgents integration is wired.  Source = 'none' means no
+    narrative signal is active and gates should ignore this dimension.
+    """
+    summary:             str     # Free-text narrative from LLM layer
+    sentiment:           str     # 'BULLISH' | 'BEARISH' | 'NEUTRAL'
+    confidence:          float   # 0..1
+    source:              str     # 'TradingAgents' | 'Qwen3' | 'none'
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            'summary': self.summary, 'sentiment': self.sentiment,
+            'confidence': self.confidence, 'source': self.source,
+        }
+
+
+@dataclass
+class HistoricalMatchState:
+    """Dimension 5: What this has looked like before (Alexandrian Library).
+
+    Stub until the Library is wired.  Source = 'none' means no match is active.
+    """
+    regime_label:        str     # e.g. 'ASIAN_CURRENCY_CONTAGION'
+    similarity_score:    float   # 0..1  (0.927 = very close match)
+    volumes_converging:  int     # volumes agreeing (out of 10)
+    typical_outcome:     str     # historical tendency description
+    lookback_period_days: int    # how many days back the match spans
+    source:              str     # 'AlexandrianLibrary' | 'none'
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            'regime_label': self.regime_label,
+            'similarity_score': self.similarity_score,
+            'volumes_converging': self.volumes_converging,
+            'typical_outcome': self.typical_outcome,
+            'lookback_period_days': self.lookback_period_days,
+            'source': self.source,
+        }
+
+
+@dataclass
+class CatalystWindowState:
+    """Dimension 6: When resolution is expected (OU model + CB calendar)."""
+    ou_half_life_days:       float   # physics-derived reversion half-life
+    ou_reversion_days:       float   # expected days to mean reversion
+    ou_confidence:           str     # 'HIGH' | 'MEDIUM' | 'LOW'
+    next_cb_event_bank:      Optional[str]   # e.g. 'FED'
+    next_cb_event_days:      int             # calendar days until next CB meeting
+    cb_blackout_active:      bool            # within 10-day blackout window
+    catalyst_urgency:        str     # 'IMMINENT' (<7d) | 'NEAR' (<21d) | 'DISTANT' | 'NONE'
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            'ou_half_life_days': self.ou_half_life_days,
+            'ou_reversion_days': self.ou_reversion_days,
+            'ou_confidence': self.ou_confidence,
+            'next_cb_event_bank': self.next_cb_event_bank,
+            'next_cb_event_days': self.next_cb_event_days,
+            'cb_blackout_active': self.cb_blackout_active,
+            'catalyst_urgency': self.catalyst_urgency,
+        }
+
+
+@dataclass
+class PresentState:
+    """The unified six-dimension snapshot the orchestrator reads before every decision.
+
+    Not a gate — a shared substrate.  All existing gates already draw from pieces
+    of this.  PresentState makes those pieces coherent, logged, and consistent.
+
+    Alignment score counts how many of the 6 active dimensions point the same
+    direction as the current trade bias.  Higher = more constrained future.
+    """
+    symbol:           str
+    timestamp:        str
+    price_regime:     PriceRegimeState
+    macro_regime:     MacroRegimeState
+    positioning:      PositioningState
+    narrative:        NarrativeState
+    historical_match: HistoricalMatchState
+    catalyst_window:  CatalystWindowState
+
+    # Derived coherence metrics
+    dimensions_active:  int    # how many dimensions have live data (source != 'none')
+    alignment_score:    float  # 0..1 (fraction of active dimensions aligned with trade bias)
+    alignment_label:    str    # 'FULL' | 'STRONG' | 'PARTIAL' | 'WEAK' | 'NONE'
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            'symbol': self.symbol,
+            'timestamp': self.timestamp,
+            'price_regime': self.price_regime.to_dict(),
+            'macro_regime': self.macro_regime.to_dict(),
+            'positioning': self.positioning.to_dict(),
+            'narrative': self.narrative.to_dict(),
+            'historical_match': self.historical_match.to_dict(),
+            'catalyst_window': self.catalyst_window.to_dict(),
+            'dimensions_active': self.dimensions_active,
+            'alignment_score': self.alignment_score,
+            'alignment_label': self.alignment_label,
+        }
+
+    def summary(self) -> str:
+        """One-line human-readable summary of the present state."""
+        cb_str = (f"{self.catalyst_window.next_cb_event_bank}+{self.catalyst_window.next_cb_event_days}d"
+                  if self.catalyst_window.next_cb_event_bank else 'no-CB')
+        return (
+            f"PRESENT[{self.symbol}] "
+            f"regime={self.price_regime.regime}({self.price_regime.hurst_signal}) "
+            f"macro={self.macro_regime.macro_signal} "
+            f"pos={self.positioning.positioning_bias}(z={self.positioning.cot_zscore:.2f}) "
+            f"narrative={self.narrative.sentiment}({self.narrative.source}) "
+            f"match={self.historical_match.regime_label}({self.historical_match.similarity_score:.3f}) "
+            f"catalyst={self.catalyst_window.catalyst_urgency}({cb_str}) "
+            f"→ alignment={self.alignment_label}({self.alignment_score:.2f})"
+        )
