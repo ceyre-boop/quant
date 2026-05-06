@@ -29,6 +29,7 @@ from sovereign.specialists.reversion_specialist import ReversionSpecialist
 from sovereign.risk.kelly_engine import SovereignRiskEngine
 from sovereign.ledger.trade_ledger import TradeLedger
 from sovereign.ledger.veto_ledger import VetoLedger
+from sovereign.present_state import PresentStateBuilder
 from config.loader import params
 
 # Stage 1 ML veto — loads from logs/failure_map.csv if present
@@ -69,7 +70,8 @@ class SovereignOrchestrator:
         self.risk = SovereignRiskEngine()
         self.trade_ledger = TradeLedger()
         self.veto_ledger = VetoLedger()
-        
+        self.present_state_builder = PresentStateBuilder()
+
         # Demoted to advisory
         self.petroulas = PetrolausGate()
         
@@ -293,6 +295,23 @@ class SovereignOrchestrator:
         # 2. REGIME ROUTER
         # ═══════════════════════════════════════════════════════════════
         router_out = self.router.classify(feature_record)
+
+        # ═══════════════════════════════════════════════════════════════
+        # 2b. PRESENT STATE — unified six-dimension view (non-blocking)
+        # Built once here; available to all downstream gates.
+        # ═══════════════════════════════════════════════════════════════
+        try:
+            present = self.present_state_builder.build(
+                symbol=symbol,
+                feature_record=feature_record,
+                router_out=router_out,
+                current_price=current_price,
+                atr=atr,
+            )
+            logger.info(f"[PresentState] {present.summary()}")
+        except Exception as _ps_err:
+            logger.debug(f"[PresentState] build failed (non-fatal): {_ps_err}")
+            present = None
         
         if router_out.regime == 'FLAT':
             _vr = VetoRecord(timestamp=ts, symbol=symbol,
@@ -539,7 +558,8 @@ class SovereignOrchestrator:
             'tp': risk_out.tp1_price,
             'confidence': bias.confidence,
             'regime': router_out.regime,
-            'advisories': self._get_advisories(symbol)
+            'advisories': self._get_advisories(symbol),
+            'present_state': present.to_dict() if present is not None else None,
         }
 
     def _check_hard_constraints(self, equity: float) -> Dict[str, Any]:
