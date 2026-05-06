@@ -21,6 +21,7 @@ the system's view of the present explicit, coherent, and observable.
 from __future__ import annotations
 
 import logging
+import math
 from datetime import date, datetime
 from typing import Optional
 
@@ -44,6 +45,15 @@ _EQUITY_COT_MAP: dict[str, str] = {
     'SPY':  'ES', 'QQQ':   'NQ',
     'TLT':  'ZN', 'GLD':   'GC', 'USO': 'CL',
 }
+
+
+def _safe_float(value: object, default: float = 0.0) -> float:
+    """Return ``float(value)`` or ``default`` when value is NaN / None."""
+    try:
+        f = float(value)  # type: ignore[arg-type]
+        return default if math.isnan(f) else f
+    except (TypeError, ValueError):
+        return default
 
 
 class PresentStateBuilder:
@@ -122,13 +132,13 @@ class PresentStateBuilder:
     ) -> PriceRegimeState:
         r = record.regime
         return PriceRegimeState(
-            hurst_short=float(r.hurst_short or 0.5),
-            hurst_long=float(r.hurst_long or 0.5),
+            hurst_short=_safe_float(r.hurst_short, 0.5),
+            hurst_long=_safe_float(r.hurst_long, 0.5),
             hurst_signal=r.hurst_signal or 'NEUTRAL',
             hmm_state=int(r.hmm_state or 0),
             hmm_state_label=r.hmm_state_label or 'NORMAL',
-            hmm_transition_prob=float(r.hmm_transition_prob or 0.2),
-            adx=float(r.adx or 20.0),
+            hmm_transition_prob=_safe_float(r.hmm_transition_prob, 0.2),
+            adx=_safe_float(r.adx, 20.0),
             adx_signal=r.adx_signal or 'WEAK',
             regime=router_out.regime,
             regime_confidence=float(router_out.regime_confidence),
@@ -142,13 +152,13 @@ class PresentStateBuilder:
     def _build_macro_regime(record: SovereignFeatureRecord) -> MacroRegimeState:
         m = record.macro
         return MacroRegimeState(
-            yield_curve_slope=float(m.yield_curve_slope or 0.0),
-            yield_curve_velocity=float(m.yield_curve_velocity or 0.0),
-            erp=float(m.erp or 0.0),
-            cape_zscore=float(m.cape_zscore) if m.cape_zscore == m.cape_zscore else 0.0,
-            cot_zscore=float(m.cot_zscore) if m.cot_zscore == m.cot_zscore else 0.0,
-            m2_velocity=float(m.m2_velocity or 1.5),
-            hyg_spread_bps=float(m.hyg_spread_bps or 200.0),
+            yield_curve_slope=_safe_float(m.yield_curve_slope),
+            yield_curve_velocity=_safe_float(m.yield_curve_velocity),
+            erp=_safe_float(m.erp),
+            cape_zscore=_safe_float(m.cape_zscore),
+            cot_zscore=_safe_float(m.cot_zscore),
+            m2_velocity=_safe_float(m.m2_velocity, 1.5),
+            hyg_spread_bps=_safe_float(m.hyg_spread_bps, 200.0),
             macro_signal=m.macro_signal or 'NEUTRAL',
         )
 
@@ -177,9 +187,14 @@ class PresentStateBuilder:
             pass
 
         # Fall back to macro feature cot_zscore if live pull failed
-        if cot_z != cot_z:  # isnan
-            cot_z = float(record.macro.cot_zscore) if record.macro.cot_zscore == record.macro.cot_zscore else 0.0
-            source = 'macro_features' if cot_z != 0.0 else 'none'
+        if math.isnan(cot_z):
+            fallback = _safe_float(record.macro.cot_zscore, float('nan'))
+            if not math.isnan(fallback):
+                cot_z = fallback
+                source = 'macro_features'
+            else:
+                cot_z = 0.0
+                source = 'none'
 
         # Classify bias
         if cot_z > 1.0:
@@ -248,6 +263,10 @@ class PresentStateBuilder:
         """
         OU model data comes from the caller (orchestrator computes it
         separately for each symbol).  CB calendar is queried fresh.
+
+        The CB calendar is loaded via importlib rather than a normal package
+        import so that sovereign.forex.__init__ (which eagerly imports heavy
+        optional dependencies) is never executed.
         """
         # OU defaults when not provided
         half_life = float(ou_half_life_days or 20.0)
@@ -260,8 +279,8 @@ class PresentStateBuilder:
         blackout = False
 
         try:
-            # Import cb_calendar directly (bypasses sovereign.forex.__init__ to avoid
-            # loading heavy forex dependencies that may not be installed in all envs).
+            # Load cb_calendar directly to avoid triggering sovereign.forex.__init__,
+            # which imports optional forex dependencies not present in all environments.
             import importlib.util as _ilu
             import pathlib as _pl
             _cb_path = _pl.Path(__file__).parent / 'forex' / 'cb_calendar.py'
@@ -331,9 +350,10 @@ class PresentStateBuilder:
         regime_ok = (
             (direction == 'LONG'  and price.regime == 'MOMENTUM') or
             (direction == 'SHORT' and price.regime == 'REVERSION') or
-            price.regime not in ('FLAT',)
+            price.regime != 'FLAT' or
+            not direction
         )
-        if regime_ok or not direction:
+        if regime_ok:
             aligned += 1
 
         # Dimension 2 — macro regime (always active)
@@ -377,7 +397,7 @@ class PresentStateBuilder:
 
         # Dimension 6 — catalyst window (always active; non-imminent = aligned)
         active += 1
-        cat_ok = cat.catalyst_urgency not in ('IMMINENT',) or not direction
+        cat_ok = cat.catalyst_urgency != 'IMMINENT' or not direction
         if cat_ok:
             aligned += 1
 

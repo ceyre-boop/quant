@@ -797,6 +797,12 @@ class CatalystWindowState:
             'catalyst_urgency': self.catalyst_urgency,
         }
 
+    def format_next_event(self) -> str:
+        """Human-readable catalyst window summary."""
+        if self.next_cb_event_bank:
+            return f"{self.next_cb_event_bank}+{self.next_cb_event_days}d"
+        return 'no-CB'
+
 
 @dataclass
 class PresentState:
@@ -839,8 +845,6 @@ class PresentState:
 
     def summary(self) -> str:
         """One-line human-readable summary of the present state."""
-        cb_str = (f"{self.catalyst_window.next_cb_event_bank}+{self.catalyst_window.next_cb_event_days}d"
-                  if self.catalyst_window.next_cb_event_bank else 'no-CB')
         return (
             f"PRESENT[{self.symbol}] "
             f"regime={self.price_regime.regime}({self.price_regime.hurst_signal}) "
@@ -848,6 +852,6 @@ class PresentState:
             f"pos={self.positioning.positioning_bias}(z={self.positioning.cot_zscore:.2f}) "
             f"narrative={self.narrative.sentiment}({self.narrative.source}) "
             f"match={self.historical_match.regime_label}({self.historical_match.similarity_score:.3f}) "
-            f"catalyst={self.catalyst_window.catalyst_urgency}({cb_str}) "
+            f"catalyst={self.catalyst_window.catalyst_urgency}({self.catalyst_window.format_next_event()}) "
             f"→ alignment={self.alignment_label}({self.alignment_score:.2f})"
         )
