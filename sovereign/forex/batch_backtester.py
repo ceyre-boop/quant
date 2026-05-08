@@ -15,6 +15,7 @@ from typing import Dict, Optional
 
 import numpy as np
 import pandas as pd
+import yfinance as yf
 
 from sovereign.forex.fast_backtester import (
     simulate_forex_trades_arrays,
@@ -80,7 +81,16 @@ class ForexBatchBacktester:
             cfg = PAIR_CONFIG.get(pair)
             if not cfg:
                 continue
-            df = self._backtester._download_price(pair)
+            df = yf.download(
+                pair,
+                start=self._backtester.start,
+                end=self._backtester.end,
+                progress=False,
+                auto_adjust=True,
+            )
+            if isinstance(df.columns, pd.MultiIndex):
+                df.columns = df.columns.get_level_values(0)
+            df = df.dropna()
             if df is None or len(df) < 252:
                 continue
             base_country = CB_TO_COUNTRY[cfg.base_central_bank]
