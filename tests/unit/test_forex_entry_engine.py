@@ -136,11 +136,15 @@ def test_evaluate_returns_no_trade_below_conviction():
 def test_evaluate_long_signal_is_tradeable():
     engine = ForexEntryEngine()
     macro_sig = _make_macro_signal(direction="LONG", conviction=0.80)
-    ict = _make_ict_analysis()
+    # atr=0.025 ensures atr_pct = 0.025/1.12 ≈ 2.23%, above the 2.2% ATR gate.
+    # _entry_stop is patched to return a stop 1×ATR below entry so atr_ratio=1.0
+    # (within the required 0.5–2.5× range).
+    ict = _make_ict_analysis(atr=0.025)
 
     with patch.object(engine._macro, "score_pair", return_value=macro_sig), \
          patch.object(engine._ict, "analyse", return_value=ict), \
-         patch.object(engine._commodity, "score_pair", return_value=None):
+         patch.object(engine._commodity, "score_pair", return_value=None), \
+         patch.object(engine, "_entry_stop", return_value=(1.1200, 1.0950)):
         result = engine.evaluate("EURUSD=X", daily_df=_make_prices())
 
     assert result is not None

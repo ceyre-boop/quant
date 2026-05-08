@@ -19,6 +19,7 @@ from typing import List, Optional
 
 import numpy as np
 import pandas as pd
+import yfinance as yf
 from sovereign.forex.pair_universe import ALL_PAIRS, PAIR_CONFIG, CB_TO_COUNTRY
 from sovereign.forex.data_fetcher import ForexDataFetcher
 from sovereign.forex.fair_value import FairValueModel

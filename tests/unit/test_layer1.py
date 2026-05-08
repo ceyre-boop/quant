@@ -218,7 +218,7 @@ class TestBiasEngine:
             RiskAppetite.RISK_ON, MomentumRegime.ACCELERATING,
             EventRisk.EXTREME, 0.5
         )
-        override = engine._check_regime_override(regime)
+        override = engine._check_regime_override(regime, sample_features)
         assert override is True
         
         # Clear conditions
@@ -227,7 +227,7 @@ class TestBiasEngine:
             RiskAppetite.RISK_ON, MomentumRegime.ACCELERATING,
             EventRisk.CLEAR, 0.75
         )
-        override = engine._check_regime_override(regime)
+        override = engine._check_regime_override(regime, sample_features)
         assert override is False
     
     def test_rationale_generation(self):
