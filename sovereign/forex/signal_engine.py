@@ -374,7 +374,6 @@ def build_signal_frame(
         {
             'signal': signal_arr.astype(float, copy=False),
             'hold': hold_arr.astype(int, copy=False),
-            'hold_days': hold_arr.astype(int, copy=False),
         },
         index=prices.index,
     )

@@ -10,6 +10,12 @@ import numpy as np
 
 HOLD_DAYS = 60
 STOP_PCT = 0.04
+EXIT_REASON_STOP = 1
+EXIT_REASON_REVERSAL = 2
+EXIT_REASON_CB_REFRESH = 3
+EXIT_REASON_TIME = 4
+EXIT_REASON_TRAILING = 5
+EXIT_REASON_DONCHIAN = 6
 
 
 def _rolling_min_prev(values: np.ndarray, window: int) -> np.ndarray:
@@ -84,10 +90,10 @@ def _simulate_forex_core(
             trail_hit = False
             if trailing_atr_mult > 0:
                 if direction == 1:
-                    trail_stop = best_price - (trailing_atr_mult * atr_pct_now * price)
+                    trail_stop = best_price - (trailing_atr_mult * atr_pct_now * best_price)
                     trail_hit = price <= trail_stop
                 else:
-                    trail_stop = worst_price + (trailing_atr_mult * atr_pct_now * price)
+                    trail_stop = worst_price + (trailing_atr_mult * atr_pct_now * worst_price)
                     trail_hit = price >= trail_stop
 
             donchian_hit = False
@@ -112,17 +118,17 @@ def _simulate_forex_core(
                 holds.append(hold_count)
                 units_arr.append(units)
                 if stop_hit:
-                    reasons.append(1)
+                    reasons.append(EXIT_REASON_STOP)
                 elif trail_hit:
-                    reasons.append(5)
+                    reasons.append(EXIT_REASON_TRAILING)
                 elif donchian_hit:
-                    reasons.append(6)
+                    reasons.append(EXIT_REASON_DONCHIAN)
                 elif reversal:
-                    reasons.append(2)
+                    reasons.append(EXIT_REASON_REVERSAL)
                 elif cb_refresh:
-                    reasons.append(3)
+                    reasons.append(EXIT_REASON_CB_REFRESH)
                 else:
-                    reasons.append(4)
+                    reasons.append(EXIT_REASON_TIME)
                 in_trade = False
 
                 reenter_dir = signal_today if (reversal or cb_refresh) and signal_today != 0 else 0
@@ -240,7 +246,14 @@ def simulate_forex_trades_arrays(
         enable_cb_refresh=bool(enable_cb_refresh),
     )
 
-    reason_map = {1: 'stop', 2: 'reversal', 3: 'cb_refresh', 4: 'time', 5: 'trailing_stop', 6: 'donchian_exit'}
+    reason_map = {
+        EXIT_REASON_STOP: 'stop',
+        EXIT_REASON_REVERSAL: 'reversal',
+        EXIT_REASON_CB_REFRESH: 'cb_refresh',
+        EXIT_REASON_TIME: 'time',
+        EXIT_REASON_TRAILING: 'trailing_stop',
+        EXIT_REASON_DONCHIAN: 'donchian_exit',
+    }
     effective_risk_pct = min(float(risk_pct), float(max_risk_pct))
     trades = []
     for j in range(len(entry_idx)):
