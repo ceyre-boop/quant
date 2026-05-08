@@ -72,7 +72,6 @@ class ForexSignalEngine:
             {
                 'signal': signals.astype(float, copy=False),
                 'hold_days': hold_days.astype(int, copy=False),
-                'hold': hold_days.astype(int, copy=False),
             },
             index=close.index,
         )
@@ -238,6 +237,7 @@ class ForexSignalEngine:
         fast_days: int,
         slow_days: int,
     ) -> np.ndarray:
+        """Donchian breakout entries: long on fast/slow highs, short on fast/slow lows."""
         if close.empty:
             return np.zeros(0, dtype=np.int8)
         fast_high = close.rolling(fast_days).max().shift(1)

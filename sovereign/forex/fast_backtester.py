@@ -13,6 +13,7 @@ STOP_PCT = 0.04
 
 
 def _rolling_min_prev(values: np.ndarray, window: int) -> np.ndarray:
+    """Rolling minimum over the *previous* `window` bars (excludes current bar)."""
     out = np.full(len(values), np.nan, dtype=np.float64)
     if window <= 0:
         return out
@@ -53,6 +54,7 @@ def _simulate_forex_core(
     max_units: int,
     enable_cb_refresh: bool,
 ):
+    """Core loop for trade simulation with ATR stops, trailing exits, and optional pyramiding."""
     entries, exits, dirs, pnls, holds, reasons, units_arr = [], [], [], [], [], [], []
 
     in_trade = False
