@@ -15,10 +15,19 @@ from typing import Dict, Optional
 
 import numpy as np
 import pandas as pd
+import yfinance as yf
 
-from sovereign.forex.fast_backtester import simulate_forex_trades_arrays, warmup_forex_kernel
+from sovereign.forex.fast_backtester import (
+    simulate_forex_trades_arrays,
+    warmup_forex_kernel,
+    ForexArrayDataset as LegacyForexArrayDataset,
+    ForexFastBacktester,
+    HOLD_DAYS,
+    STOP_PCT,
+)
 from sovereign.forex.forex_backtester import ForexBacktester, ForexBacktestResult
 from sovereign.forex.pair_universe import ALL_PAIRS, CB_TO_COUNTRY, PAIR_CONFIG
+from sovereign.forex.signal_engine import build_signal_arrays
 
 
 @dataclass
@@ -42,6 +51,22 @@ class ForexArrayDataset:
     index: pd.Index
 
 
+def _make_synthetic_dataset(rng: np.random.Generator, n_bars: int = 2500, pair: str = "SYN00=X") -> LegacyForexArrayDataset:
+    trend = 0.00015
+    noise = rng.normal(0.0, 0.0008, size=n_bars)
+    rets = trend + noise
+    close = 1.20 * np.cumprod(1.0 + rets)
+    opens = close * (1.0 - rng.normal(0.0, 0.0001, size=n_bars))
+    signal = rng.choice(np.array([-1.0, 0.0, 1.0]), size=n_bars, p=[0.1, 0.8, 0.1])
+    return LegacyForexArrayDataset(
+        pair=pair,
+        close=close.astype(np.float64),
+        opens=opens.astype(np.float64),
+        signal=signal.astype(np.float64),
+        n_bars=n_bars,
+    )
+
+
 class ForexBatchBacktester:
     def __init__(self, start: str = '2015-01-01', end: str = '2024-12-31'):
         self._backtester = ForexBacktester(start=start, end=end)
@@ -56,16 +81,29 @@ class ForexBatchBacktester:
             cfg = PAIR_CONFIG.get(pair)
             if not cfg:
                 continue
-            df = self._backtester._download_price(pair)
+            df = yf.download(
+                pair,
+                start=self._backtester.start,
+                end=self._backtester.end,
+                progress=False,
+                auto_adjust=True,
+            )
+            if isinstance(df.columns, pd.MultiIndex):
+                df.columns = df.columns.get_level_values(0)
+            df = df.dropna()
             if df is None or len(df) < 252:
                 continue
             base_country = CB_TO_COUNTRY[cfg.base_central_bank]
             quote_country = CB_TO_COUNTRY[cfg.quote_central_bank]
             close = df['Close'] if 'Close' in df.columns else df.iloc[:, 0]
-            signals, hold_days = self._backtester._signals.build_signal_arrays(
-                close=close,
+            signals, hold_days = build_signal_arrays(
+                pair=pair,
+                prices=df,
                 base_country=base_country,
                 quote_country=quote_country,
+                fetcher=self._backtester._fetcher,
+                cb_trigger=self._backtester._cb,
+                config=self._backtester._signals.config,
                 start=self._backtester.start,
                 end=self._backtester.end,
             )
@@ -177,3 +215,24 @@ class ForexBatchBacktester:
                 index=base_index,
             )
         return cache
+
+    # Compatibility wrappers used by unit tests
+    def run_synthetic_benchmark(self, n_pairs: int = 11, n_bars: int = 2500, n_iterations: int = 500) -> dict:
+        bm = self.benchmark_synthetic(pair_count=n_pairs, bars=n_bars, iterations=n_iterations)
+        return {
+            "n_pairs": bm.pair_count,
+            "n_bars": n_bars,
+            "n_iterations": n_iterations,
+            "total_runs": bm.total_runs,
+            "elapsed_s": bm.elapsed_sec,
+            "runs_per_sec": bm.runs_per_sec,
+        }
+
+    def run_serial(self, datasets: list[LegacyForexArrayDataset]):
+        bt = ForexFastBacktester(hold_days=HOLD_DAYS, stop_pct=STOP_PCT)
+        out = []
+        for ds in datasets:
+            result = bt.run(ds)
+            if result is not None:
+                out.append(result)
+        return out
