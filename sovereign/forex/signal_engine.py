@@ -223,6 +223,7 @@ class ForexSignalEngine:
                 slow_days=self.config.donchian_slow_entry_days,
             )
             if self.config.use_macro_overlay:
+                # In strict mode, conflicting macro direction cancels the Donchian entry.
                 overlay_ok = (signals == 0) | (signals == donchian_signals)
                 signals = np.where(overlay_ok, donchian_signals, 0).astype(np.int8, copy=False)
             else:

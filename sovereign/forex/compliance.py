@@ -50,7 +50,7 @@ def score_compliance(config: ForexComplianceConfig) -> Dict[str, Any]:
         "donchian_entries": config.use_donchian_entries,
         "donchian_exits": config.use_donchian_exits,
         "correlation_cap": config.max_shared_jpy_positions >= 1,
-        "pyramiding_unit_cap": (not config.allow_pyramiding) or (1 <= config.max_pyramid_units <= 4),
+        "pyramiding_unit_cap": 1 <= config.max_pyramid_units <= 4,
         "macro_overlay_optional": isinstance(config.use_macro_overlay, bool),
     }
     passed = sum(1 for v in checks.values() if v)

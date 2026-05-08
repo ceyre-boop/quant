@@ -314,8 +314,8 @@ def main():
             status=report['status'],
             score=report['score'],
         )
-    except Exception:
-        pass
+    except Exception as exc:
+        logger.warning(f"Governance compliance update skipped: {exc}")
 
     results = bt.backtest_all()
 
