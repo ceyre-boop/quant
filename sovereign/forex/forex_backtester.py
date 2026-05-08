@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import json
 import logging
+import argparse
 from dataclasses import dataclass, asdict
 from pathlib import Path
 from typing import Dict, List, Optional
@@ -24,6 +25,11 @@ from sovereign.forex.data_fetcher import ForexDataFetcher
 from sovereign.forex.entry_engine import CBEventTrigger, CB_MIN_SURPRISE_BPS
 from sovereign.forex.fast_backtester import simulate_forex_trades
 from sovereign.forex.signal_engine import ForexSignalEngine, SignalConfig
+from sovereign.forex.compliance import (
+    ForexComplianceConfig,
+    score_compliance,
+    block_live_mode_if_needed,
+)
 logger = logging.getLogger(__name__)
 
 RESULTS_PATH = Path(__file__).parents[2] / 'logs' / 'forex_backtest_results.json'
@@ -46,13 +52,38 @@ class ForexBacktestResult:
 class ForexBacktester:
 
     HOLD_DAYS = 60          # hold per signal — macro signals play out over 2-3 months
-    STOP_PCT = 0.04         # 4% hard stop — wide enough for FX swing, tight enough to limit ruin
+    STOP_PCT = 0.04         # compatibility fallback only; strict mode uses ATR stop
+    STOP_ATR_MULT = 2.0
+    TRAILING_ATR_MULT = 1.0
+    DONCHIAN_EXIT_DAYS = 10
     SIGNAL_THRESHOLD = 0.15   # lowered from 0.20 — more macro signals for statistical validity
     CB_SURPRISE_THRESHOLD = 20  # 20bp in backtest (vs 25bp live) for adequate sample size
+    MAX_RISK_PER_TRADE_PCT = 0.01
+    MAX_SHARED_JPY_POSITIONS = 2
 
-    def __init__(self, start: str = '2015-01-01', end: str = '2024-12-31'):
+    def __init__(
+        self,
+        start: str = '2015-01-01',
+        end: str = '2024-12-31',
+        *,
+        strict_mode: bool = False,
+        use_macro_overlay: bool = False,
+        allow_pyramiding: bool = True,
+        max_pyramid_units: int = 4,
+    ):
         self.start = start
         self.end = end
+        self.strict_mode = strict_mode
+        self.allow_pyramiding = allow_pyramiding and strict_mode
+        self.max_pyramid_units = max_pyramid_units if strict_mode else 1
+        self._compliance = ForexComplianceConfig(
+            strict_mode=strict_mode,
+            max_risk_per_trade_pct=self.MAX_RISK_PER_TRADE_PCT,
+            max_shared_jpy_positions=self.MAX_SHARED_JPY_POSITIONS,
+            max_pyramid_units=self.max_pyramid_units,
+            use_macro_overlay=use_macro_overlay,
+        )
+        self._compliance.validate_startup()
         self._fetcher = ForexDataFetcher()
         self._cb = CBEventTrigger()
         self._signals = ForexSignalEngine(
@@ -62,6 +93,8 @@ class ForexBacktester:
                 hold_days=self.HOLD_DAYS,
                 signal_threshold=self.SIGNAL_THRESHOLD,
                 cb_surprise_threshold=self.CB_SURPRISE_THRESHOLD,
+                strict_mode=strict_mode,
+                use_macro_overlay=use_macro_overlay,
             ),
         )
 
@@ -96,6 +129,7 @@ class ForexBacktester:
     def backtest_all(self) -> List[ForexBacktestResult]:
         results = []
         all_trades: dict[str, list] = {}
+        pair_bars: dict[str, int] = {}
 
         for pair in ALL_PAIRS:
             try:
@@ -115,16 +149,27 @@ class ForexBacktester:
                 trades = self._simulate_trades(df, signals)
                 if not trades:
                     continue
-                r = self._compute_stats(pair, trades, len(df))
-                results.append(r)
                 all_trades[pair] = trades
-                print(
-                    f"  {pair:12s}  win={r.win_rate:.1%}  pf={r.profit_factor:.2f}"
-                    f"  sharpe={r.sharpe:.2f}  dd={r.max_drawdown:.1%}"
-                    f"  tpy={r.trades_per_year:.0f}"
-                )
+                pair_bars[pair] = len(df)
             except Exception as e:
                 logger.warning(f"Backtest failed for {pair}: {e}")
+
+        if self.strict_mode:
+            all_trades = self._apply_correlation_caps(all_trades)
+
+        for pair, trades in all_trades.items():
+            if not trades:
+                continue
+            n_bars = pair_bars.get(pair, 0)
+            if n_bars <= 0:
+                continue
+            r = self._compute_stats(pair, trades, n_bars)
+            results.append(r)
+            print(
+                f"  {pair:12s}  win={r.win_rate:.1%}  pf={r.profit_factor:.2f}"
+                f"  sharpe={r.sharpe:.2f}  dd={r.max_drawdown:.1%}"
+                f"  tpy={r.trades_per_year:.0f}"
+            )
 
         output = [asdict(r) for r in results]
         with open(RESULTS_PATH, 'w') as f:
@@ -146,7 +191,50 @@ class ForexBacktester:
     def _simulate_trades(
         self, df: pd.DataFrame, signals: pd.DataFrame
     ) -> list:
-        return simulate_forex_trades(df, signals, stop_pct=self.STOP_PCT)
+        close = df['Close'] if 'Close' in df.columns else df.iloc[:, 0]
+        atr_series = self._signals._compute_atr_pct(close, df)
+        return simulate_forex_trades(
+            df,
+            signals,
+            stop_pct=self.STOP_PCT,
+            atr_series=atr_series,
+            stop_atr_mult=self.STOP_ATR_MULT,
+            trailing_atr_mult=self.TRAILING_ATR_MULT,
+            strict_mode=self.strict_mode,
+            donchian_exit_days=self.DONCHIAN_EXIT_DAYS,
+            allow_pyramiding=self.allow_pyramiding,
+            max_pyramid_units=self.max_pyramid_units,
+            risk_pct=self.MAX_RISK_PER_TRADE_PCT,
+            max_risk_pct=self.MAX_RISK_PER_TRADE_PCT,
+            enable_cb_refresh=not self.strict_mode,
+        )
+
+    def _apply_correlation_caps(self, all_trades: dict[str, list]) -> dict[str, list]:
+        flattened = []
+        for pair, trades in all_trades.items():
+            for t in trades:
+                flattened.append((pair, t))
+        flattened.sort(key=lambda x: x[1]['entry_date'])
+
+        accepted: dict[str, list] = {pair: [] for pair in all_trades.keys()}
+        active = []
+        for pair, trade in flattened:
+            entry_dt = trade['entry_date']
+            active = [a for a in active if a['exit_date'] >= entry_dt]
+            if 'JPY' in pair:
+                jpy_active = sum(1 for a in active if 'JPY' in a['pair'])
+                if jpy_active >= self.MAX_SHARED_JPY_POSITIONS:
+                    continue
+            trade_with_pair = dict(trade)
+            trade_with_pair['pair'] = pair
+            active.append(trade_with_pair)
+            accepted[pair].append(trade)
+        return accepted
+
+    def generate_compliance_report(self, mode: str = 'paper') -> dict:
+        report = score_compliance(self._compliance)
+        block_live_mode_if_needed(mode=mode, report=report)
+        return report
 
     def _compute_stats(
         self, pair: str, trades: list, n_bars: int
@@ -205,9 +293,30 @@ class ForexBacktester:
 
 
 def main():
+    parser = argparse.ArgumentParser(description="Forex backtester")
+    parser.add_argument("--mode", choices=["paper", "live"], default="paper")
+    parser.add_argument("--strict-mode", action="store_true")
+    parser.add_argument("--macro-overlay", action="store_true")
+    args = parser.parse_args()
+
     print("\nFOREX BACKTEST — 2015–2024")
     print('=' * 60)
-    bt = ForexBacktester()
+    bt = ForexBacktester(strict_mode=args.strict_mode, use_macro_overlay=args.macro_overlay)
+    report = bt.generate_compliance_report(mode=args.mode)
+    print(
+        f"Compliance: score={report['score']} status={report['status']} "
+        f"rules={report['rule_set_version']}"
+    )
+    try:
+        from governance.policy_engine import GOVERNANCE
+        GOVERNANCE.update_forex_compliance(
+            rule_set_version=report['rule_set_version'],
+            status=report['status'],
+            score=report['score'],
+        )
+    except Exception:
+        pass
+
     results = bt.backtest_all()
 
     if results:

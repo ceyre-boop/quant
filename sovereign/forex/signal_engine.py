@@ -17,17 +17,28 @@ from typing import Optional
 import numpy as np
 import pandas as pd
 
-from sovereign.forex.data_fetcher import FALLBACK_CPI, FALLBACK_RATES
+from sovereign.forex.data_fetcher import FALLBACK_CPI, FALLBACK_RATES, ForexDataFetcher
 from sovereign.forex.calendar_signals import CalendarSignalEngine
 from sovereign.forex.cpi_engine import CPISurpriseEngine
+from sovereign.forex.entry_engine import CBEventTrigger
+
+HOLD_DAYS = 60
+SIGNAL_THRESHOLD = 0.15
+CB_SURPRISE_THRESHOLD = 20
+DONCHIAN_FAST_ENTRY_DAYS = 20
+DONCHIAN_SLOW_ENTRY_DAYS = 55
 
 
 @dataclass(frozen=True)
 class SignalConfig:
-    hold_days: int = 60
-    signal_threshold: float = 0.15
+    hold_days: int = HOLD_DAYS
+    signal_threshold: float = SIGNAL_THRESHOLD
     cb_entry_window_days: int = 5
-    cb_surprise_threshold: int = 20
+    cb_surprise_threshold: int = CB_SURPRISE_THRESHOLD
+    strict_mode: bool = False
+    use_macro_overlay: bool = False
+    donchian_fast_entry_days: int = DONCHIAN_FAST_ENTRY_DAYS
+    donchian_slow_entry_days: int = DONCHIAN_SLOW_ENTRY_DAYS
 
 
 class ForexSignalEngine:
@@ -61,6 +72,7 @@ class ForexSignalEngine:
             {
                 'signal': signals.astype(float, copy=False),
                 'hold_days': hold_days.astype(int, copy=False),
+                'hold': hold_days.astype(int, copy=False),
             },
             index=close.index,
         )
@@ -205,7 +217,41 @@ class ForexSignalEngine:
                     signals[idx] = signal_val
                     hold_days[idx] = ev_hold
 
+        if self.config.strict_mode:
+            donchian_signals = self._build_donchian_signals(
+                close=close,
+                fast_days=self.config.donchian_fast_entry_days,
+                slow_days=self.config.donchian_slow_entry_days,
+            )
+            if self.config.use_macro_overlay:
+                overlay_ok = (signals == 0) | (signals == donchian_signals)
+                signals = np.where(overlay_ok, donchian_signals, 0).astype(np.int8, copy=False)
+            else:
+                signals = donchian_signals.astype(np.int8, copy=False)
+            hold_days = np.full(len(all_dates), self.config.hold_days, dtype=np.int32)
+
         return signals, hold_days
+
+    @staticmethod
+    def _build_donchian_signals(
+        close: pd.Series,
+        fast_days: int,
+        slow_days: int,
+    ) -> np.ndarray:
+        if close.empty:
+            return np.zeros(0, dtype=np.int8)
+        fast_high = close.rolling(fast_days).max().shift(1)
+        fast_low = close.rolling(fast_days).min().shift(1)
+        slow_high = close.rolling(slow_days).max().shift(1)
+        slow_low = close.rolling(slow_days).min().shift(1)
+
+        long_break = (close > fast_high) | (close > slow_high)
+        short_break = (close < fast_low) | (close < slow_low)
+
+        signals = np.zeros(len(close), dtype=np.int8)
+        signals[(long_break & ~short_break).fillna(False).to_numpy()] = 1
+        signals[(short_break & ~long_break).fillna(False).to_numpy()] = -1
+        return signals
 
     @staticmethod
     def _compute_atr_pct(
@@ -268,3 +314,67 @@ class ForexSignalEngine:
         if macro_sign != 0 and (mom_sign == 0 or mom_sign == macro_sign):
             return macro_sign
         return 0
+
+
+def build_signal_arrays(
+    pair: str,
+    prices: pd.DataFrame,
+    base_country: str,
+    quote_country: str,
+    *,
+    fetcher=None,
+    cb_trigger=None,
+    config: Optional[SignalConfig] = None,
+    start: Optional[str] = None,
+    end: Optional[str] = None,
+) -> tuple[np.ndarray, np.ndarray]:
+    fetcher = fetcher or ForexDataFetcher()
+    cb_trigger = cb_trigger or CBEventTrigger()
+    engine = ForexSignalEngine(fetcher=fetcher, cb_trigger=cb_trigger, config=config)
+    if start is None:
+        start = str(prices.index.min().date()) if len(prices.index) else '2015-01-01'
+    if end is None:
+        end = str(prices.index.max().date()) if len(prices.index) else '2015-01-01'
+    close = prices['Close'] if 'Close' in prices.columns else prices.iloc[:, 0]
+    return engine.build_signal_arrays(
+        close=close,
+        base_country=base_country,
+        quote_country=quote_country,
+        start=start,
+        end=end,
+        pair=pair,
+        prices_df=prices,
+    )
+
+
+def build_signal_frame(
+    pair: str,
+    prices: pd.DataFrame,
+    base_country: str,
+    quote_country: str,
+    *,
+    fetcher=None,
+    cb_trigger=None,
+    config: Optional[SignalConfig] = None,
+    start: Optional[str] = None,
+    end: Optional[str] = None,
+) -> pd.DataFrame:
+    signal_arr, hold_arr = build_signal_arrays(
+        pair=pair,
+        prices=prices,
+        base_country=base_country,
+        quote_country=quote_country,
+        fetcher=fetcher,
+        cb_trigger=cb_trigger,
+        config=config,
+        start=start,
+        end=end,
+    )
+    return pd.DataFrame(
+        {
+            'signal': signal_arr.astype(float, copy=False),
+            'hold': hold_arr.astype(int, copy=False),
+            'hold_days': hold_arr.astype(int, copy=False),
+        },
+        index=prices.index,
+    )

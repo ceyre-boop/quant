@@ -17,6 +17,9 @@ class GovernanceLayer:
         self.config_path = config_path
         self.parameters = self._load_parameters()
         self.config_hash = self._compute_hash()
+        self.forex_rule_set_version = "turtle-v1"
+        self.forex_compliance_status = "unknown"
+        self.forex_compliance_score = 0
         
     def _load_parameters(self) -> Dict[str, Any]:
         if not os.path.exists(self.config_path):
@@ -35,8 +38,16 @@ class GovernanceLayer:
             "timestamp": datetime.utcnow().isoformat(),
             "config_hash": self.config_hash,
             "version": self.parameters.get("version"),
-            "environment": self.parameters.get("environment")
+            "environment": self.parameters.get("environment"),
+            "forex_rule_set_version": self.forex_rule_set_version,
+            "forex_compliance_status": self.forex_compliance_status,
+            "forex_compliance_score": self.forex_compliance_score,
         }
+
+    def update_forex_compliance(self, *, rule_set_version: str, status: str, score: int) -> None:
+        self.forex_rule_set_version = rule_set_version
+        self.forex_compliance_status = status
+        self.forex_compliance_score = score
 
     def log_run_start(self):
         manifest = self.get_manifest()
