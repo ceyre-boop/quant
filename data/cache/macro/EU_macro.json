@@ -1,0 +1,25 @@
+{
+  "country": "EU",
+  "rate": 2.5,
+  "cpi_yoy": 2.2,
+  "gdp_growth": 1.2,
+  "real_rate": 0.2999999999999998,
+  "rate_trajectory": [
+    -1,
+    -1,
+    -1
+  ],
+  "source_map": {
+    "rate": "fallback_static",
+    "cpi_yoy": "fallback_static",
+    "gdp_growth": "fallback_static",
+    "rate_trajectory": "manual_prior"
+  },
+  "synthetic_fields": [
+    "rate",
+    "cpi_yoy",
+    "gdp_growth",
+    "rate_trajectory"
+  ],
+  "as_of": "2026-05-08"
+}
