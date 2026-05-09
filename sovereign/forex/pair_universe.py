@@ -15,6 +15,13 @@ CROSSES: List[str] = [
 
 ALL_PAIRS: List[str] = MAJOR_PAIRS + CROSSES
 
+# Track 2 — carry base pairs (NOT in ALL_PAIRS; never run through macro signal gates).
+# These are managed exclusively by sovereign.forex.carry_engine.CarryEngine.
+CARRY_PAIRS: List[str] = [
+    'AUDCHF=X',   # borrow CHF (~0-1.5%), hold AUD (~4-5%) — highest G10 carry
+    'NZDJPY=X',   # borrow JPY (~0.1%), hold NZD (~5%) — second highest G10 carry
+]
+
 
 @dataclass(frozen=True)
 class PairConfig:

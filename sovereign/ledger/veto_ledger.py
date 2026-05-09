@@ -3,10 +3,13 @@ Phase 7 — Veto Ledger (V1.0)
 Logs EVERY signal rejection to monitor system filter health.
 """
 
+import csv
 import json
+from collections import Counter, defaultdict
 from datetime import datetime
 from pathlib import Path
-from collections import Counter
+from typing import Dict, List
+
 from contracts.types import VetoRecord
 
 class VetoLedger:
@@ -58,7 +61,125 @@ class VetoLedger:
             
         return dict(counts)
 
-    def print_health_report(self):
+    def gate_cooccurrence_report(self) -> Dict[str, object]:
+        """
+        Reads all veto records (JSONL shards + CSV legacy files) and reports:
+          - How often each gate fires
+          - How often each gate fires WITHOUT any other gate also firing that day
+          - Co-occurrence pairs (gates that always fire together = one is redundant)
+
+        A gate that never fires alone carries no independent information — it is a
+        candidate for removal per the problem statement's gate-redundancy analysis.
+
+        Returns a dict with:
+          'gate_counts'      : {gate: total_fires}
+          'solo_fires'       : {gate: fires_where_no_other_gate_fired_same_day}
+          'solo_pct'         : {gate: solo_fires / total_fires}
+          'cooccurrence'     : {(gA, gB): count_both_fired_same_day}
+          'likely_redundant' : [gate, ...]  — solo_pct < 0.05
+        """
+        # ── 1. Collect all veto events as (date, gate) ─────────────────── #
+        events: List[tuple[str, str]] = []
+
+        # JSONL shards (sovereign/ledger/veto_ledger_*.jsonl)
+        for f in sorted(self.path.glob('veto_ledger_*.jsonl')):
+            try:
+                with open(f) as fh:
+                    for line in fh:
+                        rec = json.loads(line)
+                        date_str = (rec.get('timestamp') or rec.get('logged_at') or '')[:10]
+                        gate = rec.get('stage') or rec.get('reason') or 'UNKNOWN'
+                        events.append((date_str, gate))
+            except Exception:
+                pass
+
+        # CSV legacy files (data/paper_trading/veto_ledger_*.csv)
+        legacy_paths = list(
+            (self.path.parent / 'paper_trading').glob('veto_ledger*.csv')
+        )
+        for f in legacy_paths:
+            try:
+                with open(f, newline='') as fh:
+                    reader = csv.DictReader(fh)
+                    for row in reader:
+                        date_str = (row.get('date') or '')[:10]
+                        gate = row.get('veto_reason') or row.get('stage') or 'UNKNOWN'
+                        # Normalise: trim trailing detail (e.g. "PROB: 0.25 < 0.45" → "PROB")
+                        gate_key = gate.split(':')[0].strip()
+                        events.append((date_str, gate_key))
+            except Exception:
+                pass
+
+        if not events:
+            return {
+                'gate_counts': {},
+                'solo_fires': {},
+                'solo_pct': {},
+                'cooccurrence': {},
+                'likely_redundant': [],
+                'note': 'No veto data found.',
+            }
+
+        # ── 2. Group by date ─────────────────────────────────────────────── #
+        by_date: Dict[str, set] = defaultdict(set)
+        for date_str, gate in events:
+            by_date[date_str].add(gate)
+
+        gate_counts: Counter = Counter()
+        solo_fires: Counter = Counter()
+        cooccurrence: Counter = Counter()
+
+        for date_str, gates in by_date.items():
+            gates_list = sorted(gates)
+            for g in gates_list:
+                gate_counts[g] += 1
+                if len(gates_list) == 1:
+                    solo_fires[g] += 1
+            # Record pairwise co-occurrences
+            for i in range(len(gates_list)):
+                for j in range(i + 1, len(gates_list)):
+                    cooccurrence[(gates_list[i], gates_list[j])] += 1
+
+        solo_pct = {
+            g: round(solo_fires[g] / gate_counts[g], 3) if gate_counts[g] else 0.0
+            for g in gate_counts
+        }
+        likely_redundant = [g for g, pct in solo_pct.items() if pct < 0.05]
+
+        return {
+            'gate_counts': dict(gate_counts.most_common()),
+            'solo_fires': dict(solo_fires),
+            'solo_pct': solo_pct,
+            'cooccurrence': {f'{a}+{b}': cnt for (a, b), cnt in cooccurrence.most_common()},
+            'likely_redundant': likely_redundant,
+        }
+
+    def print_cooccurrence_report(self) -> None:
+        """Human-readable gate redundancy report printed to stdout."""
+        report = self.gate_cooccurrence_report()
+        if report.get('note'):
+            print(f"\n[VetoLedger] {report['note']}")
+            return
+
+        print('\n─── GATE CO-OCCURRENCE REPORT ───────────────────────────────────')
+        print(f"{'Gate':<25} {'Total':>7} {'Solo':>7} {'Solo%':>7}")
+        print('─' * 50)
+        for gate, total in report['gate_counts'].items():
+            solo = report['solo_fires'].get(gate, 0)
+            pct = report['solo_pct'].get(gate, 0.0)
+            flag = ' ⚠ REDUNDANT?' if gate in report['likely_redundant'] else ''
+            print(f'{gate:<25} {total:>7} {solo:>7} {pct:>6.1%}{flag}')
+
+        if report['cooccurrence']:
+            print('\n─── MOST COMMON CO-FIRING PAIRS ─────────────────────────────────')
+            for pair, cnt in list(report['cooccurrence'].items())[:10]:
+                print(f'  {pair:<40} {cnt:>5} days')
+
+        if report['likely_redundant']:
+            print(f'\n⚠  Likely redundant (solo% < 5%): {report["likely_redundant"]}')
+        print('─────────────────────────────────────────────────────────────────\n')
+
+
         """Prints a summary of the current filter stack health."""
         rates = self.get_veto_rate()
         print("\n--- SOVEREIGN FILTER HEALTH REPORT ---")
