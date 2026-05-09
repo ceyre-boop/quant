@@ -4,8 +4,19 @@ scripts/push_to_firebase.py
 Push live v004 system state to Firebase Realtime Database.
 The frontend at https://ceyre-boop.github.io/quant/ reads from these paths.
 
-Run once to seed with current state, then the orchestrator calls this
-automatically on every signal via on_trade_close() and evaluate_signal().
+Authentication: Firebase Admin SDK with service account key.
+  1. Firebase Console → Project Settings → Service Accounts
+  2. "Generate new private key" → save JSON
+  3. Set env var: export FIREBASE_SERVICE_ACCOUNT=/path/to/key.json
+     OR place file at: config/firebase_service_account.json
+
+Firebase rules (set in Console → Realtime Database → Rules):
+  {
+    "rules": {
+      ".read": true,
+      ".write": "auth != null"
+    }
+  }
 
 Usage:
     python3 scripts/push_to_firebase.py          # push current state now
@@ -22,6 +33,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import time
 import sys
 from datetime import datetime, timezone
@@ -32,11 +44,63 @@ sys.path.insert(0, str(Path(__file__).parents[1]))
 FIREBASE_DB_URL = "https://clawd-trading-7b8de-default-rtdb.firebaseio.com"
 SYMBOL = "SOVEREIGN_FOREX"
 
+# Service account key locations (checked in order)
+_SA_CANDIDATES = [
+    os.environ.get('FIREBASE_SERVICE_ACCOUNT', ''),
+    'config/firebase_service_account.json',
+    str(Path.home() / '.config' / 'clawd' / 'firebase_service_account.json'),
+]
+
+_db_ref = None  # cached Admin SDK db reference
+
+
+def _init_admin() -> bool:
+    """Initialise firebase-admin with service account. Returns True if ready."""
+    global _db_ref
+    if _db_ref is not None:
+        return True
+
+    try:
+        import firebase_admin
+        from firebase_admin import credentials, db as rtdb
+
+        sa_path = next((p for p in _SA_CANDIDATES if p and Path(p).exists()), None)
+
+        if sa_path:
+            # Authenticated — service account found
+            if not firebase_admin._apps:
+                cred = credentials.Certificate(sa_path)
+                firebase_admin.initialize_app(cred, {'databaseURL': FIREBASE_DB_URL})
+            _db_ref = rtdb.reference('/')
+            print(f"  Auth: service account ({sa_path})")
+            return True
+        else:
+            # Fallback: unauthenticated REST (works when rules are open)
+            print("  Auth: none — rules must allow unauthenticated writes")
+            print("  To use service account: export FIREBASE_SERVICE_ACCOUNT=/path/to/key.json")
+            return False
+
+    except Exception as e:
+        print(f"  Admin SDK init failed: {e}")
+        return False
+
 
 def push(path: str, data: dict) -> bool:
-    """PUT data to Firebase REST API (no SDK needed — works with web API key)."""
+    """Write data to Firebase — uses Admin SDK if authenticated, REST otherwise."""
+    global _db_ref
+
+    # Try Admin SDK first (authenticated)
+    if _db_ref is not None:
+        try:
+            _db_ref.child(path).set(data)
+            return True
+        except Exception as e:
+            print(f"  Admin write failed ({path}): {e}")
+            return False
+
+    # Fallback: unauthenticated REST PUT
     try:
-        import urllib.request, urllib.error
+        import urllib.request
         url = f"{FIREBASE_DB_URL}/{path}.json"
         payload = json.dumps(data).encode()
         req = urllib.request.Request(url, data=payload, method='PUT',
@@ -44,22 +108,7 @@ def push(path: str, data: dict) -> bool:
         with urllib.request.urlopen(req, timeout=10) as resp:
             return resp.status == 200
     except Exception as e:
-        print(f"  Firebase write failed ({path}): {e}")
-        return False
-
-
-def patch(path: str, data: dict) -> bool:
-    """PATCH (merge) data at a Firebase path."""
-    try:
-        import urllib.request
-        url = f"{FIREBASE_DB_URL}/{path}.json"
-        payload = json.dumps(data).encode()
-        req = urllib.request.Request(url, data=payload, method='PATCH',
-                                     headers={'Content-Type': 'application/json'})
-        with urllib.request.urlopen(req, timeout=10) as resp:
-            return resp.status == 200
-    except Exception as e:
-        print(f"  Firebase patch failed ({path}): {e}")
+        print(f"  REST write failed ({path}): {e}")
         return False
 
 
@@ -194,6 +243,7 @@ def build_state() -> dict:
 
 
 def push_all(verbose: bool = True) -> bool:
+    _init_admin()
     state = build_state()
     ts = datetime.now().strftime('%H:%M:%S')
     ok = True
