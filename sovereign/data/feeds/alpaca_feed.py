@@ -1,3 +1,6 @@
+from dotenv import load_dotenv
+load_dotenv()
+
 """
 Sovereign Trading Intelligence — Alpaca OHLCV Feed
 Phase 1: Data Foundation
@@ -21,8 +24,6 @@ import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta, timezone
 from typing import Optional, List, Dict
-
-from dotenv import load_dotenv
 
 logger = logging.getLogger(__name__)
 
@@ -58,8 +59,6 @@ class AlpacaFeed:
         secret_key: Optional[str] = None,
         cache_dir: Optional[str] = None,
     ):
-        load_dotenv()
-        
         self.api_key = api_key or os.getenv('ALPACA_API_KEY')
         self.secret_key = secret_key or os.getenv('ALPACA_SECRET_KEY')
         
@@ -257,6 +256,23 @@ class AlpacaFeed:
         
         return pd.DataFrame(counts)
     
+    def health_check(self) -> bool:
+        """Return True if credentials are set and client is initialized."""
+        return bool(self.api_key and self.secret_key)
+
+    def get_historical_bars(
+        self,
+        symbol: str,
+        start: Optional[str] = None,
+        end: Optional[str] = None,
+        timeframe: str = '1D',
+    ) -> pd.DataFrame:
+        """Alias for get_bars() that accepts string dates and maps '1D' timeframe."""
+        start_dt = datetime.fromisoformat(start).replace(tzinfo=timezone.utc) if isinstance(start, str) else start
+        end_dt = datetime.fromisoformat(end).replace(tzinfo=timezone.utc) if isinstance(end, str) else end
+        tf = '1d' if timeframe.upper() in ('1D', 'DAY', 'DAILY') else timeframe
+        return self.get_bars(symbol, start=start_dt, end=end_dt, timeframe=tf)
+
     # ------------------------------------------------------------------
     # Internal: API fetch
     # ------------------------------------------------------------------

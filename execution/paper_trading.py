@@ -51,10 +51,28 @@ class PaperPosition:
 
 
 from execution.rr_engine import RREngine
+try:
+    from execution.ptj_gates import PTJCircuitBreaker, PTJGateRunner, ptj_shock_candle_gate, TradePhaseTracker
+    _PTJ_AVAILABLE = True
+except ImportError:
+    _PTJ_AVAILABLE = False
 
 class PaperTradingEngine:
-    """Paper trading engine - trades with fake money, real data."""
-    
+    """
+    Paper trading engine — PTJ capital protection integrated.
+
+    PTJ gates run before every execute_signal():
+      Gate 1-3: circuit breakers (weekly/monthly loss, post-loss cooldown)
+      Gate 4:   max concurrent positions
+      Gate 5-6: 200 SMA (requires spy_prices + asset_prices passed in)
+      Gate 9:   stop-first enforcement
+      Gate 10:  R:R minimum
+      Gate 11:  portfolio risk cap
+
+    Phase tracker (Principle 4) added to every position.
+    Circuit breaker updated on every close.
+    """
+
     def __init__(self, starting_equity: float = 100000.0):
         self.starting_equity = starting_equity
         self.current_equity = starting_equity
@@ -63,29 +81,114 @@ class PaperTradingEngine:
         self.daily_pnl = 0.0
         self.daily_trades = 0
         self.last_reset = datetime.now().date()
-        self.rr_engine = RREngine() # Initialize Dynamic RR
-        
+        self.rr_engine = RREngine()
+        self._phase_trackers: Dict[str, Any] = {}
+
+        # PTJ circuit breaker — tracks weekly/monthly P&L
+        self._ptj_cb = PTJCircuitBreaker(starting_equity) if _PTJ_AVAILABLE else None
+
         self.logger = logging.getLogger(__name__)
-        self.logger.info(f"Paper trading initialized: ${starting_equity:,.2f} with Dynamic RR")
+        self.logger.info(
+            f"Paper trading initialized: ${starting_equity:,.2f} | "
+            f"PTJ gates: {'ACTIVE' if _PTJ_AVAILABLE else 'unavailable'}"
+        )
     
-    def execute_signal(self, signal: EnhancedEntrySignal, current_price: float, current_atr: float) -> Optional[PaperPosition]:
+    def execute_signal(
+        self,
+        signal: EnhancedEntrySignal,
+        current_price: float,
+        current_atr: float,
+        spy_prices=None,
+        asset_prices=None,
+        grade: str = 'B',
+    ) -> Optional[PaperPosition]:
         """
-        Execute a paper trade from an entry signal with Dynamic RR calculation.
+        Execute a paper trade — PTJ 12-gate filter runs first.
+
+        PTJ sequence (defence-first, enforced in code order):
+          1. Run circuit breakers and position limits
+          2. Run 200 SMA gates (requires spy_prices, asset_prices)
+          3. Compute stop (STEP 1 — must happen before target)
+          4. Compute targets from stop (STEP 2+3)
+          5. R:R gate
+          6. Only then: create position
         """
-        # Check if we already have a position for this symbol
+        import numpy as np
+
+        # Already in this symbol?
         if signal.symbol in self.positions:
             self.logger.info(f"Already have position in {signal.symbol}, skipping")
             return None
-        
-        # Calculate brackets using Dynamic RR Engine
-        brackets = self.rr_engine.calculate_brackets(current_price, current_atr, signal.direction.value)
+
+        direction_int = signal.direction.value  # 1=long, -1=short
+        direction_str = 'long' if direction_int == 1 else 'short'
+
+        # ── PTJ Gates (Gates 1-11) ────────────────────────────────────────── #
+        if _PTJ_AVAILABLE and self._ptj_cb is not None:
+            open_pos_list = [
+                {'risk_pct': 0.015}  # approximate risk per open position
+                for _ in self.positions
+            ]
+            spy_arr = (np.array(spy_prices) if spy_prices is not None
+                       else np.full(200, current_price))
+            asset_arr = (np.array(asset_prices) if asset_prices is not None
+                         else np.full(200, current_price))
+
+            runner = PTJGateRunner(self._ptj_cb, open_pos_list, self.current_equity)
+
+            # Compute stop FIRST (PTJ principle: stop before target)
+            stop_price = self.rr_engine.calculate_stop(
+                current_price, current_atr, direction_int)
+            unit_risk = abs(current_price - stop_price)
+            tp1 = current_price + direction_int * unit_risk * 1.5
+            new_risk_pct = (unit_risk * 1.0) / self.current_equity  # approx
+
+            gate_result = runner.run(
+                signal_direction=direction_str,
+                symbol=signal.symbol,
+                grade=grade,
+                spy_prices=spy_arr,
+                asset_prices=asset_arr,
+                entry_price=current_price,
+                stop_price=stop_price,
+                tp1_price=tp1,
+                new_trade_risk_pct=new_risk_pct,
+                direction_int=direction_int,
+            )
+
+            if not gate_result:
+                self.logger.info(
+                    f"[PTJ_GATE] {signal.symbol} BLOCKED by {gate_result.gate}: "
+                    f"{gate_result.reason}"
+                )
+                return None
+
+            size_mod = gate_result.size_modifier
+        else:
+            # PTJ not available — compute stop for downstream use
+            stop_price = self.rr_engine.calculate_stop(
+                current_price, current_atr, direction_int)
+            size_mod = 1.0
+
+        # ── Compute PTJ 3-target bracket (stop already computed above) ────── #
+        bracket = self.rr_engine.calculate_brackets(
+            current_price, stop_price, direction_int, grade=grade)
+
+        # Legacy single-target brackets dict for backward compat
+        brackets = {
+            'sl':  bracket.stop_price,
+            'tp':  bracket.tp1_price,
+            'tp1': bracket.tp1_price,
+            'tp2': bracket.tp2_price,
+            'tp3': bracket.tp3_price,
+        }
         
         # Generate trade ID
         trade_id = f"PAPER_{uuid.uuid4().hex[:8].upper()}"
         
-        # Calculate position size in dollars (2% risk based on ATR stop)
+        # Position size: 2% risk × PTJ size modifier (circuit breakers may halve this)
         risk_per_share = abs(current_price - brackets['sl'])
-        position_size_shares = (self.current_equity * 0.02) / risk_per_share
+        position_size_shares = (self.current_equity * 0.02 * size_mod) / max(risk_per_share, 1e-9)
         position_value = position_size_shares * current_price
         
         # Create position
@@ -107,7 +210,15 @@ class PaperTradingEngine:
         )
         
         self.positions[signal.symbol] = position
-        
+
+        # PTJ Phase tracker — "every position starts wrong until proven otherwise"
+        if _PTJ_AVAILABLE:
+            self._phase_trackers[signal.symbol] = TradePhaseTracker(
+                entry_price=current_price,
+                stop_price=brackets['sl'],
+                direction=direction_int,
+            )
+
         # Log the trade
         log_live_trade(
             trade_id=trade_id,
@@ -129,26 +240,54 @@ class PaperTradingEngine:
         self.daily_trades += 1
         return position
     
-    def update_positions(self, market_data: Dict[str, float]) -> list:
+    def update_positions(self, market_data: Dict[str, float], atrs: Dict[str, float] = None) -> list:
         """
-        Update all open positions. Includes Automated Trailing Stop management.
+        Update all open positions — PTJ phase tracking + shock candle + trailing.
         """
         closed = []
-        
+        atrs = atrs or {}
+
         for symbol, price in market_data.items():
             if symbol not in self.positions:
                 continue
-            
+
             position = self.positions[symbol]
             direction_val = 1 if position.direction == "LONG" else -1
-            
+
+            # PTJ Phase tracker update
+            if _PTJ_AVAILABLE and symbol in self._phase_trackers:
+                tracker = self._phase_trackers[symbol]
+                tracker.update(price)
+                # Phase 1 early exit: moving against us before thesis proven
+                if tracker.should_exit_early(price):
+                    self.logger.info(
+                        f"[PTJ_PHASE1] {symbol}: early exit — "
+                        f"price moving against unproven position"
+                    )
+                    closed_pos = self._close_position(symbol, price, "PTJ_PHASE1_EARLY_EXIT")
+                    if closed_pos:
+                        closed.append(closed_pos)
+                    continue
+
+            # PTJ Shock candle gate (Gate 7)
+            if _PTJ_AVAILABLE and symbol in atrs and atrs[symbol] > 0:
+                prev_price = position.entry_price  # simplification; use last bar close ideally
+                bar_ret = price - prev_price
+                shock = ptj_shock_candle_gate(bar_ret, atrs[symbol], direction_val)
+                if not shock:
+                    self.logger.info(f"[PTJ_SHOCK] {symbol}: shock candle exit")
+                    closed_pos = self._close_position(symbol, price, "PTJ_SHOCK_CANDLE")
+                    if closed_pos:
+                        closed.append(closed_pos)
+                    continue
+
             # --- AUTO TRAILING LOGIC ---
             old_sl = position.stop_loss
             position.stop_loss = self.rr_engine.update_trailing_stop(
                 price, position.entry_price, position.stop_loss, direction_val
             )
             if position.stop_loss != old_sl:
-                self.logger.info(f"TRAILING STOP TRIGGERED for {symbol}: {old_sl:.2f} -> {position.stop_loss:.2f}")
+                self.logger.info(f"TRAILING STOP: {symbol}: {old_sl:.4f} → {position.stop_loss:.4f}")
 
             # Check for exit conditions
             exit_triggered = False
@@ -206,7 +345,14 @@ class PaperTradingEngine:
         # Update equity
         self.current_equity += position.pnl
         self.daily_pnl += position.pnl
-        
+
+        # PTJ circuit breaker: record every close so weekly/monthly tracking stays live
+        if _PTJ_AVAILABLE and self._ptj_cb is not None:
+            self._ptj_cb.record_trade(position.pnl)
+
+        # Clean up phase tracker
+        self._phase_trackers.pop(symbol, None)
+
         # Add to closed positions
         self.closed_positions.append(position)
         

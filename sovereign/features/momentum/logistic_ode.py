@@ -27,6 +27,7 @@ import pandas as pd
 from scipy.optimize import curve_fit
 import logging
 import warnings
+from typing import Optional, List, Dict, Tuple
 from config.loader import params
 from contracts.types import MomentumFeatures
 

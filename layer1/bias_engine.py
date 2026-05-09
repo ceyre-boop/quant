@@ -44,6 +44,116 @@ class BiasEngine:
         # Feature group mapping for rationale
         self.feature_to_group = self._build_feature_group_mapping()
     
+    def train(self, records: list) -> None:
+        """Train a direction predictor on SovereignFeatureRecord list."""
+        import xgboost as xgb
+
+        X, y = [], []
+        for r in records:
+            X.append([
+                r.regime.hurst_short,
+                r.regime.hurst_long,
+                r.regime.adx,
+                r.momentum.rsi_14,
+                r.regime.hmm_confidence,
+                r.regime.hmm_transition_prob,
+            ])
+            y.append(1 if r.momentum.rsi_14 > 50 else 0)
+
+        if not X:
+            return
+
+        X_arr = np.array(X)
+        y_arr = np.array(y)
+
+        self._sovereign_feature_names = [
+            'hurst_short', 'hurst_long', 'adx', 'rsi_14',
+            'hmm_confidence', 'hmm_transition_prob',
+        ]
+        self._sovereign_model = xgb.XGBClassifier(
+            n_estimators=100, max_depth=3, verbosity=0, eval_metric='logloss'
+        )
+        self._sovereign_model.fit(X_arr, y_arr)
+        self._sovereign_fitted = True
+        logger.info(f"BiasEngine trained on {len(X)} sovereign records")
+
+    def save(self, path: str) -> None:
+        import joblib
+        data: Dict[str, Any] = {}
+        if getattr(self, '_sovereign_fitted', False):
+            data['sovereign_model'] = self._sovereign_model
+            data['sovereign_feature_names'] = self._sovereign_feature_names
+        if self.model is not None:
+            data['model'] = self.model
+            data['feature_names'] = self.feature_names
+        joblib.dump(data, path)
+        logger.info(f"BiasEngine saved to {path}")
+
+    def load(self, path: str) -> None:
+        import joblib
+        if not os.path.exists(path):
+            return
+        data = joblib.load(path)
+        if 'sovereign_model' in data:
+            self._sovereign_model = data['sovereign_model']
+            self._sovereign_feature_names = data['sovereign_feature_names']
+            self._sovereign_fitted = True
+        if 'model' in data:
+            self.model = data['model']
+            self.feature_names = data.get('feature_names')
+        logger.info(f"BiasEngine loaded from {path}")
+
+    def get_sovereign_bias(self, symbol: str, record) -> 'BiasOutput':
+        """Predict direction from a SovereignFeatureRecord."""
+        sovereign_fitted = getattr(self, '_sovereign_fitted', False)
+
+        if sovereign_fitted:
+            try:
+                feat = np.array([[
+                    record.regime.hurst_short,
+                    record.regime.hurst_long,
+                    record.regime.adx,
+                    record.momentum.rsi_14,
+                    record.regime.hmm_confidence,
+                    record.regime.hmm_transition_prob,
+                ]])
+                prob = float(self._sovereign_model.predict_proba(feat)[0, 1])
+                if prob > 0.55:
+                    direction, confidence = Direction.LONG, prob
+                elif prob < 0.45:
+                    direction, confidence = Direction.SHORT, 1.0 - prob
+                else:
+                    direction, confidence = Direction.NEUTRAL, 0.5
+            except Exception as e:
+                logger.warning(f"Sovereign inference error: {e}")
+                direction, confidence = Direction.NEUTRAL, 0.5
+        else:
+            rsi = record.momentum.rsi_14
+            hurst = record.regime.hurst_short
+            if rsi > 55 and hurst > 0.52:
+                direction, confidence = Direction.LONG, 0.6
+            elif rsi < 45 and hurst < 0.45:
+                direction, confidence = Direction.SHORT, 0.6
+            else:
+                direction, confidence = Direction.NEUTRAL, 0.5
+
+        if confidence > 0.8 and record.regime.adx > 30:
+            magnitude = Magnitude.LARGE
+        elif confidence > 0.65:
+            magnitude = Magnitude.NORMAL
+        else:
+            magnitude = Magnitude.SMALL
+
+        return BiasOutput(
+            direction=direction,
+            magnitude=magnitude,
+            confidence=confidence,
+            regime_override=False,
+            rationale=[f'sovereign_{direction.name.lower()}'],
+            model_version=self.model_version,
+            feature_snapshot={},
+        )
+
     def _load_model(self):
         """Load XGBoost model and metadata if they exist."""
         if os.path.exists(self.model_path):

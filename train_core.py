@@ -91,7 +91,7 @@ def train_core_models(symbols):
         try:
             df = feed.get_historical_bars(
                 symbol=symbol,
-                start='2022-01-01',
+                start='2018-01-01',
                 end='2024-12-31',
                 timeframe='1D'
             )
@@ -129,37 +129,65 @@ def train_core_models(symbols):
     return True
 
 
+def _compute_rsi(closes: 'np.ndarray', period: int = 14) -> 'np.ndarray':
+    """Wilder-smoothed RSI-14 as a numpy array aligned to closes."""
+    import numpy as np
+    n = len(closes)
+    rsi = np.full(n, 50.0)
+    delta = np.diff(closes, prepend=closes[0])
+    gain = np.where(delta > 0, delta, 0.0)
+    loss = np.where(delta < 0, -delta, 0.0)
+    avg_gain = np.zeros(n)
+    avg_loss = np.zeros(n)
+    # Seed with simple average of first period
+    avg_gain[period] = gain[1:period+1].mean()
+    avg_loss[period] = loss[1:period+1].mean()
+    for i in range(period + 1, n):
+        avg_gain[i] = (avg_gain[i-1] * (period - 1) + gain[i]) / period
+        avg_loss[i] = (avg_loss[i-1] * (period - 1) + loss[i]) / period
+    safe_loss = np.where(avg_loss > 0, avg_loss, 1e-9)
+    rs = avg_gain / safe_loss
+    rsi[period:] = 100.0 - 100.0 / (1.0 + rs[period:])
+    return rsi
+
+
 def _build_records_from_df(symbol, df):
-    """Build minimal SovereignFeatureRecords from OHLCV DataFrame."""
+    """Build SovereignFeatureRecords from OHLCV DataFrame with real RSI + Hurst."""
+    import numpy as np
     from contracts.types import (
         SovereignFeatureRecord, RegimeFeatures, MomentumFeatures,
         MacroFeatures, PetrolausDecision
     )
     from sovereign.features.regime.hurst import compute_hurst_features
-    
+
     records = []
-    
-    # Compute Hurst on the dataframe
+
+    # Compute Hurst
     try:
         hurst_df = compute_hurst_features(df)
     except Exception:
         hurst_df = None
-    
+
+    # Compute RSI-14 on the full close series
+    closes = df['close'].to_numpy(dtype=float)
+    rsi_arr = _compute_rsi(closes)
+
     for i, (idx, row) in enumerate(df.iterrows()):
-        # Skip first 90 bars (need lookback for Hurst long)
-        if i < 90:
+        if i < 90:          # need lookback for hurst_long
             continue
-        
+
         h_short = 0.5
-        h_long = 0.5
+        h_long  = 0.5
         if hurst_df is not None and idx in hurst_df.index:
             h_short = float(hurst_df.loc[idx].get('hurst_short', 0.5))
-            h_long = float(hurst_df.loc[idx].get('hurst_long', 0.5))
-        
+            h_long  = float(hurst_df.loc[idx].get('hurst_long',  0.5))
+
+        rsi_val = float(rsi_arr[i])
+
         regime = RegimeFeatures(
             hurst_short=h_short,
             hurst_long=h_long,
-            hurst_signal='TRENDING' if h_short > 0.52 else 'MEAN_REVERT' if h_short < 0.45 else 'NEUTRAL',
+            hurst_signal='TRENDING' if h_short > 0.52 else ('MEAN_REVERT' if h_short < 0.45 else 'NEUTRAL'),
             csd_score=0.5,
             csd_signal='NEUTRAL',
             hmm_state=1,
@@ -167,17 +195,17 @@ def _build_records_from_df(symbol, df):
             hmm_confidence=0.6,
             hmm_transition_prob=0.2,
             adx=25.0,
-            adx_signal='ESTABLISHED'
+            adx_signal='ESTABLISHED',
         )
-        
+
         momentum = MomentumFeatures(
             logistic_ode_score=0.0,
             jt_momentum_12_1=0.0,
             volume_entropy=1.0,
-            rsi_14=50.0,
-            rsi_signal='NEUTRAL'
+            rsi_14=rsi_val,
+            rsi_signal='OVERBOUGHT' if rsi_val > 70 else ('OVERSOLD' if rsi_val < 30 else 'NEUTRAL'),
         )
-        
+
         macro = MacroFeatures(
             yield_curve_slope=0.01,
             yield_curve_velocity=0.0,
@@ -186,17 +214,17 @@ def _build_records_from_df(symbol, df):
             cot_zscore=0.0,
             m2_velocity=1.5,
             hyg_spread_bps=200.0,
-            macro_signal='RISK_ON'
+            macro_signal='RISK_ON',
         )
-        
+
         petroulas = PetrolausDecision(
             fault_detected=False,
             fault_reason=None,
             fault_frameworks=[],
             action='TRADE',
-            macro_features=macro
+            macro_features=macro,
         )
-        
+
         record = SovereignFeatureRecord(
             symbol=symbol,
             timestamp=idx.isoformat() if hasattr(idx, 'isoformat') else str(idx),
@@ -205,18 +233,18 @@ def _build_records_from_df(symbol, df):
             macro=macro,
             petroulas=petroulas,
             bar_ohlcv={
-                'open': float(row['open']),
-                'high': float(row['high']),
-                'low': float(row['low']),
-                'close': float(row['close']),
-                'volume': float(row.get('volume', 0))
+                'open':   float(row['open']),
+                'high':   float(row['high']),
+                'low':    float(row['low']),
+                'close':  float(row['close']),
+                'volume': float(row.get('volume', 0)),
             },
             is_valid=True,
-            validation_errors=[]
+            validation_errors=[],
         )
-        
+
         records.append(record)
-    
+
     return records
 
 
@@ -225,7 +253,7 @@ def main():
     parser.add_argument(
         '--symbols',
         nargs='+',
-        default=['META', 'PFE', 'UNH'],
+        default=['META', 'PFE', 'UNH', 'TLT', 'GLD', 'SPY'],
         help='Symbols to train on'
     )
     parser.add_argument(

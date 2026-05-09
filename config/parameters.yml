@@ -150,7 +150,11 @@ asset_params:
   TSLA:
     atr_target_multiplier: 4.0
 regime_params:
-  REVERSION:
+  MOMENTUM:
     stop_atr_mult: 1.0
     tp_rr: 1.5
-    fitted_on: '2026-04-15'
+    fitted_on: '2026-05-01'
+  REVERSION:
+    stop_atr_mult: 1.0
+    tp_rr: 2.0
+    fitted_on: '2026-05-01'

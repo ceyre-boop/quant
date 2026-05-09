@@ -95,11 +95,6 @@ class ForexSignalEngine:
         # Trajectory model: atr_pct < 2.2% = worst R outcomes (77% importance).
         atr_series = self._compute_atr_pct(close, prices_df)
 
-        # ── Pre-fetch BOJ rate history for JPY gate ───────────────────── #
-        boj_rates = None
-        if 'JPY' in pair:
-            boj_rates = self._fetcher.get_rate_history('JP', start='2014-01-01')
-
         # ── Layer 3: Macro (lowest priority, 60-day hold) ─────────────── #
         base_rates  = self._fetcher.get_rate_history(base_country, start='2014-01-01')
         quote_rates = self._fetcher.get_rate_history(quote_country, start='2014-01-01')
@@ -113,29 +108,23 @@ class ForexSignalEngine:
                 if atr_pct_now < 0.022:   # 2.2% median from attribution training
                     continue
 
-            # ── USDCHF: only trade when CHF safe-haven flows are active ── #
-            # SNB suppression dominates in low-VIX risk-on environments.
-            # Use the macro_engine RiskSentimentEngine result via a proxy:
-            # approximate VIX from VXX/SPY returns (already in spy_5d_return).
-            # Simpler: skip USDCHF when the CHF rate is moving (SNB signalling).
-            # Best available signal in the data: USDCHF has near-zero real rate
-            # differential. Gate it on CHF rate movement (same as BOJ gate).
+            # ── USDCHF: require confirmed momentum alignment ──────────── #
+            # v003 gate (SNB rate change > 0.10) was broken: SNB held flat
+            # -0.75% for 7 years → nearly all signals filtered → noise.
+            # v004 fix: remove rate gate. Instead require BOTH macro sign AND
+            # 3-month momentum in the same direction. CHF safe-haven reversals
+            # are fast and macro-confirmed; pure IRP signals are unreliable.
+            # This doubles the confirmation bar without blocking all signals.
+            _usdchf_mom_gate = True   # assume pass unless pair-specific check fails
             if pair == 'USDCHF=X':
-                ch_rates = self._fetcher.get_rate_history('CH', start='2014-01-01')
-                if ch_rates is not None and len(ch_rates) >= 63:
-                    ch_recent = ch_rates.loc[:date].iloc[-63:] if len(ch_rates.loc[:date]) >= 63 else None
-                    if ch_recent is not None:
-                        ch_change = abs(float(ch_recent.iloc[-1]) - float(ch_recent.iloc[0]))
-                        if ch_change < 0.10:   # SNB hasn't moved in 3 months
-                            continue
+                hist_check = close.loc[:date]
+                if len(hist_check) >= 63:
+                    mom_63 = float(hist_check.iloc[-1] / hist_check.iloc[-63] - 1)
+                    # Only allow signal if 3-month momentum is meaningful
+                    _usdchf_mom_gate = abs(mom_63) > 0.015  # 1.5% move in 3 months
 
-            # ── EURJPY/JPY: BOJ activity gate ────────────────────────── #
-            if 'JPY' in pair and boj_rates is not None and len(boj_rates) >= 90:
-                boj_hist = boj_rates.loc[:date]
-                if len(boj_hist) >= 90:
-                    boj_change_90d = abs(float(boj_hist.iloc[-1]) - float(boj_hist.iloc[-90]))
-                    if boj_change_90d < 0.001:   # BOJ frozen — no edge
-                        continue
+            if pair == 'USDCHF=X' and not _usdchf_mom_gate:
+                continue
 
             macro_sign = self._macro_signal_for_date(
                 close=close, date=date,
@@ -143,6 +132,20 @@ class ForexSignalEngine:
                 base_rates=base_rates, quote_rates=quote_rates,
                 base_cpi_h=base_cpi_h, quote_cpi_h=quote_cpi_h,
             )
+
+            # ── EURGBP: require 6-month momentum confirmation ─────────── #
+            # v003: ECB and BOE hiked in lockstep 2022-2024 → IRP differential
+            # near zero → random macro signals → -0.04 Sharpe.
+            # v004 fix: require 6-month price momentum to confirm macro direction.
+            # EURGBP is a cross with low carry — macro alone is insufficient.
+            if pair == 'EURGBP=X' and macro_sign != 0:
+                hist_check = close.loc[:date]
+                if len(hist_check) >= 126:
+                    mom_126 = float(hist_check.iloc[-1] / hist_check.iloc[-126] - 1)
+                    # Only enter if 6-month momentum agrees with macro direction
+                    if int(np.sign(mom_126)) != macro_sign:
+                        macro_sign = 0  # suppress signal: macro and momentum conflict
+
             if macro_sign != 0:
                 idx = all_dates.get_indexer([date])[0]
                 if idx >= 0:
@@ -272,7 +275,7 @@ class ForexSignalEngine:
                 tr = close.diff().abs()
             atr = tr.rolling(period).mean()
             atr_pct = atr / close
-            return atr_pct.fillna(method='bfill')
+            return atr_pct.bfill()
         except Exception:
             return None
 

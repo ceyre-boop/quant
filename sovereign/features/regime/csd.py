@@ -33,6 +33,7 @@ Implementation matches research/critical_slowing_detector.py exactly.
 import numpy as np
 import pandas as pd
 import logging
+from typing import Optional
 from config.loader import params
 
 logger = logging.getLogger(__name__)

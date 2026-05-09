@@ -16,6 +16,7 @@ from tqdm import tqdm
 
 from sovereign.orchestrator import SovereignOrchestrator
 from sovereign.data.feeds.alpaca_feed import AlpacaFeed
+from sovereign.ledger.trade_ledger import TradeLedger
 from contracts.types import SovereignFeatureRecord, MarketData
 from config.loader import params
 
@@ -77,7 +78,9 @@ class SovereignBacktest:
         
         # Initialize components
         self.orchestrator = SovereignOrchestrator(mode='paper')
+        self.orchestrator.load_models()
         self.feed = AlpacaFeed()
+        self.trade_ledger = TradeLedger()
         
         # Tracking
         self.equity = starting_equity
@@ -150,56 +153,101 @@ class SovereignBacktest:
         
         return data
     
+    @staticmethod
+    def _compute_features_from_bars(df: 'pd.DataFrame', up_to_idx: int):
+        """Compute Hurst/RSI/ATR from a historical DataFrame up to (but not including) up_to_idx."""
+        window = df.iloc[max(0, up_to_idx - 90): up_to_idx]
+        if len(window) < 20:
+            return 0.5, 0.5, 50.0, None
+
+        closes = window['close'].to_numpy(dtype=float)
+        highs  = window['high'].to_numpy(dtype=float)
+        lows   = window['low'].to_numpy(dtype=float)
+        n = len(closes)
+
+        # ATR-14
+        prev_c = np.empty(n); prev_c[0] = closes[0]; prev_c[1:] = closes[:-1]
+        tr  = np.maximum(highs - lows,
+              np.maximum(np.abs(highs - prev_c), np.abs(lows - prev_c)))
+        atr = float(tr[-14:].mean()) if n >= 14 else closes[-1] * 0.02
+
+        # RSI-14
+        delta = np.diff(closes, prepend=closes[0])
+        gain  = np.where(delta > 0, delta, 0.0)
+        loss  = np.where(delta < 0, -delta, 0.0)
+        ag, al = gain[1:15].mean() if n >= 15 else gain.mean(), \
+                 loss[1:15].mean() if n >= 15 else loss.mean()
+        for i in range(15, n):
+            ag = (ag * 13 + gain[i]) / 14
+            al = (al * 13 + loss[i]) / 14
+        rs = ag / (al + 1e-9)
+        rsi_val = float(100.0 - 100.0 / (1.0 + rs))
+
+        def hurst_rs(seg):
+            r = np.diff(np.log(np.maximum(seg, 1e-9)))
+            if len(r) < 4 or r.std() < 1e-12:
+                return 0.5
+            dev = np.cumsum(r - r.mean())
+            rs_ = (dev.max() - dev.min()) / r.std()
+            return float(np.log(rs_) / np.log(len(r))) if rs_ > 0 else 0.5
+
+        h_short = hurst_rs(closes[-30:]) if n >= 30 else 0.5
+        h_long  = hurst_rs(closes[-63:]) if n >= 63 else h_short
+        return h_short, h_long, rsi_val, atr
+
     def _simulate(self, data: Dict[str, pd.DataFrame]):
         """Run bar-by-bar simulation."""
-        # Align dates across all symbols
         all_dates = set()
         for df in data.values():
             all_dates.update(df.index)
-        
+
         dates = sorted(all_dates)
-        
+
         for date in tqdm(dates, desc="Simulating"):
             for symbol, df in data.items():
                 if date not in df.index:
                     continue
-                
+
                 row = df.loc[date]
-                
+
                 # Update existing positions
                 self._update_positions(symbol, row)
-                
+
+                # Compute rolling features up to (not including) this bar
+                idx = df.index.get_loc(date)
+                h_short, h_long, rsi_val, atr = self._compute_features_from_bars(df, idx)
+
                 # Check for new signals
-                self._check_for_signals(symbol, row, date)
-                
+                self._check_for_signals(symbol, row, date, h_short, h_long, rsi_val, atr)
+
                 # Record equity
                 self._record_equity(date)
     
-    def _check_for_signals(self, symbol: str, row: pd.Series, date: datetime):
+    def _check_for_signals(self, symbol: str, row: pd.Series, date: datetime,
+                           h_short: float = 0.5, h_long: float = 0.5,
+                           rsi_val: float = 50.0, atr: Optional[float] = None):
         """Check if orchestrator generates a signal."""
-        # Skip if already in position
         if symbol in self.positions:
             return
-        
-        # Build feature record (simplified - would need full feature pipeline)
-        # For backtest, we'd ideally pre-compute all features
-        # Here we simulate with basic features
-        
+
         try:
-            # Get ATR
-            atr = row.get('atr_14', row['close'] * 0.02)  # Default 2% if no ATR
-            
-            # Create minimal feature record for orchestrator
-            # In production, this would come from full feature pipeline
+            if atr is None:
+                atr = row['close'] * 0.02
+
+            h_signal = ('TRENDING'    if h_short > 0.55
+                        else ('MEAN_REVERT' if h_short < 0.45 else 'NEUTRAL'))
+            rsi_sig  = ('OVERBOUGHT'  if rsi_val > 70
+                        else ('OVERSOLD' if rsi_val < 30 else 'NEUTRAL'))
+
             from contracts.types import (
                 RegimeFeatures, MomentumFeatures, MacroFeatures,
                 PetrolausDecision
             )
-            
+
             regime = RegimeFeatures(
-                hurst_short=0.5,  # Neutral default
-                hurst_long=0.5,
-                hurst_signal='NEUTRAL',
+                hurst_short=h_short,
+                hurst_long=h_long,
+                hurst_signal=h_signal,
                 csd_score=0.5,
                 csd_signal='NEUTRAL',
                 hmm_state=1,
@@ -209,15 +257,15 @@ class SovereignBacktest:
                 adx=25.0,
                 adx_signal='ESTABLISHED'
             )
-            
+
             momentum = MomentumFeatures(
                 logistic_ode_score=0.0,
                 jt_momentum_12_1=0.0,
                 volume_entropy=1.0,
-                rsi_14=50.0,
-                rsi_signal='NEUTRAL'
+                rsi_14=rsi_val,
+                rsi_signal=rsi_sig
             )
-            
+
             macro = MacroFeatures(
                 yield_curve_slope=0.01,
                 yield_curve_velocity=0.0,
@@ -228,7 +276,7 @@ class SovereignBacktest:
                 hyg_spread_bps=200.0,
                 macro_signal='RISK_ON'
             )
-            
+
             petroulas = PetrolausDecision(
                 fault_detected=False,
                 fault_reason=None,
@@ -236,7 +284,7 @@ class SovereignBacktest:
                 action='TRADE',
                 macro_features=macro
             )
-            
+
             feature_record = SovereignFeatureRecord(
                 symbol=symbol,
                 timestamp=date.isoformat(),
@@ -257,7 +305,7 @@ class SovereignBacktest:
             
             # Run orchestrator
             result = self.orchestrator.run_session(
-                symbol=symbol,
+                symbol,
                 feature_record=feature_record,
                 current_price=row['close'],
                 atr=atr,
@@ -380,6 +428,25 @@ class SovereignBacktest:
         }
         
         self.trades.append(trade)
+        try:
+            self.trade_ledger.log_close(
+                trade_id=f"BT_{symbol}_{position['entry_date'].strftime('%Y%m%d%H%M%S')}",
+                symbol=symbol,
+                direction='LONG' if direction == 1 else 'SHORT',
+                entry_price=position['entry_price'],
+                exit_price=filled_exit,
+                size=position['position_value'],
+                sl=position['stop_loss'],
+                tp=position['take_profit'],
+                confidence=0.5,
+                pnl=pnl_dollars,
+                strategy='backtest',
+                exit_reason=reason,
+                entry_time=position['entry_date'],
+                exit_time=exit_date,
+            )
+        except Exception:
+            pass
         del self.positions[symbol]
         
         emoji = "✅" if pnl_dollars > 0 else "❌"

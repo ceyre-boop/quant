@@ -20,7 +20,7 @@ def _hurst_rs_matrix(matrix):
     log_matrix = np.log(matrix)
     
     # Vectorized Log Returns: (n_windows, window_size - 1)
-    returns = np.diff(log_matrix, axis=1)
+    returns = log_matrix[:, 1:] - log_matrix[:, :-1]
     n_ret = window_size - 1
     
     # Rescaled Range math across axis 1

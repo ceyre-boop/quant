@@ -9,6 +9,7 @@ import numpy as np
 import pandas as pd
 from scipy.stats import entropy
 import logging
+from typing import Optional, List, Dict, Tuple
 from config.loader import params
 from contracts.types import MomentumFeatures
 

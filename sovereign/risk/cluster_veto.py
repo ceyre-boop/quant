@@ -61,8 +61,10 @@ _REGIME_ALIASES: dict = {
 _KNOWN_REGIMES    = ["MOMENTUM", "NEUTRAL", "REVERSION"]
 _KNOWN_STRATEGIES = ["atr_channel", "bb_reversion", "donchian_breakout", "momentum_sma"]
 
-# Block threshold: clusters with avg_loss_r below this are vetoed
-BLOCK_THRESHOLD = -2.5
+# Block threshold: clusters with avg_loss_r below this are vetoed.
+# Calibrated to the backtest R-scale (timeout losses reach -5 to -10R).
+# Only the worst ≤2 clusters block; milder clusters allow through.
+BLOCK_THRESHOLD = -4.8
 
 
 class ClusterVeto:
@@ -78,6 +80,20 @@ class ClusterVeto:
         failure_map_path:  str = "logs/failure_map.csv",
         clusters_path:     str = "logs/failure_clusters.json",
     ):
+        # Normalize live ledger strategy names → backtest names used in failure clusters
+        self.STRATEGY_MAP = {
+            "momentum":          "momentum_sma",
+            "jt_momentum":       "momentum_sma",
+            "donchian":          "donchian_breakout",
+            "bb_reversion":      "bb_reversion",
+            "atr_channel":       "atr_channel",
+            "fvg_fill":          "momentum_sma",       # closest proxy
+            "liquidity_sweep":   "donchian_breakout",  # closest proxy
+            # passthrough for already-canonical names
+            "momentum_sma":      "momentum_sma",
+            "donchian_breakout": "donchian_breakout",
+        }
+
         self.ready = False
         self.cluster_info: dict = {}
         self._knn = None
@@ -197,7 +213,7 @@ class ClusterVeto:
         if not self.ready:
             return False, ""
 
-        canon_strategy = _STRATEGY_ALIASES.get(strategy_name)
+        canon_strategy = self.STRATEGY_MAP.get(strategy_name) or _STRATEGY_ALIASES.get(strategy_name)
         if canon_strategy is None:
             return False, ""
 

@@ -49,12 +49,8 @@ class BaseSpecialist:
         
         if not self._regime_matches(record):
             return self._neutral_bias('REGIME_MISMATCH')
-            
-        return self.engine.get_daily_bias(
-            symbol=record.symbol,
-            feature_vector=record,
-            regime=record.regime
-        )
+
+        return self.engine.get_sovereign_bias(symbol=record.symbol, record=record)
 
     def _regime_matches(self, record: SovereignFeatureRecord) -> bool:
         """Regime gating logic - implemented by subclasses."""

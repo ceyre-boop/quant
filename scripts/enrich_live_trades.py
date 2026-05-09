@@ -47,21 +47,42 @@ ENRICHED_COLS = [
 
 
 def _find_ledger_files() -> List[Path]:
-    """Return all trade_ledger_*.csv files under data/ledger/."""
+    """Return all trade_ledger_*.csv and trade_ledger_*.jsonl files under data/ledger/."""
     if not LEDGER_DIR.exists():
         return []
-    files = sorted(LEDGER_DIR.glob("trade_ledger*.csv"))
+    files = sorted(LEDGER_DIR.glob("trade_ledger*.csv")) + \
+            sorted(LEDGER_DIR.glob("trade_ledger*.jsonl"))
     return files
 
 
 def _load_ledger(files: List[Path]) -> Optional[pd.DataFrame]:
-    """Load and concatenate all ledger CSVs."""
+    """Load and concatenate all ledger CSVs and JSONLs.
+
+    JSONL rows use entry_time and strategy; normalise to CSV column names so
+    _enrich_trade() can consume either format without branching.
+    """
     if not files:
         return None
     frames = []
     for f in files:
         try:
-            df = pd.read_csv(f)
+            if f.suffix == ".jsonl":
+                import json as _json
+                rows = []
+                for line in f.read_text().splitlines():
+                    line = line.strip()
+                    if line:
+                        rows.append(_json.loads(line))
+                if not rows:
+                    continue
+                df = pd.DataFrame(rows)
+                # Normalise field names to match CSV schema
+                if "entry_time" in df.columns and "entry_date" not in df.columns:
+                    df = df.rename(columns={"entry_time": "entry_date"})
+                if "strategy" not in df.columns:
+                    df["strategy"] = "momentum"
+            else:
+                df = pd.read_csv(f)
             frames.append(df)
         except Exception as e:
             print(f"  [warn] Could not read {f}: {e}")
@@ -83,32 +104,6 @@ def _fetch_spy_weekly(start_date: str, end_date: str) -> pd.Series:
     return weekly  # DatetimeIndex → float
 
 
-def _rolling_hurst_for_date(
-    ticker: str, trade_date: str, window: int = 63
-) -> float:
-    """Download ~3 months of data before trade_date and return Hurst estimate."""
-    try:
-        import yfinance as yf
-        from universe_sweep import _rolling_hurst
-
-        end   = pd.Timestamp(trade_date) + pd.Timedelta(days=5)
-        start = pd.Timestamp(trade_date) - pd.Timedelta(days=window * 2)
-
-        raw = yf.download(ticker, start=str(start.date()), end=str(end.date()),
-                          auto_adjust=True, progress=False)
-        if isinstance(raw.columns, pd.MultiIndex):
-            raw = raw.xs(ticker, axis=1, level=1)
-        raw.columns = [str(c).lower() for c in raw.columns]
-        closes = raw["close"].dropna().to_numpy(dtype=np.float64)
-        if len(closes) < 10:
-            return 0.5
-
-        hurst_arr = _rolling_hurst(closes)
-        return float(hurst_arr[-1])
-    except Exception:
-        return 0.5
-
-
 def _hurst_label(h: float) -> str:
     if h > 0.55:
         return "MOMENTUM"
@@ -117,7 +112,58 @@ def _hurst_label(h: float) -> str:
     return "NEUTRAL"
 
 
-def _enrich_trade(row: pd.Series, spy_weekly: pd.Series, veto) -> dict:
+def _build_symbol_features(symbols: list, start_date: str, end_date: str) -> dict:
+    """Batch-download OHLCV and compute rolling ATR-14 + Hurst-63 per symbol.
+
+    Returns:
+        {symbol: pd.DataFrame with DatetimeIndex and columns ['atr_pct', 'hurst']}
+    """
+    import yfinance as yf
+
+    result = {}
+    for sym in symbols:
+        try:
+            ticker = yf.Ticker(sym)
+            raw = ticker.history(start=start_date, end=end_date, auto_adjust=True)
+            if raw.empty or len(raw) < 20:
+                continue
+            raw.columns = [str(c).lower() for c in raw.columns]
+            df = raw[["high", "low", "close"]].dropna()
+            if df.index.tz is not None:
+                df.index = df.index.tz_localize(None)
+            n = len(df)
+            c = df["close"].to_numpy(np.float64)
+            h = df["high"].to_numpy(np.float64)
+            lo = df["low"].to_numpy(np.float64)
+            # Wilder ATR-14
+            prev_c = np.empty(n); prev_c[0] = c[0]; prev_c[1:] = c[:-1]
+            tr = np.maximum(h - lo, np.maximum(np.abs(h - prev_c), np.abs(lo - prev_c)))
+            atr = np.zeros(n)
+            for i in range(1, n):
+                atr[i] = atr[i-1] * (1 - 1/14) + tr[i] * (1/14) if i >= 14 else tr[i]
+            atr_pct = np.where(c > 0, atr / c * 100, 0.0)
+            # Rolling Hurst (63-bar window)
+            log_c = np.log(np.maximum(c, 1e-9))
+            hurst_arr = np.full(n, 0.5)
+            window = 63
+            for i in range(window, n):
+                seg = log_c[i-window:i]
+                ret = np.diff(seg)
+                if len(ret) < 4 or ret.std() < 1e-12:
+                    continue
+                dev = np.cumsum(ret - ret.mean())
+                rs = (dev.max() - dev.min()) / ret.std()
+                if rs > 0:
+                    hurst_arr[i] = np.log(rs) / np.log(window)
+            feat = pd.DataFrame({"atr_pct": atr_pct, "hurst": hurst_arr}, index=df.index)
+            result[sym] = feat
+        except Exception:
+            pass
+    return result
+
+
+def _enrich_trade(row: pd.Series, spy_weekly: pd.Series, veto,
+                  sym_features: dict) -> dict:
     """Enrich one trade row. Returns dict with extra fields."""
     entry_date_str = str(row.get("entry_date", row.get("timestamp", "2024-01-01")))
     try:
@@ -143,30 +189,21 @@ def _enrich_trade(row: pd.Series, spy_weekly: pd.Series, veto) -> dict:
         if idx is not None and idx in spy_weekly.index:
             spy_ret = float(spy_weekly[idx])
 
-    # Regime from Hurst (would need real OHLCV — use cached or default)
-    # For enrichment we use 0.5 as fallback if no feature cube available
     symbol = str(row.get("symbol", "SPY"))
+    regime  = "NEUTRAL"
+    atr_pct = 1.5  # sensible fallback (avg equity ATR ~1.5%)
 
-    feature_cube = Path("logs/feature_cube.parquet")
-    regime = "NEUTRAL"
-    atr_pct = 0.0
-
-    if feature_cube.exists():
+    feat_df = sym_features.get(symbol)
+    if feat_df is not None and not feat_df.empty:
         try:
-            cube = pd.read_parquet(feature_cube)
-            cube.index = pd.to_datetime(cube.index)
-            closest = cube.index.asof(entry_ts)
-            if closest in cube.index:
-                sym_data = cube.loc[closest]
-                regime = _hurst_label(float(sym_data.get("hurst", 0.5)))
-                atr_pct = float(sym_data.get("atr_pct", 0.0))
+            entry_date_naive = entry_ts.tz_localize(None) if entry_ts.tzinfo else entry_ts
+            idx = feat_df.index.asof(entry_date_naive)
+            if idx in feat_df.index:
+                row_feat = feat_df.loc[idx]
+                atr_pct  = float(row_feat["atr_pct"]) or 1.5
+                regime   = _hurst_label(float(row_feat["hurst"]))
         except Exception:
             pass
-    else:
-        # Fallback: mild estimate from price if ATR is in the row
-        atr_raw = float(row.get("atr", 0))
-        price   = float(row.get("entry_price", 1))
-        atr_pct = (atr_raw / price * 100.0) if price > 0 else 0.0
 
     strategy = str(row.get("strategy", row.get("specialist", "momentum")))
 
@@ -260,10 +297,17 @@ def main():
         print(f"  [warn] SPY fetch failed: {e}")
         spy_weekly = pd.Series(dtype=float)
 
+    # Batch-fetch ATR + Hurst for all unique symbols (30-day buffer on either side)
+    unique_symbols = trades["symbol"].dropna().unique().tolist() if "symbol" in trades.columns else []
+    feat_start = str((pd.Timestamp(start) - pd.Timedelta(days=90)).date())
+    print(f"[Features] Fetching ATR/Hurst for {len(unique_symbols)} symbols ({feat_start}→{end})...")
+    sym_features = _build_symbol_features(unique_symbols, feat_start, end)
+    print(f"[Features] Loaded data for {len(sym_features)}/{len(unique_symbols)} symbols")
+
     # Enrich each trade
     enriched_rows = []
     for _, row in trades.iterrows():
-        enriched_rows.append(_enrich_trade(row, spy_weekly, veto))
+        enriched_rows.append(_enrich_trade(row, spy_weekly, veto, sym_features))
 
     enriched_df = pd.DataFrame(enriched_rows)
     enriched_df.to_csv(ENRICHED_OUT, index=False)

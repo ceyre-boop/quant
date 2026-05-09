@@ -21,6 +21,7 @@ def calculate_combined_risk_limits(
     participant_likelihoods: List[ParticipantLikelihood],
     regime: RegimeCluster,
     base_limits: Dict[str, Any],
+    event_risk: str = 'CLEAR'
 ) -> Dict[str, Any]:
     """
     Calculate combined risk limits from participant + regime analysis.
@@ -31,12 +32,13 @@ def calculate_combined_risk_limits(
         participant_likelihoods: From participant classification
         regime: From regime classification
         base_limits: Base risk limits from Layer 3
+        event_risk: Economic calendar risk level
     
     Returns:
         Combined risk limits with all adjustments
     """
-    # Get participant risk
-    participant_limits = calculate_participant_risk_limits(participant_likelihoods)
+    # Get participant risk (now handles event_risk vetoes)
+    participant_limits = calculate_participant_risk_limits(participant_likelihoods, event_risk)
     
     # Get regime risk
     regime_limits = get_regime_risk_limits(regime)
@@ -60,7 +62,7 @@ def calculate_combined_risk_limits(
     block_reasons = []
     
     if participant_limits.no_trade:
-        block_reasons.append("participant_news_algo")
+        block_reasons.append(participant_limits.metadata.get('block_reason', 'participant_veto'))
     
     if regime_limits.news_rules.get("block_fresh_entry"):
         block_reasons.append("regime_news_shock")
@@ -113,17 +115,6 @@ def validate_entry_with_combined_risk(
 ) -> Dict[str, Any]:
     """
     Validate entry signal with combined participant + regime risk.
-    
-    Full integration for Gate 12.
-    
-    Args:
-        entry_signal: Proposed entry from Entry Engine
-        layer1_output: Layer 1 analysis output
-        base_risk_limits: From Layer 3 / Hard Constraints
-        current_exposure: Current portfolio exposure
-    
-    Returns:
-        Validation result with allow/block decision
     """
     from clawd_trading.participants import (
         extract_from_layer1_context,
@@ -134,6 +125,9 @@ def validate_entry_with_combined_risk(
     participant_features = extract_from_layer1_context(layer1_output)
     participant_likelihoods = classify_participants(participant_features)
     
+    # Extract event risk from Layer 1 metadata or context
+    event_risk = layer1_output.get('event_risk') or layer1_output.get('metadata', {}).get('event_risk', 'CLEAR')
+    
     # Classify regime
     regime = classify_regime_from_layer1(layer1_output)
     
@@ -142,6 +136,7 @@ def validate_entry_with_combined_risk(
         participant_likelihoods=participant_likelihoods,
         regime=regime,
         base_limits=base_risk_limits,
+        event_risk=event_risk
     )
     
     # Check if blocked
@@ -191,6 +186,7 @@ def validate_entry_with_combined_risk(
                 participant_likelihoods, key=lambda x: x.probability
             ).type.name,
             "regime": regime.value,
+            "event_risk": event_risk,
             "size_multiplier": combined_limits["risk_multipliers"]["combined_size"],
         },
     }

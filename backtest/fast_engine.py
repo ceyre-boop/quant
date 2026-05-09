@@ -416,6 +416,19 @@ class FastBacktestEngine:
 
     # ── Constructors ─────────────────────────────────────────────────────
 
+    @staticmethod
+    def _normalize_columns(df: pd.DataFrame) -> pd.DataFrame:
+        """Flatten yfinance MultiIndex columns (e.g. ('Close','SPY') → 'close')."""
+        import pandas as pd
+        if isinstance(df.columns, pd.MultiIndex):
+            df = df.copy()
+            df.columns = [c[0].lower() for c in df.columns]
+        else:
+            df = df.copy()
+            df.columns = [c.lower() if isinstance(c, str) else str(c).lower()
+                          for c in df.columns]
+        return df
+
     @classmethod
     def from_dataframe(
         cls,
@@ -433,6 +446,7 @@ class FastBacktestEngine:
             fast_sma: Fast SMA period (ignored when signal_fn provided).
             slow_sma: Slow SMA period (ignored when signal_fn provided).
         """
+        df = cls._normalize_columns(df)
         opens  = df["open"].to_numpy(dtype=np.float32)
         highs  = df["high"].to_numpy(dtype=np.float32)
         lows   = df["low"].to_numpy(dtype=np.float32)
@@ -470,6 +484,7 @@ class FastBacktestEngine:
             signals: int8 array — 1=long, -1=short, 0=flat.
             confidence: float32 array (0–1). Defaults to all-ones (always trade).
         """
+        df = cls._normalize_columns(df)
         opens  = df["open"].to_numpy(dtype=np.float32)
         highs  = df["high"].to_numpy(dtype=np.float32)
         lows   = df["low"].to_numpy(dtype=np.float32)

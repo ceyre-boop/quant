@@ -19,7 +19,7 @@ class VetoLedger:
     """
 
     def __init__(self):
-        self.path = Path('data/ledger')
+        self.path = Path(__file__).parent.parent.parent / 'data' / 'ledger'
         self.path.mkdir(parents=True, exist_ok=True)
 
     def log_veto(self, record: VetoRecord):

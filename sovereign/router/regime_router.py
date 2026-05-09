@@ -114,6 +114,17 @@ class RegimeRouter:
             regime = 'FLAT'
             confidence = 1.0
 
+        # BEAR MARKET FILTER: block momentum longs when SPY < 50-day SMA
+        if regime == 'MOMENTUM':
+            try:
+                import yfinance as yf
+                spy = yf.Ticker('SPY').history(period='60d', auto_adjust=True)['Close']
+                if len(spy) >= 50 and spy.iloc[-1] < spy.rolling(50).mean().iloc[-1]:
+                    regime = 'FLAT'
+                    confidence = 1.0
+            except Exception:
+                pass  # If SPY fetch fails, don't block trading
+
         return RouterOutput(
             symbol=record.symbol,
             timestamp=record.timestamp,

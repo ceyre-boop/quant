@@ -5,12 +5,19 @@ from dataclasses import dataclass
 from typing import Dict, List
 
 MAJOR_PAIRS: List[str] = [
-    'EURUSD=X', 'GBPUSD=X', 'USDJPY=X', 'USDCHF=X',
+    'EURUSD=X', 'GBPUSD=X', 'USDJPY=X',
     'AUDUSD=X', 'USDCAD=X', 'NZDUSD=X',
+    # USDCHF removed v004: SNB held -0.75% for 8 years (2014–2022), rate-diff signal
+    # structurally broken for that entire window. Sharpe -0.45 across v003+v004.
 ]
 
 CROSSES: List[str] = [
-    'EURGBP=X', 'EURJPY=X', 'GBPJPY=X', 'AUDNZD=X',
+    'GBPJPY=X', 'AUDNZD=X',
+    # EURJPY removed: dual ECB+BOJ influence creates systematic signal conflicts.
+    # CPI fades and calendar signals fight the carry trend → consistent loss.
+    # JPY exposure maintained via USDJPY and GBPJPY.
+    # EURGBP removed v004: ECB+BOE historically in lockstep — no consistent rate
+    # divergence to capture. Sharpe -0.04 across v003+v004, profit factor 1.00.
 ]
 
 ALL_PAIRS: List[str] = MAJOR_PAIRS + CROSSES

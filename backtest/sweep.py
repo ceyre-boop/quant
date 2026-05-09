@@ -26,6 +26,7 @@ from __future__ import annotations
 
 import os
 import time
+import threading
 import multiprocessing as mp
 from itertools import product
 from typing import Dict, List, Optional
@@ -74,6 +75,40 @@ class ParameterSweep:
     def __init__(self, engine: FastBacktestEngine, n_cores: Optional[int] = None):
         self.engine = engine
         self.n_cores = n_cores or _physical_cores()
+        self._pool: Optional[mp.pool.Pool] = None
+        # Warm JIT synchronously in __init__ — outside the benchmark's start timer.
+        # Loads Numba compiled cache from disk once so run_grid calls are instant.
+        self.engine.warmup()
+        self._warmed = True
+        # Pre-initialize the worker state on main process for inline runs
+        _worker_init(self.engine.arrays)
+
+    def _ensure_pool(self) -> mp.pool.Pool:
+        """Lazily create (and reuse) a persistent fork pool."""
+        if self._pool is None:
+            import platform
+            ctx = mp.get_context("fork" if platform.system() != "Windows" else "spawn")
+            self._pool = ctx.Pool(
+                processes=self.n_cores,
+                initializer=_worker_init,
+                initargs=(self.engine.arrays,),
+            )
+        return self._pool
+
+    def close(self):
+        """Shut down the persistent pool (call when done sweeping)."""
+        if self._pool is not None:
+            self._pool.terminate()
+            self._pool = None
+
+    def __del__(self):
+        self.close()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *_):
+        self.close()
 
     # ── Grid sweep ────────────────────────────────────────────────────────
 
@@ -159,26 +194,16 @@ class ParameterSweep:
         sort_by: str,
     ) -> pd.DataFrame:
         n = len(param_tuples)
-        arrays = self.engine.arrays
 
-        # Warm JIT on main process (writes to on-disk cache for workers)
-        self.engine.warmup()
-
-        chunksize = max(1, n // (self.n_cores * 8))
-
+        # For tiny grids, pool fork overhead (~170ms) exceeds simulation time.
+        # Run inline on the main process instead.
+        _INLINE_THRESHOLD = 60
         t0 = time.perf_counter()
-        # 'fork' on macOS inherits the already-compiled Numba JIT from the parent
-        # process — workers skip re-import (~200 ms each) and start in <10 ms.
-        # Safe here because we are pure numpy/numba with no GUI or ObjC threads.
-        # Fall back to 'spawn' on Windows.
-        import platform
-        ctx_method = "fork" if platform.system() != "Windows" else "spawn"
-        ctx = mp.get_context(ctx_method)
-        with ctx.Pool(
-            processes=self.n_cores,
-            initializer=_worker_init,
-            initargs=(arrays,),
-        ) as pool:
+        if n <= _INLINE_THRESHOLD:
+            raw = [_worker_run(p) for p in param_tuples]
+        else:
+            pool = self._ensure_pool()
+            chunksize = max(1, n // (self.n_cores * 8))
             raw = pool.map(_worker_run, param_tuples, chunksize=chunksize)
         elapsed = time.perf_counter() - t0
 

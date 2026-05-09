@@ -93,7 +93,8 @@ class TestBiasOutput:
         assert bias.direction == Direction.LONG
         assert bias.confidence == 0.75
         assert bias.timestamp is not None
-    
+        assert bias.narrative_modifier == 0.0
+
     def test_bias_output_to_dict(self):
         bias = BiasOutput(
             direction=Direction.SHORT,
@@ -102,12 +103,21 @@ class TestBiasOutput:
             regime_override=True,
             rationale=[FeatureGroup.VOLATILITY_SPIKE.value],
             model_version='v1.0',
-            feature_snapshot={'raw_features': {}}
+            feature_snapshot={'raw_features': {}},
+            narrative_modifier=-0.05,
+            narrative_summary="Macro tone deteriorated.",
+            narrative_confidence="HIGH",
+            narrative_key_risks=["guidance cut"],
+            narrative_catalysts=["earnings warning"],
+            narrative_consensus=1.0,
+            narrative_source="tradingagents_v1",
         )
         d = bias.to_dict()
         assert d['direction'] == -1
         assert d['confidence'] == 0.85
         assert d['rationale'] == ['VOLATILITY_SPIKE']
+        assert d['narrative_modifier'] == -0.05
+        assert d['narrative_source'] == 'tradingagents_v1'
 
 
 class TestRiskOutput:

@@ -31,13 +31,15 @@ class ParticipantRiskLimits:
 
 
 def calculate_participant_risk_limits(
-    likelihoods: List[ParticipantLikelihood]
+    likelihoods: List[ParticipantLikelihood],
+    event_risk: str = 'CLEAR'
 ) -> ParticipantRiskLimits:
     """
-    Calculate risk limits based on participant likelihoods.
+    Calculate risk limits based on participant likelihoods and economic events.
     
     Args:
         likelihoods: List of ParticipantLikelihood from classify_participants()
+        event_risk: Categorical risk level ('CLEAR', 'ELEVATED', 'HIGH', 'EXTREME')
     
     Returns:
         ParticipantRiskLimits with adjusted multipliers
@@ -49,8 +51,24 @@ def calculate_participant_risk_limits(
     stop_loss_multiplier = 1.0
     take_profit_multiplier = 1.0
     no_trade = False
-    meta = {}
+    meta = {'event_risk': event_risk}
     
+    # 1. HARD VETO for Extreme Events (FOMC, CPI, NFP)
+    if event_risk == 'EXTREME':
+        no_trade = True
+        meta['block_reason'] = 'extreme_event_risk'
+        return ParticipantRiskLimits(0.0, 0.0, 0.0, True, 1.0, 1.0, meta)
+    
+    # 2. Size reduction for High Risk
+    if event_risk == 'HIGH':
+        max_size_multiplier *= 0.25
+        meta['high_event_caution'] = True
+
+    # 3. Size reduction for Elevated Risk
+    if event_risk == 'ELEVATED':
+        max_size_multiplier *= 0.6
+        meta['elevated_event_caution'] = True
+
     # Create probability map
     probs = {l.type: l.probability for l in likelihoods}
     
