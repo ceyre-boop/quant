@@ -261,10 +261,13 @@ class PresentStateBuilder:
 
                 # Map existing feature fields onto Library feature keys.
                 # Use _safe_float to guard against NaN / None.
-                features[F_VIX]        = _safe_float(m.hyg_spread_bps, 0.0) / 100.0
+                # F_VIX: no direct VIX field in SovereignFeatureRecord; use HMM
+                # stress state as a proxy (hmm_state > 1 ≈ elevated vol regime).
+                features[F_VIX]        = float(max(0, _safe_float(r.hmm_state, 0) - 1))
                 features[F_DXY]        = _safe_float(m.m2_velocity, 1.5) - 1.5
                 features[F_SPY_VS_200] = _safe_float(m.cape_zscore, 0.0) / 10.0
                 features[F_YIELD_CURVE] = _safe_float(m.yield_curve_slope, 0.0)
+                # HYG spread expressed as z-score: 200bps = baseline → deviation
                 features[F_HYG_SPREAD] = _safe_float(m.hyg_spread_bps, 200.0) / 200.0 - 1.0
                 features[F_COT_SPEC]   = _safe_float(m.cot_zscore, 0.0)
 

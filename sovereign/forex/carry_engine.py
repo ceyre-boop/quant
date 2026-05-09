@@ -216,7 +216,6 @@ class CarryEngine:
 
         prices = self._fetch_prices(cfg.ticker)
         atr = self._compute_atr(prices)
-        spot = float(prices['Close'].iloc[-1]) if prices is not None and len(prices) else 1.0
 
         if spread_bps < MIN_CARRY_SPREAD_BPS:
             return CarrySignal(
@@ -263,7 +262,6 @@ class CarryEngine:
         # Fallback to the same data source used by the macro signal engine
         try:
             from sovereign.forex.data_fetcher import ForexDataFetcher, FALLBACK_RATES
-            from sovereign.forex.pair_universe import CB_TO_COUNTRY
             # Reverse map: currency → country code
             _CCY_TO_COUNTRY: Dict[str, str] = {
                 'AUD': 'AU', 'NZD': 'NZ', 'JPY': 'JP', 'CHF': 'CH',

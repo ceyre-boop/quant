@@ -179,7 +179,7 @@ class VetoLedger:
             print(f'\n⚠  Likely redundant (solo% < 5%): {report["likely_redundant"]}')
         print('─────────────────────────────────────────────────────────────────\n')
 
-
+    def print_health_report(self):
         """Prints a summary of the current filter stack health."""
         rates = self.get_veto_rate()
         print("\n--- SOVEREIGN FILTER HEALTH REPORT ---")

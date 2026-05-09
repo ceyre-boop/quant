@@ -37,6 +37,11 @@ logger = logging.getLogger(__name__)
 SIMILARITY_HIGH = 0.85   # above this → log top features + flag for operator review
 SIMILARITY_LOW  = 0.50   # below this → treat as no match (source='none')
 
+# Features are considered "converging" (pointing the same way as the scenario)
+# when their value is within this distance of the scenario reference value.
+# 0.5 corresponds to roughly ½ a standard deviation for z-scored inputs.
+CONVERGENCE_THRESHOLD = 0.5
+
 # ---------------------------------------------------------------------------
 # Feature key constants
 # ---------------------------------------------------------------------------
@@ -324,7 +329,7 @@ class AlexandrianLibrary:
             if abs(c) > 1e-9:
                 contributions.append((abs(c), feat, a, b))
 
-            if b != 0.0 and abs(a - b) <= 0.5:
+            if b != 0.0 and abs(a - b) <= CONVERGENCE_THRESHOLD:
                 converging += 1
 
         denom = math.sqrt(norm_a * norm_b)
