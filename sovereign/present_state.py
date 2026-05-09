@@ -92,7 +92,7 @@ class PresentStateBuilder:
         macro_state = self._build_macro_regime(feature_record)
         position_state = self._build_positioning(symbol, feature_record)
         narrative_state = self._build_narrative()
-        historical_state = self._build_historical_match()
+        historical_state = self._build_historical_match(feature_record)
         catalyst_state = self._build_catalyst_window(
             symbol, ou_half_life_days, ou_reversion_days, ou_confidence
         )
@@ -230,24 +230,65 @@ class PresentStateBuilder:
         )
 
     # ------------------------------------------------------------------
-    # Dimension 5 — Historical Match (stub until Alexandrian Library)
+    # Dimension 5 — Historical Match (Alexandrian Library)
     # ------------------------------------------------------------------
 
     @staticmethod
-    def _build_historical_match() -> HistoricalMatchState:
+    def _build_historical_match(
+        feature_record: 'SovereignFeatureRecord | None' = None,
+    ) -> HistoricalMatchState:
         """
-        Returns a neutral stub.  Replace this with an Alexandrian Library
-        call once built.  The source='none' flag tells alignment scoring
-        to ignore this dimension until then.
+        Queries the Alexandrian Library for the closest historical analogue.
+
+        When similarity > 0.85, the Library logs the top-3 driving features
+        at INFO level so the operator can distinguish a genuine structural
+        match from a surface-level false positive.
+
+        Falls back to a neutral stub if the Library is unavailable or raises.
         """
-        return HistoricalMatchState(
-            regime_label='UNKNOWN',
-            similarity_score=0.0,
-            volumes_converging=0,
-            typical_outcome='No historical match available',
-            lookback_period_days=0,
-            source='none',
-        )
+        try:
+            from sovereign.features.alexandrian_library import (
+                AlexandrianLibrary,
+                F_VIX, F_VIX_TERM, F_DXY, F_SPY_VS_200,
+                F_YIELD_CURVE, F_HYG_SPREAD, F_COT_SPEC, F_ATR_PCT,
+            )
+
+            features: dict[str, float] = {}
+
+            if feature_record is not None:
+                r = feature_record.regime
+                m = feature_record.macro
+
+                # Map existing feature fields onto Library feature keys.
+                # Use _safe_float to guard against NaN / None.
+                # F_VIX: no direct VIX field in SovereignFeatureRecord; use HMM
+                # stress state as a proxy (hmm_state > 1 ≈ elevated vol regime).
+                features[F_VIX]        = float(max(0, _safe_float(r.hmm_state, 0) - 1))
+                features[F_DXY]        = _safe_float(m.m2_velocity, 1.5) - 1.5
+                features[F_SPY_VS_200] = _safe_float(m.cape_zscore, 0.0) / 10.0
+                features[F_YIELD_CURVE] = _safe_float(m.yield_curve_slope, 0.0)
+                # HYG spread expressed as z-score: 200bps = baseline → deviation
+                features[F_HYG_SPREAD] = _safe_float(m.hyg_spread_bps, 200.0) / 200.0 - 1.0
+                features[F_COT_SPEC]   = _safe_float(m.cot_zscore, 0.0)
+
+                # Hurst can proxy for ATR compression (low Hurst ≈ mean-reverting ≈ low trend ATR)
+                hurst = _safe_float(r.hurst_short, 0.5)
+                features[F_ATR_PCT] = (hurst - 0.5) * 4.0  # roughly z-score scaled
+
+            lib = AlexandrianLibrary()
+            match = lib.match(features)
+            return lib.to_historical_match_state(match)
+
+        except Exception as exc:
+            logger.debug(f'[PresentState] AlexandrianLibrary unavailable: {exc}')
+            return HistoricalMatchState(
+                regime_label='UNKNOWN',
+                similarity_score=0.0,
+                volumes_converging=0,
+                typical_outcome='No historical match available',
+                lookback_period_days=0,
+                source='none',
+            )
 
     # ------------------------------------------------------------------
     # Dimension 6 — Catalyst Window
