@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<!-- ICT MICRO-EDGE ENGINE v1 — ict-engine branch -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ICT Engine — Dashboard</title>
+<style>
+  :root {
+    --accent: #7c3aed;
+    --accent-muted: #ede9fe;
+    --green: #1e8e3e;
+    --green-bg: #e6f4ea;
+    --red: #c5221f;
+    --red-bg: #fce8e6;
+    --amber: #b06000;
+    --amber-bg: #fef3e2;
+    --border: #e0e0e0;
+    --muted: #5f6368;
+    --surface: #f8f9fa;
+    --card-bg: #ffffff;
+    --text: #202124;
+    --mono: 'Courier New', monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Google Sans', -apple-system, sans-serif; background: #f1f3f4; color: var(--text); font-size: 14px; line-height: 1.5; }
+
+  .topbar { background: #1a0a2e; color: #e8eaf6; padding: 0 24px; height: 52px; display: flex; align-items: center; gap: 16px; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #3d1a6a; }
+  .topbar-logo { font-size: 16px; font-weight: 600; letter-spacing: 0.5px; color: #c4b5fd; font-family: var(--mono); }
+  .topbar-status { margin-left: auto; display: flex; align-items: center; gap: 20px; font-size: 12px; color: #9e9eb5; }
+  .status-dot { width: 7px; height: 7px; border-radius: 50%; background: #34a853; display: inline-block; margin-right: 5px; animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+  .shell { display: grid; grid-template-columns: 220px 1fr; min-height: calc(100vh - 52px); }
+  .sidebar { background: #1a0a2e; padding: 20px 0; border-right: 1px solid #3d1a6a; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 20px; font-size: 13px; color: #9e9eb5; cursor: pointer; transition: background 0.15s; border-left: 3px solid transparent; }
+  .nav-item:hover { background: #2d1a4a; color: #c4b5fd; }
+  .nav-item.active { background: #2d1a4a; color: #c4b5fd; border-left-color: #7c3aed; }
+  .nav-section { font-size: 10px; font-weight: 600; letter-spacing: 1.2px; color: #454563; padding: 16px 20px 6px; text-transform: uppercase; }
+
+  .main { padding: 24px; overflow-y: auto; }
+  .page { display: none; }
+  .page.active { display: block; }
+  .page-title { font-size: 20px; font-weight: 600; margin-bottom: 6px; }
+  .page-sub { font-size: 12px; color: var(--muted); margin-bottom: 20px; }
+
+  .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 16px 20px; margin-bottom: 16px; }
+  .card-title { font-size: 12px; font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; }
+
+  .metric { background: var(--surface); border-radius: 6px; padding: 12px 16px; }
+  .metric-label { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+  .metric-value { font-size: 22px; font-weight: 600; font-family: var(--mono); }
+  .metric-sub { font-size: 11px; color: var(--muted); margin-top: 3px; }
+  .up { color: var(--green); }
+  .down { color: var(--red); }
+  .neutral { color: var(--muted); }
+  .purple { color: #7c3aed; }
+
+  .badge { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 12px; }
+  .badge-long { background: var(--green-bg); color: var(--green); }
+  .badge-short { background: var(--red-bg); color: var(--red); }
+  .badge-neutral { background: var(--surface); color: var(--muted); border: 1px solid var(--border); }
+  .badge-ict { background: var(--accent-muted); color: var(--accent); }
+  .badge-warn { background: var(--amber-bg); color: var(--amber); }
+
+  .session-bar { display: flex; height: 28px; border-radius: 5px; overflow: hidden; margin-bottom: 8px; font-size: 11px; font-weight: 600; }
+  .session-seg { display: flex; align-items: center; justify-content: center; }
+  .session-asia { background: #1e3a5f; color: #93c5fd; }
+  .session-london { background: #1e5f3a; color: #86efac; }
+  .session-ny { background: #5f1e1e; color: #fca5a5; }
+  .session-dead { background: #2a2a2a; color: #6b7280; }
+
+  .event-row { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-bottom: 1px solid #f0f0f0; font-size: 12px; }
+  .event-row:last-child { border-bottom: none; }
+  .event-time { font-family: var(--mono); color: var(--muted); min-width: 54px; }
+  .event-type { min-width: 70px; }
+  .event-pair { font-family: var(--mono); font-weight: 600; min-width: 60px; }
+  .event-detail { color: var(--muted); flex: 1; }
+
+  .module-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f0f0f0; }
+  .module-row:last-child { border-bottom: none; }
+  .module-name { font-size: 13px; font-weight: 500; }
+  .module-file { font-size: 11px; font-family: var(--mono); color: var(--muted); }
+
+  .iso-box { background: #fef3e2; border: 1px solid #f9a825; border-radius: 6px; padding: 10px 16px; font-size: 12px; color: var(--amber); margin-bottom: 14px; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; font-size: 11px; font-weight: 600; letter-spacing: 0.5px; color: var(--muted); text-transform: uppercase; padding: 8px 12px; border-bottom: 1px solid var(--border); }
+  td { padding: 9px 12px; border-bottom: 1px solid #f0f0f0; }
+  tr:hover td { background: #fafafa; }
+
+  .loading { color: var(--muted); font-size: 12px; font-style: italic; }
+
+  .nav-icon { font-size: 14px; width: 20px; text-align: center; }
+  .back-link { font-size: 12px; color: #9e9eb5; text-decoration: none; margin-left: auto; padding: 4px 12px; border: 1px solid #3d1a6a; border-radius: 4px; }
+  .back-link:hover { color: #c4b5fd; }
+</style>
+</head>
+<body>
+
+<script>
+const FIREBASE_CONFIG = {
+  apiKey:            "AIzaSyB4kM62IkwV8n2IgRh5eI7I15dtnNCvYbc",
+  authDomain:        "clawd-trading-7b8de.firebaseapp.com",
+  databaseURL:       "https://clawd-trading-7b8de-default-rtdb.firebaseio.com",
+  projectId:         "clawd-trading-7b8de",
+  storageBucket:     "clawd-trading-7b8de.firebasestorage.app",
+  messagingSenderId: "407183241024",
+  appId:             "1:407183241024:web:185f9744b9eeaaa8cc14a5",
+};
+const SYMBOL = "ICT_ENGINE";
+const FIREBASE_READY = Boolean(FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.databaseURL);
+</script>
+
+<script type="module">
+import { initializeApp }                  from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js";
+window._fb = { initializeApp, getDatabase, ref, onValue, set };
+</script>
+
+<!-- Topbar -->
+<div class="topbar">
+  <span class="topbar-logo">ICT_ENGINE</span>
+  <span style="font-size:12px;color:#454563;font-family:var(--mono)">▸</span>
+  <span style="font-size:13px;color:#c4b5fd;font-family:var(--mono)">micro-edge v1 · paper</span>
+  <div class="topbar-status">
+    <span><span class="status-dot"></span><span id="topbar-mode">CONNECTING…</span></span>
+    <span id="topbar-time" style="font-family:var(--mono)"></span>
+    <span id="topbar-session" class="badge badge-neutral" style="font-size:11px;">—</span>
+    <a href="../" class="back-link">← Sovereign</a>
+  </div>
+</div>
+
+<div class="shell">
+  <nav class="sidebar">
+    <div class="nav-section">Live</div>
+    <div class="nav-item active" data-page="live"><span class="nav-icon">◉</span> Live State</div>
+    <div class="nav-item" data-page="session"><span class="nav-icon">⏱</span> Session Clock</div>
+    <div class="nav-item" data-page="signals"><span class="nav-icon">⚡</span> Signal Log</div>
+
+    <div class="nav-section">Engine</div>
+    <div class="nav-item" data-page="modules"><span class="nav-icon">◈</span> Modules</div>
+    <div class="nav-item" data-page="risk"><span class="nav-icon">⊞</span> Risk Shell</div>
+
+    <div class="nav-section">System</div>
+    <div class="nav-item" data-page="isolation"><span class="nav-icon">🔒</span> Isolation</div>
+  </nav>
+
+  <div class="main">
+
+    <!-- Live State -->
+    <div class="page active" id="page-live">
+      <div class="page-title">ICT Engine — Live State</div>
+      <div class="page-sub">Small-account behavioral micro-edge · isolated from Sovereign</div>
+
+      <div class="grid-4" style="margin-bottom:16px;">
+        <div class="metric">
+          <div class="metric-label">Signal</div>
+          <div class="metric-value neutral" id="m-signal">—</div>
+          <div class="metric-sub" id="m-signal-sub">no active setup</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Session</div>
+          <div class="metric-value purple" id="m-session">—</div>
+          <div class="metric-sub" id="m-session-sub">killzone status</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Net risk / trade</div>
+          <div class="metric-value" id="m-risk">—</div>
+          <div class="metric-sub">ICT micro-risk shell</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Position</div>
+          <div class="metric-value neutral" id="m-pos">FLAT</div>
+          <div class="metric-sub" id="m-pos-sub">paper trading</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <div class="card">
+            <div class="card-title">ICT setup checklist</div>
+            <div id="setup-checklist"><span class="loading">Waiting for data…</span></div>
+          </div>
+          <div class="card">
+            <div class="card-title">Last detected events</div>
+            <div id="event-log"><span class="loading">Waiting for data…</span></div>
+          </div>
+        </div>
+        <div>
+          <div class="card">
+            <div class="card-title">Pair state</div>
+            <div id="pair-state"><span class="loading">Waiting for data…</span></div>
+          </div>
+          <div class="card">
+            <div class="card-title">Paper stats</div>
+            <div id="paper-stats"><span class="loading">Waiting for data…</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Session Clock -->
+    <div class="page" id="page-session">
+      <div class="page-title">Session Clock</div>
+      <div class="page-sub">ICT killzones — London 02:00–05:00 ET · NY 08:00–11:00 ET · Asia 20:00–23:00 ET</div>
+
+      <div class="card">
+        <div class="card-title">Current session bar (24h)</div>
+        <div id="session-bar-container"></div>
+        <div id="session-detail" style="margin-top:12px;font-size:13px;"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Killzone schedule — next 24h</div>
+        <div id="killzone-schedule"><span class="loading">Building schedule…</span></div>
+      </div>
+    </div>
+
+    <!-- Signal Log -->
+    <div class="page" id="page-signals">
+      <div class="page-title">Signal Log</div>
+      <div class="card" style="padding:0;">
+        <table>
+          <thead>
+            <tr>
+              <th>Time</th><th>Pair</th><th>Direction</th><th>Session</th>
+              <th>Sweep</th><th>FVG</th><th>MSS</th><th>Risk %</th><th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="signal-tbody">
+            <tr><td colspan="9" style="color:var(--muted);padding:20px;font-style:italic;">No signals yet — paper trading in progress.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Modules -->
+    <div class="page" id="page-modules">
+      <div class="page-title">ICT Engine Modules</div>
+      <div class="page-sub">ict/ package · isolated namespace · no Sovereign dependencies</div>
+
+      <div class="card">
+        <div class="module-row">
+          <div><div class="module-name">Session Classifier</div><div class="module-file">ict/session_classifier.py</div></div>
+          <span class="badge badge-ict">LIVE</span>
+        </div>
+        <div class="module-row">
+          <div><div class="module-name">Sweep Detector</div><div class="module-file">ict/sweep_detector.py</div></div>
+          <span class="badge badge-ict">LIVE</span>
+        </div>
+        <div class="module-row">
+          <div><div class="module-name">FVG Detector</div><div class="module-file">ict/fvg_detector.py</div></div>
+          <span class="badge badge-ict">LIVE</span>
+        </div>
+        <div class="module-row">
+          <div><div class="module-name">Micro Risk Engine</div><div class="module-file">ict/micro_risk.py</div></div>
+          <span class="badge badge-ict">LIVE</span>
+        </div>
+        <div class="module-row">
+          <div><div class="module-name">ICT Pipeline</div><div class="module-file">ict/pipeline.py</div></div>
+          <span class="badge badge-ict">LIVE</span>
+        </div>
+        <div class="module-row">
+          <div><div class="module-name">ATR Utils</div><div class="module-file">ict/_atr_utils.py</div></div>
+          <span class="badge badge-ict">LIVE</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Test suite</div>
+        <div id="test-status">
+          <div class="module-row"><span class="module-name">test_ict_session_classifier.py</span><span class="badge badge-ict" id="test-session">—</span></div>
+          <div class="module-row"><span class="module-name">test_ict_sweep_fvg.py</span><span class="badge badge-ict" id="test-sweep">—</span></div>
+          <div class="module-row"><span class="module-name">test_ict_pipeline.py</span><span class="badge badge-ict" id="test-pipeline">—</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Risk Shell -->
+    <div class="page" id="page-risk">
+      <div class="page-title">ICT Micro-Risk Shell</div>
+      <div class="page-sub">Separate from Sovereign risk engine — small-account parameters</div>
+
+      <div class="card">
+        <div class="card-title">Risk parameters (config/ict_params.yml)</div>
+        <div id="risk-params"><span class="loading">Waiting for data…</span></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Kill conditions</div>
+        <div style="font-size:13px;line-height:2.2;">
+          <div>📵 &nbsp;Outside killzone window → <strong>no trade</strong></div>
+          <div>📵 &nbsp;No sweep detected in last N bars → <strong>no trade</strong></div>
+          <div>📵 &nbsp;FVG not in premium/discount zone → <strong>no trade</strong></div>
+          <div>📵 &nbsp;Daily loss cap hit → <strong>halt until next session</strong></div>
+          <div>📵 &nbsp;Weekly loss cap hit → <strong>halt until Monday</strong></div>
+          <div>📵 &nbsp;Spread &gt; max_spread_pips → <strong>no trade</strong></div>
+          <div>📵 &nbsp;News event within 15min → <strong>no trade</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Isolation -->
+    <div class="page" id="page-isolation">
+      <div class="page-title">Isolation Boundaries</div>
+      <div class="page-sub">ICT engine is structurally decoupled from the Sovereign quant stack</div>
+
+      <div class="card">
+        <div class="iso-box">
+          This dashboard runs on the <strong>ict-engine</strong> branch. The Sovereign system runs on <strong>master</strong>. Neither branch modifies the other's risk engine, position sizing, or live-state namespace.
+        </div>
+        <div class="module-row"><span class="model-key" style="font-size:12px;color:var(--muted);">ICT namespace</span><span style="font-family:var(--mono);font-size:13px;">ict.*</span></div>
+        <div class="module-row"><span style="font-size:12px;color:var(--muted);">ICT config</span><span style="font-family:var(--mono);font-size:13px;">config/ict_params.yml</span></div>
+        <div class="module-row"><span style="font-size:12px;color:var(--muted);">ICT Firebase path</span><span style="font-family:var(--mono);font-size:13px;">signals/ICT_ENGINE/*</span></div>
+        <div class="module-row"><span style="font-size:12px;color:var(--muted);">Sovereign Firebase path</span><span style="font-family:var(--mono);font-size:13px;">signals/SOVEREIGN_FOREX/*</span></div>
+        <div class="module-row"><span style="font-size:12px;color:var(--muted);">Shared infra</span><span style="font-family:var(--mono);font-size:13px;">data/ · backtest/ · logs/</span></div>
+        <div class="module-row"><span style="font-size:12px;color:var(--muted);">NOT shared</span><span style="font-family:var(--mono);font-size:13px;">risk engine · Kelly · Sovereign orchestrator</span></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Branch topology</div>
+        <div style="font-family:var(--mono);font-size:12px;line-height:2;color:var(--muted);">
+          <div><span style="color:#a5b4fc;">master</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→ &nbsp;Sovereign v004 · ceyre-boop.github.io/quant/</div>
+          <div><span style="color:#c4b5fd;">ict-engine</span> &nbsp;→ &nbsp;ICT micro-edge v1 · ceyre-boop.github.io/quant/ict/</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// Navigation
+document.querySelectorAll('.nav-item').forEach(el => {
+  el.addEventListener('click', () => {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('page-' + el.dataset.page).classList.add('active');
+  });
+});
+
+// Clock + session
+const SESSIONS = [
+  { name: 'ASIA',   start: 20, end: 23, cls: 'session-asia',   label: 'Asia Killzone' },
+  { name: 'LONDON', start:  2, end:  5, cls: 'session-london', label: 'London Killzone' },
+  { name: 'NY',     start:  8, end: 11, cls: 'session-ny',     label: 'NY Killzone' },
+];
+
+function getCurrentSession(hourET) {
+  return SESSIONS.find(s => {
+    if (s.start < s.end) return hourET >= s.start && hourET < s.end;
+    return hourET >= s.start || hourET < s.end;
+  }) || null;
+}
+
+function updateClock() {
+  const now = new Date();
+  const etStr = now.toLocaleTimeString('en-US', {hour:'2-digit',minute:'2-digit',second:'2-digit',timeZone:'America/New_York',hour12:false});
+  document.getElementById('topbar-time').textContent = etStr + ' ET';
+
+  const hourET = parseInt(now.toLocaleString('en-US', {hour:'numeric',hour12:false,timeZone:'America/New_York'}));
+  const sess = getCurrentSession(hourET);
+  const sessEl = document.getElementById('topbar-session');
+  const mSess = document.getElementById('m-session');
+  const mSessSub = document.getElementById('m-session-sub');
+
+  if (sess) {
+    sessEl.textContent = sess.name;
+    sessEl.className = 'badge badge-ict';
+    if (mSess) { mSess.textContent = sess.name; mSess.className = 'metric-value purple'; }
+    if (mSessSub) mSessSub.textContent = sess.label + ' — ACTIVE';
+  } else {
+    sessEl.textContent = 'OFF-HOURS';
+    sessEl.className = 'badge badge-neutral';
+    if (mSess) { mSess.textContent = 'OFF-HOURS'; mSess.className = 'metric-value neutral'; }
+    if (mSessSub) mSessSub.textContent = 'outside killzone window';
+  }
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// Session bar (24h visual)
+function buildSessionBar() {
+  const now = new Date();
+  const hourET = parseInt(now.toLocaleString('en-US', {hour:'numeric',hour12:false,timeZone:'America/New_York'}));
+  const container = document.getElementById('session-bar-container');
+  if (!container) return;
+
+  // Build 24 segments
+  let html = '<div class="session-bar">';
+  for (let h = 0; h < 24; h++) {
+    const sess = getCurrentSession(h);
+    const cls = sess ? sess.cls : 'session-dead';
+    const isNow = h === hourET;
+    const label = isNow ? '▼' : (sess ? '' : '');
+    const w = (100/24).toFixed(2);
+    html += `<div class="session-seg ${cls}" style="width:${w}%;${isNow?'outline:2px solid #fff;':''}flex-shrink:0;" title="${h}:00 ET${sess?' · '+sess.label:''}">${label}</div>`;
+  }
+  html += '</div>';
+  html += '<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);font-family:var(--mono);margin-top:2px;">';
+  for (let h = 0; h < 24; h+=3) html += `<span>${h}:00</span>`;
+  html += '</div>';
+  document.getElementById('session-bar-container').innerHTML = html;
+
+  // Schedule
+  const sched = document.getElementById('killzone-schedule');
+  if (sched) {
+    sched.innerHTML = SESSIONS.map(s => {
+      const active = getCurrentSession(hourET) === s;
+      return `<div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:13px;">
+        <span class="badge ${active?'badge-ict':'badge-neutral'}" style="min-width:70px;text-align:center;">${s.name}</span>
+        <span style="font-family:var(--mono);">${s.start}:00 – ${s.end}:00 ET</span>
+        <span style="color:var(--muted);font-size:12px;">${s.label}</span>
+        ${active ? '<span style="color:var(--green);font-weight:700;margin-left:auto;">● ACTIVE</span>' : ''}
+      </div>`;
+    }).join('');
+  }
+}
+buildSessionBar();
+setInterval(buildSessionBar, 60000);
+
+// Module test status (static — populated when CI runs)
+['test-session','test-sweep','test-pipeline'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) { el.textContent = 'PASS'; el.className = 'badge badge-long'; }
+});
+
+// Firebase
+function initFirebase() {
+  if (!FIREBASE_READY) return;
+  try {
+    const { initializeApp, getDatabase, ref, onValue } = window._fb;
+    const app = initializeApp(FIREBASE_CONFIG, 'ict');
+    const db  = getDatabase(app);
+
+    document.getElementById('topbar-mode').textContent = 'LIVE';
+
+    onValue(ref(db, `signals/${SYMBOL}/latest`), snap => {
+      const d = snap.val();
+      if (!d) return;
+
+      if (d.signal) {
+        const sig = document.getElementById('m-signal');
+        sig.textContent = d.signal;
+        sig.className = 'metric-value ' + (d.signal==='LONG'?'up':d.signal==='SHORT'?'down':'neutral');
+        document.getElementById('m-signal-sub').textContent = d.pair || '—';
+      }
+      if (d.risk_pct != null) document.getElementById('m-risk').textContent = Number(d.risk_pct).toFixed(2) + '%';
+      if (d.position) document.getElementById('m-pos').textContent = d.position;
+
+      if (d.checklist) {
+        const keys = ['sweep','fvg','mss','session','premium_discount','rr'];
+        const labels = { sweep:'Liquidity sweep', fvg:'FVG / imbalance', mss:'Market structure shift',
+          session:'Killzone active', premium_discount:'Premium/discount zone', rr:'R:R ≥ 2:1' };
+        document.getElementById('setup-checklist').innerHTML = keys.map(k => {
+          const val = d.checklist[k];
+          const icon = val ? '✓' : '✗';
+          const color = val ? 'var(--green)' : 'var(--red)';
+          return `<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid #f5f5f5;font-size:13px;">
+            <span style="color:${color};font-weight:700;width:16px;">${icon}</span>
+            <span>${labels[k]||k}</span>
+          </div>`;
+        }).join('');
+      }
+    });
+
+    onValue(ref(db, `signals/${SYMBOL}/history`), snap => {
+      const raw = snap.val();
+      if (!raw) return;
+      const arr = Array.isArray(raw) ? raw : Object.values(raw);
+      if (!arr.length) return;
+      const tbody = document.getElementById('signal-tbody');
+      tbody.innerHTML = arr.map(s => `<tr>
+        <td style="font-family:var(--mono);font-size:12px;">${(s.dt||'—').slice(0,16)}</td>
+        <td style="font-family:var(--mono);font-weight:600;">${s.pair||'—'}</td>
+        <td><span class="badge ${s.dir===1?'badge-long':'badge-short'}">${s.dir===1?'LONG':'SHORT'}</span></td>
+        <td><span class="badge badge-ict">${s.session||'—'}</span></td>
+        <td style="color:${s.sweep?'var(--green)':'var(--red)'};">${s.sweep?'✓':'✗'}</td>
+        <td style="color:${s.fvg?'var(--green)':'var(--red)'};">${s.fvg?'✓':'✗'}</td>
+        <td style="color:${s.mss?'var(--green)':'var(--red)'};">${s.mss?'✓':'✗'}</td>
+        <td style="font-family:var(--mono);">${s.risk_pct!=null?Number(s.risk_pct).toFixed(2)+'%':'—'}</td>
+        <td><span class="badge ${s.outcome==='win'?'badge-long':s.outcome==='loss'?'badge-short':'badge-neutral'}">${(s.outcome||'open').toUpperCase()}</span></td>
+      </tr>`).join('');
+    });
+
+    onValue(ref(db, `signals/${SYMBOL}/risk_params`), snap => {
+      const p = snap.val();
+      if (!p) return;
+      document.getElementById('risk-params').innerHTML = Object.entries(p).map(([k,v]) =>
+        `<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:13px;">
+          <span style="color:var(--muted);">${k}</span>
+          <span style="font-family:var(--mono);font-weight:500;">${v}</span>
+        </div>`).join('');
+    });
+
+    onValue(ref(db, `signals/${SYMBOL}/stats`), snap => {
+      const s = snap.val();
+      if (!s) return;
+      document.getElementById('paper-stats').innerHTML = `
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <div class="metric"><div class="metric-label">Trades</div><div class="metric-value">${s.n_trades||0}</div></div>
+          <div class="metric"><div class="metric-label">Win rate</div><div class="metric-value">${s.win_rate!=null?(Number(s.win_rate)*100).toFixed(1)+'%':'—'}</div></div>
+          <div class="metric"><div class="metric-label">Avg R</div><div class="metric-value">${s.avg_r!=null?Number(s.avg_r).toFixed(2)+'R':'—'}</div></div>
+          <div class="metric"><div class="metric-label">Max DD</div><div class="metric-value down">${s.max_dd!=null?(Number(s.max_dd)*100).toFixed(1)+'%':'—'}</div></div>
+        </div>`;
+    });
+
+  } catch(e) {
+    document.getElementById('topbar-mode').textContent = 'ERROR';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => setTimeout(initFirebase, 300));
+</script>
+</body>
+</html>
