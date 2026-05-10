@@ -381,13 +381,16 @@ window._fb = { initializeApp, getDatabase, ref, onValue, set };
 
 <script>
 // ── Navigation ────────────────────────────────────────────────────────────────
+function navigate(page) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p => { p.style.display = 'none'; p.classList.remove('active'); });
+  const navEl = document.querySelector(`.nav-item[data-page="${page}"]`);
+  const pageEl = document.getElementById('page-' + page);
+  if (navEl) navEl.classList.add('active');
+  if (pageEl) { pageEl.style.display = 'block'; pageEl.classList.add('active'); }
+}
 document.querySelectorAll('.nav-item').forEach(el => {
-  el.addEventListener('click', () => {
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    el.classList.add('active');
-    document.getElementById('page-' + el.dataset.page).classList.add('active');
-  });
+  el.addEventListener('click', () => navigate(el.dataset.page));
 });
 
 // ── Session helpers ───────────────────────────────────────────────────────────
