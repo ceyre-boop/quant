@@ -25,6 +25,8 @@ from typing import List, Optional, Tuple
 import pandas as pd
 import yaml
 
+from ict._atr_utils import compute_atr
+
 logger = logging.getLogger(__name__)
 
 _DEFAULT_FVG_MIN_ATR = 0.3
@@ -133,7 +135,7 @@ class FVGDetector:
 
         as_of_idx = as_of_idx if as_of_idx >= 0 else len(df) - 1
         price_now = float(df["Close"].iloc[as_of_idx])
-        atr = self._atr(df)
+        atr = compute_atr(df)
 
         fvgs = self._find_fvgs(df, atr, price_now, as_of_idx)
         obs = self._find_obs(df, atr, price_now, as_of_idx)
@@ -284,17 +286,6 @@ class FVGDetector:
                   for c in df.columns if c.lower() in ("open", "high", "low", "close", "volume")}
         df = df.rename(columns=rename)
         return df[["Open", "High", "Low", "Close"]].dropna()
-
-    @staticmethod
-    def _atr(df: pd.DataFrame, period: int = 14) -> float:
-        h, l, c = df["High"], df["Low"], df["Close"]
-        tr = pd.concat([
-            h - l,
-            (h - c.shift()).abs(),
-            (l - c.shift()).abs(),
-        ], axis=1).max(axis=1)
-        val = float(tr.rolling(period).mean().iloc[-1])
-        return val if val > 0 else 1.0
 
     @staticmethod
     def _load_config(config_path: Optional[str]) -> dict:

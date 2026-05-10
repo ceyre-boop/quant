@@ -75,6 +75,10 @@ micro_risk:
 scoring:
   # Minimum score to generate a paper trade signal
   min_score_to_trade: 6.5
+  # A+ grade threshold
+  grade_a_plus_threshold: 8.5
+  # B grade threshold (logged, not executed); below this = C (rejected)
+  grade_b_threshold: 5.0
   # Component weights (must sum to 10.0)
   weights:
     kill_zone:    2.0   # timing is non-negotiable

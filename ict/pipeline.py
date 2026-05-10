@@ -33,6 +33,7 @@ from typing import Dict, List, Optional
 import pandas as pd
 import yaml
 
+from ict._atr_utils import compute_atr
 from ict.session_classifier import SessionClassifier, KillZoneStatus
 from ict.sweep_detector import SweepDetector, SweepResult
 from ict.fvg_detector import FVGDetector, FVGResult, OrderBlockResult
@@ -126,6 +127,9 @@ class ICTPipeline:
         scoring_cfg = cfg.get("scoring", {})
         self._min_score: float = scoring_cfg.get("min_score_to_trade", _DEFAULT_MIN_SCORE)
         self._weights: Dict[str, float] = scoring_cfg.get("weights", _DEFAULT_WEIGHTS)
+        # Grade thresholds (configurable so they can be tuned without code changes)
+        self._grade_a_plus_threshold: float = scoring_cfg.get("grade_a_plus_threshold", 8.5)
+        self._grade_b_threshold: float = scoring_cfg.get("grade_b_threshold", 5.0)
 
         self.session_clf = SessionClassifier(config_path)
         self.sweep_det = SweepDetector(config_path)
@@ -167,7 +171,7 @@ class ICTPipeline:
 
         df = self._normalise(df)
         if atr is None:
-            atr = self._atr(df)
+            atr = compute_atr(df)
 
         price = float(df["Close"].iloc[-1])
         scores: Dict[str, float] = {}
@@ -288,25 +292,27 @@ class ICTPipeline:
     @staticmethod
     def _market_structure_score(df: pd.DataFrame, direction: str) -> tuple[float, str]:
         """
-        Simple swing-based BOS / CHOCH check.
+        Vectorized swing-based BOS / CHOCH check.
 
+        Uses pandas rolling max/min (O(n)) rather than a Python loop (O(n²)).
         Returns (score_fraction 0–1, label string).
         """
         if len(df) < 15:
             return 0.0, "Not enough bars"
 
-        highs = df["High"].values
-        lows = df["Low"].values
         p = 5  # swing period
+        highs = df["High"]
+        lows = df["Low"]
 
-        sh_idx = [i for i in range(p, len(df) - p) if highs[i] == max(highs[i - p:i + p + 1])]
-        sl_idx = [i for i in range(p, len(df) - p) if lows[i] == min(lows[i - p:i + p + 1])]
+        # A bar is a swing high if its High equals the rolling max over [i-p, i+p]
+        roll_max = highs.rolling(2 * p + 1, center=True).max()
+        roll_min = lows.rolling(2 * p + 1, center=True).min()
 
-        if len(sh_idx) < 2 or len(sl_idx) < 2:
+        sh_vals = highs[highs == roll_max].dropna().values
+        sl_vals = lows[lows == roll_min].dropna().values
+
+        if len(sh_vals) < 2 or len(sl_vals) < 2:
             return 0.0, "Insufficient swing data"
-
-        sh_vals = [highs[i] for i in sh_idx[-3:]]
-        sl_vals = [lows[i] for i in sl_idx[-3:]]
 
         higher_highs = sh_vals[-1] > sh_vals[-2]
         higher_lows = sl_vals[-1] > sl_vals[-2]
@@ -361,13 +367,11 @@ class ICTPipeline:
     # ── Grading ────────────────────────────────────────────────────────── #
 
     def _grade(self, score: float) -> ICTGrade:
-        max_score = sum(self._weights.values())
-        pct = score / max_score if max_score > 0 else 0
-        if score >= 8.5:
+        if score >= self._grade_a_plus_threshold:
             return ICTGrade.A_PLUS
         if score >= self._min_score:
             return ICTGrade.A
-        if score >= 5.0:
+        if score >= self._grade_b_threshold:
             return ICTGrade.B
         return ICTGrade.C
 
@@ -381,17 +385,6 @@ class ICTPipeline:
         rename = {c: c.capitalize()
                   for c in df.columns if c.lower() in ("open", "high", "low", "close", "volume")}
         return df.rename(columns=rename)[["Open", "High", "Low", "Close"]].dropna()
-
-    @staticmethod
-    def _atr(df: pd.DataFrame, period: int = 14) -> float:
-        h, l, c = df["High"], df["Low"], df["Close"]
-        tr = pd.concat([
-            h - l,
-            (h - c.shift()).abs(),
-            (l - c.shift()).abs(),
-        ], axis=1).max(axis=1)
-        val = float(tr.rolling(period).mean().iloc[-1])
-        return val if val > 0 else 1e-6
 
     @staticmethod
     def _load_config(config_path: Optional[str]) -> dict:

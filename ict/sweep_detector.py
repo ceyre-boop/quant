@@ -21,6 +21,8 @@ from typing import List, Optional
 import pandas as pd
 import yaml
 
+from ict._atr_utils import compute_atr
+
 logger = logging.getLogger(__name__)
 
 _DEFAULT_LOOKBACK = 20
@@ -82,7 +84,7 @@ class SweepDetector:
             logger.debug("Not enough bars (%d < %d) for sweep detection", len(df), min_rows)
             return []
 
-        atr = self._atr(df)
+        atr = compute_atr(df)
         results: List[SweepResult] = []
 
         start = self._lookback
@@ -147,23 +149,6 @@ class SweepDetector:
 
     @staticmethod
     def _normalise(df: pd.DataFrame) -> pd.DataFrame:
-        df = df.copy()
-        if isinstance(df.columns, pd.MultiIndex):
-            df.columns = df.columns.get_level_values(0)
-        rename = {c: c.capitalize() for c in df.columns if c.lower() in ("open", "high", "low", "close", "volume")}
-        df = df.rename(columns=rename)
-        return df[["Open", "High", "Low", "Close"]].dropna()
-
-    @staticmethod
-    def _atr(df: pd.DataFrame, period: int = 14) -> float:
-        h, l, c = df["High"], df["Low"], df["Close"]
-        tr = pd.concat([
-            h - l,
-            (h - c.shift()).abs(),
-            (l - c.shift()).abs(),
-        ], axis=1).max(axis=1)
-        val = float(tr.rolling(period).mean().iloc[-1])
-        return val if val > 0 else 1.0  # guard zero-ATR
 
     @staticmethod
     def _load_config(config_path: Optional[str]) -> dict:

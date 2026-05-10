@@ -204,11 +204,14 @@ class MicroRiskEngine:
         position_units = risk_dollars / (stop_distance * pip_value) if pip_value > 0 else 0.0
 
         # ── Gate 6: leverage cap ─────────────────────────────────────────
-        notional = position_units * entry * pip_value
+        # Notional value of the position in account currency = units × entry price.
+        # pip_value is *not* included here because it only scales P&L per unit move,
+        # not the face value of the position itself.
+        notional = position_units * entry
         leverage = notional / params.account_size if params.account_size > 0 else 0.0
         if leverage > self.max_leverage:
             # Scale down to stay within leverage cap
-            position_units = (params.account_size * self.max_leverage) / (entry * pip_value)
+            position_units = (params.account_size * self.max_leverage) / entry
             risk_dollars = position_units * stop_distance * pip_value
             leverage = self.max_leverage
 
