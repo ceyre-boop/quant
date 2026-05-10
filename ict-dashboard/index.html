@@ -399,7 +399,7 @@
     ICT ENGINE
   </div>
   <div class="header-right">
-    <a href="../dashboard/index.html" class="sovereign-link" title="Switch to Sovereign macro dashboard">
+    <a href="https://ceyre-boop.github.io/quant/" class="sovereign-link" title="Switch to Sovereign macro dashboard" id="sovereign-link">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="15 18 9 12 15 6"/>
       </svg>
@@ -505,6 +505,20 @@
 
 </main>
 
+<!-- Firebase SDK (modular v10) — loaded when FIREBASE_CONFIG is injected -->
+<script type="module">
+  // If window.FIREBASE_CONFIG is defined (injected at build/serve time),
+  // import the SDK and expose it globally so the main script can pick it up.
+  if (typeof window.FIREBASE_CONFIG !== "undefined") {
+    try {
+      const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
+      const { getDatabase, ref, onValue } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js");
+      window._fb = { initializeApp, getDatabase, ref, onValue };
+    } catch (e) {
+      console.warn("Firebase SDK load failed:", e);
+    }
+  }
+</script>
 <script>
 // ── State ──────────────────────────────────────────────────────────────────
 const PAIRS = ["GBPUSD","EURUSD","AUDUSD","USDJPY","USDCAD","NZDUSD","GBPJPY","AUDNZD"];
@@ -675,37 +689,34 @@ function updateScorecard() {
 
 // ── Firebase integration ────────────────────────────────────────────────────
 function initFirebase() {
-  // Firebase config is injected at runtime via environment / GitHub Actions secret.
-  // If window.FIREBASE_CONFIG is set (via a build step or inline script), use it.
-  // Otherwise, fall back to demo/mock mode.
-  if (typeof window.FIREBASE_CONFIG !== "undefined") {
+  // window.FIREBASE_CONFIG is injected at build/serve time (GitHub Actions secret
+  // expansion or a server-side template step).  The Firebase SDK is loaded via
+  // an async module script above and exposed as window._fb once ready.
+  if (typeof window.FIREBASE_CONFIG !== "undefined" && window._fb) {
     try {
-      const { initializeApp } = window.firebase_app || {};
-      const { getDatabase, ref, onValue } = window.firebase_db || {};
-      if (initializeApp && getDatabase) {
-        const app = initializeApp(window.FIREBASE_CONFIG);
-        const db  = getDatabase(app);
-        PAIRS.forEach(pair => {
-          const r = ref(db, `live_state/ICT_FOREX/${pair}`);
-          onValue(r, snapshot => {
-            const val = snapshot.val();
-            if (val) {
-              pairData[pair] = val;
-              checkForNewSignal(pair, val);
-              renderPairList();
-              updateScorecard();
-              if (selectedPair === pair) selectPair(pair);
-            }
-          });
+      const { initializeApp, getDatabase, ref, onValue } = window._fb;
+      const app = initializeApp(window.FIREBASE_CONFIG);
+      const db  = getDatabase(app);
+      PAIRS.forEach(pair => {
+        const r = ref(db, `live_state/ICT_FOREX/${pair}`);
+        onValue(r, snapshot => {
+          const val = snapshot.val();
+          if (val) {
+            pairData[pair] = val;
+            checkForNewSignal(pair, val);
+            renderPairList();
+            updateScorecard();
+            if (selectedPair === pair) selectPair(pair);
+          }
         });
-        firebaseReady = true;
-        return;
-      }
+      });
+      firebaseReady = true;
+      return;
     } catch (e) {
       console.warn("Firebase init failed, using demo mode:", e);
     }
   }
-  // Demo mode — simulate random data for UI development
+  // Demo mode — simulate random data for UI development / GitHub Pages preview
   startDemoMode();
 }
 

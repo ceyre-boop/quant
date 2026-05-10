@@ -25,7 +25,7 @@ import time
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 
 import yaml
 
@@ -53,11 +53,11 @@ _DEFAULT_CONFIG_PATH: str = str(
 class PairScanResult:
     pair: str
     timestamp: datetime
-    long_result:  "ICTSignal | ICTVeto"
-    short_result: "ICTSignal | ICTVeto"
+    long_result:  Union[ICTSignal, ICTVeto]
+    short_result: Union[ICTSignal, ICTVeto]
 
     @property
-    def best_signal(self) -> "Optional[ICTSignal]":
+    def best_signal(self) -> Optional[ICTSignal]:
         """Return the highest-scoring approved signal, if any."""
         candidates = [
             r for r in (self.long_result, self.short_result)

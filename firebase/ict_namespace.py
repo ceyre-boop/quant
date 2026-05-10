@@ -30,8 +30,9 @@ from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Optional
 
 if TYPE_CHECKING:
-    from ict_engine.orchestrator import PairScanResult
-    from ict.pipeline import ICTSignal
+    # ict-engine uses a hyphen so it is not a regular importable package;
+    # PairScanResult is referenced only in type hints (never at runtime).
+    from ict.pipeline import ICTSignal  # noqa: F401
 
 logger = logging.getLogger(__name__)
 
@@ -108,11 +109,11 @@ class ICTFirebasePublisher:
             "confirmations": summary["confirmations"],
             "missing":       summary["missing"],
             "kill_zone":     (
-                best.session_status.kill_zone_name
+                getattr(best.session_status, "kill_zone_name", None)
                 if best and best.session_status else None
             ),
             "in_kill_zone": (
-                bool(best.session_status.should_trade)
+                bool(getattr(best.session_status, "should_trade", False))
                 if best and best.session_status else False
             ),
         }
