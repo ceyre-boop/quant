@@ -190,6 +190,7 @@ window._fb = { initializeApp, getDatabase, ref, onValue, set };
       <div id="kz-banner" class="kz-banner kz-inactive">
         <div class="kz-dot-off"></div>
         <span id="kz-text">Calculating killzone…</span>
+        <span id="kz-countdown" style="margin-left:auto;font-family:var(--mono);font-size:12px;opacity:0.7;"></span>
       </div>
 
       <div class="grid-4" style="margin-bottom:14px;">
@@ -220,6 +221,10 @@ window._fb = { initializeApp, getDatabase, ref, onValue, set };
           <div class="card">
             <div class="card-title">ICT setup checklist — best current signal</div>
             <div id="checklist"><span class="loading">Waiting for data…</span></div>
+          </div>
+          <div class="card">
+            <div class="card-title">Stage breakdown</div>
+            <div id="stage-breakdown"><span class="loading">Waiting for data…</span></div>
           </div>
           <div class="card">
             <div class="card-title">Confirmations &amp; missing</div>
@@ -418,12 +423,43 @@ function updateClock() {
   }
 }
 function nextKillzone(h) {
-  const all = SESSIONS.map(s => ({ name: s.name, hours: s.start < h ? s.start + 24 : s.start }));
-  all.sort((a,b) => a.hours - b.hours);
-  return all[0] ? `${all[0].name} @ ${SESSIONS.find(s=>s.name===all[0].name).start}:00 ET` : '—';
+  const candidates = SESSIONS.map(s => {
+    const diff = s.start <= h ? s.start + 24 - h : s.start - h;
+    return { name: s.name, start: s.start, diff };
+  }).sort((a,b) => a.diff - b.diff);
+  return candidates[0] || null;
+}
+
+function updateCountdown() {
+  const now = new Date();
+  const etNow = new Date(now.toLocaleString('en-US', {timeZone:'America/New_York'}));
+  const h = etNow.getHours(), m = etNow.getMinutes(), s = etNow.getSeconds();
+  const sess = getActiveSession(h);
+  const cd = document.getElementById('kz-countdown');
+  if (!cd) return;
+  if (sess) {
+    // Time remaining in session
+    const endH = sess.end;
+    const nowSecs = h * 3600 + m * 60 + s;
+    const endSecs = endH * 3600;
+    const rem = endSecs > nowSecs ? endSecs - nowSecs : 0;
+    const rm = Math.floor(rem / 60), rs = rem % 60;
+    cd.textContent = `ends in ${rm}m ${rs}s`;
+  } else {
+    const nxt = nextKillzone(h);
+    if (nxt) {
+      const nowSecs = h * 3600 + m * 60 + s;
+      const startSecs = nxt.start * 3600 + (nxt.start <= h ? 24 * 3600 : 0);
+      const rem = startSecs - nowSecs;
+      const rh = Math.floor(rem / 3600), rm = Math.floor((rem % 3600) / 60), rs = rem % 60;
+      cd.textContent = `${nxt.name} in ${rh > 0 ? rh+'h ' : ''}${rm}m ${rs}s`;
+    }
+  }
 }
 setInterval(updateClock, 1000);
+setInterval(updateCountdown, 1000);
 updateClock();
+updateCountdown();
 
 // ── Session bar ───────────────────────────────────────────────────────────────
 function buildSessionBar() {
@@ -510,6 +546,37 @@ function renderLiveState(d) {
       <span class="check-score">${score.toFixed(1)}/${ck.weight}</span>
     </div>`;
   }).join('');
+
+  // Stage breakdown
+  const cs = d.component_scores || {};
+  const stages = [
+    { key:'kill_zone',        label:'Kill Zone',          max:2.0, icon:'⏱' },
+    { key:'sweep',            label:'Liquidity Sweep',    max:2.5, icon:'🌊' },
+    { key:'fvg_tap',          label:'FVG / OB Tap',       max:2.0, icon:'📦' },
+    { key:'market_structure', label:'Market Structure',   max:2.0, icon:'📈' },
+    { key:'pd_alignment',     label:'PD Zone',            max:1.5, icon:'⚖️' },
+  ];
+  const sbEl = document.getElementById('stage-breakdown');
+  if (sbEl) {
+    const total = stages.reduce((s,st) => s + st.max, 0);
+    sbEl.innerHTML = stages.map(st => {
+      const score = Number(cs[st.key] || 0);
+      const pct = Math.round((score / st.max) * 100);
+      const color = pct >= 100 ? 'var(--green)' : pct >= 50 ? 'var(--gold)' : '#e5e7eb';
+      const textColor = pct >= 100 ? 'var(--green)' : pct >= 50 ? 'var(--gold)' : 'var(--muted)';
+      return `<div style="margin-bottom:8px;">
+        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;">
+          <span>${st.icon} ${st.label}</span>
+          <span style="font-family:var(--mono);color:${textColor};">${score.toFixed(1)}/${st.max}</span>
+        </div>
+        <div style="height:6px;background:#f3f4f6;border-radius:3px;overflow:hidden;">
+          <div style="height:100%;width:${pct}%;background:${color};border-radius:3px;transition:width 0.4s;"></div>
+        </div>
+      </div>`;
+    }).join('') + `<div style="margin-top:10px;padding-top:8px;border-top:1px solid #f3f4f6;display:flex;justify-content:space-between;font-size:12px;font-weight:700;">
+      <span>Total</span><span style="font-family:var(--mono);">${Number(d.score||0).toFixed(1)} / ${total}</span>
+    </div>`;
+  }
 
   // Confirmations + missing
   const conf = d.confirmations || [];

@@ -50,6 +50,13 @@ _DEFAULT_WEIGHTS: Dict[str, float] = {
     "pd_alignment":     1.5,
 }
 
+# Volatility-adaptive threshold offsets
+# ATR / price > HIGH_VOL_THRESHOLD → lower bar (easier to trade)
+# ATR / price < LOW_VOL_THRESHOLD  → raise bar (avoid dead markets)
+_HIGH_VOL_THRESHOLD = 0.008   # 0.8% ATR/price
+_LOW_VOL_THRESHOLD  = 0.002   # 0.2% ATR/price
+_ATR_SPIKE_MULT     = 3.0     # veto if ATR spikes 3× recent average
+
 
 # ── Enums & data classes ─────────────────────────────────────────────────── #
 
@@ -174,8 +181,31 @@ class ICTPipeline:
             atr = compute_atr(df)
 
         price = float(df["Close"].iloc[-1])
+
+        # ── ATR spike veto (robustness gate) ─────────────────────────────
+        if len(df) >= 20:
+            recent_atr = compute_atr(df.iloc[-20:])
+            if recent_atr > 0 and atr > recent_atr * _ATR_SPIKE_MULT:
+                return ICTVeto(
+                    symbol=symbol, direction=direction, timestamp=timestamp,
+                    score=0.0, grade=ICTGrade.VETOED,
+                    reason=f"ATR_SPIKE: current ATR {atr:.5f} > {_ATR_SPIKE_MULT}× recent avg {recent_atr:.5f}",
+                )
+
+        # ── Volatility-adaptive threshold ─────────────────────────────────
+        vol_ratio = atr / price if price > 0 else 0.0
+        if vol_ratio > _HIGH_VOL_THRESHOLD:
+            effective_threshold = self._min_score - 0.5   # high vol → easier bar
+            vol_regime = "HIGH_VOL"
+        elif vol_ratio < _LOW_VOL_THRESHOLD:
+            effective_threshold = self._min_score + 0.5   # dead market → raise bar
+            vol_regime = "LOW_VOL"
+        else:
+            effective_threshold = self._min_score
+            vol_regime = "NORMAL_VOL"
+
         scores: Dict[str, float] = {}
-        confirmations: List[str] = []
+        confirmations: List[str] = [f"Vol regime: {vol_regime} (ATR/price={vol_ratio:.4f})"]
         missing: List[str] = []
 
         # ── Stage 1: Kill Zone / session ────────────────────────────────
@@ -244,7 +274,7 @@ class ICTPipeline:
             missing.append(f"PD array ({pd_label})")
 
         total_score = sum(scores.values())
-        grade = self._grade(total_score)
+        grade = self._grade(total_score, threshold=effective_threshold)
 
         # ── Stage 6: Risk engine gate ─────────────────────────────────────
         if grade in (ICTGrade.A_PLUS, ICTGrade.A):
@@ -366,10 +396,11 @@ class ICTPipeline:
 
     # ── Grading ────────────────────────────────────────────────────────── #
 
-    def _grade(self, score: float) -> ICTGrade:
+    def _grade(self, score: float, threshold: Optional[float] = None) -> ICTGrade:
+        t = threshold if threshold is not None else self._min_score
         if score >= self._grade_a_plus_threshold:
             return ICTGrade.A_PLUS
-        if score >= self._min_score:
+        if score >= t:
             return ICTGrade.A
         if score >= self._grade_b_threshold:
             return ICTGrade.B

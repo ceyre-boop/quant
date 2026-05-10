@@ -199,6 +199,11 @@ class ICTOrchestrator:
             except Exception as e:
                 logger.warning("Pair scan failed for %s: %s", pair, e)
 
+        # Multi-pair USD confluence boost
+        results = self._apply_confluence(results)
+        for r in results:
+            self.publisher.publish_pair(r)
+
         self.publisher.publish_system({
             "updated_at": now.isoformat(),
             "pairs_scanned": len(self.pairs),
@@ -210,6 +215,28 @@ class ICTOrchestrator:
         return results
 
     # ── Internal ───────────────────────────────────────────────────────── #
+
+    def _apply_confluence(self, results: List[PairScanResult]) -> List[PairScanResult]:
+        """
+        Multi-pair USD confluence: if ≥3 USD pairs signal the same USD direction,
+        boost their scores by 0.5 (capped at 10.0).
+        USD pairs: GBPUSD EURUSD AUDUSD NZDUSD = short USD when LONG
+                   USDJPY USDCAD = short USD when SHORT
+        """
+        usd_long_signals  = sum(1 for r in results if r.signal == 'LONG'  and any(p in r.pair for p in ['GBPUSD','EURUSD','AUDUSD','NZDUSD']))
+        usd_short_signals = sum(1 for r in results if r.signal == 'SHORT' and any(p in r.pair for p in ['USDJPY','USDCAD']))
+        usd_long_signals  += sum(1 for r in results if r.signal == 'SHORT' and any(p in r.pair for p in ['GBPUSD','EURUSD','AUDUSD','NZDUSD']))
+        usd_short_signals += sum(1 for r in results if r.signal == 'LONG'  and any(p in r.pair for p in ['USDJPY','USDCAD']))
+
+        boosted = []
+        for r in results:
+            if r.signal in ('LONG', 'SHORT') and (usd_long_signals >= 3 or usd_short_signals >= 3):
+                new_score = min(r.score + 0.5, 10.0)
+                confs = r.confirmations + [f"USD confluence boost (+0.5): {max(usd_long_signals, usd_short_signals)} pairs aligned"]
+                from dataclasses import replace
+                r = replace(r, score=new_score, confirmations=confs)
+            boosted.append(r)
+        return boosted
 
     def _scan_pair(self, pair: str, now: datetime, dp: DataProvider) -> PairScanResult:
         from ict.pipeline import ICTSignal, ICTVeto

@@ -53,6 +53,7 @@ class MicroRiskParams:
     open_positions: int = 0         # number of currently open ICT positions
     open_risk_pct: float = 0.0      # total unrealised risk as fraction of account
     daily_loss_pct: float = 0.0     # realised loss today as fraction of account
+    consecutive_losses: int = 0     # consecutive losses this session (kill switch)
 
 
 @dataclass(frozen=True)
@@ -142,6 +143,14 @@ class MicroRiskEngine:
         Returns:
             PositionSizing if approved, RiskVeto if blocked.
         """
+        # ── Gate 0: 3-loss kill switch ───────────────────────────────────
+        max_consecutive = 3
+        if params.consecutive_losses >= max_consecutive:
+            return RiskVeto(
+                reason="KILL_SWITCH",
+                detail=f"{params.consecutive_losses} consecutive losses this session. Paused until next killzone.",
+            )
+
         # ── Gate 1: daily loss limit ─────────────────────────────────────
         if params.daily_loss_pct >= self.max_daily_loss_pct:
             return RiskVeto(
