@@ -21,6 +21,6 @@ jobs:
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: './dashboard'
+          path: './ict-dashboard'
       - uses: actions/deploy-pages@v4
         id: deployment

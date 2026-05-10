@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ICT Engine — Micro-Structure Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:           #03040b;
+      --surface:      #0a0c14;
+      --surface-2:    #111420;
+      --accent:       #f59e0b;          /* amber — ICT gold */
+      --accent-glow:  rgba(245,158,11,.15);
+      --accent-dim:   rgba(245,158,11,.08);
+      --green:        #10b981;
+      --red:          #ef4444;
+      --blue:         #6366f1;
+      --grey:         #94a3b8;
+      --border:       rgba(255,255,255,.08);
+      --text-1:       #f8fafc;
+      --text-2:       #94a3b8;
+      --font:         'Inter', sans-serif;
+      --font-title:   'Outfit', sans-serif;
+      --font-mono:    'JetBrains Mono', monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text-1);
+      min-height: 100vh;
+      overflow-x: hidden;
+      background-image:
+        radial-gradient(circle at 50% 0%,   var(--accent-glow) 0%, transparent 55%),
+        radial-gradient(circle at 100% 100%, rgba(245,158,11,.04) 0%, transparent 35%);
+    }
+
+    /* ── Header ─────────────────────────────────────────────────────────── */
+    header {
+      padding: 1.5rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(20px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(3,4,11,.85);
+    }
+
+    .logo {
+      font-family: var(--font-title);
+      font-size: 1.4rem;
+      font-weight: 600;
+      letter-spacing: -.02em;
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+    }
+
+    .logo-icon {
+      width: 32px; height: 32px;
+      background: var(--accent);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .9rem; font-weight: 700; color: #000;
+      box-shadow: 0 0 18px var(--accent-glow);
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+    }
+
+    .sovereign-link {
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+      padding: .45rem 1rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      color: var(--text-2);
+      font-size: .82rem;
+      font-weight: 500;
+      text-decoration: none;
+      transition: all .2s;
+      background: var(--surface);
+    }
+
+    .sovereign-link:hover {
+      border-color: var(--blue);
+      color: var(--text-1);
+      background: rgba(99,102,241,.08);
+    }
+
+    .sovereign-link svg { flex-shrink: 0; }
+
+    .live-badge {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      padding: .45rem 1rem;
+      border-radius: 99px;
+      font-size: .78rem;
+      font-weight: 500;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text-2);
+    }
+
+    .live-dot {
+      width: 7px; height: 7px;
+      background: var(--accent);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--accent);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+    /* ── Layout ─────────────────────────────────────────────────────────── */
+    main {
+      padding: 2rem 3rem;
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 1.5rem;
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 1.25rem;
+      padding: 1.75rem;
+      transition: border-color .25s, transform .25s, box-shadow .25s;
+    }
+
+    .panel:hover {
+      border-color: rgba(245,158,11,.25);
+      transform: translateY(-3px);
+      box-shadow: 0 16px 40px rgba(0,0,0,.3);
+    }
+
+    .panel-title {
+      font-family: var(--font-title);
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: .35rem;
+    }
+
+    .panel-sub {
+      font-size: .8rem;
+      color: var(--text-2);
+      margin-bottom: 1.5rem;
+    }
+
+    /* ── Scorecard ───────────────────────────────────────────────────────── */
+    .scorecard {
+      grid-column: span 12;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+    }
+
+    .metric-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 1.25rem;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: .5rem;
+      transition: border-color .2s;
+    }
+
+    .metric-card:hover { border-color: rgba(245,158,11,.3); }
+
+    .metric-label {
+      font-size: .72rem;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--text-2);
+    }
+
+    .metric-value {
+      font-family: var(--font-title);
+      font-size: 2.25rem;
+      font-weight: 600;
+      color: var(--text-1);
+    }
+
+    .metric-sub {
+      font-size: .8rem;
+      color: var(--text-2);
+    }
+
+    /* ── Kill Zone banner ────────────────────────────────────────────────── */
+    .kill-zone-bar {
+      grid-column: span 12;
+      border-radius: 1rem;
+      padding: 1rem 1.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: .875rem;
+      font-weight: 500;
+    }
+
+    .kz-active {
+      background: rgba(16,185,129,.08);
+      border: 1px solid rgba(16,185,129,.25);
+      color: var(--green);
+    }
+
+    .kz-inactive {
+      background: rgba(148,163,184,.05);
+      border: 1px solid var(--border);
+      color: var(--text-2);
+    }
+
+    .kz-label { display: flex; align-items: center; gap: .6rem; }
+    .kz-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: currentColor;
+    }
+
+    /* ── Pair grid ───────────────────────────────────────────────────────── */
+    .pair-grid {
+      grid-column: span 7;
+      min-height: 400px;
+    }
+
+    .pair-list { display: flex; flex-direction: column; gap: .75rem; }
+
+    .pair-row {
+      padding: .85rem 1.1rem;
+      background: rgba(255,255,255,.025);
+      border: 1px solid transparent;
+      border-radius: .875rem;
+      display: grid;
+      grid-template-columns: 1fr auto auto auto;
+      align-items: center;
+      gap: 1rem;
+      transition: all .2s;
+    }
+
+    .pair-row:hover {
+      background: rgba(255,255,255,.05);
+      border-color: var(--border);
+    }
+
+    .pair-name {
+      font-family: var(--font-mono);
+      font-weight: 500;
+      font-size: .95rem;
+    }
+
+    .score-bar-wrap {
+      width: 90px;
+      height: 6px;
+      background: rgba(255,255,255,.07);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .score-bar {
+      height: 100%;
+      border-radius: 3px;
+      transition: width .5s ease;
+    }
+
+    .grade-pill {
+      padding: .2rem .6rem;
+      border-radius: 5px;
+      font-size: .72rem;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      min-width: 36px;
+      text-align: center;
+    }
+
+    .grade-aplus  { background: rgba(16,185,129,.15);  color: var(--green); border: 1px solid rgba(16,185,129,.25); }
+    .grade-a      { background: rgba(245,158,11,.12);  color: var(--accent); border: 1px solid rgba(245,158,11,.25); }
+    .grade-b      { background: rgba(99,102,241,.10);  color: var(--blue);  border: 1px solid rgba(99,102,241,.2); }
+    .grade-none   { background: rgba(148,163,184,.06); color: var(--grey);  border: 1px solid rgba(148,163,184,.1); }
+    .grade-vetoed { background: rgba(239,68,68,.08);   color: var(--red);   border: 1px solid rgba(239,68,68,.15); }
+
+    .direction-tag {
+      font-family: var(--font-mono);
+      font-size: .75rem;
+      font-weight: 600;
+      padding: .2rem .55rem;
+      border-radius: 5px;
+    }
+
+    .dir-long  { background: rgba(16,185,129,.1); color: var(--green); }
+    .dir-short { background: rgba(239,68,68,.1);  color: var(--red); }
+    .dir-none  { color: var(--text-2); }
+
+    /* ── Signal log ──────────────────────────────────────────────────────── */
+    .signal-log {
+      grid-column: span 5;
+      min-height: 400px;
+    }
+
+    .log-list { display: flex; flex-direction: column; gap: .6rem; overflow-y: auto; max-height: 340px; }
+
+    .log-entry {
+      padding: .75rem 1rem;
+      background: rgba(255,255,255,.02);
+      border: 1px solid transparent;
+      border-radius: .75rem;
+      font-size: .8rem;
+      line-height: 1.5;
+    }
+
+    .log-entry.signal-entry { border-color: rgba(245,158,11,.2); }
+
+    .log-time {
+      font-family: var(--font-mono);
+      font-size: .7rem;
+      color: var(--text-2);
+      margin-bottom: .3rem;
+    }
+
+    .log-pair { font-weight: 600; margin-right: .5rem; }
+
+    .confirmation-tags { display: flex; flex-wrap: wrap; gap: .3rem; margin-top: .4rem; }
+
+    .conf-tag {
+      background: rgba(245,158,11,.1);
+      color: var(--accent);
+      border: 1px solid rgba(245,158,11,.2);
+      padding: .1rem .4rem;
+      border-radius: 4px;
+      font-size: .68rem;
+      font-family: var(--font-mono);
+    }
+
+    /* ── Stage breakdown ─────────────────────────────────────────────────── */
+    .stage-breakdown {
+      grid-column: span 12;
+    }
+
+    .stage-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 1rem;
+    }
+
+    .stage-card {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      padding: 1.25rem;
+      text-align: center;
+    }
+
+    .stage-icon { font-size: 1.5rem; margin-bottom: .5rem; }
+    .stage-name { font-size: .75rem; text-transform: uppercase; letter-spacing: .08em; color: var(--text-2); }
+    .stage-score {
+      font-family: var(--font-title);
+      font-size: 1.75rem;
+      font-weight: 600;
+      margin: .4rem 0;
+    }
+
+    .stage-max { font-size: .7rem; color: var(--text-2); }
+
+    /* ── Empty states ────────────────────────────────────────────────────── */
+    .empty-state {
+      color: var(--text-2);
+      font-size: .875rem;
+      text-align: center;
+      padding: 2rem;
+    }
+
+    /* ── Responsive ──────────────────────────────────────────────────────── */
+    @media (max-width: 900px) {
+      main { padding: 1rem; gap: 1rem; }
+      .scorecard { grid-template-columns: repeat(2,1fr); }
+      .pair-grid, .signal-log { grid-column: span 12; }
+      .stage-grid { grid-template-columns: repeat(3,1fr); }
+      header { padding: 1rem 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">⚡</div>
+    ICT ENGINE
+  </div>
+  <div class="header-right">
+    <a href="../dashboard/index.html" class="sovereign-link" title="Switch to Sovereign macro dashboard">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+      Sovereign
+    </a>
+    <div class="live-badge">
+      <div class="live-dot"></div>
+      ICT Scan Active
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- Scorecard -->
+  <div class="scorecard">
+    <div class="metric-card">
+      <div class="metric-label">Active Signals</div>
+      <div class="metric-value" id="active-signals">0</div>
+      <div class="metric-sub">A / A+ grade</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Pairs Scanned</div>
+      <div class="metric-value" id="pairs-scanned">8</div>
+      <div class="metric-sub">This cycle</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Kill Zone</div>
+      <div class="metric-value" id="kill-zone-name" style="font-size:1.4rem">—</div>
+      <div class="metric-sub" id="kill-zone-status">Checking…</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Last Scan</div>
+      <div class="metric-value" id="last-scan" style="font-size:1.1rem">—</div>
+      <div class="metric-sub">UTC</div>
+    </div>
+  </div>
+
+  <!-- Kill Zone Banner -->
+  <div class="kill-zone-bar kz-inactive" id="kz-banner">
+    <div class="kz-label">
+      <div class="kz-dot"></div>
+      <span id="kz-banner-text">Kill Zone: Off Hours — not a high-probability window</span>
+    </div>
+    <span id="kz-session-time" style="font-family:var(--font-mono);font-size:.8rem"></span>
+  </div>
+
+  <!-- Pair Grid -->
+  <div class="panel pair-grid">
+    <div class="panel-title">Pair Scanner</div>
+    <div class="panel-sub">5-stage ICT score per pair — Kill Zone · Sweep · FVG · BOS · PD</div>
+    <div class="pair-list" id="pair-list">
+      <div class="empty-state">Waiting for first scan cycle…</div>
+    </div>
+  </div>
+
+  <!-- Signal Log -->
+  <div class="panel signal-log">
+    <div class="panel-title">Signal Log</div>
+    <div class="panel-sub">A+ and A grade entries this session</div>
+    <div class="log-list" id="signal-log">
+      <div class="empty-state">No signals yet</div>
+    </div>
+  </div>
+
+  <!-- Stage Breakdown -->
+  <div class="panel stage-breakdown">
+    <div class="panel-title">Stage Weights (active pair)</div>
+    <div class="panel-sub">Maximum possible score = 10.0 — select a pair above to inspect</div>
+    <div class="stage-grid" id="stage-grid">
+      <div class="stage-card">
+        <div class="stage-icon">🕐</div>
+        <div class="stage-name">Kill Zone</div>
+        <div class="stage-score" id="s-kill-zone">—</div>
+        <div class="stage-max">/ 2.0</div>
+      </div>
+      <div class="stage-card">
+        <div class="stage-icon">💧</div>
+        <div class="stage-name">Sweep</div>
+        <div class="stage-score" id="s-sweep">—</div>
+        <div class="stage-max">/ 2.5</div>
+      </div>
+      <div class="stage-card">
+        <div class="stage-icon">📊</div>
+        <div class="stage-name">FVG / OB</div>
+        <div class="stage-score" id="s-fvg">—</div>
+        <div class="stage-max">/ 2.0</div>
+      </div>
+      <div class="stage-card">
+        <div class="stage-icon">🏗️</div>
+        <div class="stage-name">Market Structure</div>
+        <div class="stage-score" id="s-ms">—</div>
+        <div class="stage-max">/ 2.0</div>
+      </div>
+      <div class="stage-card">
+        <div class="stage-icon">⚖️</div>
+        <div class="stage-name">PD Array</div>
+        <div class="stage-score" id="s-pd">—</div>
+        <div class="stage-max">/ 1.5</div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+// ── State ──────────────────────────────────────────────────────────────────
+const PAIRS = ["GBPUSD","EURUSD","AUDUSD","USDJPY","USDCAD","NZDUSD","GBPJPY","AUDNZD"];
+const MAX_SCORE = 10.0;
+const GRADE_ORDER = {"A+":4,"A":3,"B":2,"C":1,"VETOED":0,"—":0};
+
+const KZ_WINDOWS = [
+  { name:"London",  start:[2,0],  end:[5,0]  },
+  { name:"NY Open", start:[7,0],  end:[10,0] },
+  { name:"NY PM",   start:[13,30],end:[16,0] },
+  { name:"Asia",    start:[20,0], end:[23,59] },
+];
+const NY_LUNCH = { start:[12,0], end:[13,30] };
+
+let pairData = {};
+let signalLog = [];
+let selectedPair = null;
+let firebaseReady = false;
+
+// ── Kill Zone ───────────────────────────────────────────────────────────────
+function getUTCHHMM() {
+  const now = new Date();
+  return [now.getUTCHours(), now.getUTCMinutes()];
+}
+
+function minutesSinceMidnight(hh, mm) { return hh * 60 + mm; }
+
+function detectKillZone() {
+  const [h, m] = getUTCHHMM();
+  const now = minutesSinceMidnight(h, m);
+  for (const kz of KZ_WINDOWS) {
+    const s = minutesSinceMidnight(...kz.start);
+    const e = minutesSinceMidnight(...kz.end);
+    if (now >= s && now <= e) return { active: true, name: kz.name };
+  }
+  const ls = minutesSinceMidnight(...NY_LUNCH.start);
+  const le = minutesSinceMidnight(...NY_LUNCH.end);
+  if (now >= ls && now <= le) return { active: false, name: "NY Lunch" };
+  return { active: false, name: "Off Hours" };
+}
+
+function updateKillZone() {
+  const kz = detectKillZone();
+  const banner = document.getElementById("kz-banner");
+  const bannerText = document.getElementById("kz-banner-text");
+  const kzName = document.getElementById("kill-zone-name");
+  const kzStatus = document.getElementById("kill-zone-status");
+  const kzTime = document.getElementById("kz-session-time");
+
+  const now = new Date();
+  const utcStr = now.toISOString().slice(11, 16) + " UTC";
+
+  kzTime.textContent = utcStr;
+  kzName.textContent = kz.name;
+
+  if (kz.active) {
+    banner.className = "kill-zone-bar kz-active";
+    bannerText.textContent = `Kill Zone ACTIVE — ${kz.name} — high-probability window`;
+    kzStatus.textContent = "High-probability window";
+  } else {
+    banner.className = "kill-zone-bar kz-inactive";
+    bannerText.textContent = `Kill Zone: ${kz.name} — not a high-probability window`;
+    kzStatus.textContent = kz.name === "NY Lunch" ? "Avoid — NY Lunch" : "Off Hours";
+  }
+}
+
+// ── Grade helpers ───────────────────────────────────────────────────────────
+function gradeClass(grade) {
+  const map = {"A+":"grade-aplus","A":"grade-a","B":"grade-b","VETOED":"grade-vetoed"};
+  return map[grade] || "grade-none";
+}
+
+function scoreColor(score) {
+  const pct = Math.min(score / MAX_SCORE, 1);
+  if (pct >= 0.85) return "var(--green)";
+  if (pct >= 0.65) return "var(--accent)";
+  if (pct >= 0.45) return "var(--blue)";
+  return "var(--grey)";
+}
+
+// ── Pair grid render ────────────────────────────────────────────────────────
+function renderPairList() {
+  const list = document.getElementById("pair-list");
+  if (!Object.keys(pairData).length) return;
+
+  const sorted = [...PAIRS].sort((a, b) => {
+    const da = pairData[a] || {};
+    const db = pairData[b] || {};
+    return (db.score || 0) - (da.score || 0);
+  });
+
+  list.innerHTML = sorted.map(pair => {
+    const d = pairData[pair] || {};
+    const score = d.score || 0;
+    const grade = d.grade || "—";
+    const signal = d.signal || "NONE";
+    const barPct = Math.min(score / MAX_SCORE * 100, 100);
+    const barColor = scoreColor(score);
+
+    const dirClass = signal === "LONG" ? "dir-long" : signal === "SHORT" ? "dir-short" : "dir-none";
+    const dirLabel = signal === "NONE" ? "—" : signal;
+
+    return `
+      <div class="pair-row" onclick="selectPair('${pair}')" style="cursor:pointer">
+        <span class="pair-name">${pair}</span>
+        <div class="score-bar-wrap">
+          <div class="score-bar" style="width:${barPct}%;background:${barColor}"></div>
+        </div>
+        <span class="${'grade-pill ' + gradeClass(grade)}">${grade}</span>
+        <span class="${'direction-tag ' + dirClass}">${dirLabel}</span>
+      </div>`;
+  }).join("");
+}
+
+// ── Select pair → stage breakdown ───────────────────────────────────────────
+function selectPair(pair) {
+  selectedPair = pair;
+  const d = pairData[pair] || {};
+  const cs = d.component_scores || {};
+
+  const set = (id, val) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = val !== undefined ? Number(val).toFixed(1) : "—";
+  };
+
+  set("s-kill-zone", cs.kill_zone);
+  set("s-sweep",     cs.sweep);
+  set("s-fvg",       cs.fvg_tap);
+  set("s-ms",        cs.market_structure);
+  set("s-pd",        cs.pd_alignment);
+
+  // Highlight selected row
+  document.querySelectorAll(".pair-row").forEach(row => {
+    row.style.background = row.textContent.trim().startsWith(pair)
+      ? "rgba(245,158,11,.06)"
+      : "";
+  });
+}
+
+// ── Signal log render ───────────────────────────────────────────────────────
+function renderSignalLog() {
+  const logEl = document.getElementById("signal-log");
+  if (!signalLog.length) {
+    logEl.innerHTML = '<div class="empty-state">No signals yet this session</div>';
+    return;
+  }
+  logEl.innerHTML = [...signalLog].reverse().slice(0, 20).map(e => `
+    <div class="log-entry signal-entry">
+      <div class="log-time">${e.time}</div>
+      <span class="log-pair">${e.pair}</span>
+      <span class="${'direction-tag ' + (e.direction === 'LONG' ? 'dir-long' : 'dir-short')}">${e.direction}</span>
+      <span class="${'grade-pill ' + gradeClass(e.grade)}" style="margin-left:.5rem">${e.grade}</span>
+      <span style="margin-left:.5rem;font-family:var(--font-mono);font-size:.75rem;color:var(--text-2)">${e.score.toFixed(1)}</span>
+      ${e.confirmations && e.confirmations.length ? `
+        <div class="confirmation-tags">
+          ${e.confirmations.slice(0,3).map(c => `<span class="conf-tag">${c}</span>`).join("")}
+        </div>` : ""}
+    </div>`).join("");
+}
+
+// ── Scorecard update ────────────────────────────────────────────────────────
+function updateScorecard() {
+  const active = Object.values(pairData).filter(d => d.grade === "A+" || d.grade === "A").length;
+  document.getElementById("active-signals").textContent = active;
+  document.getElementById("pairs-scanned").textContent = Object.keys(pairData).length || 8;
+  document.getElementById("last-scan").textContent = new Date().toISOString().slice(11, 19);
+}
+
+// ── Firebase integration ────────────────────────────────────────────────────
+function initFirebase() {
+  // Firebase config is injected at runtime via environment / GitHub Actions secret.
+  // If window.FIREBASE_CONFIG is set (via a build step or inline script), use it.
+  // Otherwise, fall back to demo/mock mode.
+  if (typeof window.FIREBASE_CONFIG !== "undefined") {
+    try {
+      const { initializeApp } = window.firebase_app || {};
+      const { getDatabase, ref, onValue } = window.firebase_db || {};
+      if (initializeApp && getDatabase) {
+        const app = initializeApp(window.FIREBASE_CONFIG);
+        const db  = getDatabase(app);
+        PAIRS.forEach(pair => {
+          const r = ref(db, `live_state/ICT_FOREX/${pair}`);
+          onValue(r, snapshot => {
+            const val = snapshot.val();
+            if (val) {
+              pairData[pair] = val;
+              checkForNewSignal(pair, val);
+              renderPairList();
+              updateScorecard();
+              if (selectedPair === pair) selectPair(pair);
+            }
+          });
+        });
+        firebaseReady = true;
+        return;
+      }
+    } catch (e) {
+      console.warn("Firebase init failed, using demo mode:", e);
+    }
+  }
+  // Demo mode — simulate random data for UI development
+  startDemoMode();
+}
+
+// ── New signal detection ────────────────────────────────────────────────────
+function checkForNewSignal(pair, d) {
+  if ((d.grade === "A+" || d.grade === "A") && d.signal !== "NONE") {
+    const already = signalLog.some(e => e.pair === pair && e.time === d.updated_at);
+    if (!already) {
+      signalLog.push({
+        pair,
+        direction:    d.signal,
+        grade:        d.grade,
+        score:        d.score || 0,
+        time:         d.updated_at || new Date().toISOString(),
+        confirmations: d.confirmations || [],
+      });
+      renderSignalLog();
+    }
+  }
+}
+
+// ── Demo mode (no Firebase wired) ───────────────────────────────────────────
+function startDemoMode() {
+  console.info("ICT Dashboard: demo mode (no Firebase config)");
+  function genDemo() {
+    const grades = ["A+","A","A","B","B","C","C","—"];
+    const dirs   = ["LONG","SHORT","NONE","NONE"];
+    PAIRS.forEach(pair => {
+      const g = grades[Math.floor(Math.random() * grades.length)];
+      const d = (g === "A+" || g === "A") ? dirs[Math.floor(Math.random()*2)] : "NONE";
+      const score = g === "A+" ? 8.5 + Math.random() :
+                    g === "A"  ? 6.5 + Math.random() * 2 :
+                    g === "B"  ? 5.0 + Math.random() * 1.5 :
+                                 Math.random() * 5;
+      pairData[pair] = {
+        signal: d, grade: g, score,
+        long_score:  Math.random() * 10,
+        short_score: Math.random() * 10,
+        confirmations: d !== "NONE" ? ["Kill Zone: NY Open","Sweep: BULLISH","FVG tap"] : [],
+        missing: d === "NONE" ? ["Kill Zone","Liquidity sweep"] : [],
+        in_kill_zone: Math.random() > .5,
+        kill_zone: "NY Open",
+        component_scores: {
+          kill_zone:        Math.random() * 2,
+          sweep:            Math.random() * 2.5,
+          fvg_tap:          Math.random() * 2,
+          market_structure: Math.random() * 2,
+          pd_alignment:     Math.random() * 1.5,
+        },
+        updated_at: new Date().toISOString(),
+      };
+      checkForNewSignal(pair, pairData[pair]);
+    });
+    renderPairList();
+    updateScorecard();
+    if (!selectedPair) selectPair(PAIRS[0]);
+  }
+  genDemo();
+  setInterval(genDemo, 30_000);
+}
+
+// ── Clock ───────────────────────────────────────────────────────────────────
+setInterval(updateKillZone, 10_000);
+
+// ── Boot ────────────────────────────────────────────────────────────────────
+document.addEventListener("DOMContentLoaded", () => {
+  updateKillZone();
+  initFirebase();
+});
+</script>
+
+</body>
+</html>
