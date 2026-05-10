@@ -1,0 +1,88 @@
+# ── ICT Micro-Edge Engine Configuration ───────────────────────────────────── #
+#
+# ISOLATION RULE: These parameters govern the retail/ICT subsystem ONLY.
+# They MUST NOT be read by or influence Sovereign (institutional) components.
+# Never import this file in sovereign/, layer1/, layer2/, layer3/.
+#
+# Purpose: small-account capital generation ($5k–$50k), behavioral micro-edges.
+# Risk profile: high leverage, tight stops, selective session participation.
+
+session:
+  # Kill Zone windows in UTC hours (approximates ET DST).  Tune to broker data.
+  kill_zones:
+    London:
+      start_utc: "02:00"
+      end_utc:   "05:00"
+    NY_Open:
+      start_utc: "07:00"
+      end_utc:   "10:00"
+    NY_PM:
+      start_utc: "13:30"
+      end_utc:   "16:00"
+    Asia:
+      start_utc: "20:00"
+      end_utc:   "23:59"
+  # Block entries during NY lunch consolidation
+  ny_lunch_start_utc: "12:00"
+  ny_lunch_end_utc:   "13:30"
+  # Kill zones considered high-probability (entries allowed only here)
+  high_probability_zones: ["London", "NY_Open", "NY_PM"]
+
+sweep:
+  # Minimum lookback bars to establish the SSL/BSL level being swept
+  lookback_bars: 20
+  # Price must close back through the swept level within this many bars
+  reversal_bars: 3
+  # Swept level must be at least this multiple of ATR beyond prior range
+  min_wick_atr_multiple: 0.3
+
+fvg:
+  # FVG must be at least this fraction of ATR to be tradeable
+  min_size_atr_fraction: 0.3
+  # Maximum bars since FVG formed before we consider it stale
+  max_age_bars: 50
+  # Require price to approach within this fraction of FVG size to confirm tap
+  tap_proximity_fraction: 0.5
+
+order_block:
+  # Look back this many bars for order block candidates
+  lookback_bars: 20
+  # Impulse candle must be at least N × ATR to qualify as valid OB
+  impulse_atr_multiple: 1.5
+
+micro_risk:
+  # Hard cap: never risk more than this fraction of account per trade
+  max_risk_per_trade: 0.02          # 2 %
+  # Hard cap: max total open risk at any time
+  max_concurrent_risk: 0.06         # 6 % combined (3 × 2 %)
+  # Max concurrent ICT positions
+  max_positions: 3
+  # Daily loss limit — halt trading for the day if breached
+  max_daily_loss_pct: 0.05          # 5 %
+  # Default leverage cap (broker max may be higher; we enforce this ceiling)
+  max_leverage: 30
+  # R:R minimum to take a trade (1 : N where N >= this)
+  min_rr: 2.0
+  # Stop placed below/above this ATR multiple from entry
+  stop_atr_multiple: 1.0
+  # TP1 at this R multiple (partial close)
+  tp1_r: 2.0
+  # TP2 at this R multiple (full close or trail)
+  tp2_r: 4.0
+  # Fraction of position to close at TP1
+  tp1_size_fraction: 0.5
+
+scoring:
+  # Minimum score to generate a paper trade signal
+  min_score_to_trade: 6.5
+  # A+ grade threshold
+  grade_a_plus_threshold: 8.5
+  # B grade threshold (logged, not executed); below this = C (rejected)
+  grade_b_threshold: 5.0
+  # Component weights (must sum to 10.0)
+  weights:
+    kill_zone:    2.0   # timing is non-negotiable
+    sweep:        2.5   # institutional fuel — highest weight
+    fvg_tap:      2.0   # precision entry alignment
+    market_structure: 2.0  # BOS / CHOCH confirmation
+    pd_alignment: 1.5   # premium/discount zone alignment
