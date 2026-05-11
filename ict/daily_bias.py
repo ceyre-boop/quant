@@ -30,16 +30,16 @@ from typing import Dict, List, Optional
 logger = logging.getLogger(__name__)
 
 # Pairs the ICT engine trades
-ICT_PAIRS = ['USDJPY', 'NZDUSD', 'EURUSD']
+ICT_PAIRS = ['GBPUSD', 'EURUSD', 'AUDUSD', 'AUDNZD']
 
 # Currency → pairs affected
 CURRENCY_PAIRS = {
-    'USD': ['USDJPY', 'NZDUSD', 'EURUSD'],
-    'JPY': ['USDJPY'],
+    'USD': ['GBPUSD', 'EURUSD', 'AUDUSD'],
+    'GBP': ['GBPUSD'],
     'EUR': ['EURUSD'],
-    'NZD': ['NZDUSD'],
-    'GBP': [],
-    'AUD': [],
+    'AUD': ['AUDUSD', 'AUDNZD'],
+    'NZD': ['AUDNZD'],
+    'JPY': [],
     'CAD': [],
     'CHF': [],
 }
@@ -180,27 +180,74 @@ def _regime_to_pair_vote(regime: str, pair: str) -> float:
     # USD-positive regimes
     if any(x in r for x in ('DOLLAR_WRECKING', 'USD_STRENGTH', 'RISK_OFF', 'FLIGHT_TO_SAFETY',
                              'FED_HIKING', 'RATE_DIFFERENTIAL_USD')):
-        if pair == 'USDJPY': return 1.0
-        if pair in ('EURUSD', 'NZDUSD'): return -1.0
+        if pair == 'USDJPY':  return 1.0
+        if pair == 'GBPUSD':  return -1.0   # USD strong → SHORT GBPUSD
+        if pair == 'EURUSD':  return -1.0
 
     # USD-negative / risk-on
     if any(x in r for x in ('DOLLAR_DECLINE', 'RISK_ON', 'MELT_UP', 'EARLY_RECOVERY',
                              'FED_CUTTING', 'FED_PIVOT')):
-        if pair == 'USDJPY': return -1.0
-        if pair in ('EURUSD', 'NZDUSD'): return 1.0
+        if pair == 'USDJPY':  return -1.0
+        if pair == 'GBPUSD':  return 1.0    # USD weak → LONG GBPUSD
+        if pair == 'EURUSD':  return 1.0
+
+    # BOE-specific regimes (GBPUSD's primary driver)
+    if any(x in r for x in ('BOE_HIKING', 'BOE_HAWKISH', 'UK_STRENGTH')):
+        if pair == 'GBPUSD':  return 1.0
+
+    if any(x in r for x in ('BOE_CUTTING', 'BOE_DOVISH', 'UK_RECESSION', 'BREXIT')):
+        if pair == 'GBPUSD':  return -1.0
+
+    # Rate differential: FED hiking faster than BOE → SHORT GBPUSD
+    if 'FED_HIKING' in r and 'PAUSE' not in r:
+        if pair == 'GBPUSD':  return -0.8
 
     # JPY-specific
     if any(x in r for x in ('ASIAN_CURRENCY', 'BOJ', 'JAPAN', 'YEN_CARRY_UNWIND')):
-        if pair == 'USDJPY': return -1.0   # JPY strength
+        if pair == 'USDJPY':  return -1.0
 
     if 'CARRY_TRADE' in r:
-        if pair == 'USDJPY': return 1.0    # carry builds USDJPY
-        if pair == 'NZDUSD': return 1.0
+        if pair == 'USDJPY':  return 1.0
+        if pair == 'GBPUSD':  return 0.5   # GBP is a carry currency too
 
-    # Contagion / crisis = USD + JPY safe haven
+    # Contagion / crisis = USD + JPY safe haven, GBP sells off
     if any(x in r for x in ('CONTAGION', 'CRISIS', 'CREDIT_STRESS', 'REPO_STRESS',
                              'LIQUIDITY_CRISIS')):
-        if pair == 'USDJPY': return -0.5   # USD + JPY both safe haven, muted
-        if pair in ('EURUSD', 'NZDUSD'): return -1.0
+        if pair == 'USDJPY':  return -0.5
+        if pair == 'GBPUSD':  return -1.0   # GBP always sells in crisis
+        if pair == 'EURUSD':  return -1.0
+
+    # RBA-specific (AUDUSD + AUDNZD driver)
+    if any(x in r for x in ('RBA_HIKING', 'RBA_HAWKISH', 'CHINA_GROWTH',
+                             'COMMODITY_BOOM', 'IRON_ORE_BULL')):
+        if pair == 'AUDUSD':  return 1.0
+        if pair == 'AUDNZD':  return 0.7
+
+    if any(x in r for x in ('RBA_CUTTING', 'RBA_DOVISH', 'CHINA_SLOWDOWN',
+                             'COMMODITY_BUST', 'IRON_ORE_BEAR')):
+        if pair == 'AUDUSD':  return -1.0
+        if pair == 'AUDNZD':  return -0.5
+
+    # RBNZ-specific (AUDNZD driver — inverse: RBNZ hawkish = SHORT AUDNZD)
+    if any(x in r for x in ('RBNZ_HIKING', 'RBNZ_HAWKISH', 'NZ_STRENGTH')):
+        if pair == 'AUDNZD':  return -0.8
+
+    if any(x in r for x in ('RBNZ_CUTTING', 'RBNZ_DOVISH', 'NZ_WEAKNESS')):
+        if pair == 'AUDNZD':  return 0.8
+
+    # Risk-on: AUD outperforms as risk/commodity currency
+    if any(x in r for x in ('RISK_ON', 'MELT_UP', 'EARLY_RECOVERY', 'FED_CUTTING')):
+        if pair == 'AUDUSD':  return 1.0
+        if pair == 'GBPUSD':  return 0.7
+
+    # Risk-off: AUD underperforms
+    if any(x in r for x in ('RISK_OFF', 'FLIGHT_TO_SAFETY', 'CONTAGION', 'CRISIS')):
+        if pair == 'AUDUSD':  return -1.0
+        if pair == 'GBPUSD':  return -0.8
+
+    # Oil/commodity stress
+    if 'OIL' in r or 'SHALE' in r or 'COMMODITY' in r:
+        if pair == 'AUDUSD':  return -0.6   # AUD is a commodity currency
+        if pair == 'GBPUSD':  return -0.3
 
     return 0.0

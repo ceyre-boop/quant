@@ -33,8 +33,13 @@ SESSION_CLOSE_HOUR_ET = 16
 
 # ── Proven configuration (data-driven, not theory) ─────────────────────────── #
 
-# Dead pairs removed: AUDUSD (12% WR), GBPUSD (22% WR), GBPJPY (27% WR)
-PROVEN_PAIRS = ['USDJPY=X', 'NZDUSD=X', 'EURUSD=X']
+# Macro-filtered universe (forex v004 results — all pairs macro-gated via library):
+#   GBPUSD: Sharpe 1.094, WR 59.4%, PF 1.76 — BOE/FED rate differential
+#   EURUSD: Sharpe 0.982, WR 54.5%, PF 1.62 — ECB/FED rate differential
+#   AUDUSD: Sharpe 0.896, WR 52.5%, PF 1.56 — RBA/FED rate differential
+#   AUDNZD: Sharpe 0.884, WR 56.3%, PF 1.61 — RBA/RBNZ rate differential
+# ICT entry precision + macro direction filter = compounding edge
+PROVEN_PAIRS = ['GBPUSD=X', 'EURUSD=X', 'AUDUSD=X', 'AUDNZD=X']
 
 # NY PM is the only session with positive EV (53% WR, +0.556R avg)
 # London included as secondary (31% WR, slightly negative — monitor only)

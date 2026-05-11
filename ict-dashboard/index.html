@@ -280,7 +280,7 @@ const FB = {
   appId:             "1:407183241024:web:185f9744b9eeaaa8cc14a5",
 };
 const FB_ROOT = "signals/ICT_ENGINE";
-const PAIRS   = ["USDJPY","NZDUSD","EURUSD"];
+const PAIRS   = ["GBPUSD","EURUSD","AUDUSD","AUDNZD"];
 
 const SESSIONS = [
   {name:"LONDON", start:2,  end:5,  label:"London Killzone"},
@@ -354,9 +354,10 @@ window._fb = { initializeApp, getDatabase, ref, onValue };
   <!-- ── Sidebar ── -->
   <nav class="sidebar">
     <div class="sb-section">Pairs</div>
-    <label class="sb-item active"><input type="checkbox" checked onchange="filterChanged()"> USDJPY</label>
-    <label class="sb-item active"><input type="checkbox" checked onchange="filterChanged()"> NZDUSD</label>
+    <label class="sb-item active"><input type="checkbox" checked onchange="filterChanged()"> GBPUSD</label>
     <label class="sb-item active"><input type="checkbox" checked onchange="filterChanged()"> EURUSD</label>
+    <label class="sb-item active"><input type="checkbox" checked onchange="filterChanged()"> AUDUSD</label>
+    <label class="sb-item active"><input type="checkbox" checked onchange="filterChanged()"> AUDNZD</label>
 
     <div class="sb-section">Session</div>
     <div class="sb-item active" data-sess="NY_PM" onclick="setSessFilter(this)">NY PM <span style="margin-left:auto;font-size:9px;color:var(--green)">PRIMARY</span></div>
@@ -1132,7 +1133,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       // Memory matches + heatmaps per pair
-      ['USDJPY','NZDUSD','EURUSD'].forEach(pair => {
+      ['GBPUSD','EURUSD','AUDUSD','AUDNZD'].forEach(pair => {
         onValue(ref(db, `${FB_ROOT}/${pair}/memory`), snap => {
           const d = snap.val();
           if (d) { _state.memoryMatches[pair] = d; renderMarketConditions(_state.signals, _state.system); }
