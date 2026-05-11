@@ -149,6 +149,10 @@ class SweepDetector:
 
     @staticmethod
     def _normalise(df: pd.DataFrame) -> pd.DataFrame:
+        if isinstance(df.columns, pd.MultiIndex):
+            df.columns = df.columns.get_level_values(0)
+        rename = {c: c.capitalize() for c in df.columns if c.lower() in ('open','high','low','close','volume')}
+        return df.rename(columns=rename)[['Open','High','Low','Close']].dropna()
 
     @staticmethod
     def _load_config(config_path: Optional[str]) -> dict:

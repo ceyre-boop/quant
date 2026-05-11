@@ -234,15 +234,35 @@ class MicroRiskEngine:
         )
 
     def suggest_stop(self, entry: float, direction: str, atr: float) -> float:
-        """
-        Suggest an ATR-based stop-loss level (default ICT micro-risk style).
-
-        Caller may override with structural stop; this is just a default.
-        """
+        """ATR-based stop — fallback when no structural level is available."""
         mult = self.stop_atr_mult
         if direction == "LONG":
             return entry - mult * atr
         return entry + mult * atr
+
+    def structural_stop(
+        self,
+        swept_level: float,
+        direction: str,
+        atr: float,
+        buffer_atr: float = 0.08,
+    ) -> float:
+        """
+        ICT structural stop: place stop just beyond the swept level.
+
+        For LONG (bullish sweep of a low): stop = swept_level - buffer
+        For SHORT (bearish sweep of a high): stop = swept_level + buffer
+
+        This is the correct ICT invalidation point.  If price closes back
+        through the swept level, the setup is invalidated — smart money
+        did NOT defend it.
+
+        The buffer (default 0.08×ATR) accounts for spread and slippage.
+        """
+        buf = buffer_atr * atr
+        if direction == "LONG":
+            return swept_level - buf
+        return swept_level + buf
 
     # ── Private helpers ────────────────────────────────────────────────── #
 
