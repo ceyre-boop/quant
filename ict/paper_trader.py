@@ -108,7 +108,7 @@ class PaperTrader:
     def has_open_trade(self, pair: str) -> bool:
         return any(t['pair'] == pair for t in self._state.get('open', []))
 
-    def open_trade(self, scan_result, tp1_r: float = TP1_R, tp2_r: float = TP2_R) -> Optional[PaperTrade]:
+    def open_trade(self, scan_result, tp1_r: float = TP1_R, tp2_r: float = TP2_R, risk_mult: float = 1.0) -> Optional[PaperTrade]:
         """
         Open a new paper trade from a ScanResult.
         Returns None if pair already has an open trade or max concurrent reached.
@@ -127,7 +127,7 @@ class PaperTrader:
             return None
 
         stop_dist    = abs(entry - stop)
-        risk_dollars = ACCOUNT * RISK_PCT
+        risk_dollars = ACCOUNT * RISK_PCT * max(risk_mult, 0.25)
         sign         = 1 if scan_result.signal == 'LONG' else -1
         tp1          = entry + sign * stop_dist * tp1_r
         tp2          = entry + sign * stop_dist * tp2_r

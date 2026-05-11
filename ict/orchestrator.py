@@ -41,10 +41,11 @@ SESSION_CLOSE_HOUR_ET = 16
 # ICT entry precision + macro direction filter = compounding edge
 PROVEN_PAIRS = ['GBPUSD=X', 'EURUSD=X', 'AUDUSD=X', 'AUDNZD=X']
 
-# NY PM is the only session with positive EV (53% WR, +0.556R avg)
-# London included as secondary (31% WR, slightly negative — monitor only)
-ACTIVE_SESSIONS = {'NY_PM', 'London'}
-PRIMARY_SESSION = 'NY_PM'   # where real edge lives
+# NY PM: primary session, all pairs
+# London: GBPUSD-only (BOE overlap gives clean BOE/FED structure — 59.4% WR)
+ACTIVE_SESSIONS   = {'NY_PM', 'London'}
+PRIMARY_SESSION   = 'NY_PM'
+LONDON_PAIRS      = {'GBPUSD'}   # only GBPUSD trades London (has BOE structure)
 
 FIREBASE_ROOT   = 'signals/ICT_ENGINE'
 ACCOUNT_SIZE    = 10_000.0
@@ -223,13 +224,63 @@ class ICTOrchestrator:
                         or bias_dir == best.direction
                     )
 
-                    # A-grade + primary session + no blackout + bias agrees = actionable
+                    # Lever 4: Memory skip — low similarity or losing cluster
+                    mem_check   = self._memory.match(
+                        type('R', (), {'pair': clean, 'signal': best.direction,
+                                       'grade': best.grade.value if hasattr(best.grade,'value') else str(best.grade),
+                                       'score': best.score, 'session': sess_name,
+                                       'adr_pct': 0.0, 'risk_pct': 0.0,
+                                       'confirmations': best.confirmations,
+                                       'missing': best.missing})()
+                    )
+                    mem_veto = (
+                        mem_check.available
+                        and (mem_check.similarity < 0.50
+                             or mem_check.historical_wr < 0.30)
+                    )
+                    if mem_veto:
+                        logger.info("%s: memory veto sim=%.2f wr=%.2f",
+                                    clean, mem_check.similarity, mem_check.historical_wr)
+
+                    # Lever 5: Heatmap conflict — opposing magnet closer than TP1
+                    heatmap_conflict = False
+                    try:
+                        from ict.liquidity_heatmap import compute_heatmap
+                        hm = compute_heatmap(clean, df, atr)
+                        top = hm.get('top_magnet')
+                        if top and sz:
+                            entry_p = getattr(best, 'entry_level', None)
+                            tp1_p   = getattr(sz, 'tp1', None)
+                            if entry_p and tp1_p and top['prob'] > 0.75:
+                                magnet_dist = abs(top['price'] - entry_p)
+                                tp1_dist    = abs(tp1_p - entry_p)
+                                # Magnet between entry and TP1 = conflict
+                                opposing_side = (
+                                    (best.direction == 'LONG'  and top['price'] < entry_p) or
+                                    (best.direction == 'SHORT' and top['price'] > entry_p)
+                                )
+                                if not opposing_side and magnet_dist < tp1_dist:
+                                    heatmap_conflict = True
+                                    logger.info("%s: heatmap conflict — magnet %.5f prob=%.2f blocks TP1",
+                                                clean, top['price'], top['prob'])
+                    except Exception:
+                        pass
+
+                    # London session: only GBPUSD trades (has BOE/FED structure)
+                    session_ok = (
+                        sess_name == PRIMARY_SESSION
+                        or (sess_name == 'London' and clean in LONDON_PAIRS)
+                    )
+
+                    # A-grade + session + no blackout + bias agrees + memory + heatmap
                     is_actionable = (
                         best.passed
                         and best.grade == ICTGrade.A
-                        and sess_name in ACTIVE_SESSIONS
+                        and session_ok
                         and not blackout
                         and bias_agrees
+                        and not mem_veto
+                        and not heatmap_conflict
                     )
                     if not bias_agrees:
                         logger.info("%s: bias=%s conflicts signal=%s — skipping",
@@ -306,11 +357,12 @@ class ICTOrchestrator:
                     if regime_targets['skip']:
                         logger.info("%s: regime says SKIP (%s)", clean, regime_targets['reason'])
                     else:
-                        # Pass regime targets into paper trader
+                        # Pass regime targets + risk multiplier into paper trader
                         opened = self._paper.open_trade(
                             r,
                             tp1_r=regime_targets['tp1_r'],
                             tp2_r=regime_targets['tp2_r'],
+                            risk_mult=regime_targets.get('risk_mult', 1.0),
                         )
                         if opened:
                             logger.info(

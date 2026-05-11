@@ -44,11 +44,19 @@ _REGIME_MAP = {
     'CONTAGION':             (1.5, 2.5, 'STRESSED',   'Contagion — very tight'),
 }
 
-# Threat-level overrides (apply after regime lookup)
+# Threat-level overrides — never skip entirely (timeout kills prop challenge)
+# Instead: reduce targets and risk. Only true black swans (repo freeze) skip.
 _THREAT_OVERRIDE = {
-    'CRITICAL': (0.0, 0.0, 'SKIP',     'CRITICAL threat — no new trades'),
-    'DANGER':   (1.5, 2.5, 'STRESSED', 'DANGER threat — tight targets only'),
-    'WARNING':  (1.5, 3.0, 'STRESSED', 'WARNING threat — conservative targets'),
+    'CRITICAL': (1.5, 2.5, 'STRESSED', 'CRITICAL — tightest targets, 0.5% risk'),
+    'DANGER':   (1.5, 3.0, 'STRESSED', 'DANGER — tight targets, reduced risk'),
+    'WARNING':  (2.0, 3.5, 'STRESSED', 'WARNING — conservative targets'),
+}
+
+# True skip events — only these hard-coded regime names cause a full skip
+_SKIP_REGIMES = {
+    'REPO_MARKET_STRESS',       # interbank freeze
+    'EXCHANGE_CIRCUIT_BREAKER', # market-wide halt
+    'FLASH_CRASH',              # genuine 1-in-100 day
 }
 
 DEFAULT = (2.0, 4.0, 'NEUTRAL', 'Default ICT 2R/4R')
@@ -60,22 +68,27 @@ def get_regime_targets(regime: str, threat: str = 'NORMAL') -> dict:
 
     Returns:
       {
-        'tp1_r':    2.0,
-        'tp2_r':    4.0,
-        'mode':     'NEUTRAL',
-        'reason':   'Standard ICT 2R/4R',
-        'skip':     False,
+        'tp1_r':      2.0,
+        'tp2_r':      4.0,
+        'risk_mult':  1.0,   # multiply base risk% by this
+        'mode':       'NEUTRAL',
+        'reason':     'Standard ICT 2R/4R',
+        'skip':       False,
       }
     """
-    # Threat override takes priority
+    # Hard skip for true black-swan regimes only
+    if regime in _SKIP_REGIMES:
+        return {'tp1_r': 0, 'tp2_r': 0, 'risk_mult': 0,
+                'mode': 'SKIP', 'reason': f'{regime} — market halted', 'skip': True}
+
+    # Threat override adjusts targets + risk multiplier
+    risk_mult = 1.0
     if threat in _THREAT_OVERRIDE:
         tp1, tp2, mode, reason = _THREAT_OVERRIDE[threat]
+        risk_mult = {'CRITICAL': 0.5, 'DANGER': 0.75, 'WARNING': 0.85}.get(threat, 1.0)
         return {
-            'tp1_r':  tp1,
-            'tp2_r':  tp2,
-            'mode':   mode,
-            'reason': reason,
-            'skip':   mode == 'SKIP',
+            'tp1_r': tp1, 'tp2_r': tp2, 'risk_mult': risk_mult,
+            'mode': mode, 'reason': reason, 'skip': False,
         }
 
     # Regime lookup — try exact match then keyword scan
@@ -92,9 +105,10 @@ def get_regime_targets(regime: str, threat: str = 'NORMAL') -> dict:
 
     tp1, tp2, mode, reason = entry
     return {
-        'tp1_r':  tp1,
-        'tp2_r':  tp2,
-        'mode':   mode,
-        'reason': reason,
-        'skip':   False,
+        'tp1_r':     tp1,
+        'tp2_r':     tp2,
+        'risk_mult': 1.0,
+        'mode':      mode,
+        'reason':    reason,
+        'skip':      False,
     }
