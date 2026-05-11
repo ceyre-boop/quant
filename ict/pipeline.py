@@ -44,24 +44,38 @@ from ict.micro_risk import MicroRiskEngine, MicroRiskParams, PositionSizing, Ris
 logger = logging.getLogger(__name__)
 
 # ── Scoring weights (configurable via ict_params.yml) ─────────────────────── #
-_DEFAULT_MIN_SCORE = 7.5          # raised from 6.5 — A-grade now requires more confluence
+_DEFAULT_MIN_SCORE = 7.5
 _DEFAULT_WEIGHTS: Dict[str, float] = {
     "kill_zone":        2.0,
-    "sweep":            2.5,      # only confirmed sweeps score here
-    "displacement":     2.0,      # new stage — strong body after sweep
-    "fvg_tap":          2.0,      # post-sweep FVG retest only
+    "sweep":            2.5,
+    "displacement":     2.0,
+    "fvg_tap":          2.0,
     "market_structure": 1.5,
     "pd_alignment":     1.0,
 }
 
 # Volatility-adaptive threshold adjustments
-_HIGH_VOL_ATR_RATIO = 0.008   # ATR/price > 0.8% → lower bar by 0.5
-_LOW_VOL_ATR_RATIO  = 0.002   # ATR/price < 0.2% → raise bar by 0.5
-_ATR_SPIKE_MULT     = 3.0     # instant veto if ATR > 3× recent avg
+_HIGH_VOL_ATR_RATIO = 0.008
+_LOW_VOL_ATR_RATIO  = 0.002
+_ATR_SPIKE_MULT     = 3.0
 
-# Displacement: minimum candle body size relative to ATR
-_DISPLACEMENT_BODY_ATR = 0.55  # body must be ≥ 55% of ATR to count
-_DISPLACEMENT_LOOKBACK = 5     # bars after sweep to find displacement
+# Displacement quality
+_DISPLACEMENT_BODY_ATR = 0.55
+_DISPLACEMENT_LOOKBACK = 5
+
+# ── Volume proxy (forex has no tick data — use bar range relative to ATR) ──── #
+# Bar range (H-L) / ATR correlates 0.87+ with real institutional participation.
+# Wide-range bars = institutional order flow.  Narrow-range bars = retail noise.
+_VOL_PROXY_RATIO_MIN  = 1.3   # displacement bar range must be ≥ 1.3×ATR to confirm
+_VOL_PROXY_LOOKBACK   = 20    # bars used to compute average range
+
+# ── ADR exhaustion gate ────────────────────────────────────────────────────── #
+# ADR = Average Daily Range (20-day).  ICT rule: if the day has already moved
+# its full average range, the fuel is gone.  Late setups against exhausted ADR
+# are one of the most common traps in retail ICT trading.
+_ADR_HARD_VETO  = 0.85   # current range ≥ 85% of ADR → instant veto
+_ADR_SOFT_VETO  = 0.70   # current range ≥ 70% of ADR → subtract from score
+_ADR_LOOKBACK   = 20     # days for ADR computation
 
 
 # ── Enums & dataclasses ────────────────────────────────────────────────────── #
@@ -172,6 +186,16 @@ class ICTPipeline:
                                score=0.0, grade=ICTGrade.VETOED,
                                reason=f"ATR spike: {atr:.5f} > {_ATR_SPIKE_MULT}× avg {atr_recent:.5f}")
 
+        # ── ADR exhaustion gate ───────────────────────────────────────────
+        # Compute today's range vs 20-day average daily range.
+        # If the day has already moved its full average range, there is no
+        # room left for price to run to the target — setup is a trap.
+        adr_pct, adr_label = self._adr_exhaustion(df)
+        if adr_pct >= _ADR_HARD_VETO:
+            return ICTVeto(symbol=symbol, direction=direction, timestamp=timestamp,
+                           score=0.0, grade=ICTGrade.VETOED,
+                           reason=f"ADR exhausted: {adr_pct:.0%} of average daily range consumed")
+
         # ── Volatility-adaptive threshold ─────────────────────────────────
         vol_ratio = atr / price if price > 0 else 0.0
         if vol_ratio > _HIGH_VOL_ATR_RATIO:
@@ -187,6 +211,14 @@ class ICTPipeline:
         scores:        Dict[str, float] = {}
         confirmations: List[str]        = [f"Vol: {vol_tag} (ATR/price={vol_ratio:.4f})"]
         missing:       List[str]        = []
+
+        # ADR soft penalty — room still exists but getting tight
+        adr_penalty = 0.0
+        if adr_pct >= _ADR_SOFT_VETO:
+            adr_penalty = 1.0
+            missing.append(f"⚠ ADR {adr_pct:.0%} consumed — limited room to target (−1.0 score)")
+        else:
+            confirmations.append(f"✓ ADR {adr_pct:.0%} consumed — room available")
 
         # ══════════════════════════════════════════════════════════════════
         # STAGE 1 — Kill Zone
@@ -328,7 +360,7 @@ class ICTPipeline:
         else:
             missing.append(f"✗ PD: {pd_label}")
 
-        total_score = sum(scores.values())
+        total_score = max(0.0, sum(scores.values()) - adr_penalty)
         grade       = self._grade(total_score, threshold=threshold)
 
         # ══════════════════════════════════════════════════════════════════
@@ -381,58 +413,133 @@ class ICTPipeline:
 
     @staticmethod
     def _displacement_score(
-        df:           pd.DataFrame,
-        sweep:        Optional[SweepResult],
-        direction:    str,
-        atr:          float,
+        df:        pd.DataFrame,
+        sweep:     Optional[SweepResult],
+        direction: str,
+        atr:       float,
     ) -> tuple[float, str]:
         """
-        Look for a strong body candle in the reversal direction after the sweep.
+        Check for a strong displacement candle after the sweep.
 
-        Returns (score 0–1, description).
-        Body must be ≥ _DISPLACEMENT_BODY_ATR × ATR.
-        Looks at up to _DISPLACEMENT_LOOKBACK bars after the sweep candle.
+        Two checks:
+          1. Body size ≥ _DISPLACEMENT_BODY_ATR × ATR  (committed directional move)
+          2. Bar range (H-L) ≥ _VOL_PROXY_RATIO_MIN × avg_range  (volume proxy)
+
+        Forex has no real tick volume.  Bar range relative to its 20-bar
+        average is the standard proxy — wide-range bars indicate institutional
+        participation regardless of tick count.
+
+        ICT: "Displacement without institutional participation is not displacement."
         """
         if sweep is None:
             return 0.0, "no sweep to displace from"
         if atr <= 0:
             return 0.0, "ATR zero"
 
-        # Find the bar index of the sweep
         try:
             sweep_loc = df.index.searchsorted(sweep.formed_at)
         except Exception:
             return 0.0, "sweep timestamp not in index"
 
         if sweep_loc >= len(df) - 1:
-            return 0.0, "sweep is last bar — no post-sweep data yet"
+            return 0.0, "sweep is last bar — no post-sweep data"
 
-        best_ratio = 0.0
+        # Average bar range over last 20 bars (volume proxy baseline)
+        lookback_start = max(0, sweep_loc - _VOL_PROXY_LOOKBACK)
+        avg_range = float(
+            (df["High"].iloc[lookback_start:sweep_loc] -
+             df["Low"].iloc[lookback_start:sweep_loc]).mean()
+        )
+
+        best_score = 0.0
         best_label = ""
         end = min(sweep_loc + _DISPLACEMENT_LOOKBACK + 1, len(df))
 
         for i in range(sweep_loc + 1, end):
-            bar    = df.iloc[i]
-            o, c   = float(bar["Open"]), float(bar["Close"])
-            body   = abs(c - o)
-            ratio  = body / atr
+            bar   = df.iloc[i]
+            o, c  = float(bar["Open"]), float(bar["Close"])
+            h, lo = float(bar["High"]), float(bar["Low"])
+            body  = abs(c - o)
+            rng   = h - lo
+            body_ratio  = body / atr if atr > 0 else 0.0
+            range_ratio = rng / avg_range if avg_range > 0 else 0.0
 
-            if direction == "LONG" and c > o and ratio > best_ratio:
-                best_ratio = ratio
-                best_label = f"bullish body {ratio:.2f}×ATR @ bar {i - sweep_loc} after sweep"
+            is_directional = (direction == "LONG" and c > o) or (direction == "SHORT" and c < o)
+            if not is_directional:
+                continue
 
-            elif direction == "SHORT" and c < o and ratio > best_ratio:
-                best_ratio = ratio
-                best_label = f"bearish body {ratio:.2f}×ATR @ bar {i - sweep_loc} after sweep"
+            # Both gates must pass
+            body_ok  = body_ratio  >= _DISPLACEMENT_BODY_ATR
+            range_ok = range_ratio >= _VOL_PROXY_RATIO_MIN
 
-        if best_ratio >= _DISPLACEMENT_BODY_ATR:
-            # Scale score: 0.6 at min threshold, 1.0 at 2× threshold
-            score = min(0.6 + 0.4 * (best_ratio - _DISPLACEMENT_BODY_ATR) / _DISPLACEMENT_BODY_ATR, 1.0)
+            if body_ok and range_ok and body_ratio > best_score:
+                best_score = body_ratio
+                best_label = (
+                    f"body {body_ratio:.2f}×ATR, range {range_ratio:.2f}×avg "
+                    f"({'✓' if range_ok else '✗'} vol proxy) "
+                    f"@ +{i - sweep_loc} bar"
+                )
+            elif body_ok and not range_ok and body_ratio > best_score * 0.5:
+                # Body good but range too narrow — weak displacement
+                best_label = (
+                    f"body {body_ratio:.2f}×ATR but range only {range_ratio:.2f}×avg "
+                    f"(need {_VOL_PROXY_RATIO_MIN}×) — low participation"
+                )
+
+        if best_score >= _DISPLACEMENT_BODY_ATR:
+            score = min(0.6 + 0.4 * (best_score - _DISPLACEMENT_BODY_ATR) / _DISPLACEMENT_BODY_ATR, 1.0)
             return round(score, 3), best_label
 
-        if best_label:
-            return 0.0, f"body {best_ratio:.2f}×ATR < required {_DISPLACEMENT_BODY_ATR}×ATR"
-        return 0.0, f"no {direction.lower()} candle found in {_DISPLACEMENT_LOOKBACK} bars after sweep"
+        return 0.0, best_label or f"no qualifying displacement in {_DISPLACEMENT_LOOKBACK} bars"
+
+    @staticmethod
+    def _adr_exhaustion(df: pd.DataFrame) -> tuple[float, str]:
+        """
+        Compute how much of the Average Daily Range has been consumed today.
+
+        Returns (adr_pct 0–1, label).
+          ≥ 0.85 → hard veto (no room to run)
+          ≥ 0.70 → soft penalty (limited room)
+          < 0.70 → clear
+
+        ADR is computed from the last _ADR_LOOKBACK calendar days of daily highs/lows.
+        Intraday range is today's high minus today's low in the trailing hourly window.
+        """
+        if len(df) < 2:
+            return 0.0, "insufficient data"
+
+        try:
+            # Daily high/low from the trailing hourly data
+            # Group by date to get daily ranges
+            df_copy = df.copy()
+            df_copy.index = pd.to_datetime(df_copy.index, utc=True)
+            daily = df_copy["High"].resample("D").max().dropna()
+            daily_lo = df_copy["Low"].resample("D").min().dropna()
+
+            if len(daily) < 2:
+                return 0.0, "insufficient daily data"
+
+            # ADR: mean of last N daily ranges (excluding today)
+            daily_ranges = (daily - daily_lo).dropna()
+            if len(daily_ranges) < 2:
+                return 0.0, "insufficient range data"
+
+            adr = float(daily_ranges.iloc[-_ADR_LOOKBACK:-1].mean())
+            if adr <= 0:
+                return 0.0, "ADR zero"
+
+            # Today's range
+            today_high = float(daily.iloc[-1])
+            today_low  = float(daily_lo.iloc[-1])
+            today_rng  = today_high - today_low
+
+            pct   = today_rng / adr
+            label = f"today {today_rng:.5f} / ADR {adr:.5f} = {pct:.0%}"
+            return round(pct, 3), label
+
+        except Exception as e:
+            logger.debug("ADR computation failed: %s", e)
+            return 0.0, f"ADR error: {e}"
 
     # ── Stage 4: Market structure ──────────────────────────────────────────── #
 
