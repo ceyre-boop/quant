@@ -2,12 +2,19 @@ name: Deploy
 on:
   push:
     branches: [master]
-    paths: ["dashboard/**", "ict-dashboard/**"]
+    paths:
+      - "dashboard/**"
+      - "ict-dashboard/**"
   workflow_dispatch:
-permissions: {contents: read, pages: write, id-token: write}
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 jobs:
   deploy:
-    environment: {name: github-pages, url: ${{steps.deployment.outputs.page_url}}}
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -17,6 +24,7 @@ jobs:
           cp -r dashboard/. _site/
           cp -r ict-dashboard/. _site/ict/
       - uses: actions/upload-pages-artifact@v3
-        with: {path: './_site'}
+        with:
+          path: './_site'
       - uses: actions/deploy-pages@v4
         id: deployment
