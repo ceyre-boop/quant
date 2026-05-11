@@ -153,6 +153,13 @@ class PaperTrader:
         logger.info("📂 OPENED: %s %s @ %s  stop=%s  TP1=%s  TP2=%s",
                     trade.pair, trade.direction, trade.entry,
                     trade.stop, trade.tp1, trade.tp2)
+        self._notify(
+            f'ICT TRADE OPENED — {trade.pair}',
+            f'{trade.direction} {trade.grade}  score={trade.score:.1f}\n'
+            f'Entry {trade.entry}  Stop {trade.stop}\n'
+            f'TP1 {trade.tp1}  TP2 {trade.tp2}  Risk ${trade.risk_dollars:.0f}',
+            tags='white_check_mark',
+        )
         return trade
 
     def update_trades(self, current_prices: Dict[str, dict]) -> List[PaperTrade]:
@@ -202,6 +209,13 @@ class PaperTrader:
                 closed_this_cycle.append(t)
                 logger.info("🔴 CLOSED %s: %s  pnl=%.2fR ($%.2f)",
                             t.pair, t.outcome, t.pnl_r, t.pnl_dollars)
+                emoji = 'rotating_light' if t.outcome == 'STOP' else 'moneybag'
+                self._notify(
+                    f'ICT {t.outcome} — {t.pair}',
+                    f'{t.direction}  pnl={t.pnl_r:+.2f}R (${t.pnl_dollars:+.2f})\n'
+                    f'Entry {t.entry} → Exit {t.exit_price}',
+                    tags=emoji,
+                )
                 continue
 
             # TP2 check (only after partial close)
@@ -221,6 +235,12 @@ class PaperTrader:
                     closed_this_cycle.append(t)
                     logger.info("🟢 CLOSED %s: TP2  pnl=%.2fR ($%.2f)",
                                 t.pair, t.pnl_r, t.pnl_dollars)
+                    self._notify(
+                        f'ICT TP2 FULL TARGET — {t.pair}',
+                        f'{t.direction}  pnl={t.pnl_r:+.2f}R (${t.pnl_dollars:+.2f})\n'
+                        f'Entry {t.entry} → TP2 {t.tp2}',
+                        tags='moneybag,tada',
+                    )
                     continue
 
             # TP1 check (first half close)
@@ -340,6 +360,23 @@ class PaperTrader:
             })
         except Exception as e:
             logger.debug("Firebase paper mirror failed: %s", e)
+
+    def _notify(self, title: str, body: str, tags: str = 'chart_with_upwards_trend'):
+        """Push notification via ntfy.sh — zero config, works on iOS/Android."""
+        import os, urllib.request
+        topic = os.environ.get('NTFY_TOPIC', '')
+        if not topic:
+            return
+        try:
+            req = urllib.request.Request(
+                f'https://ntfy.sh/{topic}',
+                data=body.encode(),
+                headers={'Title': title, 'Tags': tags, 'Priority': '3'},
+                method='POST',
+            )
+            urllib.request.urlopen(req, timeout=5)
+        except Exception as e:
+            logger.debug("ntfy push failed: %s", e)
 
     def _days_running(self) -> int:
         started = self._state.get('started', datetime.now(timezone.utc).isoformat())
