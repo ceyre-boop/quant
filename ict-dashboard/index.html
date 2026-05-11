@@ -335,9 +335,17 @@ window._fb = { initializeApp, getDatabase, ref, onValue };
       <span class="stat-label">Live DD</span>
       <span class="stat-value stat-neutral" id="ts-live-dd">—</span>
     </div>
+    <div class="stat-pill">
+      <span class="stat-label">TP Mode</span>
+      <span class="stat-value stat-neutral" id="ts-tp-mode">—</span>
+    </div>
     <div class="topbar-auto">
       <span class="dot dot-off" id="auto-dot"></span>
       <span class="auto-label" id="auto-label" style="color:var(--text3)">AUTO PAPER</span>
+    </div>
+    <div class="topbar-auto" style="margin-left:8px">
+      <span class="dot dot-off" id="exec-dot"></span>
+      <span class="auto-label" id="exec-label" style="color:var(--text3)">ROUTING: OFF</span>
     </div>
   </div>
 </div>
@@ -540,6 +548,8 @@ let _state = {
   system:       null,
   library:      null,
   pairBiases:   {},
+  memoryMatches:{},   // pair → MemoryMatch
+  heatmaps:     {},   // pair → heatmap
   equityChart:  null,
   showBt:       false,
   sessFilter:   'NY_PM',
@@ -700,6 +710,22 @@ function renderSignals(signals) {
   tbody.innerHTML = rows || '<tr><td colspan="9" class="no-trades">No data</td></tr>';
 }
 
+function _renderMemoryBadge(pair) {
+  const m = _state.memoryMatches[pair];
+  if (!m || !m.available) {
+    const n = m ? m.n_samples : 0;
+    return `<div class="pc-stat"><div class="pc-label">Memory</div><div style="font-size:9px;color:var(--text3)">accumulating (${n}/${20})</div></div>`;
+  }
+  const outcomeColor = m.expected_outcome === 'CONTINUATION' ? 'var(--green)' : m.expected_outcome === 'REVERSAL' ? 'var(--red)' : 'var(--text3)';
+  const simPct = (m.similarity * 100).toFixed(0);
+  return `<div class="pc-stat">
+    <div class="pc-label">Memory match</div>
+    <div class="pc-val" style="color:${outcomeColor}">${m.expected_outcome}</div>
+    <div class="pc-label" style="margin-top:2px">sim=${simPct}% · WR=${(m.historical_wr*100).toFixed(0)}% · n=${m.n_samples}</div>
+    ${m.analog_date ? `<div class="pc-label" style="margin-top:1px">analog: ${m.analog_date} → ${m.analog_outcome}</div>` : ''}
+  </div>`;
+}
+
 // ── Render: performance ────────────────────────────────────────────────────────
 const BT_BASELINE = {win_rate:0.365, avg_r:0.073, sharpe:1.465, profit_factor:1.11, max_dd_pct:-10.5};
 
@@ -833,6 +859,7 @@ function renderMarketConditions(signals, system) {
         <div class="pc-val" style="color:${biasColor}">${bias} <span style="color:var(--text3);font-size:10px">${biasConf}</span></div>
         ${biasReason}
       </div>
+      ${_renderMemoryBadge(pair)}
     </div>`;
   }).join('');
 
@@ -1059,6 +1086,41 @@ document.addEventListener('DOMContentLoaded', () => {
           renderLivePerf(d.paper_stats);
         }
         updateSidebarStatus(d, d.paper_stats);
+        renderMarketConditions(_state.signals, d);
+
+        // Regime TP mode in topbar
+        const rt = d.regime_targets;
+        if (rt) {
+          const tpEl = document.getElementById('ts-tp-mode');
+          const colors = {TRENDING:'var(--green)', NEUTRAL:'var(--text2)', RANGING:'var(--amber)', STRESSED:'#f97316', SKIP:'var(--red)'};
+          tpEl.textContent = rt.skip ? 'SKIP' : `${rt.tp1_r}R/${rt.tp2_r}R`;
+          tpEl.style.color = colors[rt.mode] || 'var(--text2)';
+          tpEl.title = rt.reason;
+        }
+
+        // Executor / routing status
+        const ex = d.executor;
+        if (ex) {
+          const dot   = document.getElementById('exec-dot');
+          const label = document.getElementById('exec-label');
+          if (ex.routing === 'LIVE') {
+            dot.className   = 'dot dot-on';
+            label.textContent = 'ROUTING: LIVE';
+            label.style.color = 'var(--green)';
+          } else if (ex.routing === 'DEMO') {
+            dot.className   = 'dot dot-on';
+            label.textContent = 'ROUTING: DEMO';
+            label.style.color = 'var(--amber)';
+          } else {
+            dot.className   = 'dot dot-off';
+            label.textContent = 'ROUTING: OFF';
+            label.style.color = 'var(--text3)';
+          }
+          if (ex.blocked) {
+            label.textContent += ' [DD LIMIT]';
+            label.style.color = 'var(--red)';
+          }
+        }
       });
 
       // Config / auto-trading flag
@@ -1067,6 +1129,18 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!d) return;
         _state.config = d;
         updateAutoStatus(d.auto_paper_trading_enabled);
+      });
+
+      // Memory matches + heatmaps per pair
+      ['USDJPY','NZDUSD','EURUSD'].forEach(pair => {
+        onValue(ref(db, `${FB_ROOT}/${pair}/memory`), snap => {
+          const d = snap.val();
+          if (d) { _state.memoryMatches[pair] = d; renderMarketConditions(_state.signals, _state.system); }
+        });
+        onValue(ref(db, `${FB_ROOT}/heatmap/${pair}`), snap => {
+          const d = snap.val();
+          if (d) { _state.heatmaps[pair] = d; }
+        });
       });
 
       // Init default BT display (from known backtest results)

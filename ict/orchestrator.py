@@ -128,12 +128,18 @@ class ICTOrchestrator:
         from ict.paper_trader import PaperTrader
         from ict.library_bridge import query_library
         from ict.daily_bias import DailyBiasEngine
-        self._pipeline    = ICTPipeline()
-        self._params      = MicroRiskParams
-        self._sess_clf    = SessionClassifier()
-        self._paper       = PaperTrader()
-        self._query_lib   = query_library
-        self._bias_engine = DailyBiasEngine()
+        from ict.memory_engine import ICTMemoryEngine
+        from ict.regime_execution import get_regime_targets
+        from execution.funderpro_executor import FunderProExecutor
+        self._pipeline       = ICTPipeline()
+        self._params         = MicroRiskParams
+        self._sess_clf       = SessionClassifier()
+        self._paper          = PaperTrader()
+        self._query_lib      = query_library
+        self._bias_engine    = DailyBiasEngine()
+        self._memory         = ICTMemoryEngine()
+        self._get_targets    = get_regime_targets
+        self._executor       = FunderProExecutor(account_size=ACCOUNT_SIZE)
         # Wire Firebase into paper trader after publisher is ready
         if self.publisher._db:
             self._paper.set_firebase(self.publisher._db)
@@ -150,11 +156,16 @@ class ICTOrchestrator:
         actionable = []
 
         # ── Macro context (once per scan, not per pair) ───────────────────
-        library_ctx = self._query_lib()
-        pair_biases = self._bias_engine.get_biases(library_ctx)
-        logger.info("Library: regime=%s threat=%s size=%.2f×",
+        library_ctx    = self._query_lib()
+        pair_biases    = self._bias_engine.get_biases(library_ctx)
+        regime_targets = self._get_targets(
+            library_ctx['regime'], library_ctx['threat']
+        )
+        logger.info("Library: regime=%s threat=%s size=%.2f× | TP %.1fR/%.1fR [%s]",
                     library_ctx['regime'], library_ctx['threat'],
-                    library_ctx['size_modifier'])
+                    library_ctx['size_modifier'],
+                    regime_targets['tp1_r'], regime_targets['tp2_r'],
+                    regime_targets['mode'])
         for p, b in pair_biases.items():
             flag = ' [BLACKOUT]' if b['blackout'] else f" bias={b['bias']} conf={b['confidence']:.2f}"
             logger.info("  %s:%s", p, flag)
@@ -249,11 +260,33 @@ class ICTOrchestrator:
                         veto_reason=best.reason,
                     )
 
+                # ── Memory: record scan, compute match ────────────────────
+                self._memory.record_scan(r)
+                memory_match = self._memory.match(r)
+
+                # Push heatmap to Firebase
+                try:
+                    from ict.liquidity_heatmap import compute_heatmap
+                    heatmap = compute_heatmap(clean, df, atr)
+                    if self.publisher._db and heatmap.get('available'):
+                        self.publisher._db.child(
+                            f'signals/ICT_ENGINE/heatmap/{clean}'
+                        ).set(heatmap)
+                except Exception as he:
+                    logger.debug("Heatmap failed for %s: %s", clean, he)
+
                 results.append(r)
                 self.publisher.push(r)
 
+                # Push memory match to Firebase
+                if self.publisher._db:
+                    try:
+                        path = f"signals/ICT_ENGINE/{clean}/memory"
+                        self.publisher._db.child(path).set(memory_match.to_dict())
+                    except Exception:
+                        pass
+
                 # ── Paper trading ─────────────────────────────────────────
-                # Update open trades with current bar prices
                 bar = df.iloc[-1]
                 self._paper.update_trades({
                     clean: {
@@ -263,13 +296,31 @@ class ICTOrchestrator:
                     }
                 })
 
-                # Open new trade if signal is actionable and no position open
+                # Open new trade if actionable — apply regime TP ratios
                 if isinstance(r, ScanResult) and r.actionable:
-                    from ict.pipeline import ICTGrade
-                    opened = self._paper.open_trade(r)
-                    if opened:
-                        logger.info("📋 Paper trade opened: %s %s grade=%s score=%.1f",
-                                    clean, r.signal, r.grade, r.score)
+                    if regime_targets['skip']:
+                        logger.info("%s: regime says SKIP (%s)", clean, regime_targets['reason'])
+                    else:
+                        # Pass regime targets into paper trader
+                        opened = self._paper.open_trade(
+                            r,
+                            tp1_r=regime_targets['tp1_r'],
+                            tp2_r=regime_targets['tp2_r'],
+                        )
+                        if opened:
+                            logger.info(
+                                "📋 Paper trade opened: %s %s grade=%s score=%.1f "
+                                "TP %.1fR/%.1fR [%s]",
+                                clean, r.signal, r.grade, r.score,
+                                regime_targets['tp1_r'], regime_targets['tp2_r'],
+                                regime_targets['mode'],
+                            )
+                        # Forward to prop executor (OFF by default)
+                        self._executor.submit(
+                            r,
+                            tp1_r=regime_targets['tp1_r'],
+                            tp2_r=regime_targets['tp2_r'],
+                        )
 
             except Exception as e:
                 logger.error("%s scan failed: %s", clean, e)
@@ -284,18 +335,21 @@ class ICTOrchestrator:
                 logger.info("Session ended — closed %d trade(s)", len(closed))
 
         # Push running paper stats + macro context to Firebase
-        stats = self._paper.get_stats()
+        stats           = self._paper.get_stats()
+        executor_status = self._executor.get_status().to_dict()
         self.publisher.push_system({
-            'updated_at':    now.isoformat(),
-            'session':       session.kill_zone_name or 'OFF-HOURS',
-            'is_primary':    session.kill_zone_name == PRIMARY_SESSION,
-            'pairs_scanned': len(results),
-            'actionable':    len(actionable),
-            'open_trades':   self._paper.n_open,
-            'paper_stats':   stats,
-            'library':       library_ctx,
-            'pair_biases':   pair_biases,
-            'version':       'v2',
+            'updated_at':      now.isoformat(),
+            'session':         session.kill_zone_name or 'OFF-HOURS',
+            'is_primary':      session.kill_zone_name == PRIMARY_SESSION,
+            'pairs_scanned':   len(results),
+            'actionable':      len(actionable),
+            'open_trades':     self._paper.n_open,
+            'paper_stats':     stats,
+            'library':         library_ctx,
+            'pair_biases':     pair_biases,
+            'regime_targets':  regime_targets,
+            'executor':        executor_status,
+            'version':         'v3',
         })
         # Write auto-trading config flag for dashboard
         if self.publisher._db:
