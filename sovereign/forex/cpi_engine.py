@@ -148,7 +148,7 @@ class CPISurpriseEngine:
             try:
                 return pd.read_parquet(cache_path).squeeze()
             except Exception:
-                pass
+                logger.debug("CPI cache read failed for %s, trying fetcher", country)
 
         if self._fetcher:
             try:

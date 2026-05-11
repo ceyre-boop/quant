@@ -44,6 +44,7 @@ from sovereign.forex.ict_engine import ICTEngine, ICTAnalysis
 from sovereign.forex.commodity_engine import CommodityEngine, COMMODITY_PAIRS
 from sovereign.forex.cot_engine import COTEngine
 from sovereign.forex.dxy_engine import DXYEngine
+from sovereign.forex.cpi_engine import CPISurpriseEngine
 from sovereign.forex.strategy import (
     CONVICTION_NEUTRAL_THRESHOLD,
     CONVICTION_FULL_SIZE,
@@ -244,6 +245,7 @@ class ForexEntryEngine:
         self._cb = CBEventTrigger()
         self._cot = COTEngine()
         self._dxy = DXYEngine()
+        self._cpi = CPISurpriseEngine()
         self._open_count = 0
 
     def evaluate(
@@ -412,6 +414,24 @@ class ForexEntryEngine:
                 rationale.append(
                     f'DXY: {td["trend"]} ({td["smile_regime"]}) — size ×{dxy_mult}'
                 )
+        except Exception:
+            pass
+
+        # ── CPI surprise fade (Edge 2) ────────────────────────────────── #
+        try:
+            from sovereign.forex.pair_universe import PAIR_CONFIG
+            pc = PAIR_CONFIG.get(pair)
+            if pc:
+                for country_code in [pc.base_currency[:2], pc.quote_currency[:2]]:
+                    surprise = self._cpi.get_latest_surprise(country_code)
+                    if surprise and surprise.get('direction') == target_direction:
+                        fade_mult = min(0.5 + abs(surprise['surprise_pct']) * 5, 0.9)
+                        size_mod = round(min(size_mod * fade_mult, 1.5), 3)
+                        rationale.append(
+                            f"CPI fade ({country_code}): "
+                            f"surprise {surprise['surprise_pct']:+.2f}% → "
+                            f"size ×{fade_mult:.2f}"
+                        )
         except Exception:
             pass
 

@@ -82,8 +82,17 @@ class COTEngine:
         if not code:
             return None
         try:
-            url = 'https://www.cftc.gov/dea/newcot/c_disagg.txt'
-            df = pd.read_csv(url, low_memory=False)
+            import io, zipfile, urllib.request
+            # CFTC blocks direct .txt access — use the zip which is publicly available
+            url = 'https://www.cftc.gov/files/dea/history/fut_disagg_txt_2024.zip'
+            headers = {'User-Agent': 'Mozilla/5.0 (compatible; quant-research/1.0)'}
+            req = urllib.request.Request(url, headers=headers)
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                zdata = resp.read()
+            with zipfile.ZipFile(io.BytesIO(zdata)) as zf:
+                fname = next(n for n in zf.namelist() if n.endswith('.txt'))
+                raw = zf.read(fname)
+            df = pd.read_csv(io.BytesIO(raw), low_memory=False)
             df.columns = [c.strip() for c in df.columns]
 
             market_col = next(c for c in df.columns if 'CFTC' in c.upper() and 'CODE' in c.upper())

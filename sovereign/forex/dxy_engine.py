@@ -158,7 +158,7 @@ class DXYEngine:
                 try:
                     return pd.read_parquet(CACHE_PATH).squeeze()
                 except Exception:
-                    pass
+                    logger.debug("DXY cache read failed, refetching")
         try:
             df = yf.download(DXY_TICKER, period='3y', progress=False, auto_adjust=True)
             if df.empty:
