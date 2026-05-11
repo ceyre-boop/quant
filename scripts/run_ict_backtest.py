@@ -88,14 +88,22 @@ class Trade:
 
 # ── Data ─────────────────────────────────────────────────────────────────── #
 
-def fetch(pair: str) -> pd.DataFrame:
+def fetch(pair: str, start: Optional[str] = None, end: Optional[str] = None) -> pd.DataFrame:
     logger.info("Fetching %s …", pair)
-    df = yf.download(pair, period='1y', interval='1h',
-                     progress=False, auto_adjust=True)
+    if start or end:
+        df = yf.download(pair, start=start, end=end, interval='1h',
+                         progress=False, auto_adjust=True)
+    else:
+        df = yf.download(pair, period='1y', interval='1h',
+                         progress=False, auto_adjust=True)
     if isinstance(df.columns, pd.MultiIndex):
         df.columns = df.columns.get_level_values(0)
     df = df.rename(columns=str.capitalize)[['Open','High','Low','Close']].dropna()
     df.index = pd.to_datetime(df.index, utc=True)
+    if start:
+        df = df[df.index >= pd.Timestamp(start, tz='UTC')]
+    if end:
+        df = df[df.index <= pd.Timestamp(end, tz='UTC')]
     return df
 
 
@@ -192,8 +200,8 @@ def simulate_outcome(
 
 # ── Per-pair backtest ─────────────────────────────────────────────────────── #
 
-def backtest_pair(pair: str) -> List[Trade]:
-    df = fetch(pair)
+def backtest_pair(pair: str, start: Optional[str] = None, end: Optional[str] = None) -> List[Trade]:
+    df = fetch(pair, start=start, end=end)
     if df.empty or len(df) < MIN_BARS:
         logger.warning("%s: not enough data (%d bars)", pair, len(df))
         return []
@@ -443,8 +451,11 @@ def push_to_firebase(stats: dict, trades: List[Trade]):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--pairs', nargs='+', default=None)
+    parser.add_argument('--pairs',   nargs='+', default=None)
     parser.add_argument('--no-push', action='store_true')
+    parser.add_argument('--start',   default=None, help='Start date YYYY-MM-DD')
+    parser.add_argument('--end',     default=None, help='End date YYYY-MM-DD')
+    parser.add_argument('--label',   default='', help='Label for this run (e.g. H1, H2, OOS)')
     args = parser.parse_args()
 
     pairs = [f'{p}=X' if '=X' not in p else p for p in args.pairs] if args.pairs else PAIRS
@@ -452,7 +463,7 @@ def main():
     all_trades: List[Trade] = []
     for pair in pairs:
         try:
-            trades = backtest_pair(pair)
+            trades = backtest_pair(pair, start=args.start, end=args.end)
             all_trades.extend(trades)
         except Exception as e:
             logger.error("Backtest failed for %s: %s", pair, e)
