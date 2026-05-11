@@ -28,6 +28,9 @@ from typing import List, Optional
 
 logger = logging.getLogger(__name__)
 
+# ET session end hour — close all paper trades at 4 PM ET
+SESSION_CLOSE_HOUR_ET = 16
+
 # ── Proven configuration (data-driven, not theory) ─────────────────────────── #
 
 # Dead pairs removed: AUDUSD (12% WR), GBPUSD (22% WR), GBPJPY (27% WR)
@@ -120,9 +123,11 @@ class ICTOrchestrator:
         from ict.pipeline import ICTPipeline
         from ict.micro_risk import MicroRiskParams
         from ict.session_classifier import SessionClassifier
-        self._pipeline  = ICTPipeline()
-        self._params    = MicroRiskParams
-        self._sess_clf  = SessionClassifier()
+        from ict.paper_trader import PaperTrader
+        self._pipeline    = ICTPipeline()
+        self._params      = MicroRiskParams
+        self._sess_clf    = SessionClassifier()
+        self._paper       = PaperTrader()
 
     def scan_once(self, log_all: bool = True) -> List[ScanResult]:
         import yfinance as yf
@@ -213,16 +218,48 @@ class ICTOrchestrator:
                 results.append(r)
                 self.publisher.push(r)
 
+                # ── Paper trading ─────────────────────────────────────────
+                # Update open trades with current bar prices
+                bar = df.iloc[-1]
+                self._paper.update_trades({
+                    clean: {
+                        'high':  float(bar['High']),
+                        'low':   float(bar['Low']),
+                        'close': float(bar['Close']),
+                    }
+                })
+
+                # Open new trade if signal is actionable and no position open
+                if isinstance(r, ScanResult) and r.actionable:
+                    from ict.pipeline import ICTGrade
+                    opened = self._paper.open_trade(r)
+                    if opened:
+                        logger.info("📋 Paper trade opened: %s %s grade=%s score=%.1f",
+                                    clean, r.signal, r.grade, r.score)
+
             except Exception as e:
                 logger.error("%s scan failed: %s", clean, e)
 
+        # Close all trades if NY PM session has ended (4 PM ET)
+        et_hour = int(datetime.now().astimezone(
+            __import__('zoneinfo').ZoneInfo('America/New_York')
+        ).strftime('%H'))
+        if et_hour >= SESSION_CLOSE_HOUR_ET:
+            closed = self._paper.close_session('NY_PM_END')
+            if closed:
+                logger.info("Session ended — closed %d trade(s)", len(closed))
+
+        # Push running paper stats to Firebase
+        stats = self._paper.get_stats()
         self.publisher.push_system({
-            'updated_at':   now.isoformat(),
-            'session':      session.kill_zone_name or 'OFF-HOURS',
-            'is_primary':   session.kill_zone_name == PRIMARY_SESSION,
+            'updated_at':    now.isoformat(),
+            'session':       session.kill_zone_name or 'OFF-HOURS',
+            'is_primary':    session.kill_zone_name == PRIMARY_SESSION,
             'pairs_scanned': len(results),
-            'actionable':   len(actionable),
-            'version':      'v1',
+            'actionable':    len(actionable),
+            'open_trades':   self._paper.n_open,
+            'paper_stats':   stats,
+            'version':       'v1',
         })
 
         if log_all:
