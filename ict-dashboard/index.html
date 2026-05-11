@@ -449,7 +449,7 @@ window._fb = { initializeApp, getDatabase, ref, onValue };
         <div class="perf-section">
           <div class="perf-head">
             <span>Live (Paper)</span>
-            <span class="panel-badge badge-live">PAPER</span>
+            <span class="panel-badge badge-live" id="live-perf-badge">BT BASELINE</span>
           </div>
           <div class="perf-grid">
             <div class="perf-cell"><div class="perf-key">Win Rate</div><div class="perf-val" id="pf-live-wr">—</div></div>
@@ -699,30 +699,40 @@ function renderSignals(signals) {
 }
 
 // ── Render: performance ────────────────────────────────────────────────────────
+const BT_BASELINE = {win_rate:0.365, avg_r:0.073, sharpe:1.465, profit_factor:1.11, max_dd_pct:-10.5};
+
 function renderLivePerf(stats) {
-  if (!stats || !stats.n_trades) {
-    ['wr','avgr','sharpe','pf','dd','n'].forEach(k =>
-      document.getElementById(`pf-live-${k}`).textContent = '—');
-    return;
+  const noLive = !stats || !stats.n_trades;
+  const s = noLive ? BT_BASELINE : stats;
+
+  // Badge label: show trade count or "BT baseline" when accumulating
+  const badge = document.getElementById('live-perf-badge');
+  if (badge) {
+    badge.textContent = noLive ? 'BT BASELINE' : `${stats.n_trades} TRADES`;
+    badge.style.color = noLive ? 'var(--text3)' : 'var(--amber)';
   }
+
   const set = (id, val, pos) => {
     const el = document.getElementById(id);
+    if (!el) return;
     el.textContent = val;
     el.className = 'perf-val ' + (pos === true ? 'stat-pos' : pos === false ? 'stat-neg' : '');
+    if (noLive) el.style.opacity = '0.55';
+    else el.style.opacity = '1';
   };
-  set('pf-live-wr',     `${(stats.win_rate*100).toFixed(1)}%`, stats.win_rate >= 0.33);
-  set('pf-live-avgr',   `${stats.avg_r >= 0?'+':''}${stats.avg_r.toFixed(3)}R`, stats.avg_r > 0);
-  set('pf-live-sharpe', stats.sharpe != null ? stats.sharpe.toFixed(2) : '—', stats.sharpe > 0);
-  set('pf-live-pf',     stats.profit_factor != null ? stats.profit_factor.toFixed(2) : '—', stats.profit_factor > 1);
-  set('pf-live-dd',     stats.max_dd_pct != null ? `${stats.max_dd_pct.toFixed(1)}%` : '—', false);
-  set('pf-live-n',      stats.n_trades, null);
+  set('pf-live-wr',     `${(s.win_rate*100).toFixed(1)}%`, s.win_rate >= 0.33);
+  set('pf-live-avgr',   `${s.avg_r >= 0?'+':''}${s.avg_r.toFixed(3)}R`, s.avg_r > 0);
+  set('pf-live-sharpe', s.sharpe != null ? s.sharpe.toFixed(2) : '—', s.sharpe > 0);
+  set('pf-live-pf',     s.profit_factor != null ? s.profit_factor.toFixed(2) : '—', s.profit_factor > 1);
+  set('pf-live-dd',     s.max_dd_pct != null ? `${s.max_dd_pct.toFixed(1)}%` : '—', false);
+  set('pf-live-n',      noLive ? '0 live' : stats.n_trades, null);
 
-  // Update topbar
-  document.getElementById('ts-live-wr').textContent = `${(stats.win_rate*100).toFixed(0)}%`;
-  document.getElementById('ts-live-wr').className = `stat-value ${stats.win_rate >= 0.33 ? 'stat-pos' : 'stat-neg'}`;
-  document.getElementById('ts-live-sharpe').textContent = stats.sharpe != null ? stats.sharpe.toFixed(2) : '—';
-  document.getElementById('ts-live-sharpe').className = `stat-value ${stats.sharpe > 0 ? 'stat-pos' : 'stat-neg'}`;
-  document.getElementById('ts-live-dd').textContent = stats.max_dd_pct != null ? `${stats.max_dd_pct.toFixed(1)}%` : '—';
+  // Update topbar (only show real live data there, or BT if nothing yet)
+  document.getElementById('ts-live-wr').textContent = `${(s.win_rate*100).toFixed(0)}%`;
+  document.getElementById('ts-live-wr').className = `stat-value ${s.win_rate >= 0.33 ? 'stat-pos' : 'stat-neg'}`;
+  document.getElementById('ts-live-sharpe').textContent = s.sharpe != null ? s.sharpe.toFixed(2) : '—';
+  document.getElementById('ts-live-sharpe').className = `stat-value ${s.sharpe > 0 ? 'stat-pos' : 'stat-neg'}`;
+  document.getElementById('ts-live-dd').textContent = s.max_dd_pct != null ? `${s.max_dd_pct.toFixed(1)}%` : '—';
 }
 
 function renderBtPerf(bt) {
