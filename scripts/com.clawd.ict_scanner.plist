@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.clawd.ict_scanner</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>/Users/taboost/quant/scripts/launch_ict_scanner.sh</string>
+  </array>
+
+  <!-- Every 5 minutes -->
+  <key>StartInterval</key>
+  <integer>300</integer>
+
+  <key>RunAtLoad</key>
+  <false/>
+
+  <key>StandardOutPath</key>
+  <string>/Users/taboost/quant/logs/ict_scanner_launchd.log</string>
+
+  <key>StandardErrorPath</key>
+  <string>/Users/taboost/quant/logs/ict_scanner_launchd.log</string>
+
+  <key>WorkingDirectory</key>
+  <string>/Users/taboost/quant</string>
+
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+    <key>FIREBASE_SERVICE_ACCOUNT</key>
+    <string>/Users/taboost/quant/config/firebase_service_account.json</string>
+  </dict>
+</dict>
+</plist>

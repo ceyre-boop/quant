@@ -360,8 +360,23 @@ class ICTPipeline:
         else:
             missing.append(f"✗ PD: {pd_label}")
 
-        total_score = max(0.0, sum(scores.values()) - adr_penalty)
-        grade       = self._grade(total_score, threshold=threshold)
+        raw_score = max(0.0, sum(scores.values()) - adr_penalty)
+
+        # Over-confirmation penalty: A+ setups (score > 9.0) are empirically worse
+        # than A setups (7.5–9.0). High score = late entry = move already done.
+        # The sweet spot is the slightly uncomfortable setup, not the perfect one.
+        # Encode that discovery: cap at 9.5, penalise anything above 9.0.
+        if raw_score > 9.0:
+            over_confirm_penalty = (raw_score - 9.0) * 0.5
+            total_score = raw_score - over_confirm_penalty
+            missing.append(
+                f"⚠ Over-confirmation penalty: score {raw_score:.1f} → {total_score:.1f} "
+                f"(A+ setups run late — sweet spot is A grade)"
+            )
+        else:
+            total_score = raw_score
+
+        grade = self._grade(total_score, threshold=threshold)
 
         # ══════════════════════════════════════════════════════════════════
         # STAGE 6 — Risk engine gate
