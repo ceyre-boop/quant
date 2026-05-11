@@ -73,7 +73,8 @@ class ScanResult:
 
 class ICTPublisher:
     def __init__(self):
-        self._db = None
+        self._db    = None
+        self._ref   = None
         self._init()
 
     def _init(self):
@@ -87,7 +88,8 @@ class ICTPublisher:
                     credentials.Certificate(sa),
                     {'databaseURL': 'https://clawd-trading-7b8de-default-rtdb.firebaseio.com'}
                 )
-            self._db = rtdb.reference('/')
+            self._db  = rtdb.reference('/')
+            self._ref = self._db
             logger.info("Firebase: connected")
         except Exception as e:
             logger.warning("Firebase unavailable (%s) — offline mode", e)
@@ -128,6 +130,9 @@ class ICTOrchestrator:
         self._params      = MicroRiskParams
         self._sess_clf    = SessionClassifier()
         self._paper       = PaperTrader()
+        # Wire Firebase into paper trader after publisher is ready
+        if self.publisher._db:
+            self._paper.set_firebase(self.publisher._db)
 
     def scan_once(self, log_all: bool = True) -> List[ScanResult]:
         import yfinance as yf
@@ -261,6 +266,17 @@ class ICTOrchestrator:
             'paper_stats':   stats,
             'version':       'v1',
         })
+        # Write auto-trading config flag for dashboard
+        if self.publisher._db:
+            try:
+                self.publisher._db.child('signals/ICT_ENGINE/config').set({
+                    'auto_paper_trading_enabled': True,
+                    'active_pairs': [p.replace('=X','') for p in self.pairs],
+                    'primary_session': PRIMARY_SESSION,
+                    'grade_filter': 'A',
+                })
+            except Exception:
+                pass
 
         if log_all:
             _print_results(results, actionable, now, session)

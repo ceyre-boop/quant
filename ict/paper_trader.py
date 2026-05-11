@@ -85,11 +85,15 @@ class PaperTrader:
     Loads state from disk, processes current prices, saves state back.
     """
 
-    def __init__(self):
+    def __init__(self, firebase_db=None):
         STATE_PATH.parent.mkdir(parents=True, exist_ok=True)
         LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
         self._ensure_log_header()
         self._state = self._load_state()
+        self._db = firebase_db  # optional Firebase db reference
+
+    def set_firebase(self, db):
+        self._db = db
 
     # ── Public API ─────────────────────────────────────────────────────────── #
 
@@ -287,7 +291,7 @@ class PaperTrader:
     # ── Internal ───────────────────────────────────────────────────────────── #
 
     def _log_trade(self, t: PaperTrade):
-        """Append closed trade to CSV log and closed ledger."""
+        """Append closed trade to CSV log, closed ledger, and Firebase."""
         row = [
             datetime.now(timezone.utc).strftime('%Y-%m-%d'),
             t.open_time[:16],
@@ -304,6 +308,7 @@ class PaperTrader:
             csv.writer(f).writerow(row)
 
         self._state.setdefault('closed', []).append(asdict(t))
+        self._push_to_firebase()
 
     def _load_state(self) -> dict:
         if STATE_PATH.exists():
@@ -320,6 +325,21 @@ class PaperTrader:
         if not LOG_PATH.exists():
             with open(LOG_PATH, 'w', newline='') as f:
                 csv.writer(f).writerow(LOG_HEADER)
+
+    def _push_to_firebase(self):
+        """Mirror full paper trade state to Firebase for the dashboard."""
+        if self._db is None:
+            return
+        try:
+            closed = self._state.get('closed', [])
+            self._db.child('signals/ICT_ENGINE/paper_trades').set({
+                'open':   self._state.get('open', []),
+                'closed': closed[-50:],  # last 50 closed trades
+                'stats':  self.get_stats(),
+                'updated_at': datetime.now(timezone.utc).isoformat(),
+            })
+        except Exception as e:
+            logger.debug("Firebase paper mirror failed: %s", e)
 
     def _days_running(self) -> int:
         started = self._state.get('started', datetime.now(timezone.utc).isoformat())
