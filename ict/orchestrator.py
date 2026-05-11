@@ -126,10 +126,14 @@ class ICTOrchestrator:
         from ict.micro_risk import MicroRiskParams
         from ict.session_classifier import SessionClassifier
         from ict.paper_trader import PaperTrader
+        from ict.library_bridge import query_library
+        from ict.daily_bias import DailyBiasEngine
         self._pipeline    = ICTPipeline()
         self._params      = MicroRiskParams
         self._sess_clf    = SessionClassifier()
         self._paper       = PaperTrader()
+        self._query_lib   = query_library
+        self._bias_engine = DailyBiasEngine()
         # Wire Firebase into paper trader after publisher is ready
         if self.publisher._db:
             self._paper.set_firebase(self.publisher._db)
@@ -144,6 +148,16 @@ class ICTOrchestrator:
         session = self._sess_clf.classify(now)
         results = []
         actionable = []
+
+        # ── Macro context (once per scan, not per pair) ───────────────────
+        library_ctx = self._query_lib()
+        pair_biases = self._bias_engine.get_biases(library_ctx)
+        logger.info("Library: regime=%s threat=%s size=%.2f×",
+                    library_ctx['regime'], library_ctx['threat'],
+                    library_ctx['size_modifier'])
+        for p, b in pair_biases.items():
+            flag = ' [BLACKOUT]' if b['blackout'] else f" bias={b['bias']} conf={b['confidence']:.2f}"
+            logger.info("  %s:%s", p, flag)
 
         for pair in self.pairs:
             clean = pair.replace('=X', '')
@@ -183,12 +197,27 @@ class ICTOrchestrator:
 
                 if isinstance(best, ICTSignal):
                     sz = best.sizing
-                    # A-grade in primary session = actionable
+                    pair_bias = pair_biases.get(clean, {})
+                    bias_dir  = pair_bias.get('bias', 'NEUTRAL')
+                    blackout  = pair_bias.get('blackout', False)
+
+                    # Bias agreement: NEUTRAL = don't block, directional = must match
+                    bias_agrees = (
+                        bias_dir == 'NEUTRAL'
+                        or bias_dir == best.direction
+                    )
+
+                    # A-grade + primary session + no blackout + bias agrees = actionable
                     is_actionable = (
                         best.passed
-                        and best.grade == ICTGrade.A   # A only, not A+
+                        and best.grade == ICTGrade.A
                         and sess_name in ACTIVE_SESSIONS
+                        and not blackout
+                        and bias_agrees
                     )
+                    if not bias_agrees:
+                        logger.info("%s: bias=%s conflicts signal=%s — skipping",
+                                    clean, bias_dir, best.direction)
                     r = ScanResult(
                         pair=clean, timestamp=now.isoformat(),
                         signal=best.direction, grade=best.grade.value,
@@ -254,7 +283,7 @@ class ICTOrchestrator:
             if closed:
                 logger.info("Session ended — closed %d trade(s)", len(closed))
 
-        # Push running paper stats to Firebase
+        # Push running paper stats + macro context to Firebase
         stats = self._paper.get_stats()
         self.publisher.push_system({
             'updated_at':    now.isoformat(),
@@ -264,7 +293,9 @@ class ICTOrchestrator:
             'actionable':    len(actionable),
             'open_trades':   self._paper.n_open,
             'paper_stats':   stats,
-            'version':       'v1',
+            'library':       library_ctx,
+            'pair_biases':   pair_biases,
+            'version':       'v2',
         })
         # Write auto-trading config flag for dashboard
         if self.publisher._db:

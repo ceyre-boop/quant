@@ -538,6 +538,8 @@ let _state = {
   liveStats:    null,
   config:       null,
   system:       null,
+  library:      null,
+  pairBiases:   {},
   equityChart:  null,
   showBt:       false,
   sessFilter:   'NY_PM',
@@ -801,12 +803,19 @@ function renderMarketConditions(signals, system) {
     const adrPct = s.adr_pct || 0;
     const adrBar = Math.min(adrPct * 100, 100);
     const adrCls = adrBar >= 85 ? 'bar-red' : adrBar >= 70 ? 'bar-amber' : 'bar-green';
-    const sess = s.session || '—';
     const score = s.score || 0;
     const volRegime = score > 7 ? 'HIGH' : score > 4 ? 'NORMAL' : 'LOW';
     const volColor = volRegime === 'HIGH' ? 'var(--green)' : volRegime === 'LOW' ? 'var(--text3)' : 'var(--text2)';
-    const bias = s.signal && s.signal !== 'VETO' && s.signal !== 'FLAT' ? s.signal : 'NEUTRAL';
+
+    // Prefer macro bias from library over raw signal direction
+    const pairBiases = (system && system.pair_biases) || {};
+    const pb = pairBiases[pair] || {};
+    const bias = pb.bias || (s.signal && s.signal !== 'VETO' && s.signal !== 'FLAT' ? s.signal : 'NEUTRAL');
+    const biasConf = pb.confidence ? `${(pb.confidence*100).toFixed(0)}%` : '';
     const biasColor = bias === 'LONG' ? 'var(--green)' : bias === 'SHORT' ? 'var(--red)' : 'var(--text3)';
+    const blackout = pb.blackout ? '<span style="color:var(--red);font-size:9px"> BLACKOUT</span>' : '';
+    const biasReason = pb.reason ? `<div class="pc-label" style="margin-top:2px;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${pb.reason}">${pb.reason.slice(0,40)}</div>` : '';
+
     return `<div class="pair-cond">
       <div class="pc-name">${pair}</div>
       <div class="pc-stat">
@@ -820,13 +829,26 @@ function renderMarketConditions(signals, system) {
         <div class="pc-label" style="margin-top:2px">score ${score.toFixed(1)}</div>
       </div>
       <div class="pc-stat">
-        <div class="pc-label">Session bias</div>
-        <div class="pc-val" style="color:${biasColor}">${bias}</div>
-        <div class="pc-label" style="margin-top:2px">${sess}</div>
+        <div class="pc-label">Macro bias${blackout}</div>
+        <div class="pc-val" style="color:${biasColor}">${bias} <span style="color:var(--text3);font-size:10px">${biasConf}</span></div>
+        ${biasReason}
       </div>
     </div>`;
   }).join('');
-  body.innerHTML = rows || '<div class="loading">Waiting for scan…</div>';
+
+  // ── Library regime banner ──────────────────────────────────────────────────
+  const lib = system && system.library;
+  let regimeBanner = '';
+  if (lib && lib.available) {
+    const threatColor = {NORMAL:'var(--text3)',ELEVATED:'var(--amber)',WARNING:'#f97316',DANGER:'var(--red)',CRITICAL:'var(--red)'}[lib.threat] || 'var(--text3)';
+    const sizeLabel = lib.size_modifier < 1 ? ` · size ${(lib.size_modifier*100).toFixed(0)}%` : '';
+    regimeBanner = `<div style="margin-bottom:8px;padding:6px 8px;background:rgba(255,255,255,.03);border-left:2px solid ${threatColor};border-radius:2px">
+      <div style="font-size:10px;font-family:var(--mono);color:${threatColor}">${lib.regime}</div>
+      <div style="font-size:9px;color:var(--text3);margin-top:2px">${lib.threat}${sizeLabel} · ${lib.advisory.slice(0,80)}</div>
+    </div>`;
+  }
+
+  body.innerHTML = regimeBanner + (rows || '<div class="loading">Waiting for scan…</div>');
   if (system) {
     document.getElementById('mc-updated').textContent = (system.updated_at||'').slice(11,16) + ' UTC';
   }
