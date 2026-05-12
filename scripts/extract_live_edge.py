@@ -9,10 +9,11 @@ Reads:  logs/ict_paper_trade_log.csv  (produced by ict/paper_trader.py)
          (use --source-json to read from the ICT backtest JSON format)
 Writes: logs/live_edge.json
 
-Outcome mapping (paper_trader.py semantics → optimizer model):
-    TP2              → tp2 category   (big winner)
-    TP1, BE, TP1_TIMEOUT → tp1 category  (partial winner)
-    STOP, TIMEOUT    → stop category  (full loss or 0R)
+Outcome mapping (both ICT backtest JSON and paper_trader.py CSV → optimizer model):
+    TP2                         → tp2 category  (big winner)
+    TP1 (backtest JSON)
+    BE, TP1_TIMEOUT (paper CSV) → tp1 category  (partial winner)
+    STOP, TIMEOUT               → stop category (full loss or 0R)
 
 Usage:
     # From live paper trade CSV (after 30 days of running paper trader):
@@ -215,12 +216,13 @@ def compute_distribution(trades: List[dict]) -> dict:
 
     ev_per_trade = tp2_rate * tp2_r + tp1_rate * tp1_r + stop_rate * stop_r
 
-    # Trades per month estimate (based on actual date span)
+    # Trades per month and actual span (used by print_report for full-window label)
     dates = [t['date'] for t in trades if t['date']]
     if len(dates) >= 2:
         span_days = (max(dates) - min(dates)).days or 1
         trades_per_month = round(n / span_days * 30, 1)
     else:
+        span_days = None
         trades_per_month = None
 
     return {
@@ -233,9 +235,10 @@ def compute_distribution(trades: List[dict]) -> dict:
         'stop_r':             round(stop_r,    3),
         'ev_per_trade_r':     round(ev_per_trade, 4),
         'trades_per_month':   trades_per_month,
+        'actual_span_days':   span_days,
         'outcome_counts': {
             'TP2':  len(tp2_trades),
-            'TP1':  len(tp1_trades),   # BE + TP1_TIMEOUT
+            'TP1':  len(tp1_trades),   # TP1 (JSON) + BE + TP1_TIMEOUT (CSV)
             'STOP': len(stop_trades),  # STOP + TIMEOUT
         },
     }
@@ -278,7 +281,12 @@ def tolerance_check(live: dict) -> Tuple[bool, List[str]]:
 def print_report(dist: dict, warnings: List[str], within_tol: bool,
                  days: int, source_label: str = '') -> None:
     width = 60
-    day_str = f'last {days} days' if days < 365 else 'full window'
+    # Use actual span from the data rather than a hardcoded 365 threshold
+    actual_span = dist.get('actual_span_days')
+    if actual_span is not None and days >= actual_span:
+        day_str = 'full window'
+    else:
+        day_str = f'last {days} days'
     src_str = f' [{source_label}]' if source_label else ''
     print(f'\n{"="*width}')
     print(f'  LIVE EDGE EXTRACTION — {day_str}{src_str}')

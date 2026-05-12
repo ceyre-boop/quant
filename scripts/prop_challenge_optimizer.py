@@ -180,9 +180,9 @@ def simulate_batch_detailed(
 
             newly_passed = active & (acct >= tgt)
             status = np.where(newly_passed, 1, status)
-            # newly_passed only selects active (status==0) trials; pass_day for those
-            # is still the sentinel, so the update is unconditional.
-            pass_day = np.where(newly_passed, day + 1, pass_day)
+            # Guard ensures pass_day is recorded at the earliest day it fires,
+            # and remains stable if this code path is ever re-entered.
+            pass_day = np.where(newly_passed & (pass_day > day), day + 1, pass_day)
             active = status == 0
 
         still_busted = active & (acct <= floor)
@@ -191,7 +191,7 @@ def simulate_batch_detailed(
 
         eod_passed = active & (acct >= tgt)
         status = np.where(eod_passed, 1, status)
-        pass_day = np.where(eod_passed, day + 1, pass_day)
+        pass_day = np.where(eod_passed & (pass_day > day), day + 1, pass_day)
         active = status == 0
 
     pass_mask    = status == 1
@@ -607,7 +607,7 @@ def main():
     print(f'  EDGE DEGRADATION TOLERANCE:')
     print(f'  {"TP2 rate":>10}  {"Pass%":>7}  {"Bust%":>6}')
     for tp2_rate, s in sorted(sens.items()):
-        marker  = ' ◄ current' if abs(tp2_rate - 0.195) < 0.001 else ''
+        marker  = ' ◄ current' if abs(tp2_rate - TP2_RATE) < 0.001 else ''
         be_flag = ' ← BREAKEVEN' if (breakeven_tp2 and abs(tp2_rate - breakeven_tp2) < 0.001) else ''
         print(f'  {tp2_rate:.1%}        {s["pass_rate"]:>5.1f}%  {s["bust_rate"]:>5.1f}%{marker}{be_flag}')
     print()

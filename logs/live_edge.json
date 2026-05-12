@@ -1,26 +1,27 @@
 {
-  "n_trades": 208,
-  "tp2_rate": 0.1683,
-  "tp1_rate": 0.1298,
-  "stop_rate": 0.7019,
-  "tp2_r": 4.157,
-  "tp1_r": 0.917,
-  "stop_r": -0.958,
-  "ev_per_trade_r": 0.1458,
-  "trades_per_month": 9.8,
+  "n_trades": 106,
+  "tp2_rate": 0.1698,
+  "tp1_rate": 0.1226,
+  "stop_rate": 0.7075,
+  "tp2_r": 4.083,
+  "tp1_r": 0.865,
+  "stop_r": -0.944,
+  "ev_per_trade_r": 0.1319,
+  "trades_per_month": 9.0,
+  "actual_span_days": 354,
   "outcome_counts": {
-    "TP2": 35,
-    "TP1": 27,
-    "STOP": 146
+    "TP2": 18,
+    "TP1": 13,
+    "STOP": 75
   },
   "days": 365,
-  "source": "logs/ict_backtest_window_A.json, logs/ict_backtest_window_B.json",
+  "source": "logs/ict_backtest_window_A.json",
   "source_type": "backtest_json",
   "within_tolerance": false,
   "tolerance_warnings": [
-    "EV drift: live=0.146R  backtest=0.40R  diff=0.254R  (threshold=0.20R)"
+    "EV drift: live=0.132R  backtest=0.40R  diff=0.268R  (threshold=0.20R)"
   ],
-  "computed_at": "2026-05-12T18:01:47.861506+00:00",
+  "computed_at": "2026-05-12T18:05:29.027223+00:00",
   "backtest_reference": {
     "tp2_rate": 0.195,
     "tp1_rate": 0.12,

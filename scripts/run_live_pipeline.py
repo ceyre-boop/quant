@@ -137,7 +137,16 @@ def step3_verdict() -> None:
     wfb     = wf.get('B')
     validated = wf.get('validated', False)
 
-    print(f'\n  LIVE EDGE (30-day paper trading):')
+    # Build a dynamic label from what was actually loaded
+    n_trades   = live.get('n_trades', '?')
+    days_used  = live.get('days', '?')
+    src_type   = live.get('source_type', 'unknown')
+    if src_type == 'backtest_json':
+        edge_label = f'{n_trades} backtest trades, {days_used}-day window'
+    else:
+        edge_label = f'{n_trades} paper trades, last {days_used} days'
+
+    print(f'\n  LIVE EDGE ({edge_label}):')
     print(f'  TP2 rate:           {live.get("tp2_rate", "?"):.1%}'
           if isinstance(live.get('tp2_rate'), float) else f'  TP2 rate: ?')
     print(f'  TP1 rate:           {live.get("tp1_rate", "?"):.1%}'
