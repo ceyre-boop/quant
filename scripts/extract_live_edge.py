@@ -10,10 +10,10 @@ Reads:  logs/ict_paper_trade_log.csv  (produced by ict/paper_trader.py)
 Writes: logs/live_edge.json
 
 Outcome mapping (both ICT backtest JSON and paper_trader.py CSV → optimizer model):
-    TP2                         → tp2 category  (big winner)
-    TP1 (backtest JSON)
-    BE, TP1_TIMEOUT (paper CSV) → tp1 category  (partial winner)
-    STOP, TIMEOUT               → stop category (full loss or 0R)
+    TP2                          → tp2 category  (big winner)
+    TP1          (backtest JSON) → tp1 category  (partial winner)
+    BE, TP1_TIMEOUT (paper CSV)  → tp1 category  (partial winner)
+    STOP, TIMEOUT                → stop category (full loss or 0R)
 
 Usage:
     # From live paper trade CSV (after 30 days of running paper trader):
