@@ -514,21 +514,53 @@ def print_config(rank: int, d: dict, label: str = ''):
           f"Median={d['median_days']}d  Cost/pass=${d['cost_per_pass']:.0f}")
 
 
+def _load_live_edge(path: str) -> None:
+    """Override module-level edge constants from a live_edge.json file."""
+    import json as _json
+    data = _json.loads(Path(path).read_text())
+    global TP2_RATE, TP1_RATE, STOP_RATE, TP2_R, TP1_R, STOP_R
+    TP2_RATE  = float(data['tp2_rate'])
+    TP1_RATE  = float(data['tp1_rate'])
+    STOP_RATE = float(data['stop_rate'])
+    TP2_R     = float(data['tp2_r'])
+    TP1_R     = float(data['tp1_r'])
+    STOP_R    = float(data['stop_r'])
+    return data
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--trials', type=int, default=10_000)
     parser.add_argument('--fast',   action='store_true',
                         help='Use 2,000 trials (quick scan)')
     parser.add_argument('--workers', type=int, default=None)
+    parser.add_argument('--live-edge-file', default=None, metavar='FILE',
+                        help='Path to live_edge.json from extract_live_edge.py. '
+                             'Overrides hardcoded TP distribution with real live data.')
     args = parser.parse_args()
 
     n_trials = 2_000 if args.fast else args.trials
 
+    live_edge_data = None
+    if args.live_edge_file:
+        try:
+            live_edge_data = _load_live_edge(args.live_edge_file)
+            edge_source = f'LIVE DATA ({live_edge_data.get("n_trades", "?")} trades, '  \
+                          f'{live_edge_data.get("days", "?")}d window)'
+        except Exception as e:
+            print(f'  ⚠️  Could not load live edge file: {e}')
+            edge_source = 'BACKTEST (fallback)'
+    else:
+        edge_source = 'BACKTEST (replicated)'
+
+    ev_per_trade = TP2_RATE * TP2_R + TP1_RATE * TP1_R + STOP_RATE * STOP_R
+
     print(f'\n{"="*65}')
     print(f'  PROP CHALLENGE OPTIMIZER')
+    print(f'  Edge source: {edge_source}')
     print(f'  Fixed edge: TP2={TP2_RATE:.1%}@{TP2_R}R | TP1={TP1_RATE:.1%}@{TP1_R}R | '
           f'STOP={STOP_RATE:.1%}@{STOP_R}R')
-    print(f'  EV per trade: +0.40R (replicated)')
+    print(f'  EV per trade: +{ev_per_trade:.2f}R')
     print(f'{"="*65}\n')
 
     # ── 1. Full sweep ──────────────────────────────────────────────────────
@@ -663,6 +695,12 @@ def main():
     Path('logs/prop_optimizer_results.json').write_text(
         json.dumps({
             'n_trials':    n_trials,
+            'edge_source': edge_source,
+            'edge_inputs': {
+                'tp2_rate': TP2_RATE, 'tp1_rate': TP1_RATE, 'stop_rate': STOP_RATE,
+                'tp2_r':    TP2_R,    'tp1_r':    TP1_R,    'stop_r':    STOP_R,
+                'ev_per_trade': round(ev_per_trade, 4),
+            },
             'top_20':      by_portfolio[:20],
             'top_ev':      by_ev[:10],
             'safest':      safest[:10],
@@ -672,6 +710,7 @@ def main():
             'walk_forward': {'A': wfa, 'B': wfb, 'validated': validated},
             'breakeven_tp2': breakeven_tp2,
             'safety_margin_pp': safety_margin,
+            'live_edge_input': live_edge_data,
         }, indent=2)
     )
     Path('logs/prop_optimal_config.json').write_text(
