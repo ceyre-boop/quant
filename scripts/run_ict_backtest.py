@@ -50,18 +50,32 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-PAIRS = [
-    'GBPUSD=X', 'EURUSD=X', 'AUDUSD=X',
-    'USDJPY=X', 'GBPJPY=X', 'NZDUSD=X',
-]
+# v2 universe: macro-validated 4 pairs (forex v004 + ICT entry precision)
+PAIRS = ['GBPUSD=X', 'EURUSD=X', 'AUDUSD=X', 'AUDNZD=X']
+
+# London session: GBPUSD only (BOE/FED structure — 59.4% WR in v004)
+LONDON_PAIRS   = {'GBPUSD'}
 
 ACCOUNT_SIZE   = 10_000.0
-RISK_PER_TRADE = 0.01        # 1% per trade for backtest sizing
-TP1_R          = 2.0
+RISK_PER_TRADE = 0.01
+TP1_R          = 2.0   # base — overridden by regime engine per trade
 TP2_R          = 4.0
-TP1_FRAC       = 0.5         # close half at TP1
-MAX_HOLD_BARS  = 20          # max 20 hours before flat
-MIN_BARS       = 80          # need at least this many bars before scanning
+TP1_FRAC       = 0.5
+MAX_HOLD_BARS  = 20
+MIN_BARS       = 80
+
+# Regime TP map (simplified version of ict/regime_execution.py for backtest)
+# In live engine, library queries yfinance. For backtest we use a static map
+# based on the known regime across each window.
+_TP_BY_REGIME = {
+    'TRENDING':   (3.0, 6.0),
+    'NORMAL':     (2.0, 4.0),
+    'STRESSED':   (1.5, 2.5),
+    'CRITICAL':   (1.5, 2.5),  # no skip — just tight targets
+}
+
+def _regime_tp(regime: str = 'NORMAL'):
+    return _TP_BY_REGIME.get(regime, (2.0, 4.0))
 
 
 # ── Trade record ─────────────────────────────────────────────────────────── #
@@ -89,13 +103,13 @@ class Trade:
 # ── Data ─────────────────────────────────────────────────────────────────── #
 
 def fetch(pair: str, start: Optional[str] = None, end: Optional[str] = None) -> pd.DataFrame:
+    """
+    yfinance 1h data is limited to ~730 days and requires period= not start/end.
+    We fetch the maximum available window and slice to start/end ourselves.
+    """
     logger.info("Fetching %s …", pair)
-    if start or end:
-        df = yf.download(pair, start=start, end=end, interval='1h',
-                         progress=False, auto_adjust=True)
-    else:
-        df = yf.download(pair, period='1y', interval='1h',
-                         progress=False, auto_adjust=True)
+    df = yf.download(pair, period='730d', interval='1h',
+                     progress=False, auto_adjust=True)
     if isinstance(df.columns, pd.MultiIndex):
         df.columns = df.columns.get_level_values(0)
     df = df.rename(columns=str.capitalize)[['Open','High','Low','Close']].dropna()
@@ -104,6 +118,9 @@ def fetch(pair: str, start: Optional[str] = None, end: Optional[str] = None) -> 
         df = df[df.index >= pd.Timestamp(start, tz='UTC')]
     if end:
         df = df[df.index <= pd.Timestamp(end, tz='UTC')]
+    logger.info("%s: %d bars (%s → %s)", pair,
+                len(df), df.index[0].date() if len(df) else '—',
+                df.index[-1].date() if len(df) else '—')
     return df
 
 
@@ -222,10 +239,12 @@ def backtest_pair(pair: str, start: Optional[str] = None, end: Optional[str] = N
         if not sess.should_trade:
             continue
 
-        # Data says NY Open (07:00-10:00 ET) has 22% WR — not tradeable
-        # London and NY PM remain active
-        if sess.kill_zone_name == 'NY_Open':
-            continue
+        # Session gate: NY_PM = all pairs. London = GBPUSD only.
+        kz = sess.kill_zone_name
+        if kz == 'NY_Open':
+            continue  # 22% WR historically — skip
+        if kz == 'London' and clean not in LONDON_PAIRS:
+            continue  # Non-GBPUSD pairs have no BOE structure in London
 
         if i - last_signal_bar < 4:   # 4-bar cooldown after any signal
             continue
@@ -292,10 +311,22 @@ def backtest_pair(pair: str, start: Optional[str] = None, end: Optional[str] = N
         else:
             stop_dist = atr * 1.0
 
+        # Regime-aware TP ratios
+        # For backtest: approximate regime from session + trend strength
+        # GBPUSD London = trending context. High-score signals = trending.
+        if clean == 'GBPUSD' and kz == 'London':
+            tp1_r, tp2_r = _regime_tp('TRENDING')   # BOE session = trending
+        elif best.score >= 8.5:
+            tp1_r, tp2_r = _regime_tp('TRENDING')   # high conviction = let it run
+        elif best.score >= 7.0:
+            tp1_r, tp2_r = _regime_tp('NORMAL')
+        else:
+            tp1_r, tp2_r = _regime_tp('STRESSED')   # low conviction = tight
+
         if outcome == 'TP2':
-            pnl_r = TP1_FRAC * TP1_R + (1 - TP1_FRAC) * TP2_R   # 1.0 + 2.0 = 3.0R
+            pnl_r = TP1_FRAC * tp1_r + (1 - TP1_FRAC) * tp2_r
         elif outcome == 'TP1':
-            pnl_r = TP1_R * TP1_FRAC - (1 - TP1_FRAC) * 0.5       # partial TP1, rest BE ≈ 0.5R net
+            pnl_r = tp1_r * TP1_FRAC - (1 - TP1_FRAC) * 0.5
         elif outcome == 'STOP':
             pnl_r = -1.0
         else:  # TIMEOUT
@@ -309,8 +340,8 @@ def backtest_pair(pair: str, start: Optional[str] = None, end: Optional[str] = N
             entry_dt=ts.strftime('%Y-%m-%d %H:%M'),
             entry=round(entry_price, 5),
             stop=round(entry_price - sign * stop_dist, 5),
-            tp1=round(entry_price + sign * stop_dist * TP1_R, 5),
-            tp2=round(entry_price + sign * stop_dist * TP2_R, 5),
+            tp1=round(entry_price + sign * stop_dist * tp1_r, 5),
+            tp2=round(entry_price + sign * stop_dist * tp2_r, 5),
             atr=round(atr, 5),
             outcome=outcome,
             exit_price=round(exit_price, 5),
@@ -504,11 +535,23 @@ def main():
 
     print('='*60)
 
-    # Save locally
-    out = Path('logs/ict_backtest_results.json')
+    # Save locally — labeled file for walk-forward comparison
+    label = args.label or 'latest'
+    out = Path(f'logs/ict_backtest_{label}.json')
     out.parent.mkdir(exist_ok=True)
+    payload = {
+        'label':  label,
+        'start':  args.start,
+        'end':    args.end,
+        'stats':  stats,
+        'trades': [asdict(t) for t in all_trades],
+    }
     with open(out, 'w') as f:
-        json.dump({'stats': stats, 'trades': [asdict(t) for t in all_trades]}, f, indent=2, default=str)
+        json.dump(payload, f, indent=2, default=str)
+    # Also overwrite latest for dashboard
+    Path('logs/ict_backtest_results.json').write_text(
+        json.dumps(payload, indent=2, default=str)
+    )
     logger.info("Saved to %s", out)
 
     if not args.no_push:

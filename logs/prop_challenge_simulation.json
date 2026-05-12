@@ -1,0 +1,43 @@
+{
+  "base": {
+    "trials": 10000,
+    "win_rate": 0.564,
+    "avg_win_r": 2.125,
+    "pass_rate": 0.834,
+    "pass_pct": 83.4,
+    "bust_pct": 0.3,
+    "timeout_pct": 16.3,
+    "median_days_to_pass": 15,
+    "avg_trades_when_passing": 9.8
+  },
+  "pair_stats": {
+    "GBPUSD": {
+      "wr": 0.594,
+      "avg_win_r": 2.4,
+      "avg_loss_r": -1.0,
+      "trades_per_month": 8
+    },
+    "EURUSD": {
+      "wr": 0.555,
+      "avg_win_r": 2.1,
+      "avg_loss_r": -1.0,
+      "trades_per_month": 4
+    },
+    "AUDUSD": {
+      "wr": 0.535,
+      "avg_win_r": 2.0,
+      "avg_loss_r": -1.0,
+      "trades_per_month": 3
+    },
+    "AUDNZD": {
+      "wr": 0.573,
+      "avg_win_r": 2.0,
+      "avg_loss_r": -1.0,
+      "trades_per_month": 3
+    }
+  },
+  "rules": {
+    "target": 8.0,
+    "max_dd": 8.0
+  }
+}
