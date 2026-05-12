@@ -54,35 +54,47 @@ def _run(cmd: list, desc: str) -> int:
     return result.returncode
 
 
-def step1_extract(days: int, min_trades: int) -> bool:
-    """Step 1: Extract live edge from paper trade log."""
+def step1_extract(days: int, min_trades: int,
+                  source_jsons: list[str] | None = None) -> bool:
+    """Step 1: Extract live edge from paper trade log or backtest JSON."""
     print(f'\n{"="*65}')
-    print(f'  STEP 1 — EXTRACT LIVE EDGE  ({days}-day window)')
+    if source_jsons:
+        src_desc = ', '.join(source_jsons)
+        print(f'  STEP 1 — EXTRACT LIVE EDGE  (backtest JSON, last {days} days)')
+        print(f'  Source: {src_desc}')
+    else:
+        print(f'  STEP 1 — EXTRACT LIVE EDGE  ({days}-day window)')
     print(f'{"="*65}')
 
-    rc = _run(
-        [sys.executable, 'scripts/extract_live_edge.py',
-         '--days', str(days),
-         '--min-trades', str(min_trades),
-         '--log', PAPER_LOG,
-         '--out', LIVE_EDGE_FILE],
-        'Extracting TP distribution from paper trade log'
-    )
+    cmd = [sys.executable, 'scripts/extract_live_edge.py',
+           '--days', str(days),
+           '--min-trades', str(min_trades),
+           '--out', LIVE_EDGE_FILE]
+    if source_jsons:
+        for jf in source_jsons:
+            cmd += ['--source-json', jf]
+    else:
+        cmd += ['--log', PAPER_LOG]
 
-    if rc != 0:
-        print(f'  ⚠️  extract_live_edge.py exited with code {rc}')
+    _run(cmd, 'Extracting TP distribution')
 
     if not Path(LIVE_EDGE_FILE).exists():
         print(f'\n  ❌ {LIVE_EDGE_FILE} was not produced.')
-        print(f'     Ensure the paper trader has been running and producing')
-        print(f'     data at {PAPER_LOG}')
+        if not source_jsons:
+            print(f'     Ensure the paper trader has been running and producing '
+                  f'data at {PAPER_LOG}')
+            print(f'     Or use --source-json logs/ict_backtest_window_A.json '
+                  f'to use existing backtest data.')
         return False
 
     data = json.loads(Path(LIVE_EDGE_FILE).read_text())
     n = data.get('n_trades', 0)
     if n < min_trades:
         print(f'\n  ❌ Only {n} trades found (need {min_trades}+).')
-        print(f'     Continue paper trading and re-run when you have more data.')
+        if source_jsons:
+            print(f'     Try --days 365 to use the full window.')
+        else:
+            print(f'     Continue paper trading and re-run when you have more data.')
         return False
 
     return True
@@ -227,26 +239,39 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description='End-to-end live pipeline: extract → optimize → validate → verdict'
     )
-    parser.add_argument('--days',         type=int, default=30)
+    parser.add_argument('--days',         type=int, default=30,
+                        help='Rolling window in days (relative to most recent trade). '
+                             'Use 365 to include full backtest windows. (default: 30)')
     parser.add_argument('--min-trades',   type=int, default=20)
     parser.add_argument('--fast',         action='store_true',
                         help='2,000 MC trials instead of 10,000 (quick scan)')
     parser.add_argument('--workers',      type=int, default=None)
     parser.add_argument('--skip-extract', action='store_true',
                         help='Skip Step 1 — use existing logs/live_edge.json')
+    parser.add_argument('--source-json',  action='append', dest='source_jsons',
+                        metavar='FILE', default=None,
+                        help='Use ICT backtest JSON instead of paper trade CSV. '
+                             'Can be specified multiple times. '
+                             'e.g. --source-json logs/ict_backtest_window_A.json')
     args = parser.parse_args()
 
     print(f'\n{"="*65}')
     print(f'  LIVE EDGE → PROP CHALLENGE PIPELINE')
     print(f'  {datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")}')
     print(f'{"="*65}')
-    print(f'  Step 1: Extract {args.days}-day live edge from paper trade log')
+    if args.source_jsons:
+        print(f'  Data source: backtest JSON windows (last {args.days} days each)')
+        for jf in args.source_jsons:
+            print(f'    {jf}')
+    else:
+        print(f'  Data source: paper trade CSV (last {args.days} days)')
+    print(f'  Step 1: Extract edge from {args.days}-day sample')
     print(f'  Step 2: Re-run optimizer with live edge (31,752 param combinations)')
     print(f'  Step 3: Compare Monte Carlo vs walk-forward → GO/NO-GO')
 
     # Step 1
     if not args.skip_extract:
-        ok = step1_extract(args.days, args.min_trades)
+        ok = step1_extract(args.days, args.min_trades, args.source_jsons)
         if not ok:
             sys.exit(1)
     else:

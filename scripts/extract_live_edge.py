@@ -5,16 +5,30 @@ Extract the real TP distribution from 30 days of live paper trading and
 write it to logs/live_edge.json for use by prop_challenge_optimizer.py.
 
 Reads:  logs/ict_paper_trade_log.csv  (produced by ict/paper_trader.py)
+   OR:  logs/ict_backtest_window_A.json / ict_backtest_window_B.json
+         (use --source-json to read from the ICT backtest JSON format)
 Writes: logs/live_edge.json
 
 Outcome mapping (paper_trader.py semantics → optimizer model):
-    TP2              → tp2 category   (50% @TP1_R then 50% @TP2_R)
-    BE, TP1_TIMEOUT  → tp1 category   (50% @TP1_R then stopped at BE)
+    TP2              → tp2 category   (big winner)
+    TP1, BE, TP1_TIMEOUT → tp1 category  (partial winner)
     STOP, TIMEOUT    → stop category  (full loss or 0R)
 
 Usage:
+    # From live paper trade CSV (after 30 days of running paper trader):
     python3 scripts/extract_live_edge.py
     python3 scripts/extract_live_edge.py --days 30 --log logs/ict_paper_trade_log.csv
+
+    # From existing backtest JSON windows (run right now, no waiting):
+    python3 scripts/extract_live_edge.py --source-json logs/ict_backtest_window_A.json
+    python3 scripts/extract_live_edge.py --source-json logs/ict_backtest_window_A.json --days 30
+    python3 scripts/extract_live_edge.py --source-json logs/ict_backtest_window_A.json --days 365
+
+    # Combine both windows (maximum statistical power):
+    python3 scripts/extract_live_edge.py \\
+        --source-json logs/ict_backtest_window_A.json \\
+        --source-json logs/ict_backtest_window_B.json
+
     python3 scripts/extract_live_edge.py --min-trades 15
 """
 from __future__ import annotations
@@ -48,9 +62,9 @@ COL_OUTCOME = 'outcome'
 COL_PNL_R   = 'pnl_r'
 COL_PAIR    = 'pair'
 
-# Outcome groups
+# Outcome groups — covers both paper_trader.py and ICT backtest JSON formats
 TP2_OUTCOMES  = {'TP2'}
-TP1_OUTCOMES  = {'BE', 'TP1_TIMEOUT'}
+TP1_OUTCOMES  = {'TP1', 'BE', 'TP1_TIMEOUT'}
 STOP_OUTCOMES = {'STOP', 'TIMEOUT'}
 
 
@@ -95,6 +109,71 @@ def load_trades(log_file: str, days: int) -> List[dict]:
                 'outcome': outcome,
                 'pnl_r':   pnl_r,
             })
+    return trades
+
+
+def load_trades_from_json(json_file: str, days: int) -> List[dict]:
+    """
+    Load and filter trades from an ICT backtest JSON file.
+
+    The JSON format (produced by ict/backtester.py) has a top-level 'trades'
+    array where each entry contains:
+        entry_dt  : 'YYYY-MM-DD HH:MM'
+        outcome   : 'TP1' | 'TP2' | 'STOP' | 'TIMEOUT'
+        pnl_r     : float
+        pair      : str
+
+    When days=365 (or any value larger than the window span), all trades are
+    returned — i.e., the entire window is treated as the live sample.
+    When days < window span, only the most recent N days are returned.
+    """
+    path = Path(json_file)
+    if not path.exists():
+        print(f'  ⚠️  File not found: {json_file}')
+        return []
+
+    data = json.loads(path.read_text())
+    raw_trades = data.get('trades', [])
+
+    # Parse all dates first so we can find the window's own most-recent date
+    parsed: List[tuple] = []
+    for t in raw_trades:
+        dt_str = t.get('entry_dt', '')
+        dt = None
+        for fmt in ('%Y-%m-%d %H:%M', '%Y-%m-%dT%H:%M:%S', '%Y-%m-%d'):
+            try:
+                dt = datetime.strptime(dt_str, fmt).replace(tzinfo=timezone.utc)
+                break
+            except ValueError:
+                continue
+        if dt:
+            parsed.append((dt, t))
+
+    if not parsed:
+        return []
+
+    # Cutoff = most recent trade date minus `days` (not wall-clock now, since
+    # backtest data may be months old relative to today)
+    latest_date = max(dt for dt, _ in parsed)
+    cutoff = latest_date - timedelta(days=days)
+
+    trades = []
+    for dt, t in parsed:
+        if dt < cutoff:
+            continue
+        outcome = t.get('outcome', '').strip()
+        if not outcome:
+            continue
+        try:
+            pnl_r = float(t.get('pnl_r', 0.0))
+        except (ValueError, TypeError):
+            pnl_r = 0.0
+        trades.append({
+            'date':    dt,
+            'pair':    t.get('pair', ''),
+            'outcome': outcome,
+            'pnl_r':   pnl_r,
+        })
     return trades
 
 
@@ -196,14 +275,17 @@ def tolerance_check(live: dict) -> Tuple[bool, List[str]]:
     return len(warnings) == 0, warnings
 
 
-def print_report(dist: dict, warnings: List[str], within_tol: bool, days: int) -> None:
+def print_report(dist: dict, warnings: List[str], within_tol: bool,
+                 days: int, source_label: str = '') -> None:
     width = 60
+    day_str = f'last {days} days' if days < 365 else 'full window'
+    src_str = f' [{source_label}]' if source_label else ''
     print(f'\n{"="*width}')
-    print(f'  LIVE EDGE EXTRACTION — last {days} days')
+    print(f'  LIVE EDGE EXTRACTION — {day_str}{src_str}')
     print(f'{"="*width}')
     print(f'  Trades analysed:       {dist["n_trades"]}')
     print(f'  Outcomes:              TP2={dist["outcome_counts"]["TP2"]}  '
-          f'TP1/BE={dist["outcome_counts"]["TP1"]}  '
+          f'TP1={dist["outcome_counts"]["TP1"]}  '
           f'STOP/TIMEOUT={dist["outcome_counts"]["STOP"]}')
     print()
     print(f'  {"":20}  {"LIVE":>8}  {"BACKTEST":>10}  {"DELTA":>8}')
@@ -236,44 +318,76 @@ def print_report(dist: dict, warnings: List[str], within_tol: bool, days: int) -
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description='Extract live TP distribution from paper trade log.'
+        description='Extract real TP distribution from paper trade log or backtest JSON.'
     )
-    parser.add_argument('--log',        default=DEFAULT_LOG,
+    parser.add_argument('--log',         default=DEFAULT_LOG,
                         help=f'Path to paper trade CSV (default: {DEFAULT_LOG})')
-    parser.add_argument('--days',       type=int, default=30,
-                        help='Rolling window in days (default: 30)')
-    parser.add_argument('--min-trades', type=int, default=20,
+    parser.add_argument('--source-json', action='append', dest='source_jsons',
+                        metavar='FILE', default=None,
+                        help='Path to ICT backtest JSON (e.g. logs/ict_backtest_window_A.json). '
+                             'Can be specified multiple times to combine windows. '
+                             'When provided, --log is ignored.')
+    parser.add_argument('--days',        type=int, default=30,
+                        help='Rolling window in days relative to the most recent trade in the '
+                             'source data. Use 365 to include the full window (default: 30).')
+    parser.add_argument('--min-trades',  type=int, default=20,
                         help='Minimum trades required for valid edge (default: 20)')
-    parser.add_argument('--out',        default=str(OUTPUT_PATH),
+    parser.add_argument('--out',         default=str(OUTPUT_PATH),
                         help=f'Output JSON path (default: {OUTPUT_PATH})')
     args = parser.parse_args()
 
-    trades = load_trades(args.log, args.days)
+    # ── Load trades ─────────────────────────────────────────────────────────── #
+    if args.source_jsons:
+        # JSON mode: read from one or more backtest window files
+        trades: List[dict] = []
+        source_labels = []
+        for jfile in args.source_jsons:
+            t = load_trades_from_json(jfile, args.days)
+            trades.extend(t)
+            label = Path(jfile).stem
+            source_labels.append(f'{label}({len(t)})')
+            print(f'  Loaded {len(t)} trades from {jfile} '
+                  f'(last {args.days} days of that window)')
+        source_label = ', '.join(source_labels)
+        source_path  = ', '.join(args.source_jsons)
+    else:
+        # CSV mode: live paper trade log
+        trades = load_trades(args.log, args.days)
+        source_label = Path(args.log).name
+        source_path  = args.log
 
+    # ── Validate count ───────────────────────────────────────────────────────── #
     if not trades:
-        print(f'\n  ⚠️  No trades found in {args.log}')
-        print(f'  The 30-day paper trading run has not produced data yet.')
-        print(f'  Run the paper trader for {args.days} days, then re-run this script.\n')
+        if args.source_jsons:
+            print(f'\n  ⚠️  No trades found in the specified JSON file(s).')
+        else:
+            print(f'\n  ⚠️  No trades found in {args.log}')
+            print(f'  The paper trading run has not produced data yet.')
+            print(f'  Use --source-json logs/ict_backtest_window_A.json to use existing data.\n')
         return
 
     if len(trades) < args.min_trades:
         print(f'\n  ⚠️  Only {len(trades)} trades found (minimum: {args.min_trades}).')
-        print(f'  Edge estimate not yet statistically reliable. Keep trading.\n')
-        # Still proceed but flag low sample
+        if not args.source_jsons:
+            print(f'  Tip: use --source-json to pull from backtest windows, or '
+                  f'--days 365 for the full window.')
+        print(f'  Proceeding — treat results with caution (wide confidence intervals).\n')
 
+    # ── Compute, check, report ───────────────────────────────────────────────── #
     dist = compute_distribution(trades)
     within_tol, warnings = tolerance_check(dist)
 
-    print_report(dist, warnings, within_tol, args.days)
+    print_report(dist, warnings, within_tol, args.days, source_label)
 
-    # Write output
+    # ── Write output ─────────────────────────────────────────────────────────── #
     out = {
         **dist,
-        'days':            args.days,
-        'source':          args.log,
+        'days':             args.days,
+        'source':           source_path,
+        'source_type':      'backtest_json' if args.source_jsons else 'paper_trade_csv',
         'within_tolerance': within_tol,
         'tolerance_warnings': warnings,
-        'computed_at':     datetime.now(timezone.utc).isoformat(),
+        'computed_at':      datetime.now(timezone.utc).isoformat(),
         'backtest_reference': {
             'tp2_rate':  BACKTEST_TP2_RATE,
             'tp1_rate':  BACKTEST_TP1_RATE,
