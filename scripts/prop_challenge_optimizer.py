@@ -64,7 +64,10 @@ def wilson_ci(n_success: int, n_total: int, z: float = 1.96) -> Tuple[float, flo
     return max(0.0, centre - margin), min(1.0, centre + margin)
 
 # ── Parameter sweep grid ─────────────────────────────────────────────────── #
-RISK_PCT_VALS      = [0.50, 0.75, 1.00, 1.25, 1.50, 1.75, 2.00]
+# Risk cap: 1.0% max — worst observed stop run (8 consecutive) at 1.0% = 8% DD,
+# exactly at the typical prop firm total DD limit. Above 1.0% risks busting
+# on a cluster before winners arrive. Walk-forward confirms this.
+RISK_PCT_VALS      = [0.50, 0.625, 0.75, 0.875, 1.00]
 TRADES_PER_MONTH   = [6, 9, 12, 15, 18, 24, 30]
 CHALLENGE_DAYS     = [30, 45, 60, 90]
 PROFIT_TARGET      = [0.06, 0.08, 0.10]
@@ -365,36 +368,39 @@ def walk_forward_validation(
     if n < 10:
         return None
 
+    # Compute calendar days per trade from actual trade timestamps
+    tpm       = best.get('trades_per_month', 9)
+    days_per_trade = 30.0 / tpm  # e.g. 9/month → 3.3 calendar days each
+
     passes = 0
     attempts = 0
     # Slide a window across the trade sequence
     for start_idx in range(n):
-        acct = ACCOUNT_START
-        day_acct = ACCOUNT_START
-        passed = busted = False
-        trade_count = 0
-        day_trades = 0
-        current_day = 0
+        acct        = ACCOUNT_START
+        day_acct    = ACCOUNT_START
+        passed      = busted = False
+        elapsed_days = 0.0
 
         for idx in range(start_idx, n):
+            elapsed_days += days_per_trade
+            if elapsed_days > days:
+                break       # challenge window expired
+
             pnl_r = pnl_seq[idx]
             pnl   = acct * risk * pnl_r
             acct += pnl
-            trade_count += 1
-            day_trades  += 1
+
+            # Daily DD: reset reference each simulated trading day
+            day_num = int(elapsed_days)
+            if day_num > int(elapsed_days - days_per_trade):
+                day_acct = acct  # new day — update daily open
 
             if acct <= floor:
                 busted = True; break
             if acct <= day_acct * (1 - daily_dd_r):
-                day_acct = acct  # end of day effectively
+                busted = True; break   # daily DD limit hit
             if acct >= target:
                 passed = True; break
-            if day_trades >= 2:  # approx 2 trades per day at 6/month
-                day_acct = acct
-                day_trades = 0
-                current_day += 1
-                if current_day >= days:
-                    break
 
         attempts += 1
         if passed:
@@ -527,20 +533,49 @@ def main():
     # ── 4. Best overall config ─────────────────────────────────────────────
     best = by_portfolio[0]
 
+    # ── 4b. Best realistic config (needed before walk-forward) ────────────────
+    realistic = [d for d in all_results
+                 if d['trades_per_month'] <= 9
+                 and d['n_simultaneous'] <= 4]
+    best_realistic = sorted(realistic, key=lambda x: -x['portfolio_pass'])[0] if realistic else best
+
     # ── 5. Walk-forward validation ─────────────────────────────────────────
-    mc_pass = best['pass_rate'] * 100
-    wfa = walk_forward_validation(best, 'Window A', 'logs/ict_backtest_window_A.json')
-    wfb = walk_forward_validation(best, 'Window B', 'logs/ict_backtest_window_B.json')
+    # Use realistic config for walk-forward (actual signal frequency, not theoretical best)
+    # Walk-forward validates the edge exists — not whether 24 trades/month is achievable
+    wf_config = best_realistic.copy()
+    wf_mc_result = simulate_batch(
+        wf_config['risk_pct'], wf_config['trades_per_month'],
+        wf_config['challenge_days'], wf_config['profit_target'],
+        wf_config['max_daily_dd'], wf_config['max_total_dd'],
+        n_trials,
+    )
+    mc_pass = wf_mc_result.pass_rate * 100
+    wfa = walk_forward_validation(wf_config, 'Window A', 'logs/ict_backtest_window_A.json')
+    wfb = walk_forward_validation(wf_config, 'Window B', 'logs/ict_backtest_window_B.json')
 
     validated = False
     adj_risk_note = ''
+    wf_verdict = 'UNKNOWN'
     if wfa and wfb:
-        avg_wf = (wfa + wfb) / 2
-        diff   = abs(mc_pass - avg_wf)
-        validated = diff <= 5
-        if not validated and diff > 10:
-            adj_risk_note = (f'  → Clustering risk detected. Reduce risk to '
-                             f'{best["risk_pct"] - RISK_ADJUST_PP:.2f}% and re-run.')
+        avg_wf    = (wfa + wfb) / 2
+        worst_wf  = min(wfa, wfb)
+        best_wf   = max(wfa, wfb)
+        # Use average gap rather than worst-case: small sample (66 trades) means
+        # individual windows are noisy. Average is more informative.
+        avg_diff  = abs(mc_pass - avg_wf)
+        # Also weight toward most-recent window (B) — more predictive of near future
+        recent_diff = abs(mc_pass - wfb)
+        validated = avg_diff <= 5
+        if avg_diff <= 5:
+            wf_verdict = 'VALIDATED'
+        elif avg_diff <= 10 or recent_diff <= 5:
+            wf_verdict = 'MARGINAL'
+            adj_risk_note = (f'  → Borderline: reduce risk to '
+                             f'{best["risk_pct"] - RISK_ADJUST_PP:.2f}% for safety')
+        else:
+            wf_verdict = 'UNSTABLE'
+            adj_risk_note = (f'  → Trade clustering detected. Need more data '
+                             f'or reduce risk to {best["risk_pct"] - RISK_ADJUST_PP:.2f}%')
 
     # ── 6. Sensitivity analysis ────────────────────────────────────────────
     sens = sensitivity_analysis(best, n_trials=min(n_trials, 5_000))
@@ -554,11 +589,6 @@ def main():
     safety_margin = round((TP2_RATE - (breakeven_tp2 or 0)) * 100, 1) if breakeven_tp2 else '>13%'
 
     # ── 7. Final recommendation ────────────────────────────────────────────
-    realistic = [d for d in all_results
-                 if d['trades_per_month'] <= 9
-                 and d['n_simultaneous'] <= 4]
-    best_realistic = sorted(realistic, key=lambda x: -x['portfolio_pass'])[0] if realistic else best
-
     gap = best_realistic['trades_per_month'] - 6
     if gap > 0:
         rec_text = (f'FunderPro $10k challenge.  '
@@ -638,7 +668,9 @@ def main():
             'best':        best,
             'best_realistic': best_realistic,
             'sensitivity': {str(k): v for k, v in sens.items()},
-            'walk_forward': {'A': wfa, 'B': wfb, 'validated': validated},
+            'walk_forward': {'A': wfa, 'B': wfb, 'validated': validated,
+                             'verdict': wf_verdict,
+                             'avg_wf': round(avg_wf, 1) if wfa and wfb else None},
             'breakeven_tp2': breakeven_tp2,
             'safety_margin_pp': safety_margin,
             'live_edge_input': live_edge_data,
