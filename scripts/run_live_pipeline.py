@@ -160,10 +160,10 @@ def step3_verdict() -> None:
         print(f'     Verdict: CONDITIONAL — review walk-forward data manually')
     else:
         avg_wf = (wfa + wfb) / 2
-        diff   = mc_pass - avg_wf  # positive means MC over-estimates
+        diff = mc_pass - avg_wf  # positive means MC over-estimates walk-forward
 
-        if diff <= WF_WITHIN_5PP:
-            print(f'  ✅  VALIDATED — walk-forward within {diff:.1f}pp of Monte Carlo')
+        if abs(diff) <= WF_WITHIN_5PP:
+            print(f'  ✅  VALIDATED — walk-forward within {abs(diff):.1f}pp of Monte Carlo')
             print(f'\n  ════════════════════════════════════════════════════')
             print(f'  🟢  GO — ATTEMPT ONE REAL PROP CHALLENGE')
             print(f'  ════════════════════════════════════════════════════')
@@ -176,9 +176,9 @@ def step3_verdict() -> None:
             print(f'  Firm:            FunderPro $10k challenge (~$99)')
             print(f'\n  Trust the optimizer. Not your gut.')
 
-        elif diff <= WF_OVER_10PP:
-            adj_risk = round((best.get('risk_pct', 1.0) or 1.0) - 0.25, 2)
-            print(f'  ⚠️  MARGINAL — walk-forward {diff:.1f}pp below Monte Carlo')
+        elif abs(diff) <= WF_OVER_10PP:
+            adj_risk = round(best.get('risk_pct', 1.0) - 0.25, 2)
+            print(f'  ⚠️  MARGINAL — walk-forward {abs(diff):.1f}pp below Monte Carlo')
             print(f'     Clustering risk is borderline.')
             print(f'\n  ════════════════════════════════════════════════════')
             print(f'  🟡  CONDITIONAL GO — reduce risk to {adj_risk:.2f}% and re-run')
@@ -189,7 +189,7 @@ def step3_verdict() -> None:
             print(f'  3. If walk-forward is then within 5pp → attempt challenge')
 
         else:
-            print(f'  ❌  EDGE UNSTABLE — walk-forward {diff:.1f}pp below Monte Carlo')
+            print(f'  ❌  EDGE UNSTABLE — walk-forward {abs(diff):.1f}pp below Monte Carlo')
             print(f'     (threshold: >{WF_OVER_10PP}pp = do not attempt)')
             print(f'\n  ════════════════════════════════════════════════════')
             print(f'  🔴  NO-GO — DO NOT ATTEMPT CHALLENGE')
@@ -234,8 +234,8 @@ def main() -> None:
     print(f'  LIVE EDGE → PROP CHALLENGE PIPELINE')
     print(f'  {datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")}')
     print(f'{"="*65}')
-    print(f'  Step 1: Extract 30-day live edge from paper trade log')
-    print(f'  Step 2: Re-run optimizer (317M simulations) with live edge')
+    print(f'  Step 1: Extract {args.days}-day live edge from paper trade log')
+    print(f'  Step 2: Re-run optimizer with live edge (31,752 param combinations)')
     print(f'  Step 3: Compare Monte Carlo vs walk-forward → GO/NO-GO')
 
     # Step 1

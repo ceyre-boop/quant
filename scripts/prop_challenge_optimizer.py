@@ -44,7 +44,16 @@ ACCOUNT_START   = 10_000.0
 
 
 def wilson_ci(n_success: int, n_total: int, z: float = 1.96) -> Tuple[float, float]:
-    """Wilson score confidence interval for a proportion."""
+    """Wilson score confidence interval for a proportion.
+
+    Args:
+        n_success: Number of successes.
+        n_total:   Total number of trials.
+        z:         Z-score for desired confidence level (default 1.96 → 95%).
+
+    Returns:
+        (lower_bound, upper_bound) both in [0, 1].
+    """
     if n_total == 0:
         return 0.0, 0.0
     p = n_success / n_total
@@ -92,104 +101,14 @@ def simulate_batch(
     """
     Vectorised Monte Carlo simulation of one parameter set.
     Runs n_trials simultaneously using numpy.
+    Thin wrapper over simulate_batch_detailed — discards balance array.
     """
-    rng = np.random.default_rng(rng_seed)
-    risk  = risk_pct / 100.0
-    acct  = np.full(n_trials, ACCOUNT_START, dtype=np.float64)
-    peak  = acct.copy()
-    floor = ACCOUNT_START * (1 - max_total_dd)
-    tgt   = ACCOUNT_START * (1 + profit_target)
-
-    # State flags: 0=active, 1=passed, 2=busted
-    status     = np.zeros(n_trials, dtype=np.int8)
-    pass_day   = np.full(n_trials, challenge_days + 1, dtype=np.int32)
-
-    # Expected trades per day (Poisson)
-    lam = trades_per_month / 30.0
-
-    for day in range(challenge_days):
-        active = status == 0
-        if not active.any():
-            break
-
-        daily_open  = acct.copy()
-        daily_floor = daily_open * (1 - max_daily_dd)
-        daily_dd_hit = np.zeros(n_trials, dtype=bool)
-
-        # Number of trade opportunities today (Poisson)
-        n_trades_today = rng.poisson(lam, size=n_trials)
-
-        for trade_slot in range(int(np.max(n_trades_today)) + 1):
-            # Mask: active + not daily DD busted + has a trade this slot
-            mask = active & ~daily_dd_hit & (n_trades_today > trade_slot)
-            if not mask.any():
-                break
-
-            # Draw outcome from TP distribution
-            u = rng.uniform(size=n_trials)
-            noise = rng.normal(1.0, NOISE_STD, size=n_trials)
-            noise = np.clip(noise, 0.5, 1.5)
-
-            pnl = np.where(
-                u < TP2_RATE,
-                acct * risk * TP2_R * noise,
-                np.where(
-                    u < TP2_RATE + TP1_RATE,
-                    acct * risk * TP1_R * noise,
-                    acct * risk * STOP_R * noise,
-                )
-            )
-
-            # Apply only where mask is active
-            acct = np.where(mask, acct + pnl, acct)
-            peak = np.maximum(peak, acct)
-
-            # Daily DD check
-            daily_dd_hit |= (mask & (acct <= daily_floor))
-
-            # Total DD check → bust
-            newly_busted = mask & (acct <= floor)
-            status = np.where(newly_busted, 2, status)
-            active = status == 0
-
-            # Pass check
-            newly_passed = active & (acct >= tgt)
-            status = np.where(newly_passed, 1, status)
-            pass_day = np.where(newly_passed & (pass_day > day), day + 1, pass_day)
-            active = status == 0
-
-        # End of day: check total DD for any remaining active
-        still_busted = active & (acct <= floor)
-        status = np.where(still_busted, 2, status)
-        active = status == 0
-
-        # Check pass at end of day
-        eod_passed = active & (acct >= tgt)
-        status = np.where(eod_passed, 1, status)
-        pass_day = np.where(eod_passed & (pass_day > day), day + 1, pass_day)
-        active = status == 0
-
-    pass_mask    = status == 1
-    bust_mask    = status == 2
-    timeout_mask = status == 0
-
-    pass_rate    = float(pass_mask.sum() / n_trials)
-    bust_rate    = float(bust_mask.sum() / n_trials)
-    timeout_rate = float(timeout_mask.sum() / n_trials)
-
-    pass_days = pass_day[pass_mask]
-    median_days = int(np.median(pass_days)) if len(pass_days) > 0 else None
-
-    # EV per attempt = E[final_balance] - ACCOUNT_START
-    ev = float(np.mean(acct) - ACCOUNT_START)
-
-    return SimResult(
-        risk_pct=risk_pct, trades_per_month=trades_per_month,
-        challenge_days=challenge_days, profit_target=profit_target,
-        max_daily_dd=max_daily_dd, max_total_dd=max_total_dd,
-        n_trials=n_trials, pass_rate=pass_rate, bust_rate=bust_rate,
-        timeout_rate=timeout_rate, median_days=median_days, ev_per_attempt=ev,
+    result, _ = simulate_batch_detailed(
+        risk_pct, trades_per_month, challenge_days,
+        profit_target, max_daily_dd, max_total_dd,
+        n_trials, rng_seed=rng_seed,
     )
+    return result
 
 
 def simulate_batch_detailed(
@@ -203,7 +122,12 @@ def simulate_batch_detailed(
     rng_seed:         int = 42,
 ) -> Tuple[SimResult, np.ndarray]:
     """
-    Same as simulate_batch but also returns final balance array for histogram.
+    Vectorised Monte Carlo simulation of one parameter set.
+    Runs n_trials simultaneously using numpy.
+
+    Returns:
+        (SimResult, final_balance_array) — the balance array enables
+        histogram analysis for the top-3 detailed report.
     """
     rng = np.random.default_rng(rng_seed)
     risk  = risk_pct / 100.0
@@ -514,8 +438,11 @@ def print_config(rank: int, d: dict, label: str = ''):
           f"Median={d['median_days']}d  Cost/pass=${d['cost_per_pass']:.0f}")
 
 
-def _load_live_edge(path: str) -> None:
-    """Override module-level edge constants from a live_edge.json file."""
+def _load_live_edge(path: str) -> dict:
+    """Override module-level edge constants from a live_edge.json file.
+
+    Returns the parsed JSON dict so callers can log metadata.
+    """
     import json as _json
     data = _json.loads(Path(path).read_text())
     global TP2_RATE, TP1_RATE, STOP_RATE, TP2_R, TP1_R, STOP_R

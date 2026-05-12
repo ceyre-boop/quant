@@ -123,7 +123,7 @@ def compute_distribution(trades: List[dict]) -> dict:
     tp1_rate  = _safe_rate(tp1_trades)
     stop_rate = _safe_rate(stop_trades)
 
-    # Normalise so rates sum to exactly 1.0
+    # Normalize so rates sum to exactly 1.0
     total = tp2_rate + tp1_rate + stop_rate
     if total > 0:
         tp2_rate  /= total
