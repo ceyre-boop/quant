@@ -43,6 +43,8 @@ WF_WITHIN_5PP  = 5.0    # walk-forward within 5pp → VALIDATED
 WF_WITHIN_10PP = 10.0   # 5–10pp → reduce risk
 WF_OVER_10PP   = 10.0   # >10pp → DO NOT attempt challenge
 
+RISK_ADJUST_PP = 0.25   # pp to subtract when clustering risk is borderline
+
 
 def _run(cmd: list, desc: str) -> int:
     """Run a subprocess command, streaming output to stdout."""
@@ -177,15 +179,19 @@ def step3_verdict() -> None:
             print(f'\n  Trust the optimizer. Not your gut.')
 
         elif abs(diff) <= WF_OVER_10PP:
-            adj_risk = round(best.get('risk_pct', 1.0) - 0.25, 2)
+            risk_pct = best.get('risk_pct')
+            if risk_pct is None:
+                adj_risk_str = '(current risk - 0.25%)'
+            else:
+                adj_risk_str = f'{round(risk_pct - RISK_ADJUST_PP, 2):.2f}%'
             print(f'  ⚠️  MARGINAL — walk-forward {abs(diff):.1f}pp below Monte Carlo')
             print(f'     Clustering risk is borderline.')
             print(f'\n  ════════════════════════════════════════════════════')
-            print(f'  🟡  CONDITIONAL GO — reduce risk to {adj_risk:.2f}% and re-run')
+            print(f'  🟡  CONDITIONAL GO — reduce risk to {adj_risk_str} and re-run')
             print(f'  ════════════════════════════════════════════════════')
             print(f'\n  Action:')
-            print(f'  1. Edit --live-edge-file and set risk_pct to {adj_risk:.2f}%')
-            print(f'  2. Re-run:  python3 scripts/run_live_pipeline.py')
+            print(f'  1. Set risk_pct to {adj_risk_str} in logs/live_edge.json')
+            print(f'  2. Re-run:  python3 scripts/run_live_pipeline.py --skip-extract')
             print(f'  3. If walk-forward is then within 5pp → attempt challenge')
 
         else:

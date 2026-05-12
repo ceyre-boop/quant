@@ -41,6 +41,7 @@ NOISE_STD = 0.15     # gaussian noise on pnl (slippage/spread variation)
 
 CHALLENGE_FEE   = 99.0   # USD — FunderPro $10k challenge
 ACCOUNT_START   = 10_000.0
+RISK_ADJUST_PP  = 0.25   # pp to reduce risk when clustering risk is detected
 
 
 def wilson_ci(n_success: int, n_total: int, z: float = 1.96) -> Tuple[float, float]:
@@ -179,7 +180,9 @@ def simulate_batch_detailed(
 
             newly_passed = active & (acct >= tgt)
             status = np.where(newly_passed, 1, status)
-            pass_day = np.where(newly_passed & (pass_day > day), day + 1, pass_day)
+            # newly_passed only selects active (status==0) trials; pass_day for those
+            # is still the sentinel, so the update is unconditional.
+            pass_day = np.where(newly_passed, day + 1, pass_day)
             active = status == 0
 
         still_busted = active & (acct <= floor)
@@ -188,7 +191,7 @@ def simulate_batch_detailed(
 
         eod_passed = active & (acct >= tgt)
         status = np.where(eod_passed, 1, status)
-        pass_day = np.where(eod_passed & (pass_day > day), day + 1, pass_day)
+        pass_day = np.where(eod_passed, day + 1, pass_day)
         active = status == 0
 
     pass_mask    = status == 1
@@ -536,7 +539,8 @@ def main():
         diff   = abs(mc_pass - avg_wf)
         validated = diff <= 5
         if not validated and diff > 10:
-            adj_risk_note = f'  → Clustering risk detected. Reduce risk to {best["risk_pct"]-0.25:.2f}% and re-run.'
+            adj_risk_note = (f'  → Clustering risk detected. Reduce risk to '
+                             f'{best["risk_pct"] - RISK_ADJUST_PP:.2f}% and re-run.')
 
     # ── 6. Sensitivity analysis ────────────────────────────────────────────
     sens = sensitivity_analysis(best, n_trials=min(n_trials, 5_000))
