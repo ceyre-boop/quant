@@ -292,10 +292,12 @@ def simulate_batch_detailed(
 def ascii_histogram(values: np.ndarray, n_bins: int = 12, width: int = 40) -> str:
     """Return multi-line ASCII histogram string."""
     lo, hi = float(np.min(values)), float(np.max(values))
-    if lo == hi:
+    if np.isclose(lo, hi):
         return f'  All values: {lo:.0f}'
     counts, edges = np.histogram(values, bins=n_bins)
     max_count = counts.max()
+    if max_count == 0:
+        return '  (no data)'
     lines = []
     for i, (cnt, left) in enumerate(zip(counts, edges)):
         bar_len = int(cnt / max_count * width)
@@ -305,13 +307,13 @@ def ascii_histogram(values: np.ndarray, n_bins: int = 12, width: int = 40) -> st
     return '\n'.join(lines)
 
 
-def print_top3_analysis(top3: List[dict], n_trials: int = 10_000) -> None:
+def print_top3_analysis(top_configs: List[dict], n_trials: int = 10_000) -> None:
     """Re-run top-3 configs with detailed output: histogram, CI, expected cost."""
     print(f'\n{"="*65}')
     print('  TOP 3 DETAILED ANALYSIS')
     print(f'{"="*65}')
 
-    for rank, d in enumerate(top3, 1):
+    for rank, d in enumerate(top_configs, 1):
         result, final_balances = simulate_batch_detailed(
             d['risk_pct'], d['trades_per_month'], d['challenge_days'],
             d['profit_target'], d['max_daily_dd'], d['max_total_dd'],
@@ -319,8 +321,14 @@ def print_top3_analysis(top3: List[dict], n_trials: int = 10_000) -> None:
         )
         n_pass   = int(round(result.pass_rate * n_trials))
         ci_lo, ci_hi = wilson_ci(n_pass, n_trials)
-        exp_attempts = 1 / result.pass_rate if result.pass_rate > 0 else float('inf')
-        exp_cost     = exp_attempts * CHALLENGE_FEE
+        if result.pass_rate > 0:
+            exp_attempts = 1 / result.pass_rate
+            exp_cost     = exp_attempts * CHALLENGE_FEE
+            exp_attempts_str = f'{exp_attempts:.1f}'
+            exp_cost_str     = f'${exp_cost:.0f}'
+        else:
+            exp_attempts_str = 'N/A (0% pass rate)'
+            exp_cost_str     = 'N/A'
 
         print(f'\n  ── Config #{rank} ──────────────────────────────────────────')
         print(f'  Risk={d["risk_pct"]:.2f}%  Trades/mo={d["trades_per_month"]}  '
@@ -330,8 +338,8 @@ def print_top3_analysis(top3: List[dict], n_trials: int = 10_000) -> None:
         print(f'  Pass={result.pass_rate*100:.1f}%  Bust={result.bust_rate*100:.1f}%  '
               f'Timeout={result.timeout_rate*100:.1f}%  Portfolio={d["portfolio_pass"]*100:.1f}%')
         print(f'  95% CI for pass rate: [{ci_lo*100:.1f}%, {ci_hi*100:.1f}%]')
-        print(f'  Expected attempts to first success: {exp_attempts:.1f}')
-        print(f'  Expected cost to funded account:    ${exp_cost:.0f}')
+        print(f'  Expected attempts to first success: {exp_attempts_str}')
+        print(f'  Expected cost to funded account:    {exp_cost_str}')
         print(f'  Median days to pass:                {result.median_days}')
         print(f'\n  Final balance distribution ({n_trials:,} trials):')
         print(ascii_histogram(final_balances))
