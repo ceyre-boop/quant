@@ -41,6 +41,27 @@ NOISE_STD = 0.15     # gaussian noise on pnl (slippage/spread variation)
 
 CHALLENGE_FEE   = 99.0   # USD — FunderPro $10k challenge
 ACCOUNT_START   = 10_000.0
+RISK_ADJUST_PP  = 0.25   # pp to reduce risk when clustering risk is detected
+
+
+def wilson_ci(n_success: int, n_total: int, z: float = 1.96) -> Tuple[float, float]:
+    """Wilson score confidence interval for a proportion.
+
+    Args:
+        n_success: Number of successes.
+        n_total:   Total number of trials.
+        z:         Z-score for desired confidence level (default 1.96 → 95%).
+
+    Returns:
+        (lower_bound, upper_bound) both in [0, 1].
+    """
+    if n_total == 0:
+        return 0.0, 0.0
+    p = n_success / n_total
+    denom = 1 + z * z / n_total
+    centre = (p + z * z / (2 * n_total)) / denom
+    margin = (z * (p * (1 - p) / n_total + z * z / (4 * n_total ** 2)) ** 0.5) / denom
+    return max(0.0, centre - margin), min(1.0, centre + margin)
 
 # ── Parameter sweep grid ─────────────────────────────────────────────────── #
 RISK_PCT_VALS      = [0.50, 0.75, 1.00, 1.25, 1.50, 1.75, 2.00]
@@ -81,6 +102,33 @@ def simulate_batch(
     """
     Vectorised Monte Carlo simulation of one parameter set.
     Runs n_trials simultaneously using numpy.
+    Thin wrapper over simulate_batch_detailed — discards balance array.
+    """
+    result, _ = simulate_batch_detailed(
+        risk_pct, trades_per_month, challenge_days,
+        profit_target, max_daily_dd, max_total_dd,
+        n_trials, rng_seed=rng_seed,
+    )
+    return result
+
+
+def simulate_batch_detailed(
+    risk_pct:         float,
+    trades_per_month: int,
+    challenge_days:   int,
+    profit_target:    float,
+    max_daily_dd:     float,
+    max_total_dd:     float,
+    n_trials:         int,
+    rng_seed:         int = 42,
+) -> Tuple[SimResult, np.ndarray]:
+    """
+    Vectorised Monte Carlo simulation of one parameter set.
+    Runs n_trials simultaneously using numpy.
+
+    Returns:
+        (SimResult, final_balance_array) — the balance array enables
+        histogram analysis for the top-3 detailed report.
     """
     rng = np.random.default_rng(rng_seed)
     risk  = risk_pct / 100.0
@@ -89,11 +137,8 @@ def simulate_batch(
     floor = ACCOUNT_START * (1 - max_total_dd)
     tgt   = ACCOUNT_START * (1 + profit_target)
 
-    # State flags: 0=active, 1=passed, 2=busted
-    status     = np.zeros(n_trials, dtype=np.int8)
-    pass_day   = np.full(n_trials, challenge_days + 1, dtype=np.int32)
-
-    # Expected trades per day (Poisson)
+    status   = np.zeros(n_trials, dtype=np.int8)
+    pass_day = np.full(n_trials, challenge_days + 1, dtype=np.int32)
     lam = trades_per_month / 30.0
 
     for day in range(challenge_days):
@@ -101,23 +146,19 @@ def simulate_batch(
         if not active.any():
             break
 
-        daily_open  = acct.copy()
-        daily_floor = daily_open * (1 - max_daily_dd)
+        daily_open   = acct.copy()
+        daily_floor  = daily_open * (1 - max_daily_dd)
         daily_dd_hit = np.zeros(n_trials, dtype=bool)
 
-        # Number of trade opportunities today (Poisson)
         n_trades_today = rng.poisson(lam, size=n_trials)
 
         for trade_slot in range(int(np.max(n_trades_today)) + 1):
-            # Mask: active + not daily DD busted + has a trade this slot
             mask = active & ~daily_dd_hit & (n_trades_today > trade_slot)
             if not mask.any():
                 break
 
-            # Draw outcome from TP distribution
-            u = rng.uniform(size=n_trials)
-            noise = rng.normal(1.0, NOISE_STD, size=n_trials)
-            noise = np.clip(noise, 0.5, 1.5)
+            u     = rng.uniform(size=n_trials)
+            noise = np.clip(rng.normal(1.0, NOISE_STD, size=n_trials), 0.5, 1.5)
 
             pnl = np.where(
                 u < TP2_RATE,
@@ -129,30 +170,25 @@ def simulate_batch(
                 )
             )
 
-            # Apply only where mask is active
             acct = np.where(mask, acct + pnl, acct)
             peak = np.maximum(peak, acct)
-
-            # Daily DD check
             daily_dd_hit |= (mask & (acct <= daily_floor))
 
-            # Total DD check → bust
             newly_busted = mask & (acct <= floor)
             status = np.where(newly_busted, 2, status)
             active = status == 0
 
-            # Pass check
             newly_passed = active & (acct >= tgt)
             status = np.where(newly_passed, 1, status)
+            # Guard ensures pass_day is recorded at the earliest day it fires,
+            # and remains stable if this code path is ever re-entered.
             pass_day = np.where(newly_passed & (pass_day > day), day + 1, pass_day)
             active = status == 0
 
-        # End of day: check total DD for any remaining active
         still_busted = active & (acct <= floor)
         status = np.where(still_busted, 2, status)
         active = status == 0
 
-        # Check pass at end of day
         eod_passed = active & (acct >= tgt)
         status = np.where(eod_passed, 1, status)
         pass_day = np.where(eod_passed & (pass_day > day), day + 1, pass_day)
@@ -166,19 +202,74 @@ def simulate_batch(
     bust_rate    = float(bust_mask.sum() / n_trials)
     timeout_rate = float(timeout_mask.sum() / n_trials)
 
-    pass_days = pass_day[pass_mask]
+    pass_days   = pass_day[pass_mask]
     median_days = int(np.median(pass_days)) if len(pass_days) > 0 else None
+    ev          = float(np.mean(acct) - ACCOUNT_START)
 
-    # EV per attempt = E[final_balance] - ACCOUNT_START
-    ev = float(np.mean(acct) - ACCOUNT_START)
-
-    return SimResult(
+    result = SimResult(
         risk_pct=risk_pct, trades_per_month=trades_per_month,
         challenge_days=challenge_days, profit_target=profit_target,
         max_daily_dd=max_daily_dd, max_total_dd=max_total_dd,
         n_trials=n_trials, pass_rate=pass_rate, bust_rate=bust_rate,
         timeout_rate=timeout_rate, median_days=median_days, ev_per_attempt=ev,
     )
+    return result, acct
+
+
+def ascii_histogram(values: np.ndarray, n_bins: int = 12, width: int = 40) -> str:
+    """Return multi-line ASCII histogram string."""
+    lo, hi = float(np.min(values)), float(np.max(values))
+    if np.isclose(lo, hi):
+        return f'  All values: {lo:.0f}'
+    counts, edges = np.histogram(values, bins=n_bins)
+    max_count = counts.max()
+    if max_count == 0:
+        return '  (no data)'
+    lines = []
+    for i, (cnt, left) in enumerate(zip(counts, edges)):
+        bar_len = int(cnt / max_count * width)
+        bar = '█' * bar_len
+        pct = cnt / len(values) * 100
+        lines.append(f'  ${left:>7.0f}  {bar:<{width}}  {pct:>5.1f}%')
+    return '\n'.join(lines)
+
+
+def print_top3_analysis(top_configs: List[dict], n_trials: int = 10_000) -> None:
+    """Re-run top-3 configs with detailed output: histogram, CI, expected cost."""
+    print(f'\n{"="*65}')
+    print('  TOP 3 DETAILED ANALYSIS')
+    print(f'{"="*65}')
+
+    for rank, d in enumerate(top_configs, 1):
+        result, final_balances = simulate_batch_detailed(
+            d['risk_pct'], d['trades_per_month'], d['challenge_days'],
+            d['profit_target'], d['max_daily_dd'], d['max_total_dd'],
+            n_trials,
+        )
+        n_pass   = int(round(result.pass_rate * n_trials))
+        ci_lo, ci_hi = wilson_ci(n_pass, n_trials)
+        if result.pass_rate > 0:
+            exp_attempts = 1 / result.pass_rate
+            exp_cost     = exp_attempts * CHALLENGE_FEE
+            exp_attempts_str = f'{exp_attempts:.1f}'
+            exp_cost_str     = f'${exp_cost:.0f}'
+        else:
+            exp_attempts_str = 'N/A (0% pass rate)'
+            exp_cost_str     = 'N/A'
+
+        print(f'\n  ── Config #{rank} ──────────────────────────────────────────')
+        print(f'  Risk={d["risk_pct"]:.2f}%  Trades/mo={d["trades_per_month"]}  '
+              f'Days={d["challenge_days"]}  Target={d["profit_target"]*100:.0f}%  '
+              f'DailyDD={d["max_daily_dd"]*100:.0f}%  TotalDD={d["max_total_dd"]*100:.0f}%  '
+              f'n_sim={d["n_simultaneous"]}')
+        print(f'  Pass={result.pass_rate*100:.1f}%  Bust={result.bust_rate*100:.1f}%  '
+              f'Timeout={result.timeout_rate*100:.1f}%  Portfolio={d["portfolio_pass"]*100:.1f}%')
+        print(f'  95% CI for pass rate: [{ci_lo*100:.1f}%, {ci_hi*100:.1f}%]')
+        print(f'  Expected attempts to first success: {exp_attempts_str}')
+        print(f'  Expected cost to funded account:    {exp_cost_str}')
+        print(f'  Median days to pass:                {result.median_days}')
+        print(f'\n  Final balance distribution ({n_trials:,} trials):')
+        print(ascii_histogram(final_balances))
 
 
 def _worker(args):
@@ -350,21 +441,56 @@ def print_config(rank: int, d: dict, label: str = ''):
           f"Median={d['median_days']}d  Cost/pass=${d['cost_per_pass']:.0f}")
 
 
+def _load_live_edge(path: str) -> dict:
+    """Override module-level edge constants from a live_edge.json file.
+
+    Returns the parsed JSON dict so callers can log metadata.
+    """
+    import json as _json
+    data = _json.loads(Path(path).read_text())
+    global TP2_RATE, TP1_RATE, STOP_RATE, TP2_R, TP1_R, STOP_R
+    TP2_RATE  = float(data['tp2_rate'])
+    TP1_RATE  = float(data['tp1_rate'])
+    STOP_RATE = float(data['stop_rate'])
+    TP2_R     = float(data['tp2_r'])
+    TP1_R     = float(data['tp1_r'])
+    STOP_R    = float(data['stop_r'])
+    return data
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--trials', type=int, default=10_000)
     parser.add_argument('--fast',   action='store_true',
                         help='Use 2,000 trials (quick scan)')
     parser.add_argument('--workers', type=int, default=None)
+    parser.add_argument('--live-edge-file', default=None, metavar='FILE',
+                        help='Path to live_edge.json from extract_live_edge.py. '
+                             'Overrides hardcoded TP distribution with real live data.')
     args = parser.parse_args()
 
     n_trials = 2_000 if args.fast else args.trials
 
+    live_edge_data = None
+    if args.live_edge_file:
+        try:
+            live_edge_data = _load_live_edge(args.live_edge_file)
+            edge_source = f'LIVE DATA ({live_edge_data.get("n_trades", "?")} trades, '  \
+                          f'{live_edge_data.get("days", "?")}d window)'
+        except Exception as e:
+            print(f'  ⚠️  Could not load live edge file: {e}')
+            edge_source = 'BACKTEST (fallback)'
+    else:
+        edge_source = 'BACKTEST (replicated)'
+
+    ev_per_trade = TP2_RATE * TP2_R + TP1_RATE * TP1_R + STOP_RATE * STOP_R
+
     print(f'\n{"="*65}')
     print(f'  PROP CHALLENGE OPTIMIZER')
+    print(f'  Edge source: {edge_source}')
     print(f'  Fixed edge: TP2={TP2_RATE:.1%}@{TP2_R}R | TP1={TP1_RATE:.1%}@{TP1_R}R | '
           f'STOP={STOP_RATE:.1%}@{STOP_R}R')
-    print(f'  EV per trade: +0.40R (replicated)')
+    print(f'  EV per trade: +{ev_per_trade:.2f}R')
     print(f'{"="*65}\n')
 
     # ── 1. Full sweep ──────────────────────────────────────────────────────
@@ -395,90 +521,117 @@ def main():
     for i, d in enumerate(safest[:10]):
         print_config(i+1, d)
 
-    # ── 3. Best overall config ─────────────────────────────────────────────
-    best = by_portfolio[0]
-    print(f'\n{"="*65}')
-    print('  OPTIMAL CONFIGURATION')
-    print(f'{"="*65}')
-    print(f'  Risk per trade:         {best["risk_pct"]:.2f}%')
-    print(f'  Trades per month:       {best["trades_per_month"]}')
-    print(f'  Challenge window:       {best["challenge_days"]} days')
-    print(f'  Profit target:          {best["profit_target"]*100:.0f}%')
-    print(f'  Max daily DD:           {best["max_daily_dd"]*100:.0f}%')
-    print(f'  Max total DD:           {best["max_total_dd"]*100:.0f}%')
-    print(f'  Simultaneous attempts:  {best["n_simultaneous"]}')
-    print()
-    print(f'  Single attempt pass:    {best["pass_rate"]*100:.1f}%')
-    print(f'  Single attempt bust:    {best["bust_rate"]*100:.1f}%')
-    print(f'  Portfolio pass rate:    {best["portfolio_pass"]*100:.1f}%')
-    print(f'  Expected attempts:      {best["exp_attempts"]:.1f}')
-    print(f'  Expected cost:          ${best["exp_cost"]:.0f}')
-    print(f'  Median days to pass:    {best["median_days"]}')
-    print(f'  Cost per funded acct:   ${best["cost_per_pass"]:.0f}')
+    # ── 3. Top 3 detailed analysis ─────────────────────────────────────────
+    print_top3_analysis(by_portfolio[:3], n_trials=n_trials)
 
-    # ── 4. Walk-forward validation ─────────────────────────────────────────
-    print(f'\n  WALK-FORWARD VALIDATION')
+    # ── 4. Best overall config ─────────────────────────────────────────────
+    best = by_portfolio[0]
+
+    # ── 5. Walk-forward validation ─────────────────────────────────────────
     mc_pass = best['pass_rate'] * 100
     wfa = walk_forward_validation(best, 'Window A', 'logs/ict_backtest_window_A.json')
     wfb = walk_forward_validation(best, 'Window B', 'logs/ict_backtest_window_B.json')
-    print(f'  Monte Carlo:    {mc_pass:.1f}%')
-    print(f'  Walk-forward A: {wfa if wfa else "n/a"}%')
-    print(f'  Walk-forward B: {wfb if wfb else "n/a"}%')
 
     validated = False
+    adj_risk_note = ''
     if wfa and wfb:
         avg_wf = (wfa + wfb) / 2
         diff   = abs(mc_pass - avg_wf)
         validated = diff <= 5
-        print(f'  Agreement:      {"YES ✓" if validated else "NO — clustering risk detected"}')
-        if not validated:
-            adj_risk = best['risk_pct'] - 0.25
-            print(f'  → Adjust: reduce risk to {adj_risk:.2f}% and re-run')
+        if not validated and diff > 10:
+            adj_risk_note = (f'  → Clustering risk detected. Reduce risk to '
+                             f'{best["risk_pct"] - RISK_ADJUST_PP:.2f}% and re-run.')
 
-    # ── 5. Sensitivity analysis ────────────────────────────────────────────
-    print(f'\n  EDGE DEGRADATION TOLERANCE')
-    print(f'  {"TP2 rate":>10}  {"Pass%":>7}  {"Bust%":>6}')
+    # ── 6. Sensitivity analysis ────────────────────────────────────────────
     sens = sensitivity_analysis(best, n_trials=min(n_trials, 5_000))
     breakeven_tp2 = None
-    for tp2_rate, s in sorted(sens.items()):
-        marker = ' ◄ current' if abs(tp2_rate - 0.195) < 0.001 else ''
-        be_flag = ''
+    # Iterate descending so we find the highest TP2 where pass_rate drops below 50%
+    # (i.e., the edge-degradation breakeven when sliding down from current 19.5%)
+    for tp2_rate, s in sorted(sens.items(), reverse=True):
         if s['pass_rate'] < 50 and breakeven_tp2 is None:
             breakeven_tp2 = tp2_rate
-            be_flag = ' ← BREAKEVEN'
-        print(f'  {tp2_rate:.1%}        {s["pass_rate"]:>5.1f}%  {s["bust_rate"]:>5.1f}%{marker}{be_flag}')
 
     safety_margin = round((TP2_RATE - (breakeven_tp2 or 0)) * 100, 1) if breakeven_tp2 else '>13%'
-    print(f'\n  Current TP2 rate:    {TP2_RATE:.1%}')
-    print(f'  Breakeven TP2 rate:  {breakeven_tp2:.1%}' if breakeven_tp2 else '  Breakeven: not reached')
-    print(f'  Safety margin:       {safety_margin}pp')
 
-    # ── 6. Final recommendation ────────────────────────────────────────────
-    # Find best config for realistic current signal frequency (6 trades/month GBPUSD)
+    # ── 7. Final recommendation ────────────────────────────────────────────
     realistic = [d for d in all_results
-                 if d['trades_per_month'] <= 9   # what we actually generate
-                 and d['n_simultaneous'] <= 4]   # keep cost reasonable
+                 if d['trades_per_month'] <= 9
+                 and d['n_simultaneous'] <= 4]
     best_realistic = sorted(realistic, key=lambda x: -x['portfolio_pass'])[0] if realistic else best
 
-    print(f'\n{"="*65}')
-    print('  RECOMMENDATION (current signal frequency)')
-    print(f'{"="*65}')
-    print_config(1, best_realistic, 'REALISTIC')
-    print(f'\n  Monthly GBPUSD trades:  6 (confirmed)')
-    print(f'  Needed to reach target: {best_realistic["trades_per_month"]}/month')
     gap = best_realistic['trades_per_month'] - 6
     if gap > 0:
-        print(f'  Gap to fill:            +{gap}/month from other pairs')
-        print(f'  → Fix EURUSD/AUDUSD to contribute {gap} more trades/month')
-        print(f'  → Each pair needs ~{gap//2} clean A-grade signals/month')
+        rec_text = (f'FunderPro $10k challenge.  '
+                    f'Risk {best_realistic["risk_pct"]:.2f}%/trade, '
+                    f'{best_realistic["trades_per_month"]} trades/month across GBPUSD/EURUSD/AUDUSD '
+                    f'({gap} additional trades/month needed beyond current GBPUSD-only pace), '
+                    f'{best_realistic["n_simultaneous"]} simultaneous attempts, '
+                    f'{best_realistic["challenge_days"]}-day window, '
+                    f'{best_realistic["profit_target"]*100:.0f}% target, '
+                    f'{best_realistic["max_daily_dd"]*100:.0f}% daily DD, '
+                    f'{best_realistic["max_total_dd"]*100:.0f}% total DD.')
     else:
-        print(f'  → Already within reach — start challenge now')
+        rec_text = (f'FunderPro $10k challenge.  '
+                    f'Risk {best_realistic["risk_pct"]:.2f}%/trade, '
+                    f'{best_realistic["trades_per_month"]} trades/month (already within reach), '
+                    f'{best_realistic["n_simultaneous"]} simultaneous attempts, '
+                    f'{best_realistic["challenge_days"]}-day window — start challenge now.')
+
+    # ── 8. Print final output block ────────────────────────────────────────
+    print(f'\n{"="*65}')
+    print('  OPTIMAL PROP CHALLENGE CONFIGURATION')
+    print(f'{"="*65}')
+    print(f'  Risk per trade:          {best["risk_pct"]:.2f}%')
+    print(f'  Trades per month needed: {best["trades_per_month"]}')
+    print(f'  Challenge window:        {best["challenge_days"]} days')
+    print(f'  Profit target:           {best["profit_target"]*100:.0f}%')
+    print(f'  Max daily DD:            {best["max_daily_dd"]*100:.0f}%')
+    print(f'  Max total DD:            {best["max_total_dd"]*100:.0f}%')
+    print(f'  Simultaneous attempts:   {best["n_simultaneous"]}')
+    print()
+    print(f'  PROBABILITIES:')
+    print(f'  Single attempt pass:     {best["pass_rate"]*100:.1f}%')
+    print(f'  Single attempt bust:     {best["bust_rate"]*100:.1f}%')
+    print(f'  Portfolio pass rate:     {best["portfolio_pass"]*100:.1f}%')
+    print(f'  Expected attempts:       {best["exp_attempts"]:.1f}')
+    print(f'  Expected cost:           ${best["exp_cost"]:.0f}')
+    print(f'  Median days to pass:     {best["median_days"]}')
+    print()
+    print(f'  VALIDATED:')
+    print(f'  Walk-forward A:          {f"{wfa}%" if wfa else "n/a"}')
+    print(f'  Walk-forward B:          {f"{wfb}%" if wfb else "n/a"}')
+    print(f'  Monte Carlo agreement:   {"YES" if validated else "NO"}')
+    if adj_risk_note:
+        print(adj_risk_note)
+    print()
+    print(f'  EDGE DEGRADATION TOLERANCE:')
+    print(f'  {"TP2 rate":>10}  {"Pass%":>7}  {"Bust%":>6}')
+    for tp2_rate, s in sorted(sens.items()):
+        marker  = ' ◄ current' if abs(tp2_rate - TP2_RATE) < 0.001 else ''
+        be_flag = ' ← BREAKEVEN' if (breakeven_tp2 and abs(tp2_rate - breakeven_tp2) < 0.001) else ''
+        print(f'  {tp2_rate:.1%}        {s["pass_rate"]:>5.1f}%  {s["bust_rate"]:>5.1f}%{marker}{be_flag}')
+    print()
+    print(f'  Current TP2 rate:        {TP2_RATE:.1%}')
+    if breakeven_tp2:
+        print(f'  Breakeven TP2 rate:      {breakeven_tp2:.1%}')
+    else:
+        print(f'  Breakeven TP2 rate:      not reached in tested range')
+    print(f'  Safety margin:           {safety_margin} percentage points')
+    print()
+    print(f'  RECOMMENDATION:')
+    print(f'  {rec_text}')
     print(f'{"="*65}\n')
 
-    # ── 7. Save ────────────────────────────────────────────────────────────
+    # ── 9. Save ────────────────────────────────────────────────────────────
     Path('logs/prop_optimizer_results.json').write_text(
         json.dumps({
             'n_trials':    n_trials,
+            'edge_source': edge_source,
+            'edge_inputs': {
+                'tp2_rate': TP2_RATE, 'tp1_rate': TP1_RATE, 'stop_rate': STOP_RATE,
+                'tp2_r':    TP2_R,    'tp1_r':    TP1_R,    'stop_r':    STOP_R,
+                'ev_per_trade': round(ev_per_trade, 4),
+            },
             'top_20':      by_portfolio[:20],
             'top_ev':      by_ev[:10],
             'safest':      safest[:10],
@@ -488,6 +641,7 @@ def main():
             'walk_forward': {'A': wfa, 'B': wfb, 'validated': validated},
             'breakeven_tp2': breakeven_tp2,
             'safety_margin_pp': safety_margin,
+            'live_edge_input': live_edge_data,
         }, indent=2)
     )
     Path('logs/prop_optimal_config.json').write_text(
