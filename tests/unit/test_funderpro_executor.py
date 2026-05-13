@@ -268,9 +268,17 @@ class TestCTraderDelegation:
             routing='DEMO', timestamp='2026-05-13T00:00:00+00:00',
         )
         position_id = ex._send_ctrader_order(order)
-        bridge.send_bracket_order.assert_called_once()
-        call_kwargs = bridge.send_bracket_order.call_args
-        assert call_kwargs.kwargs.get('direction') == 'LONG' or call_kwargs.args[0] == 'LONG'
+        bridge.send_bracket_order.assert_called_once_with(
+            direction='LONG',
+            size_lots=0.10,
+            entry=1.27,
+            stop=1.26,
+            target=1.29,
+            conviction=0.0,
+            pred_p50=0.0,
+            pred_p90=0.0,
+            timeout=15.0,
+        )
         assert position_id == '99001'
 
     def test_send_raises_when_bridge_times_out(self):

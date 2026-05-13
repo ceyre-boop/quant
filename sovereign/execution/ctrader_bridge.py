@@ -165,8 +165,11 @@ class CTraderBridge:
         # ── Threading synchronisation (used by send_bracket_order / close_position) ──
         # _auth_ready is set once the account is authenticated and symbol ID is known.
         # _order_filled is cleared before each order send and set when execution fires.
+        # _position_lock guards _last_position_id and _open_positions which are written
+        # by the reactor thread and read (or written) by external threads.
         self._auth_ready: threading.Event     = threading.Event()
         self._order_filled: threading.Event   = threading.Event()
+        self._position_lock: threading.Lock   = threading.Lock()
         self._last_position_id: Optional[str] = None   # captured in _handle_execution
 
         # Lazy-load trajectory model (no penalty if unavailable)
@@ -481,8 +484,11 @@ class CTraderBridge:
             mode             = self.mode,
         )
         _log_fill(fill)
-        self._open_positions += 1
-        self._last_position_id = str(getattr(deal, 'positionId', ''))
+        # Atomic update: write position_id under lock, then signal outside the lock
+        # so the waiting thread can proceed without racing to acquire the lock.
+        with self._position_lock:
+            self._open_positions += 1
+            self._last_position_id = str(getattr(deal, 'positionId', ''))
         self._order_filled.set()
         self._pending_fill = {}
 
@@ -534,7 +540,8 @@ class CTraderBridge:
                 timeout, direction, size_lots,
             )
             return None
-        return self._last_position_id
+        with self._position_lock:
+            return self._last_position_id
 
     def close_position(self, position_id: str, timeout: float = 10.0) -> bool:
         """
@@ -554,7 +561,8 @@ class CTraderBridge:
             req.ctidTraderAccountId = self._account_id
             req.positionId = int(position_id)
             self._client.send(req).addErrback(self._on_error)
-            self._open_positions = max(0, self._open_positions - 1)
+            with self._position_lock:
+                self._open_positions = max(0, self._open_positions - 1)
             send_done.set()
 
         reactor.callFromThread(_do_close)
