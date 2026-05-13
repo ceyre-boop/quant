@@ -40,7 +40,7 @@ _DEFAULT_OB_IMPULSE_ATR = 1.5
 
 @dataclass
 class FVGResult:
-    """A detected, unfilled Fair Value Gap."""
+    """A detected Fair Value Gap, with post-formation validity tracking."""
     kind: str           # 'BULLISH' | 'BEARISH'
     top: float
     bottom: float
@@ -48,7 +48,8 @@ class FVGResult:
     formed_at: pd.Timestamp
     size: float
     size_atr_ratio: float
-    filled: bool
+    filled: bool        # True if current price is on the wrong side of the gap
+    invalidated: bool   # True if any bar after formation fully traversed the gap
     age_bars: int       # bars since formation (relative to as_of)
 
     @property
@@ -62,8 +63,6 @@ class FVGResult:
     def price_tapping(self, price: float, proximity_fraction: float = 0.5) -> bool:
         """Return True if *price* is within *proximity_fraction* × size of the gap."""
         margin = proximity_fraction * self.size
-        if self.is_bullish:
-            return self.bottom - margin <= price <= self.top + margin
         return self.bottom - margin <= price <= self.top + margin
 
 
@@ -157,8 +156,8 @@ class FVGDetector:
         fvgs, obs = self.detect(df)
         price = float(df["Close"].iloc[-1])
 
-        bull_fvgs = [f for f in fvgs if f.is_bullish and not f.filled and f.top < price]
-        bear_fvgs = [f for f in fvgs if f.is_bearish and not f.filled and f.bottom > price]
+        bull_fvgs = [f for f in fvgs if f.is_bullish and not f.filled and not f.invalidated and f.top < price]
+        bear_fvgs = [f for f in fvgs if f.is_bearish and not f.filled and not f.invalidated and f.bottom > price]
         bull_obs = [o for o in obs if o.is_bullish and o.valid and not o.is_breaker and o.high < price]
         bear_obs = [o for o in obs if o.is_bearish and o.valid and not o.is_breaker and o.low > price]
 
@@ -189,6 +188,9 @@ class FVGDetector:
                 bottom = float(c1["High"])
                 size = top - bottom
                 if size >= self._fvg_min_atr * atr:
+                    # Post-formation invalidation: any bar after c3 closes below FVG bottom
+                    post_bars = df.iloc[i + 3: as_of + 1]
+                    invalidated = bool((post_bars["Close"] < bottom).any()) if len(post_bars) else False
                     results.append(FVGResult(
                         kind="BULLISH",
                         top=top,
@@ -198,6 +200,7 @@ class FVGDetector:
                         size=size,
                         size_atr_ratio=size / atr if atr > 0 else 0.0,
                         filled=price_now < bottom,
+                        invalidated=invalidated,
                         age_bars=age,
                     ))
 
@@ -207,6 +210,9 @@ class FVGDetector:
                 bottom = float(c3["High"])
                 size = top - bottom
                 if size >= self._fvg_min_atr * atr:
+                    # Post-formation invalidation: any bar after c3 closes above FVG top
+                    post_bars = df.iloc[i + 3: as_of + 1]
+                    invalidated = bool((post_bars["Close"] > top).any()) if len(post_bars) else False
                     results.append(FVGResult(
                         kind="BEARISH",
                         top=top,
@@ -216,6 +222,7 @@ class FVGDetector:
                         size=size,
                         size_atr_ratio=size / atr if atr > 0 else 0.0,
                         filled=price_now > top,
+                        invalidated=invalidated,
                         age_bars=age,
                     ))
 

@@ -40,6 +40,21 @@ _DEFAULT_PAIRS = [
 
 _FIREBASE_ROOT = "signals/ICT_ENGINE"
 
+# ── Direction-quality constants (Phase 2) ─────────────────────────────────── #
+
+# Minimum absolute score for the winning direction to emit a signal.
+# Scores the pipeline — must be at-or-above this to avoid emitting noisy trades.
+_MIN_SCORE_TO_TRADE: float = 6.5
+
+# Winning direction must beat the opposing direction by at least this margin.
+# Prevents trading when both sides look similar (ambiguous market).
+_MIN_SCORE_GAP: float = 1.5
+
+# Pairs where USD is the quote currency (LONG = weak USD, SHORT = strong USD)
+_USD_QUOTED_PAIRS = ["GBPUSD", "EURUSD", "AUDUSD", "NZDUSD"]
+# Pairs where USD is the base currency (SHORT = weak USD, LONG = strong USD)
+_USD_BASE_PAIRS = ["USDJPY", "USDCAD"]
+
 
 # ── Result container ──────────────────────────────────────────────────────── #
 
@@ -128,10 +143,11 @@ class ICTFirebasePublisher:
 class DataProvider:
     """
     Minimal interface for price data. Override for live/paper use.
-    Default implementation uses yfinance.
+    Default implementation uses yfinance at 1m resolution for ICT-grade intraday fidelity.
+    5m data is too coarse for accurate sweep / FVG detection.
     """
 
-    def get_ohlcv(self, symbol: str, period: str = "5d", interval: str = "5m"):
+    def get_ohlcv(self, symbol: str, period: str = "5d", interval: str = "1m"):
         import yfinance as yf
         tk = yf.Ticker(symbol)
         df = tk.history(period=period, interval=interval)
@@ -218,21 +234,50 @@ class ICTOrchestrator:
 
     def _apply_confluence(self, results: List[PairScanResult]) -> List[PairScanResult]:
         """
-        Multi-pair USD confluence: if ≥3 USD pairs signal the same USD direction,
-        boost their scores by 0.5 (capped at 10.0).
-        USD pairs: GBPUSD EURUSD AUDUSD NZDUSD = short USD when LONG
-                   USDJPY USDCAD = short USD when SHORT
+        Multi-pair USD confluence: if ≥3 USD pairs all point the SAME USD direction,
+        boost the score of each aligned signal by 0.5 (capped at 10.0).
+
+        USD direction:
+          Weak USD  — LONG  on GBPUSD/EURUSD/AUDUSD/NZDUSD
+                    — SHORT on USDJPY/USDCAD
+          Strong USD — SHORT on GBPUSD/EURUSD/AUDUSD/NZDUSD
+                    — LONG  on USDJPY/USDCAD
+
+        Only signals that ALIGN with the dominant direction receive the boost.
+        Non-USD pairs (GBPJPY, AUDNZD, …) are never counted or boosted here.
         """
-        usd_long_signals  = sum(1 for r in results if r.signal == 'LONG'  and any(p in r.pair for p in ['GBPUSD','EURUSD','AUDUSD','NZDUSD']))
-        usd_short_signals = sum(1 for r in results if r.signal == 'SHORT' and any(p in r.pair for p in ['USDJPY','USDCAD']))
-        usd_long_signals  += sum(1 for r in results if r.signal == 'SHORT' and any(p in r.pair for p in ['GBPUSD','EURUSD','AUDUSD','NZDUSD']))
-        usd_short_signals += sum(1 for r in results if r.signal == 'LONG'  and any(p in r.pair for p in ['USDJPY','USDCAD']))
+        def _is_usd_weak(r: PairScanResult) -> bool:
+            return (
+                (r.signal == "LONG"  and any(p in r.pair for p in _USD_QUOTED_PAIRS)) or
+                (r.signal == "SHORT" and any(p in r.pair for p in _USD_BASE_PAIRS))
+            )
+
+        def _is_usd_strong(r: PairScanResult) -> bool:
+            return (
+                (r.signal == "SHORT" and any(p in r.pair for p in _USD_QUOTED_PAIRS)) or
+                (r.signal == "LONG"  and any(p in r.pair for p in _USD_BASE_PAIRS))
+            )
+
+        usd_weak_count   = sum(1 for r in results if _is_usd_weak(r))
+        usd_strong_count = sum(1 for r in results if _is_usd_strong(r))
 
         boosted = []
         for r in results:
-            if r.signal in ('LONG', 'SHORT') and (usd_long_signals >= 3 or usd_short_signals >= 3):
+            if r.signal not in ("LONG", "SHORT"):
+                boosted.append(r)
+                continue
+
+            aligned_weak   = usd_weak_count   >= 3 and _is_usd_weak(r)
+            aligned_strong = usd_strong_count >= 3 and _is_usd_strong(r)
+
+            if aligned_weak or aligned_strong:
+                dominant_count = usd_weak_count if aligned_weak else usd_strong_count
+                direction_label = "weak" if aligned_weak else "strong"
                 new_score = min(r.score + 0.5, 10.0)
-                confs = r.confirmations + [f"USD confluence boost (+0.5): {max(usd_long_signals, usd_short_signals)} pairs aligned"]
+                confs = r.confirmations + [
+                    f"USD {direction_label} confluence boost (+0.5): "
+                    f"{dominant_count} pairs aligned"
+                ]
                 from dataclasses import replace
                 r = replace(r, score=new_score, confirmations=confs)
             boosted.append(r)
@@ -244,21 +289,49 @@ class ICTOrchestrator:
         df = dp.get_ohlcv(pair)
         account = self._MicroRiskParams(account_size=self.account_size)
 
-        # Try both directions, take the higher-scoring one
-        best = None
+        # Evaluate both directions so we can apply the score-gap quality filter.
+        results_by_dir: dict = {}
         for direction in ("LONG", "SHORT"):
-            result = self._pipeline.evaluate(
+            results_by_dir[direction] = self._pipeline.evaluate(
                 symbol=pair,
                 direction=direction,
                 df=df,
                 timestamp=now,
                 account=account,
             )
-            score = result.score if hasattr(result, "score") else 0.0
-            if best is None or score > best.score:
-                best = result
+
+        long_score  = results_by_dir["LONG"].score
+        short_score = results_by_dir["SHORT"].score
+        best_dir    = "LONG" if long_score >= short_score else "SHORT"
+        other_dir   = "SHORT" if best_dir == "LONG" else "LONG"
+        best        = results_by_dir[best_dir]
+        best_score  = getattr(best, "score", 0.0)
+        other_score = getattr(results_by_dir[other_dir], "score", 0.0)
 
         ts = now.isoformat()
+
+        # ── Phase 2: direction quality gates ─────────────────────────────
+        # Gate A: winning side score must meet the minimum tradeable threshold.
+        if best_score < _MIN_SCORE_TO_TRADE:
+            return PairScanResult(
+                pair=pair, timestamp=ts,
+                signal="FLAT", grade="—", score=best_score,
+                session="—", confirmations=[], missing=[],
+                veto_reason=f"SCORE_TOO_LOW: best={best_score:.1f} < {_MIN_SCORE_TO_TRADE}",
+            )
+
+        # Gate B: winning side must have a clear advantage over the opposite side.
+        score_gap = best_score - other_score
+        if score_gap < _MIN_SCORE_GAP:
+            return PairScanResult(
+                pair=pair, timestamp=ts,
+                signal="FLAT", grade="—", score=best_score,
+                session="—", confirmations=[], missing=[],
+                veto_reason=(
+                    f"AMBIGUOUS_DIRECTION: gap={score_gap:.1f} < {_MIN_SCORE_GAP} "
+                    f"(LONG={long_score:.1f} SHORT={short_score:.1f})"
+                ),
+            )
 
         if isinstance(best, ICTSignal) and best.passed:
             sz = best.sizing
@@ -269,11 +342,11 @@ class ICTOrchestrator:
                 session=best.session_status.kill_zone_name or "OFF-HOURS",
                 confirmations=best.confirmations,
                 missing=best.missing,
-                risk_pct=getattr(sz, "risk_pct", 0.0),
-                entry=getattr(sz, "entry", 0.0),
-                stop=getattr(sz, "stop_loss", 0.0),
-                tp1=getattr(sz, "tp1", 0.0),
-                tp2=getattr(sz, "tp2", 0.0),
+                risk_pct=sz.risk_pct,
+                entry=sz.entry_price,          # Phase 0 fix: was getattr(sz, "entry", 0.0)
+                stop=sz.stop_loss,
+                tp1=sz.tp1,
+                tp2=sz.tp2,
                 component_scores=best.component_scores,
             )
         elif isinstance(best, ICTVeto):
