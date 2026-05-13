@@ -14,6 +14,7 @@ Teardown implemented per operator directive:
   6. Hard Constraints → Execute → Log
 """
 
+import json
 import logging
 import os
 from datetime import datetime
@@ -511,6 +512,9 @@ class SovereignOrchestrator:
         self._ptj_gate_runner = None
         self._ptj_spy_arr = None
         self._ptj_ast_arr = None
+        self._latest_ml_snapshot: dict = {}
+        self._ml_snapshot_history: list = []
+        self._last_runtime_modulators: dict = {}
         try:
             from execution.ptj_gates import PTJCircuitBreaker
             _init_equity = params.get('account', {}).get('starting_equity', 100_000.0)
@@ -518,6 +522,141 @@ class SovereignOrchestrator:
             logger.info("[OK] PTJ circuit breaker loaded")
         except Exception as _pte:
             logger.debug(f"[PTJ] circuit breaker init non-fatal: {_pte}")
+
+    def get_ml_state_snapshot(
+        self,
+        regime: Optional[str] = None,
+        blended_conf: Optional[float] = None,
+        votes: Optional[Dict[str, Optional[str]]] = None,
+    ) -> Dict[str, Any]:
+        """Return a consolidated runtime snapshot of the ML stack."""
+        modules: Dict[str, Dict[str, Any]] = {}
+        cold = 0
+
+        softmax_fitted = bool(self._softmax_regime is not None and getattr(self._softmax_regime, "_fitted", False))
+        modules["softmax"] = {
+            "fitted": softmax_fitted,
+            "n_samples": int(getattr(self._softmax_regime, "_n_updates", 0)) if self._softmax_regime is not None else 0,
+        }
+        cold += 0 if softmax_fitted else 1
+
+        kalman_bars = int(getattr(self._kalman, "_n_updates", 0)) if self._kalman is not None else 0
+        kalman_out = {}
+        if self._kalman is not None:
+            try:
+                kalman_out = self._kalman.get_regime_output()
+            except Exception:
+                kalman_out = {}
+        kalman_fitted = kalman_bars > 0
+        modules["kalman"] = {
+            "fitted": kalman_fitted,
+            "bars": kalman_bars,
+            "dominant": kalman_out.get("regime"),
+            "uncertainty": float(self._kalman.state_uncertainty()) if self._kalman is not None else None,
+        }
+        cold += 0 if kalman_fitted else 1
+
+        kmeans_fitted = bool(self._kmeans_regime is not None and getattr(self._kmeans_regime, "_centroids", None) is not None)
+        modules["ml_diag"] = {
+            "fitted": kmeans_fitted,
+            "n_samples": int(len(getattr(self, "_kmeans_feature_buffer", []))),
+            "dominant": (votes or {}).get("kmeans"),
+        }
+        cold += 0 if kmeans_fitted else 1
+
+        pn_n = int(len(getattr(self.predict_now, "_X", []))) if self.predict_now is not None else 0
+        pn_fitted = pn_n >= 5
+        modules["predict_now"] = {
+            "fitted": pn_fitted,
+            "n_outcomes": pn_n,
+        }
+        cold += 0 if pn_fitted else 1
+
+        ad_n = int(len(getattr(self.alpha_decay_momentum, "_r_history", []))) if self.alpha_decay_momentum is not None else 0
+        ad_level = "INSUFFICIENT_DATA"
+        try:
+            if self.alpha_decay_momentum is not None:
+                ad_level = self.alpha_decay_momentum.check().level
+        except Exception:
+            pass
+        ad_fitted = ad_n >= 20
+        modules["alpha_decay"] = {"fitted": ad_fitted, "n_samples": ad_n, "gate": ad_level}
+        cold += 0 if ad_fitted else 1
+
+        peg_updates = int(getattr(self._pegasus, "n_updates", 0)) if self._pegasus is not None else 0
+        peg_fitted = peg_updates >= 10
+        modules["pegasus"] = {
+            "fitted": peg_fitted,
+            "updates": peg_updates,
+            "trust": float(self._pegasus.trust_multiplier) if self._pegasus is not None else 0.0,
+        }
+        cold += 0 if peg_fitted else 1
+
+        mdp_trades = int(getattr(getattr(self._trade_mdp, "_m", None), "n_trades", 0)) if self._trade_mdp is not None else 0
+        mdp_fitted = mdp_trades >= 20
+        modules["mdp"] = {
+            "fitted": mdp_fitted,
+            "trades": mdp_trades,
+            "policy_source": "learned" if mdp_fitted else "expert_prior",
+        }
+        cold += 0 if mdp_fitted else 1
+
+        lqr_fitted = bool(self._lqr is not None and getattr(self._lqr, "_K", None) is not None)
+        modules["lqr"] = {"fitted": lqr_fitted, "riccati_solved": lqr_fitted}
+        cold += 0 if lqr_fitted else 1
+
+        corr_fitted = bool(self._corr_tracker is not None)
+        corr_wr = None
+        if self._corr_tracker is not None:
+            try:
+                corr_wr = self._corr_tracker.session_win_rate()
+            except Exception:
+                corr_wr = None
+        modules["corr_tracker"] = {
+            "fitted": corr_fitted,
+            "session_win_rate": corr_wr,
+            "gate": "CLEAR" if corr_wr is None else ("SUPPRESSED" if corr_wr < 0.4 else "CLEAR"),
+        }
+        cold += 0 if corr_fitted else 1
+
+        bs_fitted = bool(self._vol_regime is not None)
+        bs_sig = {}
+        if self._vol_regime is not None:
+            try:
+                bs_sig = self._vol_regime.get_signal()
+            except Exception:
+                bs_sig = {}
+        modules["bs"] = {
+            "fitted": bs_fitted,
+            "vol_regime": bs_sig.get("vol_regime"),
+            "iv_rv_ratio": bs_sig.get("iv_rv_ratio"),
+            "size_scalar": bs_sig.get("size_adjustment"),
+        }
+        cold += 0 if bs_fitted else 1
+
+        snapshot = {
+            "timestamp": datetime.utcnow().isoformat() + "Z",
+            "modules": modules,
+            "ensemble_vote": {
+                "regime": regime,
+                "blended_conf": blended_conf,
+                "votes": votes or {},
+            },
+            "integrations": {
+                "alexandrian_library_loaded": self._alexandrian_library is not None,
+                "market_memory_loaded": self._market_memory is not None,
+            },
+            "runtime_modulators": dict(self._last_runtime_modulators) if self._last_runtime_modulators else {},
+            "active_modules": int(max(0, 10 - cold)),
+            "cold_modules": int(cold),
+        }
+        return snapshot
+
+    def get_latest_ml_snapshot(self) -> Dict[str, Any]:
+        """Get the latest runtime snapshot (or a fresh startup snapshot)."""
+        if self._latest_ml_snapshot:
+            return dict(self._latest_ml_snapshot)
+        return self.get_ml_state_snapshot()
 
     # ── Bootstrap helpers: cold-start the online learners from ledger ─── #
 
@@ -1038,6 +1177,8 @@ class SovereignOrchestrator:
         # disagreement reduces it. The blended signal feeds Lo, MDP, and LQR.
         # This replaces the raw HMM regime_confidence with a ensemble estimate.
         _hmm_label = router_out.regime or 'FLAT'
+        _softmax_vote = None
+        _kmeans_vote = None
         _blended_regime_conf = float(router_out.regime_confidence or 0.5)
         _softmax_proba: dict = {}
 
@@ -1053,6 +1194,7 @@ class SovereignOrchestrator:
                 )
                 _softmax_proba = self._softmax_regime.predict_proba(_sf_x)
                 _sf_pred = max(_softmax_proba, key=_softmax_proba.get)
+                _softmax_vote = _sf_pred
                 _sf_conf = _softmax_proba.get(_sf_pred, 1.0 / 3)
                 if _sf_pred == _hmm_label:
                     # Agreement: confidence amplifies proportionally to Softmax certainty
@@ -1080,6 +1222,7 @@ class SovereignOrchestrator:
                     float(feature_record.regime.hmm_transition_prob or 0.5),
                 ])
                 _km_pred = self._kmeans_regime.predict(_km_x)
+                _kmeans_vote = _km_pred
                 # Three-way vote tally
                 _votes = {_hmm_label: 1}
                 _votes[_km_pred] = _votes.get(_km_pred, 0) + 1
@@ -1097,6 +1240,24 @@ class SovereignOrchestrator:
                 )
             except Exception as _kme:
                 logger.debug(f"[KMeans] non-fatal: {_kme}")
+
+        try:
+            _snapshot = self.get_ml_state_snapshot(
+                regime=_hmm_label,
+                blended_conf=float(_blended_regime_conf),
+                votes={
+                    "hmm": _hmm_label,
+                    "softmax": _softmax_vote,
+                    "kmeans": _kmeans_vote,
+                },
+            )
+            self._latest_ml_snapshot = _snapshot
+            self._ml_snapshot_history.append(_snapshot)
+            if len(self._ml_snapshot_history) > 500:
+                self._ml_snapshot_history = self._ml_snapshot_history[-500:]
+            logger.info(f"[ML_SNAPSHOT] {json.dumps(_snapshot, default=str)}")
+        except Exception as _mse:
+            logger.debug(f"[ML_SNAPSHOT] non-fatal: {_mse}")
 
         # ── Pegasus Gate 0: learned HMM confidence gate ───────────────── #
         # Pegasus has learned a minimum blended regime confidence below which
@@ -1538,6 +1699,9 @@ class SovereignOrchestrator:
                 logger.debug(f"[VolRegime] non-fatal: {_vre}")
 
         _mdp_mult = 1.0
+        _lqr_mult = 1.0
+        _vr_mult = 1.0
+        _effective_size_mult = 1.0
         if self._trade_mdp is not None and self._trade_mdp._m.n_trades >= 20:
             try:
                 _consec = int(self._last_trade_state.get('consecutive_losses', 0))
@@ -1640,6 +1804,13 @@ class SovereignOrchestrator:
         # ═══════════════════════════════════════════════════════════════
         # 7. EXECUTE
         # ═══════════════════════════════════════════════════════════════
+        self._last_runtime_modulators = {
+            "mdp_mult": float(_mdp_mult),
+            "lqr_mult": float(_lqr_mult),
+            "vol_mult": float(_vr_mult),
+            "pegasus_mult": float(_effective_size_mult),
+            "position_size": float(risk_out.position_size),
+        }
         logger.info(
             f"[OK] EXECUTION: {symbol} {bias.direction.name} @ {current_price:.2f} "
             f"Size: {risk_out.position_size:.4f} SL: {risk_out.stop_price:.2f} "
@@ -1696,6 +1867,10 @@ class SovereignOrchestrator:
             'tp': risk_out.tp1_price,
             'confidence': bias.confidence,
             'regime': router_out.regime,
+            'strategy': router_out.specialist_to_run,
+            'hmm_transition_prob': float(feature_record.regime.hmm_transition_prob or 0.5),
+            'hurst': float(feature_record.regime.hurst_short or 0.5),
+            'adx': float(feature_record.regime.adx or 20.0),
             'advisories': self._get_advisories(symbol),
             'present_state': present.to_dict() if present is not None else None,
         }
@@ -1933,6 +2108,34 @@ class SovereignOrchestrator:
             f"[on_trade_close] {symbol} {direction} pnl={pnl:+.4f} "
             f"({'WIN' if won else 'LOSS'}) — all learners updated"
         )
+
+        # Cold-start risk-window telemetry (first 30 closed trades)
+        _closed_trades = int(getattr(getattr(self._trade_mdp, "_m", None), "n_trades", 0)) if self._trade_mdp is not None else 0
+        if 0 < _closed_trades <= 30:
+            _latest = self._latest_ml_snapshot if isinstance(self._latest_ml_snapshot, dict) else {}
+            _mods = _latest.get("modules", {})
+            _telemetry = {
+                "closed_trades": _closed_trades,
+                "pegasus_updates": int(getattr(self._pegasus, "n_updates", 0)) if self._pegasus is not None else 0,
+                "pegasus_trust": float(self._pegasus.trust_multiplier) if self._pegasus is not None else 0.0,
+                "pegasus_phase": (
+                    "off" if (self._pegasus is None or self._pegasus.n_updates < 10)
+                    else "gate_only" if self._pegasus.n_updates < 20
+                    else "trust_ramp" if self._pegasus.n_updates < 30
+                    else "full"
+                ),
+                "mdp_trades": int(_mods.get("mdp", {}).get("trades", 0)),
+                "mdp_policy_source": _mods.get("mdp", {}).get("policy_source", "expert_prior"),
+                "kalman_bars": int(_mods.get("kalman", {}).get("bars", 0)),
+                "kalman_phase": "warming_up" if int(_mods.get("kalman", {}).get("bars", 0)) < 15 else "converged",
+                "ensemble_blended_conf": _latest.get("ensemble_vote", {}).get("blended_conf"),
+                "ensemble_votes": _latest.get("ensemble_vote", {}).get("votes", {}),
+                "cold_modules": int(_latest.get("cold_modules", 0)),
+            }
+            try:
+                logger.info(f"[COLD_START_TELEMETRY] {json.dumps(_telemetry, default=str)}")
+            except Exception:
+                logger.info(f"[COLD_START_TELEMETRY] {_telemetry}")
 
     def _check_hard_constraints(self, equity: float) -> Dict[str, Any]:
         """

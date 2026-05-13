@@ -15,6 +15,7 @@ Usage:
 """
 
 import argparse
+import json
 import logging
 import sys
 from pathlib import Path
@@ -84,8 +85,20 @@ def run_phase_11(start_campaign=False, daily_cycle=False):
         starting_equity=100000.0,
         campaign_name='sovereign_paper_v1'
     )
+
+    replay_report_path = Path("data/reports/replay_validation_latest.json")
+    replay_passed = False
+    if replay_report_path.exists():
+        try:
+            replay_data = json.loads(replay_report_path.read_text())
+            replay_passed = bool(replay_data.get("replay_passed", False))
+        except Exception:
+            replay_passed = False
     
     if start_campaign:
+        if not replay_passed:
+            logger.error("Replay validation not passed. Run scripts/run_replay_validation.py and ensure replay_passed=true before phase 11.")
+            return 1
         runner.start()
         logger.info("Paper trading campaign started successfully")
     
