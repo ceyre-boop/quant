@@ -136,6 +136,7 @@ class ICTOrchestrator:
         from ict.daily_bias import DailyBiasEngine
         from ict.memory_engine import ICTMemoryEngine
         from ict.regime_execution import get_regime_targets
+        from ict.ict_veto_ledger import ICTVetoLedger
         from execution.funderpro_executor import FunderProExecutor
         self._pipeline       = ICTPipeline()
         self._params         = MicroRiskParams
@@ -145,6 +146,7 @@ class ICTOrchestrator:
         self._bias_engine    = DailyBiasEngine()
         self._memory         = ICTMemoryEngine()
         self._get_targets    = get_regime_targets
+        self._veto_ledger    = ICTVetoLedger()
         self._executor       = FunderProExecutor(account_size=ACCOUNT_SIZE)
         # Wire Firebase into paper trader after publisher is ready
         if self.publisher._db:
@@ -233,14 +235,21 @@ class ICTOrchestrator:
                                        'confirmations': best.confirmations,
                                        'missing': best.missing})()
                     )
-                    mem_veto = (
-                        mem_check.available
-                        and (mem_check.similarity < 0.50
-                             or mem_check.historical_wr < 0.30)
-                    )
+                    mem_assessment = self._memory.assess_match(mem_check)
+                    mem_veto = mem_assessment["hard_veto"]
+                    soft_penalty_value = mem_assessment["penalty"]
+                    # Start with original score, reduce only for soft-veto clusters.
+                    decision_score = best.score
                     if mem_veto:
                         logger.info("%s: memory veto sim=%.2f wr=%.2f",
                                     clean, mem_check.similarity, mem_check.historical_wr)
+                    elif mem_assessment["soft_veto"]:
+                        decision_score = max(0.0, best.score - soft_penalty_value)
+                        logger.info(
+                            "%s: memory soft veto wr=%.2f penalty=%.2f score %.2f→%.2f",
+                            clean, mem_check.historical_wr, soft_penalty_value,
+                            best.score, decision_score,
+                        )
 
                     # Lever 5: Heatmap conflict — opposing magnet closer than TP1
                     heatmap_conflict = False
@@ -280,6 +289,7 @@ class ICTOrchestrator:
                         and not blackout
                         and bias_agrees
                         and not mem_veto
+                        and decision_score >= mem_assessment["score_floor"]
                         and not heatmap_conflict
                     )
                     if not bias_agrees:
@@ -288,7 +298,7 @@ class ICTOrchestrator:
                     r = ScanResult(
                         pair=clean, timestamp=now.isoformat(),
                         signal=best.direction, grade=best.grade.value,
-                        score=round(best.score, 2), session=sess_name,
+                        score=round(decision_score, 2), session=sess_name,
                         is_primary=is_primary, actionable=is_actionable,
                         entry_level=getattr(best, 'entry_level', None),
                         stop=getattr(sz, 'stop_loss', None),
@@ -302,6 +312,35 @@ class ICTOrchestrator:
                     )
                     if is_actionable:
                         actionable.append(r)
+                    else:
+                        # A-grade signal that didn't clear post-pipeline gates —
+                        # record to veto ledger for retroactive labeling.
+                        veto_stage = (
+                            "memory" if mem_veto else
+                            "heatmap" if heatmap_conflict else
+                            "bias" if not bias_agrees else
+                            "session" if not session_ok else
+                            "gate"
+                        )
+                        self._veto_ledger.record_veto(
+                            pair=clean,
+                            session=sess_name,
+                            signal=best.direction,
+                            grade=r.grade,
+                            score=r.score,
+                            veto_reason=veto_stage,
+                            veto_stage=veto_stage,
+                            entry_level=r.entry_level,
+                            stop=r.stop,
+                            tp1=r.tp1,
+                            tp2=r.tp2,
+                            adr_pct=r.adr_pct,
+                            risk_pct=r.risk_pct,
+                            confirmations=list(r.confirmations),
+                            missing=list(r.missing),
+                            component_scores=dict(r.component_scores),
+                            timestamp=r.timestamp,
+                        )
                 else:
                     r = ScanResult(
                         pair=clean, timestamp=now.isoformat(),
@@ -314,6 +353,26 @@ class ICTOrchestrator:
                         missing=best.missing,
                         component_scores=best.component_scores,
                         veto_reason=best.reason,
+                    )
+                    # Pipeline-level veto (grade B/C or hard gate failure)
+                    self._veto_ledger.record_veto(
+                        pair=clean,
+                        session=sess_name,
+                        signal=r.signal,
+                        grade=r.grade,
+                        score=r.score,
+                        veto_reason=best.reason,
+                        veto_stage="grade",
+                        entry_level=None,
+                        stop=None,
+                        tp1=None,
+                        tp2=None,
+                        adr_pct=0.0,
+                        risk_pct=0.0,
+                        confirmations=list(best.confirmations),
+                        missing=list(best.missing),
+                        component_scores=dict(best.component_scores),
+                        timestamp=now.isoformat(),
                     )
 
                 # ── Memory: record scan, compute match ────────────────────
@@ -344,13 +403,20 @@ class ICTOrchestrator:
 
                 # ── Paper trading ─────────────────────────────────────────
                 bar = df.iloc[-1]
-                self._paper.update_trades({
+                closed_updates = self._paper.update_trades({
                     clean: {
                         'high':  float(bar['High']),
                         'low':   float(bar['Low']),
                         'close': float(bar['Close']),
                     }
                 })
+                for t in closed_updates:
+                    self._memory.record_outcome(
+                        trade_id=t.id,
+                        pair=t.pair,
+                        outcome=t.outcome,
+                        pnl_r=t.pnl_r,
+                    )
 
                 # Open new trade if actionable — apply regime TP ratios
                 if isinstance(r, ScanResult) and r.actionable:
@@ -390,6 +456,13 @@ class ICTOrchestrator:
             closed = self._paper.close_session('NY_PM_END')
             if closed:
                 logger.info("Session ended — closed %d trade(s)", len(closed))
+            for t in closed:
+                self._memory.record_outcome(
+                    trade_id=t.id,
+                    pair=t.pair,
+                    outcome=t.outcome,
+                    pnl_r=t.pnl_r,
+                )
 
         # Push running paper stats + macro context to Firebase
         stats           = self._paper.get_stats()

@@ -149,6 +149,13 @@ class ICTPipeline:
         self._weights                = scoring_cfg.get("weights", _DEFAULT_WEIGHTS)
         self._grade_a_plus_threshold = scoring_cfg.get("grade_a_plus_threshold", 9.5)
         self._grade_b_threshold      = scoring_cfg.get("grade_b_threshold", 5.0)
+        pipeline_cfg = cfg.get("pipeline", {})
+        self._atr_spike_mult = pipeline_cfg.get("atr_spike_veto_multiplier", _ATR_SPIKE_MULT)
+        self._adr_hard_veto = pipeline_cfg.get("adr_exhaustion_threshold", _ADR_HARD_VETO)
+        self._adr_soft_veto = pipeline_cfg.get("adr_soft_penalty_threshold", _ADR_SOFT_VETO)
+        self._displacement_body_atr = pipeline_cfg.get("displacement_atr_multiplier", _DISPLACEMENT_BODY_ATR)
+        self._overconfirm_threshold = pipeline_cfg.get("overconfirmation_penalty_threshold", 9.0)
+        self._overconfirm_slope = pipeline_cfg.get("overconfirmation_penalty_slope", 0.5)
 
         self.session_clf = SessionClassifier(config_path)
         self.sweep_det   = SweepDetector(config_path)
@@ -181,17 +188,17 @@ class ICTPipeline:
         # ── Robustness: ATR spike veto ────────────────────────────────────
         if len(df) >= 20:
             atr_recent = compute_atr(df.iloc[-20:])
-            if atr_recent > 0 and atr > atr_recent * _ATR_SPIKE_MULT:
+            if atr_recent > 0 and atr > atr_recent * self._atr_spike_mult:
                 return ICTVeto(symbol=symbol, direction=direction, timestamp=timestamp,
                                score=0.0, grade=ICTGrade.VETOED,
-                               reason=f"ATR spike: {atr:.5f} > {_ATR_SPIKE_MULT}× avg {atr_recent:.5f}")
+                               reason=f"ATR spike: {atr:.5f} > {self._atr_spike_mult}× avg {atr_recent:.5f}")
 
         # ── ADR exhaustion gate ───────────────────────────────────────────
         # Compute today's range vs 20-day average daily range.
         # If the day has already moved its full average range, there is no
         # room left for price to run to the target — setup is a trap.
         adr_pct, adr_label = self._adr_exhaustion(df)
-        if adr_pct >= _ADR_HARD_VETO:
+        if adr_pct >= self._adr_hard_veto:
             return ICTVeto(symbol=symbol, direction=direction, timestamp=timestamp,
                            score=0.0, grade=ICTGrade.VETOED,
                            reason=f"ADR exhausted: {adr_pct:.0%} of average daily range consumed")
@@ -214,7 +221,7 @@ class ICTPipeline:
 
         # ADR soft penalty — room still exists but getting tight
         adr_penalty = 0.0
-        if adr_pct >= _ADR_SOFT_VETO:
+        if adr_pct >= self._adr_soft_veto:
             adr_penalty = 1.0
             missing.append(f"⚠ ADR {adr_pct:.0%} consumed — limited room to target (−1.0 score)")
         else:
@@ -279,7 +286,9 @@ class ICTPipeline:
         # Requirement: at least one candle AFTER the sweep whose BODY
         # (not wick) is ≥ 55% of ATR in the reversal direction.
         # ══════════════════════════════════════════════════════════════════
-        disp_score, disp_label = self._displacement_score(df, recent_sweep, direction, atr)
+        disp_score, disp_label = self._displacement_score(
+            df, recent_sweep, direction, atr, self._displacement_body_atr
+        )
         scores["displacement"] = disp_score * self._weights.get("displacement", 2.0)
         if disp_score > 0:
             confirmations.append(f"✓ Displacement: {disp_label}")
@@ -366,8 +375,8 @@ class ICTPipeline:
         # than A setups (7.5–9.0). High score = late entry = move already done.
         # The sweet spot is the slightly uncomfortable setup, not the perfect one.
         # Encode that discovery: cap at 9.5, penalise anything above 9.0.
-        if raw_score > 9.0:
-            over_confirm_penalty = (raw_score - 9.0) * 0.5
+        if raw_score > self._overconfirm_threshold:
+            over_confirm_penalty = (raw_score - self._overconfirm_threshold) * self._overconfirm_slope
             total_score = raw_score - over_confirm_penalty
             missing.append(
                 f"⚠ Over-confirmation penalty: score {raw_score:.1f} → {total_score:.1f} "
@@ -432,6 +441,7 @@ class ICTPipeline:
         sweep:     Optional[SweepResult],
         direction: str,
         atr:       float,
+        displacement_body_atr: float,
     ) -> tuple[float, str]:
         """
         Check for a strong displacement candle after the sweep.
@@ -484,7 +494,7 @@ class ICTPipeline:
                 continue
 
             # Both gates must pass
-            body_ok  = body_ratio  >= _DISPLACEMENT_BODY_ATR
+            body_ok  = body_ratio  >= displacement_body_atr
             range_ok = range_ratio >= _VOL_PROXY_RATIO_MIN
 
             if body_ok and range_ok and body_ratio > best_score:
@@ -501,8 +511,8 @@ class ICTPipeline:
                     f"(need {_VOL_PROXY_RATIO_MIN}×) — low participation"
                 )
 
-        if best_score >= _DISPLACEMENT_BODY_ATR:
-            score = min(0.6 + 0.4 * (best_score - _DISPLACEMENT_BODY_ATR) / _DISPLACEMENT_BODY_ATR, 1.0)
+        if best_score >= displacement_body_atr:
+            score = min(0.6 + 0.4 * (best_score - displacement_body_atr) / displacement_body_atr, 1.0)
             return round(score, 3), best_label
 
         return 0.0, best_label or f"no qualifying displacement in {_DISPLACEMENT_LOOKBACK} bars"
@@ -638,5 +648,8 @@ class ICTPipeline:
 
 def _default_config_path() -> str:
     import os
+    override = os.environ.get("ICT_CONFIG_PATH")
+    if override:
+        return override
     here = os.path.dirname(os.path.abspath(__file__))
     return os.path.join(here, "..", "config", "ict_params.yml")
