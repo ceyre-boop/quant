@@ -162,12 +162,13 @@ class ICTPipeline:
         atr: Optional[float] = None,
     ) -> "ICTSignal | ICTVeto":
         """
-        Run the full 5-stage ICT pipeline.
+        Run the full ICT pipeline (6 stages + risk engine gate).
 
         Stages 1–5 collect component scores.
         Stages 1, 2, and 5 are HARD GATES (Phase 3): failing any one returns an
         immediate ICTVeto regardless of the other scores, because these components
         are not independent evidence — they describe the same institutional move.
+        Stage 6 is the risk engine gate that checks account constraints.
 
         Args:
             symbol: e.g. 'GBPUSD'

@@ -101,6 +101,11 @@ class SweepDetector:
             logger.debug("Not enough bars (%d < %d) for sweep detection", len(df), min_rows)
             return []
 
+        # Global fallback ATR: used when a candidate's prior window is too short for a
+        # 14-period rolling average.  Computed once to avoid re-scanning the full df
+        # for every candidate whose prior window happens to be < 14 bars.
+        global_atr = compute_atr(df)
+
         results: List[SweepResult] = []
 
         start = self._lookback
@@ -111,7 +116,7 @@ class SweepDetector:
             prior = df.iloc[i - self._lookback: i]
 
             # Local ATR: measure volatility at the sweep bar, not globally
-            local_atr = compute_atr(prior) if len(prior) >= 14 else compute_atr(df)
+            local_atr = compute_atr(prior) if len(prior) >= 14 else global_atr
             if local_atr <= 0:
                 continue
 

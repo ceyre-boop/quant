@@ -226,7 +226,10 @@ class MicroRiskEngine:
         r_tp2 = entry + direction_sign * stop_distance * self.tp2_r
 
         def _valid_tp(tp: Optional[float], r_fallback: float) -> float:
-            """Return tp if it is on the correct side and farther than entry; else r_fallback."""
+            """Return tp if it lies on the profitable side of entry; else r_fallback.
+            'Profitable side' means above entry for LONG, below entry for SHORT —
+            i.e., the direction in which the trade makes money.
+            """
             if tp is None:
                 return r_fallback
             if direction == "LONG" and tp > entry:

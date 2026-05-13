@@ -343,7 +343,7 @@ class ICTOrchestrator:
                 confirmations=best.confirmations,
                 missing=best.missing,
                 risk_pct=sz.risk_pct,
-                entry=sz.entry_price,          # Phase 0 fix: was getattr(sz, "entry", 0.0)
+                entry=sz.entry_price,          # PositionSizing stores entry as entry_price, not entry
                 stop=sz.stop_loss,
                 tp1=sz.tp1,
                 tp2=sz.tp2,
