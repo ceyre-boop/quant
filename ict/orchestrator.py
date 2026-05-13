@@ -136,6 +136,7 @@ class ICTOrchestrator:
         from ict.daily_bias import DailyBiasEngine
         from ict.memory_engine import ICTMemoryEngine
         from ict.regime_execution import get_regime_targets
+        from ict.ict_veto_ledger import ICTVetoLedger
         from execution.funderpro_executor import FunderProExecutor
         self._pipeline       = ICTPipeline()
         self._params         = MicroRiskParams
@@ -145,6 +146,7 @@ class ICTOrchestrator:
         self._bias_engine    = DailyBiasEngine()
         self._memory         = ICTMemoryEngine()
         self._get_targets    = get_regime_targets
+        self._veto_ledger    = ICTVetoLedger()
         self._executor       = FunderProExecutor(account_size=ACCOUNT_SIZE)
         # Wire Firebase into paper trader after publisher is ready
         if self.publisher._db:
@@ -310,6 +312,35 @@ class ICTOrchestrator:
                     )
                     if is_actionable:
                         actionable.append(r)
+                    else:
+                        # A-grade signal that didn't clear post-pipeline gates —
+                        # record to veto ledger for retroactive labeling.
+                        veto_stage = (
+                            "memory" if mem_veto else
+                            "heatmap" if heatmap_conflict else
+                            "bias" if not bias_agrees else
+                            "session" if not session_ok else
+                            "gate"
+                        )
+                        self._veto_ledger.record_veto(
+                            pair=clean,
+                            session=sess_name,
+                            signal=best.direction,
+                            grade=r.grade,
+                            score=r.score,
+                            veto_reason=veto_stage,
+                            veto_stage=veto_stage,
+                            entry_level=r.entry_level,
+                            stop=r.stop,
+                            tp1=r.tp1,
+                            tp2=r.tp2,
+                            adr_pct=r.adr_pct,
+                            risk_pct=r.risk_pct,
+                            confirmations=list(r.confirmations),
+                            missing=list(r.missing),
+                            component_scores=dict(r.component_scores),
+                            timestamp=r.timestamp,
+                        )
                 else:
                     r = ScanResult(
                         pair=clean, timestamp=now.isoformat(),
@@ -322,6 +353,26 @@ class ICTOrchestrator:
                         missing=best.missing,
                         component_scores=best.component_scores,
                         veto_reason=best.reason,
+                    )
+                    # Pipeline-level veto (grade B/C or hard gate failure)
+                    self._veto_ledger.record_veto(
+                        pair=clean,
+                        session=sess_name,
+                        signal=r.signal,
+                        grade=r.grade,
+                        score=r.score,
+                        veto_reason=best.reason,
+                        veto_stage="grade",
+                        entry_level=None,
+                        stop=None,
+                        tp1=None,
+                        tp2=None,
+                        adr_pct=0.0,
+                        risk_pct=0.0,
+                        confirmations=list(best.confirmations),
+                        missing=list(best.missing),
+                        component_scores=dict(best.component_scores),
+                        timestamp=now.isoformat(),
                     )
 
                 # ── Memory: record scan, compute match ────────────────────

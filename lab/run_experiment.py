@@ -6,7 +6,7 @@ import json
 import os
 import tempfile
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Tuple
+from typing import Any, Callable, Dict, List, Literal, Tuple
 
 import yaml
 
@@ -15,6 +15,71 @@ from lab.baseline_registry import BaselineRegistry
 import logging
 
 logger = logging.getLogger(__name__)
+
+# ── Minimum trade-count gates ──────────────────────────────────────────────── #
+# These prevent the ML stack from proposing or executing experiments before it
+# has enough labeled data to support valid conclusions.  The numbers are not
+# arbitrary — they are derived from statistical power analysis on 5% effect
+# detection at 95% confidence for a ~50% base win-rate strategy.
+#
+# Do NOT lower these thresholds without explicit human review.  They are the
+# primary defence against self-overfitting on a thin sample.
+
+MINIMUM_TRADES_FOR_PARAMETER_TUNING    = 100   # smallest nudge experiments
+MINIMUM_TRADES_FOR_META_LABEL_TRAINING = 150   # second-layer classifier refit
+MINIMUM_TRADES_FOR_REGIME_ATTRIBUTION  = 50    # per-regime slice (each regime)
+MINIMUM_TRADES_FOR_CONFIG_PROMOTION    = 200   # champion replacement gate
+
+_EXPERIMENT_GATES: Dict[str, int] = {
+    "parameter_nudge":    MINIMUM_TRADES_FOR_PARAMETER_TUNING,
+    "meta_label_retrain": MINIMUM_TRADES_FOR_META_LABEL_TRAINING,
+    "regime_specific":    MINIMUM_TRADES_FOR_REGIME_ATTRIBUTION,
+    "config_promotion":   MINIMUM_TRADES_FOR_CONFIG_PROMOTION,
+}
+
+ExperimentType = Literal[
+    "parameter_nudge",
+    "meta_label_retrain",
+    "regime_specific",
+    "config_promotion",
+]
+
+
+def can_run_experiment(
+    trade_count: int,
+    experiment_type: ExperimentType,
+) -> Tuple[bool, str]:
+    """Return (allowed, reason) for a given experiment type and trade count.
+
+    Raises ``ValueError`` for unknown experiment types so callers discover
+    typos at call time rather than silently bypassing a gate.
+
+    Examples
+    --------
+    >>> ok, msg = can_run_experiment(120, "parameter_nudge")
+    >>> ok
+    True
+    >>> ok, msg = can_run_experiment(50, "config_promotion")
+    >>> ok
+    False
+    """
+    if experiment_type not in _EXPERIMENT_GATES:
+        raise ValueError(
+            f"Unknown experiment_type {experiment_type!r}. "
+            f"Valid types: {sorted(_EXPERIMENT_GATES)}"
+        )
+    required = _EXPERIMENT_GATES[experiment_type]
+    if trade_count >= required:
+        return True, (
+            f"Gate cleared: {trade_count} trades >= {required} required "
+            f"for {experiment_type!r}."
+        )
+    shortfall = required - trade_count
+    return False, (
+        f"Insufficient data: {trade_count} trades, need {required} "
+        f"for {experiment_type!r} ({shortfall} more required)."
+    )
+
 
 DEFAULT_THRESHOLDS = {
     # Candidate must improve EV/trade by at least +0.05,

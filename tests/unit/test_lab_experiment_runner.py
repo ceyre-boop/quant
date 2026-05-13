@@ -2,13 +2,19 @@ from __future__ import annotations
 
 import json
 
+import pytest
 import yaml
 
 from lab.run_experiment import (
     apply_mutations,
+    can_run_experiment,
     evaluate_vs_baseline,
     run_experiment,
     validate_mutation_scope,
+    MINIMUM_TRADES_FOR_PARAMETER_TUNING,
+    MINIMUM_TRADES_FOR_META_LABEL_TRAINING,
+    MINIMUM_TRADES_FOR_REGIME_ATTRIBUTION,
+    MINIMUM_TRADES_FOR_CONFIG_PROMOTION,
 )
 
 
@@ -87,4 +93,52 @@ def test_run_experiment_with_stub_runner(tmp_path):
     assert results["ev_per_trade"] == 0.20
     assert verdict["go"] is True
     assert candidate["ml_lab"]["pipeline"]["adr_exhaustion_threshold"]["value"] == 0.9
+
+
+# ── Minimum N gate tests ──────────────────────────────────────────────────── #
+
+def test_can_run_experiment_below_threshold_blocked():
+    ok, msg = can_run_experiment(50, "parameter_nudge")
+    assert ok is False
+    assert "Insufficient data" in msg
+    assert "50 more required" in msg or "50 more" in msg or str(MINIMUM_TRADES_FOR_PARAMETER_TUNING - 50) in msg
+
+
+def test_can_run_experiment_at_threshold_allowed():
+    ok, msg = can_run_experiment(MINIMUM_TRADES_FOR_PARAMETER_TUNING, "parameter_nudge")
+    assert ok is True
+    assert "Gate cleared" in msg
+
+
+def test_can_run_experiment_above_threshold_allowed():
+    ok, msg = can_run_experiment(500, "config_promotion")
+    assert ok is True
+
+
+def test_can_run_experiment_blocked_for_config_promotion():
+    ok, msg = can_run_experiment(150, "config_promotion")
+    assert ok is False
+    assert str(MINIMUM_TRADES_FOR_CONFIG_PROMOTION - 150) in msg
+
+
+def test_can_run_experiment_meta_label_blocked():
+    ok, _msg = can_run_experiment(MINIMUM_TRADES_FOR_META_LABEL_TRAINING - 1, "meta_label_retrain")
+    assert ok is False
+
+
+def test_can_run_experiment_regime_specific_allowed():
+    ok, _msg = can_run_experiment(MINIMUM_TRADES_FOR_REGIME_ATTRIBUTION, "regime_specific")
+    assert ok is True
+
+
+def test_can_run_experiment_unknown_type_raises():
+    with pytest.raises(ValueError, match="Unknown experiment_type"):
+        can_run_experiment(500, "random_mutation")  # type: ignore[arg-type]
+
+
+def test_minimum_gate_constants_are_ordered():
+    """Sanity check: promotion gate must be the strictest."""
+    assert MINIMUM_TRADES_FOR_REGIME_ATTRIBUTION < MINIMUM_TRADES_FOR_PARAMETER_TUNING
+    assert MINIMUM_TRADES_FOR_PARAMETER_TUNING < MINIMUM_TRADES_FOR_META_LABEL_TRAINING
+    assert MINIMUM_TRADES_FOR_META_LABEL_TRAINING < MINIMUM_TRADES_FOR_CONFIG_PROMOTION
 

@@ -44,3 +44,35 @@ class BaselineRegistry:
         with self.experiment_log_path.open("a") as f:
             f.write(json.dumps(payload, default=str) + "\n")
 
+    def get_trade_count(self) -> int:
+        """Return the total number of closed trades recorded in the experiment log.
+
+        Each ``append_experiment`` call may include a ``trade_count`` field from
+        the backtest runner.  This method sums those counts across all log
+        entries.  If no entry carries ``trade_count``, the raw entry count is
+        returned as a conservative lower bound.
+
+        This value feeds the minimum-N gates in ``lab/run_experiment.py``.
+        """
+        if not self.experiment_log_path.exists():
+            return 0
+        total = 0
+        has_explicit_count = False
+        with self.experiment_log_path.open() as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    entry = json.loads(line)
+                    results = entry.get("results", {})
+                    if "trade_count" in results:
+                        total += int(results["trade_count"])
+                        has_explicit_count = True
+                    elif not has_explicit_count:
+                        # Fallback: count each logged experiment as 1 observation
+                        total += 1
+                except (json.JSONDecodeError, ValueError, TypeError):
+                    pass
+        return total
+
