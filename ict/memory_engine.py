@@ -125,7 +125,13 @@ class ICTMemoryEngine:
             pair_closed = closed  # fall back to all pairs if not enough pair-specific
 
         # Find k-means clusters (default k=3: win / loss / flat)
-        clusters = self._cluster(pair_closed, k=max(2, self._cluster_k))
+        cluster_k = max(2, min(self._cluster_k, len(pair_closed)))
+        if cluster_k < self._cluster_k:
+            logger.debug(
+                "Reduced cluster_k from %d to %d due to sample size=%d",
+                self._cluster_k, cluster_k, len(pair_closed)
+            )
+        clusters = self._cluster(pair_closed, k=cluster_k)
 
         # Find which cluster today's vector is closest to
         best_cluster, best_sim = 0, -1.0

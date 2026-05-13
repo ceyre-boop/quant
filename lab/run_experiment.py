@@ -12,6 +12,10 @@ import yaml
 
 from lab.baseline_registry import BaselineRegistry
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 DEFAULT_THRESHOLDS = {
     "min_ev_improvement": 0.05,
     "max_dd_degradation": 0.0,
@@ -20,8 +24,11 @@ DEFAULT_THRESHOLDS = {
 
 # Mutation key -> runtime config path
 RUNTIME_TARGETS = {
+    "pipeline.adr_exhaustion_threshold": "pipeline.adr_exhaustion_threshold",
+    "pipeline.displacement_atr_multiplier": "pipeline.displacement_atr_multiplier",
     "risk.tp1_r": "micro_risk.tp1_r",
     "risk.tp2_r": "micro_risk.tp2_r",
+    "memory.cluster_k": "memory.cluster_k",
 }
 
 
@@ -49,7 +56,9 @@ def validate_mutation_scope(config: Dict[str, Any], mutations: Dict[str, Any]) -
     for key, value in mutations.items():
         spec = _spec_for(config, key)
         if not spec:
-            raise ValueError(f"Unknown mutation key: {key}")
+            raise ValueError(
+                f"Unknown mutation key: {key}. Valid keys must be defined in ml_lab config."
+            )
         if not bool(spec.get("mutable_by_ml", False)):
             raise ValueError(f"Mutation not allowed for invariant key: {key}")
         mn = spec.get("min")
@@ -73,8 +82,12 @@ def _set_path(data: Dict[str, Any], dotted_path: str, value: Any) -> None:
 def apply_mutations(config: Dict[str, Any], mutations: Dict[str, Any]) -> Dict[str, Any]:
     candidate = copy.deepcopy(config)
     for key, value in mutations.items():
+        runtime_path = RUNTIME_TARGETS.get(key, key)
         # Runtime path used by current ICT engine
-        _set_path(candidate, RUNTIME_TARGETS.get(key, key), value)
+        _set_path(candidate, runtime_path, value)
+        # Keep mirrored high-level key in sync when runtime path differs.
+        if runtime_path != key:
+            _set_path(candidate, key, value)
         # Keep ml_lab value updated for registry/audit
         _set_path(candidate, f"ml_lab.{key}.value", value)
     return candidate
@@ -85,6 +98,10 @@ def _extract_metric(metrics: Dict[str, Any], key: str, default: float = 0.0) -> 
     try:
         return float(val)
     except Exception:
+        logger.warning(
+            "Failed to convert metric %s=%r to float; using default %s",
+            key, val, default,
+        )
         return default
 
 
@@ -123,7 +140,9 @@ def _default_runner(candidate_config: Dict[str, Any], windows: List[str]) -> Dic
     script_path = Path(__file__).resolve().parents[1] / "scripts" / "run_ict_backtest.py"
     spec = importlib.util.spec_from_file_location("run_ict_backtest", script_path)
     if spec is None or spec.loader is None:
-        raise RuntimeError(f"Unable to load backtest script from {script_path}")
+        raise RuntimeError(
+            f"Unable to load backtest script from {script_path}: file not found or invalid module"
+        )
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     backtest_pair = getattr(module, "backtest_pair")
@@ -143,9 +162,12 @@ def _default_runner(candidate_config: Dict[str, Any], windows: List[str]) -> Dic
     try:
         all_trades = []
         window_stats = []
-        targets = windows or [""]
+        targets = windows if windows else [None]
         for w in targets:
-            start, end = (w.split(":") + [None, None])[:2] if w else (None, None)
+            if w is None:
+                start, end = None, None
+            else:
+                start, end = (w.split(":") + [None, None])[:2]
             window_trades = []
             for pair in pairs:
                 window_trades.extend(backtest_pair(pair, start=start, end=end))
