@@ -13,18 +13,30 @@ Safety rules (hard-coded, non-negotiable):
   daily_loss_limit:    4.0%  — FunderPro challenge rule
   max_spread_pips:     2.5   — forex, tight spreads only
 
+LIVE routing guard (cannot be bypassed):
+  FUNDERPRO_LIVE=live is refused unless:
+    • data/pipeline_verdict.json exists and contains verdict=GO
+    • The config hash recorded in that file matches config/parameters.yml
+
 Status: ROUTING_OFF by default.
-Toggle: set env var FUNDERPRO_LIVE=1 to enable.
+Toggle: set env var FUNDERPRO_LIVE=1 (demo) or FUNDERPRO_LIVE=live.
 Credentials via env vars — never hardcoded.
 
 Usage:
     executor = FunderProExecutor()
     executor.submit(scan_result, tp1_r=2.0, tp2_r=4.0)
+
+    # Record a GO verdict after a successful pipeline evaluation:
+    from execution.funderpro_executor import record_pipeline_go
+    record_pipeline_go()
 """
 from __future__ import annotations
 
+import hashlib
+import json
 import logging
 import os
+import threading
 from dataclasses import dataclass, asdict
 from datetime import datetime, timezone
 from pathlib import Path
@@ -47,6 +59,48 @@ PIP_SIZE = {
     'GBPUSD': 0.0001,
     'AUDUSD': 0.0001,
 }
+
+# ── Pipeline GO guard paths ────────────────────────────────────────────────── #
+
+_ROOT                = Path(__file__).resolve().parents[1]
+PIPELINE_VERDICT_FILE = _ROOT / 'data' / 'pipeline_verdict.json'
+CONFIG_FILE           = _ROOT / 'config' / 'parameters.yml'
+
+
+# ── Public utility: call after a successful pipeline evaluation ────────────── #
+
+def record_pipeline_go(
+    config_path: Path = CONFIG_FILE,
+    verdict_path: Path = PIPELINE_VERDICT_FILE,
+) -> None:
+    """
+    Persist a GO verdict so FUNDERPRO_LIVE=live can proceed.
+
+    Call this from run_live_pipeline.py (or equivalent) immediately after the
+    pipeline evaluation prints 🟢 GO.  The config file hash is recorded so
+    that any subsequent parameter change forces a re-evaluation.
+
+    Example::
+
+        from execution.funderpro_executor import record_pipeline_go
+        record_pipeline_go()
+    """
+    config_hash = (
+        hashlib.sha256(config_path.read_bytes()).hexdigest()[:16]
+        if config_path.exists()
+        else ''
+    )
+    payload = {
+        'verdict':     'GO',
+        'timestamp':   datetime.now(timezone.utc).isoformat(),
+        'config_hash': config_hash,
+    }
+    verdict_path.parent.mkdir(parents=True, exist_ok=True)
+    verdict_path.write_text(json.dumps(payload, indent=2))
+    logger.info(
+        "Pipeline GO verdict recorded (config_hash=%s, path=%s)",
+        config_hash, verdict_path,
+    )
 
 
 @dataclass
@@ -89,13 +143,18 @@ class FunderProExecutor:
       OFF   — log only, no orders sent (default)
       DEMO  — send to demo account for validation
       LIVE  — send to live challenge account
+
+    LIVE mode is refused at construction time unless ``data/pipeline_verdict.json``
+    records a GO verdict **and** the config hash matches ``config/parameters.yml``.
+    This hard guard is intentional: the code enforces the discipline of waiting
+    for the pipeline to confirm the edge before pressing the button.
     """
 
     def __init__(self, account_size: float = 10_000.0):
         self.account_size = account_size
         self._routing     = self._detect_routing()
         self._daily_pnl   = 0.0
-        self._open        = {}   # pair → order_id
+        self._open        = {}   # pair → position_id (cTrader positionId string)
         self._ctrader     = None
 
         if self._routing != 'OFF':
@@ -195,34 +254,170 @@ class FunderProExecutor:
             logger.error("Failed to close %s: %s", pair, e)
             return False
 
-    # ── cTrader integration stubs ─────────────────────────────────────────── #
+    # ── cTrader integration ────────────────────────────────────────────────── #
 
-    def _init_ctrader(self):
-        """Initialize cTrader API connection."""
+    def _init_ctrader(self) -> None:
+        """
+        Create a ``CTraderBridge``, start its Twisted reactor in a daemon
+        background thread, and block until authentication completes.
+
+        Stores the connected bridge in ``self._ctrader``.  If credentials are
+        missing or authentication times out the executor falls back to stub
+        mode (``self._ctrader`` stays ``None``), which causes subsequent
+        ``_send_ctrader_order`` calls to raise and be caught by ``submit``.
+        """
         try:
             client_id     = os.environ.get('CTRADER_CLIENT_ID', '')
             client_secret = os.environ.get('CTRADER_CLIENT_SECRET', '')
             account_id    = os.environ.get('CTRADER_ACCOUNT_ID', '')
-            if not all([client_id, client_secret, account_id]):
-                logger.warning("cTrader credentials not set — remaining in stub mode")
+            access_token  = os.environ.get('CTRADER_ACCESS_TOKEN', '')
+            if not all([client_id, client_secret, account_id, access_token]):
+                logger.warning(
+                    "cTrader credentials incomplete — "
+                    "set CTRADER_CLIENT_ID, CTRADER_CLIENT_SECRET, "
+                    "CTRADER_ACCOUNT_ID, CTRADER_ACCESS_TOKEN"
+                )
                 return
-            # TODO: import ctrader OpenAPI client and authenticate
-            # from ctrader_open_api import Client, Protobuf, TcpProtocol, Auth
-            # self._ctrader = Client(...)
-            logger.info("cTrader: stub initialized (credentials present, API not yet wired)")
+
+            from sovereign.execution.ctrader_bridge import CTraderBridge
+
+            mode   = 'live' if self._routing == 'LIVE' else 'demo'
+            bridge = CTraderBridge(mode=mode)
+
+            # Run the Twisted reactor in a daemon thread so it doesn't block
+            # the main process and dies automatically when the process exits.
+            reactor_thread = threading.Thread(
+                target=bridge.start,
+                name='ctrader-reactor',
+                daemon=True,
+            )
+            reactor_thread.start()
+
+            # Wait for the bridge to authenticate and resolve the symbol ID.
+            if not bridge.wait_for_ready(timeout=30.0):
+                logger.error(
+                    "cTrader: authentication timed out after 30s — "
+                    "check credentials and network connectivity"
+                )
+                return
+
+            self._ctrader = bridge
+            logger.info("cTrader: connected and authenticated (%s)", mode.upper())
+
         except Exception as e:
             logger.warning("cTrader init failed: %s", e)
 
     def _send_ctrader_order(self, order: OrderResult) -> str:
-        """Send bracket order to cTrader. Returns order ID."""
-        # TODO: implement using cTrader OpenAPI ProtoOANewOrderReq
-        # with stop-loss and take-profit attached
-        raise NotImplementedError("cTrader live order submission not yet implemented. "
-                                  "Set FUNDERPRO_LIVE=0 to use paper routing.")
+        """
+        Send a bracket order via ``CTraderBridge.send_bracket_order``.
 
-    def _close_ctrader_order(self, order_id: str):
-        """Close a cTrader position by order ID."""
-        raise NotImplementedError("cTrader close not yet implemented.")
+        Uses TP1 as the primary take-profit on the broker side.  TP2/TP3
+        partial exits are managed by the RR engine once the position is open.
+
+        Returns the cTrader ``positionId`` string (used for close).
+        Raises ``RuntimeError`` on timeout or if the bridge is not connected.
+        """
+        if self._ctrader is None:
+            raise RuntimeError(
+                "cTrader bridge not connected — check credentials and FUNDERPRO_LIVE"
+            )
+
+        position_id = self._ctrader.send_bracket_order(
+            direction=order.direction,
+            size_lots=order.lots,
+            entry=order.entry,
+            stop=order.stop,
+            target=order.tp1,   # primary TP; RR engine manages TP2/TP3 partials
+            conviction=0.0,
+            pred_p50=0.0,
+            pred_p90=0.0,
+            timeout=15.0,
+        )
+        if position_id is None:
+            raise RuntimeError(
+                f"Order submission timed out or failed for {order.pair} "
+                f"({order.direction} @ {order.entry:.5f})"
+            )
+        return position_id
+
+    def _close_ctrader_order(self, position_id: str) -> None:
+        """
+        Send a market-close for the given cTrader ``positionId``.
+
+        Delegates to ``CTraderBridge.close_position`` which dispatches a
+        ``ProtoOAClosePositionReq`` on the reactor thread.
+        Raises ``RuntimeError`` on timeout or if the bridge is not connected.
+        """
+        if self._ctrader is None:
+            raise RuntimeError(
+                "cTrader bridge not connected — cannot close position"
+            )
+        ok = self._ctrader.close_position(position_id=position_id, timeout=10.0)
+        if not ok:
+            raise RuntimeError(
+                f"Close request timed out for positionId={position_id}"
+            )
+
+    # ── Live routing guard ─────────────────────────────────────────────────── #
+
+    @staticmethod
+    def _check_pipeline_go(
+        verdict_path: Path = PIPELINE_VERDICT_FILE,
+        config_path: Path = CONFIG_FILE,
+    ) -> tuple[bool, str]:
+        """
+        Return ``(True, reason)`` if the pipeline last printed GO **and** the
+        config hash matches ``config/parameters.yml``.
+
+        Returns ``(False, reason)`` in every failure case.  Called from
+        ``_detect_routing`` to hard-block LIVE mode until the edge is confirmed.
+        """
+        if not verdict_path.exists():
+            return (
+                False,
+                f"No pipeline verdict on record ({verdict_path}) — "
+                "run the pipeline evaluation and call record_pipeline_go() first",
+            )
+        try:
+            payload = json.loads(verdict_path.read_text())
+        except Exception as exc:
+            return False, f"Cannot read pipeline verdict: {exc}"
+
+        if payload.get('verdict') != 'GO':
+            v = payload.get('verdict', 'UNKNOWN')
+            ts = payload.get('timestamp', '')
+            return False, f"Pipeline verdict is {v} (recorded {ts}) — must be GO to enable LIVE"
+
+        if config_path.exists():
+            current_hash  = hashlib.sha256(config_path.read_bytes()).hexdigest()[:16]
+            recorded_hash = payload.get('config_hash', '')
+            if recorded_hash and current_hash != recorded_hash:
+                return (
+                    False,
+                    f"config/parameters.yml changed since GO verdict "
+                    f"(recorded={recorded_hash}, current={current_hash}) — "
+                    "re-run pipeline evaluation before going live",
+                )
+
+        ts = payload.get('timestamp', 'unknown time')
+        return True, f"Pipeline GO confirmed (recorded {ts})"
+
+    @staticmethod
+    def _detect_routing() -> str:
+        val = os.environ.get('FUNDERPRO_LIVE', 'off').lower()
+        if val == 'live':
+            ok, reason = FunderProExecutor._check_pipeline_go()
+            if not ok:
+                raise RuntimeError(
+                    f"LIVE mode refused by pipeline GO guard:\n  {reason}\n"
+                    "Call record_pipeline_go() after a successful evaluation, "
+                    "or set FUNDERPRO_LIVE=demo for paper validation first."
+                )
+            logger.info("LIVE routing enabled — pipeline GO guard passed")
+            return 'LIVE'
+        if val in ('demo', '1', 'true'):
+            return 'DEMO'
+        return 'OFF'
 
     # ── Sizing ─────────────────────────────────────────────────────────────── #
 
@@ -242,10 +437,3 @@ class FunderProExecutor:
             entry=0, stop=0, tp1=0, tp2=0, lots=0,
             routing=self._routing, timestamp=ts, error=reason,
         )
-
-    @staticmethod
-    def _detect_routing() -> str:
-        val = os.environ.get('FUNDERPRO_LIVE', 'off').lower()
-        if val == 'live':   return 'LIVE'
-        if val in ('demo', '1', 'true'): return 'DEMO'
-        return 'OFF'

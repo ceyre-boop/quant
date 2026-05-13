@@ -32,6 +32,7 @@ import argparse
 import json
 import logging
 import os
+import threading
 import time
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
@@ -46,6 +47,7 @@ from ctrader_open_api.messages.OpenApiCommonMessages_pb2 import ProtoMessage
 from ctrader_open_api.messages.OpenApiMessages_pb2 import (
     ProtoOAApplicationAuthReq,
     ProtoOAAccountAuthReq,
+    ProtoOAClosePositionReq,
     ProtoOASymbolsListReq,
     ProtoOATraderReq,
     ProtoOANewOrderReq,
@@ -160,6 +162,16 @@ class CTraderBridge:
         self._session_start_balance: float = 0.0
         self._open_positions:   int   = 0
 
+        # ── Threading synchronisation (used by send_bracket_order / close_position) ──
+        # _auth_ready is set once the account is authenticated and symbol ID is known.
+        # _order_filled is cleared before each order send and set when execution fires.
+        # _position_lock guards _last_position_id and _open_positions which are written
+        # by the reactor thread and read (or written) by external threads.
+        self._auth_ready: threading.Event     = threading.Event()
+        self._order_filled: threading.Event   = threading.Event()
+        self._position_lock: threading.Lock   = threading.Lock()
+        self._last_position_id: Optional[str] = None   # captured in _handle_execution
+
         # Lazy-load trajectory model (no penalty if unavailable)
         self._trajectory = None
 
@@ -212,7 +224,6 @@ class CTraderBridge:
             logger.info("[CTraderBridge] Account authenticated ✓")
             self._fetch_account_info()
             self._fetch_symbol_id()
-
         elif payload_type == ProtoOAPayloadType.PROTO_OA_TRADER_RES:
             resp = Protobuf.extract(message)
             self._account_balance = resp.trader.balance / 100.0  # cents → units
@@ -229,6 +240,9 @@ class CTraderBridge:
                     break
             if self._gbpusd_symbol_id is None:
                 logger.error("[CTraderBridge] GBPUSD not found in symbol list — check account")
+            # Signal ready once authenticated AND symbol resolved
+            if self._authenticated:
+                self._auth_ready.set()
 
         elif payload_type == ProtoOAPayloadType.PROTO_OA_NEW_ORDER_RES:
             resp = Protobuf.extract(message)
@@ -470,8 +484,96 @@ class CTraderBridge:
             mode             = self.mode,
         )
         _log_fill(fill)
-        self._open_positions += 1
+        # Atomic update: write position_id under lock, then signal outside the lock
+        # so the waiting thread can proceed without racing to acquire the lock.
+        with self._position_lock:
+            self._open_positions += 1
+            self._last_position_id = str(getattr(deal, 'positionId', ''))
+        self._order_filled.set()
         self._pending_fill = {}
+
+    # ── Thread-safe public API (called from non-reactor threads) ──────────────
+
+    def wait_for_ready(self, timeout: float = 30.0) -> bool:
+        """
+        Block until the bridge is authenticated and the GBPUSD symbol ID is
+        resolved.  Returns True on success, False on timeout.
+
+        Safe to call from any thread.  FunderProExecutor calls this from the
+        main thread after launching the Twisted reactor in a daemon thread.
+        """
+        return self._auth_ready.wait(timeout)
+
+    def send_bracket_order(
+        self,
+        direction: str,
+        size_lots: float,
+        entry: float,
+        stop: float,
+        target: float,
+        conviction: float = 0.0,
+        pred_p50: float = 0.0,
+        pred_p90: float = 0.0,
+        timeout: float = 15.0,
+    ) -> Optional[str]:
+        """
+        Thread-safe wrapper around ``_send_market_order``.
+
+        Schedules the order on the Twisted reactor thread, then blocks until
+        the execution event fires (``_handle_execution`` sets ``_order_filled``).
+        Returns the cTrader ``positionId`` string on success, or ``None`` on
+        timeout / failure.
+
+        Safe to call from any thread (uses ``reactor.callFromThread``).
+        """
+        self._order_filled.clear()
+        self._last_position_id = None
+        reactor.callFromThread(
+            self._send_market_order,
+            direction, size_lots, entry, stop, target,
+            conviction, pred_p50, pred_p90,
+        )
+        if not self._order_filled.wait(timeout):
+            logger.error(
+                "[CTraderBridge] Timed out waiting for execution event "
+                "(timeout=%.1fs direction=%s lots=%.2f)",
+                timeout, direction, size_lots,
+            )
+            return None
+        with self._position_lock:
+            return self._last_position_id
+
+    def close_position(self, position_id: str, timeout: float = 10.0) -> bool:
+        """
+        Thread-safe market-close for an open position.
+
+        Schedules a ``ProtoOAClosePositionReq`` on the reactor thread and
+        returns once the message has been dispatched (fire-and-forget — the
+        broker confirmation arrives asynchronously via ``_on_message``).
+
+        Returns True once the request has been sent, False on timeout.
+        Safe to call from any thread.
+        """
+        send_done: threading.Event = threading.Event()
+
+        def _do_close() -> None:
+            req = ProtoOAClosePositionReq()
+            req.ctidTraderAccountId = self._account_id
+            req.positionId = int(position_id)
+            self._client.send(req).addErrback(self._on_error)
+            with self._position_lock:
+                self._open_positions = max(0, self._open_positions - 1)
+            send_done.set()
+
+        reactor.callFromThread(_do_close)
+        if not send_done.wait(timeout):
+            logger.error(
+                "[CTraderBridge] Timed out dispatching close for positionId=%s",
+                position_id,
+            )
+            return False
+        logger.info("[CTraderBridge] Close request sent for positionId=%s", position_id)
+        return True
 
     # ── Self-test ─────────────────────────────────────────────────────
 
