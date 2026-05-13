@@ -36,6 +36,8 @@ _MAX_RISK_PER_TRADE = 0.02     # 2 %
 _MAX_CONCURRENT_RISK = 0.06    # 6 %
 _MAX_POSITIONS = 3
 _MAX_DAILY_LOSS_PCT = 0.05     # 5 %
+_MAX_TOTAL_DD_PCT = 0.10       # 10 % — prop-firm style total drawdown ceiling
+_MAX_CONSECUTIVE_LOSSES = 3    # kill-switch trips after this many in a row
 _MAX_LEVERAGE = 30
 _MIN_RR = 2.0
 _STOP_ATR_MULT = 1.0
@@ -54,6 +56,7 @@ class MicroRiskParams:
     open_risk_pct: float = 0.0      # total unrealised risk as fraction of account
     daily_loss_pct: float = 0.0     # realised loss today as fraction of account
     consecutive_losses: int = 0     # consecutive losses this session (kill switch)
+    total_dd_pct: float = 0.0       # total peak-to-trough drawdown since account inception
 
 
 @dataclass(frozen=True)
@@ -109,6 +112,8 @@ class MicroRiskEngine:
         self.max_concurrent_risk: float = cfg.get("max_concurrent_risk", _MAX_CONCURRENT_RISK)
         self.max_positions: int = cfg.get("max_positions", _MAX_POSITIONS)
         self.max_daily_loss_pct: float = cfg.get("max_daily_loss_pct", _MAX_DAILY_LOSS_PCT)
+        self.max_total_dd_pct: float = cfg.get("max_total_dd_pct", _MAX_TOTAL_DD_PCT)
+        self.max_consecutive_losses: int = cfg.get("max_consecutive_losses", _MAX_CONSECUTIVE_LOSSES)
         self.max_leverage: float = cfg.get("max_leverage", _MAX_LEVERAGE)
         self.min_rr: float = cfg.get("min_rr", _MIN_RR)
         self.stop_atr_mult: float = cfg.get("stop_atr_multiple", _STOP_ATR_MULT)
@@ -126,6 +131,8 @@ class MicroRiskEngine:
         atr: float,
         params: MicroRiskParams,
         pip_value: float = 1.0,
+        tp1_override: Optional[float] = None,
+        tp2_override: Optional[float] = None,
     ) -> "PositionSizing | RiskVeto":
         """
         Compute sizing for a proposed trade.
@@ -139,33 +146,49 @@ class MicroRiskEngine:
             pip_value: value of 1 unit × 1 price-unit move in account currency.
                        For 1 standard forex lot: pip_value = 10 per pip.
                        Pass 1.0 if working in dimensionless units.
+            tp1_override: explicit TP1 level (from compute_liquidity_targets);
+                          falls back to R-based TP if None or invalid.
+            tp2_override: explicit TP2 level; falls back to R-based TP if None or invalid.
 
         Returns:
             PositionSizing if approved, RiskVeto if blocked.
         """
-        # ── Gate 0: 3-loss kill switch ───────────────────────────────────
-        max_consecutive = 3
-        if params.consecutive_losses >= max_consecutive:
+        # ── Gate 0: kill switch (configurable consecutive-loss limit) ────
+        if params.consecutive_losses >= self.max_consecutive_losses:
             return RiskVeto(
                 reason="KILL_SWITCH",
-                detail=f"{params.consecutive_losses} consecutive losses this session. Paused until next killzone.",
+                detail=(
+                    f"{params.consecutive_losses} consecutive losses this session "
+                    f"(limit {self.max_consecutive_losses}). "
+                    "Paused until next kill zone."
+                ),
             )
 
-        # ── Gate 1: daily loss limit ─────────────────────────────────────
+        # ── Gate 1: total account drawdown ceiling ───────────────────────
+        if params.total_dd_pct >= self.max_total_dd_pct:
+            return RiskVeto(
+                reason="MAX_TOTAL_DD",
+                detail=(
+                    f"Total drawdown {params.total_dd_pct:.1%} ≥ limit "
+                    f"{self.max_total_dd_pct:.1%}. Account in preservation mode."
+                ),
+            )
+
+        # ── Gate 2: daily loss limit ─────────────────────────────────────
         if params.daily_loss_pct >= self.max_daily_loss_pct:
             return RiskVeto(
                 reason="DAILY_LOSS_LIMIT",
                 detail=f"Daily loss {params.daily_loss_pct:.1%} ≥ limit {self.max_daily_loss_pct:.1%}. No more trades today.",
             )
 
-        # ── Gate 2: max concurrent positions ────────────────────────────
+        # ── Gate 3: max concurrent positions ────────────────────────────
         if params.open_positions >= self.max_positions:
             return RiskVeto(
                 reason="MAX_POSITIONS",
                 detail=f"Already {params.open_positions} open positions (max {self.max_positions}).",
             )
 
-        # ── Gate 3: max concurrent portfolio risk ─────────────────────
+        # ── Gate 4: max concurrent portfolio risk ─────────────────────
         if params.open_risk_pct + self.max_risk_per_trade > self.max_concurrent_risk:
             return RiskVeto(
                 reason="MAX_CONCURRENT_RISK",
@@ -176,7 +199,7 @@ class MicroRiskEngine:
                 ),
             )
 
-        # ── Gate 4: valid stop-loss placement ───────────────────────────
+        # ── Gate 5: valid stop-loss placement ───────────────────────────
         stop_distance = abs(entry - stop_loss)
         if stop_distance <= 0:
             return RiskVeto(
@@ -197,11 +220,36 @@ class MicroRiskEngine:
             )
 
         # ── Compute take-profit levels ───────────────────────────────────
-        tp1 = entry + direction_sign * stop_distance * self.tp1_r
-        tp2 = entry + direction_sign * stop_distance * self.tp2_r
-        rr_ratio = self.tp1_r  # R:R at first target
+        # Prefer ICT-native liquidity targets; fall back to R-multiple if
+        # override is absent, on the wrong side, or inside the stop distance.
+        r_tp1 = entry + direction_sign * stop_distance * self.tp1_r
+        r_tp2 = entry + direction_sign * stop_distance * self.tp2_r
 
-        # ── Gate 5: minimum R:R ─────────────────────────────────────────
+        def _valid_tp(tp: Optional[float], r_fallback: float) -> float:
+            """Return tp if it lies on the profitable side of entry; else r_fallback.
+            'Profitable side' means above entry for LONG, below entry for SHORT —
+            i.e., the direction in which the trade makes money.
+            """
+            if tp is None:
+                return r_fallback
+            if direction == "LONG" and tp > entry:
+                return tp
+            if direction == "SHORT" and tp < entry:
+                return tp
+            return r_fallback
+
+        tp1 = _valid_tp(tp1_override, r_tp1)
+        tp2 = _valid_tp(tp2_override, r_tp2)
+
+        # Ensure tp2 is farther than tp1 in the correct direction.
+        if direction == "LONG" and tp2 <= tp1:
+            tp2 = r_tp2
+        if direction == "SHORT" and tp2 >= tp1:
+            tp2 = r_tp2
+
+        rr_ratio = abs(tp1 - entry) / stop_distance if stop_distance > 0 else 0.0
+
+        # ── Gate 6: minimum R:R ─────────────────────────────────────────
         if rr_ratio < self.min_rr:
             return RiskVeto(
                 reason="MIN_RR",
@@ -212,14 +260,10 @@ class MicroRiskEngine:
         risk_dollars = params.account_size * self.max_risk_per_trade
         position_units = risk_dollars / (stop_distance * pip_value) if pip_value > 0 else 0.0
 
-        # ── Gate 6: leverage cap ─────────────────────────────────────────
-        # Notional value of the position in account currency = units × entry price.
-        # pip_value is *not* included here because it only scales P&L per unit move,
-        # not the face value of the position itself.
+        # ── Gate 7: leverage cap ─────────────────────────────────────────
         notional = position_units * entry
         leverage = notional / params.account_size if params.account_size > 0 else 0.0
         if leverage > self.max_leverage:
-            # Scale down to stay within leverage cap
             position_units = (params.account_size * self.max_leverage) / entry
             risk_dollars = position_units * stop_distance * pip_value
             leverage = self.max_leverage
@@ -237,7 +281,7 @@ class MicroRiskEngine:
             risk_dollars=round(risk_dollars, 2),
             position_units=round(position_units, 6),
             leverage_used=round(leverage, 2),
-            rr_ratio=rr_ratio,
+            rr_ratio=round(rr_ratio, 2),
             tp1_units=round(tp1_units, 6),
             tp2_units=round(tp2_units, 6),
         )

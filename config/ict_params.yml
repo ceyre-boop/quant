@@ -33,8 +33,12 @@ sweep:
   lookback_bars: 20
   # Price must close back through the swept level within this many bars
   reversal_bars: 3
-  # Swept level must be at least this multiple of ATR beyond prior range
+  # Swept level must be at least this multiple of local ATR beyond prior range
   min_wick_atr_multiple: 0.3
+  # Post-sweep displacement: first bar body must be ≥ this × local ATR in the expected direction
+  min_displacement_atr: 0.5
+  # Rejection quality: sweep candle close must be ≥ this fraction back inside the prior range
+  min_rejection_pct: 0.5
 
 fvg:
   # FVG must be at least this fraction of ATR to be tradeable
@@ -59,15 +63,19 @@ micro_risk:
   max_positions: 3
   # Daily loss limit — halt trading for the day if breached
   max_daily_loss_pct: 0.05          # 5 %
+  # Total peak-to-trough drawdown ceiling (prop-firm style account preservation)
+  max_total_dd_pct: 0.10            # 10 %
+  # Kill-switch trips after this many consecutive losses; resets at next session
+  max_consecutive_losses: 3
   # Default leverage cap (broker max may be higher; we enforce this ceiling)
   max_leverage: 30
   # R:R minimum to take a trade (1 : N where N >= this)
   min_rr: 2.0
-  # Stop placed below/above this ATR multiple from entry
+  # Stop placed below/above this ATR multiple from entry (used as ATR fallback only)
   stop_atr_multiple: 1.0
-  # TP1 at this R multiple (partial close)
+  # TP1 at this R multiple (partial close) — used as fallback when no liquidity targets
   tp1_r: 2.0
-  # TP2 at this R multiple (full close or trail)
+  # TP2 at this R multiple (full close or trail) — used as fallback when no liquidity targets
   tp2_r: 4.0
   # Fraction of position to close at TP1
   tp1_size_fraction: 0.5
@@ -79,6 +87,9 @@ scoring:
   grade_a_plus_threshold: 8.5
   # B grade threshold (logged, not executed); below this = C (rejected)
   grade_b_threshold: 5.0
+  # Minimum score advantage the winning direction must have over the opposing side.
+  # Prevents ambiguous "coin-flip" trades where both directions score similarly.
+  min_score_gap: 1.5
   # Component weights (must sum to 10.0)
   weights:
     kill_zone:    2.0   # timing is non-negotiable

@@ -28,7 +28,7 @@ import logging
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 
 import pandas as pd
 import yaml
@@ -49,6 +49,13 @@ _DEFAULT_WEIGHTS: Dict[str, float] = {
     "market_structure": 2.0,
     "pd_alignment":     1.5,
 }
+
+# Stop buffer expressed as a fraction of ATR added beyond the structural anchor.
+_STRUCTURE_STOP_BUFFER_ATR = 0.2
+
+# Minimum stop distance as a fraction of ATR (prevents stops so tight they
+# are immediately hit by spread/noise even when the structure anchor is close).
+_MIN_STOP_ATR_FRACTION = 0.5
 
 # Volatility-adaptive threshold offsets
 # ATR / price > HIGH_VOL_THRESHOLD → lower bar (easier to trade)
@@ -155,7 +162,13 @@ class ICTPipeline:
         atr: Optional[float] = None,
     ) -> "ICTSignal | ICTVeto":
         """
-        Run the full 5-stage ICT pipeline.
+        Run the full ICT pipeline (6 stages + risk engine gate).
+
+        Stages 1–5 collect component scores.
+        Stages 1, 2, and 5 are HARD GATES (Phase 3): failing any one returns an
+        immediate ICTVeto regardless of the other scores, because these components
+        are not independent evidence — they describe the same institutional move.
+        Stage 6 is the risk engine gate that checks account constraints.
 
         Args:
             symbol: e.g. 'GBPUSD'
@@ -195,10 +208,10 @@ class ICTPipeline:
         # ── Volatility-adaptive threshold ─────────────────────────────────
         vol_ratio = atr / price if price > 0 else 0.0
         if vol_ratio > _HIGH_VOL_THRESHOLD:
-            effective_threshold = self._min_score - 0.5   # high vol → easier bar
+            effective_threshold = self._min_score - 0.5
             vol_regime = "HIGH_VOL"
         elif vol_ratio < _LOW_VOL_THRESHOLD:
-            effective_threshold = self._min_score + 0.5   # dead market → raise bar
+            effective_threshold = self._min_score + 0.5
             vol_regime = "LOW_VOL"
         else:
             effective_threshold = self._min_score
@@ -220,6 +233,17 @@ class ICTPipeline:
             )
             missing.append(f"Kill Zone ({reason})")
 
+        # ── HARD GATE: kill zone required ────────────────────────────────
+        if scores["kill_zone"] == 0.0:
+            return ICTVeto(
+                symbol=symbol, direction=direction, timestamp=timestamp,
+                score=scores["kill_zone"], grade=ICTGrade.VETOED,
+                reason="GATE_KILL_ZONE: must be in a high-probability kill zone — off-hours = no ICT trade",
+                component_scores=scores,
+                confirmations=confirmations,
+                missing=missing,
+            )
+
         # ── Stage 2: Liquidity sweep ─────────────────────────────────────
         expected_sweep_dir = "BULLISH_SWEEP" if direction == "LONG" else "BEARISH_SWEEP"
         sweeps = self.sweep_det.detect(df)
@@ -231,17 +255,28 @@ class ICTPipeline:
             confirmations.append(
                 f"Sweep: {recent_sweep.direction} @ {recent_sweep.swept_level:.5f}"
                 + (" (reversal confirmed)" if recent_sweep.reversal_confirmed else "")
+                + (" [displacement]" if recent_sweep.displacement_confirmed else "")
             )
         else:
             scores["sweep"] = 0.0
             missing.append(f"Liquidity sweep ({expected_sweep_dir})")
+
+        # ── HARD GATE: sweep required ────────────────────────────────────
+        if scores["sweep"] == 0.0:
+            return ICTVeto(
+                symbol=symbol, direction=direction, timestamp=timestamp,
+                score=sum(scores.values()), grade=ICTGrade.VETOED,
+                reason="GATE_SWEEP: liquidity sweep required — no ICT trade without institutional fuel",
+                component_scores=scores,
+                confirmations=confirmations,
+                missing=missing,
+            )
 
         # ── Stage 3: FVG tap + OB alignment ──────────────────────────────
         bull_fvg, bear_fvg, bull_ob, bear_ob = self.fvg_det.nearest_actionable(df)
         tap_fvg = bull_fvg if direction == "LONG" else bear_fvg
         tap_ob = bull_ob if direction == "LONG" else bear_ob
 
-        # Score FVG tap
         fvg_score = 0.0
         if tap_fvg is not None and tap_fvg.price_tapping(price, proximity_fraction=0.5):
             fvg_score = self._weights.get("fvg_tap", 2.0)
@@ -273,18 +308,50 @@ class ICTPipeline:
         else:
             missing.append(f"PD array ({pd_label})")
 
+        # ── HARD GATE: PD array alignment required ───────────────────────
+        if scores["pd_alignment"] == 0.0:
+            return ICTVeto(
+                symbol=symbol, direction=direction, timestamp=timestamp,
+                score=sum(scores.values()), grade=ICTGrade.VETOED,
+                reason="GATE_PD_ARRAY: price must be in the correct PD array zone — longs from discount, shorts from premium",
+                component_scores=scores,
+                confirmations=confirmations,
+                missing=missing,
+            )
+
         total_score = sum(scores.values())
         grade = self._grade(total_score, threshold=effective_threshold)
 
         # ── Stage 6: Risk engine gate ─────────────────────────────────────
         if grade in (ICTGrade.A_PLUS, ICTGrade.A):
-            stop = self.risk_engine.suggest_stop(price, direction, atr)
+            # Phase 1: use ICT-native structure stop instead of generic ATR stop
+            stop = self.compute_structure_stop(
+                direction=direction,
+                sweep=recent_sweep,
+                nearest_ob=tap_ob,
+                nearest_fvg=tap_fvg,
+                df=df,
+                atr=atr,
+            )
+
+            # Phase 1: compute liquidity-based TP levels
+            liq_targets = self.compute_liquidity_targets(
+                direction=direction,
+                df=df,
+                price=price,
+                atr=atr,
+            )
+            tp1_override = liq_targets[0] if len(liq_targets) >= 1 else None
+            tp2_override = liq_targets[1] if len(liq_targets) >= 2 else None
+
             sizing_result = self.risk_engine.size(
                 direction=direction,
                 entry=price,
                 stop_loss=stop,
                 atr=atr,
                 params=account,
+                tp1_override=tp1_override,
+                tp2_override=tp2_override,
             )
             if isinstance(sizing_result, RiskVeto):
                 return ICTVeto(
@@ -316,6 +383,134 @@ class ICTPipeline:
             confirmations=confirmations,
             missing=missing,
         )
+
+    # ── ICT-native stop computation (Phase 1) ─────────────────────────── #
+
+    @staticmethod
+    def compute_structure_stop(
+        direction: str,
+        sweep: Optional[SweepResult],
+        nearest_ob: Optional[OrderBlockResult],
+        nearest_fvg: Optional[FVGResult],
+        df: pd.DataFrame,
+        atr: float,
+    ) -> float:
+        """
+        Compute an ICT-native stop-loss using structure invalidation anchors.
+
+        Priority (highest to lowest):
+          1. Sweep anchor  — below the sweep candle's wick low (LONG) / above wick high (SHORT).
+             This is the exact level where the setup is proved wrong: if price returns
+             to the sweep extreme, the smart-money absorption failed.
+          2. Order Block   — below OB.low (LONG) / above OB.high (SHORT).
+          3. FVG anchor    — below FVG.bottom (LONG) / above FVG.top (SHORT).
+          4. Swing fallback — below 20-bar swing low (LONG) / above 20-bar swing high (SHORT).
+
+        A small ATR-derived buffer is always added to avoid stop-hunting on the spread.
+        If the resulting stop distance is smaller than ``_MIN_STOP_ATR_FRACTION × atr``,
+        the stop is pushed out to that minimum to prevent noise-hits.
+        """
+        buffer = _STRUCTURE_STOP_BUFFER_ATR * atr
+
+        if direction == "LONG":
+            if sweep is not None:
+                raw_stop = sweep.wick_low - buffer
+            elif nearest_ob is not None:
+                raw_stop = nearest_ob.low - buffer
+            elif nearest_fvg is not None:
+                raw_stop = nearest_fvg.bottom - buffer
+            else:
+                raw_stop = float(df["Low"].tail(20).min()) - buffer
+        else:  # SHORT
+            if sweep is not None:
+                raw_stop = sweep.wick_high + buffer
+            elif nearest_ob is not None:
+                raw_stop = nearest_ob.high + buffer
+            elif nearest_fvg is not None:
+                raw_stop = nearest_fvg.top + buffer
+            else:
+                raw_stop = float(df["High"].tail(20).max()) + buffer
+
+        # Sanity: ensure the stop distance meets the minimum ATR fraction
+        price = float(df["Close"].iloc[-1])
+        min_distance = _MIN_STOP_ATR_FRACTION * atr
+        actual_distance = abs(price - raw_stop)
+        if actual_distance < min_distance:
+            if direction == "LONG":
+                raw_stop = price - min_distance
+            else:
+                raw_stop = price + min_distance
+
+        return raw_stop
+
+    @staticmethod
+    def compute_liquidity_targets(
+        direction: str,
+        df: pd.DataFrame,
+        price: float,
+        atr: float,
+        n_targets: int = 2,
+    ) -> List[float]:
+        """
+        Compute ICT-style liquidity-based take-profit targets.
+
+        Scans for:
+          • Prior swing highs (LONG) / swing lows (SHORT) — BSL / SSL pools.
+          • Session high/low (last 4 hours of 5-minute bars ≈ 48 bars).
+          • Clusters equal highs / equal lows (levels within 0.5 × ATR)
+            and uses their centroid as a single target.
+
+        Returns up to ``n_targets`` levels sorted nearest-first.
+        Falls back to an empty list when no valid targets can be identified;
+        the risk engine will then use R-multiple TPs as a fallback.
+        """
+        highs = df["High"].values
+        lows = df["Low"].values
+        n = len(df)
+        p = 5  # swing-detection period
+
+        raw_targets: List[float] = []
+
+        if direction == "LONG":
+            # Collect swing highs above current price
+            for i in range(p, n - p):
+                if highs[i] == max(highs[max(0, i - p): i + p + 1]) and highs[i] > price:
+                    raw_targets.append(float(highs[i]))
+            # Session high (last 48 bars ≈ 4 hours at 5m)
+            session_high = float(df["High"].tail(48).max())
+            if session_high > price:
+                raw_targets.append(session_high)
+        else:
+            # Collect swing lows below current price
+            for i in range(p, n - p):
+                if lows[i] == min(lows[max(0, i - p): i + p + 1]) and lows[i] < price:
+                    raw_targets.append(float(lows[i]))
+            # Session low
+            session_low = float(df["Low"].tail(48).min())
+            if session_low < price:
+                raw_targets.append(session_low)
+
+        if not raw_targets:
+            return []
+
+        # Cluster equal levels within 0.5 × ATR (equal highs / equal lows)
+        cluster_threshold = 0.5 * atr
+        sorted_levels = sorted(raw_targets)
+        clusters: List[List[float]] = [[sorted_levels[0]]]
+        for level in sorted_levels[1:]:
+            if level - clusters[-1][-1] <= cluster_threshold:
+                clusters[-1].append(level)
+            else:
+                clusters.append([level])
+        clustered = [sum(c) / len(c) for c in clusters]
+
+        # Sort nearest-first
+        if direction == "LONG":
+            clustered.sort()
+        else:
+            clustered.sort(reverse=True)
+
+        return clustered[:n_targets]
 
     # ── Market-structure helper ────────────────────────────────────────── #
 
