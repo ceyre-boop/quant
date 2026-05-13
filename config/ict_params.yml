@@ -86,3 +86,111 @@ scoring:
     fvg_tap:      2.0   # precision entry alignment
     market_structure: 2.0  # BOS / CHOCH confirmation
     pd_alignment: 1.5   # premium/discount zone alignment
+
+pipeline:
+  # Hard invariant: ATR spike veto (do not mutate automatically)
+  atr_spike_veto_multiplier: 3.0
+  # ADR exhaustion thresholds
+  adr_exhaustion_threshold: 0.85
+  adr_soft_penalty_threshold: 0.70
+  # Displacement quality gate
+  displacement_atr_multiplier: 0.55
+  # Over-confirmation penalty (empirically validated)
+  overconfirmation_penalty_threshold: 9.0
+  overconfirmation_penalty_slope: 0.5
+  # Grade invariant at execution layer
+  min_grade_to_execute: "A"
+
+memory:
+  cluster_k: 3
+  min_trades_before_cluster_gate: 20
+  cluster_soft_veto_wr: 0.40
+  cluster_hard_veto_wr: 0.30
+  cluster_similarity_floor: 0.50
+  cluster_soft_veto_penalty: 0.75
+  cluster_soft_veto_score_floor: 7.5
+
+risk:
+  # Mirrors micro_risk.max_risk_per_trade
+  risk_per_trade_pct: 0.02
+  # Mirrors micro_risk.tp1_r / tp2_r
+  tp1_r: 2.0
+  tp2_r: 4.0
+
+sessions:
+  london_only_pairs: ["GBPUSD"]
+  ny_pm_pairs: ["GBPUSD", "EURUSD", "AUDUSD", "AUDNZD"]
+
+ml_lab:
+  pipeline:
+    atr_spike_veto_multiplier:
+      value: 3.0
+      mutable_by_ml: false
+      min: null
+      max: null
+    adr_exhaustion_threshold:
+      value: 0.85
+      mutable_by_ml: true
+      min: 0.75
+      max: 0.95
+      step: 0.05
+    displacement_atr_multiplier:
+      value: 0.55
+      mutable_by_ml: true
+      min: 0.45
+      max: 1.00
+      step: 0.05
+    overconfirmation_penalty_threshold:
+      value: 9.0
+      mutable_by_ml: false
+      min: null
+      max: null
+    min_grade_to_execute:
+      value: "A"
+      mutable_by_ml: false
+      min: null
+      max: null
+
+  sessions:
+    london_only_pairs:
+      value: ["GBPUSD"]
+      mutable_by_ml: false
+      min: null
+      max: null
+    ny_pm_pairs:
+      value: ["GBPUSD", "EURUSD", "AUDUSD", "AUDNZD"]
+      mutable_by_ml: false
+      min: null
+      max: null
+
+  risk:
+    risk_per_trade_pct:
+      value: 0.02
+      mutable_by_ml: false
+      min: null
+      max: null
+    tp1_r:
+      value: 2.0
+      mutable_by_ml: true
+      min: 1.5
+      max: 3.0
+      step: 0.25
+    tp2_r:
+      value: 4.0
+      mutable_by_ml: true
+      min: 3.0
+      max: 6.0
+      step: 0.50
+
+  memory:
+    cluster_k:
+      value: 3
+      mutable_by_ml: true
+      min: 2
+      max: 6
+      step: 1
+    min_trades_before_cluster_gate:
+      value: 20
+      mutable_by_ml: false
+      min: null
+      max: null

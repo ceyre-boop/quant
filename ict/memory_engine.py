@@ -25,6 +25,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, List, Optional
 
+import yaml
 logger = logging.getLogger(__name__)
 
 MEMORY_PATH  = Path('data/ledger/ict_memory.json')
@@ -53,8 +54,18 @@ class ICTMemoryEngine:
     Lightweight — no sklearn dependency, uses pure cosine similarity + k-means.
     """
 
-    def __init__(self):
-        MEMORY_PATH.parent.mkdir(parents=True, exist_ok=True)
+    def __init__(self, memory_path: Optional[Path] = None, config_path: Optional[str] = None):
+        self._memory_path = memory_path or MEMORY_PATH
+        self._cfg = self._load_config(config_path)
+        self._cluster_k = int(self._cfg.get("cluster_k", 3))
+        self._min_patterns = int(self._cfg.get("min_trades_before_cluster_gate", MIN_PATTERNS))
+        self._soft_veto_wr = float(self._cfg.get("cluster_soft_veto_wr", 0.40))
+        self._hard_veto_wr = float(self._cfg.get("cluster_hard_veto_wr", 0.30))
+        self._similarity_floor = float(self._cfg.get("cluster_similarity_floor", 0.50))
+        self._soft_veto_penalty = float(self._cfg.get("cluster_soft_veto_penalty", 0.75))
+        self._soft_veto_score_floor = float(self._cfg.get("cluster_soft_veto_score_floor", 7.5))
+
+        self._memory_path.parent.mkdir(parents=True, exist_ok=True)
         self._state = self._load()
 
     # ── Public API ─────────────────────────────────────────────────────────── #
@@ -92,7 +103,7 @@ class ICTMemoryEngine:
     def match(self, scan_result) -> MemoryMatch:
         """Find the best cluster match for the current scan result."""
         closed = [s for s in self._state.get('scans', []) if s.get('outcome')]
-        if len(closed) < MIN_PATTERNS:
+        if len(closed) < self._min_patterns:
             return MemoryMatch(
                 pair=scan_result.pair, cluster=-1, similarity=0.0,
                 expected_outcome='INSUFFICIENT_DATA',
@@ -113,8 +124,8 @@ class ICTMemoryEngine:
         if len(pair_closed) < 10:
             pair_closed = closed  # fall back to all pairs if not enough pair-specific
 
-        # Find k-means clusters (k=3: win / loss / flat)
-        clusters = self._cluster(pair_closed, k=3)
+        # Find k-means clusters (default k=3: win / loss / flat)
+        clusters = self._cluster(pair_closed, k=max(2, self._cluster_k))
 
         # Find which cluster today's vector is closest to
         best_cluster, best_sim = 0, -1.0
@@ -147,6 +158,41 @@ class ICTMemoryEngine:
             analog_outcome=analog_outcome,
             available=True,
         )
+
+    def assess_match(self, match: MemoryMatch) -> dict:
+        """
+        Returns hard/soft veto decision based on cluster quality thresholds.
+        """
+        if not match.available:
+            return {
+                "hard_veto": False,
+                "soft_veto": False,
+                "penalty": 0.0,
+                "score_floor": self._soft_veto_score_floor,
+                "reason": "insufficient_data",
+            }
+
+        hard_veto = (
+            match.similarity < self._similarity_floor
+            or match.historical_wr < self._hard_veto_wr
+        )
+        if hard_veto:
+            return {
+                "hard_veto": True,
+                "soft_veto": False,
+                "penalty": 0.0,
+                "score_floor": self._soft_veto_score_floor,
+                "reason": "hard_threshold",
+            }
+
+        soft_veto = match.historical_wr < self._soft_veto_wr
+        return {
+            "hard_veto": False,
+            "soft_veto": soft_veto,
+            "penalty": self._soft_veto_penalty if soft_veto else 0.0,
+            "score_floor": self._soft_veto_score_floor,
+            "reason": "soft_cluster_wr" if soft_veto else "ok",
+        }
 
     # ── Internal ───────────────────────────────────────────────────────────── #
 
@@ -197,15 +243,35 @@ class ICTMemoryEngine:
         return {'centroids': centroids}
 
     def _load(self) -> dict:
-        if MEMORY_PATH.exists():
+        if self._memory_path.exists():
             try:
-                return json.loads(MEMORY_PATH.read_text())
+                return json.loads(self._memory_path.read_text())
             except Exception:
                 pass
         return {'scans': [], 'created': datetime.now(timezone.utc).isoformat()}
 
     def _save(self):
-        MEMORY_PATH.write_text(json.dumps(self._state, indent=2, default=str))
+        self._memory_path.write_text(json.dumps(self._state, indent=2, default=str))
+
+    @staticmethod
+    def _load_config(config_path: Optional[str]) -> dict:
+        path = config_path or _default_config_path()
+        try:
+            with open(path) as f:
+                full = yaml.safe_load(f) or {}
+            return full.get('memory', {})
+        except FileNotFoundError:
+            logger.warning("ICT config not found at %s — using memory defaults", path)
+            return {}
+
+
+def _default_config_path() -> str:
+    import os
+    override = os.environ.get("ICT_CONFIG_PATH")
+    if override:
+        return override
+    here = os.path.dirname(os.path.abspath(__file__))
+    return os.path.join(here, "..", "config", "ict_params.yml")
 
 
 # ── Math helpers ───────────────────────────────────────────────────────────── #

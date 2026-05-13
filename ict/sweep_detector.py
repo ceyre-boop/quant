@@ -168,5 +168,8 @@ class SweepDetector:
 
 def _default_config_path() -> str:
     import os
+    override = os.environ.get("ICT_CONFIG_PATH")
+    if override:
+        return override
     here = os.path.dirname(os.path.abspath(__file__))
     return os.path.join(here, "..", "config", "ict_params.yml")

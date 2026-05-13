@@ -233,14 +233,19 @@ class ICTOrchestrator:
                                        'confirmations': best.confirmations,
                                        'missing': best.missing})()
                     )
-                    mem_veto = (
-                        mem_check.available
-                        and (mem_check.similarity < 0.50
-                             or mem_check.historical_wr < 0.30)
-                    )
+                    mem_assessment = self._memory.assess_match(mem_check)
+                    mem_veto = mem_assessment["hard_veto"]
+                    memory_soft_penalty = mem_assessment["penalty"]
+                    decision_score = max(0.0, best.score - memory_soft_penalty)
                     if mem_veto:
                         logger.info("%s: memory veto sim=%.2f wr=%.2f",
                                     clean, mem_check.similarity, mem_check.historical_wr)
+                    elif mem_assessment["soft_veto"]:
+                        logger.info(
+                            "%s: memory soft veto wr=%.2f penalty=%.2f score %.2f→%.2f",
+                            clean, mem_check.historical_wr, memory_soft_penalty,
+                            best.score, decision_score,
+                        )
 
                     # Lever 5: Heatmap conflict — opposing magnet closer than TP1
                     heatmap_conflict = False
@@ -280,6 +285,7 @@ class ICTOrchestrator:
                         and not blackout
                         and bias_agrees
                         and not mem_veto
+                        and decision_score >= mem_assessment["score_floor"]
                         and not heatmap_conflict
                     )
                     if not bias_agrees:
@@ -288,7 +294,7 @@ class ICTOrchestrator:
                     r = ScanResult(
                         pair=clean, timestamp=now.isoformat(),
                         signal=best.direction, grade=best.grade.value,
-                        score=round(best.score, 2), session=sess_name,
+                        score=round(decision_score, 2), session=sess_name,
                         is_primary=is_primary, actionable=is_actionable,
                         entry_level=getattr(best, 'entry_level', None),
                         stop=getattr(sz, 'stop_loss', None),
@@ -344,13 +350,20 @@ class ICTOrchestrator:
 
                 # ── Paper trading ─────────────────────────────────────────
                 bar = df.iloc[-1]
-                self._paper.update_trades({
+                closed_updates = self._paper.update_trades({
                     clean: {
                         'high':  float(bar['High']),
                         'low':   float(bar['Low']),
                         'close': float(bar['Close']),
                     }
                 })
+                for t in closed_updates:
+                    self._memory.record_outcome(
+                        trade_id=t.id,
+                        pair=t.pair,
+                        outcome=t.outcome,
+                        pnl_r=t.pnl_r,
+                    )
 
                 # Open new trade if actionable — apply regime TP ratios
                 if isinstance(r, ScanResult) and r.actionable:
@@ -390,6 +403,13 @@ class ICTOrchestrator:
             closed = self._paper.close_session('NY_PM_END')
             if closed:
                 logger.info("Session ended — closed %d trade(s)", len(closed))
+            for t in closed:
+                self._memory.record_outcome(
+                    trade_id=t.id,
+                    pair=t.pair,
+                    outcome=t.outcome,
+                    pnl_r=t.pnl_r,
+                )
 
         # Push running paper stats + macro context to Firebase
         stats           = self._paper.get_stats()
