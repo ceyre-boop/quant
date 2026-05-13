@@ -101,7 +101,8 @@ def test_can_run_experiment_below_threshold_blocked():
     ok, msg = can_run_experiment(50, "parameter_nudge")
     assert ok is False
     assert "Insufficient data" in msg
-    assert "50 more required" in msg or "50 more" in msg or str(MINIMUM_TRADES_FOR_PARAMETER_TUNING - 50) in msg
+    shortfall = MINIMUM_TRADES_FOR_PARAMETER_TUNING - 50
+    assert str(shortfall) in msg
 
 
 def test_can_run_experiment_at_threshold_allowed():
