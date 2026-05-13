@@ -475,6 +475,9 @@ class SovereignBacktest:
                 hmm_transition_prob=float(position.get('hmm_transition_prob', 0.5)),
                 hurst=float(position.get('hurst', 0.5)),
                 adx=float(position.get('adx', 20.0)),
+                pnl_override=float(pnl_dollars),
+                entry_time=position['entry_date'],
+                exit_time=exit_date,
             )
         except Exception:
             try:

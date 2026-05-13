@@ -1,6 +1,18 @@
 #!/usr/bin/env python3
 """
 Run replay validation over recent history and enforce ML gate checks.
+
+Pass criteria:
+- 3x-slippage stress test passes in backtest result
+- all gate checks in this script evaluate True
+
+Exit codes:
+- 0: replay_passed=True
+- 1: replay_passed=False (including dependency/runtime failure)
+
+Outputs:
+- Writes a structured JSON report (default: data/reports/replay_validation_latest.json)
+  used by phase-11 guardrails.
 """
 
 from __future__ import annotations
@@ -8,13 +20,14 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Dict, List
 
-from config.loader import params
-from sovereign.validation.backtest_engine import SovereignBacktest
-
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 def _is_finite_number(x: Any) -> bool:
     try:
@@ -80,6 +93,8 @@ def run_replay(symbols: List[str], days: int) -> Dict[str, Any]:
     end = datetime.now(timezone.utc).date()
     start = end - timedelta(days=days)
 
+    from sovereign.validation.backtest_engine import SovereignBacktest
+
     bt = SovereignBacktest(
         symbols=symbols,
         start_date=start.strftime("%Y-%m-%d"),
@@ -117,7 +132,7 @@ def main() -> int:
     parser.add_argument(
         "--symbols",
         nargs="*",
-        default=params.get("universe", {}).get("trinity_assets", ["META", "PFE", "UNH"]),
+        default=None,
         help="Symbols to replay",
     )
     parser.add_argument(
@@ -128,7 +143,21 @@ def main() -> int:
     args = parser.parse_args()
 
     repo_root = Path(__file__).resolve().parents[1]
-    report = run_replay(symbols=args.symbols, days=args.days)
+    symbols = args.symbols
+    if not symbols:
+        from config.loader import params
+        symbols = params.get("universe", {}).get("trinity_assets", ["META", "PFE", "UNH"])
+
+    try:
+        report = run_replay(symbols=symbols, days=args.days)
+    except Exception as e:
+        report = {
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "window": {"days": args.days},
+            "symbols": symbols,
+            "replay_passed": False,
+            "error": str(e),
+        }
 
     out_path = repo_root / args.out
     out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -139,4 +168,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

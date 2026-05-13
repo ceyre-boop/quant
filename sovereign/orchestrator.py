@@ -17,7 +17,7 @@ Teardown implemented per operator directive:
 import json
 import logging
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional, Dict, Any, List
 
@@ -635,7 +635,7 @@ class SovereignOrchestrator:
         cold += 0 if bs_fitted else 1
 
         snapshot = {
-            "timestamp": datetime.utcnow().isoformat() + "Z",
+            "timestamp": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
             "modules": modules,
             "ensemble_vote": {
                 "regime": regime,
@@ -1894,6 +1894,9 @@ class SovereignOrchestrator:
         adx: float = 20.0,
         drawdown_pct: float = 0.0,
         consecutive_losses: int = 0,
+        pnl_override: Optional[float] = None,
+        entry_time=None,
+        exit_time=None,
     ):
         """
         Call this whenever a trade closes (SL hit, TP hit, manual exit, end-of-day).
@@ -1910,7 +1913,9 @@ class SovereignOrchestrator:
           6. Pegasus.reinforce_update()       — REINFORCE policy gradient step
           7. _last_trade_state update         — feeds LQR + TradeMDP next session
         """
-        pnl = (exit_price - entry_price) * size * (1 if direction == 'LONG' else -1)
+        pnl = float(pnl_override) if pnl_override is not None else (
+            (exit_price - entry_price) * size * (1 if direction == 'LONG' else -1)
+        )
         won = pnl > 0
 
         # 1. Persistent ledger record
@@ -1920,6 +1925,7 @@ class SovereignOrchestrator:
                 entry_price=entry_price, exit_price=exit_price, size=size,
                 sl=sl, tp=tp, confidence=confidence, pnl=pnl,
                 strategy=strategy, exit_reason=exit_reason,
+                entry_time=entry_time, exit_time=exit_time,
             )
         except Exception as e:
             logger.warning(f"[on_trade_close] ledger write failed: {e}")

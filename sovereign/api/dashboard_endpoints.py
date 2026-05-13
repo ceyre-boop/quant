@@ -7,6 +7,7 @@ The dashboard shows you exactly what to fix next.
 
 from flask import Blueprint, jsonify, request
 import logging
+import threading
 from datetime import datetime, timedelta
 import pandas as pd
 
@@ -28,12 +29,15 @@ sim_loop = SimulationLoop(signal_engine, trainer, data_provider)
 # Cache for latest results
 last_metrics = {}
 _snapshot_orchestrator = None
+_snapshot_orchestrator_lock = threading.Lock()
 
 
 def _get_snapshot_orchestrator():
     global _snapshot_orchestrator
     if _snapshot_orchestrator is None:
-        _snapshot_orchestrator = SovereignOrchestrator(mode='paper')
+        with _snapshot_orchestrator_lock:
+            if _snapshot_orchestrator is None:
+                _snapshot_orchestrator = SovereignOrchestrator(mode='paper')
     return _snapshot_orchestrator
 
 @sovereign_bp.route('/simulation/run', methods=['GET'])
@@ -147,4 +151,4 @@ def get_ml_snapshot():
         return jsonify(orch.get_latest_ml_snapshot())
     except Exception as e:
         logger.error(f"ML snapshot fetch failed: {e}")
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": "ml_snapshot_unavailable"}), 500

@@ -12,13 +12,15 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict
 
-from sovereign.orchestrator import SovereignOrchestrator
-
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 REQUIRED_CLOSED_FEATURES = [
     "regime",
@@ -92,8 +94,15 @@ def audit_checkpoints(repo_root: Path) -> Dict[str, Any]:
 
 def run_audit(repo_root: Path) -> Dict[str, Any]:
     ledger = audit_ledger(repo_root)
-    orch = SovereignOrchestrator(mode="paper")
-    snapshot = orch.get_latest_ml_snapshot()
+    snapshot = {}
+    snapshot_error = None
+    try:
+        from sovereign.orchestrator import SovereignOrchestrator
+        orch = SovereignOrchestrator(mode="paper")
+        snapshot = orch.get_latest_ml_snapshot()
+    except Exception as e:
+        snapshot_error = str(e)
+
     checkpoints = audit_checkpoints(repo_root)
 
     return {
@@ -101,6 +110,7 @@ def run_audit(repo_root: Path) -> Dict[str, Any]:
         "repo_root": str(repo_root),
         "ledger": ledger,
         "startup_ml_snapshot": snapshot,
+        "startup_ml_snapshot_error": snapshot_error,
         "checkpoints": checkpoints,
         "ready_for_warm_start": bool(
             ledger["has_bootstrap_depth_50"] and ledger["complete_closed_features"]
@@ -129,4 +139,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
