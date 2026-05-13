@@ -22,6 +22,9 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+# Required for ledger bootstrap + three-vote diagnostics:
+# - regime/hurst/hmm_transition_prob/adx/strategy feed Softmax/KMeans/PredictNow
+# - pnl is required to derive trade outcome labels (win/loss) for online learners
 REQUIRED_CLOSED_FEATURES = [
     "regime",
     "hurst",

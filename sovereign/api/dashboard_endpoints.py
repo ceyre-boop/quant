@@ -34,10 +34,9 @@ _snapshot_orchestrator_lock = threading.Lock()
 
 def _get_snapshot_orchestrator():
     global _snapshot_orchestrator
-    if _snapshot_orchestrator is None:
-        with _snapshot_orchestrator_lock:
-            if _snapshot_orchestrator is None:
-                _snapshot_orchestrator = SovereignOrchestrator(mode='paper')
+    with _snapshot_orchestrator_lock:
+        if _snapshot_orchestrator is None:
+            _snapshot_orchestrator = SovereignOrchestrator(mode='paper')
     return _snapshot_orchestrator
 
 @sovereign_bp.route('/simulation/run', methods=['GET'])

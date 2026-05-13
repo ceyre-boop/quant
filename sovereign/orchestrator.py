@@ -635,7 +635,7 @@ class SovereignOrchestrator:
         cold += 0 if bs_fitted else 1
 
         snapshot = {
-            "timestamp": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+            "timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
             "modules": modules,
             "ensemble_vote": {
                 "regime": regime,

@@ -29,6 +29,13 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+PEGASUS_EXEC_THRESHOLD = 20
+PEGASUS_FULL_THRESHOLD = 30
+FLOAT_EPS = 1e-6
+FLOAT_ZERO = 0.0
+FLOAT_ONE = 1.0
+
+
 def _is_finite_number(x: Any) -> bool:
     try:
         return math.isfinite(float(x))
@@ -61,12 +68,12 @@ def evaluate_gates(snapshot: Dict[str, Any], history_count: int) -> Dict[str, An
 
     peg_updates = int(pegasus.get("updates", 0))
     peg_trust = float(pegasus.get("trust", 0.0))
-    if peg_updates < 20:
-        pegasus_gate_ok = abs(peg_trust) <= 1e-6
-    elif peg_updates < 30:
-        pegasus_gate_ok = 0.0 <= peg_trust <= 1.0
+    if peg_updates < PEGASUS_EXEC_THRESHOLD:
+        pegasus_gate_ok = abs(peg_trust) <= FLOAT_EPS
+    elif peg_updates < PEGASUS_FULL_THRESHOLD:
+        pegasus_gate_ok = FLOAT_ZERO <= peg_trust <= FLOAT_ONE
     else:
-        pegasus_gate_ok = abs(peg_trust - 1.0) <= 1e-6
+        pegasus_gate_ok = abs(peg_trust - FLOAT_ONE) <= FLOAT_EPS
 
     bounded_keys = ["mdp_mult", "lqr_mult", "vol_mult", "pegasus_mult", "position_size"]
     bounded_ok = all(

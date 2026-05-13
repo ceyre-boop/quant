@@ -30,6 +30,7 @@ logging.basicConfig(
 )
 
 logger = logging.getLogger(__name__)
+REPLAY_VALIDATION_REPORT_PATH = Path("data/reports/replay_validation_latest.json")
 
 
 def run_phase_9():
@@ -86,7 +87,7 @@ def run_phase_11(start_campaign=False, daily_cycle=False):
         campaign_name='sovereign_paper_v1'
     )
 
-    replay_report_path = Path("data/reports/replay_validation_latest.json")
+    replay_report_path = REPLAY_VALIDATION_REPORT_PATH
     replay_passed = False
     if replay_report_path.exists():
         try:
