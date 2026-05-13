@@ -37,7 +37,7 @@ def _get_snapshot_orchestrator():
     with _snapshot_orchestrator_lock:
         if _snapshot_orchestrator is None:
             _snapshot_orchestrator = SovereignOrchestrator(mode='paper')
-    return _snapshot_orchestrator
+        return _snapshot_orchestrator
 
 @sovereign_bp.route('/simulation/run', methods=['GET'])
 def run_simulation():

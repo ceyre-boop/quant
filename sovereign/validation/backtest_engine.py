@@ -124,8 +124,8 @@ class SovereignBacktest:
         try:
             result.diagnostics['ml_snapshot'] = self.orchestrator.get_latest_ml_snapshot()
             result.diagnostics['ml_snapshot_count'] = len(getattr(self.orchestrator, "_ml_snapshot_history", []))
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning(f"ML snapshot attachment failed: {e}")
 
         # Run 3x slippage stress test
         logger.info("Running 3x slippage stress test...")
@@ -479,7 +479,8 @@ class SovereignBacktest:
                 entry_time=position['entry_date'],
                 exit_time=exit_date,
             )
-        except Exception:
+        except Exception as e:
+            logger.warning(f"orchestrator.on_trade_close failed, falling back to ledger log_close: {e}")
             try:
                 self.trade_ledger.log_close(
                     trade_id=f"BT_{symbol}_{position['entry_date'].strftime('%Y%m%d%H%M%S')}",

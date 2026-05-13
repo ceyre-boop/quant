@@ -31,9 +31,8 @@ if str(ROOT) not in sys.path:
 
 PEGASUS_EXEC_THRESHOLD = 20
 PEGASUS_FULL_THRESHOLD = 30
+MDP_LEARNED_POLICY_THRESHOLD = 20
 FLOAT_EPS = 1e-6
-FLOAT_ZERO = 0.0
-FLOAT_ONE = 1.0
 
 
 def _is_finite_number(x: Any) -> bool:
@@ -64,16 +63,19 @@ def evaluate_gates(snapshot: Dict[str, Any], history_count: int) -> Dict[str, An
     pegasus = modules.get("pegasus", {})
     mdp_trades = int(mdp.get("trades", 0))
     mdp_policy = str(mdp.get("policy_source", "expert_prior"))
-    mdp_gate_ok = (mdp_trades < 20 and mdp_policy == "expert_prior") or (mdp_trades >= 20 and mdp_policy == "learned")
+    mdp_gate_ok = (
+        (mdp_trades < MDP_LEARNED_POLICY_THRESHOLD and mdp_policy == "expert_prior")
+        or (mdp_trades >= MDP_LEARNED_POLICY_THRESHOLD and mdp_policy == "learned")
+    )
 
     peg_updates = int(pegasus.get("updates", 0))
     peg_trust = float(pegasus.get("trust", 0.0))
     if peg_updates < PEGASUS_EXEC_THRESHOLD:
         pegasus_gate_ok = abs(peg_trust) <= FLOAT_EPS
     elif peg_updates < PEGASUS_FULL_THRESHOLD:
-        pegasus_gate_ok = FLOAT_ZERO <= peg_trust <= FLOAT_ONE
+        pegasus_gate_ok = 0.0 <= peg_trust <= 1.0
     else:
-        pegasus_gate_ok = abs(peg_trust - FLOAT_ONE) <= FLOAT_EPS
+        pegasus_gate_ok = abs(peg_trust - 1.0) <= FLOAT_EPS
 
     bounded_keys = ["mdp_mult", "lqr_mult", "vol_mult", "pegasus_mult", "position_size"]
     bounded_ok = all(

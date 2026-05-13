@@ -23,8 +23,12 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 # Required for ledger bootstrap + three-vote diagnostics:
-# - regime/hurst/hmm_transition_prob/adx/strategy feed Softmax/KMeans/PredictNow
-# - pnl is required to derive trade outcome labels (win/loss) for online learners
+# - regime                -> SoftmaxRegimeClassifier labels; KMeans regime diagnostics
+# - hurst                 -> Softmax/KMeans/PredictNow feature vectors
+# - hmm_transition_prob   -> Softmax/KMeans/PredictNow feature vectors
+# - adx                   -> Softmax/KMeans/PredictNow feature vectors
+# - strategy              -> Softmax/PredictNow feature encoding
+# - pnl                   -> win/loss outcome label for PredictNow/online learners
 REQUIRED_CLOSED_FEATURES = [
     "regime",
     "hurst",

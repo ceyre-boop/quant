@@ -1255,7 +1255,7 @@ class SovereignOrchestrator:
             self._ml_snapshot_history.append(_snapshot)
             if len(self._ml_snapshot_history) > 500:
                 self._ml_snapshot_history = self._ml_snapshot_history[-500:]
-            logger.info(f"[ML_SNAPSHOT] {json.dumps(_snapshot, default=str)}")
+            logger.debug(f"[ML_SNAPSHOT] {json.dumps(_snapshot, default=str)}")
         except Exception as _mse:
             logger.debug(f"[ML_SNAPSHOT] non-fatal: {_mse}")
 
