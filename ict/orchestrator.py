@@ -235,17 +235,17 @@ class ICTOrchestrator:
                     )
                     mem_assessment = self._memory.assess_match(mem_check)
                     mem_veto = mem_assessment["hard_veto"]
-                    memory_soft_penalty = mem_assessment["penalty"]
+                    soft_penalty_value = mem_assessment["penalty"]
                     # Start with original score, reduce only for soft-veto clusters.
                     decision_score = best.score
                     if mem_veto:
                         logger.info("%s: memory veto sim=%.2f wr=%.2f",
                                     clean, mem_check.similarity, mem_check.historical_wr)
                     elif mem_assessment["soft_veto"]:
-                        decision_score = max(0.0, best.score - memory_soft_penalty)
+                        decision_score = max(0.0, best.score - soft_penalty_value)
                         logger.info(
                             "%s: memory soft veto wr=%.2f penalty=%.2f score %.2f→%.2f",
-                            clean, mem_check.historical_wr, memory_soft_penalty,
+                            clean, mem_check.historical_wr, soft_penalty_value,
                             best.score, decision_score,
                         )
 

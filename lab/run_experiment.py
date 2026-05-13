@@ -17,6 +17,9 @@ import logging
 logger = logging.getLogger(__name__)
 
 DEFAULT_THRESHOLDS = {
+    # Candidate must improve EV/trade by at least +0.05,
+    # must not increase max drawdown at all, and must pass
+    # at least 70% of configured walk-forward windows.
     "min_ev_improvement": 0.05,
     "max_dd_degradation": 0.0,
     "required_wf_pass_rate": 0.70,
@@ -97,12 +100,16 @@ def _extract_metric(metrics: Dict[str, Any], key: str, default: float = 0.0) -> 
     val = metrics.get(key, default)
     try:
         return float(val)
-    except Exception:
+    except (TypeError, ValueError):
         logger.warning(
             "Failed to convert metric %s=%r to float; using default %s",
             key, val, default,
         )
         return default
+
+
+def _normalize_yfinance_pairs(pairs: List[str]) -> List[str]:
+    return [f"{p}=X" if "=X" not in p else p for p in pairs]
 
 
 def evaluate_vs_baseline(
@@ -151,7 +158,7 @@ def _default_runner(candidate_config: Dict[str, Any], windows: List[str]) -> Dic
     pairs = candidate_config.get("sessions", {}).get(
         "ny_pm_pairs", ["GBPUSD", "EURUSD", "AUDUSD", "AUDNZD"]
     )
-    pairs = [f"{p}=X" if "=X" not in p else p for p in pairs]
+    pairs = _normalize_yfinance_pairs(pairs)
 
     with tempfile.NamedTemporaryFile("w", suffix=".yml", delete=False) as tmp:
         yaml.safe_dump(candidate_config, tmp, sort_keys=False)
@@ -175,7 +182,7 @@ def _default_runner(candidate_config: Dict[str, Any], windows: List[str]) -> Dic
             window_stats.append(stats)
             all_trades.extend(window_trades)
         total = compute_stats(all_trades)
-        pos_windows = sum(1 for s in window_stats if float(s.get("avg_r", 0)) > 0)
+        pos_windows = sum(1 for s in window_stats if _extract_metric(s, "avg_r") > 0)
         total["ev_per_trade"] = float(total.get("avg_r", 0.0))
         total["max_dd"] = abs(float(total.get("max_dd_pct", 0.0)))
         total["wf_pass_rate"] = (pos_windows / len(window_stats)) if window_stats else 0.0

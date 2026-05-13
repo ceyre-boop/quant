@@ -121,7 +121,11 @@ sessions:
   london_only_pairs: ["GBPUSD"]
   ny_pm_pairs: ["GBPUSD", "EURUSD", "AUDUSD", "AUDNZD"]
 
-# step: suggested increment size for grid search / Bayesian-free numeric tuning.
+# ML mutation metadata:
+# - value: current champion value
+# - mutable_by_ml: whether automated mutation is allowed
+# - min/max: hard search bounds
+# - step: suggested increment for grid search / gradient-free tuning
 ml_lab:
   pipeline:
     atr_spike_veto_multiplier:

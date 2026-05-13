@@ -123,6 +123,13 @@ class ICTMemoryEngine:
         pair_closed = [s for s in closed if s['pair'] == scan_result.pair]
         if len(pair_closed) < 10:
             pair_closed = closed  # fall back to all pairs if not enough pair-specific
+        if len(pair_closed) < 2:
+            return MemoryMatch(
+                pair=scan_result.pair, cluster=-1, similarity=0.0,
+                expected_outcome='INSUFFICIENT_DATA',
+                historical_wr=0.0, n_samples=len(pair_closed),
+                analog_date='', analog_outcome='', available=False,
+            )
 
         # Find k-means clusters (default k=3: win / loss / flat)
         cluster_k = max(2, min(self._cluster_k, len(pair_closed)))
