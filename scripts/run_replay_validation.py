@@ -131,6 +131,8 @@ def run_replay(symbols: List[str], days: int) -> Dict[str, Any]:
         "ml_snapshot": snapshot,
         "ml_snapshot_count": history_count,
         "gate_checks": gates,
+        # alias used by diagnostic/runbook snippets
+        "gate_results": gates,
         "replay_passed": bool(result.passed_3x_slippage and gates["all_pass"]),
     }
 

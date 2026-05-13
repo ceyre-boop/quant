@@ -498,8 +498,11 @@ class SovereignBacktest:
                     entry_time=position['entry_date'],
                     exit_time=exit_date,
                 )
-            except Exception:
-                pass
+            except Exception as le:
+                logger.error(
+                    f"[_close_position] ledger fallback log_close also failed for "
+                    f"{symbol} trade_id=BT_{symbol}_{position['entry_date'].strftime('%Y%m%d%H%M%S')}: {le}"
+                )
         del self.positions[symbol]
         
         emoji = "✅" if pnl_dollars > 0 else "❌"
