@@ -7,12 +7,14 @@ The dashboard shows you exactly what to fix next.
 
 from flask import Blueprint, jsonify, request
 import logging
+import threading
 from datetime import datetime, timedelta
 import pandas as pd
 
 from sovereign.signal_engine import SignalEngine
 from sovereign.ml_trainer import MLTrainer
 from sovereign.simulation import SimulationLoop
+from sovereign.orchestrator import SovereignOrchestrator
 from data.providers import get_provider
 
 logger = logging.getLogger(__name__)
@@ -26,6 +28,16 @@ sim_loop = SimulationLoop(signal_engine, trainer, data_provider)
 
 # Cache for latest results
 last_metrics = {}
+_snapshot_orchestrator = None
+_snapshot_orchestrator_lock = threading.Lock()
+
+
+def _get_snapshot_orchestrator():
+    global _snapshot_orchestrator
+    with _snapshot_orchestrator_lock:
+        if _snapshot_orchestrator is None:
+            _snapshot_orchestrator = SovereignOrchestrator(mode='paper')
+        return _snapshot_orchestrator
 
 @sovereign_bp.route('/simulation/run', methods=['GET'])
 def run_simulation():
@@ -125,3 +137,17 @@ def get_current_regime():
             }
             
     return jsonify(regimes)
+
+
+@sovereign_bp.route('/ml/snapshot', methods=['GET'])
+def get_ml_snapshot():
+    """
+    Consolidated runtime snapshot for all 10 ML modules + ensemble vote.
+    Operational surface for monitoring and lab orchestration prompts.
+    """
+    try:
+        orch = _get_snapshot_orchestrator()
+        return jsonify(orch.get_latest_ml_snapshot())
+    except Exception as e:
+        logger.error(f"ML snapshot fetch failed: {e}")
+        return jsonify({"error": "ml_snapshot_unavailable"}), 500

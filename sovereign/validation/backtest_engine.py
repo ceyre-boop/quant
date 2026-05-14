@@ -120,6 +120,13 @@ class SovereignBacktest:
         logger.info("Calculating performance metrics...")
         result = self._calculate_metrics()
         
+        # Attach orchestrator ML snapshot diagnostics before stress test reset
+        try:
+            result.diagnostics['ml_snapshot'] = self.orchestrator.get_latest_ml_snapshot()
+            result.diagnostics['ml_snapshot_count'] = len(getattr(self.orchestrator, "_ml_snapshot_history", []))
+        except Exception as e:
+            logger.warning(f"ML snapshot attachment failed: {e}")
+
         # Run 3x slippage stress test
         logger.info("Running 3x slippage stress test...")
         result_3x = self._run_slippage_stress_test()
@@ -313,12 +320,29 @@ class SovereignBacktest:
             )
             
             if result and result.get('status') == 'EXECUTED':
-                self._execute_trade(symbol, row, date, result)
+                self._execute_trade(
+                    symbol=symbol,
+                    row=row,
+                    date=date,
+                    result=result,
+                    h_short=h_short,
+                    hmm_transition_prob=float(regime.hmm_transition_prob),
+                    adx=float(regime.adx),
+                )
                 
         except Exception as e:
             logger.error(f"Error checking signals for {symbol}: {e}")
     
-    def _execute_trade(self, symbol: str, row: pd.Series, date: datetime, result: Dict):
+    def _execute_trade(
+        self,
+        symbol: str,
+        row: pd.Series,
+        date: datetime,
+        result: Dict,
+        h_short: float = 0.5,
+        hmm_transition_prob: float = 0.5,
+        adx: float = 20.0,
+    ):
         """Simulate trade execution with slippage."""
         # Apply slippage to entry
         direction = 1 if result.get('direction') == 'LONG' else -1
@@ -341,7 +365,13 @@ class SovereignBacktest:
             'stop_loss': stop_price,
             'take_profit': tp_price,
             'direction': direction,
-            'commission_paid': commission_cost
+            'commission_paid': commission_cost,
+            'regime': result.get('regime', 'FLAT'),
+            'strategy': result.get('strategy', 'backtest'),
+            'confidence': float(result.get('confidence', 0.5)),
+            'hmm_transition_prob': float(hmm_transition_prob),
+            'hurst': float(h_short),
+            'adx': float(adx),
         }
         
         self.positions[symbol] = position
@@ -429,7 +459,7 @@ class SovereignBacktest:
         
         self.trades.append(trade)
         try:
-            self.trade_ledger.log_close(
+            self.orchestrator.on_trade_close(
                 trade_id=f"BT_{symbol}_{position['entry_date'].strftime('%Y%m%d%H%M%S')}",
                 symbol=symbol,
                 direction='LONG' if direction == 1 else 'SHORT',
@@ -438,15 +468,41 @@ class SovereignBacktest:
                 size=position['position_value'],
                 sl=position['stop_loss'],
                 tp=position['take_profit'],
-                confidence=0.5,
-                pnl=pnl_dollars,
-                strategy='backtest',
+                confidence=float(position.get('confidence', 0.5)),
+                strategy=position.get('strategy', 'backtest'),
                 exit_reason=reason,
+                regime=position.get('regime', 'FLAT'),
+                hmm_transition_prob=float(position.get('hmm_transition_prob', 0.5)),
+                hurst=float(position.get('hurst', 0.5)),
+                adx=float(position.get('adx', 20.0)),
+                pnl_override=float(pnl_dollars),
                 entry_time=position['entry_date'],
                 exit_time=exit_date,
             )
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning(f"orchestrator.on_trade_close failed, falling back to ledger log_close: {e}")
+            try:
+                self.trade_ledger.log_close(
+                    trade_id=f"BT_{symbol}_{position['entry_date'].strftime('%Y%m%d%H%M%S')}",
+                    symbol=symbol,
+                    direction='LONG' if direction == 1 else 'SHORT',
+                    entry_price=position['entry_price'],
+                    exit_price=filled_exit,
+                    size=position['position_value'],
+                    sl=position['stop_loss'],
+                    tp=position['take_profit'],
+                    confidence=float(position.get('confidence', 0.5)),
+                    pnl=pnl_dollars,
+                    strategy=position.get('strategy', 'backtest'),
+                    exit_reason=reason,
+                    entry_time=position['entry_date'],
+                    exit_time=exit_date,
+                )
+            except Exception as le:
+                logger.error(
+                    f"[_close_position] ledger fallback log_close also failed for "
+                    f"{symbol} trade_id=BT_{symbol}_{position['entry_date'].strftime('%Y%m%d%H%M%S')}: {le}"
+                )
         del self.positions[symbol]
         
         emoji = "✅" if pnl_dollars > 0 else "❌"
