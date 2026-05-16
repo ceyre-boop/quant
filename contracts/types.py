@@ -80,6 +80,91 @@ class FeatureGroup(Enum):
 
 # =============================================================================
 # Regime State (5-axis classification)
+@dataclass
+class CatalystWindowState:
+    """OU mean-reversion model + CB calendar window state."""
+    ou_half_life_days:    float
+    ou_reversion_days:    float
+    ou_confidence:        str            # LOW | MEDIUM | HIGH
+    next_cb_event_bank:   Optional[str]  # e.g. 'FED', 'BOE'
+    next_cb_event_days:   int
+    cb_blackout_active:   bool
+    catalyst_urgency:     str            # NONE | DISTANT | NEAR | IMMINENT
+
+
+@dataclass
+class PriceRegimeState:
+    """Dimension 1 — price-regime classification."""
+    hurst_short:          float
+    hurst_long:           float
+    hurst_signal:         str
+    hmm_state:            int
+    hmm_state_label:      str
+    hmm_transition_prob:  float
+    adx:                  float
+    adx_signal:           str
+    regime:               str
+    regime_confidence:    float
+
+
+@dataclass
+class MacroRegimeState:
+    """Dimension 2 — macro-regime classification."""
+    yield_curve_slope:    Optional[float]
+    yield_curve_velocity: Optional[float]
+    erp:                  Optional[float]
+    cape_zscore:          Optional[float]
+    cot_zscore:           Optional[float]
+    m2_velocity:          float
+    hyg_spread_bps:       float
+    macro_signal:         str
+
+
+@dataclass
+class PositioningState:
+    """Dimension 3 — COT / positioning."""
+    cot_zscore:           float
+    cot_symbol:           str
+    positioning_bias:     str            # LONG | SHORT | NEUTRAL
+    source:               str            # cot_live | cot_cached | none
+
+
+@dataclass
+class NarrativeState:
+    """Dimension 4 — TradingAgents narrative."""
+    summary:    str
+    sentiment:  str   # BULLISH | BEARISH | NEUTRAL
+    confidence: float
+    source:     str   # tradingagents | none
+
+
+@dataclass
+class HistoricalMatchState:
+    """Dimension 5 — Alexandrian Library historical match."""
+    regime_label:         str
+    similarity_score:     float
+    volumes_converging:   int
+    typical_outcome:      str
+    lookback_period_days: int
+    source:               str   # alexandrian_library | none
+
+
+@dataclass
+class PresentState:
+    """Full multi-dimensional present-state snapshot for one symbol."""
+    symbol:             str
+    timestamp:          str
+    price_regime:       PriceRegimeState
+    macro_regime:       MacroRegimeState
+    positioning:        PositioningState
+    narrative:          NarrativeState
+    historical_match:   HistoricalMatchState
+    catalyst_window:    CatalystWindowState
+    dimensions_active:  int
+    alignment_score:    float
+    alignment_label:    str   # STRONG_ALIGN | ALIGN | NEUTRAL | CONFLICT | STRONG_CONFLICT
+
+
 # =============================================================================
 
 @dataclass
