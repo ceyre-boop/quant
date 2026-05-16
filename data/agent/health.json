@@ -1,0 +1,27 @@
+{
+  "timestamp": "2026-05-16T14:04:56",
+  "overall": "YELLOW",
+  "components": {
+    "duckdb": {
+      "status": "YELLOW",
+      "detail": "duckdb not installed"
+    },
+    "ollama": {
+      "status": "YELLOW",
+      "detail": "no response"
+    },
+    "yfinance": {
+      "status": "YELLOW",
+      "detail": "yfinance not installed"
+    },
+    "ict_scanner": {
+      "status": "YELLOW",
+      "detail": "log is 5.3h old"
+    },
+    "backtest_engine": {
+      "status": "GREEN",
+      "detail": "file present"
+    }
+  },
+  "last_checked": "2026-05-16T14:04:56"
+}

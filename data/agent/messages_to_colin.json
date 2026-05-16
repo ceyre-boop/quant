@@ -1,0 +1,142 @@
+{
+  "messages": [
+    {
+      "id": "msg-20260516140456",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "Task RQ-001 (E1 rate divergence at 60-day hold) failed: DRY RUN: E1 rate divergence at 60-day hold \u2014 not executed",
+      "timestamp": "2026-05-16T14:04:56",
+      "read": false
+    },
+    {
+      "id": "msg-20260516140424",
+      "priority": "FYI",
+      "emoji": "\ud83d\udfe2",
+      "text": "Library feature transparency [PARTIAL]: Library loaded but internal structure not inspectable via public API. The library uses cosine similarity on 23 features. Primary match: SHALE_SUPPLY_OIL_CRASH (sim=0.940). Feature transparency requires exposing feature_names attribute. Recommendation: add get_feature_weights() me",
+      "timestamp": "2026-05-16T14:04:24",
+      "read": false
+    },
+    {
+      "id": "msg-20260516140415",
+      "priority": "FYI",
+      "emoji": "\ud83d\udfe2",
+      "text": "March JPY full history 2010-2024 [DRY_RUN]: March JPY handler \u2014 would run 2010-2024 with pre/post-2015 split",
+      "timestamp": "2026-05-16T14:04:15",
+      "read": false
+    },
+    {
+      "id": "msg-20260516140415",
+      "priority": "FYI",
+      "emoji": "\ud83d\udfe2",
+      "text": "Library feature transparency [DRY_RUN]: Library feature handler \u2014 would analyze CRITICAL match drivers",
+      "timestamp": "2026-05-16T14:04:15",
+      "read": false
+    },
+    {
+      "id": "msg-20260516135445",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "Task RQ-001 (E1 rate divergence at 60-day hold) failed: DRY RUN: E1 rate divergence at 60-day hold \u2014 not executed",
+      "timestamp": "2026-05-16T13:54:45",
+      "read": false
+    },
+    {
+      "id": "boot-001",
+      "priority": "FYI",
+      "emoji": "\ud83d\udfe2",
+      "text": "Research agent data layer initialized. Run agent_scheduler.py to begin autonomous research cycles.",
+      "timestamp": "2026-05-16T00:00:00",
+      "read": false
+    },
+    {
+      "id": "oracle-20260516150512",
+      "priority": "FYI",
+      "emoji": "\ud83d\udfe2",
+      "text": "DRY RUN: Oracle would have called Claude here and written a message based on current system state.",
+      "timestamp": "2026-05-16T15:05:12.694617",
+      "read": false,
+      "source": "oracle"
+    },
+    {
+      "id": "oracle-20260516150639",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "Oracle failed: ANTHROPIC_API_KEY not set. Set it and re-run.",
+      "timestamp": "2026-05-16T15:06:39.941773",
+      "read": false,
+      "source": "oracle"
+    },
+    {
+      "id": "oracle-20260516150706",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "Oracle failed: ANTHROPIC_API_KEY not set. Set it and re-run.",
+      "timestamp": "2026-05-16T15:07:06.455690",
+      "read": false,
+      "source": "oracle"
+    },
+    {
+      "id": "oracle-20260516150730",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "Oracle failed: ANTHROPIC_API_KEY not set. Set it and re-run.",
+      "timestamp": "2026-05-16T15:07:30.839045",
+      "read": false,
+      "source": "oracle"
+    },
+    {
+      "id": "oracle-20260516150741",
+      "priority": "FYI",
+      "emoji": "\ud83d\udfe2",
+      "text": "DRY RUN: Oracle would have called Claude here and written a message based on current system state.",
+      "timestamp": "2026-05-16T15:07:41.638829",
+      "read": false,
+      "source": "oracle"
+    },
+    {
+      "id": "oracle-20260516162803",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "Oracle failed: ANTHROPIC_API_KEY not set. Set it and re-run.",
+      "timestamp": "2026-05-16T16:28:03.069131",
+      "read": false,
+      "source": "oracle"
+    },
+    {
+      "id": "oracle-20260516162817",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "Oracle error: BadRequestError: Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purcha",
+      "timestamp": "2026-05-16T16:28:17.097109",
+      "read": false,
+      "source": "oracle"
+    },
+    {
+      "id": "oracle-20260516163410",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "Your forex pipeline is dead in the water right now \u2014 every major pair is vetoed because ADR is exhausted, and the scanner log is 5+ hours stale. You should restart the ICT scanner and check what's actually moving before you process another veto. The pattern repeats identically every 5 minutes, which means either the scanner is stuck or you're looking at cached stale data.\n\nThe good news: your core edges are holding (v004 macro validates, ICT FVG still positive), and you've got two live tests running on rate",
+      "timestamp": "2026-05-16T16:34:10.762992",
+      "read": false,
+      "source": "oracle"
+    },
+    {
+      "id": "oracle-20260516163438",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "The system is choking on infrastructure and you're flying blind on data freshness. Your ICT scanner hasn't logged in 5 hours, your core dependencies (duckdb, ollama, yfinance) are offline, and you're sitting on repeated vetoes from the same four pairs because volatility has already exhausted the available range for the day\u2014which means you're not getting new signal, you're just checking the same stale conditions repeatedly.\n\nOn the positive side: your hypothesis work is solid. E1 divergence and calendar edges are still testing, your v004 macro system validated, and ICT FVG replicates. That's real. But you can't act on any of it if the plumbing is broken.\n\nYou",
+      "timestamp": "2026-05-16T16:34:38.515297",
+      "read": false,
+      "source": "oracle"
+    },
+    {
+      "id": "oracle-20260516163456",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "Your forex vetoes are screaming the same message \u2014 major pairs have exhausted their daily range, so the system is correctly staying out. That's working. But your infrastructure is rotting: duckdb and yfinance are missing, ollama isn't responding, and ict_scanner hasn't reported in over 5 hours. You should rebuild those dependencies and get fresh data before you trust any new signal coming through.",
+      "timestamp": "2026-05-16T16:34:56.433317",
+      "read": false,
+      "source": "oracle"
+    }
+  ]
+}
