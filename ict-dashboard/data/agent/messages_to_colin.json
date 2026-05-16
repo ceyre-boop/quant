@@ -1,59 +1,11 @@
 {
   "messages": [
     {
-      "id": "msg-20260516172434",
-      "priority": "IMPORTANT",
-      "emoji": "\ud83d\udfe1",
-      "text": "Task RQ-002 (March JPY full history 2010-2024) failed: DRY RUN: March JPY full history 2010-2024 \u2014 not executed",
-      "timestamp": "2026-05-16T17:24:34",
-      "read": false
-    },
-    {
-      "id": "msg-20260516172408",
-      "priority": "IMPORTANT",
-      "emoji": "\ud83d\udfe1",
-      "text": "Task RQ-001 (E1 rate divergence at 60-day hold) failed: DRY RUN: E1 rate divergence at 60-day hold \u2014 not executed",
-      "timestamp": "2026-05-16T17:24:08",
-      "read": false
-    },
-    {
-      "id": "msg-20260516140456",
-      "priority": "IMPORTANT",
-      "emoji": "\ud83d\udfe1",
-      "text": "Task RQ-001 (E1 rate divergence at 60-day hold) failed: DRY RUN: E1 rate divergence at 60-day hold \u2014 not executed",
-      "timestamp": "2026-05-16T14:04:56",
-      "read": false
-    },
-    {
       "id": "msg-20260516140424",
       "priority": "FYI",
       "emoji": "\ud83d\udfe2",
       "text": "Library feature transparency [PARTIAL]: Library loaded but internal structure not inspectable via public API. The library uses cosine similarity on 23 features. Primary match: SHALE_SUPPLY_OIL_CRASH (sim=0.940). Feature transparency requires exposing feature_names attribute. Recommendation: add get_feature_weights() me",
       "timestamp": "2026-05-16T14:04:24",
-      "read": false
-    },
-    {
-      "id": "msg-20260516140415",
-      "priority": "FYI",
-      "emoji": "\ud83d\udfe2",
-      "text": "March JPY full history 2010-2024 [DRY_RUN]: March JPY handler \u2014 would run 2010-2024 with pre/post-2015 split",
-      "timestamp": "2026-05-16T14:04:15",
-      "read": false
-    },
-    {
-      "id": "msg-20260516140415",
-      "priority": "FYI",
-      "emoji": "\ud83d\udfe2",
-      "text": "Library feature transparency [DRY_RUN]: Library feature handler \u2014 would analyze CRITICAL match drivers",
-      "timestamp": "2026-05-16T14:04:15",
-      "read": false
-    },
-    {
-      "id": "msg-20260516135445",
-      "priority": "IMPORTANT",
-      "emoji": "\ud83d\udfe1",
-      "text": "Task RQ-001 (E1 rate divergence at 60-day hold) failed: DRY RUN: E1 rate divergence at 60-day hold \u2014 not executed",
-      "timestamp": "2026-05-16T13:54:45",
       "read": false
     },
     {
@@ -63,60 +15,6 @@
       "text": "Research agent data layer initialized. Run agent_scheduler.py to begin autonomous research cycles.",
       "timestamp": "2026-05-16T00:00:00",
       "read": false
-    },
-    {
-      "id": "oracle-20260516150512",
-      "priority": "FYI",
-      "emoji": "\ud83d\udfe2",
-      "text": "DRY RUN: Oracle would have called Claude here and written a message based on current system state.",
-      "timestamp": "2026-05-16T15:05:12.694617",
-      "read": false,
-      "source": "oracle"
-    },
-    {
-      "id": "oracle-20260516150639",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "Oracle failed: ANTHROPIC_API_KEY not set. Set it and re-run.",
-      "timestamp": "2026-05-16T15:06:39.941773",
-      "read": false,
-      "source": "oracle"
-    },
-    {
-      "id": "oracle-20260516150706",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "Oracle failed: ANTHROPIC_API_KEY not set. Set it and re-run.",
-      "timestamp": "2026-05-16T15:07:06.455690",
-      "read": false,
-      "source": "oracle"
-    },
-    {
-      "id": "oracle-20260516150730",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "Oracle failed: ANTHROPIC_API_KEY not set. Set it and re-run.",
-      "timestamp": "2026-05-16T15:07:30.839045",
-      "read": false,
-      "source": "oracle"
-    },
-    {
-      "id": "oracle-20260516150741",
-      "priority": "FYI",
-      "emoji": "\ud83d\udfe2",
-      "text": "DRY RUN: Oracle would have called Claude here and written a message based on current system state.",
-      "timestamp": "2026-05-16T15:07:41.638829",
-      "read": false,
-      "source": "oracle"
-    },
-    {
-      "id": "oracle-20260516162803",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "Oracle failed: ANTHROPIC_API_KEY not set. Set it and re-run.",
-      "timestamp": "2026-05-16T16:28:03.069131",
-      "read": false,
-      "source": "oracle"
     },
     {
       "id": "oracle-20260516162817",
@@ -187,6 +85,15 @@
       "emoji": "\ud83d\udfe1",
       "text": "Your forex pairs are dead right now\u2014ADR exhaustion across majors is cleaning out every signal, which is why ICT is throwing nothing but zeros. Equity side is quiet too (ATR floor doing its job), so this is actually a clean holding pattern: system is working as designed, which means you wait. The two hypotheses in testing (rate divergence and calendar edges) should finish their dry runs before market opens tomorrow\u2014worth checking those first thing.",
       "timestamp": "2026-05-16T17:35:09.208336",
+      "read": false,
+      "source": "oracle"
+    },
+    {
+      "id": "oracle-20260516194041",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "Forex is exhausted today\u2014every major pair except AUDNZD got vetoed on ADR, which means the market moved hard and the system correctly stayed out. Your equity vetoes are stale (mid-May data on ATR thresholds), so either refresh those baselines or the scanner will keep rejecting decent candidates. The two active hypotheses are worth watching, but you should run that stop width sweep on the 8 pairs this week while conditions are live\u2014it might tighten edge quality on the next equity cycle.",
+      "timestamp": "2026-05-16T19:40:41.438954",
       "read": false,
       "source": "oracle"
     }

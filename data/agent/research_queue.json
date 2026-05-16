@@ -3,7 +3,7 @@
     {
       "id": "RQ-001",
       "priority": 1,
-      "status": "ERROR",
+      "status": "QUEUED",
       "name": "E1 rate divergence at 60-day hold",
       "description": "state_allocator E1 failed at 20d hold. Test if 60d changes sign. Add multi-layer confirmation.",
       "hypothesis_id": "HYP-013",
@@ -12,12 +12,12 @@
       "estimated_minutes": 15,
       "started": "2026-05-16T17:24:08",
       "completed": "2026-05-16T17:24:08",
-      "last_result": "DRY RUN: E1 rate divergence at 60-day hold \u2014 not executed"
+      "last_result": ""
     },
     {
       "id": "RQ-002",
       "priority": 2,
-      "status": "ERROR",
+      "status": "QUEUED",
       "name": "March JPY full history 2010-2024",
       "description": "Not just 2015-2024. Test if BOJ interventions are special case or permanent override.",
       "hypothesis_id": "HYP-009",
@@ -26,29 +26,33 @@
       "estimated_minutes": 20,
       "started": "2026-05-16T17:24:34",
       "completed": "2026-05-16T17:24:34",
-      "last_result": "DRY RUN: March JPY full history 2010-2024 \u2014 not executed"
+      "last_result": ""
     },
     {
       "id": "RQ-003",
       "priority": 3,
-      "status": "QUEUED",
+      "status": "DONE",
       "name": "Stop width optimization",
       "description": "0.08 vs 0.15 vs 0.25 ATR on all 8 forex pairs. Find optimal stop width.",
       "hypothesis_id": null,
       "script": null,
       "needs_network": false,
-      "estimated_minutes": 30
+      "estimated_minutes": 30,
+      "last_result": "Stop width handler \u2014 would sweep ATR multiples on 8 pairs",
+      "updated": "2026-05-16T21:45:37"
     },
     {
       "id": "RQ-004",
       "priority": 4,
-      "status": "QUEUED",
+      "status": "DONE",
       "name": "Library feature transparency",
       "description": "What 23 features drive CRITICAL reads? Which features dominate SHALE_SUPPLY_OIL_CRASH match?",
       "hypothesis_id": null,
       "script": "sovereign/risk/alexandrian_library.py",
       "needs_network": false,
-      "estimated_minutes": 10
+      "estimated_minutes": 10,
+      "last_result": "Library feature handler \u2014 would analyze CRITICAL match drivers",
+      "updated": "2026-05-16T21:45:32"
     },
     {
       "id": "RQ-005",
