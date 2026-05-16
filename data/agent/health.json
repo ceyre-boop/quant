@@ -1,27 +1,27 @@
 {
-  "timestamp": "2026-05-16T14:04:56",
-  "overall": "YELLOW",
+  "timestamp": "2026-05-16T17:24:34",
+  "overall": "GREEN",
   "components": {
     "duckdb": {
-      "status": "YELLOW",
-      "detail": "duckdb not installed"
+      "status": "GREEN",
+      "detail": "v1.5.2 ready (in-memory)"
     },
     "ollama": {
-      "status": "YELLOW",
-      "detail": "no response"
+      "status": "GREEN",
+      "detail": "responding"
     },
     "yfinance": {
-      "status": "YELLOW",
-      "detail": "yfinance not installed"
+      "status": "GREEN",
+      "detail": "yfinance 1.3.0 installed"
     },
     "ict_scanner": {
-      "status": "YELLOW",
-      "detail": "log is 5.3h old"
+      "status": "GREEN",
+      "detail": "outside session hours \u2014 last run 1.4h ago"
     },
     "backtest_engine": {
       "status": "GREEN",
       "detail": "file present"
     }
   },
-  "last_checked": "2026-05-16T14:04:56"
+  "last_checked": "2026-05-16T17:24:34"
 }
