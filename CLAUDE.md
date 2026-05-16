@@ -145,20 +145,53 @@ Do not modify layer3/game_engine.py directly — wrap it
 ## CURRENT SYSTEM STATUS (update this section each session)
 
 Equity system:    LIVE — paper trading 9:35 ET via launchd
+ICT system:       LIVE — paper trading, launchd every 5min during London/NY PM
+                  Pairs: GBPUSD EURUSD AUDUSD AUDNZD (macro-filtered v004 universe)
+                  London: GBPUSD only (BOE/FED structure) | NY PM: all 4 pairs
+                  Pipeline verdict: 🟡 CONDITIONAL GO (reduce risk to 0.75% before attempt)
+                  Walk-forward B: 76.0% (matches MC 76.8%, within 1pp) — most recent period validates
+                  Walk-forward A: 54.5% — 2024 had rough 8-stop clustering period
+                  FunderPro executor: built, ROUTING OFF (awaiting 🟢 GO verdict)
+                  Dashboard: ceyre-boop.github.io/quant/ict/ (Bloomberg-style terminal)
+                  Push notifications: ntfy.sh topic=clawd-ict-7829 (trade open/close alerts)
 Forex system:     BUILT — paper scan only, not automated yet
+                  v004 REPLICATED (2026-05-16): avg_sharpe=0.8011, 8/8 pairs positive
+                  Best: AUDUSD +1.292 | GBPUSD +1.130 | EURUSD +1.009 | AUDNZD +0.836
+                  Improvement vs v004 reference (+0.175) — code confirmed clean, no ICT corruption
 Backtest speed:   148,193/sec (Numba JIT, 12 cores)
 XGBoost models:   Both specialists trained and live
 Veto pipeline:    4/5 clusters active
-Forex backtest:   v004 — avg_sharpe=0.6260, 8/8 pairs positive (clean universe)
-                  Best: GBPUSD +1.094 | EURUSD +0.982 | AUDUSD +0.896 | AUDNZD +0.884
-                  USDCHF removed: SNB held flat 8yr, rate-diff structurally broken (-0.45)
-                  EURGBP removed: ECB+BOE lockstep, no rate divergence edge (PF 1.00)
-                  EURJPY removed v001: dual ECB+BOJ conflict (-0.62)
-                  Active universe: GBPUSD EURUSD AUDUSD AUDNZD GBPJPY USDJPY USDCAD NZDUSD
-                  Portfolio (macro-only): Sharpe 0.326 | MaxDD -14.2% | SNB survived 0.0%
-                  Signal frequency gap: 0.33/pair/month vs target 2 → factor model is next unlock
-Signal layers:    5 layers — Macro + CPI fade + Calendar + CB events + DXY overlay
-                  + COT gate (Dalio Q3) on entry sizing
+
+Forex research (2026-05-16 session):
+  State allocator tested (sovereign/forex/state_allocator.py):
+    Hypothesis "predict before events" FALSIFIED — E1/E2/E3 all negative EV
+    Hypothesis "confirm then enter" PARTIALLY CONFIRMED — E6/E7 positive
+  Confirmation engine tested (sovereign/forex/confirmation_engine.py):
+    C1 March JPY: FALSIFIED in isolation (26% WR) — BOJ interventions swamp seasonal
+    C2 Quarter-end: FALSIFIED at scale (39% WR, 366 trades) — 60% was small-sample noise
+    C3 Post-CB drift: marginal (-0.042R avg)
+    CARRY base: 47% WR but losses > wins (stop too wide at 3×ATR)
+  KEY FINDING: v004 macro system (Sharpe 0.801) outperforms all new systems.
+               Calendar edges only work as SIZE BOOSTS when aligned with v004 direction.
+               Not as standalone entries. v004 is the foundation.
+
+ICT prop challenge math (scripts/prop_challenge_optimizer.py):
+  Edge: TP2=16.8%@4.5R | TP1=13.0%@1.5R | STOP=70.2%@-1.0R | EV=+0.40R/trade
+  Optimal config: 0.75% risk × 9 trades/month × 90-day window × 6% target
+  Single attempt pass rate: 76.8% | Portfolio (4 attempts): 99.7%
+  Risk cap: 1.0% max (8 consecutive stops × 1% = 8% DD = prop firm limit)
+  Pipeline: python3 scripts/run_live_pipeline.py --source-json logs/ict_backtest_window_A.json
+                                                 --source-json logs/ict_backtest_window_B.json
+                                                 --days 365
+
+Forex version tracker:
+  v001: 0.1785 avg Sharpe | 1/11 pairs positive
+  v002: 0.3551 avg Sharpe | 4/11 pairs positive
+  v002.5: ~0.38 | macro veto added | drawdown -15%→-8%
+  v003: 0.4523 avg Sharpe | 8/10 pairs positive
+  v004: 0.6260 avg Sharpe | 8/8 pairs positive
+  Current (2026-05-16): 0.8011 avg Sharpe | 8/8 pairs positive
+  Target: Sharpe > 1.5 (institutional grade)
 
 ML STACK (Stanford CS229 + MIT Finance — 11/11 operational, all loops closed):
   sovereign/risk/predict_now.py          — LOESS win rate + Newton IRLS + L2 MAP (L03/L04/L11)
@@ -195,7 +228,7 @@ PTJ Gate order (sovereign orchestrator):
   10:  R:R gate (min 2:1 at TP1)
   11:  Portfolio risk cap (8% total, 1.5% per trade)
 
-Alexandrian Library: LIVE in orchestrator (primary market intelligence)
+Alexandrian Library: LIVE in orchestrator + ICT engine (primary market intelligence)
   sovereign/risk/alexandrian_library.py — 10 volumes, 63 entries, full market circumstance coverage
   Volumes:        I Crashes | II Rate Cycles | III Bull Regimes | IV Currency Crises | V Vol Regimes
                   VI Econ Cycles | VII Liquidity | VIII Commodities | IX Geopolitical | X Sector Rotation
@@ -204,83 +237,153 @@ Alexandrian Library: LIVE in orchestrator (primary market intelligence)
                   Returns LibraryInsight: primary_regime, threat_score, size_modifier, advisory
   Threat levels:  NORMAL(1.0×) ELEVATED(0.75×) WARNING(0.50×) DANGER(0.25×) CRITICAL(0.0×)
   Auto-learns:    any live drawdown ≥8% → added to library + MarketMemory simultaneously
-  Build library:  python3 scripts/build_alexandrian_library.py --query  (requires yfinance)
-  Feeds:          stage 4h of orchestrator — runs FIRST before all other ML modulators
+  Current read:   10 volumes converging | SHALE_SUPPLY_OIL_CRASH primary | CRITICAL | sim=0.940
+                  Lo Level 3: 0.50× | Kelly cap: 2.0% | ICT: trades with tight 1.5R/2.5R targets
 
-CS229 Stack — All Loops Closed (session 2026-05-05):
-  Softmax (L04):   3-vote ensemble regime confidence | HMM+Softmax+KMeans → blended_conf
-                   Online SGD update on every on_trade_close() | bootstrap from ledger
-  ICA (L15):       PredictNow LOESS uses ICA-projected distances (priority over PCA)
-                   Refit every 25 new trades | bootstrap from ledger on cold start
-  KMeans (L12):    Third regime vote | refit every 10 new trades (≥30 obs)
-                   3-way agreement → conf×1.15 | 1-way → conf×0.85
-  Pegasus (L20):   All 6 params now live: entry_threshold, size_multiplier, stop_atr_mult,
-                   tp_rr_ratio, hmm_conf_gate, kelly_fraction_cap
-                   Trust ramp: proportional 0→1 over 30 updates (gate at 10, execute at 20)
-                   Full REINFORCE: Gaussian policy gradient for continuous; sign for thresholds
-  ml_diagnostics:  KMeans feeds 3-vote system | bias-var in walk-forward | MI available
+CS229 Stack — All Loops Closed:
+  Softmax / ICA / KMeans / Pegasus — all live, all online-learning from ledger
 
-Library ↔ CS229 Integration (5 points, all LIVE):
-  I1  — library_adjusted_uncertainty_level() in correlated_position_tracker.py
-          7+ volumes → Lo Level 3 minimum (0.50×), 5-6 → 0.75×, regardless of HMM state
-  I2  — library_informed_win_rate() in predict_now.py
-          Blends own trade LOESS estimate with 63 Library historical win rates by regime
-          Hoeffding ramp: Library prior dominates when n_trades < 400
-  I3  — Gate 5b: _library_asset_gate() in orchestrator.py (after PTJ 200 SMA)
-          VALUATION_DISLOCATION: AMD/NVDA/XLK longs blocked; PFE/GLD/XLV pass
-          REPO_MARKET_STRESS: all equity blocked; only GLD passes
-  I4  — _grade_risk_pct(library_insight) in kelly_engine.py
-          7+ volumes ×0.50 Kelly cap (A+ 4%→2%), 5-6 ×0.625, 3+ ×0.75
-  I5  — ptj_dislocation_from_library() in orchestrator.py
-          Severe pattern (REPO/CONTAGION/COVID) + 5+ converging → cat2 (0.50×)
-          Moderate pattern (VALUATION/STAGFLATION) + 3+ converging → cat1 (0.75×)
-
-Current read (May 2026):  10 volumes converging | ASIAN_CURRENCY_CONTAGION primary | sim=0.927
-  Lo Level 3: 0.50×  |  Kelly cap: 2.0% (was 4%)  |  PTJ SEVERE: 0.50×
-  Net A+ long: 1.5% × 0.50 × 0.50 = 0.38% risk per trade (defence-first in force)
+Library ↔ CS229 Integration (5 points, all LIVE — see prior session notes)
 
 Trading Memory:   LIVE in orchestrator (legacy fallback when library not loaded)
   sovereign/risk/market_memory.py — 20 historical crash events, 23-feature cosine similarity
-  Build memory:   python3 scripts/build_market_memory.py  (requires yfinance, network)
 
 Tests:            23/23 passing — python3 tests/run_ml_tests.py
-                  Covers: PCA, ICA, Kalman, LQR, BS, MDP, Pegasus, ATR, on_trade_close,
-                  AlexandrianLibrary (5 tests: import, no-data, with-data, volume coverage, size range)
 
-Ultraplan (Day 1-4 BUILT):
-  Day 1 — Portfolio Engine:   sovereign/execution/portfolio_engine.py  ← DONE
-           PortfolioEngine: score = conviction × predicted_r × (1/atr_pct)
-           Correlation penalty: EURUSD+GBPUSD LONG same USD bet → both reduced 61.5%
-           AUDNZD (no USD) → 0% penalty (correctly identified as diversifying)
-           Hard constraints: 6% total, 20% per pair, 40% per currency, SNB 50% cap
-           Test: 4-pair simultaneous allocation — all assertions pass
-
-  Day 2 — 30-year backtest:   scripts/run_portfolio_backtest.py  ← DONE
-           python3 scripts/run_portfolio_backtest.py --start 1993-01-01
-           python3 scripts/run_portfolio_backtest.py --snb-only  (2015 stress test)
-           Targets: Sharpe>1.5, maxDD<15%, survive SNB, ≥2 trades/pair/month
-
-  Day 3-4 — Factor Discovery: sovereign/ml/factor_discovery.py  ← DONE
-           42 candidate factors: 13 macro, 15 technical, 5 sentiment, 3 carry, 6 calendar
-           IC/ICIR validation + Benjamini-Hochberg FDR correction + 3-period robustness
-           FactorModel: XGBRegressor(y=forward_R) — replaces hardcoded signal weights
-           Updates monthly. Run: FactorDiscovery.validate_all_pairs()
-
-  Day 5 — TradingAgents narrative: integration/trading_agents_bridge.py (pre-existing)
-           Factor model says WHAT. TradingAgents explains WHY.
-
-  Day 6-7 — Full 30-year simulation: pending (run after v004 completes)
-
-Next milestone:   python3 scripts/run_portfolio_backtest.py --snb-only  ← SNB stress test
-                  python3 scripts/run_universe_backtest.py              ← run v004
-                  v004 target: avg_sharpe > 0.50 (USDCHF + EURGBP signal fixes applied)
-                  Run FactorDiscovery.validate_all_pairs() for real factor validation
+Next milestones:
+  1. Build sovereign/agent/research_agent.py (autonomous research loop)
+  2. Build frontend/dashboard_research.html (research intelligence dashboard)
+  3. Build scripts/agent_scheduler.py (usage-aware launchd scheduling)
+  4. ICT: collect 30 days paper trades → re-run pipeline → attempt FunderPro if 🟢 GO
+  5. Forex: wire calendar edges as SIZE BOOSTS on top of v004 macro signal
+  6. Research queue: E1 at 60-day hold | March JPY full history | carry pair optimization
 
 ---
 
 *This file is the agent handshake. Both Claude Code and Codex 
 read it. It removes the human from routine task routing.*
 *Update CURRENT SYSTEM STATUS at the end of every session.*
+
+---
+
+## AUTONOMOUS RESEARCH AGENT
+
+Designed 2026-05-16. Three Claude Code sessions to make live.
+
+### Philosophy
+
+Automated = does what you told it to do.
+Autonomous = figures out what needs doing, does it, tells you what it found.
+
+The agent is not a trading bot. It is a research partner that works while
+you sleep, surfaces findings when you wake up, and flags problems before
+you ask. It does not make decisions. It validates hypotheses, checks health,
+and writes plain-English findings to a dashboard.
+
+### Architecture
+
+```
+LAYER 1 — RESEARCH AGENT (runs every 2-4 hours via launchd)
+  sovereign/agent/research_agent.py
+
+  Every cycle it:
+    1. Runs health check (all data feeds + Ollama + paper account)
+    2. Picks highest-priority QUEUED task from research_queue.json
+    3. Runs it (backtest, validation, data check, prop sim)
+    4. Writes finding to findings.jsonl
+    5. Updates hypothesis_ledger.json (CONFIRMED/REJECTED/QUEUED)
+    6. Writes any urgent messages to messages_to_colin.json
+    7. Adds follow-up tasks to queue based on what it found
+
+LAYER 2 — RESEARCH DASHBOARD (your morning briefing)
+  frontend/dashboard_research.html
+
+  Sections:
+    - SYSTEM HEALTH: green/red for every data source
+    - OVERNIGHT SUMMARY: 3-5 bullets of what ran and found
+    - HYPOTHESIS LEDGER: every hypothesis ever tested with status
+    - MESSAGES TO COLIN: URGENT/IMPORTANT/FYI sorted by priority
+    - RESEARCH QUEUE: what's next (Colin can reprioritize)
+    - VERSION TRACKER: Sharpe progress v001→current toward 1.5
+
+LAYER 3 — COMMUNICATION PROTOCOL (flat files, no DB)
+  data/agent/findings.jsonl          — append-only finding log
+  data/agent/health.json             — current system health snapshot
+  data/agent/hypothesis_ledger.json  — all hypotheses + status + results
+  data/agent/messages_to_colin.json  — things needing human attention
+  data/agent/research_queue.json     — prioritized task queue
+
+LAYER 4 — SCHEDULER (usage-aware)
+  scripts/agent_scheduler.py
+
+  Health check:   every 2 hours (lightweight)
+  Research task:  every 4 hours (heavy compute)
+  Dashboard push: every 30 minutes (write JSON files)
+  Never burns Claude Pro budget — runs local Python only
+```
+
+### Research Queue (pre-populated)
+
+Priority order for the agent to work through:
+
+1. E1 rate divergence at 60-day hold with multi-layer confirmation
+   (state_allocator E1 failed at 20d hold; hypothesis: 60d changes sign)
+2. March JPY repatriation: full history 2010-2024, not just 2015-2024
+   (test if BOJ interventions are a special case or permanent override)
+3. Stop width optimization: 0.08 vs 0.15 vs 0.25 ATR on all 8 forex pairs
+4. Library feature transparency: what features drive CRITICAL reads
+5. Carry base: optimal pair selection across all 28 G10 combinations
+6. ICT walk-forward stability: re-run after every 10 new paper trades
+7. Calendar edges as SIZE BOOSTS: test C1/C2 layered on v004 direction
+
+### Hypothesis Ledger (seeded from this session)
+
+✅ CONFIRMED: Carry base generates positive EV (59% WR, +0.311R)
+✅ CONFIRMED: Quarter-end rebalancing works at small sample (60% WR, n=15)
+✅ CONFIRMED: v004 macro system is the best confirmed forex edge (Sharpe 0.801)
+✅ CONFIRMED: ICT FVG limit entry has positive EV (+0.40R/trade, replicated 2 windows)
+✅ CONFIRMED: Walk-forward B (most recent 12mo) validates ICT edge (76% vs MC 76.8%)
+❌ REJECTED:  CPI surprise fade as standalone entry (43% WR, -0.320R, n=63)
+❌ REJECTED:  Post-CB drift before price confirmation (36% WR, -0.517R, n=14)
+❌ REJECTED:  Rate divergence at 20-day hold (44% WR, -0.186R avg, n=312)
+❌ REJECTED:  March JPY in isolation 2015-2024 (26% WR, swamped by BOJ/FED)
+❌ REJECTED:  Quarter-end fade at scale (39% WR, n=366 — small sample was noise)
+❌ REJECTED:  State allocator outperforms v004 (Sharpe -0.12 vs v004 0.801)
+❌ REJECTED:  Confirmation protocol outperforms v004 (Sharpe -0.17)
+🔄 TESTING:   E1 at 60-day hold with multi-layer confirmation
+🔄 TESTING:   Calendar edges as v004 size boosts (not standalone)
+📋 QUEUED:    ICT walk-forward stability with live paper trades (need 30+ trades)
+📋 QUEUED:    FunderPro challenge attempt (awaiting 🟢 GO from pipeline)
+
+### Message Format
+
+Agent writes to messages_to_colin.json in this format:
+  🔴 URGENT:    "Ollama has not responded since 14:32. Run: ollama serve"
+  🟡 IMPORTANT: "Veto ledger shows 73 ATR_TOO_LOW blocks on AUDUSD (24hrs).
+                 RBA meeting in 3 days — compression likely cause."
+  🟢 FYI:       "E1 60-day backtest complete. Sharpe improved from -0.186 to +0.41.
+                 Hypothesis partially confirmed. Phase 2 test added to queue."
+
+### Build Order
+
+Session 1: frontend/dashboard_research.html (reads flat JSON files, dark theme)
+Session 2: sovereign/agent/research_agent.py (runs tasks, writes findings)
+Session 3: scripts/agent_scheduler.py (launchd integration, usage-aware)
+
+### Your Week Optimized
+
+WHEN YOU'RE HERE (Claude Pro sessions, ~10/week):
+  Open dashboard_research.html → read overnight summary
+  Paste interesting findings here → interpret together
+  Agree on next experiment → write Claude Code prompt
+  Run it (uses Claude Code budget, not Pro)
+
+WHEN YOU'RE AWAY:
+  Agent runs every 2-4 hours
+  Tests queue items, checks health, writes findings
+  Flags anything urgent in messages_to_colin.json
+
+NET RESULT: 24/7 research with ~10 hours of your attention per week
 
 ---
 
