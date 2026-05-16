@@ -53,7 +53,7 @@ FRED_RATES = {
 }
 
 START = '2014-01-01'
-END   = '2024-12-31'
+END   = datetime.today().strftime('%Y-%m-%d')
 MIN_CHANGE_BPS = 1   # detect any change ≥ 1bp
 
 
