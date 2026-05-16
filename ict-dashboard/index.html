@@ -251,6 +251,25 @@
     margin-bottom: 8px;
     display: inline-block;
   }
+
+  /* ── SUGGESTIONS ────────────────────────────────────────── */
+  .sug-item {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .sug-item:last-child { border-bottom: none; }
+  .sug-header { display: flex; gap: 8px; align-items: baseline; margin-bottom: 4px; }
+  .sug-id     { font-size: 10px; color: var(--muted); font-family: monospace; }
+  .sug-cat    { font-size: 10px; padding: 1px 5px; border: 1px solid var(--border); color: var(--accent); }
+  .sug-title  { font-size: 12px; color: var(--fg); font-weight: bold; }
+  .sug-detail { font-size: 11px; color: var(--muted); margin: 3px 0 6px; line-height: 1.5; }
+  .sug-action { font-size: 10px; color: var(--yellow); margin-bottom: 6px; }
+  .sug-cmd    { font-size: 10px; font-family: monospace; color: var(--muted); cursor: pointer; }
+  .sug-cmd:hover { color: var(--fg); }
+  .sug-pri-HIGH   { color: var(--red); }
+  .sug-pri-MEDIUM { color: var(--yellow); }
+  .sug-pri-LOW    { color: var(--green); }
+  .sug-empty { color: var(--muted); font-size: 11px; padding: 8px 0; }
 </style>
 </head>
 <body>
@@ -306,6 +325,13 @@
     <div class="loading">Loading...</div>
   </div>
 
+
+  <!-- Row 5: Suggestions (full width) -->
+  <div class="panel half-width" id="panel-suggestions" style="grid-column: span 3;">
+    <div class="panel-title">Oracle Suggestions <span id="sug-count" style="color:var(--muted);font-size:10px;margin-left:8px;"></span></div>
+    <div class="loading">Loading...</div>
+  </div>
+
 </div>
 
 <script>
@@ -319,6 +345,7 @@ const FILES = {
   usage:      DATA_BASE + "usage.json",
   hypotheses: DATA_BASE + "hypothesis_ledger.json",
   queue:      DATA_BASE + "research_queue.json",
+  suggestions: DATA_BASE + "suggestions.json",
 };
 
 // ── VERSION DATA (static — update manually or from findings) ──────────────────
@@ -558,17 +585,63 @@ function renderVersions() {
     </div>`;
 }
 
+
+// ── SUGGESTIONS ───────────────────────────────────────────────────────────────
+function renderSuggestions(data) {
+  const el = document.getElementById("panel-suggestions");
+  const header = '<div class="panel-title">Oracle Suggestions <span id="sug-count" style="color:var(--muted);font-size:10px;margin-left:8px;"></span></div>';
+  if (!data || !data.suggestions) {
+    el.innerHTML = header + '<div class="sug-empty">No suggestions yet — Oracle generates them automatically.</div>';
+    return;
+  }
+  const open = data.suggestions.filter(s => s.status === "NEW");
+  const done = data.suggestions.filter(s => s.status !== "NEW");
+  const priIcon = {HIGH:"🔴", MEDIUM:"🟡", LOW:"🟢"};
+
+  let html = header;
+  if (open.length === 0) {
+    html += '<div class="sug-empty">No open suggestions. Oracle will generate more next cycle.</div>';
+  } else {
+    html += open.map(s => `
+      <div class="sug-item">
+        <div class="sug-header">
+          <span class="sug-pri-${s.priority}">${priIcon[s.priority]||"○"}</span>
+          <span class="sug-id">${s.id}</span>
+          <span class="sug-cat">${s.category}</span>
+          <span class="sug-title">${s.title}</span>
+        </div>
+        <div class="sug-detail">${s.detail}</div>
+        <div class="sug-action">→ ${s.action}</div>
+        <div class="sug-cmd" onclick="navigator.clipboard.writeText('python3 scripts/suggestions.py --implement ${s.id}')" title="Click to copy">
+          📋 python3 scripts/suggestions.py --implement ${s.id}
+        </div>
+        <div class="sug-cmd" onclick="navigator.clipboard.writeText('python3 scripts/suggestions.py --veto ${s.id}')" title="Click to copy" style="margin-top:2px;">
+          ❌ python3 scripts/suggestions.py --veto ${s.id}
+        </div>
+      </div>`).join('');
+  }
+
+  const stats = data.stats || {};
+  html += `<div style="margin-top:10px;font-size:10px;color:var(--muted);">
+    ${stats.total_generated||0} generated · ${stats.implemented||0} implemented · ${stats.vetoed||0} vetoed
+    ${done.length > 0 ? '· ' + done.slice(-3).map(s => (s.status==="IMPLEMENTED"?"✅":"❌") + " " + s.title.slice(0,40)).join(' | ') : ''}
+  </div>`;
+
+  el.innerHTML = html;
+}
+
 // ── LOAD ALL ──────────────────────────────────────────────────────────────────
 async function loadAll() {
   document.getElementById("last-refresh").textContent =
     "Refreshing... " + new Date().toLocaleTimeString();
 
-  const [health, messages, usage, hypotheses, queue] = await Promise.all([
+  const [health, messages, usage, hypotheses, queue, suggestions] = await Promise.all([
     fetchJSON(FILES.health),
     fetchJSON(FILES.messages),
     fetchJSON(FILES.usage),
     fetchJSON(FILES.hypotheses),
     fetchJSON(FILES.queue),
+    fetchJSON(FILES.suggestions),
   ]);
 
   renderHealth(health);
@@ -577,6 +650,7 @@ async function loadAll() {
   renderHypotheses(hypotheses);
   renderQueue(queue);
   renderVersions();
+  renderSuggestions(suggestions);
 
   document.getElementById("last-refresh").textContent =
     "Last refresh: " + new Date().toLocaleTimeString();
