@@ -1,6 +1,22 @@
 {
   "messages": [
     {
+      "id": "msg-20260516172434",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "Task RQ-002 (March JPY full history 2010-2024) failed: DRY RUN: March JPY full history 2010-2024 \u2014 not executed",
+      "timestamp": "2026-05-16T17:24:34",
+      "read": false
+    },
+    {
+      "id": "msg-20260516172408",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "Task RQ-001 (E1 rate divergence at 60-day hold) failed: DRY RUN: E1 rate divergence at 60-day hold \u2014 not executed",
+      "timestamp": "2026-05-16T17:24:08",
+      "read": false
+    },
+    {
       "id": "msg-20260516140456",
       "priority": "IMPORTANT",
       "emoji": "\ud83d\udfe1",
@@ -153,6 +169,15 @@
       "emoji": "\ud83d\udd34",
       "text": "The forex side is choking\u2014every major pair is exhausted on daily range, and your scanner hasn't logged fresh data in over 5 hours, which means you're flying blind on entry signals. You need to restart the scanner and duckdb/yfinance immediately, otherwise you're just sitting on old vetoes and missing real market moves. Equities are quiet but stale (last veto was May 2nd), and your two active hypotheses need actual execution to tell you anything useful\u2014E1 divergence is still in dry run limbo.",
       "timestamp": "2026-05-16T16:52:24.320408",
+      "read": false,
+      "source": "oracle"
+    },
+    {
+      "id": "oracle-20260516172457",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "Your forex pairs are dead today \u2014 ADR exhausted across the board, which tells me the market moved hard and early, leaving nothing for your setup. The ICT scanner is working fine, but it's correctly staying out; equities are similarly quiet with volatility too low across the board. You should wait for tomorrow's session to see if range resets, and meanwhile push the E1 rate divergence testing live \u2014 that's where the signal is right now.",
+      "timestamp": "2026-05-16T17:24:57.351348",
       "read": false,
       "source": "oracle"
     }
