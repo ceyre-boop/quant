@@ -1,0 +1,20 @@
+{
+  "ledger": [
+    {"id": "HYP-001", "name": "Carry base positive EV", "status": "CONFIRMED", "result": "59% WR, +0.311R", "date": "2026-05-16"},
+    {"id": "HYP-002", "name": "Quarter-end rebalancing (small sample)", "status": "CONFIRMED", "result": "60% WR, n=15", "date": "2026-05-16"},
+    {"id": "HYP-003", "name": "v004 macro system best forex edge", "status": "CONFIRMED", "result": "Sharpe 0.801, 8/8 pairs positive", "date": "2026-05-16"},
+    {"id": "HYP-004", "name": "ICT FVG limit entry positive EV", "status": "CONFIRMED", "result": "+0.40R/trade, replicated 2 windows", "date": "2026-05-16"},
+    {"id": "HYP-005", "name": "ICT walk-forward B validates edge", "status": "CONFIRMED", "result": "76.0% vs MC 76.8%, within 1pp", "date": "2026-05-16"},
+    {"id": "HYP-006", "name": "CPI surprise fade standalone", "status": "REJECTED", "result": "43% WR, -0.320R, n=63", "date": "2026-05-16"},
+    {"id": "HYP-007", "name": "Post-CB drift before price confirmation", "status": "REJECTED", "result": "36% WR, -0.517R, n=14", "date": "2026-05-16"},
+    {"id": "HYP-008", "name": "Rate divergence 20-day hold", "status": "REJECTED", "result": "44% WR, -0.186R avg, n=312", "date": "2026-05-16"},
+    {"id": "HYP-009", "name": "March JPY in isolation 2015-2024", "status": "REJECTED", "result": "26% WR, swamped by BOJ/FED", "date": "2026-05-16"},
+    {"id": "HYP-010", "name": "Quarter-end fade at scale", "status": "REJECTED", "result": "39% WR, n=366 — small sample was noise", "date": "2026-05-16"},
+    {"id": "HYP-011", "name": "State allocator outperforms v004", "status": "REJECTED", "result": "Sharpe -0.12 vs v004 0.801", "date": "2026-05-16"},
+    {"id": "HYP-012", "name": "Confirmation protocol outperforms v004", "status": "REJECTED", "result": "Sharpe -0.17", "date": "2026-05-16"},
+    {"id": "HYP-013", "name": "E1 rate divergence at 60-day hold", "status": "TESTING", "result": null, "date": "2026-05-16"},
+    {"id": "HYP-014", "name": "Calendar edges as v004 size boosts", "status": "TESTING", "result": null, "date": "2026-05-16"},
+    {"id": "HYP-015", "name": "ICT walk-forward stability with live paper trades", "status": "QUEUED", "result": null, "date": "2026-05-16"},
+    {"id": "HYP-016", "name": "FunderPro challenge attempt", "status": "QUEUED", "result": null, "date": "2026-05-16"}
+  ]
+}

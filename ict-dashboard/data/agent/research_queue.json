@@ -1,0 +1,83 @@
+{
+  "queue": [
+    {
+      "id": "RQ-001",
+      "priority": 1,
+      "status": "QUEUED",
+      "name": "E1 rate divergence at 60-day hold",
+      "description": "state_allocator E1 failed at 20d hold. Test if 60d changes sign. Add multi-layer confirmation.",
+      "hypothesis_id": "HYP-013",
+      "script": null,
+      "needs_network": true,
+      "estimated_minutes": 15,
+      "started": "2026-05-16T14:04:56"
+    },
+    {
+      "id": "RQ-002",
+      "priority": 2,
+      "status": "QUEUED",
+      "name": "March JPY full history 2010-2024",
+      "description": "Not just 2015-2024. Test if BOJ interventions are special case or permanent override.",
+      "hypothesis_id": "HYP-009",
+      "script": null,
+      "needs_network": true,
+      "estimated_minutes": 20
+    },
+    {
+      "id": "RQ-003",
+      "priority": 3,
+      "status": "QUEUED",
+      "name": "Stop width optimization",
+      "description": "0.08 vs 0.15 vs 0.25 ATR on all 8 forex pairs. Find optimal stop width.",
+      "hypothesis_id": null,
+      "script": null,
+      "needs_network": false,
+      "estimated_minutes": 30
+    },
+    {
+      "id": "RQ-004",
+      "priority": 4,
+      "status": "QUEUED",
+      "name": "Library feature transparency",
+      "description": "What 23 features drive CRITICAL reads? Which features dominate SHALE_SUPPLY_OIL_CRASH match?",
+      "hypothesis_id": null,
+      "script": "sovereign/risk/alexandrian_library.py",
+      "needs_network": false,
+      "estimated_minutes": 10
+    },
+    {
+      "id": "RQ-005",
+      "priority": 5,
+      "status": "QUEUED",
+      "name": "Carry base pair optimization",
+      "description": "Test all 28 G10 combinations. Find optimal 5-pair carry portfolio.",
+      "hypothesis_id": null,
+      "script": null,
+      "needs_network": true,
+      "estimated_minutes": 45
+    },
+    {
+      "id": "RQ-006",
+      "priority": 6,
+      "status": "QUEUED",
+      "name": "ICT walk-forward stability",
+      "description": "Re-run pipeline after every 10 new paper trades. Blocked until 30+ trades collected.",
+      "hypothesis_id": "HYP-015",
+      "script": "scripts/run_live_pipeline.py",
+      "needs_network": false,
+      "estimated_minutes": 5,
+      "blocked_until": "30_paper_trades"
+    },
+    {
+      "id": "RQ-007",
+      "priority": 7,
+      "status": "QUEUED",
+      "name": "Calendar edges as v004 SIZE BOOSTS",
+      "description": "Test C1/C2 layered on top of v004 direction \u2014 not standalone. Measure Sharpe improvement.",
+      "hypothesis_id": "HYP-014",
+      "script": null,
+      "needs_network": true,
+      "estimated_minutes": 25
+    }
+  ]
+}

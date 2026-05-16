@@ -1,0 +1,35 @@
+{
+  "meta": {
+    "note": "Claude Pro has no usage API. This is a local ledger. Sync weekly_used manually from claude.ai/settings or run: python3 sovereign/tools/claude_usage_tracker.py sync --used 142000",
+    "weekly_reset_day": "Saturday",
+    "weekly_total_estimate": 200000,
+    "human_share": 0.7,
+    "agent_share": 0.3
+  },
+  "week": {
+    "start_date": "2026-05-16",
+    "weekly_used": 3100,
+    "weekly_remaining": 196900,
+    "last_synced": null
+  },
+  "today": {
+    "date": "2026-05-16",
+    "human_used": 0,
+    "agent_used": 3100,
+    "daily_human_budget": 20000,
+    "daily_agent_budget": 8571,
+    "agent_extra_from_rollover": 20000,
+    "agent_allowed_today": 28571
+  },
+  "session": {
+    "started": null,
+    "estimated_tokens": 0
+  },
+  "mode": "NORMAL",
+  "thresholds": {
+    "weekly_danger": 20000,
+    "weekly_light_mode": 50000,
+    "human_minimum_buffer": 8000,
+    "heavy_task_minimum": 15000
+  }
+}
