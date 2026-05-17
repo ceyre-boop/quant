@@ -193,8 +193,8 @@ def run_health_check() -> dict:
         "polygon":        _check_polygon,
         "openweather":    _check_openweather,
         "nasdaq":         _check_nasdaq,
+        "reddit":         _check_reddit,
         # twitter removed — X API requires paid plan ($100+/mo), not worth it
-        # sentiment covered by news_api + reddit (free)
     }
 
     issues = []
@@ -481,6 +481,39 @@ def _check_twitter() -> tuple:
     return "YELLOW", f"status {code}"
 
 
+def _check_reddit() -> tuple:
+    """Check Reddit sentiment cache freshness. Scraper runs every ~hour."""
+    cache = ROOT / "data" / "cache" / "reddit_sentiment.json"
+    if not cache.exists():
+        # Run it now on first check
+        try:
+            import time as _time
+            result = subprocess.run(
+                [sys.executable, str(ROOT / "sovereign" / "data" / "reddit_scraper.py")],
+                cwd=str(ROOT), capture_output=True, text=True, timeout=60
+            )
+            if result.returncode == 0 and cache.exists():
+                data = json.loads(cache.read_text())
+                eq = data["summary"].get("equity", "?")[:50]
+                return "GREEN", f"fresh — top equity: {eq}"
+            return "YELLOW", "scraper ran but no cache produced"
+        except Exception as e:
+            return "YELLOW", f"scraper failed: {e}"
+
+    import time as _time
+    age_min = (_time.time() - cache.stat().st_mtime) / 60
+    try:
+        data = json.loads(cache.read_text())
+        eq = data["summary"].get("equity", "?")[:60]
+        fx = data["summary"].get("forex", "?")[:40]
+        posts = data.get("posts_scanned", "?")
+        if age_min < 90:
+            return "GREEN", f"{posts} posts | {age_min:.0f}m ago | {eq}"
+        return "YELLOW", f"cache {age_min:.0f}m old — needs refresh"
+    except Exception:
+        return "YELLOW", f"cache unreadable"
+
+
 def _check_nasdaq() -> tuple:
     k = os.environ.get("NASDAQ_DATA_LINK_API_KEY", "")
     if not k:
@@ -493,6 +526,28 @@ def _check_nasdaq() -> tuple:
         rows = len(body["datatable"].get("data", []))
         return "GREEN", f"WIKI prices ok ({rows} rows)"
     return "YELLOW", f"status {code}"
+
+
+# ── Reddit sentiment refresh ───────────────────────────────────────────────────
+
+def _refresh_reddit_if_stale():
+    """Run reddit_scraper if cache is >90 minutes old or missing."""
+    import time as _time
+    cache = ROOT / "data" / "cache" / "reddit_sentiment.json"
+    if cache.exists():
+        age_min = (_time.time() - cache.stat().st_mtime) / 60
+        if age_min < 90:
+            log.info(f"Reddit cache {age_min:.0f}m old — skipping refresh")
+            return
+    log.info("Refreshing Reddit sentiment...")
+    try:
+        subprocess.run(
+            [sys.executable, str(ROOT / "sovereign" / "data" / "reddit_scraper.py")],
+            cwd=str(ROOT), capture_output=True, text=True, timeout=90
+        )
+        log.info("Reddit sentiment refreshed")
+    except Exception as e:
+        log.warning(f"Reddit refresh failed: {e}")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -600,7 +655,10 @@ def run_cycle(dry_run: bool = False, force_heavy: bool = False) -> None:
         log.info("Mode=SKIP — nothing to do this cycle")
         return
 
-    # 2. Always run health check (lightweight)
+    # 2. Refresh Reddit sentiment if stale (no API key needed, always runs)
+    _refresh_reddit_if_stale()
+
+    # 3. Always run health check (lightweight)
     log.info("Running health check...")
     health = run_health_check()
     log.info(f"Health: {health['overall']}")

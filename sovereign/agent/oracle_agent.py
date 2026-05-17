@@ -42,7 +42,8 @@ MESSAGES_PATH = DATA_AGENT / "messages_to_colin.json"
 HEALTH_PATH   = DATA_AGENT / "health.json"
 HYPO_PATH     = DATA_AGENT / "hypothesis_ledger.json"
 FINDINGS_PATH = DATA_AGENT / "findings.jsonl"
-QUEUE_PATH    = DATA_AGENT / "research_queue.json"
+QUEUE_PATH      = DATA_AGENT / "research_queue.json"
+REDDIT_CACHE    = ROOT / "data" / "cache" / "reddit_sentiment.json"
 SUGGESTIONS_PATH  = DATA_AGENT / "suggestions.json"
 PROMPT_QUEUE_PATH = DATA_AGENT / "prompt_queue.json"
 
@@ -200,6 +201,20 @@ def build_context() -> str:
     if queued_tasks:
         lines = [f"  [{i+1}] {t.get('name','?')}" for i, t in enumerate(queued_tasks)]
         parts.append("RESEARCH QUEUE (top 3 queued):\n" + "\n".join(lines) + "\n")
+
+    # Reddit sentiment
+    reddit = _read_json(REDDIT_CACHE, {})
+    if reddit and reddit.get("summary"):
+        age_min = ""
+        try:
+            from datetime import datetime, timezone
+            ts = datetime.fromisoformat(reddit["last_updated"].replace("Z","+00:00"))
+            age_min = f" ({int((datetime.now(timezone.utc)-ts).total_seconds()/60)}m ago)"
+        except Exception:
+            pass
+        eq  = reddit["summary"].get("equity", "none")
+        fx  = reddit["summary"].get("forex", "none")
+        parts.append(f"REDDIT SENTIMENT{age_min}:\n  Equity: {eq}\n  Forex: {fx}\n")
 
     # Recent findings
     findings = _read_findings_tail(n=3)

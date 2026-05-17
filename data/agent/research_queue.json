@@ -57,13 +57,16 @@
     {
       "id": "RQ-005",
       "priority": 5,
-      "status": "QUEUED",
+      "status": "ERROR",
       "name": "Carry base pair optimization",
       "description": "Test all 28 G10 combinations. Find optimal 5-pair carry portfolio.",
       "hypothesis_id": null,
       "script": null,
       "needs_network": true,
-      "estimated_minutes": 45
+      "estimated_minutes": 45,
+      "started": "2026-05-16T23:53:12",
+      "completed": "2026-05-16T23:53:12",
+      "last_result": "DRY RUN: Carry base pair optimization \u2014 not executed"
     },
     {
       "id": "RQ-006",
