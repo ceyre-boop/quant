@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-05-16T17:24:34",
-  "overall": "GREEN",
+  "timestamp": "2026-05-16T23:38:52",
+  "overall": "YELLOW",
   "components": {
     "duckdb": {
       "status": "GREEN",
@@ -16,12 +16,56 @@
     },
     "ict_scanner": {
       "status": "GREEN",
-      "detail": "outside session hours \u2014 last run 1.4h ago"
+      "detail": "outside session hours \u2014 last run 7.6h ago"
     },
     "backtest_engine": {
       "status": "GREEN",
       "detail": "file present"
+    },
+    "alpaca": {
+      "status": "GREEN",
+      "detail": "paper account equity=$102,521"
+    },
+    "fred": {
+      "status": "GREEN",
+      "detail": "fed funds series ok"
+    },
+    "alpha_vantage": {
+      "status": "GREEN",
+      "detail": "latest bar 2026-05-15"
+    },
+    "tiingo": {
+      "status": "GREEN",
+      "detail": "authenticated"
+    },
+    "news_api": {
+      "status": "GREEN",
+      "detail": "34 business articles"
+    },
+    "oanda": {
+      "status": "GREEN",
+      "detail": "NAV=$110,000 practice"
+    },
+    "firebase": {
+      "status": "GREEN",
+      "detail": "reachable"
+    },
+    "polygon": {
+      "status": "GREEN",
+      "detail": "free tier active (reference data)"
+    },
+    "openweather": {
+      "status": "YELLOW",
+      "detail": "key not yet active \u2014 new keys take up to 2h to activate"
+    },
+    "twitter": {
+      "status": "YELLOW",
+      "detail": "token looks wrong (50 chars) \u2014 regenerate Bearer Token from Twitter Dev Portal"
+    },
+    "nasdaq": {
+      "status": "GREEN",
+      "detail": "WIKI prices ok (1 rows)"
     }
   },
-  "last_checked": "2026-05-16T17:24:34"
+  "last_checked": "2026-05-16T23:38:52"
 }
