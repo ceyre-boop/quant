@@ -20,11 +20,11 @@
       "detail": "AUDNZD scoring 5.0 consistently below 7.0 threshold (ICTGrade.C). Cross-pair volatility drag. EURJPY/GBPJPY show stronger macro edges per v004 backtest data. Single swap reduces system complexity.",
       "action": "Remove AUDNZD from ALL_PAIRS list in config.py; backtest EURJPY or GBPJPY replacement; update portfolio Sharpe target.",
       "id": "SUG-002",
-      "status": "NEW",
+      "status": "VETOED",
       "created": "2026-05-16T19:41:22.066368",
-      "vetoed_at": null,
+      "vetoed_at": "2026-05-16T21:36:41.675297",
       "implemented_at": null,
-      "veto_reason": null
+      "veto_reason": "Backtest disproves: AUDNZD Sharpe 0.836 > GBPJPY 0.741 > EURJPY -0.808. GBPJPY already in universe. AUDNZD stays."
     },
     {
       "category": "RESEARCH",
@@ -40,10 +40,12 @@
       "veto_reason": null
     }
   ],
-  "vetoed_ids": [],
+  "vetoed_ids": [
+    "SUG-002"
+  ],
   "stats": {
     "total_generated": 3,
     "implemented": 0,
-    "vetoed": 0
+    "vetoed": 1
   }
 }
