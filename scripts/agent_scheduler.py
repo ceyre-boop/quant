@@ -192,8 +192,9 @@ def run_health_check() -> dict:
         "firebase":       _check_firebase,
         "polygon":        _check_polygon,
         "openweather":    _check_openweather,
-        "twitter":        _check_twitter,
         "nasdaq":         _check_nasdaq,
+        # twitter removed — X API requires paid plan ($100+/mo), not worth it
+        # sentiment covered by news_api + reddit (free)
     }
 
     issues = []
