@@ -277,6 +277,10 @@ def _git_push_data():
     dst.mkdir(parents=True, exist_ok=True)
     for f in src.glob("*.json"):
         shutil.copy2(f, dst / f.name)
+    # Also copy oracle cost log so dashboard can show usage breakdown
+    cost_src = ROOT / "logs" / "oracle_cost.json"
+    if cost_src.exists():
+        shutil.copy2(cost_src, dst / "oracle_cost.json")
 
     try:
         subprocess.run(

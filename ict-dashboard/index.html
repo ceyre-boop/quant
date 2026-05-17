@@ -283,10 +283,10 @@
 
 <!-- STATS BAR -->
 <div id="statsbar">
-  <div>Oracle budget: <span id="stat-budget">—</span></div>
-  <div>Trades today: <span id="stat-trades">—</span></div>
+  <div>Oracle today: <span id="stat-today">—</span></div>
+  <div>Oracle week: <span id="stat-week">—</span></div>
+  <div>Budget remaining: <span id="stat-budget">—</span></div>
   <div>ICT veto rate: <span id="stat-veto">—</span></div>
-  <div>Reddit: <span id="stat-reddit">—</span></div>
   <div>v004 Sharpe: <span id="stat-sharpe">0.8843</span></div>
 </div>
 
@@ -300,6 +300,7 @@ const FILES = {
   queue:       BASE + "research_queue.json",
   suggestions: BASE + "suggestions.json",
   prompts:     BASE + "prompt_queue.json",
+  cost:        BASE + "oracle_cost.json",
 };
 
 // ── Fetch ──────────────────────────────────────────────────────────────────
@@ -572,18 +573,34 @@ function renderVersions() {
 }
 
 // ── Stats bar ──────────────────────────────────────────────────────────────
-function renderStats(usage, messages) {
-  // Oracle budget from oracle_cost.json — not available, show message count
-  const oracleMsgs = (messages||[]).filter(m=>m.source==="oracle").length;
-  document.getElementById("stat-budget").textContent = "~$19.96 remaining";
-  document.getElementById("stat-trades").textContent = `${oracleMsgs} oracle cycles`;
+function renderStats(usage, messages, costData) {
+  const BUDGET = 20.00;
+  const calls = costData?.calls || [];
+  const now = new Date();
+  const todayStr = now.toISOString().slice(0,10);
+  const weekAgo = new Date(now - 7*24*60*60*1000);
+
+  const todayCalls = calls.filter(c => c.timestamp.slice(0,10) === todayStr);
+  const weekCalls  = calls.filter(c => new Date(c.timestamp) >= weekAgo);
+
+  const todayCost = todayCalls.reduce((s,c) => s + (c.cost_usd||0), 0);
+  const weekCost  = weekCalls.reduce((s,c)  => s + (c.cost_usd||0), 0);
+  const totalSpent = calls.reduce((s,c) => s + (c.cost_usd||0), 0);
+  const remaining  = BUDGET - totalSpent;
+
+  document.getElementById("stat-today").textContent =
+    `${todayCalls.length} calls · $${todayCost.toFixed(4)}`;
+  document.getElementById("stat-week").textContent =
+    `${weekCalls.length} calls · $${weekCost.toFixed(3)}`;
+  document.getElementById("stat-budget").textContent =
+    `$${remaining.toFixed(2)} of $${BUDGET.toFixed(0)}`;
 }
 
 // ── LOAD ALL ───────────────────────────────────────────────────────────────
 async function loadAll() {
   document.getElementById("last-refresh").textContent = "refreshing...";
 
-  const [health, messages, usage, hypotheses, queue, suggestions, prompts] = await Promise.all([
+  const [health, messages, usage, hypotheses, queue, suggestions, prompts, costData] = await Promise.all([
     fetchJSON(FILES.health),
     fetchJSON(FILES.messages),
     fetchJSON(FILES.usage),
@@ -591,6 +608,7 @@ async function loadAll() {
     fetchJSON(FILES.queue),
     fetchJSON(FILES.suggestions),
     fetchJSON(FILES.prompts),
+    fetchJSON(FILES.cost),
   ]);
 
   const msgs = messages?.messages || [];
@@ -602,7 +620,7 @@ async function loadAll() {
   renderPrompts(prompts);
   renderHypotheses(hypotheses);
   renderVersions();
-  renderStats(usage, msgs);
+  renderStats(usage, msgs, costData);
 
   document.getElementById("last-refresh").textContent =
     "updated " + new Date().toLocaleTimeString();
