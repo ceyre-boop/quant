@@ -7,10 +7,10 @@
       "detail": "GBPUSD, EURUSD, AUDUSD hit 98-236% ADR exhaustion daily. Static 100% ADR gate is too rigid. Implement 120% threshold during high-vol sessions (London overlap, NFP) to capture extended-range FVGs without false vetoes.",
       "action": "Edit ICT_ADR_THRESHOLD in ict_scanner config from 1.0 to 1.2; add session_type logic gating 1.0 during US solo hours.",
       "id": "SUG-001",
-      "status": "NEW",
+      "status": "IMPLEMENTED",
       "created": "2026-05-16T19:41:22.066360",
       "vetoed_at": null,
-      "implemented_at": null,
+      "implemented_at": "2026-05-16T22:07:16.056224",
       "veto_reason": null
     },
     {
@@ -45,7 +45,7 @@
   ],
   "stats": {
     "total_generated": 3,
-    "implemented": 0,
+    "implemented": 1,
     "vetoed": 1
   }
 }
