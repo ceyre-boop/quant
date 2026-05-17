@@ -207,7 +207,6 @@ def build_context() -> str:
     if reddit and reddit.get("summary"):
         age_min = ""
         try:
-            from datetime import datetime, timezone
             ts = datetime.fromisoformat(reddit["last_updated"].replace("Z","+00:00"))
             age_min = f" ({int((datetime.now(timezone.utc)-ts).total_seconds()/60)}m ago)"
         except Exception:
