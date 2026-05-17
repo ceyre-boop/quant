@@ -2,6 +2,7 @@
 Phase 7 — Trade Ledger (V1.0)
 Logs EVERY executed trade for performance audit.
 """
+from __future__ import annotations
 
 import csv
 import json

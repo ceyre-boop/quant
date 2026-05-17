@@ -34,6 +34,24 @@ from pathlib import Path
 
 import anthropic
 
+# Load .env from repo root so the API key is always available regardless of
+# how this script is invoked (launchd, agent_scheduler, direct CLI).
+def _load_dotenv(env_path: Path) -> None:
+    if not env_path.exists():
+        return
+    with open(env_path) as f:
+        for line in f:
+            line = line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            key, _, val = line.partition("=")
+            key = key.strip()
+            val = val.strip().strip('"').strip("'")
+            if key and key not in os.environ:
+                os.environ[key] = val
+
+_load_dotenv(Path(__file__).parent.parent.parent / ".env")
+
 # ── Paths ─────────────────────────────────────────────────────────────────────
 ROOT          = Path(__file__).parent.parent.parent
 DATA_AGENT    = ROOT / "data" / "agent"

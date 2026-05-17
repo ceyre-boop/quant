@@ -1071,6 +1071,8 @@ class SovereignOrchestrator:
         except Exception as _ptje:
             logger.debug(f"[PTJ_200SMA] non-fatal: {_ptje}")
 
+        _insight = None  # set properly in stage 4; pre-init here for gate 5b
+
         # ── Gate 5b: Library Asset Class Filter ──────────────────────── #
         # The Library advisory identifies which sectors are safe in the current
         # macro regime. In VALUATION_DISLOCATION + DEFENSIVE_ROTATION: growth
