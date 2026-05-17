@@ -1,0 +1,104 @@
+{
+  "generated_at": "2026-05-17T06:40:47.701060",
+  "total_r_lost_to_failures": -342.95,
+  "potentially_recoverable_r": -273.23,
+  "recovery_pct_of_losses": 79.7,
+  "rules": [
+    {
+      "id": "C-001",
+      "type": "VETO",
+      "condition": "real_rate_diff sign opposes trade direction",
+      "detail": "Block new entries where real rate differential favors the opposite direction. This is the macro engine's core signal \u2014 trading against it is anti-edge.",
+      "evidence": {
+        "trades_affected": 189,
+        "avg_r_when_broken": -0.838,
+        "total_r_lost": -158.37
+      },
+      "priority": 1
+    },
+    {
+      "id": "C-003",
+      "type": "VETO",
+      "condition": "63-day momentum opposes trade direction by > 1%",
+      "detail": "Macro signal may be right directionally but momentum is still against us. Wait for momentum crossover or reduce size aggressively.",
+      "evidence": {
+        "trades_affected": 61,
+        "avg_r_when_broken": -0.905,
+        "total_r_lost": -55.21
+      },
+      "priority": 2
+    },
+    {
+      "id": "C-002",
+      "type": "SIZE_CUT",
+      "condition": "63-day momentum < 0.5% AND ATR < 0.7%",
+      "detail": "Reduce position size to 0.5\u00d7 when entering a flat, low-volatility market. Trailing stops are premature in compression; wait for expansion.",
+      "evidence": {
+        "trades_affected": 33,
+        "avg_r_when_broken": -0.899,
+        "total_r_lost": -29.68
+      },
+      "priority": 2
+    },
+    {
+      "id": "C-006",
+      "type": "VETO",
+      "condition": "ATR_14d_pct < 0.6%",
+      "detail": "Compressed volatility means the pair cannot deliver the range needed to hit targets. This is separate from the ICT ADR filter \u2014 apply at signal generation too.",
+      "evidence": {
+        "trades_affected": 31,
+        "avg_r_when_broken": -0.605,
+        "total_r_lost": -18.75
+      },
+      "priority": 2
+    },
+    {
+      "id": "C-005",
+      "type": "VETO",
+      "condition": "|real_rate_diff| < 0.5%",
+      "detail": "When rate differential is too narrow (<50bp real), the macro edge disappears. Skip these setups or wait for CB divergence to widen.",
+      "evidence": {
+        "trades_affected": 27,
+        "avg_r_when_broken": -1.11,
+        "total_r_lost": -29.97
+      },
+      "priority": 2
+    },
+    {
+      "id": "B-003",
+      "type": "SIZE_BOOST",
+      "condition": "|real_rate_diff| >= 2.5%",
+      "detail": "When real rate divergence is extreme (>250bp), the directional edge is highest. Scale to 1.25\u00d7 base size.",
+      "evidence": {
+        "trades_affected": 97,
+        "avg_r_won": 0.945,
+        "total_r_won": 91.65
+      },
+      "priority": 2
+    },
+    {
+      "id": "B-001",
+      "type": "SIZE_BOOST",
+      "condition": "real_rate_diff aligns with direction AND |real_rate_diff| >= 2% AND momentum confirms",
+      "detail": "Strong macro alignment with momentum confirmation is the system's highest-confidence setup. Scale to 1.5\u00d7 base size.",
+      "evidence": {
+        "trades_affected": 25,
+        "avg_r_won": 3.084,
+        "total_r_won": 77.1
+      },
+      "priority": 1
+    },
+    {
+      "id": "B-002",
+      "type": "BOOST",
+      "condition": "exit_type would be trailing_stop AND ATR_14d > 0.9%",
+      "detail": "High-ATR trending markets let trailing stops run. Widen trailing stop multiplier from 1.0\u00d7 to 1.3\u00d7 ATR in these conditions.",
+      "evidence": {
+        "trades_affected": 9,
+        "avg_r_won": 3.141,
+        "total_r_won": 28.27
+      },
+      "priority": 2
+    }
+  ]
+}

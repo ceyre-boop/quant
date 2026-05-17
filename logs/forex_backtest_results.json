@@ -1,40 +1,83 @@
 {
-  "run_date": "2026-05-17T00:10:21.589537",
-  "version": "v004-7pair-2026-05-17",
-  "date_range": "2015-2024",
-  "avg_sharpe": 0.8843,
-  "pairs_positive": 7,
-  "total_pairs": 7,
-  "removed": "NZDUSD \u2014 Sharpe 0.22, Oracle audit 2026-05-17",
-  "delta_vs_8pair": 0.083,
-  "results": [
-    {
+  "results": {
+    "EURUSD=X": {
       "pair": "EURUSD=X",
-      "sharpe": 1.01
+      "win_rate": 0.548,
+      "profit_factor": 1.894,
+      "sharpe": 1.441,
+      "max_drawdown": -0.045,
+      "avg_hold_days": 5.8,
+      "trades_per_year": 12.0,
+      "total_trades": 124,
+      "years": 10.3
     },
-    {
+    "GBPUSD=X": {
       "pair": "GBPUSD=X",
-      "sharpe": 1.13
+      "win_rate": 0.541,
+      "profit_factor": 1.847,
+      "sharpe": 1.306,
+      "max_drawdown": -0.044,
+      "avg_hold_days": 6.0,
+      "trades_per_year": 12.9,
+      "total_trades": 133,
+      "years": 10.3
     },
-    {
+    "USDJPY=X": {
       "pair": "USDJPY=X",
-      "sharpe": 0.61
+      "win_rate": 0.492,
+      "profit_factor": 1.539,
+      "sharpe": 1.004,
+      "max_drawdown": -0.083,
+      "avg_hold_days": 5.9,
+      "trades_per_year": 11.6,
+      "total_trades": 120,
+      "years": 10.3
     },
-    {
+    "AUDUSD=X": {
       "pair": "AUDUSD=X",
-      "sharpe": 1.29
+      "win_rate": 0.483,
+      "profit_factor": 1.741,
+      "sharpe": 1.264,
+      "max_drawdown": -0.052,
+      "avg_hold_days": 5.6,
+      "trades_per_year": 11.4,
+      "total_trades": 118,
+      "years": 10.3
     },
-    {
+    "USDCAD=X": {
       "pair": "USDCAD=X",
-      "sharpe": 0.57
+      "win_rate": 0.418,
+      "profit_factor": 1.162,
+      "sharpe": 0.326,
+      "max_drawdown": -0.082,
+      "avg_hold_days": 5.5,
+      "trades_per_year": 11.8,
+      "total_trades": 122,
+      "years": 10.3
     },
-    {
+    "GBPJPY=X": {
       "pair": "GBPJPY=X",
-      "sharpe": 0.74
+      "win_rate": 0.549,
+      "profit_factor": 1.321,
+      "sharpe": 0.653,
+      "max_drawdown": -0.093,
+      "avg_hold_days": 6.0,
+      "trades_per_year": 12.9,
+      "total_trades": 133,
+      "years": 10.3
     },
-    {
+    "AUDNZD=X": {
       "pair": "AUDNZD=X",
-      "sharpe": 0.84
+      "win_rate": 0.529,
+      "profit_factor": 1.716,
+      "sharpe": 1.172,
+      "max_drawdown": -0.035,
+      "avg_hold_days": 6.2,
+      "trades_per_year": 10.1,
+      "total_trades": 104,
+      "years": 10.3
     }
-  ]
+  },
+  "avg_sharpe": 1.0237,
+  "version": "v005-trailing1.25"
 }

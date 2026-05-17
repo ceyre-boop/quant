@@ -54,7 +54,7 @@ class ForexBacktester:
     HOLD_DAYS = 60          # hold per signal — macro signals play out over 2-3 months
     STOP_PCT = 0.04         # compatibility fallback only; strict mode uses ATR stop
     STOP_ATR_MULT = 2.0
-    TRAILING_ATR_MULT = 1.0
+    TRAILING_ATR_MULT = 1.25  # forensics v1: 1.25x beats 1.0x (Sharpe 1.024 vs 0.884)
     DONCHIAN_EXIT_DAYS = 10
     SIGNAL_THRESHOLD = 0.15   # lowered from 0.20 — more macro signals for statistical validity
     CB_SURPRISE_THRESHOLD = 20  # 20bp in backtest (vs 25bp live) for adequate sample size
