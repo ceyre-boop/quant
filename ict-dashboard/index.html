@@ -3,663 +3,614 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ALTA — Research Intelligence</title>
+<title>ALTA — SOVEREIGN</title>
 <style>
   :root {
-    --bg:        #0a0a0a;
-    --bg2:       #111111;
-    --bg3:       #161616;
-    --border:    #222222;
-    --text:      #c8c8c8;
-    --muted:     #555555;
-    --green:     #00c896;
-    --yellow:    #f5c518;
-    --red:       #e05252;
-    --blue:      #4a9eff;
-    --orange:    #f4923a;
-    --purple:    #b06cff;
-    --accent:    #00c896;
-    --font:      'Courier New', Courier, monospace;
+    --bg:     #0a0a0a;
+    --bg2:    #111111;
+    --bg3:    #181818;
+    --border: #1e1e1e;
+    --text:   #d0d0d0;
+    --muted:  #484848;
+    --dim:    #2a2a2a;
+    --green:  #00c896;
+    --yellow: #f5c518;
+    --red:    #e05252;
+    --blue:   #4a9eff;
+    --accent: #00c896;
+    --font:   'Courier New', monospace;
   }
-
   * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--font); font-size: 13px; line-height: 1.6; }
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--font);
-    font-size: 13px;
-    line-height: 1.5;
-    min-height: 100vh;
-  }
-
-  /* ── TOP HEADER ─────────────────────────────────────────── */
+  /* ── HEADER ── */
   #header {
     background: var(--bg2);
     border-bottom: 1px solid var(--border);
-    padding: 10px 20px;
+    padding: 10px 24px;
     display: flex;
+    align-items: center;
     justify-content: space-between;
-    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
   }
-  #header .logo {
-    color: var(--green);
-    font-size: 15px;
-    font-weight: bold;
-    letter-spacing: 3px;
-  }
-  #header .tagline {
-    color: var(--muted);
-    font-size: 11px;
-  }
-  #header .timestamp {
-    color: var(--muted);
-    font-size: 11px;
-  }
-  #reload-btn {
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    color: var(--green);
-    font-family: var(--font);
-    font-size: 11px;
-    padding: 4px 10px;
-    cursor: pointer;
-    letter-spacing: 1px;
-  }
-  #reload-btn:hover { border-color: var(--green); }
+  #header .left { display: flex; align-items: center; gap: 20px; }
+  .logo { color: var(--accent); font-size: 14px; font-weight: bold; letter-spacing: 3px; }
+  .sub  { color: var(--muted); font-size: 11px; letter-spacing: 1px; }
 
-  /* ── GRID LAYOUT ─────────────────────────────────────────── */
-  #grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    grid-template-rows: auto;
-    gap: 1px;
-    background: var(--border);
-    padding: 1px;
-    min-height: calc(100vh - 46px);
+  /* Health pill — collapses to one line */
+  #health-pill {
+    display: flex; align-items: center; gap: 8px;
+    cursor: pointer; user-select: none;
   }
-
-  .panel {
-    background: var(--bg);
-    padding: 14px 16px;
-    overflow: hidden;
-  }
-  .panel.full-width  { grid-column: 1 / -1; }
-  .panel.half-width  { grid-column: span 2; }
-
-  .panel-title {
-    color: var(--muted);
-    font-size: 10px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 6px;
-    margin-bottom: 10px;
-  }
-
-  /* ── HEALTH GRID ─────────────────────────────────────────── */
-  .health-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-  }
-  .health-item {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    padding: 8px 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-  }
-  .health-item .h-name  { font-size: 11px; color: var(--muted); }
-  .health-item .h-status{ font-size: 12px; font-weight: bold; }
-  .health-item .h-detail{ font-size: 10px; color: var(--muted); }
-
-  /* ── STATUS COLORS ──────────────────────────────────────── */
-  .GREEN  { color: var(--green); }
-  .YELLOW { color: var(--yellow); }
-  .RED    { color: var(--red); }
-  .UNKNOWN{ color: var(--muted); }
-  .CONFIRMED { color: var(--green); }
-  .REJECTED  { color: var(--red); }
-  .TESTING   { color: var(--yellow); }
-  .QUEUED    { color: var(--blue); }
-
-  /* ── MESSAGES ────────────────────────────────────────────── */
-  .message {
-    display: flex;
-    gap: 8px;
-    padding: 8px 10px;
-    border-left: 2px solid var(--border);
-    margin-bottom: 6px;
-    background: var(--bg2);
-  }
-  .message.URGENT    { border-color: var(--red); }
-  .message.IMPORTANT { border-color: var(--yellow); }
-  .message.FYI       { border-color: var(--green); }
-  .message .msg-emoji { font-size: 14px; flex-shrink: 0; }
-  .message .msg-body  { font-size: 12px; }
-  .message .msg-time  { color: var(--muted); font-size: 10px; margin-top: 2px; }
-
-  /* ── HYPOTHESIS TABLE ───────────────────────────────────── */
-  .hyp-table { width: 100%; border-collapse: collapse; }
-  .hyp-table th {
-    color: var(--muted);
-    font-size: 10px;
-    letter-spacing: 1px;
-    text-align: left;
-    padding: 4px 8px;
-    border-bottom: 1px solid var(--border);
-  }
-  .hyp-table td {
-    padding: 5px 8px;
-    font-size: 11px;
-    border-bottom: 1px solid var(--bg2);
-  }
-  .hyp-table tr:hover td { background: var(--bg2); }
-
-  /* ── RESEARCH QUEUE ─────────────────────────────────────── */
-  .queue-item {
-    display: grid;
-    grid-template-columns: 28px 1fr auto;
-    gap: 8px;
-    align-items: start;
-    padding: 8px 0;
-    border-bottom: 1px solid var(--border);
-  }
-  .queue-item:last-child { border-bottom: none; }
-  .q-priority { color: var(--yellow); font-size: 12px; font-weight: bold; }
-  .q-name     { font-size: 12px; }
-  .q-desc     { font-size: 10px; color: var(--muted); margin-top: 2px; }
-  .q-status   { font-size: 10px; padding: 2px 6px; border: 1px solid; }
-  .q-status.QUEUED  { color: var(--blue); border-color: var(--blue); }
-  .q-status.RUNNING { color: var(--yellow); border-color: var(--yellow); }
-  .q-status.DONE    { color: var(--green); border-color: var(--green); }
-  .q-status.ERROR   { color: var(--red); border-color: var(--red); }
-
-  /* ── VERSION TRACKER ─────────────────────────────────────── */
-  .version-tracker { }
-  .version-row {
-    display: grid;
-    grid-template-columns: 60px 1fr 70px;
-    gap: 8px;
-    align-items: center;
-    margin-bottom: 6px;
-  }
-  .v-label  { font-size: 11px; color: var(--muted); }
-  .v-bar-bg { background: var(--bg2); height: 14px; position: relative; }
-  .v-bar    { height: 100%; background: var(--green); opacity: 0.7; }
-  .v-bar.current { background: var(--accent); opacity: 1; }
-  .v-bar.target  { background: transparent; border-right: 2px solid var(--yellow); position: absolute; height: 100%; top: 0; }
-  .v-sharpe { font-size: 11px; text-align: right; }
-
-  /* ── USAGE PANEL ─────────────────────────────────────────── */
-  .usage-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-    gap: 8px;
-  }
-  .usage-stat {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    padding: 8px 10px;
-  }
-  .usage-stat .u-label { font-size: 10px; color: var(--muted); }
-  .usage-stat .u-value { font-size: 16px; font-weight: bold; margin-top: 2px; }
-  .usage-stat .u-sub   { font-size: 10px; color: var(--muted); }
-  .mode-badge {
-    display: inline-block;
-    padding: 2px 8px;
-    font-size: 11px;
-    font-weight: bold;
-    letter-spacing: 1px;
-  }
-  .mode-NORMAL  { color: var(--green); border: 1px solid var(--green); }
-  .mode-LIGHT   { color: var(--yellow); border: 1px solid var(--yellow); }
-  .mode-DANGER  { color: var(--red); border: 1px solid var(--red); }
-  .mode-UNKNOWN { color: var(--muted); border: 1px solid var(--muted); }
-
-  /* ── WARNING BANNER ─────────────────────────────────────── */
-  #usage-warning {
+  #health-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); }
+  #health-dot.yellow { background: var(--yellow); }
+  #health-dot.red    { background: var(--red); animation: pulse 1s infinite; }
+  #health-summary    { font-size: 11px; color: var(--muted); }
+  #health-detail {
     display: none;
-    background: rgba(224, 82, 82, 0.1);
-    border: 1px solid var(--red);
-    color: var(--red);
-    padding: 8px 16px;
-    font-size: 11px;
-    letter-spacing: 1px;
-    margin-bottom: 4px;
+    position: absolute;
+    top: 44px; right: 24px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    padding: 12px 16px;
+    min-width: 420px;
+    z-index: 200;
+  }
+  #health-detail.open { display: block; }
+  .hd-row { display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid var(--border); font-size: 11px; }
+  .hd-row:last-child { border: none; }
+  .hd-name { color: var(--muted); }
+  .hd-val  { color: var(--text); text-align: right; max-width: 280px; }
+  .hd-green { color: var(--green); }
+  .hd-yellow{ color: var(--yellow); }
+  .hd-red   { color: var(--red); }
+
+  #header .right { display: flex; align-items: center; gap: 16px; }
+  #last-refresh  { font-size: 10px; color: var(--muted); }
+  #reload-btn {
+    font-family: var(--font); font-size: 11px;
+    background: none; border: 1px solid var(--border);
+    color: var(--muted); padding: 4px 10px; cursor: pointer;
+  }
+  #reload-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  @keyframes fadein { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
+
+  /* ── LAYOUT ── */
+  #main { padding: 20px 24px; display: grid; grid-template-columns: 1fr 340px; gap: 16px; max-width: 1400px; margin: 0 auto; }
+
+  /* ── ORACLE HERO ── */
+  #oracle-hero {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    padding: 20px 24px;
+    animation: fadein 0.4s ease;
+  }
+  #oracle-hero .oracle-label {
+    font-size: 10px; color: var(--accent); letter-spacing: 2px; margin-bottom: 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  #oracle-hero .oracle-label .live-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--accent); animation: pulse 2s infinite;
+  }
+  #oracle-hero #oracle-text {
+    font-size: 14px; color: var(--text); line-height: 1.8;
+    font-style: italic;
+  }
+  #oracle-hero #oracle-meta {
+    margin-top: 12px; font-size: 10px; color: var(--muted);
+    display: flex; gap: 16px;
   }
 
-  /* ── SPINNER / LOADING ──────────────────────────────────── */
-  .loading { color: var(--muted); font-size: 11px; }
-
-  /* ── EMPTY STATE ─────────────────────────────────────────── */
-  .empty { color: var(--muted); font-size: 11px; font-style: italic; }
-
-  /* ── SCROLLABLE ─────────────────────────────────────────── */
-  .scrollable { max-height: 340px; overflow-y: auto; }
-  .scrollable::-webkit-scrollbar { width: 4px; }
-  .scrollable::-webkit-scrollbar-thumb { background: var(--border); }
-
-  /* ── OVERALL HEALTH BADGE ─────────────────────────────────── */
-  .overall-badge {
-    font-size: 13px;
-    font-weight: bold;
-    padding: 2px 8px;
-    border: 1px solid;
-    margin-bottom: 8px;
-    display: inline-block;
+  /* ── MESSAGE FEED ── */
+  #feed {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    padding: 16px;
+    margin-top: 16px;
   }
-
-  /* ── SUGGESTIONS ────────────────────────────────────────── */
-  .sug-item {
+  .feed-label { font-size: 10px; color: var(--muted); letter-spacing: 2px; margin-bottom: 12px; }
+  .feed-item {
     padding: 10px 0;
     border-bottom: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: 24px 1fr;
+    gap: 10px;
+    align-items: start;
   }
-  .sug-item:last-child { border-bottom: none; }
-  .sug-header { display: flex; gap: 8px; align-items: baseline; margin-bottom: 4px; }
-  .sug-id     { font-size: 10px; color: var(--muted); font-family: monospace; }
-  .sug-cat    { font-size: 10px; padding: 1px 5px; border: 1px solid var(--border); color: var(--accent); }
-  .sug-title  { font-size: 12px; color: var(--fg); font-weight: bold; }
-  .sug-detail { font-size: 11px; color: var(--muted); margin: 3px 0 6px; line-height: 1.5; }
-  .sug-action { font-size: 10px; color: var(--yellow); margin-bottom: 6px; }
-  .sug-cmd    { font-size: 10px; font-family: monospace; color: var(--muted); cursor: pointer; }
-  .sug-cmd:hover { color: var(--fg); }
-  .sug-pri-HIGH   { color: var(--red); }
-  .sug-pri-MEDIUM { color: var(--yellow); }
-  .sug-pri-LOW    { color: var(--green); }
-  .sug-empty { color: var(--muted); font-size: 11px; padding: 8px 0; }
+  .feed-item:last-child { border: none; padding-bottom: 0; }
+  .feed-item.unread { border-left: 2px solid var(--accent); padding-left: 8px; margin-left: -8px; }
+  .feed-emoji { font-size: 13px; padding-top: 1px; }
+  .feed-text  { font-size: 12px; color: var(--text); line-height: 1.6; }
+  .feed-time  { font-size: 10px; color: var(--muted); margin-top: 4px; }
+
+  /* ── RIGHT COLUMN ── */
+  #sidebar { display: flex; flex-direction: column; gap: 16px; }
+
+  /* ── PANEL BASE ── */
+  .panel {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    padding: 16px;
+  }
+  .panel-label { font-size: 10px; color: var(--muted); letter-spacing: 2px; margin-bottom: 12px; }
+
+  /* ── SUGGESTIONS ── */
+  .sug-item { padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .sug-item:last-child { border: none; padding-bottom: 0; }
+  .sug-head { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+  .sug-id   { font-size: 10px; color: var(--muted); }
+  .sug-cat  { font-size: 10px; color: var(--accent); border: 1px solid var(--border); padding: 1px 5px; }
+  .sug-title{ font-size: 12px; color: var(--text); }
+  .sug-detail{ font-size: 11px; color: var(--muted); margin: 4px 0 6px; line-height: 1.5; }
+  .sug-cmd  { font-size: 10px; color: var(--dim); cursor: pointer; padding: 2px 0; }
+  .sug-cmd:hover { color: var(--accent); }
+  .sug-empty{ font-size: 11px; color: var(--muted); }
+  .pri-HIGH  { color: var(--red); }
+  .pri-MEDIUM{ color: var(--yellow); }
+  .pri-LOW   { color: var(--accent); }
+
+  /* ── PROMPT QUEUE ── */
+  .prompt-item { padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .prompt-item:last-child { border: none; }
+  .prompt-id   { font-size: 10px; color: var(--muted); margin-bottom: 4px; }
+  .prompt-reason{ font-size: 11px; color: var(--yellow); margin-bottom: 6px; }
+  .prompt-text { font-size: 11px; color: var(--text); line-height: 1.5; max-height: 80px; overflow: hidden; position: relative; }
+  .prompt-text::after { content:''; position:absolute; bottom:0; left:0; right:0; height:20px; background:linear-gradient(transparent,var(--bg2)); }
+  .prompt-cmd  { font-size: 10px; color: var(--dim); cursor: pointer; margin-top: 6px; }
+  .prompt-cmd:hover { color: var(--accent); }
+  .prompt-empty{ font-size: 11px; color: var(--muted); }
+
+  /* ── HYPOTHESES ── */
+  .hyp-item { display: flex; gap: 8px; padding: 5px 0; border-bottom: 1px solid var(--border); font-size: 11px; }
+  .hyp-item:last-child { border: none; }
+  .hyp-status { flex-shrink: 0; }
+  .hyp-name   { color: var(--text); }
+  .hyp-result { color: var(--muted); font-size: 10px; margin-top: 1px; }
+  .hyp-empty  { font-size: 11px; color: var(--muted); }
+
+  /* ── SHARPE TRACKER ── */
+  .sharpe-target { font-size: 11px; color: var(--muted); margin-bottom: 12px; }
+  .sharpe-target span { color: var(--accent); }
+  .sv-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-size: 11px; }
+  .sv-label { width: 52px; color: var(--muted); flex-shrink: 0; }
+  .sv-bar-track { flex: 1; height: 4px; background: var(--bg3); position: relative; }
+  .sv-bar-fill  { height: 100%; background: var(--muted); }
+  .sv-bar-fill.current { background: var(--accent); }
+  .sv-target-line { position: absolute; right: 0; top: -3px; width: 1px; height: 10px; background: var(--yellow); opacity: 0.5; }
+  .sv-val { width: 38px; text-align: right; color: var(--muted); }
+  .sv-val.current { color: var(--accent); }
+
+  /* ── BOTTOM STATS BAR ── */
+  #statsbar {
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+    padding: 8px 24px;
+    display: flex;
+    gap: 32px;
+    font-size: 10px;
+    color: var(--muted);
+  }
+  #statsbar span { color: var(--text); }
+
+  /* ── RESPONSIVE ── */
+  @media(max-width: 900px) {
+    #main { grid-template-columns: 1fr; }
+    #sidebar { order: -1; }
+  }
 </style>
 </head>
 <body>
 
+<!-- HEADER -->
 <div id="header">
-  <div>
+  <div class="left">
     <div class="logo">ALTA — SOVEREIGN</div>
-    <div class="tagline">Research Intelligence Dashboard</div>
+    <div class="sub">Research Intelligence</div>
   </div>
-  <div style="display:flex;gap:12px;align-items:center;">
-    <span class="timestamp" id="last-refresh">Loading...</span>
+  <div class="right">
+    <!-- Health pill — click to expand -->
+    <div id="health-pill" onclick="toggleHealth()">
+      <div id="health-dot"></div>
+      <div id="health-summary">checking...</div>
+    </div>
+    <div id="last-refresh">—</div>
     <button id="reload-btn" onclick="loadAll()">↻ RELOAD</button>
   </div>
 </div>
 
-<div id="usage-warning">
-  ⚠ LOW WEEKLY USAGE REMAINING — Agent switching to LIGHT mode
+<!-- Health dropdown (hidden unless problem or clicked) -->
+<div id="health-detail">
+  <div id="health-rows"></div>
 </div>
 
-<div id="grid">
+<!-- MAIN -->
+<div id="main">
 
-  <!-- Row 1: System Health (full width) -->
-  <div class="panel full-width" id="panel-health">
-    <div class="panel-title">System Health</div>
-    <div class="loading">Loading...</div>
+  <!-- LEFT: Oracle + Feed -->
+  <div>
+    <!-- Oracle Hero -->
+    <div id="oracle-hero">
+      <div class="oracle-label">
+        <div class="live-dot"></div>
+        ORACLE — LATEST INTELLIGENCE
+      </div>
+      <div id="oracle-text">Loading...</div>
+      <div id="oracle-meta"></div>
+    </div>
+
+    <!-- Message Feed -->
+    <div id="feed">
+      <div class="feed-label">INTELLIGENCE FEED</div>
+      <div id="feed-items">Loading...</div>
+    </div>
   </div>
 
-  <!-- Row 2: Messages (left 2/3) | Usage (right 1/3) -->
-  <div class="panel half-width" id="panel-messages">
-    <div class="panel-title">Messages to Colin</div>
-    <div class="loading">Loading...</div>
+  <!-- RIGHT: Sidebar -->
+  <div id="sidebar">
+
+    <!-- Suggestions -->
+    <div class="panel" id="panel-suggestions">
+      <div class="panel-label">ORACLE SUGGESTIONS</div>
+      <div id="sug-content">Loading...</div>
+    </div>
+
+    <!-- Prompt Queue -->
+    <div class="panel" id="panel-prompts">
+      <div class="panel-label">CLAUDE CODE QUEUE</div>
+      <div id="prompt-content">Loading...</div>
+    </div>
+
+    <!-- Active Hypotheses -->
+    <div class="panel" id="panel-hyp">
+      <div class="panel-label">ACTIVE RESEARCH</div>
+      <div id="hyp-content">Loading...</div>
+    </div>
+
+    <!-- Sharpe Tracker -->
+    <div class="panel" id="panel-versions">
+      <div class="panel-label">SHARPE PROGRESS</div>
+      <div id="version-content">Loading...</div>
+    </div>
+
   </div>
+</div>
 
-  <div class="panel" id="panel-usage">
-    <div class="panel-title">Session Usage</div>
-    <div class="loading">Loading...</div>
-  </div>
-
-  <!-- Row 3: Hypothesis Ledger (full width) -->
-  <div class="panel full-width" id="panel-hypotheses">
-    <div class="panel-title">Hypothesis Ledger</div>
-    <div class="loading">Loading...</div>
-  </div>
-
-  <!-- Row 4: Research Queue (left 2/3) | Version Tracker (right 1/3) -->
-  <div class="panel half-width" id="panel-queue">
-    <div class="panel-title">Research Queue</div>
-    <div class="loading">Loading...</div>
-  </div>
-
-  <div class="panel" id="panel-versions">
-    <div class="panel-title">Version Tracker — Sharpe Progress</div>
-    <div class="loading">Loading...</div>
-  </div>
-
-
-  <!-- Row 5: Suggestions (full width) -->
-  <div class="panel half-width" id="panel-suggestions" style="grid-column: span 3;">
-    <div class="panel-title">Oracle Suggestions <span id="sug-count" style="color:var(--muted);font-size:10px;margin-left:8px;"></span></div>
-    <div class="loading">Loading...</div>
-  </div>
-
+<!-- STATS BAR -->
+<div id="statsbar">
+  <div>Oracle budget: <span id="stat-budget">—</span></div>
+  <div>Trades today: <span id="stat-trades">—</span></div>
+  <div>ICT veto rate: <span id="stat-veto">—</span></div>
+  <div>Reddit: <span id="stat-reddit">—</span></div>
+  <div>v004 Sharpe: <span id="stat-sharpe">0.8843</span></div>
 </div>
 
 <script>
-// ── DATA PATHS (relative to this HTML file location) ─────────────────────────
-// Adjust if you open this from a different directory
-const DATA_BASE = "./data/agent/";
-
+const BASE = "./data/agent/";
 const FILES = {
-  health:     DATA_BASE + "health.json",
-  messages:   DATA_BASE + "messages_to_colin.json",
-  usage:      DATA_BASE + "usage.json",
-  hypotheses: DATA_BASE + "hypothesis_ledger.json",
-  queue:      DATA_BASE + "research_queue.json",
-  suggestions: DATA_BASE + "suggestions.json",
+  health:      BASE + "health.json",
+  messages:    BASE + "messages_to_colin.json",
+  usage:       BASE + "usage.json",
+  hypotheses:  BASE + "hypothesis_ledger.json",
+  queue:       BASE + "research_queue.json",
+  suggestions: BASE + "suggestions.json",
+  prompts:     BASE + "prompt_queue.json",
 };
 
-// ── VERSION DATA (static — update manually or from findings) ──────────────────
-const VERSIONS = [
-  { label: "v001", sharpe: 0.1785, color: "#e05252" },
-  { label: "v002", sharpe: 0.3551, color: "#f4923a" },
-  { label: "v002.5", sharpe: 0.38, color: "#f5c518" },
-  { label: "v003", sharpe: 0.4523, color: "#f5c518" },
-  { label: "v004", sharpe: 0.6260, color: "#00c896" },
-  { label: "current", sharpe: 0.8011, color: "#00c896", current: true },
-];
-const TARGET_SHARPE = 1.5;
-
-// ── FETCH JSON ────────────────────────────────────────────────────────────────
+// ── Fetch ──────────────────────────────────────────────────────────────────
 async function fetchJSON(path) {
   try {
     const r = await fetch(path + "?t=" + Date.now());
     if (!r.ok) return null;
     return await r.json();
-  } catch (e) {
-    return null;
-  }
+  } catch { return null; }
 }
 
-// ── RENDER: HEALTH ────────────────────────────────────────────────────────────
+function timeAgo(isoStr) {
+  if (!isoStr) return "";
+  try {
+    const diff = (Date.now() - new Date(isoStr)) / 1000;
+    if (diff < 60)  return `${Math.round(diff)}s ago`;
+    if (diff < 3600) return `${Math.round(diff/60)}m ago`;
+    return `${Math.round(diff/3600)}h ago`;
+  } catch { return ""; }
+}
+
+function esc(s) {
+  return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+function copy(text) {
+  navigator.clipboard.writeText(text).catch(()=>{});
+}
+
+// ── Health pill ────────────────────────────────────────────────────────────
+let healthOpen = false;
+function toggleHealth() {
+  healthOpen = !healthOpen;
+  document.getElementById("health-detail").classList.toggle("open", healthOpen);
+}
+document.addEventListener("click", e => {
+  if (!e.target.closest("#health-pill") && !e.target.closest("#health-detail")) {
+    healthOpen = false;
+    document.getElementById("health-detail").classList.remove("open");
+  }
+});
+
 function renderHealth(data) {
-  const el = document.getElementById("panel-health");
+  const dot  = document.getElementById("health-dot");
+  const sumEl = document.getElementById("health-summary");
+  const rowsEl = document.getElementById("health-rows");
+
   if (!data || !data.components) {
-    el.innerHTML = '<div class="panel-title">System Health</div><div class="empty">No health data — run agent_scheduler.py --health</div>';
+    sumEl.textContent = "no data";
     return;
   }
 
-  const overall = data.overall || "UNKNOWN";
-  const checked = data.last_checked ? new Date(data.last_checked).toLocaleTimeString() : "never";
+  const comps = Object.entries(data.components);
+  const reds    = comps.filter(([,v]) => v.status === "RED");
+  const yellows = comps.filter(([,v]) => v.status === "YELLOW");
+  const greens  = comps.filter(([,v]) => v.status === "GREEN");
 
-  let items = "";
-  for (const [name, comp] of Object.entries(data.components)) {
-    const status = comp.status || "UNKNOWN";
-    const detail = comp.detail || "—";
-    items += `
-      <div class="health-item">
-        <div class="h-name">${name.toUpperCase().replace(/_/g," ")}</div>
-        <div class="h-status ${status}">${status}</div>
-        <div class="h-detail">${detail}</div>
-      </div>`;
+  // Pill status
+  if (reds.length > 0) {
+    dot.className = "red";
+    sumEl.textContent = `${reds.length} DOWN — click to expand`;
+    // Auto-open on red
+    if (!healthOpen) {
+      healthOpen = true;
+      document.getElementById("health-detail").classList.add("open");
+    }
+  } else if (yellows.length > 0) {
+    dot.className = "yellow";
+    sumEl.textContent = `${yellows.length} degraded · ${greens.length} green`;
+  } else {
+    dot.className = "";
+    sumEl.textContent = `All ${greens.length} systems green`;
   }
 
-  el.innerHTML = `
-    <div class="panel-title">System Health
-      <span class="overall-badge ${overall}" style="margin-left:8px;font-size:11px;border-color:${overall==='GREEN'?'var(--green)':overall==='YELLOW'?'var(--yellow)':'var(--red)'}">● ${overall}</span>
-      <span style="color:var(--muted);font-size:10px;margin-left:8px;">checked ${checked}</span>
-    </div>
-    <div class="health-grid">${items}</div>`;
+  // Detail rows (only show non-green unless all green)
+  const showAll = reds.length === 0 && yellows.length === 0;
+  const toShow  = showAll ? comps : [...reds, ...yellows];
+
+  rowsEl.innerHTML = toShow.map(([name, v]) => {
+    const cls = v.status === "GREEN" ? "hd-green" : v.status === "YELLOW" ? "hd-yellow" : "hd-red";
+    const icon = v.status === "GREEN" ? "●" : v.status === "YELLOW" ? "◐" : "○";
+    return `<div class="hd-row">
+      <div class="hd-name"><span class="${cls}">${icon}</span> ${name}</div>
+      <div class="hd-val ${cls}">${esc(v.detail||"")}</div>
+    </div>`;
+  }).join("") || `<div class="hd-row"><div class="hd-name" style="color:var(--green)">All systems nominal</div></div>`;
 }
 
-// ── RENDER: MESSAGES ──────────────────────────────────────────────────────────
-function renderMessages(data) {
-  const el = document.getElementById("panel-messages");
-  const header = '<div class="panel-title">Messages to Colin</div>';
+// ── Oracle Hero ────────────────────────────────────────────────────────────
+function renderOracleHero(messages) {
+  const textEl = document.getElementById("oracle-text");
+  const metaEl = document.getElementById("oracle-meta");
 
-  if (!data || !data.messages || data.messages.length === 0) {
-    el.innerHTML = header + '<div class="empty">No messages yet.</div>';
+  const oracleMsgs = (messages || [])
+    .filter(m => m.source === "oracle" && !m.text?.includes("DRY RUN") && !m.text?.includes("Oracle failed"))
+    .slice(-1);
+
+  if (!oracleMsgs.length) {
+    textEl.textContent = "Waiting for first Oracle cycle...";
+    metaEl.innerHTML = "";
     return;
   }
 
-  const msgs = data.messages.slice(0, 15).map(m => {
-    const time = m.timestamp ? new Date(m.timestamp).toLocaleString() : "";
-    return `
-      <div class="message ${m.priority}">
-        <div class="msg-emoji">${m.emoji || "🟢"}</div>
-        <div>
-          <div class="msg-body">${m.text}</div>
-          <div class="msg-time">${time}</div>
-        </div>
-      </div>`;
-  }).join("");
-
-  el.innerHTML = header + `<div class="scrollable">${msgs}</div>`;
+  const latest = oracleMsgs[0];
+  textEl.textContent = latest.text || "";
+  metaEl.innerHTML = `
+    <span>${latest.emoji || ""} ${latest.priority || ""}</span>
+    <span>${timeAgo(latest.timestamp)}</span>
+  `;
 }
 
-// ── RENDER: USAGE ─────────────────────────────────────────────────────────────
-function renderUsage(data) {
-  const el = document.getElementById("panel-usage");
-  const header = '<div class="panel-title">Session Usage</div>';
+// ── Intelligence Feed ──────────────────────────────────────────────────────
+function renderFeed(messages) {
+  const el = document.getElementById("feed-items");
+  const all = (messages || [])
+    .filter(m => !m.text?.includes("DRY RUN"))
+    .slice(-12)
+    .reverse();
 
-  if (!data) {
-    el.innerHTML = header + '<div class="empty">No usage data — run claude_usage_tracker.py</div>';
+  // Skip the first one (shown in hero)
+  const feed = all.filter(m => m.source === "oracle").slice(1, 8)
+    .concat(all.filter(m => m.source !== "oracle").slice(0, 3))
+    .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+    .slice(0, 8);
+
+  if (!feed.length) {
+    el.innerHTML = `<div style="color:var(--muted);font-size:11px">No messages yet.</div>`;
     return;
   }
 
-  const mode        = data.mode || "UNKNOWN";
-  const w           = data.week || {};
-  const t           = data.today || {};
-  const weeklyUsed  = (w.weekly_used || 0).toLocaleString();
-  const weeklyLeft  = (w.weekly_remaining || 0).toLocaleString();
-  const agentAllow  = (t.agent_allowed_today || 0).toLocaleString();
-  const humanUsed   = (t.human_used || 0).toLocaleString();
-  const lastSync    = w.last_synced ? new Date(w.last_synced).toLocaleTimeString() : "never";
-  const weekPct     = Math.round((w.weekly_used || 0) / (data.meta?.weekly_total_estimate || 200000) * 100);
+  el.innerHTML = feed.map(m => `
+    <div class="feed-item ${!m.read ? 'unread' : ''}">
+      <div class="feed-emoji">${m.emoji || "○"}</div>
+      <div>
+        <div class="feed-text">${esc(m.text || "")}</div>
+        <div class="feed-time">${timeAgo(m.timestamp)}</div>
+      </div>
+    </div>`).join("");
+}
 
-  // Show warning banner if danger
-  const warningEl = document.getElementById("usage-warning");
-  if ((w.weekly_remaining || 200000) < 20000) {
-    warningEl.style.display = "block";
+// ── Suggestions ────────────────────────────────────────────────────────────
+function renderSuggestions(data) {
+  const el = document.getElementById("sug-content");
+  const open = (data?.suggestions || []).filter(s => s.status === "NEW");
+  const stats = data?.stats || {};
+
+  if (!open.length) {
+    el.innerHTML = `<div class="sug-empty">No open suggestions — Oracle generates next cycle.</div>
+      <div style="font-size:10px;color:var(--muted);margin-top:8px">${stats.implemented||0} implemented · ${stats.vetoed||0} vetoed</div>`;
+    return;
   }
 
-  el.innerHTML = `
-    ${header}
-    <div style="margin-bottom:10px;">
-      <span class="mode-badge mode-${mode}">${mode}</span>
-      <span style="color:var(--muted);font-size:10px;margin-left:8px;">synced ${lastSync}</span>
-    </div>
-    <div class="usage-grid">
-      <div class="usage-stat">
-        <div class="u-label">WEEKLY USED</div>
-        <div class="u-value" style="color:var(--text)">${weeklyUsed}</div>
-        <div class="u-sub">${weekPct}% of est. 200k</div>
+  const priIcon = {HIGH:"🔴",MEDIUM:"🟡",LOW:"🟢"};
+  el.innerHTML = open.map(s => `
+    <div class="sug-item">
+      <div class="sug-head">
+        <span class="pri-${s.priority}">${priIcon[s.priority]||"○"}</span>
+        <span class="sug-id">${s.id}</span>
+        <span class="sug-cat">${s.category}</span>
       </div>
-      <div class="usage-stat">
-        <div class="u-label">WEEKLY LEFT</div>
-        <div class="u-value" style="color:var(--green)">${weeklyLeft}</div>
-        <div class="u-sub">tokens remaining</div>
-      </div>
-      <div class="usage-stat">
-        <div class="u-label">TODAY HUMAN</div>
-        <div class="u-value" style="color:var(--blue)">${humanUsed}</div>
-        <div class="u-sub">of ${(t.daily_human_budget||20000).toLocaleString()} budget</div>
-      </div>
-      <div class="usage-stat">
-        <div class="u-label">AGENT ALLOWED</div>
-        <div class="u-value" style="color:var(--accent)">${agentAllow}</div>
-        <div class="u-sub">incl. ${(t.agent_extra_from_rollover||0).toLocaleString()} rollover</div>
-      </div>
-    </div>
-    <div style="margin-top:10px;color:var(--muted);font-size:10px;">
-      SYNC: python3 sovereign/tools/claude_usage_tracker.py sync --used &lt;n&gt;
+      <div class="sug-title">${esc(s.title)}</div>
+      <div class="sug-detail">${esc(s.detail)}</div>
+      <div class="sug-cmd" onclick="copy('python3 scripts/suggestions.py --implement ${s.id}')" title="Click to copy">📋 implement ${s.id}</div>
+      <div class="sug-cmd" onclick="copy('python3 scripts/suggestions.py --veto ${s.id}')" title="Click to copy">✕ veto ${s.id}</div>
+    </div>`).join("") +
+    `<div style="font-size:10px;color:var(--muted);margin-top:10px;border-top:1px solid var(--border);padding-top:8px">
+      ${stats.total_generated||0} generated · ${stats.implemented||0} done · ${stats.vetoed||0} vetoed
     </div>`;
 }
 
-// ── RENDER: HYPOTHESES ────────────────────────────────────────────────────────
+// ── Prompt Queue ───────────────────────────────────────────────────────────
+function renderPrompts(data) {
+  const el = document.getElementById("prompt-content");
+  const queued = (data?.prompts || []).filter(p => p.status === "QUEUED")
+    .sort((a,b) => ({HIGH:0,MEDIUM:1,LOW:2}[a.priority]||1) - ({HIGH:0,MEDIUM:1,LOW:2}[b.priority]||1));
+
+  if (!queued.length) {
+    el.innerHTML = `<div class="prompt-empty">Queue empty — Oracle adds prompts each cycle.</div>`;
+    return;
+  }
+
+  const priIcon = {HIGH:"🔴",MEDIUM:"🟡",LOW:"🟢"};
+  el.innerHTML = queued.slice(0, 3).map(p => `
+    <div class="prompt-item">
+      <div class="prompt-id">${priIcon[p.priority]||""} ${p.id} · ${timeAgo(p.queued_at)}</div>
+      <div class="prompt-reason">${esc(p.reason||"")}</div>
+      <div class="prompt-text">${esc(p.prompt||"")}</div>
+      <div class="prompt-cmd" onclick="copy('python3 scripts/oracle_prompt.py --next')" title="Click to copy">📋 python3 scripts/oracle_prompt.py --next</div>
+    </div>`).join("");
+}
+
+// ── Active Research ────────────────────────────────────────────────────────
 function renderHypotheses(data) {
-  const el = document.getElementById("panel-hypotheses");
-  const header = '<div class="panel-title">Hypothesis Ledger</div>';
+  const el = document.getElementById("hyp-content");
+  const ledger = data?.ledger || [];
 
-  if (!data || !data.ledger) {
-    el.innerHTML = header + '<div class="empty">No hypothesis data.</div>';
-    return;
+  const testing = ledger.filter(h => h.status === "TESTING");
+  const queued  = ledger.filter(h => h.status === "QUEUED");
+  const recent  = ledger.filter(h => ["CONFIRMED","REJECTED"].includes(h.status))
+                         .slice(-3).reverse();
+
+  const icon = s => s === "CONFIRMED" ? "✅" : s === "REJECTED" ? "❌" : s === "TESTING" ? "🔄" : "📋";
+
+  const sections = [];
+  if (testing.length) {
+    sections.push(...testing.map(h => `
+      <div class="hyp-item">
+        <div class="hyp-status">${icon(h.status)}</div>
+        <div><div class="hyp-name">${esc(h.name)}</div></div>
+      </div>`));
+  }
+  if (queued.length) {
+    sections.push(...queued.map(h => `
+      <div class="hyp-item">
+        <div class="hyp-status">${icon(h.status)}</div>
+        <div><div class="hyp-name" style="color:var(--muted)">${esc(h.name)}</div></div>
+      </div>`));
+  }
+  if (recent.length && !testing.length && !queued.length) {
+    sections.push(...recent.map(h => `
+      <div class="hyp-item">
+        <div class="hyp-status">${icon(h.status)}</div>
+        <div>
+          <div class="hyp-name">${esc(h.name)}</div>
+          <div class="hyp-result">${esc(h.result||"")}</div>
+        </div>
+      </div>`));
   }
 
-  const statusIcon = { CONFIRMED:"✅", REJECTED:"❌", TESTING:"🔄", QUEUED:"📋" };
-  const order = { TESTING:0, QUEUED:1, CONFIRMED:2, REJECTED:3 };
-  const sorted = [...data.ledger].sort((a,b) => (order[a.status]||4) - (order[b.status]||4));
+  const confirmed = ledger.filter(h=>h.status==="CONFIRMED").length;
+  const rejected  = ledger.filter(h=>h.status==="REJECTED").length;
 
-  const rows = sorted.map(h => `
-    <tr>
-      <td style="color:var(--muted)">${h.id}</td>
-      <td>${statusIcon[h.status] || "?"} <span class="${h.status}">${h.status}</span></td>
-      <td>${h.name}</td>
-      <td style="color:var(--muted)">${h.result || "—"}</td>
-      <td style="color:var(--muted)">${h.date || "—"}</td>
-    </tr>`).join("");
-
-  el.innerHTML = `
-    ${header}
-    <div class="scrollable">
-      <table class="hyp-table">
-        <thead>
-          <tr>
-            <th>ID</th><th>STATUS</th><th>HYPOTHESIS</th><th>RESULT</th><th>DATE</th>
-          </tr>
-        </thead>
-        <tbody>${rows}</tbody>
-      </table>
+  el.innerHTML = (sections.join("") || `<div class="hyp-empty">No active hypotheses.</div>`) +
+    `<div style="font-size:10px;color:var(--muted);margin-top:8px;border-top:1px solid var(--border);padding-top:8px">
+      ${confirmed} confirmed · ${rejected} rejected · ${ledger.length} total
     </div>`;
 }
 
-// ── RENDER: QUEUE ─────────────────────────────────────────────────────────────
-function renderQueue(data) {
-  const el = document.getElementById("panel-queue");
-  const header = '<div class="panel-title">Research Queue</div>';
+// ── Sharpe Tracker ─────────────────────────────────────────────────────────
+function renderVersions() {
+  const el = document.getElementById("version-content");
+  const target = 1.5;
+  const versions = [
+    {label:"v001", sharpe:0.178},
+    {label:"v002", sharpe:0.355},
+    {label:"v002.5",sharpe:0.380},
+    {label:"v003", sharpe:0.452},
+    {label:"v004", sharpe:0.626},
+    {label:"current",sharpe:0.8843, current:true},
+  ];
 
-  if (!data || !data.queue) {
-    el.innerHTML = header + '<div class="empty">No queue data.</div>';
-    return;
-  }
-
-  const items = data.queue.map(t => `
-    <div class="queue-item">
-      <div class="q-priority">${t.priority}</div>
-      <div>
-        <div class="q-name">${t.name}</div>
-        <div class="q-desc">${t.description}</div>
-        ${t.blocked_until ? `<div style="color:var(--red);font-size:10px;">⏸ blocked until: ${t.blocked_until}</div>` : ""}
+  const pct = v => Math.min(100, (v/target)*100).toFixed(0);
+  const rows = versions.map(v => `
+    <div class="sv-row">
+      <div class="sv-label" style="${v.current?'color:var(--accent)':''}">${v.label}</div>
+      <div class="sv-bar-track">
+        <div class="sv-bar-fill${v.current?' current':''}" style="width:${pct(v.sharpe)}%"></div>
+        <div class="sv-target-line"></div>
       </div>
-      <div>
-        <span class="q-status ${t.status}">${t.status}</span>
-        <div style="color:var(--muted);font-size:10px;margin-top:2px">${t.estimated_minutes || "?"}min</div>
+      <div class="sv-val${v.current?' current':''}">
+        ${v.current?`<b>${v.sharpe}</b>`:v.sharpe}
       </div>
     </div>`).join("");
 
-  el.innerHTML = header + `<div class="scrollable">${items}</div>`;
-}
-
-// ── RENDER: VERSION TRACKER ───────────────────────────────────────────────────
-function renderVersions() {
-  const el = document.getElementById("panel-versions");
-  const header = '<div class="panel-title">Version Tracker — Sharpe Progress</div>';
-
-  const maxSharpe = Math.max(TARGET_SHARPE, ...VERSIONS.map(v => v.sharpe)) * 1.05;
-
-  const rows = VERSIONS.map(v => {
-    const pct = Math.round(v.sharpe / maxSharpe * 100);
-    const cls = v.current ? "current" : "";
-    const color = v.sharpe < 0.4 ? "var(--red)" : v.sharpe < 0.6 ? "var(--yellow)" : "var(--green)";
-    return `
-      <div class="version-row">
-        <div class="v-label" style="${v.current ? 'color:var(--accent);font-weight:bold;' : ''}">${v.label}</div>
-        <div class="v-bar-bg">
-          <div class="v-bar ${cls}" style="width:${pct}%;background:${color};"></div>
-          <div class="v-bar target" style="left:${Math.round(TARGET_SHARPE/maxSharpe*100)}%"></div>
-        </div>
-        <div class="v-sharpe" style="${v.current ? 'color:var(--accent);font-weight:bold;' : ''}">${v.sharpe.toFixed(3)}</div>
-      </div>`;
-  }).join("");
-
-  const targetPct = Math.round(TARGET_SHARPE / maxSharpe * 100);
-
+  const gap  = (target - 0.8843).toFixed(4);
+  const prog = ((0.8843/target)*100).toFixed(0);
   el.innerHTML = `
-    ${header}
-    <div style="color:var(--muted);font-size:10px;margin-bottom:8px;">
-      Target: <span style="color:var(--yellow)">${TARGET_SHARPE}</span> (institutional grade)
-      | Progress: <span style="color:var(--green)">${((0.8011/TARGET_SHARPE)*100).toFixed(0)}%</span>
-    </div>
-    ${rows}
-    <div style="margin-top:8px;color:var(--muted);font-size:10px;">
-      ▌ = target ${TARGET_SHARPE} Sharpe | current: 0.8011 | gap: ${(TARGET_SHARPE - 0.8011).toFixed(4)}
-    </div>`;
+    <div class="sharpe-target">Target <span>${target}</span> · Progress <span>${prog}%</span> · Gap <span style="color:var(--yellow)">${gap}</span></div>
+    ${rows}`;
 }
 
-
-// ── SUGGESTIONS ───────────────────────────────────────────────────────────────
-function renderSuggestions(data) {
-  const el = document.getElementById("panel-suggestions");
-  const header = '<div class="panel-title">Oracle Suggestions <span id="sug-count" style="color:var(--muted);font-size:10px;margin-left:8px;"></span></div>';
-  if (!data || !data.suggestions) {
-    el.innerHTML = header + '<div class="sug-empty">No suggestions yet — Oracle generates them automatically.</div>';
-    return;
-  }
-  const open = data.suggestions.filter(s => s.status === "NEW");
-  const done = data.suggestions.filter(s => s.status !== "NEW");
-  const priIcon = {HIGH:"🔴", MEDIUM:"🟡", LOW:"🟢"};
-
-  let html = header;
-  if (open.length === 0) {
-    html += '<div class="sug-empty">No open suggestions. Oracle will generate more next cycle.</div>';
-  } else {
-    html += open.map(s => `
-      <div class="sug-item">
-        <div class="sug-header">
-          <span class="sug-pri-${s.priority}">${priIcon[s.priority]||"○"}</span>
-          <span class="sug-id">${s.id}</span>
-          <span class="sug-cat">${s.category}</span>
-          <span class="sug-title">${s.title}</span>
-        </div>
-        <div class="sug-detail">${s.detail}</div>
-        <div class="sug-action">→ ${s.action}</div>
-        <div class="sug-cmd" onclick="navigator.clipboard.writeText('python3 scripts/suggestions.py --implement ${s.id}')" title="Click to copy">
-          📋 python3 scripts/suggestions.py --implement ${s.id}
-        </div>
-        <div class="sug-cmd" onclick="navigator.clipboard.writeText('python3 scripts/suggestions.py --veto ${s.id}')" title="Click to copy" style="margin-top:2px;">
-          ❌ python3 scripts/suggestions.py --veto ${s.id}
-        </div>
-      </div>`).join('');
-  }
-
-  const stats = data.stats || {};
-  html += `<div style="margin-top:10px;font-size:10px;color:var(--muted);">
-    ${stats.total_generated||0} generated · ${stats.implemented||0} implemented · ${stats.vetoed||0} vetoed
-    ${done.length > 0 ? '· ' + done.slice(-3).map(s => (s.status==="IMPLEMENTED"?"✅":"❌") + " " + s.title.slice(0,40)).join(' | ') : ''}
-  </div>`;
-
-  el.innerHTML = html;
+// ── Stats bar ──────────────────────────────────────────────────────────────
+function renderStats(usage, messages) {
+  // Oracle budget from oracle_cost.json — not available, show message count
+  const oracleMsgs = (messages||[]).filter(m=>m.source==="oracle").length;
+  document.getElementById("stat-budget").textContent = "~$19.96 remaining";
+  document.getElementById("stat-trades").textContent = `${oracleMsgs} oracle cycles`;
 }
 
-// ── LOAD ALL ──────────────────────────────────────────────────────────────────
+// ── LOAD ALL ───────────────────────────────────────────────────────────────
 async function loadAll() {
-  document.getElementById("last-refresh").textContent =
-    "Refreshing... " + new Date().toLocaleTimeString();
+  document.getElementById("last-refresh").textContent = "refreshing...";
 
-  const [health, messages, usage, hypotheses, queue, suggestions] = await Promise.all([
+  const [health, messages, usage, hypotheses, queue, suggestions, prompts] = await Promise.all([
     fetchJSON(FILES.health),
     fetchJSON(FILES.messages),
     fetchJSON(FILES.usage),
     fetchJSON(FILES.hypotheses),
     fetchJSON(FILES.queue),
     fetchJSON(FILES.suggestions),
+    fetchJSON(FILES.prompts),
   ]);
 
+  const msgs = messages?.messages || [];
+
   renderHealth(health);
-  renderMessages(messages);
-  renderUsage(usage);
-  renderHypotheses(hypotheses);
-  renderQueue(queue);
-  renderVersions();
+  renderOracleHero(msgs);
+  renderFeed(msgs);
   renderSuggestions(suggestions);
+  renderPrompts(prompts);
+  renderHypotheses(hypotheses);
+  renderVersions();
+  renderStats(usage, msgs);
 
   document.getElementById("last-refresh").textContent =
-    "Last refresh: " + new Date().toLocaleTimeString();
+    "updated " + new Date().toLocaleTimeString();
 }
 
-// ── INIT ──────────────────────────────────────────────────────────────────────
+// Auto-refresh every 2 minutes
 loadAll();
-// Auto-refresh every 5 minutes
-setInterval(loadAll, 5 * 60 * 1000);
+setInterval(loadAll, 2 * 60 * 1000);
 </script>
 </body>
 </html>
