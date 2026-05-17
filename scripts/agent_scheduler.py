@@ -182,6 +182,18 @@ def run_health_check() -> dict:
         "yfinance":       _check_yfinance,
         "ict_scanner":    _check_ict_scanner,
         "backtest_engine":_check_backtest_engine,
+        # Data ecosystem
+        "alpaca":         _check_alpaca,
+        "fred":           _check_fred,
+        "alpha_vantage":  _check_alpha_vantage,
+        "tiingo":         _check_tiingo,
+        "news_api":       _check_news_api,
+        "oanda":          _check_oanda,
+        "firebase":       _check_firebase,
+        "polygon":        _check_polygon,
+        "openweather":    _check_openweather,
+        "twitter":        _check_twitter,
+        "nasdaq":         _check_nasdaq,
     }
 
     issues = []
@@ -308,6 +320,178 @@ def _check_backtest_engine() -> tuple:
     if engine_path.exists():
         return "GREEN", "file present"
     return "RED", "fast_engine.py missing"
+
+
+# ── Ecosystem data source health checks ───────────────────────────────────────
+
+def _http_get(url: str, headers: dict = None, timeout: int = 6) -> tuple:
+    """Returns (status_code, json_or_none, error_str)."""
+    try:
+        import requests
+        r = requests.get(url, headers=headers or {}, timeout=timeout)
+        try:
+            body = r.json()
+        except Exception:
+            body = None
+        return r.status_code, body, None
+    except Exception as e:
+        return 0, None, str(e)
+
+
+def _check_alpaca() -> tuple:
+    k  = os.environ.get("ALPACA_API_KEY", "")
+    sk = os.environ.get("ALPACA_SECRET_KEY", "")
+    if not k:
+        return "YELLOW", "key missing"
+    base = "https://paper-api.alpaca.markets" if os.environ.get("ALPACA_PAPER") == "true" else "https://api.alpaca.markets"
+    code, body, err = _http_get(f"{base}/v2/account", {"APCA-API-KEY-ID": k, "APCA-API-SECRET-KEY": sk})
+    if err:
+        return "RED", err
+    if code == 200 and body:
+        equity = body.get("equity", "?")
+        return "GREEN", f"paper account equity=${float(equity or 0):,.0f}"
+    return "YELLOW", f"status {code}"
+
+
+def _check_fred() -> tuple:
+    k = os.environ.get("FRED_API_KEY", "")
+    if not k:
+        return "YELLOW", "key missing"
+    code, body, err = _http_get(f"https://api.stlouisfed.org/fred/series?series_id=FEDFUNDS&api_key={k}&file_type=json")
+    if err:
+        return "RED", err
+    if code == 200:
+        return "GREEN", "fed funds series ok"
+    return "YELLOW", f"status {code}"
+
+
+def _check_alpha_vantage() -> tuple:
+    k = os.environ.get("ALPHA_VANTAGE_API_KEY", "")
+    if not k:
+        return "YELLOW", "key missing"
+    code, body, err = _http_get(f"https://www.alphavantage.co/query?function=FX_DAILY&from_symbol=EUR&to_symbol=USD&outputsize=compact&apikey={k}")
+    if err:
+        return "RED", err
+    if code == 200 and body and "Time Series FX (Daily)" in body:
+        dates = list(body["Time Series FX (Daily)"].keys())
+        return "GREEN", f"latest bar {dates[0]}"
+    if body and "Note" in body:
+        return "YELLOW", "rate limited (free tier)"
+    return "YELLOW", f"status {code}"
+
+
+def _check_tiingo() -> tuple:
+    k = os.environ.get("TIINGO_API_KEY", "")
+    if not k:
+        return "YELLOW", "key missing"
+    code, body, err = _http_get("https://api.tiingo.com/api/test/", {"Authorization": f"Token {k}"})
+    if err:
+        return "RED", err
+    if code == 200:
+        return "GREEN", "authenticated"
+    return "YELLOW", f"status {code}"
+
+
+def _check_news_api() -> tuple:
+    k = os.environ.get("NEWS_API_KEY", "")
+    if not k:
+        return "YELLOW", "key missing"
+    code, body, err = _http_get(f"https://newsapi.org/v2/top-headlines?category=business&pageSize=1&apiKey={k}")
+    if err:
+        return "RED", err
+    if code == 200 and body and body.get("status") == "ok":
+        return "GREEN", f"{body.get('totalResults','?')} business articles"
+    return "YELLOW", f"status {code}"
+
+
+def _check_oanda() -> tuple:
+    k   = os.environ.get("OANDA_API_KEY", "")
+    acc = os.environ.get("OANDA_ACCOUNT_ID", "")
+    base = os.environ.get("OANDA_BASE_URL", "https://api-fxpractice.oanda.com")
+    if not k or not acc:
+        return "YELLOW", "key or account ID missing"
+    code, body, err = _http_get(f"{base}/v3/accounts/{acc}", {"Authorization": f"Bearer {k}"})
+    if err:
+        return "RED", err
+    if code == 200 and body:
+        nav = body.get("account", {}).get("NAV", "?")
+        return "GREEN", f"NAV=${float(nav or 0):,.0f} practice"
+    return "YELLOW", f"status {code}"
+
+
+def _check_firebase() -> tuple:
+    db_url = os.environ.get("FIREBASE_DATABASE_URL", "")
+    if not db_url:
+        return "YELLOW", "FIREBASE_DATABASE_URL missing"
+    # Ping the .json endpoint — no auth needed for public rules
+    code, body, err = _http_get(f"{db_url}/.json?shallow=true&limitToFirst=1")
+    if err:
+        return "RED", err
+    if code in (200, 401, 403):
+        # 401/403 = reachable but auth required (expected)
+        return "GREEN", "reachable"
+    return "YELLOW", f"status {code}"
+
+
+def _check_polygon() -> tuple:
+    k = os.environ.get("POLYGON_API_KEY", "")
+    if not k:
+        return "YELLOW", "key missing"
+    # Free plan only allows some endpoints — check ticker detail (always free)
+    code, body, err = _http_get(f"https://api.polygon.io/v3/reference/tickers/AAPL?apiKey={k}")
+    if err:
+        return "RED", err
+    if code == 200:
+        return "GREEN", "free tier active (reference data)"
+    if code == 403:
+        return "YELLOW", "key valid, plan too limited for historical — upgrade for full access"
+    return "YELLOW", f"status {code}"
+
+
+def _check_openweather() -> tuple:
+    k = os.environ.get("OPENWEATHER_API_KEY", "")
+    if not k:
+        return "YELLOW", "key missing"
+    code, body, err = _http_get(f"https://api.openweathermap.org/data/2.5/weather?q=London&appid={k}")
+    if err:
+        return "RED", err
+    if code == 200:
+        return "GREEN", "weather data ok"
+    if code == 401:
+        return "YELLOW", "key not yet active — new keys take up to 2h to activate"
+    return "YELLOW", f"status {code}"
+
+
+def _check_twitter() -> tuple:
+    bt = os.environ.get("TWITTER_BEARER_TOKEN", "")
+    if not bt:
+        return "YELLOW", "TWITTER_BEARER_TOKEN missing"
+    if len(bt) < 80:
+        return "YELLOW", f"token looks wrong ({len(bt)} chars) — regenerate Bearer Token from Twitter Dev Portal"
+    code, body, err = _http_get(
+        "https://api.twitter.com/2/tweets/search/recent?query=fed+rates&max_results=10",
+        {"Authorization": f"Bearer {bt}"}
+    )
+    if err:
+        return "RED", err
+    if code == 200:
+        count = len((body or {}).get("data", []))
+        return "GREEN", f"{count} recent tweets fetched"
+    return "YELLOW", f"status {code}"
+
+
+def _check_nasdaq() -> tuple:
+    k = os.environ.get("NASDAQ_DATA_LINK_API_KEY", "")
+    if not k:
+        return "YELLOW", "key missing"
+    # WIKI prices table — confirmed free
+    code, body, err = _http_get(f"https://data.nasdaq.com/api/v3/datatables/WIKI/PRICES.json?ticker=AAPL&qopts.per_page=1&api_key={k}")
+    if err:
+        return "RED", err
+    if code == 200 and body and body.get("datatable"):
+        rows = len(body["datatable"].get("data", []))
+        return "GREEN", f"WIKI prices ok ({rows} rows)"
+    return "YELLOW", f"status {code}"
 
 
 # ─────────────────────────────────────────────────────────────────────────────

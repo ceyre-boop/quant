@@ -8,10 +8,19 @@
       "status": "QUEUED",
       "queued_at": "2026-05-16T22:09:41.908900",
       "sent_at": "2026-05-16T22:09:45.858958"
+    },
+    {
+      "id": "PQ-002",
+      "prompt": "Run the E1 rate divergence backtest at 60-day hold across all 8 pairs (EURUSD, GBPUSD, AUDUSD, NZDUSD, USDCAD, USDJPY, AUDNZD, EURGBP) using backtest_engine.py. Report Sharpe ratio, win rate, and average R-multiple for the 60-day hold vs the 20-day hold baseline. Save results to a timestamped JSON file in results/.",
+      "reason": "E1 rate divergence is actively TESTING and the DRY RUN was not executed \u2014 completing this backtest will either confirm or reject a queued hypothesis and unblock calendar edge optimization work.",
+      "priority": "HIGH",
+      "status": "QUEUED",
+      "queued_at": "2026-05-16T23:39:18.899669",
+      "sent_at": null
     }
   ],
   "stats": {
-    "total_queued": 1,
+    "total_queued": 2,
     "total_sent": 1
   }
 }
