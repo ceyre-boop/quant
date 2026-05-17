@@ -1,6 +1,14 @@
 {
   "messages": [
     {
+      "id": "msg-20260516233857",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "Task RQ-001 (E1 rate divergence at 60-day hold) failed: DRY RUN: E1 rate divergence at 60-day hold \u2014 not executed",
+      "timestamp": "2026-05-16T23:38:57",
+      "read": false
+    },
+    {
       "id": "msg-20260516140424",
       "priority": "FYI",
       "emoji": "\ud83d\udfe2",
@@ -121,6 +129,15 @@
       "emoji": "\ud83d\udfe2",
       "text": "DRY RUN: Oracle would have called Claude here and written a message based on current system state.",
       "timestamp": "2026-05-16T23:38:56.795116",
+      "read": false,
+      "source": "oracle"
+    },
+    {
+      "id": "oracle-20260516233915",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "You've got two dead weight integrations sitting in yellow (openweather and Twitter) that aren't driving trades \u2014 turn them off or fix them this week. The forex system is doing its job fine but the ICT scanner hasn't run in 7+ hours and the veto ledger is stale; you should kick it manually to see if there's actual signal in the last session or just confirm the market was dead. E1 rate divergence is still in dry run \u2014 if you believe in it, execute the backtest and stop sitting on it.",
+      "timestamp": "2026-05-16T23:39:15.397513",
       "read": false,
       "source": "oracle"
     }
