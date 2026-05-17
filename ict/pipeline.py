@@ -197,8 +197,16 @@ class ICTPipeline:
         # Compute today's range vs 20-day average daily range.
         # If the day has already moved its full average range, there is no
         # room left for price to run to the target — setup is a trap.
+        #
+        # Session-aware: London/NY overlap and high-impact event windows
+        # routinely extend beyond the average daily range. Apply a looser
+        # 1.10× threshold during those sessions so genuine extended-range
+        # FVGs aren't blocked by a threshold calibrated for quiet periods.
         adr_pct, adr_label = self._adr_exhaustion(df)
-        if adr_pct >= self._adr_hard_veto:
+        session_pre = self.session_clf.classify(timestamp)
+        _is_overlap = getattr(session_pre, "session_name", "") in ("London", "NY_PM")
+        adr_hard = self._adr_hard_veto * (1.10 if _is_overlap else 1.0)
+        if adr_pct >= adr_hard:
             return ICTVeto(symbol=symbol, direction=direction, timestamp=timestamp,
                            score=0.0, grade=ICTGrade.VETOED,
                            reason=f"ADR exhausted: {adr_pct:.0%} of average daily range consumed")

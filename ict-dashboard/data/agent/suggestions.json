@@ -38,13 +38,52 @@
       "vetoed_at": null,
       "implemented_at": null,
       "veto_reason": null
+    },
+    {
+      "category": "ICT",
+      "priority": "HIGH",
+      "title": "Implement ADR buffer zone to prevent exhaustion vetoes",
+      "detail": "EURUSD (110%), AUDUSD (236%), GBPUSD (98%) repeatedly veto due to ADR exhaustion. Add 15% safety margin: reject setups when intraday range > 0.85 \u00d7 ADR_20d. Recovers ~3\u20135 valid daily signals.",
+      "action": "In ict_scanner.py, add ADR buffer check before score_setup(). If (high - low) / ADR_20d > 0.85, return veto reason 'ADR_BUFFER_BREACH'.",
+      "id": "SUG-004",
+      "status": "NEW",
+      "created": "2026-05-16T22:09:39.350189",
+      "vetoed_at": null,
+      "implemented_at": null,
+      "veto_reason": null
+    },
+    {
+      "category": "FOREX",
+      "priority": "HIGH",
+      "title": "Backtest v004 stop width sweep on 8-pair portfolio",
+      "detail": "Recent findings reference stop width ATR multiple optimization, but no results logged. Run sweep: test 1.2x\u20132.0x ATR across all 8 pairs, target Sharpe improvement to 0.90+. Current 0.801 leaves room.",
+      "action": "Create backtest_stop_width_sweep.py. Loop ATR_multiples [1.2, 1.4, 1.6, 1.8, 2.0], backtest v004 on 8 pairs, log Sharpe/max_DD/RC per multiple. Compare vs baseline 0.801.",
+      "id": "SUG-005",
+      "status": "NEW",
+      "created": "2026-05-16T22:09:39.350195",
+      "vetoed_at": null,
+      "implemented_at": null,
+      "veto_reason": null
+    },
+    {
+      "category": "RESEARCH",
+      "priority": "MEDIUM",
+      "title": "Isolate Library feature criticality ranking",
+      "detail": "Recent findings note Library handler would analyze CRITICAL match drivers (logged twice, no detail). Quantify: run ablation test removing each library feature, measure EV impact. Deprioritize low-impact features.",
+      "action": "Create ablation_library_features.py. For each feature, backtest equity system with feature ON/OFF. Log delta EV and Sharpe. Rank by impact, document in findings.",
+      "id": "SUG-006",
+      "status": "NEW",
+      "created": "2026-05-16T22:09:39.350197",
+      "vetoed_at": null,
+      "implemented_at": null,
+      "veto_reason": null
     }
   ],
   "vetoed_ids": [
     "SUG-002"
   ],
   "stats": {
-    "total_generated": 3,
+    "total_generated": 6,
     "implemented": 1,
     "vetoed": 1
   }

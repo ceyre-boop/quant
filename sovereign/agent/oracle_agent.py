@@ -43,7 +43,11 @@ HEALTH_PATH   = DATA_AGENT / "health.json"
 HYPO_PATH     = DATA_AGENT / "hypothesis_ledger.json"
 FINDINGS_PATH = DATA_AGENT / "findings.jsonl"
 QUEUE_PATH    = DATA_AGENT / "research_queue.json"
-SUGGESTIONS_PATH = DATA_AGENT / "suggestions.json"
+SUGGESTIONS_PATH  = DATA_AGENT / "suggestions.json"
+PROMPT_QUEUE_PATH = DATA_AGENT / "prompt_queue.json"
+
+# Oracle will only queue Claude Code prompts when usage is healthy
+MIN_BUDGET_FOR_PROMPTS = 20_000   # tokens remaining
 VETO_ICT      = DATA_LEDGER / "ict_veto_ledger_2026_05.jsonl"
 VETO_EQ       = DATA_LEDGER / "veto_ledger_2026_05.jsonl"
 USAGE_PATH    = DATA_AGENT / "usage.json"
@@ -470,6 +474,122 @@ def _generate_suggestions(client: anthropic.Anthropic, context: str):
         log.warning(f"Suggestion generation failed: {e}")
 
 
+# ── Claude Code Prompt Queue ───────────────────────────────────────────────────
+
+PROMPT_SYSTEM = """You are the Oracle for a systematic trading system called Sovereign.
+
+Your job: write ONE prompt for Colin to paste into Claude Code — his AI coding partner.
+
+Claude Code has his full codebase, can edit files, run tests, run backtests, and commit code.
+Oracle (you) handles monitoring. Claude Code handles building. Keep them separate.
+
+GOOD PROMPTS FOR CLAUDE CODE:
+- "Run the E1 rate divergence backtest at 60-day hold across all 8 pairs and report Sharpe vs 20-day"
+- "Check if AUDNZD=X ICT scores above 7.0 in London session — pull last 30 veto ledger entries and compute hit rate"
+- "The ICT scanner log shows ADR exhaustion on AUDUSD at 236% — is that a data error or a genuine spike? Check adr_exhaustion() in pipeline.py"
+- "Implement the carry pair optimization: test all 28 G10 combinations using the existing carry_engine.py and report top 5 by Sharpe"
+
+BAD PROMPTS (don't write these):
+- Anything requiring live internet unless Colin is there (yfinance, FRED pulls)
+- Anything affecting live trading parameters without Colin's explicit approval
+- Vague requests like "improve the model" — be specific
+- Duplicating work that's already in the suggestions or hypothesis queue
+
+RULES:
+- One prompt only. No preamble. No "Here is a prompt:" — just the prompt itself.
+- Prompt must be self-contained (Claude Code doesn't read Oracle's messages)
+- Prompt must reference specific files, functions, or metrics
+- Priority: HIGH if it unblocks a known hypothesis; MEDIUM for optimization; LOW for exploration
+
+OUTPUT FORMAT — valid JSON only:
+{
+  "prompt": "The exact text Colin should paste into Claude Code.",
+  "reason": "One sentence explaining why this is worth doing now.",
+  "priority": "HIGH" | "MEDIUM" | "LOW"
+}"""
+
+
+def _count_queued_prompts() -> int:
+    try:
+        data = json.loads(PROMPT_QUEUE_PATH.read_text())
+        return sum(1 for p in data.get("prompts", []) if p.get("status") == "QUEUED")
+    except Exception:
+        return 0
+
+
+def _generate_prompt(client: anthropic.Anthropic, context: str):
+    """Queue a Claude Code prompt when budget allows and queue is empty."""
+    # Don't queue if prompts already waiting
+    if _count_queued_prompts() >= 2:
+        log.info("Prompt queue: 2+ pending — skipping generation")
+        return
+
+    # Don't queue if budget is low
+    usage = _read_json(USAGE_PATH, {})
+    remaining = usage.get("weekly_remaining", 999_999)
+    if isinstance(remaining, (int, float)) and remaining < MIN_BUDGET_FOR_PROMPTS:
+        log.info(f"Prompt queue: budget {remaining} < {MIN_BUDGET_FOR_PROMPTS} — skipping")
+        return
+
+    # Build context about what's already queued / suggested
+    suggestions_data = _read_json(SUGGESTIONS_PATH, {})
+    open_sugs = [s["title"] for s in suggestions_data.get("suggestions", []) if s.get("status") == "NEW"]
+    hypo_data = _read_json(HYPO_PATH, {})
+    testing   = [h["name"] for h in hypo_data.get("ledger", []) if h.get("status") == "TESTING"]
+
+    context_extra = ""
+    if open_sugs:
+        context_extra += f"\nOPEN SUGGESTIONS: {', '.join(open_sugs)}"
+    if testing:
+        context_extra += f"\nHYPOTHESES IN TESTING: {', '.join(testing)}"
+
+    try:
+        log.info("Generating Claude Code prompt (claude-haiku-4-5)...")
+        response = client.messages.create(
+            model="claude-haiku-4-5",
+            max_tokens=400,
+            system=[{"type": "text", "text": PROMPT_SYSTEM, "cache_control": {"type": "ephemeral"}}],
+            messages=[{"role": "user", "content": f"System state:\n\n{context}{context_extra}\n\nWrite one Claude Code prompt."}],
+        )
+
+        raw = next((b.text for b in response.content if b.type == "text"), "").strip()
+        if "```" in raw:
+            raw = raw.split("```")[1]
+            if raw.startswith("json"):
+                raw = raw[4:]
+
+        parsed = json.loads(raw)
+
+        # Write to queue
+        try:
+            queue_data = json.loads(PROMPT_QUEUE_PATH.read_text())
+        except Exception:
+            queue_data = {"prompts": [], "stats": {"total_queued": 0, "total_sent": 0}}
+
+        total = queue_data["stats"].get("total_queued", 0) + 1
+        pid = f"PQ-{total:03d}"
+        queue_data["prompts"].append({
+            "id": pid,
+            "prompt": parsed["prompt"],
+            "reason": parsed.get("reason", ""),
+            "priority": parsed.get("priority", "MEDIUM"),
+            "status": "QUEUED",
+            "queued_at": datetime.now().isoformat(),
+            "sent_at": None,
+        })
+        queue_data["stats"]["total_queued"] = total
+        PROMPT_QUEUE_PATH.write_text(json.dumps(queue_data, indent=2))
+
+        cached = getattr(response.usage, "cache_read_input_tokens", 0) or 0
+        _log_cost(response.usage.input_tokens, response.usage.output_tokens, cached)
+        log.info(f"Queued prompt {pid} [{parsed.get('priority','?')}]: {parsed.get('reason','')[:80]}")
+
+    except json.JSONDecodeError as e:
+        log.warning(f"Prompt JSON parse failed: {e}")
+    except Exception as e:
+        log.warning(f"Prompt generation failed: {e}")
+
+
 # ── Main ───────────────────────────────────────────────────────────────────────
 
 def run(dry_run: bool = False, force: bool = False):
@@ -542,6 +662,9 @@ def run(dry_run: bool = False, force: bool = False):
 
         # Generate suggestions if fewer than 3 open
         _generate_suggestions(client, context)
+
+        # Queue a Claude Code prompt if queue is empty and budget allows
+        _generate_prompt(client, context)
 
     except anthropic.AuthenticationError:
         log.error("Invalid API key")

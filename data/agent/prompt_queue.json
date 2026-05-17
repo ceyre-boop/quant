@@ -1,4 +1,17 @@
 {
-  "prompts": [],
-  "stats": {"total_queued": 0, "total_sent": 0}
+  "prompts": [
+    {
+      "id": "PQ-001",
+      "prompt": "Run a backtest of the E1 rate divergence hypothesis at 60-day hold across all 8 forex pairs (EURUSD, GBPUSD, AUDUSD, AUDNZD, NZDUSD, USDCAD, USDJPY, EURGBP). Compare Sharpe ratio and win rate vs. the 20-day hold variant. Output: Sharpe (60d vs 20d), total trades, win%, average R per trade, and monthly drawdown for each hold period. This completes the TESTING hypothesis.",
+      "reason": "E1 rate divergence is actively being tested and completion unblocks decision to confirm or reject this hypothesis \u2014 required to finalize the hypothesis ledger.",
+      "priority": "HIGH",
+      "status": "QUEUED",
+      "queued_at": "2026-05-16T22:09:41.908900",
+      "sent_at": "2026-05-16T22:09:45.858958"
+    }
+  ],
+  "stats": {
+    "total_queued": 1,
+    "total_sent": 1
+  }
 }
