@@ -6,7 +6,10 @@ from typing import Dict, List
 
 MAJOR_PAIRS: List[str] = [
     'EURUSD=X', 'GBPUSD=X', 'USDJPY=X',
-    'AUDUSD=X', 'USDCAD=X', 'NZDUSD=X',
+    'AUDUSD=X', 'USDCAD=X',
+    # NZDUSD removed Oracle audit 2026-05-17: Sharpe 0.22 across 2015-2024, max DD -11%.
+    # Lowest in universe, drag on portfolio avg. RBNZ policy too closely tracks RBA
+    # (AUDUSD already captures the Oceania macro signal). Slot freed for future pair.
     # USDCHF removed v004: SNB held -0.75% for 8 years (2014–2022), rate-diff signal
     # structurally broken for that entire window. Sharpe -0.45 across v003+v004.
 ]
