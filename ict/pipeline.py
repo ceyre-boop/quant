@@ -396,6 +396,22 @@ class ICTPipeline:
         grade = self._grade(total_score, threshold=threshold)
 
         # ══════════════════════════════════════════════════════════════════
+        # STAGE 5.5 — Reddit sentiment filter (contrarian signal)
+        # Reddit retail is directionally wrong often enough to be useful as a
+        # FADE signal. When retail is strongly bullish on a pair and we're
+        # looking to go LONG, that's a warning, not a confirmation.
+        # Logic: if net_score > 3 and direction matches retail → -0.5 penalty
+        #        if net_score > 5 and direction matches retail → veto (crowded)
+        #        if net_score < -3 and direction opposes retail → +0.3 boost
+        # ══════════════════════════════════════════════════════════════════
+        total_score = self._apply_reddit_filter(
+            symbol=symbol, direction=direction,
+            score=total_score, confirmations=confirmations, missing=missing,
+        )
+        # Re-grade after sentiment adjustment
+        grade = self._grade(total_score, threshold=threshold)
+
+        # ══════════════════════════════════════════════════════════════════
         # STAGE 6 — Risk engine gate
         # Entry price = FVG midpoint (limit), not current market price.
         # ══════════════════════════════════════════════════════════════════
@@ -631,6 +647,88 @@ class ICTPipeline:
         if score >= t:                            return ICTGrade.A
         if score >= self._grade_b_threshold:      return ICTGrade.B
         return ICTGrade.C
+
+    # ── Reddit sentiment filter ────────────────────────────────────────────── #
+
+    _reddit_cache: dict = {}   # class-level cache, refreshed when stale
+
+    def _apply_reddit_filter(
+        self,
+        symbol: str,
+        direction: str,
+        score: float,
+        confirmations: list,
+        missing: list,
+    ) -> float:
+        """
+        Adjust ICT score based on Reddit retail sentiment (contrarian signal).
+        Retail positioning on r/Forex is historically inverse-correlated with
+        short-term price moves — crowded retail = fade opportunity.
+
+        Rules:
+          net_score > +5 AND direction==LONG  → veto level (crowded long, skip)
+          net_score > +3 AND direction==LONG  → -0.5 penalty (crowded)
+          net_score < -3 AND direction==SHORT → +0.3 boost (retail fading our short)
+          Symmetric for SHORT direction.
+        """
+        import json, time
+        from pathlib import Path as _Path
+
+        REDDIT_PATH = _Path(__file__).parents[1] / "data" / "cache" / "reddit_sentiment.json"
+        MAX_AGE_MIN = 120  # don't use data older than 2 hours
+
+        try:
+            # Cache at class level — reload only when stale
+            cache_key = "reddit"
+            cached_time = self._reddit_cache.get("_loaded_at", 0)
+            if time.time() - cached_time > MAX_AGE_MIN * 60 or "data" not in self._reddit_cache:
+                if REDDIT_PATH.exists():
+                    self._reddit_cache["data"] = json.loads(REDDIT_PATH.read_text())
+                    self._reddit_cache["_loaded_at"] = time.time()
+                else:
+                    return score
+
+            reddit_data = self._reddit_cache.get("data", {})
+            forex_sentiment = reddit_data.get("forex", {})
+
+            # Normalise pair name: GBPUSD=X → GBPUSD
+            pair = symbol.replace("=X", "").replace("/", "").upper()
+            entry = forex_sentiment.get(pair)
+            if not entry:
+                return score  # pair not in Reddit data — no adjustment
+
+            net = entry.get("net_score", 0.0)
+            mentions = entry.get("mentions", 0)
+            if mentions < 3:
+                return score  # too few mentions to be meaningful
+
+            # Apply contrarian logic
+            if direction == "LONG":
+                if net > 5:
+                    missing.append(f"⚠ Reddit CROWDED LONG: {pair} net={net:.1f} ({mentions} mentions) — retail piling in")
+                    score -= 1.5  # hard penalty, likely to drop below threshold
+                elif net > 3:
+                    missing.append(f"⚠ Reddit retail long {pair} net={net:.1f} — slight fade")
+                    score -= 0.5
+                elif net < -3:
+                    confirmations.append(f"✓ Reddit fading SHORT on {pair} net={net:.1f} — contrarian support for LONG")
+                    score += 0.3
+
+            elif direction == "SHORT":
+                if net < -5:
+                    missing.append(f"⚠ Reddit CROWDED SHORT: {pair} net={net:.1f} ({mentions} mentions) — retail piling in")
+                    score -= 1.5
+                elif net < -3:
+                    missing.append(f"⚠ Reddit retail short {pair} net={net:.1f} — slight fade")
+                    score -= 0.5
+                elif net > 3:
+                    confirmations.append(f"✓ Reddit fading LONG on {pair} net={net:.1f} — contrarian support for SHORT")
+                    score += 0.3
+
+        except Exception:
+            pass  # never block a trade due to Reddit failure
+
+        return score
 
     # ── Static helpers ─────────────────────────────────────────────────────── #
 
