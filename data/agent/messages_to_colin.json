@@ -175,6 +175,15 @@
       "read": false,
       "source": "oracle",
       "type": "system_assessment"
+    },
+    {
+      "id": "oracle-20260517001129",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "Forex is locked up\u2014GBPUSD, EURUSD, and AUDUSD are all exhausted on ADR, which means you're not getting new ICT signals until volatility resets, probably overnight. Your two hypotheses in testing (E1 rate divergence and calendar edges) are sitting in dry run status; you should execute them live or commit to killing them, because watching them idle costs you information. Equities are quieter but cleaner\u2014ATR floor is holding the filter tight, which is working.",
+      "timestamp": "2026-05-17T00:11:29.673525",
+      "read": false,
+      "source": "oracle"
     }
   ]
 }

@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-05-16T23:47:19",
-  "overall": "YELLOW",
+  "timestamp": "2026-05-16T23:53:08",
+  "overall": "GREEN",
   "components": {
     "duckdb": {
       "status": "GREEN",
@@ -16,7 +16,7 @@
     },
     "ict_scanner": {
       "status": "GREEN",
-      "detail": "outside session hours \u2014 last run 7.8h ago"
+      "detail": "outside session hours \u2014 last run 7.9h ago"
     },
     "backtest_engine": {
       "status": "GREEN",
@@ -55,13 +55,17 @@
       "detail": "free tier active (reference data)"
     },
     "openweather": {
-      "status": "YELLOW",
-      "detail": "key not yet active \u2014 new keys take up to 2h to activate"
+      "status": "GREEN",
+      "detail": "weather data ok"
     },
     "nasdaq": {
       "status": "GREEN",
       "detail": "WIKI prices ok (1 rows)"
+    },
+    "reddit": {
+      "status": "GREEN",
+      "detail": "50 posts | 2m ago | NVDA(B12), AMD(B10), SPY(B5), MSFT(B4), META(B4), AMZN(B4), "
     }
   },
-  "last_checked": "2026-05-16T23:47:19"
+  "last_checked": "2026-05-16T23:53:08"
 }
