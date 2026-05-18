@@ -1,0 +1,83 @@
+{
+  "checked_at": "2026-05-18T20:06:50.241984+00:00",
+  "active_edges_checked": 7,
+  "decaying": 0,
+  "retired": 0,
+  "watch": 0,
+  "healthy": 0,
+  "reports": [
+    {
+      "hypothesis_id": "HYP-001",
+      "name": "Carry base positive EV",
+      "edge_type": "generic",
+      "decay_status": "MANUAL_REVIEW_NEEDED",
+      "checked_at": "2026-05-18T20:06:50.241919+00:00",
+      "validation": {
+        "baseline_win_rate": 0.59,
+        "recent_win_rate": null,
+        "status": "MANUAL_REVIEW_NEEDED",
+        "note": "No automated validator for this edge type; requires manual re-run"
+      },
+      "action_required": false
+    },
+    {
+      "hypothesis_id": "HYP-002",
+      "name": "Quarter-end rebalancing (small sample)",
+      "edge_type": "generic",
+      "decay_status": "MANUAL_REVIEW_NEEDED",
+      "checked_at": "2026-05-18T20:06:50.241942+00:00",
+      "validation": {
+        "baseline_win_rate": 0.6,
+        "recent_win_rate": null,
+        "status": "MANUAL_REVIEW_NEEDED",
+        "note": "No automated validator for this edge type; requires manual re-run"
+      },
+      "action_required": false
+    },
+    {
+      "hypothesis_id": "HYP-003",
+      "name": "v004 macro system best forex edge",
+      "edge_type": "generic",
+      "decay_status": "UNKNOWN",
+      "checked_at": "2026-05-18T20:06:50.241951+00:00",
+      "validation": null,
+      "action_required": false
+    },
+    {
+      "hypothesis_id": "HYP-004",
+      "name": "ICT FVG limit entry positive EV",
+      "edge_type": "generic",
+      "decay_status": "UNKNOWN",
+      "checked_at": "2026-05-18T20:06:50.241958+00:00",
+      "validation": null,
+      "action_required": false
+    },
+    {
+      "hypothesis_id": "HYP-005",
+      "name": "ICT walk-forward B validates edge",
+      "edge_type": "generic",
+      "decay_status": "UNKNOWN",
+      "checked_at": "2026-05-18T20:06:50.241964+00:00",
+      "validation": null,
+      "action_required": false
+    },
+    {
+      "hypothesis_id": "HYP-017",
+      "name": "Stop width invariant to Sharpe",
+      "edge_type": "generic",
+      "decay_status": "UNKNOWN",
+      "checked_at": "2026-05-18T20:06:50.241975+00:00",
+      "validation": null,
+      "action_required": false
+    },
+    {
+      "hypothesis_id": "HYP-018",
+      "name": "Library bull regime CRITICAL false positive fixed",
+      "edge_type": "generic",
+      "decay_status": "UNKNOWN",
+      "checked_at": "2026-05-18T20:06:50.241983+00:00",
+      "validation": null,
+      "action_required": false
+    }
+  ]
+}

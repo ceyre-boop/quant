@@ -51,7 +51,7 @@ class ForexBacktestResult:
 
 class ForexBacktester:
 
-    HOLD_DAYS = 60          # hold per signal — macro signals play out over 2-3 months
+    HOLD_DAYS = 60          # default hold; macro signals play out over 2-3 months
     STOP_PCT = 0.04         # compatibility fallback only; strict mode uses ATR stop
     STOP_ATR_MULT = 2.0
     TRAILING_ATR_MULT = 1.25  # forensics v1: 1.25x beats 1.0x (Sharpe 1.024 vs 0.884)
@@ -60,6 +60,10 @@ class ForexBacktester:
     CB_SURPRISE_THRESHOLD = 20  # 20bp in backtest (vs 25bp live) for adequate sample size
     MAX_RISK_PER_TRADE_PCT = 0.01
     MAX_SHARED_JPY_POSITIONS = 2
+    # micro_edge_sweep v1: GBPUSD captures momentum in first week (Sharpe +0.217 at 6d).
+    # All other pairs benefit from the full macro hold (60d). Per-pair override.
+    PAIR_HOLD_OVERRIDES: dict = {"GBPUSD=X": 6}
+    PAIR_TRAILING_OVERRIDES: dict = {"GBPUSD=X": 2.0}
 
     def __init__(
         self,
@@ -111,15 +115,13 @@ class ForexBacktester:
         base_country = CB_TO_COUNTRY[cfg.base_central_bank]
         quote_country = CB_TO_COUNTRY[cfg.quote_central_bank]
 
-        signals = self._signals.build_signal_frame(
-            prices=df,
-            base_country=base_country,
-            quote_country=quote_country,
-            start=self.start,
-            end=self.end,
-            pair=pair,
+        pair_hold = self.PAIR_HOLD_OVERRIDES.get(pair, self.HOLD_DAYS)
+        pair_trailing = self.PAIR_TRAILING_OVERRIDES.get(pair, self.TRAILING_ATR_MULT)
+        signals = self._get_pair_signals(
+            df=df, base_country=base_country, quote_country=quote_country,
+            pair=pair, hold_days=pair_hold,
         )
-        trades = self._simulate_trades(df, signals)
+        trades = self._simulate_trades(df, signals, trailing_mult=pair_trailing)
 
         if not trades:
             return None
@@ -141,12 +143,13 @@ class ForexBacktester:
                     continue
                 base_country  = CB_TO_COUNTRY[cfg.base_central_bank]
                 quote_country = CB_TO_COUNTRY[cfg.quote_central_bank]
-                signals = self._signals.build_signal_frame(
-                    prices=df, base_country=base_country,
-                    quote_country=quote_country,
-                    start=self.start, end=self.end, pair=pair,
+                pair_hold = self.PAIR_HOLD_OVERRIDES.get(pair, self.HOLD_DAYS)
+                pair_trailing = self.PAIR_TRAILING_OVERRIDES.get(pair, self.TRAILING_ATR_MULT)
+                pair_signals = self._get_pair_signals(
+                    df=df, base_country=base_country, quote_country=quote_country,
+                    pair=pair, hold_days=pair_hold,
                 )
-                trades = self._simulate_trades(df, signals)
+                trades = self._simulate_trades(df, pair_signals, trailing_mult=pair_trailing)
                 if not trades:
                     continue
                 all_trades[pair] = trades
@@ -188,8 +191,38 @@ class ForexBacktester:
 
         return results
 
+    def _get_pair_signals(
+        self,
+        df: pd.DataFrame,
+        base_country: str,
+        quote_country: str,
+        pair: str,
+        hold_days: int,
+    ) -> pd.DataFrame:
+        if hold_days == self.HOLD_DAYS:
+            return self._signals.build_signal_frame(
+                prices=df, base_country=base_country, quote_country=quote_country,
+                start=self.start, end=self.end, pair=pair,
+            )
+        # Need a different hold_days — build a one-off engine
+        from sovereign.forex.signal_engine import ForexSignalEngine, SignalConfig
+        engine = ForexSignalEngine(
+            fetcher=self._fetcher,
+            cb_trigger=self._cb,
+            config=SignalConfig(
+                hold_days=hold_days,
+                signal_threshold=self.SIGNAL_THRESHOLD,
+                cb_surprise_threshold=self.CB_SURPRISE_THRESHOLD,
+                strict_mode=self.strict_mode,
+            ),
+        )
+        return engine.build_signal_frame(
+            prices=df, base_country=base_country, quote_country=quote_country,
+            start=self.start, end=self.end, pair=pair,
+        )
+
     def _simulate_trades(
-        self, df: pd.DataFrame, signals: pd.DataFrame
+        self, df: pd.DataFrame, signals: pd.DataFrame, trailing_mult: float = None
     ) -> list:
         close = df['Close'] if 'Close' in df.columns else df.iloc[:, 0]
         atr_series = self._signals._compute_atr_pct(close, df)
@@ -199,7 +232,7 @@ class ForexBacktester:
             stop_pct=self.STOP_PCT,
             atr_series=atr_series,
             stop_atr_mult=self.STOP_ATR_MULT,
-            trailing_atr_mult=self.TRAILING_ATR_MULT,
+            trailing_atr_mult=trailing_mult if trailing_mult is not None else self.TRAILING_ATR_MULT,
             strict_mode=self.strict_mode,
             donchian_exit_days=self.DONCHIAN_EXIT_DAYS,
             allow_pyramiding=self.allow_pyramiding,
