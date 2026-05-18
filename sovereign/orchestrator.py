@@ -1130,8 +1130,8 @@ class SovereignOrchestrator:
         # atr_pct < 2.2% = worst R outcomes (-4.09R avg vs -2.24R above median)
         # ═══════════════════════════════════════════════════════════════
         _atr_pct_check = (atr / current_price) if current_price > 0 else 0
-        if _atr_pct_check < 0.022:
-            _atr_reason = f"ATR_TOO_LOW: {_atr_pct_check:.3%} < 2.2% median"
+        if _atr_pct_check < 0.018:
+            _atr_reason = f"ATR_TOO_LOW: {_atr_pct_check:.3%} < 1.8% floor"
             _vr = VetoRecord(timestamp=ts, symbol=symbol,
                              veto_stage='ATR_TOO_LOW', veto_reason=_atr_reason)
             self.veto_ledger.log_veto(_vr)

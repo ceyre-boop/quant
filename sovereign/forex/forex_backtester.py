@@ -60,8 +60,10 @@ class ForexBacktester:
     CB_SURPRISE_THRESHOLD = 20  # 20bp in backtest (vs 25bp live) for adequate sample size
     MAX_RISK_PER_TRADE_PCT = 0.01
     MAX_SHARED_JPY_POSITIONS = 2
-    # micro_edge_sweep v1: GBPUSD captures momentum in first week (Sharpe +0.217 at 6d).
-    # All other pairs benefit from the full macro hold (60d). Per-pair override.
+    # micro_edge_sweep v1 result: only GBPUSD benefits from short hold (6d/2.0x trail).
+    # Other pairs confirmed better at 60d macro hold — sweep's per-pair standalone
+    # simulation overestimated benefit; full backtester is authoritative.
+    # USDCAD/USDJPY: below sweep threshold, 60d hold unchanged.
     PAIR_HOLD_OVERRIDES: dict = {"GBPUSD=X": 6}
     PAIR_TRAILING_OVERRIDES: dict = {"GBPUSD=X": 2.0}
 
