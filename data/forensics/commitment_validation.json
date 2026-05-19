@@ -1,0 +1,111 @@
+{
+  "validated_at": "2026-05-19T17:12:02.731980+00:00",
+  "records_scored": 400,
+  "ic": -0.0279,
+  "ic_pvalue": 0.5786,
+  "ic_interpretation": "WEAK (<0.05)",
+  "ks_statistic": 0.065,
+  "ks_pvalue": 0.7934,
+  "committed_avg_score": 0.509,
+  "commitment_fail_avg_score": 0.518,
+  "score_separation": -0.009,
+  "label_distribution": {
+    "COMMITTED": 70,
+    "UNCOMMITTED": 56,
+    "DEVELOPING": 274
+  },
+  "uncommitted_precision": 0.4107,
+  "best_threshold": 0.6,
+  "best_sharpe_at_threshold": 1.8851,
+  "threshold_sweep": [
+    {
+      "threshold": 0.2,
+      "trades_kept": 400,
+      "trades_blocked": 0,
+      "win_rate": 0.5,
+      "avg_pnl_r": 0.4009,
+      "sharpe_proxy": 1.3798
+    },
+    {
+      "threshold": 0.25,
+      "trades_kept": 397,
+      "trades_blocked": 3,
+      "win_rate": 0.4962,
+      "avg_pnl_r": 0.3869,
+      "sharpe_proxy": 1.3375
+    },
+    {
+      "threshold": 0.3,
+      "trades_kept": 397,
+      "trades_blocked": 3,
+      "win_rate": 0.4962,
+      "avg_pnl_r": 0.3869,
+      "sharpe_proxy": 1.3375
+    },
+    {
+      "threshold": 0.35,
+      "trades_kept": 356,
+      "trades_blocked": 44,
+      "win_rate": 0.4972,
+      "avg_pnl_r": 0.4214,
+      "sharpe_proxy": 1.4113
+    },
+    {
+      "threshold": 0.4,
+      "trades_kept": 344,
+      "trades_blocked": 56,
+      "win_rate": 0.4855,
+      "avg_pnl_r": 0.3639,
+      "sharpe_proxy": 1.2597
+    },
+    {
+      "threshold": 0.45,
+      "trades_kept": 300,
+      "trades_blocked": 100,
+      "win_rate": 0.4833,
+      "avg_pnl_r": 0.3583,
+      "sharpe_proxy": 1.2684
+    },
+    {
+      "threshold": 0.5,
+      "trades_kept": 207,
+      "trades_blocked": 193,
+      "win_rate": 0.5072,
+      "avg_pnl_r": 0.4839,
+      "sharpe_proxy": 1.6013
+    },
+    {
+      "threshold": 0.55,
+      "trades_kept": 159,
+      "trades_blocked": 241,
+      "win_rate": 0.4843,
+      "avg_pnl_r": 0.3701,
+      "sharpe_proxy": 1.3273
+    },
+    {
+      "threshold": 0.6,
+      "trades_kept": 79,
+      "trades_blocked": 321,
+      "win_rate": 0.5063,
+      "avg_pnl_r": 0.6536,
+      "sharpe_proxy": 1.8851
+    },
+    {
+      "threshold": 0.65,
+      "trades_kept": 70,
+      "trades_blocked": 330,
+      "win_rate": 0.4429,
+      "avg_pnl_r": 0.3448,
+      "sharpe_proxy": 1.1548
+    },
+    {
+      "threshold": 0.7,
+      "trades_kept": 5,
+      "trades_blocked": 395,
+      "win_rate": 1.0,
+      "avg_pnl_r": 3.8076,
+      "sharpe_proxy": 13.8027
+    }
+  ],
+  "recommendation": "DO NOT WIRE \u2014 IC too weak (<0.05), needs more signal components"
+}

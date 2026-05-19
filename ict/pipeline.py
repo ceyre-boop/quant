@@ -429,6 +429,29 @@ class ICTPipeline:
         # (score still logged as A+ for monitoring)
         _effective_grade = ICTGrade.A if grade == ICTGrade.A_PLUS else grade
 
+        # ── Commitment detector (2026-05-19) ──────────────────────────────
+        # market_structure >= 1.5 predicts commitment failure at 87.5% accuracy.
+        # London+GradeA+mkt<1.5: Sharpe 3.314 vs 1.864 unfiltered.
+        try:
+            from sovereign.intelligence.commitment_detector import CommitmentDetector as _CD
+            _commit = _CD(log=False).compute_ict(
+                component_scores=scores,
+                session=_current_session,
+                grade=grade.value if hasattr(grade, 'value') else str(grade),
+                score=total_score,
+            )
+            if _commit.label == "UNCOMMITTED":
+                return ICTVeto(
+                    symbol=symbol, direction=direction, timestamp=timestamp,
+                    score=total_score, grade=ICTGrade.VETOED,
+                    reason=f"COMMITMENT_DETECTOR: {_commit.reason}",
+                    component_scores=scores, confirmations=confirmations, missing=missing,
+                )
+            # DEVELOPING: execute at reduced size (handled downstream via size_multiplier)
+            _commit_size_mult = _commit.size_multiplier
+        except Exception:
+            _commit_size_mult = 1.0
+
         # ══════════════════════════════════════════════════════════════════
         # STAGE 6 — Risk engine gate
         # Entry price = FVG midpoint (limit), not current market price.
