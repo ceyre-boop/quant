@@ -179,6 +179,26 @@ Unified forensics (2026-05-18): sovereign/research/unified_forensics.py
   Forex: UNEXPLAINED 59 losses — macro-aligned but requires unknown third factor
   HYP-022 → HYP-026 added to hypothesis ledger (28 total)
 
+Intelligence Architecture (2026-05-19) — 4 layers complete:
+  Layer 1 — Trade Forensic Engine:   sovereign/forensics/trade_forensic_engine.py
+    6-label taxonomy (TIMING/THESIS/REGIME/EXECUTION/SIZING/COMMITMENT)
+    1,160 forensic records in data/forensics/trade_forensics.jsonl
+  Layer 2 — Commitment Detector:     sovereign/intelligence/commitment_detector.py
+    ICT gate: mkt_struct >= 1.5 → UNCOMMITTED veto (87.5% accuracy)
+    London + Grade A + committed → Sharpe 3.314, MC pass 100% in-sample
+    Wired into ict/pipeline.py Stage 5.7-c
+  Layer 3 — Latent Feature Search:   sovereign/forensics/latent_feature_search.py
+    59 forex COMMITMENT_FAILUREs tested across 5 candidate features
+    No feature clears IC > 0.1 threshold — accept structural failure rate
+    Counter-momentum sizing: +0.331R vs +0.107R (3× better, same 52% WR)
+    VIX slope wiring confirmed in signal_engine.py (size_mult column)
+  Layer 4 — Cross-System Bridge:     sovereign/intelligence/cross_system_bridge.py
+    QUANT→ICT: Library threat >= 0.95 → HALT_NEW | >= 0.85 → TIGHTEN
+    ICT→QUANT: 3+ stops/commitment-fails in 24h → REDUCE_CONVICTION (0.50×, 48h)
+    State: data/forensics/cross_system_state.json (6h TTL)
+    Wired: ict/pipeline.py Stage 0 + agent_scheduler.py every 2h
+    Current: HALT_NEW (ASIAN_CURRENCY_CONTAGION, threat=1.00)
+
 Prop firm:        sovereign/propfirm/ — rules engine + MC simulator + paper tracker
   Lucid $100k: 90.3% pass rate (London-only) | 70.5% (all sessions)
   Paper challenge #1: ACTIVE (Day 1, balance=$100k, floor=$92k, target=$108k)
@@ -233,8 +253,8 @@ Alexandrian Library: LIVE in orchestrator + ICT engine (primary market intellige
                   Returns LibraryInsight: primary_regime, threat_score, size_modifier, advisory
   Threat levels:  NORMAL(1.0×) ELEVATED(0.75×) WARNING(0.50×) DANGER(0.25×) CRITICAL(0.0×)
   Auto-learns:    any live drawdown ≥8% → added to library + MarketMemory simultaneously
-  Current read:   10 volumes converging | SHALE_SUPPLY_OIL_CRASH primary | CRITICAL | sim=0.940
-                  Lo Level 3: 0.50× | Kelly cap: 2.0% | ICT: trades with tight 1.5R/2.5R targets
+  Current read:   ASIAN_CURRENCY_CONTAGION | CRITICAL | threat=1.00 → ICT HALT_NEW via bridge
+                  Lo Level 3: 0.50× | Kelly cap: 2.0× | Bridge blocks all new ICT entries
 
 CS229 Stack — All Loops Closed:
   Softmax / ICA / KMeans / Pegasus — all live, all online-learning from ledger
@@ -247,11 +267,12 @@ Trading Memory:   LIVE in orchestrator (legacy fallback when library not loaded)
 Tests:            23/23 passing — python3 tests/run_ml_tests.py
 
 Next milestones:
-  1. Build sovereign/agent/research_agent.py (autonomous research loop)
-  2. Build frontend/dashboard_research.html (research intelligence dashboard)
-  3. Build scripts/agent_scheduler.py (usage-aware launchd scheduling)
-  4. ICT: collect 30 days paper trades → re-run pipeline → attempt FunderPro if 🟢 GO
-  5. Forex: wire calendar edges as SIZE BOOSTS on top of v004 macro signal
+  1. Layer 5 (Prop Challenge Deployment): wait 30 live London+GradeA+committed paper trades
+     → run 10 simulated challenges at >70% pass → buy Lucid LucidFlex $100k evaluation
+  2. ICT dashboard: add cross-system bridge panel (ict_mode, quant_signal, threat score)
+  3. pd_alignment weight=0 test (HYP-024): anti-edge confirmed, zero the weight in ICT scorer
+  4. Forex: wire calendar edges as SIZE BOOSTS on top of v006 macro signal (HYP queued)
+  5. Forex Sharpe gap: 1.0547 → 1.5 target | remaining gap = 0.445
   6. Research queue: E1 at 60-day hold | March JPY full history | carry pair optimization
 
 ---
