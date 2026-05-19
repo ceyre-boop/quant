@@ -145,53 +145,49 @@ Do not modify layer3/game_engine.py directly — wrap it
 ## CURRENT SYSTEM STATUS (update this section each session)
 
 Equity system:    LIVE — paper trading 9:35 ET via launchd
+                  ATR threshold lowered 2.2% → 1.8% (2026-05-18): restores META/UNH/AAPL
+                  Was frozen since May 2 by miscalibrated threshold (trained on 2022-23 vol)
 ICT system:       LIVE — paper trading, launchd every 5min during London/NY PM
-                  Pairs: GBPUSD EURUSD AUDUSD AUDNZD (macro-filtered v004 universe)
-                  London: GBPUSD only (BOE/FED structure) | NY PM: all 4 pairs
-                  Pipeline verdict: 🟡 CONDITIONAL GO (reduce risk to 0.75% before attempt)
-                  Walk-forward B: 76.0% (matches MC 76.8%, within 1pp) — most recent period validates
-                  Walk-forward A: 54.5% — 2024 had rough 8-stop clustering period
-                  FunderPro executor: built, ROUTING OFF (awaiting 🟢 GO verdict)
-                  Dashboard: ceyre-boop.github.io/quant/ict/ (Bloomberg-style terminal)
-                  Push notifications: ntfy.sh topic=clawd-ict-7829 (trade open/close alerts)
-Forex system:     BUILT — paper scan only, not automated yet
-                  v004 REPLICATED (2026-05-16): avg_sharpe=0.8011, 8/8 pairs positive
-                  Best: AUDUSD +1.292 | GBPUSD +1.130 | EURUSD +1.009 | AUDNZD +0.836
-                  Improvement vs v004 reference (+0.175) — code confirmed clean, no ICT corruption
+                  Pairs: GBPUSD EURUSD AUDUSD AUDNZD (London session, all 4 pairs)
+                  NY_PM VETOED (2026-05-18 forensics): -0.283R avg vs London +0.471R
+                  London + Grade A = WR 41%, avgR +0.840, Sharpe proxy 2.093
+                  A+ grade downgraded to A for trade decision (13% WR → handled as A 39% WR)
+                  MC pass rate: 58.4% → 90.3% (London-only, 0.75% risk, Lucid $100k)
+                  Prop firm: sovereign/propfirm/ engine built. Paper challenge #1 active.
+                  Pipeline verdict: 🟢 GO — MC pass rate >70% confirmed
+                  Dashboard: ceyre-boop.github.io/quant/ict/ (Oracle-driven, live)
+                  QUEUED: pd_alignment weight=0 test (anti-edge confirmed, HYP-024)
+Forex system:     LIVE — v006 paper scan, all 7 pairs
+                  v006 (2026-05-18): avg_sharpe=1.0547 | 7/7 pairs positive
+                  GBPUSD: hold=6d, trailing=2.0x (Sharpe 1.523) | Others: 60d, 1.25x
+                  Micro-edge sweep: 4,200 combos in 25s, GBPUSD short-hold confirmed unique
+                  Signal decay detector: sovereign/research/signal_decay.py (monthly)
 Backtest speed:   148,193/sec (Numba JIT, 12 cores)
 XGBoost models:   Both specialists trained and live
 Veto pipeline:    4/5 clusters active
-
-Forex research (2026-05-16 session):
-  State allocator tested (sovereign/forex/state_allocator.py):
-    Hypothesis "predict before events" FALSIFIED — E1/E2/E3 all negative EV
-    Hypothesis "confirm then enter" PARTIALLY CONFIRMED — E6/E7 positive
-  Confirmation engine tested (sovereign/forex/confirmation_engine.py):
-    C1 March JPY: FALSIFIED in isolation (26% WR) — BOJ interventions swamp seasonal
-    C2 Quarter-end: FALSIFIED at scale (39% WR, 366 trades) — 60% was small-sample noise
-    C3 Post-CB drift: marginal (-0.042R avg)
-    CARRY base: 47% WR but losses > wins (stop too wide at 3×ATR)
-  KEY FINDING: v004 macro system (Sharpe 0.801) outperforms all new systems.
-               Calendar edges only work as SIZE BOOSTS when aligned with v004 direction.
-               Not as standalone entries. v004 is the foundation.
-
-ICT prop challenge math (scripts/prop_challenge_optimizer.py):
-  Edge: TP2=16.8%@4.5R | TP1=13.0%@1.5R | STOP=70.2%@-1.0R | EV=+0.40R/trade
-  Optimal config: 0.75% risk × 9 trades/month × 90-day window × 6% target
-  Single attempt pass rate: 76.8% | Portfolio (4 attempts): 99.7%
-  Risk cap: 1.0% max (8 consecutive stops × 1% = 8% DD = prop firm limit)
-  Pipeline: python3 scripts/run_live_pipeline.py --source-json logs/ict_backtest_window_A.json
-                                                 --source-json logs/ict_backtest_window_B.json
-                                                 --days 365
+New tools:        PAI (46 skills), OpenSpace MCP (4 tools), GSD hooks (8 groups)
 
 Forex version tracker:
-  v001: 0.1785 avg Sharpe | 1/11 pairs positive
-  v002: 0.3551 avg Sharpe | 4/11 pairs positive
-  v002.5: ~0.38 | macro veto added | drawdown -15%→-8%
-  v003: 0.4523 avg Sharpe | 8/10 pairs positive
-  v004: 0.6260 avg Sharpe | 8/8 pairs positive
-  Current (2026-05-16): 0.8011 avg Sharpe | 8/8 pairs positive
+  v001: 0.1785 | v002: 0.3551 | v002.5: ~0.38 | v003: 0.4523 | v004: 0.6260
+  v005: 0.8843 → 1.0237 (trailing 1.25x, forensics v1)
+  v006: 1.0237 → 1.0547 (GBPUSD per-pair 6d hold, micro-edge sweep)
   Target: Sharpe > 1.5 (institutional grade)
+
+Unified forensics (2026-05-18): sovereign/research/unified_forensics.py
+  SHARED ROOT CAUSE: Both ICT and Forex fail from PREMATURE ENTRY
+  ICT: 61% of losses stop within 3 bars (entry before market commits)
+  Forex: UNEXPLAINED 59 losses — macro-aligned but requires unknown third factor
+  HYP-022 → HYP-026 added to hypothesis ledger (28 total)
+
+Prop firm:        sovereign/propfirm/ — rules engine + MC simulator + paper tracker
+  Lucid $100k: 90.3% pass rate (London-only) | 70.5% (all sessions)
+  Paper challenge #1: ACTIVE (Day 1, balance=$100k, floor=$92k, target=$108k)
+  CLI: python3 sovereign/propfirm/paper_challenge.py --status/--eod/--trade
+
+ICT prop challenge math:
+  Edge: TP2=16.8%@4.5R | TP1=13.0%@1.5R | STOP=70.2%@-1.0R | EV=+0.40R/trade
+  London-only: avgR=+0.471 | WR=32% | Sharpe proxy=1.225
+  Best config: London + Grade A | avgR=+0.840 | WR=41%
 
 ML STACK (Stanford CS229 + MIT Finance — 11/11 operational, all loops closed):
   sovereign/risk/predict_now.py          — LOESS win rate + Newton IRLS + L2 MAP (L03/L04/L11)
