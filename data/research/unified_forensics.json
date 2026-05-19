@@ -1,0 +1,230 @@
+{
+  "generated_at": "2026-05-19T03:37:44.254081+00:00",
+  "ict": {
+    "system": "ICT",
+    "total_trades": 102,
+    "win_rate": 0.314,
+    "avg_r": 0.16,
+    "component_deltas": {
+      "kill_zone": {
+        "win_avg": 2.0,
+        "loss_avg": 2.0,
+        "delta": 0.0
+      },
+      "sweep": {
+        "win_avg": 2.005,
+        "loss_avg": 1.987,
+        "delta": 0.018
+      },
+      "displacement": {
+        "win_avg": 1.724,
+        "loss_avg": 1.661,
+        "delta": 0.063
+      },
+      "fvg_tap": {
+        "win_avg": 1.219,
+        "loss_avg": 1.164,
+        "delta": 0.054
+      },
+      "market_structure": {
+        "win_avg": 0.963,
+        "loss_avg": 1.543,
+        "delta": -0.58
+      },
+      "pd_alignment": {
+        "win_avg": 0.155,
+        "loss_avg": 0.297,
+        "delta": -0.142
+      }
+    },
+    "grade_stats": {
+      "A+": {
+        "count": 30,
+        "win_rate": 0.133,
+        "avg_r": -0.375
+      },
+      "A": {
+        "count": 72,
+        "win_rate": 0.389,
+        "avg_r": 0.383
+      }
+    },
+    "session_stats": {
+      "London": {
+        "count": 60,
+        "win_rate": 0.317,
+        "avg_r": 0.471
+      },
+      "NY_PM": {
+        "count": 42,
+        "win_rate": 0.31,
+        "avg_r": -0.283
+      }
+    },
+    "failure_modes": {
+      "APLUS_PARADOX": {
+        "description": "A+ grade (score>9) has 13% WR vs 39% for grade A. Higher scores anti-correlated with success. Over-scored setups may coincide with high-vol moments that immediately reverse.",
+        "count": 30,
+        "win_rate": 0.133,
+        "avg_r": -0.375,
+        "evidence": "Score at TP2 wins: 8.05 | Score at STOP losses: 8.41"
+      },
+      "FAST_STOP_TIMING": {
+        "description": "61% of losses stopped within 3 bars. Entry timing is off \u2014 price hasn't actually committed to the move yet when the system enters.",
+        "count": 43,
+        "pct_of_losses": 0.614,
+        "avg_score": 8.56
+      },
+      "NY_PM_DRAG": {
+        "description": "NY_PM averaging -0.283R across all pairs. London averages +0.471R. The session edge lives in London only.",
+        "session_stats": {
+          "London": {
+            "count": 60,
+            "win_rate": 0.317,
+            "avg_r": 0.471
+          },
+          "NY_PM": {
+            "count": 42,
+            "win_rate": 0.31,
+            "avg_r": -0.283
+          }
+        }
+      },
+      "PD_ALIGNMENT_ANTI_EDGE": {
+        "description": "pd_alignment>0 produces 20% WR vs 35% WR with pd_alignment=0. The PD array component is hurting, not helping.",
+        "pd_zero_wr": 0.351,
+        "pd_pos_wr": 0.2,
+        "delta": 0.151
+      }
+    },
+    "win_drivers": {
+      "LONDON_TP2": {
+        "description": "14/17 TP2 hits are London session. London is the primary edge engine.",
+        "count": 17,
+        "london_pct": 0.824,
+        "avg_hold_bars": 7.2
+      },
+      "GRADE_A_NOT_APLUS": {
+        "description": "Grade A (score 7-9) outperforms A+ (score 9+) by 26 percentage points in WR.",
+        "grade_a_wr": 0.389,
+        "grade_aplus_wr": 0.133
+      }
+    },
+    "combat_rules": [
+      {
+        "id": "ICT-C001",
+        "type": "VETO",
+        "priority": 1,
+        "condition": "grade == 'A+' AND session == 'NY_PM'",
+        "evidence": "A+ NY_PM: 9 trades",
+        "detail": "A+ in NY_PM is the worst combination. Neither the grade nor the session have edge here."
+      },
+      {
+        "id": "ICT-C002",
+        "type": "VETO",
+        "priority": 2,
+        "condition": "pd_alignment > 0 AND session == 'NY_PM'",
+        "evidence": "pd_alignment>0 WR: 20% vs 35%",
+        "detail": "pd_alignment component is anti-edge. Consider zeroing its weight in the scorer."
+      },
+      {
+        "id": "ICT-B001",
+        "type": "BOOST",
+        "priority": 1,
+        "condition": "session == 'London' AND grade == 'A' AND score < 9.0",
+        "evidence": "London A-grade: 39% WR, TP2 rate highest",
+        "detail": "This is the exact setup profile that generates TP2 hits. Size at 1.0x (don't reduce)."
+      },
+      {
+        "id": "ICT-C003",
+        "type": "FILTER",
+        "priority": 2,
+        "condition": "Test London-only mode (disable NY_PM entirely)",
+        "evidence": "London avgR=+0.471 vs NY_PM avgR=-0.283",
+        "detail": "Run backtest with NY_PM disabled. Expected Sharpe improvement: +0.3-0.5 by removing -0.283R avg session."
+      }
+    ],
+    "analyzed_at": "2026-05-19T03:37:44.251340+00:00"
+  },
+  "forex_unexplained": {
+    "unexplained_count": 59,
+    "unexplained_avg_r": -0.855,
+    "macro_vs_dir_avg": 0.949,
+    "momentum_avg": 0.0047,
+    "exit_breakdown": {
+      "trailing_stop": 32,
+      "time": 24,
+      "stop": 3
+    },
+    "momentum_filter_test": {
+      "threshold": 0.005,
+      "unexplained_would_filter": 4,
+      "unexplained_would_keep": 55,
+      "wins_would_also_filter": 45,
+      "net_r_saved": -1.05,
+      "win_r_lost": 52.65,
+      "net_gain": -53.7
+    },
+    "root_cause": "Macro-aligned entries with flat momentum. Signal is directionally right but price has no energy to sustain the move. Trailing stop fires on the first counter-move before momentum confirms.",
+    "combat_rule": {
+      "id": "FX-C007",
+      "type": "VETO",
+      "condition": "|momentum_63d| < 0.5% (flat momentum at entry)",
+      "detail": "Block entries where 63-day momentum magnitude is below 0.5%. Macro signal is valid but no momentum means no fuel for the move."
+    }
+  },
+  "shared_insights": {
+    "generated_at": "2026-05-19T03:37:44.254076+00:00",
+    "core_insight": "Both ICT and Forex share the same fundamental failure: ENTERING BEFORE THE MARKET COMMITS. ICT: 61% of losses stop within 3 bars \u2014 the move hasn't started. Forex: UNEXPLAINED losses are macro-aligned but momentum-flat \u2014 same cause. The edge exists. The timing is premature.",
+    "shared_failure": {
+      "name": "PREMATURE_ENTRY",
+      "ict_evidence": "61% of losses exit within 3 bars (fast stops)",
+      "forex_evidence": "59 UNEXPLAINED losses: macro-aligned (0.949) but flat momentum (0.005)",
+      "shared_fix": "Both systems need a momentum confirmation requirement at entry"
+    },
+    "shared_wins": {
+      "ict": "London session A-grade entries \u2192 14/17 TP2 hits. 7.2 bar avg hold.",
+      "forex": "MACRO_ALIGNED_STRONG (rate_diff \u2265 2% + momentum confirms) \u2192 3.08R avg",
+      "pattern": "When direction + macro + momentum all agree AND the market has already started moving: that is the exact setup profile for outsized wins in BOTH systems."
+    },
+    "next_experiments": [
+      {
+        "id": "EXP-001",
+        "system": "ICT",
+        "hypothesis": "London-only mode improves Sharpe by removing -0.283R NY_PM drag",
+        "test": "Run ict_backtest with NY_PM disabled. Compare walk-forward stats.",
+        "expected_impact": "WR: 31% \u2192 ~35% | AvgR: +0.160 \u2192 ~+0.35",
+        "priority": 1
+      },
+      {
+        "id": "EXP-002",
+        "system": "ICT",
+        "hypothesis": "Score cap at 9.0 (block A+ grade) improves WR",
+        "test": "Re-grade: treat all scores > 9.0 as 8.99 (grade A). Backtest.",
+        "expected_impact": "Removes 26 trades at -0.375R avg, keeping 72 trades at +0.383R",
+        "priority": 1
+      },
+      {
+        "id": "EXP-003",
+        "system": "Forex",
+        "hypothesis": "|momentum_63d| < 0.5% veto resolves 59 UNEXPLAINED losses",
+        "test": "Add momentum floor to signal_engine._macro_signal_for_date(). Backtest.",
+        "expected_impact": "Net gain: -53.70R across backtest",
+        "priority": 2
+      },
+      {
+        "id": "EXP-004",
+        "system": "ICT",
+        "hypothesis": "pd_alignment component is anti-edge (20% WR vs 35% WR without it)",
+        "test": "Zero out pd_alignment weight in ICT scorer. Backtest.",
+        "expected_impact": "WR +15pp on subset with pd_alignment>0 (25 trades)",
+        "priority": 2
+      }
+    ],
+    "shared_goal_tracker": {
+      "ICT_target": "FunderPro challenge pass \u2014 need 30 paper trades, 70.5% MC pass rate confirmed",
+      "Forex_target": "Sharpe 1.5 \u2014 current 1.0547, gap 0.4453",
+      "joint_principle": "v004/v006 is the foundation. Add edges only when they survive out-of-sample. Never trade against macro+momentum alignment."
+    }
+  }
+}

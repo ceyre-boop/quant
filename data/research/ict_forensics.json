@@ -1,0 +1,146 @@
+{
+  "system": "ICT",
+  "total_trades": 102,
+  "win_rate": 0.314,
+  "avg_r": 0.16,
+  "component_deltas": {
+    "kill_zone": {
+      "win_avg": 2.0,
+      "loss_avg": 2.0,
+      "delta": 0.0
+    },
+    "sweep": {
+      "win_avg": 2.005,
+      "loss_avg": 1.987,
+      "delta": 0.018
+    },
+    "displacement": {
+      "win_avg": 1.724,
+      "loss_avg": 1.661,
+      "delta": 0.063
+    },
+    "fvg_tap": {
+      "win_avg": 1.219,
+      "loss_avg": 1.164,
+      "delta": 0.054
+    },
+    "market_structure": {
+      "win_avg": 0.963,
+      "loss_avg": 1.543,
+      "delta": -0.58
+    },
+    "pd_alignment": {
+      "win_avg": 0.155,
+      "loss_avg": 0.297,
+      "delta": -0.142
+    }
+  },
+  "grade_stats": {
+    "A+": {
+      "count": 30,
+      "win_rate": 0.133,
+      "avg_r": -0.375
+    },
+    "A": {
+      "count": 72,
+      "win_rate": 0.389,
+      "avg_r": 0.383
+    }
+  },
+  "session_stats": {
+    "London": {
+      "count": 60,
+      "win_rate": 0.317,
+      "avg_r": 0.471
+    },
+    "NY_PM": {
+      "count": 42,
+      "win_rate": 0.31,
+      "avg_r": -0.283
+    }
+  },
+  "failure_modes": {
+    "APLUS_PARADOX": {
+      "description": "A+ grade (score>9) has 13% WR vs 39% for grade A. Higher scores anti-correlated with success. Over-scored setups may coincide with high-vol moments that immediately reverse.",
+      "count": 30,
+      "win_rate": 0.133,
+      "avg_r": -0.375,
+      "evidence": "Score at TP2 wins: 8.05 | Score at STOP losses: 8.41"
+    },
+    "FAST_STOP_TIMING": {
+      "description": "61% of losses stopped within 3 bars. Entry timing is off \u2014 price hasn't actually committed to the move yet when the system enters.",
+      "count": 43,
+      "pct_of_losses": 0.614,
+      "avg_score": 8.56
+    },
+    "NY_PM_DRAG": {
+      "description": "NY_PM averaging -0.283R across all pairs. London averages +0.471R. The session edge lives in London only.",
+      "session_stats": {
+        "London": {
+          "count": 60,
+          "win_rate": 0.317,
+          "avg_r": 0.471
+        },
+        "NY_PM": {
+          "count": 42,
+          "win_rate": 0.31,
+          "avg_r": -0.283
+        }
+      }
+    },
+    "PD_ALIGNMENT_ANTI_EDGE": {
+      "description": "pd_alignment>0 produces 20% WR vs 35% WR with pd_alignment=0. The PD array component is hurting, not helping.",
+      "pd_zero_wr": 0.351,
+      "pd_pos_wr": 0.2,
+      "delta": 0.151
+    }
+  },
+  "win_drivers": {
+    "LONDON_TP2": {
+      "description": "14/17 TP2 hits are London session. London is the primary edge engine.",
+      "count": 17,
+      "london_pct": 0.824,
+      "avg_hold_bars": 7.2
+    },
+    "GRADE_A_NOT_APLUS": {
+      "description": "Grade A (score 7-9) outperforms A+ (score 9+) by 26 percentage points in WR.",
+      "grade_a_wr": 0.389,
+      "grade_aplus_wr": 0.133
+    }
+  },
+  "combat_rules": [
+    {
+      "id": "ICT-C001",
+      "type": "VETO",
+      "priority": 1,
+      "condition": "grade == 'A+' AND session == 'NY_PM'",
+      "evidence": "A+ NY_PM: 9 trades",
+      "detail": "A+ in NY_PM is the worst combination. Neither the grade nor the session have edge here."
+    },
+    {
+      "id": "ICT-C002",
+      "type": "VETO",
+      "priority": 2,
+      "condition": "pd_alignment > 0 AND session == 'NY_PM'",
+      "evidence": "pd_alignment>0 WR: 20% vs 35%",
+      "detail": "pd_alignment component is anti-edge. Consider zeroing its weight in the scorer."
+    },
+    {
+      "id": "ICT-B001",
+      "type": "BOOST",
+      "priority": 1,
+      "condition": "session == 'London' AND grade == 'A' AND score < 9.0",
+      "evidence": "London A-grade: 39% WR, TP2 rate highest",
+      "detail": "This is the exact setup profile that generates TP2 hits. Size at 1.0x (don't reduce)."
+    },
+    {
+      "id": "ICT-C003",
+      "type": "FILTER",
+      "priority": 2,
+      "condition": "Test London-only mode (disable NY_PM entirely)",
+      "evidence": "London avgR=+0.471 vs NY_PM avgR=-0.283",
+      "detail": "Run backtest with NY_PM disabled. Expected Sharpe improvement: +0.3-0.5 by removing -0.283R avg session."
+    }
+  ],
+  "analyzed_at": "2026-05-19T03:37:44.251340+00:00"
+}

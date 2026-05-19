@@ -1,0 +1,54 @@
+{
+  "generated_at": "2026-05-19T03:37:44.254076+00:00",
+  "core_insight": "Both ICT and Forex share the same fundamental failure: ENTERING BEFORE THE MARKET COMMITS. ICT: 61% of losses stop within 3 bars \u2014 the move hasn't started. Forex: UNEXPLAINED losses are macro-aligned but momentum-flat \u2014 same cause. The edge exists. The timing is premature.",
+  "shared_failure": {
+    "name": "PREMATURE_ENTRY",
+    "ict_evidence": "61% of losses exit within 3 bars (fast stops)",
+    "forex_evidence": "59 UNEXPLAINED losses: macro-aligned (0.949) but flat momentum (0.005)",
+    "shared_fix": "Both systems need a momentum confirmation requirement at entry"
+  },
+  "shared_wins": {
+    "ict": "London session A-grade entries \u2192 14/17 TP2 hits. 7.2 bar avg hold.",
+    "forex": "MACRO_ALIGNED_STRONG (rate_diff \u2265 2% + momentum confirms) \u2192 3.08R avg",
+    "pattern": "When direction + macro + momentum all agree AND the market has already started moving: that is the exact setup profile for outsized wins in BOTH systems."
+  },
+  "next_experiments": [
+    {
+      "id": "EXP-001",
+      "system": "ICT",
+      "hypothesis": "London-only mode improves Sharpe by removing -0.283R NY_PM drag",
+      "test": "Run ict_backtest with NY_PM disabled. Compare walk-forward stats.",
+      "expected_impact": "WR: 31% \u2192 ~35% | AvgR: +0.160 \u2192 ~+0.35",
+      "priority": 1
+    },
+    {
+      "id": "EXP-002",
+      "system": "ICT",
+      "hypothesis": "Score cap at 9.0 (block A+ grade) improves WR",
+      "test": "Re-grade: treat all scores > 9.0 as 8.99 (grade A). Backtest.",
+      "expected_impact": "Removes 26 trades at -0.375R avg, keeping 72 trades at +0.383R",
+      "priority": 1
+    },
+    {
+      "id": "EXP-003",
+      "system": "Forex",
+      "hypothesis": "|momentum_63d| < 0.5% veto resolves 59 UNEXPLAINED losses",
+      "test": "Add momentum floor to signal_engine._macro_signal_for_date(). Backtest.",
+      "expected_impact": "Net gain: -53.70R across backtest",
+      "priority": 2
+    },
+    {
+      "id": "EXP-004",
+      "system": "ICT",
+      "hypothesis": "pd_alignment component is anti-edge (20% WR vs 35% WR without it)",
+      "test": "Zero out pd_alignment weight in ICT scorer. Backtest.",
+      "expected_impact": "WR +15pp on subset with pd_alignment>0 (25 trades)",
+      "priority": 2
+    }
+  ],
+  "shared_goal_tracker": {
+    "ICT_target": "FunderPro challenge pass \u2014 need 30 paper trades, 70.5% MC pass rate confirmed",
+    "Forex_target": "Sharpe 1.5 \u2014 current 1.0547, gap 0.4453",
+    "joint_principle": "v004/v006 is the foundation. Add edges only when they survive out-of-sample. Never trade against macro+momentum alignment."
+  }
+}

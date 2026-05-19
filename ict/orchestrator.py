@@ -41,11 +41,14 @@ SESSION_CLOSE_HOUR_ET = 16
 # ICT entry precision + macro direction filter = compounding edge
 PROVEN_PAIRS = ['GBPUSD=X', 'EURUSD=X', 'AUDUSD=X', 'AUDNZD=X']
 
-# NY PM: primary session, all pairs
-# London: GBPUSD-only (BOE overlap gives clean BOE/FED structure — 59.4% WR)
+# Forensics 2026-05-18: NY_PM averages -0.283R across all pairs.
+# London averages +0.471R. London-only MC pass rate: 90.3% vs 58.4%.
+# NY_PM vetoed in pipeline.py stage 5.7. Orchestrator still schedules it
+# (veto fires inside pipeline before signal is issued — no code change needed here).
+# PRIMARY_SESSION kept as NY_PM for scheduling continuity; pipeline does the filtering.
 ACTIVE_SESSIONS   = {'NY_PM', 'London'}
-PRIMARY_SESSION   = 'NY_PM'
-LONDON_PAIRS      = {'GBPUSD'}   # only GBPUSD trades London (has BOE structure)
+PRIMARY_SESSION   = 'London'    # London is now the primary edge session
+LONDON_PAIRS      = {'GBPUSD', 'EURUSD', 'AUDUSD', 'AUDNZD'}  # all pairs in London
 
 FIREBASE_ROOT   = 'signals/ICT_ENGINE'
 ACCOUNT_SIZE    = 10_000.0

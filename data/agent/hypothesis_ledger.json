@@ -166,6 +166,46 @@
       "hypothesis": "All 5 viable pairs optimized to 5-7 day holds from 60d baseline. Expected Sharpe > 1.10.",
       "result": "",
       "closed": null
+    },
+    {
+      "id": "HYP-022",
+      "name": "NY_PM session is anti-edge (-0.283R avg)",
+      "status": "CONFIRMED",
+      "result": "-0.283R avg vs London +0.471R. 102 trade sample.",
+      "date": "2026-05-19",
+      "action": "NY_PM vetoed in pipeline.py stage 5.7. London-only MC pass rate: 90.3%"
+    },
+    {
+      "id": "HYP-023",
+      "name": "A+ grade paradox \u2014 score anti-correlated with success",
+      "status": "CONFIRMED",
+      "result": "A+ WR=13% (-0.375R avg) vs Grade A WR=39% (+0.383R avg). 30 vs 72 trades.",
+      "date": "2026-05-19",
+      "action": "A+ downgraded to A for trade decision in pipeline stage 5.7. Still logged as A+."
+    },
+    {
+      "id": "HYP-024",
+      "name": "pd_alignment component is anti-edge",
+      "status": "CONFIRMED",
+      "result": "pd_alignment>0: 20% WR. pd_alignment=0: 35% WR. Delta: -15pp.",
+      "date": "2026-05-19",
+      "action": "QUEUED for testing: zero out pd_alignment weight in ICT scorer."
+    },
+    {
+      "id": "HYP-025",
+      "name": "Forex UNEXPLAINED losses are not resolvable by momentum threshold",
+      "status": "REJECTED",
+      "result": "Momentum distributions identical between unexplained losses and wins. No clean threshold exists.",
+      "date": "2026-05-19",
+      "action": "UNEXPLAINED category requires a third factor not currently measured."
+    },
+    {
+      "id": "HYP-026",
+      "name": "London-only ICT + Grade A: the exact setup for TP2 hits",
+      "status": "CONFIRMED",
+      "result": "London Grade A (n=39): WR=41%, avgR=+0.840, Sharpe proxy=2.093. 11/17 TP2 hits.",
+      "date": "2026-05-19",
+      "action": "This is the system target setup. Pipeline now routes toward this profile."
     }
   ]
 }

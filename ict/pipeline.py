@@ -412,10 +412,28 @@ class ICTPipeline:
         grade = self._grade(total_score, threshold=threshold)
 
         # ══════════════════════════════════════════════════════════════════
+        # STAGE 5.7 — Forensics combat rules (unified_forensics.py 2026-05-18)
+        # EXP-001: NY_PM has -0.283R avg vs London +0.471R. Block entirely.
+        # EXP-002: A+ grade (score>9.0) has 13% WR vs 39% for grade A.
+        #          A+ in any session is anti-edge — treat as A for trade decision.
+        # ══════════════════════════════════════════════════════════════════
+        _current_session = getattr(session_pre, "session_name", "")
+        if _current_session == "NY_PM":
+            return ICTVeto(
+                symbol=symbol, direction=direction, timestamp=timestamp,
+                score=total_score, grade=ICTGrade.VETOED,
+                reason=f"NY_PM session blocked — forensics: -0.283R avg vs London +0.471R",
+                component_scores=scores, confirmations=confirmations, missing=missing,
+            )
+        # A+ paradox: downgrade A+ to A for trade decision only
+        # (score still logged as A+ for monitoring)
+        _effective_grade = ICTGrade.A if grade == ICTGrade.A_PLUS else grade
+
+        # ══════════════════════════════════════════════════════════════════
         # STAGE 6 — Risk engine gate
         # Entry price = FVG midpoint (limit), not current market price.
         # ══════════════════════════════════════════════════════════════════
-        if grade in (ICTGrade.A_PLUS, ICTGrade.A):
+        if _effective_grade in (ICTGrade.A_PLUS, ICTGrade.A):
             ep = entry_level if entry_level is not None else price
 
             # Use structural stop (swept level) when a sweep is confirmed.
