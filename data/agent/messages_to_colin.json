@@ -6,7 +6,7 @@
       "emoji": "\ud83d\udfe1",
       "text": "Task RQ-005 (Carry base pair optimization) failed: DRY RUN: Carry base pair optimization \u2014 not executed",
       "timestamp": "2026-05-16T23:53:12",
-      "read": false
+      "read": true
     },
     {
       "id": "msg-20260516234723",
@@ -14,7 +14,7 @@
       "emoji": "\ud83d\udfe1",
       "text": "Task RQ-002 (March JPY full history 2010-2024) failed: DRY RUN: March JPY full history 2010-2024 \u2014 not executed",
       "timestamp": "2026-05-16T23:47:23",
-      "read": false
+      "read": true
     },
     {
       "id": "msg-20260516233857",
@@ -22,7 +22,7 @@
       "emoji": "\ud83d\udfe1",
       "text": "Task RQ-001 (E1 rate divergence at 60-day hold) failed: DRY RUN: E1 rate divergence at 60-day hold \u2014 not executed",
       "timestamp": "2026-05-16T23:38:57",
-      "read": false
+      "read": true
     },
     {
       "id": "msg-20260516140424",
@@ -46,7 +46,7 @@
       "emoji": "\ud83d\udd34",
       "text": "Oracle error: BadRequestError: Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purcha",
       "timestamp": "2026-05-16T16:28:17.097109",
-      "read": false,
+      "read": true,
       "source": "oracle"
     },
     {
@@ -55,7 +55,7 @@
       "emoji": "\ud83d\udd34",
       "text": "Your forex pipeline is dead in the water right now \u2014 every major pair is vetoed because ADR is exhausted, and the scanner log is 5+ hours stale. You should restart the ICT scanner and check what's actually moving before you process another veto. The pattern repeats identically every 5 minutes, which means either the scanner is stuck or you're looking at cached stale data.\n\nThe good news: your core edges are holding (v004 macro validates, ICT FVG still positive), and you've got two live tests running on rate",
       "timestamp": "2026-05-16T16:34:10.762992",
-      "read": false,
+      "read": true,
       "source": "oracle"
     },
     {
@@ -64,7 +64,7 @@
       "emoji": "\ud83d\udd34",
       "text": "The system is choking on infrastructure and you're flying blind on data freshness. Your ICT scanner hasn't logged in 5 hours, your core dependencies (duckdb, ollama, yfinance) are offline, and you're sitting on repeated vetoes from the same four pairs because volatility has already exhausted the available range for the day\u2014which means you're not getting new signal, you're just checking the same stale conditions repeatedly.\n\nOn the positive side: your hypothesis work is solid. E1 divergence and calendar edges are still testing, your v004 macro system validated, and ICT FVG replicates. That's real. But you can't act on any of it if the plumbing is broken.\n\nYou",
       "timestamp": "2026-05-16T16:34:38.515297",
-      "read": false,
+      "read": true,
       "source": "oracle"
     },
     {
@@ -73,7 +73,7 @@
       "emoji": "\ud83d\udfe1",
       "text": "Your forex vetoes are screaming the same message \u2014 major pairs have exhausted their daily range, so the system is correctly staying out. That's working. But your infrastructure is rotting: duckdb and yfinance are missing, ollama isn't responding, and ict_scanner hasn't reported in over 5 hours. You should rebuild those dependencies and get fresh data before you trust any new signal coming through.",
       "timestamp": "2026-05-16T16:34:56.433317",
-      "read": false,
+      "read": true,
       "source": "oracle"
     },
     {
@@ -82,7 +82,7 @@
       "emoji": "\ud83d\udd34",
       "text": "The system is half-awake: duckdb, ollama, and yfinance aren't installed, and your ICT scanner hasn't checked in for five hours, so you're running on stale data while forex pairs keep getting rejected for exhausted daily ranges. You should rebuild those dependencies and restart the scanner now\u2014you can't trade blind. On the bright side, your core hypotheses are holding (v004 macro edge is solid), but you won't know if E1 or calendar edges work until the infrastructure is back online.",
       "timestamp": "2026-05-16T16:41:18.707001",
-      "read": false,
+      "read": true,
       "source": "oracle"
     },
     {
@@ -91,7 +91,7 @@
       "emoji": "\ud83d\udd34",
       "text": "The forex side is choking\u2014every major pair is exhausted on daily range, and your scanner hasn't logged fresh data in over 5 hours, which means you're flying blind on entry signals. You need to restart the scanner and duckdb/yfinance immediately, otherwise you're just sitting on old vetoes and missing real market moves. Equities are quiet but stale (last veto was May 2nd), and your two active hypotheses need actual execution to tell you anything useful\u2014E1 divergence is still in dry run limbo.",
       "timestamp": "2026-05-16T16:52:24.320408",
-      "read": false,
+      "read": true,
       "source": "oracle"
     },
     {
@@ -100,7 +100,7 @@
       "emoji": "\ud83d\udfe1",
       "text": "Your forex pairs are dead today \u2014 ADR exhausted across the board, which tells me the market moved hard and early, leaving nothing for your setup. The ICT scanner is working fine, but it's correctly staying out; equities are similarly quiet with volatility too low across the board. You should wait for tomorrow's session to see if range resets, and meanwhile push the E1 rate divergence testing live \u2014 that's where the signal is right now.",
       "timestamp": "2026-05-16T17:24:57.351348",
-      "read": false,
+      "read": true,
       "source": "oracle"
     },
     {
@@ -109,7 +109,7 @@
       "emoji": "\ud83d\udfe1",
       "text": "Your forex pairs are dead right now\u2014ADR exhaustion across majors is cleaning out every signal, which is why ICT is throwing nothing but zeros. Equity side is quiet too (ATR floor doing its job), so this is actually a clean holding pattern: system is working as designed, which means you wait. The two hypotheses in testing (rate divergence and calendar edges) should finish their dry runs before market opens tomorrow\u2014worth checking those first thing.",
       "timestamp": "2026-05-16T17:35:09.208336",
-      "read": false,
+      "read": true,
       "source": "oracle"
     },
     {
@@ -118,7 +118,7 @@
       "emoji": "\ud83d\udd34",
       "text": "Forex is exhausted today\u2014every major pair except AUDNZD got vetoed on ADR, which means the market moved hard and the system correctly stayed out. Your equity vetoes are stale (mid-May data on ATR thresholds), so either refresh those baselines or the scanner will keep rejecting decent candidates. The two active hypotheses are worth watching, but you should run that stop width sweep on the 8 pairs this week while conditions are live\u2014it might tighten edge quality on the next equity cycle.",
       "timestamp": "2026-05-16T19:40:41.438954",
-      "read": false,
+      "read": true,
       "source": "oracle"
     },
     {
@@ -127,7 +127,7 @@
       "emoji": "\ud83d\udfe1",
       "text": "Everything's running clean, but your forex pairs are in a dead zone right now\u2014ADR exhaustion across majors means nothing's tradeable until volatility resets. The equity side is equally quiet with consistently low ATR, so you're looking at a holding pattern until market conditions shift; this is when you should lean into the two testing hypotheses (rate divergence, calendar edges) to sharpen them while live setups dry up.",
       "timestamp": "2026-05-16T19:41:15.365232",
-      "read": false,
+      "read": true,
       "source": "oracle"
     },
     {
@@ -136,7 +136,7 @@
       "emoji": "\ud83d\udd34",
       "text": "The forex pairs are all ADR-exhausted right now\u2014that's why you're seeing zeros across the board\u2014so there's nothing to trade until they reset tomorrow. Your equity vetoes are stale (mid-May data) and your API budget visibility is broken; you should regenerate that status so you know how much runway you actually have left before something fails. System itself is clean and your hypothesis pipeline looks solid, but fix the budget reporting today because you can't make confident decisions flying blind on token spend.",
       "timestamp": "2026-05-16T22:09:26.457199",
-      "read": false,
+      "read": true,
       "source": "oracle"
     },
     {
@@ -145,7 +145,7 @@
       "emoji": "\ud83d\udfe2",
       "text": "DRY RUN: Oracle would have called Claude here and written a message based on current system state.",
       "timestamp": "2026-05-16T23:38:56.795116",
-      "read": false,
+      "read": true,
       "source": "oracle"
     },
     {
@@ -154,7 +154,7 @@
       "emoji": "\ud83d\udd34",
       "text": "You've got two dead weight integrations sitting in yellow (openweather and Twitter) that aren't driving trades \u2014 turn them off or fix them this week. The forex system is doing its job fine but the ICT scanner hasn't run in 7+ hours and the veto ledger is stale; you should kick it manually to see if there's actual signal in the last session or just confirm the market was dead. E1 rate divergence is still in dry run \u2014 if you believe in it, execute the backtest and stop sitting on it.",
       "timestamp": "2026-05-16T23:39:15.397513",
-      "read": false,
+      "read": true,
       "source": "oracle"
     },
     {
@@ -163,7 +163,7 @@
       "emoji": "\ud83d\udfe2",
       "text": "DRY RUN: Oracle would have called Claude here and written a message based on current system state.",
       "timestamp": "2026-05-16T23:47:22.446373",
-      "read": false,
+      "read": true,
       "source": "oracle"
     },
     {
@@ -172,7 +172,7 @@
       "emoji": "\ud83d\udfe1",
       "text": "The system is architecturally sound but operationally frozen by a single gate. Your ICT engine and forex v004 are production-grade \u2014 76% walk-forward, 0.80 Sharpe across 8 pairs, 11 ML modules validated on disk. But equity trading is locked at 0x size by GOLDILOCKS_LOW_VOL, and the narrative engine that should inform position sizing is dormant. You're operating at maybe 40% capacity.\n\nStart here: pull qwen3, spin up TradingAgents, get one full narrative cycle running. Not because it's elegant \u2014 because right now you don't know if it improves decisions, and that's costing you the equity channel. The debate framework exists; it last produced coherent META analysis. If narratives don't improve decision quality within 10 cycles, kill it.\n\nBlockers in priority order: (1) GOLDILOCKS_LOW_VOL \u2014 log what triggers it, confirm the 0.00x is justified, not statistical over-caution. (2) Forex Sharpe gap 0.80\u21921.50 \u2014 that's position sizing and slippage, not signal quality. Test Kelly fraction tuning. qwen3 won't close a 70bp gap. (3) NZDUSD at Sharpe 0.22 should exit the universe \u2014 it's drag. (4) E1 hypothesis stays parked until equity is trading again.\n\nYou have 199 files, 14 data sources, and a complete autonomous research loop. This is a focus problem, not an architecture problem. Unlock equity by validating the Library gate (one afternoon), spin the narrative engine (one evening), run the full system two weeks before touching anything else.",
       "timestamp": "2026-05-16T23:58:30.360799",
-      "read": false,
+      "read": true,
       "source": "oracle",
       "type": "system_assessment"
     },
@@ -182,7 +182,7 @@
       "emoji": "\ud83d\udfe1",
       "text": "Forex is locked up\u2014GBPUSD, EURUSD, and AUDUSD are all exhausted on ADR, which means you're not getting new ICT signals until volatility resets, probably overnight. Your two hypotheses in testing (E1 rate divergence and calendar edges) are sitting in dry run status; you should execute them live or commit to killing them, because watching them idle costs you information. Equities are quieter but cleaner\u2014ATR floor is holding the filter tight, which is working.",
       "timestamp": "2026-05-17T00:11:29.673525",
-      "read": false,
+      "read": true,
       "source": "oracle"
     },
     {
@@ -191,7 +191,7 @@
       "emoji": "\ud83d\udfe1",
       "text": "The forex pairs are flatlined \u2014 every major currency pair you're scanning has exhausted its daily range, which means you're staring at a wall until London/NY opens properly. Your equity veto pipeline is clean and the library fix is holding, so equities look ready when volatility returns, but right now you're watching a market that's already priced its move for the day.",
       "timestamp": "2026-05-17T00:20:36.019457",
-      "read": false,
+      "read": true,
       "source": "oracle"
     },
     {
@@ -200,7 +200,7 @@
       "emoji": "\ud83d\udfe1",
       "text": "The forex vets are doing their job\u2014GBPUSD, EURUSD, and AUDUSD are all gapped out or scoring too low, which is textbook range exhaustion. You should know your equity side is quiet (last veto was May 2nd, all ATR_TOO_LOW), so if you're looking for a setup, the scanner isn't finding qualified shorts right now. Three dry runs sitting in recent findings\u2014if any of those are worth executing, now's the time to decide and move them into the queue instead of letting them age.",
       "timestamp": "2026-05-17T02:12:09.972604",
-      "read": false,
+      "read": true,
       "source": "oracle"
     },
     {
@@ -209,7 +209,7 @@
       "emoji": "\ud83d\udd34",
       "text": "Oracle failed: ANTHROPIC_API_KEY not set. Add it to .env.",
       "timestamp": "2026-05-17T02:21:38.349848",
-      "read": false,
+      "read": true,
       "source": "oracle"
     },
     {
@@ -218,7 +218,7 @@
       "emoji": "\ud83d\udd34",
       "text": "The forex side is dead right now\u2014every major pair is either range-exhausted or scoring below threshold, so you're getting nothing but repeats. Your equity veto ledger is stale (last hits May 2nd), which means either the scanner isn't running on equities or those tickers have moved past the ATR floor; pull a fresh scan to confirm you have tradeable names. You've got three dry runs sitting idle and seven confirmed hypotheses\u2014time to pick one and run it live, because the system is healthy but you're not actually trading anything.",
       "timestamp": "2026-05-17T02:21:47.828675",
-      "read": false,
+      "read": true,
       "source": "oracle"
     },
     {
@@ -227,6 +227,60 @@
       "emoji": "\ud83d\udfe2",
       "text": "The system is running clean but you're sitting on three dry-run findings from mid-May that haven't moved to execution\u2014E1 rate divergence, JPY history analysis, and carry pair optimization all stalled. Your forex vetoes are brutal right now (ADR exhaustion across majors) but equities are getting pinged repeatedly for low ATR, which suggests you might want to tighten or re-examine that 2.2% threshold. Execute or kill those queued hypothesis tests; leaving them in dry-run limbo is just noise.",
       "timestamp": "2026-05-17T13:43:13.964913",
+      "read": true,
+      "source": "oracle"
+    },
+    {
+      "id": "rest-20260518-001",
+      "priority": "FYI",
+      "emoji": "\ud83d\udfe2",
+      "text": "REST MODE complete (01:12\u201301:20 UTC May 18). Ran 4 backtests using cached parquet data. All 5 high-priority queue items now DONE. Zero dry runs remain in top queue.",
+      "timestamp": "2026-05-18T01:20:00",
+      "read": false,
+      "source": "rest_mode"
+    },
+    {
+      "id": "rest-20260518-002",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "HYP-013 FALSIFIED: E1 at 60-day hold does NOT improve vs 20-day. Sharpe drops 0.658\u21920.300. The hypothesis that longer hold changes sign is dead. BUT: a 5-day rate consistency filter (vs single-day signal in state_allocator) showed +0.282R at 20d vs the -0.186R in original test. This is the most promising lead from tonight \u2014 added as RQ-008.",
+      "timestamp": "2026-05-18T01:20:00",
+      "read": false,
+      "source": "rest_mode"
+    },
+    {
+      "id": "rest-20260518-003",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "Library transparency complete (RQ-004). CRITICAL fingerprint across 26 patterns is: consecutive_down_weeks, sector_dispersion, realized_vol_90d. The SHALE_SUPPLY_OIL_CRASH match is oil/macro-driven \u2014 it was bullish on equity (above 200SMA, positive momentum) during the 2014 oil crash. Current market is matching on macro conditions, not equity dislocation. Bull regime floor fix (0.50x) was correct. Recommend: add get_feature_weights() method to AlexandrianLibrary (RQ-009) for live decomposition.",
+      "timestamp": "2026-05-18T01:20:00",
+      "read": false,
+      "source": "rest_mode"
+    },
+    {
+      "id": "rest-20260518-004",
+      "priority": "FYI",
+      "emoji": "\ud83d\udfe2",
+      "text": "Carry optimization (RQ-005) complete. Pure carry as direction signal mostly negative Sharpe \u2014 only GBPUSD (+0.178) and AUDUSD (+0.174) survive. High differential pairs (USDJPY 441bps, GBPJPY 447bps) are worst performers due to BOJ vol. Carry works as income overlay inside v004 framework, not as directional signal. AUDNZD differential currently 0bps so carry is off. No change needed to live system.",
+      "timestamp": "2026-05-18T01:20:00",
+      "read": false,
+      "source": "rest_mode"
+    },
+    {
+      "id": "rest-20260518-005",
+      "priority": "FYI",
+      "emoji": "\ud83d\udfe2",
+      "text": "March JPY fully archived (RQ-002). Pre-2020: 67% WR but avg R barely negative (-0.058) \u2014 looked better but never tradeable. Post-2020: 20% WR destroyed by Fed hike cycle. 2022 was the nail: USDJPY +6% in March during Fed panic. No April reversal either. This research line is closed. 4 hypotheses tested and rejected on March JPY across 3 sessions. Done.",
+      "timestamp": "2026-05-18T01:20:00",
+      "read": false,
+      "source": "rest_mode"
+    },
+    {
+      "id": "oracle-20260518205413",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "The big story is your equity regime fix worked\u2014you're trading again after the false positive gutted sizing\u2014but your forex vetoes are brutal right now (major pairs exhausted their daily ranges yesterday and AUDNZD is barely clearing the threshold). You should skip forex entries today unless something breaks pattern; the carry optimization data suggests only two pairs are worth trading anyway, and they're not showing up.",
+      "timestamp": "2026-05-18T20:54:13.647164",
       "read": false,
       "source": "oracle"
     }

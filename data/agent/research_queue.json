@@ -3,30 +3,32 @@
     {
       "id": "RQ-001",
       "priority": 1,
-      "status": "ERROR",
+      "status": "DONE",
       "name": "E1 rate divergence at 60-day hold",
       "description": "state_allocator E1 failed at 20d hold. Test if 60d changes sign. Add multi-layer confirmation.",
       "hypothesis_id": "HYP-013",
       "script": null,
-      "needs_network": true,
+      "needs_network": false,
       "estimated_minutes": 15,
-      "started": "2026-05-16T23:38:57",
-      "completed": "2026-05-16T23:38:57",
-      "last_result": "DRY RUN: E1 rate divergence at 60-day hold \u2014 not executed"
+      "started": "2026-05-18T01:12:00",
+      "completed": "2026-05-18T01:15:00",
+      "last_result": "FALSIFIED. 60d Sharpe 0.300 vs 20d Sharpe 0.658. Longer hold hurts. Side finding: 5-day rate consistency filter shows positive 20d R \u2014 queue for state_allocator test.",
+      "rest_mode": true
     },
     {
       "id": "RQ-002",
       "priority": 2,
-      "status": "ERROR",
-      "name": "March JPY full history 2010-2024",
+      "status": "DONE",
+      "name": "March JPY full history 2014-2024",
       "description": "Not just 2015-2024. Test if BOJ interventions are special case or permanent override.",
       "hypothesis_id": "HYP-009",
       "script": null,
-      "needs_network": true,
+      "needs_network": false,
       "estimated_minutes": 20,
-      "started": "2026-05-16T23:47:23",
-      "completed": "2026-05-16T23:47:23",
-      "last_result": "DRY RUN: March JPY full history 2010-2024 \u2014 not executed"
+      "started": "2026-05-18T01:15:00",
+      "completed": "2026-05-18T01:16:00",
+      "last_result": "FALSIFIED at full scope. Pre-2020: 67% WR but avg R barely -0.058. Post-2020: 20% WR destroyed. Archive this research line.",
+      "rest_mode": true
     },
     {
       "id": "RQ-003",
@@ -34,12 +36,12 @@
       "status": "DONE",
       "name": "Stop width optimization",
       "description": "0.08 vs 0.15 vs 0.25 ATR on all 8 forex pairs. Find optimal stop width.",
-      "hypothesis_id": null,
+      "hypothesis_id": "HYP-017",
       "script": null,
       "needs_network": false,
       "estimated_minutes": 30,
-      "last_result": "Stop width handler \u2014 would sweep ATR multiples on 8 pairs",
-      "updated": "2026-05-16T21:45:37"
+      "last_result": "Sharpe invariant to stop width \u2014 sizing cannot improve Sharpe.",
+      "updated": "2026-05-17"
     },
     {
       "id": "RQ-004",
@@ -47,26 +49,28 @@
       "status": "DONE",
       "name": "Library feature transparency",
       "description": "What 23 features drive CRITICAL reads? Which features dominate SHALE_SUPPLY_OIL_CRASH match?",
-      "hypothesis_id": null,
+      "hypothesis_id": "HYP-021",
       "script": "sovereign/risk/alexandrian_library.py",
       "needs_network": false,
       "estimated_minutes": 10,
-      "last_result": "Library feature handler \u2014 would analyze CRITICAL match drivers",
-      "updated": "2026-05-16T21:45:32"
+      "last_result": "COMPLETE. CRITICAL fingerprint: consecutive_down_weeks (2.22), sector_dispersion (1.99), realized_vol_90d (1.69). SHALE match is commodity/macro-driven, not equity dislocation. Recommend: add get_feature_weights() to AlexandrianLibrary.",
+      "updated": "2026-05-18T01:18:00",
+      "rest_mode": true
     },
     {
       "id": "RQ-005",
       "priority": 5,
-      "status": "ERROR",
+      "status": "DONE",
       "name": "Carry base pair optimization",
-      "description": "Test all 28 G10 combinations. Find optimal 5-pair carry portfolio.",
-      "hypothesis_id": null,
+      "description": "Test 8 available G10 pairs for optimal carry. 28-pair test blocked (no data for other pairs).",
+      "hypothesis_id": "HYP-019",
       "script": null,
-      "needs_network": true,
+      "needs_network": false,
       "estimated_minutes": 45,
-      "started": "2026-05-16T23:53:12",
-      "completed": "2026-05-16T23:53:12",
-      "last_result": "DRY RUN: Carry base pair optimization \u2014 not executed"
+      "started": "2026-05-18T01:16:00",
+      "completed": "2026-05-18T01:17:00",
+      "last_result": "FALSIFIED as standalone. Only GBPUSD (+0.178) and AUDUSD (+0.174) positive. High differential pairs (USDJPY, GBPJPY) worst. Pure carry direction does not work without momentum alignment.",
+      "rest_mode": true
     },
     {
       "id": "RQ-006",
@@ -83,13 +87,52 @@
     {
       "id": "RQ-007",
       "priority": 7,
-      "status": "QUEUED",
+      "status": "DONE",
       "name": "Calendar edges as v004 SIZE BOOSTS",
       "description": "Test C1/C2 layered on top of v004 direction \u2014 not standalone. Measure Sharpe improvement.",
       "hypothesis_id": "HYP-014",
       "script": null,
       "needs_network": true,
-      "estimated_minutes": 25
+      "estimated_minutes": 25,
+      "last_result": "REJECTED: 3.5% trade coverage, +0.001 Sharpe delta. Not viable as size boost."
+    },
+    {
+      "id": "RQ-008",
+      "priority": 1,
+      "status": "QUEUED",
+      "name": "5-day rate consistency filter in state_allocator E1",
+      "description": "REST MODE finding: requiring 5 consecutive days of consistent rate direction before signaling may save E1. Current state_allocator uses single-day signal. Test if 5-day filter changes E1 from -0.186R to positive. Compare to raw 5-day consistent signal which showed +0.282R at 20d hold.",
+      "hypothesis_id": null,
+      "script": "sovereign/forex/state_allocator.py",
+      "needs_network": false,
+      "estimated_minutes": 20,
+      "added": "2026-05-18T01:20:00",
+      "source": "REST_MODE_FINDING"
+    },
+    {
+      "id": "RQ-009",
+      "priority": 2,
+      "status": "QUEUED",
+      "name": "Add get_feature_weights() to AlexandrianLibrary",
+      "description": "REST MODE finding: library analysis requires live feature decomposition. Add method that returns per-feature contribution to primary match similarity. Enables real-time understanding of why library is reading CRITICAL. Implementation: compute A[i]*B[i]/(|A|*|B|) per feature for top match.",
+      "hypothesis_id": null,
+      "script": "sovereign/risk/alexandrian_library.py",
+      "needs_network": false,
+      "estimated_minutes": 30,
+      "added": "2026-05-18T01:20:00",
+      "source": "REST_MODE_FINDING",
+      "is_code_change": true
+    },
+    {
+      "id": "RQ-010",
+      "priority": 1,
+      "name": "Fixed TP/SL structure vs trailing stop \u2014 v004 8-pair sweep",
+      "status": "QUEUED",
+      "hypothesis_id": "H-019",
+      "description": "Trailing stop exits: 17.1% WR. Time exits: 77.3% WR. 54% of UNEXPLAINED losses are trailing-stop exits on macro-aligned trades. Test: replace 1.25x ATR trailing with fixed TP sweep (2.0R, 2.5R, 3.0R, 3.5R, 4.0R) + fixed SL (1.0R) across all 7 active v004 pairs. Pegasus retrained on 3,983 real trades found optimal tp_rr=3.801 independently \u2014 strong prior for 3.5-4.0R range. Baseline: Sharpe 1.024.",
+      "added": "2026-05-18",
+      "updated": "2026-05-18",
+      "last_result": ""
     }
   ]
 }

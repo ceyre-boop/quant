@@ -87,9 +87,9 @@
     {
       "id": "HYP-013",
       "name": "E1 rate divergence at 60-day hold",
-      "status": "QUEUED",
-      "result": "Backtest not run \u2014 architecture blocked. Needs signal_engine hold_days parameter.",
-      "date": "2026-05-17"
+      "status": "REJECTED",
+      "result": "FALSIFIED (REST MODE 2026-05-18). 60d hold Sharpe 0.300 vs 20d hold 0.658. Longer hold hurts Sharpe despite higher avg R (0.282\u21920.355). Win rate collapses (38.8%\u219226.7%). 20-day is the better period. Side finding: 5-day consistency filter on rate signal shows positive R at 20d \u2014 worth testing in state_allocator vs single-day signal.",
+      "date": "2026-05-18"
     },
     {
       "id": "HYP-014",
@@ -115,9 +115,10 @@
     {
       "id": "HYP-017",
       "name": "Stop width invariant to Sharpe",
-      "status": "CONFIRMED",
-      "result": "Sharpe 0.884 at all stop widths 0.5%-10%. Ratio invariant to scaling \u2014 sizing cannot improve Sharpe.",
-      "date": "2026-05-17"
+      "status": "REJECTED",
+      "result": "Sharpe invariant to stop width scaling. Tested across 4200 combos \u2014 hold period dominates, not stop width.",
+      "date": "2026-05-17",
+      "closed": "2026-05-18"
     },
     {
       "id": "HYP-018",
@@ -125,6 +126,46 @@
       "status": "CONFIRMED",
       "result": "GOLDILOCKS_LOW_VOL (severity=-1) top match at 0.9338 caused 0.00x size. Fix: floor 0.50x when primary is bull. Equity trading restored.",
       "date": "2026-05-17"
+    },
+    {
+      "id": "HYP-019",
+      "name": "Pure carry direction (rate sign) works as standalone",
+      "status": "REJECTED",
+      "result": "FALSIFIED (REST MODE 2026-05-18). Only GBPUSD (+0.178) and AUDUSD (+0.174) positive Sharpe out of 8 pairs. USDJPY (-0.555) and EURUSD (-5.636) worst. High differential \u2260 good carry trade \u2014 large adverse moves dominate. Carry works as income overlay inside v004, not as directional signal. Recommended pairs: GBPUSD, AUDUSD only.",
+      "date": "2026-05-18"
+    },
+    {
+      "id": "HYP-020",
+      "name": "March JPY seasonal persists pre-2020 (extended history)",
+      "status": "REJECTED",
+      "result": "FALSIFIED (REST MODE 2026-05-18). Pre-2020 (n=6): 67% WR but avg R barely negative (-0.058). Looks better than post-2020 (20% WR) but not tradeable \u2014 too few occurrences, small edge. 2022 Fed hike cycle (+6% USDJPY in March) confirmed it is permanently broken at scale. No April reversal. Archive this research line.",
+      "date": "2026-05-18"
+    },
+    {
+      "id": "HYP-021",
+      "name": "Library CRITICAL match driven by equity dislocation features",
+      "status": "REJECTED",
+      "result": "FALSIFIED (REST MODE 2026-05-18). SHALE_SUPPLY_OIL_CRASH primary features are actually bullish equity (above 200SMA, positive momentum) \u2014 match is commodity/macro-driven, not equity dislocation. True CRITICAL fingerprint across 26 patterns: consecutive_down_weeks (signal=2.22), sector_dispersion (1.99), realized_vol_90d (1.69). Current market matching on oil-era macro, not equity crash precursors. Bull regime floor fix was correct. Recommend: add get_feature_weights() to AlexandrianLibrary for live decomposition.",
+      "date": "2026-05-18"
+    },
+    {
+      "id": "H-019",
+      "name": "Fixed TP/SL outperforms trailing stop on macro-aligned entries",
+      "status": "QUEUED",
+      "formed": "2026-05-18",
+      "closed": null,
+      "hypothesis": "Time exits (77.3% WR) dramatically outperform trailing_stop exits (17.1% WR). 54% of UNEXPLAINED losses exit via trailing stop on macro-aligned trades. Hypothesis: replacing trailing stop with fixed TP at 3.0-4.0R and fixed SL at -1.0R removes premature exit noise and recovers a portion of the UNEXPLAINED category. Pegasus retrain on 3,983 trades independently found optimal tp_rr = 3.801, consistent with this.",
+      "test_method": "Backtest v004 8-pair universe with fixed TP/SL structure. Sweep TP at 2.0R, 2.5R, 3.0R, 3.5R, 4.0R with fixed SL at 1.0R. Compare Sharpe vs current 1.024 trailing-stop baseline.",
+      "result": null
+    },
+    {
+      "id": "H-023",
+      "name": "Per-pair hold optimization v007",
+      "status": "TESTING",
+      "formed": "2026-05-18",
+      "hypothesis": "All 5 viable pairs optimized to 5-7 day holds from 60d baseline. Expected Sharpe > 1.10.",
+      "result": "",
+      "closed": null
     }
   ]
 }

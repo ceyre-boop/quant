@@ -8,22 +8,27 @@
   },
   "week": {
     "start_date": "2026-05-16",
-    "weekly_used": 5200,
-    "weekly_remaining": 194800,
-    "last_synced": null
+    "weekly_used": 8700,
+    "weekly_remaining": 191300,
+    "last_synced": null,
+    "note": "REST MODE May 18 01:12-01:20 UTC added ~3500 tokens (4 backtests, file updates)"
   },
   "today": {
-    "date": "2026-05-16",
+    "date": "2026-05-18",
     "human_used": 0,
-    "agent_used": 5200,
+    "agent_used": 3500,
     "daily_human_budget": 20000,
     "daily_agent_budget": 8571,
     "agent_extra_from_rollover": 20000,
-    "agent_allowed_today": 28571
+    "agent_allowed_today": 28571,
+    "note": "REST MODE only. Human session not yet started."
   },
   "session": {
-    "started": null,
-    "estimated_tokens": 0
+    "started": "2026-05-18T01:12:00",
+    "ended": "2026-05-18T01:20:00",
+    "estimated_tokens": 3500,
+    "mode": "REST_MODE",
+    "tasks_completed": ["RQ-001", "RQ-002", "RQ-004", "RQ-005"]
   },
   "mode": "NORMAL",
   "thresholds": {
