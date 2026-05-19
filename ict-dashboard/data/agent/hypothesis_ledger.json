@@ -224,6 +224,30 @@
       "date": "2026-05-19",
       "action": "CANDIDATE ONLY \u2014 do not activate without human review. Test via backtest first.",
       "source": "forensic_engine_auto"
+    },
+    {
+      "id": "HYP-031",
+      "name": "Counter-momentum 5d is a size booster (pullback entries have 3\u00d7 better avgR)",
+      "status": "CONFIRMED",
+      "result": "Counter (<-0.2%): 52% WR +0.331R avg | Aligned (>+0.2%): 52% WR +0.107R avg. Same WR, 3\u00d7 better R. Sizing: counter 1.25\u00d7, aligned 0.75\u00d7.",
+      "date": "2026-05-19",
+      "action": "Size modifier added to signal_engine._compute_size_multipliers(). Backtester uses median effective risk (per-trade variation requires Numba array support \u2014 future work)."
+    },
+    {
+      "id": "HYP-032",
+      "name": "VIX slope [0,1) is best forex entry environment",
+      "status": "CONFIRMED",
+      "result": "VIX slope [0,1): 75% WR +0.697R. VIX slope [3,5): 62% WR +0.353R. IC=-0.095 p=0.008. Size reducer 0.85\u00d7 when VIX slope > 3.",
+      "date": "2026-05-19",
+      "action": "VIX slope modifier added to signal_engine._compute_size_multipliers(). Reduces size 0.85\u00d7 in extreme contango environments."
+    },
+    {
+      "id": "HYP-033",
+      "name": "No single latent feature separates forex COMMITMENT_FAILUREs at IC > 0.15",
+      "status": "CONFIRMED",
+      "result": "All 5 candidates tested: commitment_score IC=-0.036, cross_pair_divergence IC=-0.021, time_of_month IC=-0.079, VIX_slope IC=-0.095, momentum_5d IC=-0.032. Max IC = 0.095.",
+      "date": "2026-05-19",
+      "action": "COMMITMENT_FAILUREs appear irreducible from available daily data. Accept ~40% entry failure rate as structural. Sizing modifiers (HYP-031, HYP-032) improve returns without gating."
     }
   ]
 }
