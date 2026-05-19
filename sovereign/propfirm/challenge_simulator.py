@@ -24,9 +24,12 @@ from sovereign.propfirm.rules_engine import PropFirmRules
 
 ROOT = Path(__file__).resolve().parents[2]
 WINDOW_FILES = {
-    "A": ROOT / "logs" / "ict_backtest_window_A.json",
-    "B": ROOT / "logs" / "ict_backtest_window_B.json",
-    "combined": ROOT / "logs" / "ict_backtest_results.json",
+    "A":          ROOT / "logs" / "ict_backtest_window_A.json",
+    "B":          ROOT / "logs" / "ict_backtest_window_B.json",
+    "combined":   ROOT / "logs" / "ict_backtest_results.json",
+    # Forensics-filtered windows (post 2026-05-18)
+    "london_a":   ROOT / "logs" / "ict_backtest_london_a.json",    # deployed edge
+    "london_all": ROOT / "logs" / "ict_backtest_london_all.json",  # conservative
 }
 OUT_FILE = ROOT / "logs" / "prop_challenge_sim.json"
 
@@ -205,7 +208,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--firm", choices=["lucid", "mff"], default="lucid")
     parser.add_argument("--account", type=float, default=100_000)
-    parser.add_argument("--window", choices=["A", "B", "combined"], default="combined")
+    parser.add_argument("--window", choices=["A", "B", "combined", "london_a", "london_all"],
+                        default="london_a", help="Trade window (default: london_a = deployed edge)")
     parser.add_argument("--n", type=int, default=10_000)
     parser.add_argument("--risk", type=float, default=0.0075,
                         help="Risk per trade as fraction of balance (default 0.0075 = 0.75%%)")

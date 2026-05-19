@@ -132,6 +132,14 @@ def cmd_status(rules: PropFirmRules, firm: str, account_size: float) -> None:
         print(f"\n💀 CHALLENGE BUSTED. Starting fresh.")
     print()
 
+    # Always show deployment checklist inline
+    try:
+        from sovereign.propfirm.deployment_checklist import run_checklist, print_checklist
+        checklist = run_checklist()
+        print_checklist(checklist, verbose=False)
+    except Exception:
+        pass
+
 
 def cmd_eod(rules: PropFirmRules, firm: str, account_size: float) -> None:
     day_str = datetime.now(timezone.utc).strftime("%Y-%m-%d")

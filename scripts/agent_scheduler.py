@@ -755,6 +755,17 @@ def run_cycle(dry_run: bool = False, force_heavy: bool = False) -> None:
     except Exception as _bridge_err:
         log.warning(f"Cross-system bridge update failed (non-fatal): {_bridge_err}")
 
+    # 3c. Run prop firm deployment checklist (log gates, post FYI if any change)
+    try:
+        from sovereign.propfirm.deployment_checklist import run_checklist
+        cl = run_checklist()
+        log.info(f"Checklist: {cl['overall']} "
+                 f"G={cl['gates_green']} Y={cl['gates_yellow']} R={cl['gates_red']}")
+        if cl["overall"] == "GO":
+            post_message("URGENT", "🟢 PROP FIRM CHECKLIST: ALL GATES GREEN — buy the challenge now!")
+    except Exception as _cl_err:
+        log.warning(f"Checklist failed (non-fatal): {_cl_err}")
+
     # 4. Run Oracle (always — it's just one cheap API call)
     oracle_script = ROOT / "sovereign" / "agent" / "oracle_agent.py"
     if oracle_script.exists() and os.environ.get("ANTHROPIC_API_KEY"):
@@ -867,6 +878,7 @@ def main():
     parser.add_argument("--gen-eod-plist", action="store_true", help="Print EOD challenge plist (17:00 ET daily) and exit")
     parser.add_argument("--health",        action="store_true", help="Run health check only and exit (JSON to stdout)")
     parser.add_argument("--eod-challenge", action="store_true", help="Run prop firm EOD floor update and exit")
+    parser.add_argument("--checklist",     action="store_true", help="Run prop firm deployment checklist and exit")
     args = parser.parse_args()
 
     if args.gen_plist:
@@ -880,6 +892,16 @@ def main():
     if args.health:
         health = run_health_check()
         print(json.dumps(health, indent=2))
+        return
+
+    if args.checklist:
+        try:
+            sys.path.insert(0, str(ROOT))
+            from sovereign.propfirm.deployment_checklist import run_checklist, print_checklist
+            result = run_checklist()
+            print_checklist(result, verbose=True)
+        except Exception as e:
+            print(f"Checklist error: {e}")
         return
 
     if args.eod_challenge:
