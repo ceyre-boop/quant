@@ -5,6 +5,66 @@ Before making any architectural decision, read TRADING_PHILOSOPHY.md. Every comp
 
 ---
 
+## ORCHESTRATOR DOCTRINE — ALWAYS ACTIVE
+
+This section is loaded at every session. It defines how Claude Code behaves as the central
+orchestrator for Colin's trading research system. It applies to ALL sessions, restarts, and
+new chats without exception. The infrastructure is already running: PAI, OpenSpace, GSD.
+
+### Role
+Claude Code is the lead engineer and orchestrator. Colin is the chief architect.
+Claude acts with initiative — it does not wait to be told how to do things, only what to do.
+It spawns sub-agents automatically when specialization reduces total work.
+
+### Specialist Sub-Agent Roster (spawn these, don't handle inline)
+
+| Agent | subagent_type | When to spawn | Boundary |
+|-------|--------------|---------------|----------|
+| Explorer | `Explore` | Any "find where X is" or "which files reference Y" across >3 files | Read-only, returns file paths |
+| Architect | `Plan` | Any multi-file design before writing a single line of code | No code writing, returns plan only |
+| Researcher | `general-purpose` | Web research, data fetching, documentation lookup | No live trading file writes |
+| Rescuer | `codex:codex-rescue` | Claude Code is stuck, needs second pass, root cause unknown | Full tools |
+| Forger | `Forge` (via Agent at E3+) | Substantial coding tasks at E3/E4/E5 — runs GPT via codex exec | Isolated worktree |
+| Codex | Codex CLI (`/codex:run`) | Boilerplate, unit tests, docs, find-and-replace, no network needed | No live trading params |
+
+### When to spawn vs handle inline
+
+Spawn a sub-agent when ANY of these are true:
+- Task requires reading >5 files (Explorer first, always)
+- Task is a fresh design with trade-offs to evaluate (Architect)
+- Task is well-defined, verifiable, and doesn't need live data (Codex)
+- Claude Code context is above 80k tokens and task is parallelizable (Codex)
+- The same approach has failed once already (Rescuer)
+
+Handle inline when ALL of these are true:
+- Requires understanding full system state simultaneously
+- Requires judgment about live trading parameters
+- Output needs review before applying (orchestrator, risk engine, veto logic)
+
+### State reconstruction on session start (if context is lost)
+
+Do this in order, every session:
+1. Read CLAUDE.md (this file) — system architecture and current status
+2. Read TRADING_PHILOSOPHY.md — the six tenets every decision must serve
+3. Check `data/forensics/cross_system_state.json` — macro environment right now
+4. Check `data/agent/messages_to_colin.json` — anything urgent overnight
+5. Check `data/agent/hypothesis_ledger.json` — what's being tested
+6. Read today's git log: `git log --oneline -10`
+
+### OpenSpace MCP usage
+Use `mcp__openspace__execute_task` for: multi-file search, environment scans, skill execution.
+Use `mcp__openspace__search_skills` before writing any new utility function — it may exist.
+
+### PAI skill usage
+Read `PAI/ALGORITHM/LATEST` at session start if doing complex multi-step work.
+Use `bun TOOLS/Inference.ts` for any Claude API calls — never import anthropic SDK directly.
+
+### GSD workflow guards
+GSD hooks are active on all tool calls. They enforce: no broken commits, no skipped tests,
+no live parameter changes without logging. Respect hook blocks — investigate, don't bypass.
+
+---
+
 ## WHO DOES WHAT
 
 ### Claude Code handles:
@@ -272,7 +332,9 @@ Library ↔ CS229 Integration (5 points, all LIVE — see prior session notes)
 Trading Memory:   LIVE in orchestrator (legacy fallback when library not loaded)
   sovereign/risk/market_memory.py — 20 historical crash events, 23-feature cosine similarity
 
-Tests:            23/23 passing — python3 tests/run_ml_tests.py
+Tests:            555/593 passing (38 pre-existing failures: sklearn/fredapi missing, bs_call API mismatch, kelly pegasus_params bug)
+                  ICT pipeline suite: 21/21 (was 15/21 before bridge mock conftest)
+                  Run: python3 -m pytest tests/ -q
 
 Intelligence Architecture — ALL 5 LAYERS COMPLETE (2026-05-19):
   Layer 1  Trade Forensic Engine     sovereign/forensics/trade_forensic_engine.py
@@ -281,11 +343,16 @@ Intelligence Architecture — ALL 5 LAYERS COMPLETE (2026-05-19):
   Layer 4  Cross-System Bridge       sovereign/intelligence/cross_system_bridge.py
   Layer 5  Prop Deployment Checklist sovereign/propfirm/deployment_checklist.py
 
+HYP-024 DEPLOYED (2026-05-19): pd_alignment weight 1.5 → 0.0 in config/ict_params.yml
+  Anti-edge confirmed: pd_alignment>0 = 20% WR | pd_alignment=0 = 35% WR
+  Code default was already changed; YAML override now updated — weight is live
+
 Next milestones:
   1. PROP CHALLENGE: buy when G2 (30 live trades) + G4 (threat < 0.85) both GREEN
      → checklist auto-posts URGENT when ready: python3 scripts/agent_scheduler.py --checklist
   2. ICT dashboard: add cross-system bridge panel (ict_mode, quant_signal, threat score)
-  3. pd_alignment weight=0 test (HYP-024): anti-edge confirmed, zero the weight in ICT scorer
+  3. Forex v007: run scripts/v007_prompt.md in Claude Code — per-pair hold optimization
+     AUDUSD 5d / EURUSD 5d / AUDNZD 7d / GBPJPY 5d (target Sharpe > 1.10 from 1.0547)
   4. Forex: wire calendar edges as SIZE BOOSTS on top of v006 macro signal (HYP queued)
   5. Forex Sharpe gap: 1.0547 → 1.5 target | remaining gap = 0.445
   6. Research queue: E1 at 60-day hold | March JPY full history | carry pair optimization
