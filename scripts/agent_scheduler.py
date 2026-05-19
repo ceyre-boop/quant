@@ -642,6 +642,88 @@ def dispatch_task(task: dict, dry_run: bool = False) -> str:
 # MAIN CYCLE
 # ─────────────────────────────────────────────────────────────────────────────
 
+def run_eod_challenge_update(dry_run: bool = False) -> None:
+    """
+    Run the prop firm paper challenge EOD update.
+    Called at 17:00 ET daily by launchd (com.alta.eod_challenge.plist).
+    Advances the floor, checks pass/bust conditions, posts a message.
+    """
+    challenge_script = ROOT / "sovereign" / "propfirm" / "paper_challenge.py"
+    if not challenge_script.exists():
+        log.warning("paper_challenge.py not found — skipping EOD update")
+        return
+
+    if dry_run:
+        log.info("[DRY-RUN] Would run: paper_challenge.py --eod")
+        return
+
+    log.info("Running prop firm EOD update...")
+    try:
+        result = subprocess.run(
+            [sys.executable, str(challenge_script), "--eod"],
+            cwd=str(ROOT), capture_output=True, text=True, timeout=30
+        )
+        output = (result.stdout + result.stderr).strip()
+        log.info(f"EOD update: {output[:300]}")
+
+        # Parse status from output and post message
+        if "PASSED" in output.upper():
+            post_message("URGENT", f"🏆 Prop challenge PASSED. {output[:200]}")
+        elif "BUSTED" in output.upper() or "FAILED" in output.upper():
+            post_message("URGENT", f"Challenge ended. {output[:200]}")
+        elif output:
+            post_message("FYI", f"EOD floor update: {output[:200]}")
+    except Exception as e:
+        log.error(f"EOD update failed: {e}")
+        post_message("IMPORTANT", f"EOD floor update failed: {e}")
+
+
+def generate_eod_plist() -> str:
+    """Generate a launchd plist that fires paper_challenge.py --eod at 17:00 ET daily."""
+    script_path = ROOT / "scripts" / "agent_scheduler.py"
+    python_path = ROOT / ".venv" / "bin" / "python3"
+    if not python_path.exists():
+        python_path = Path("/usr/local/bin/python3")
+    log_out = ROOT / "logs" / "eod_challenge_stdout.log"
+    log_err = ROOT / "logs" / "eod_challenge_stderr.log"
+
+    return f"""<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.alta.eod_challenge</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>{python_path}</string>
+        <string>{script_path}</string>
+        <string>--eod-challenge</string>
+    </array>
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Hour</key>
+        <integer>17</integer>
+        <key>Minute</key>
+        <integer>0</integer>
+    </dict>
+    <key>WorkingDirectory</key>
+    <string>{ROOT}</string>
+    <key>StandardOutPath</key>
+    <string>{log_out}</string>
+    <key>StandardErrorPath</key>
+    <string>{log_err}</string>
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PYTHONPATH</key>
+        <string>{ROOT}</string>
+    </dict>
+    <key>RunAtLoad</key>
+    <false/>
+</dict>
+</plist>"""
+
+
 def run_cycle(dry_run: bool = False, force_heavy: bool = False) -> None:
     log.info("=" * 60)
     log.info(f"Agent scheduler cycle — {datetime.now().isoformat(timespec='seconds')}")
@@ -663,7 +745,17 @@ def run_cycle(dry_run: bool = False, force_heavy: bool = False) -> None:
     health = run_health_check()
     log.info(f"Health: {health['overall']}")
 
-    # 3. Run Oracle (always — it's just one cheap API call)
+    # 3b. Update cross-system bridge (reads Library + ICT state, writes shared signal)
+    try:
+        sys.path.insert(0, str(ROOT))
+        from sovereign.intelligence.cross_system_bridge import CrossSystemBridge
+        bridge_state = CrossSystemBridge().run_full_update(verbose=False)
+        log.info(f"Bridge: ICT={bridge_state.ict_mode} QUANT={bridge_state.quant_signal} "
+                 f"threat={bridge_state.library_threat_score:.2f}")
+    except Exception as _bridge_err:
+        log.warning(f"Cross-system bridge update failed (non-fatal): {_bridge_err}")
+
+    # 4. Run Oracle (always — it's just one cheap API call)
     oracle_script = ROOT / "sovereign" / "agent" / "oracle_agent.py"
     if oracle_script.exists() and os.environ.get("ANTHROPIC_API_KEY"):
         try:
@@ -769,19 +861,29 @@ def generate_plist() -> str:
 
 def main():
     parser = argparse.ArgumentParser(description="Alta Research Agent Scheduler")
-    parser.add_argument("--dry-run",    action="store_true", help="Print what would run, don't execute")
-    parser.add_argument("--force-heavy",action="store_true", help="Override mode to FULL regardless of budget")
-    parser.add_argument("--gen-plist",  action="store_true", help="Print launchd plist to stdout and exit")
-    parser.add_argument("--health",     action="store_true", help="Run health check only and exit")
+    parser.add_argument("--dry-run",       action="store_true", help="Print what would run, don't execute")
+    parser.add_argument("--force-heavy",   action="store_true", help="Override mode to FULL regardless of budget")
+    parser.add_argument("--gen-plist",     action="store_true", help="Print research scheduler plist to stdout and exit")
+    parser.add_argument("--gen-eod-plist", action="store_true", help="Print EOD challenge plist (17:00 ET daily) and exit")
+    parser.add_argument("--health",        action="store_true", help="Run health check only and exit (JSON to stdout)")
+    parser.add_argument("--eod-challenge", action="store_true", help="Run prop firm EOD floor update and exit")
     args = parser.parse_args()
 
     if args.gen_plist:
         print(generate_plist())
         return
 
+    if args.gen_eod_plist:
+        print(generate_eod_plist())
+        return
+
     if args.health:
         health = run_health_check()
         print(json.dumps(health, indent=2))
+        return
+
+    if args.eod_challenge:
+        run_eod_challenge_update(dry_run=args.dry_run)
         return
 
     run_cycle(dry_run=args.dry_run, force_heavy=args.force_heavy)

@@ -179,6 +179,20 @@ class ICTPipeline:
                            score=0.0, grade=ICTGrade.C,
                            reason=f"Invalid direction '{direction}'")
 
+        # ── Cross-system bridge gate (Stage 0) ───────────────────────────
+        # Checks macro environment shared by the quant/forex system.
+        # HALT_NEW blocks all new entries when Library convergence is extreme.
+        # TIGHTEN adjusts thresholds below (min_score raised to 8.0).
+        try:
+            from sovereign.intelligence.cross_system_bridge import get_bridge as _get_bridge
+            _bridge_thresholds = _get_bridge().get_ict_thresholds()
+            if not _bridge_thresholds.get("active", True):
+                return ICTVeto(symbol=symbol, direction=direction, timestamp=timestamp,
+                               score=0.0, grade=ICTGrade.VETOED,
+                               reason=f"BRIDGE_HALT_NEW: {_bridge_thresholds.get('reason', '')[:80]}")
+        except Exception:
+            _bridge_thresholds = {}
+
         df    = self._normalise(df)
         price = float(df["Close"].iloc[-1])
 
@@ -222,6 +236,12 @@ class ICTPipeline:
         else:
             threshold = self._min_score
             vol_tag   = "NORMAL"
+
+        # Bridge TIGHTEN overrides threshold floor to 8.0
+        _bridge_min = _bridge_thresholds.get("min_score", 0.0)
+        if _bridge_min > threshold:
+            threshold = _bridge_min
+            vol_tag   = f"{vol_tag}+BRIDGE_TIGHTEN"
 
         scores:        Dict[str, float] = {}
         confirmations: List[str]        = [f"Vol: {vol_tag} (ATR/price={vol_ratio:.4f})"]
