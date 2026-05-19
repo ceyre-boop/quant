@@ -199,10 +199,18 @@ Intelligence Architecture (2026-05-19) — 4 layers complete:
     Wired: ict/pipeline.py Stage 0 + agent_scheduler.py every 2h
     Current: HALT_NEW (ASIAN_CURRENCY_CONTAGION, threat=1.00)
 
-Prop firm:        sovereign/propfirm/ — rules engine + MC simulator + paper tracker
-  Lucid $100k: 90.3% pass rate (London-only) | 70.5% (all sessions)
-  Paper challenge #1: ACTIVE (Day 1, balance=$100k, floor=$92k, target=$108k)
+Prop firm:        sovereign/propfirm/ — rules engine + MC simulator + paper tracker + checklist
+  MC results (2026-05-19): london_a=100% | london_all=99.7% | both clear 70% gate
+  Deployment checklist: sovereign/propfirm/deployment_checklist.py
+    G1 MC pass rate:     🟢 99.7-100% (DONE)
+    G2 Live trades:      🔴 0/30 (collecting London+GradeA paper trades)
+    G3 WR alignment:     🟡 collecting (need 10+ closed trades)
+    G4 Bridge threat:    🔴 1.00 HALT_NEW (wait for macro to clear)
+    G5 Non-bust days:    🟡 collecting
+    VERDICT: WAIT — buy when G2+G4 flip GREEN
+  Paper challenge #1: ACTIVE (Day 0, balance=$100k, floor=$92k, target=$108k)
   CLI: python3 sovereign/propfirm/paper_challenge.py --status/--eod/--trade
+       python3 scripts/agent_scheduler.py --checklist
 
 ICT prop challenge math:
   Edge: TP2=16.8%@4.5R | TP1=13.0%@1.5R | STOP=70.2%@-1.0R | EV=+0.40R/trade
@@ -266,9 +274,16 @@ Trading Memory:   LIVE in orchestrator (legacy fallback when library not loaded)
 
 Tests:            23/23 passing — python3 tests/run_ml_tests.py
 
+Intelligence Architecture — ALL 5 LAYERS COMPLETE (2026-05-19):
+  Layer 1  Trade Forensic Engine     sovereign/forensics/trade_forensic_engine.py
+  Layer 2  Commitment Detector       sovereign/intelligence/commitment_detector.py
+  Layer 3  Latent Feature Search     sovereign/forensics/latent_feature_search.py
+  Layer 4  Cross-System Bridge       sovereign/intelligence/cross_system_bridge.py
+  Layer 5  Prop Deployment Checklist sovereign/propfirm/deployment_checklist.py
+
 Next milestones:
-  1. Layer 5 (Prop Challenge Deployment): wait 30 live London+GradeA+committed paper trades
-     → run 10 simulated challenges at >70% pass → buy Lucid LucidFlex $100k evaluation
+  1. PROP CHALLENGE: buy when G2 (30 live trades) + G4 (threat < 0.85) both GREEN
+     → checklist auto-posts URGENT when ready: python3 scripts/agent_scheduler.py --checklist
   2. ICT dashboard: add cross-system bridge panel (ict_mode, quant_signal, threat score)
   3. pd_alignment weight=0 test (HYP-024): anti-edge confirmed, zero the weight in ICT scorer
   4. Forex: wire calendar edges as SIZE BOOSTS on top of v006 macro signal (HYP queued)
