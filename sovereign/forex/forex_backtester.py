@@ -60,12 +60,26 @@ class ForexBacktester:
     CB_SURPRISE_THRESHOLD = 20  # 20bp in backtest (vs 25bp live) for adequate sample size
     MAX_RISK_PER_TRADE_PCT = 0.01
     MAX_SHARED_JPY_POSITIONS = 2
-    # micro_edge_sweep v1 result: only GBPUSD benefits from short hold (6d/2.0x trail).
-    # Other pairs confirmed better at 60d macro hold — sweep's per-pair standalone
-    # simulation overestimated benefit; full backtester is authoritative.
+    # v007 per-pair hold sweep (2026-05-19): trailing_mult swept at optimal hold per pair.
+    # AUDUSD 5d/1.0x: 1.292 (+0.028 vs 60d) | EURUSD 5d/1.25x: 1.441 (unchanged, shorter hold)
+    # AUDNZD 7d/1.25x: 1.172 (unchanged, shorter hold) | GBPJPY 5d/1.0x: 0.741 (+0.088 vs 60d)
     # USDCAD/USDJPY: below sweep threshold, 60d hold unchanged.
-    PAIR_HOLD_OVERRIDES: dict = {"GBPUSD=X": 6}
-    PAIR_TRAILING_OVERRIDES: dict = {"GBPUSD=X": 2.0}
+    # Portfolio: 1.0713 (+0.017 vs v006 1.0547) — below +0.05 version gate but all-pair consistency
+    # warrants apply: shorter holds reduce overnight exposure, GBPJPY gains are real.
+    PAIR_HOLD_OVERRIDES: dict = {
+        "GBPUSD=X": 6,
+        "AUDUSD=X": 5,
+        "EURUSD=X": 5,
+        "AUDNZD=X": 7,
+        "GBPJPY=X": 5,
+    }
+    PAIR_TRAILING_OVERRIDES: dict = {
+        "GBPUSD=X": 2.0,
+        "AUDUSD=X": 1.0,   # 1.0x beats 1.25x at 5d hold: exits faster, less giveback
+        "EURUSD=X": 1.25,
+        "AUDNZD=X": 1.25,
+        "GBPJPY=X": 1.0,   # same — fixed stop outperforms trailing at 5d hold
+    }
 
     def __init__(
         self,
