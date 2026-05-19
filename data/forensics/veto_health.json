@@ -1,0 +1,52 @@
+{
+  "veto_health": {
+    "NY_PM_BLOCK": {
+      "description": "Block all ICT trades in NY_PM session",
+      "system": "ICT",
+      "birth_date": "2026-05-18",
+      "months_active": 1,
+      "blocked_simulated_r": -0.283,
+      "status": "HEALTHY",
+      "notes": [
+        "Blocking trades with avg -0.283R \u2014 working correctly."
+      ],
+      "retirement_eligible": false
+    },
+    "ATR_FLOOR_1.8pct": {
+      "description": "Equity ATR must be >= 1.8% (was 2.2%)",
+      "system": "EQUITY",
+      "birth_date": "2026-05-18",
+      "months_active": 1,
+      "blocked_simulated_r": null,
+      "status": "HEALTHY",
+      "notes": [],
+      "retirement_eligible": false
+    },
+    "MACRO_AGAINST": {
+      "description": "Forex: block when real_rate_diff opposes direction",
+      "system": "FOREX",
+      "birth_date": "2026-05-17",
+      "months_active": 1,
+      "blocked_simulated_r": -0.838,
+      "status": "HEALTHY",
+      "notes": [
+        "Blocking trades with avg -0.838R \u2014 working correctly."
+      ],
+      "retirement_eligible": false
+    },
+    "APLUS_DOWNGRADE": {
+      "description": "ICT A+ grade treated as A for execution decision",
+      "system": "ICT",
+      "birth_date": "2026-05-18",
+      "months_active": 1,
+      "blocked_simulated_r": -0.375,
+      "status": "HEALTHY",
+      "notes": [
+        "Blocking trades with avg -0.375R \u2014 working correctly."
+      ],
+      "retirement_eligible": false
+    }
+  },
+  "alerts": [],
+  "evaluated_at": "2026-05-19T04:03:05.511398+00:00"
+}

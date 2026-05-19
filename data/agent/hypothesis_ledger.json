@@ -206,6 +206,24 @@
       "result": "London Grade A (n=39): WR=41%, avgR=+0.840, Sharpe proxy=2.093. 11/17 TP2 hits.",
       "date": "2026-05-19",
       "action": "This is the system target setup. Pipeline now routes toward this profile."
+    },
+    {
+      "id": "HYP-029",
+      "name": "AUTO: eventual_correct < 1.0000",
+      "status": "CANDIDATE",
+      "result": "Separation accuracy 78% on commitment failures vs winners. n=770",
+      "date": "2026-05-19",
+      "action": "CANDIDATE ONLY \u2014 do not activate without human review. Test via backtest first.",
+      "source": "forensic_engine_auto"
+    },
+    {
+      "id": "HYP-030",
+      "name": "AUTO: mfe_within_3_bars < 0.3946",
+      "status": "CANDIDATE",
+      "result": "Separation accuracy 73% on commitment failures vs winners. n=770",
+      "date": "2026-05-19",
+      "action": "CANDIDATE ONLY \u2014 do not activate without human review. Test via backtest first.",
+      "source": "forensic_engine_auto"
     }
   ]
 }

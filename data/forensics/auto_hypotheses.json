@@ -1,0 +1,29 @@
+{
+  "candidates": [
+    {
+      "hypothesis_id": "AUTO-HYP-002",
+      "feature": "eventual_correct",
+      "condition": "eventual_correct < 1.0000",
+      "separation_accuracy": 0.7792,
+      "sample_size": 770,
+      "commitment_failures_analyzed": 328,
+      "status": "CANDIDATE",
+      "generated_at": "2026-05-19T04:03:05.510982+00:00",
+      "source": "forensic_engine_auto",
+      "note": "CANDIDATE ONLY. Human reviews and activates. Machine never auto-activates vetoes."
+    },
+    {
+      "hypothesis_id": "AUTO-HYP-001",
+      "feature": "mfe_within_3_bars",
+      "condition": "mfe_within_3_bars < 0.3946",
+      "separation_accuracy": 0.7299,
+      "sample_size": 770,
+      "commitment_failures_analyzed": 328,
+      "status": "CANDIDATE",
+      "generated_at": "2026-05-19T04:03:05.510482+00:00",
+      "source": "forensic_engine_auto",
+      "note": "CANDIDATE ONLY. Human reviews and activates. Machine never auto-activates vetoes."
+    }
+  ],
+  "generated_at": "2026-05-19T04:03:05.511204+00:00"
+}
