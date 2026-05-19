@@ -75,7 +75,84 @@ class ForexSignalEngine:
             },
             index=close.index,
         )
+        # Latent feature sizing modifiers (Session 3 findings, 2026-05-19):
+        # Counter-momentum entries produce 3× better avgR (0.331 vs 0.107).
+        # VIX slope [0,1) is best environment; >3 reduces follow-through.
+        sig_df['size_mult'] = self._compute_size_multipliers(
+            close=close, signals=sig_df['signal'], prices_df=prices
+        )
         return sig_df
+
+    def _compute_size_multipliers(
+        self,
+        close: pd.Series,
+        signals: pd.Series,
+        prices_df: pd.DataFrame,
+    ) -> pd.Series:
+        """
+        Size modifiers based on latent feature search (Session 3).
+        Counter-momentum (5d): 1.25× | Flat: 1.0× | Aligned: 0.75×
+        VIX slope > 3 (extreme contango): additional 0.85× discount
+        Combined effect: pullback entry in calm VIX regime gets 1.25×,
+                         chasing entry in high-VIX-contango gets 0.64×.
+        """
+        size_mult = pd.Series(1.0, index=close.index)
+        sig_fired = signals[signals != 0].index
+
+        if len(sig_fired) == 0:
+            return size_mult
+
+        # Pre-load VIX data (once)
+        vix_df = None
+        try:
+            import yfinance as yf
+            vix_df = yf.download('^VIX', start=str(close.index[0].date()),
+                                  end=str(close.index[-1].date()), progress=False)
+            vix3m_df = yf.download('^VIX3M', start=str(close.index[0].date()),
+                                    end=str(close.index[-1].date()), progress=False)
+            if isinstance(vix_df.columns, pd.MultiIndex):
+                vix_df.columns = vix_df.columns.get_level_values(0)
+            if isinstance(vix3m_df.columns, pd.MultiIndex):
+                vix3m_df.columns = vix3m_df.columns.get_level_values(0)
+            vix_df.index = pd.to_datetime(vix_df.index).tz_localize(None)
+            vix3m_df.index = pd.to_datetime(vix3m_df.index).tz_localize(None)
+        except Exception:
+            vix_df = None
+            vix3m_df = None
+
+        for date in sig_fired:
+            sig_dir = int(signals.loc[date])
+            mult = 1.0
+
+            # 5-day momentum modifier
+            hist = close.loc[:date].tail(8)
+            if len(hist) >= 6:
+                mom_5d = float(hist.iloc[-1] / hist.iloc[-6] - 1) * sig_dir
+                if mom_5d < -0.002:   # counter-momentum (pullback entry)
+                    mult *= 1.25
+                elif mom_5d > 0.002:  # aligned (chasing)
+                    mult *= 0.75
+
+            # VIX slope modifier
+            if vix_df is not None and vix3m_df is not None:
+                try:
+                    v   = float(vix_df.loc[:date].tail(1)['Close'].iloc[-1]
+                                if 'Close' in vix_df.columns
+                                else vix_df.loc[:date].tail(1).iloc[-1, 0])
+                    v3  = float(vix3m_df.loc[:date].tail(1)['Close'].iloc[-1]
+                                if 'Close' in vix3m_df.columns
+                                else vix3m_df.loc[:date].tail(1).iloc[-1, 0])
+                    slope = v3 - v
+                    if slope > 3.0:    # extreme contango — poor follow-through
+                        mult *= 0.85
+                    elif slope < 0.0:  # inverted — fear regime, tighten
+                        mult *= 0.90
+                except Exception:
+                    pass
+
+            size_mult.loc[date] = round(mult, 4)
+
+        return size_mult
 
     def build_signal_arrays(
         self,

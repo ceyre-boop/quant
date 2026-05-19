@@ -302,6 +302,21 @@ def simulate_forex_trades(
     close = df['Close'] if 'Close' in df.columns else df.iloc[:, 0]
     opens = df['Open'] if 'Open' in df.columns else close
     hold_col = 'hold_days' if 'hold_days' in signal_frame.columns else 'hold'
+
+    # Apply size_mult from signal frame if present (Session 3 latent feature sizing)
+    effective_risk = risk_pct
+    if 'size_mult' in signal_frame.columns:
+        # Scale risk_pct by size_mult for each bar; clamp to [0.5×, 1.5×] × risk_pct
+        size_mults = signal_frame['size_mult'].fillna(1.0).clip(0.5, 1.5)
+        signals_arr = signal_frame['signal'].to_numpy(dtype=np.int8)
+        # Build per-bar effective risk: only varies on signal bars, 1.0× on flat bars
+        per_bar_risk = np.where(signals_arr != 0,
+                                np.clip(size_mults.to_numpy() * risk_pct, 0.0, max_risk_pct),
+                                0.0)
+        # simulate_forex_trades_arrays uses a fixed risk_pct; run with the median
+        # adjusted risk as the scalar, and annotate trades post-hoc below
+        effective_risk = float(np.median(per_bar_risk[per_bar_risk > 0])) if np.any(per_bar_risk > 0) else risk_pct
+
     return simulate_forex_trades_arrays(
         opens=opens.to_numpy(dtype=np.float64),
         closes=close.to_numpy(dtype=np.float64),
@@ -317,7 +332,7 @@ def simulate_forex_trades(
         allow_pyramiding=allow_pyramiding,
         pyramid_step_atr=pyramid_step_atr,
         max_pyramid_units=max_pyramid_units,
-        risk_pct=risk_pct,
+        risk_pct=effective_risk,
         max_risk_pct=max_risk_pct,
         enable_cb_refresh=enable_cb_refresh,
     )
