@@ -33,11 +33,11 @@
       "detail": "E1 (60-day hold rate divergence) in TESTING phase. Outcome affects v004 sizing logic and macro edge sustainability. Complete test within 7 days; if confirmed, implement as secondary edge filter.",
       "action": "Run walk-forward backtest on E1 hypothesis using last 2y data; document pass/fail; if confirmed, add rate_divergence_filter to v004 entry logic.",
       "id": "SUG-003",
-      "status": "NEW",
+      "status": "VETOED",
       "created": "2026-05-16T19:41:22.066370",
-      "vetoed_at": null,
+      "vetoed_at": "2026-05-20T00:04:58.279884",
       "implemented_at": null,
-      "veto_reason": null
+      "veto_reason": "Already rejected as HYP-013: E1 60d Sharpe=0.300 vs 20d=0.658 \u2014 longer hold hurts. Closed."
     },
     {
       "category": "ICT",
@@ -80,11 +80,12 @@
     }
   ],
   "vetoed_ids": [
-    "SUG-002"
+    "SUG-002",
+    "SUG-003"
   ],
   "stats": {
     "total_generated": 6,
     "implemented": 1,
-    "vetoed": 1
+    "vetoed": 2
   }
 }
