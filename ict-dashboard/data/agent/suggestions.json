@@ -59,11 +59,11 @@
       "detail": "Recent findings reference stop width ATR multiple optimization, but no results logged. Run sweep: test 1.2x\u20132.0x ATR across all 8 pairs, target Sharpe improvement to 0.90+. Current 0.801 leaves room.",
       "action": "Create backtest_stop_width_sweep.py. Loop ATR_multiples [1.2, 1.4, 1.6, 1.8, 2.0], backtest v004 on 8 pairs, log Sharpe/max_DD/RC per multiple. Compare vs baseline 0.801.",
       "id": "SUG-005",
-      "status": "NEW",
+      "status": "VETOED",
       "created": "2026-05-16T22:09:39.350195",
-      "vetoed_at": null,
+      "vetoed_at": "2026-05-20T00:04:59.574441",
       "implemented_at": null,
-      "veto_reason": null
+      "veto_reason": "Already rejected as HYP-017: stop width is invariant to Sharpe across 4200 combos. Hold period dominates entirely."
     },
     {
       "category": "RESEARCH",
@@ -81,11 +81,12 @@
   ],
   "vetoed_ids": [
     "SUG-002",
-    "SUG-003"
+    "SUG-003",
+    "SUG-005"
   ],
   "stats": {
     "total_generated": 6,
     "implemented": 1,
-    "vetoed": 2
+    "vetoed": 3
   }
 }
