@@ -531,9 +531,11 @@ def _check_nasdaq() -> tuple:
 # ── Reddit sentiment refresh ───────────────────────────────────────────────────
 
 def _refresh_reddit_if_stale():
-    """Run reddit_scraper if cache is >90 minutes old or missing."""
+    """Run reddit_scraper if cache is >90 minutes old or missing. Archive daily snapshot."""
     import time as _time
     cache = ROOT / "data" / "cache" / "reddit_sentiment.json"
+    news_dir = ROOT / "data" / "news"
+    news_dir.mkdir(parents=True, exist_ok=True)
     if cache.exists():
         age_min = (_time.time() - cache.stat().st_mtime) / 60
         if age_min < 90:
@@ -546,6 +548,13 @@ def _refresh_reddit_if_stale():
             cwd=str(ROOT), capture_output=True, text=True, timeout=90
         )
         log.info("Reddit sentiment refreshed")
+        # Archive daily snapshot for news IC research (Phase 1 data collection)
+        today = datetime.now().strftime("%Y-%m-%d")
+        snapshot_path = news_dir / f"sentiment_{today}.json"
+        if cache.exists() and not snapshot_path.exists():
+            import shutil
+            shutil.copy(cache, snapshot_path)
+            log.info(f"Archived daily sentiment snapshot: {snapshot_path.name}")
     except Exception as e:
         log.warning(f"Reddit refresh failed: {e}")
 
