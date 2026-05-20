@@ -1,0 +1,309 @@
+{
+  "_meta": {
+    "description": "Alta Investments — Sovereign Trading System. Complete research history v001→present.",
+    "purpose": "Oracle reads this every reflection cycle. Never re-proposes rejected hypotheses unless rejection_reason is addressed. Builds on proven findings, not from scratch.",
+    "last_updated": "2026-05-19",
+    "version_at_build": "v007",
+    "sharpe_at_build": 1.0713,
+    "sharpe_target": 1.5,
+    "gap_remaining": 0.429
+  },
+
+  "proven_lessons": [
+    {
+      "id": "L-001",
+      "linked_hyp": "HYP-023",
+      "lesson": "Grade labels invert quality. Score is signal. Grade is noise.",
+      "mechanism": "ICT A+ grade selects for over-confirmation bias. High composite scores attract bad setups (overconfirmed = market already moved, late entry). A grade (7.0-9.5) = genuinely balanced entry. A+ (>9.5) = potentially chasing.",
+      "rule": "if grade == 'A+': downgrade to 'A' for trade decision. Never block A+ outright — the commitment gate handles the bad ones.",
+      "evidence": "A+: 13% WR, -0.375R avg (n=30). Grade A: 39% WR, +0.383R avg (n=72). Delta WR: -26pp.",
+      "delta_sharpe": null,
+      "p_value": null,
+      "holdout_validated": false,
+      "discovered": "2026-05-19",
+      "codified": "2026-05-19",
+      "code_location": "ict/pipeline.py stage 5.7 — _effective_grade override",
+      "health": "ACTIVE",
+      "lesson_number_in_file": 3
+    },
+    {
+      "id": "L-002",
+      "linked_hyp": "HYP-022",
+      "lesson": "Session quality is categorical. NY_PM is not weaker — it is anti-edge.",
+      "mechanism": "NY_PM session has systematic adverse flow (smart money distribution into retail continuation buyers). London session captures institutional displacement before retail participation. The difference is not magnitude — it is direction of edge.",
+      "rule": "if session == 'NY_PM': veto. London-only execution.",
+      "evidence": "NY_PM: -0.283R avg. London: +0.471R avg. 102-trade sample. MC pass rate 58% → 90% post-veto.",
+      "delta_sharpe": 0.35,
+      "p_value": null,
+      "holdout_validated": true,
+      "discovered": "2026-05-18",
+      "codified": "2026-05-18",
+      "code_location": "ict/pipeline.py stage 5.7 — NY_PM veto",
+      "health": "ACTIVE",
+      "lesson_number_in_file": 2
+    },
+    {
+      "id": "L-003",
+      "linked_hyp": "HYP-024",
+      "lesson": "pd_alignment anti-predicts success. Premium/discount zone describes retail traps, not institutional flow.",
+      "mechanism": "ICT premium/discount theory says price in premium = short, discount = long. In practice, institutional accumulation happens in 'wrong' zones (aggressive entries). The pd_alignment score penalizes exactly the entries that work.",
+      "rule": "pd_alignment weight = 0.0 in scoring. Still computed and logged for monitoring.",
+      "evidence": "pd_alignment > 0: 20% WR. pd_alignment = 0: 35% WR. Delta WR: -15pp.",
+      "delta_sharpe": null,
+      "p_value": null,
+      "holdout_validated": false,
+      "discovered": "2026-05-19",
+      "codified": "2026-05-19",
+      "code_location": "ict/pipeline.py _DEFAULT_WEIGHTS['pd_alignment'] = 0.0",
+      "health": "ACTIVE",
+      "lesson_number_in_file": 4
+    },
+    {
+      "id": "L-004",
+      "linked_hyp": "HYP-031",
+      "lesson": "Pullback entries outperform aligned entries 3:1 in R-multiple. Entry timing within direction matters as much as direction itself.",
+      "mechanism": "When 5d momentum is positive and you go long, you are chasing. When 5d momentum is negative and you go long (pullback), you are buying the dip into the structural thesis. Same directional edge, 3× better R because entry is more precise.",
+      "rule": "5d_momentum < -0.002 → size 1.25×. 5d_momentum > +0.002 → size 0.75×.",
+      "evidence": "Counter (<-0.2%): 52% WR, +0.331R avg. Aligned (>+0.2%): 52% WR, +0.107R avg. Same WR, 3× R differential.",
+      "delta_sharpe": 0.029,
+      "p_value": null,
+      "holdout_validated": false,
+      "discovered": "2026-05-19",
+      "codified": "2026-05-19",
+      "code_location": "sovereign/forex/signal_engine.py _compute_size_multipliers()",
+      "health": "ACTIVE",
+      "lesson_number_in_file": 6
+    },
+    {
+      "id": "L-005",
+      "linked_hyp": "HYP-032",
+      "lesson": "VIX term structure reveals carry regime health. Modest contango = healthy carry environment. Steep contango = nervousness with pockets of liquidity still flowing.",
+      "mechanism": "VIX slope (VIX3M - VIX): near zero = market pricing equal near/far-term risk = well-functioning carry regime. Large positive = fear premium concentrated in spot = potential for sudden unwinding. Inverse (negative) = backwardation = vol spike imminent.",
+      "rule": "VIX_slope > 3.0 → size 0.85×. VIX_slope < 0.0 → size 0.90×.",
+      "evidence": "VIX slope [0,1): 75% WR, +0.697R avg. [3,5): 62% WR, +0.353R avg. IC = -0.095, p=0.008.",
+      "delta_sharpe": null,
+      "p_value": 0.008,
+      "holdout_validated": false,
+      "discovered": "2026-05-19",
+      "codified": "2026-05-19",
+      "code_location": "sovereign/forex/signal_engine.py _compute_size_multipliers()",
+      "health": "ACTIVE",
+      "lesson_number_in_file": 7
+    },
+    {
+      "id": "L-006",
+      "linked_hyp": "HYP-026",
+      "lesson": "The exact target ICT setup: London session + Grade A + market committed. This is the only configuration with institutional-grade statistics.",
+      "mechanism": "London = institutional displacement before retail. Grade A = genuinely balanced entry. Committed market (mkt_struct < 1.5) = price is moving, not consolidating. All three conditions together select for the exact moment institutional order flow is accessible.",
+      "rule": "London session AND Grade A AND mkt_struct < 1.5 → full execution. Any condition missing → veto.",
+      "evidence": "London+GradeA+committed: WR=41%, avgR=+0.840, Sharpe proxy=2.093. MC prop pass rate 90.3%.",
+      "delta_sharpe": 1.07,
+      "p_value": null,
+      "holdout_validated": true,
+      "discovered": "2026-05-18",
+      "codified": "2026-05-18",
+      "code_location": "ict/pipeline.py stage 5.7 — three-part gate: session + grade + commitment",
+      "health": "ACTIVE",
+      "lesson_number_in_file": 1
+    },
+    {
+      "id": "L-007",
+      "linked_hyp": "HYP-033 + v006-v007",
+      "lesson": "Macro momentum has pair-specific half-lives. There is no universal hold period. Each pair's macro signal exhausts at a different rate.",
+      "mechanism": "Central bank policy divergence creates directional flows that persist until the next CB catalyst. GBPUSD policy divergence (BOE vs Fed) has a 6-day momentum half-life. AUDUSD has a 5-day half-life. AUDNZD has a 7-day half-life. 60-day hold captures the thesis correctly but gives back gains during consolidation.",
+      "rule": "GBPUSD: 6d hold / 2.0× trailing. AUDUSD: 5d / 1.0×. EURUSD: 5d / 1.25×. AUDNZD: 7d / 1.25×. GBPJPY: 5d / 1.0×. USDCAD/USDJPY: 60d / 1.25× (no short-hold edge confirmed).",
+      "evidence": "Per-pair trailing sweep run 2026-05-19. GBPUSD 1.09→1.52 (+0.43). GBPJPY 0.653→0.741 (+0.088). Portfolio 1.055→1.071.",
+      "delta_sharpe": 0.017,
+      "p_value": null,
+      "holdout_validated": false,
+      "discovered": "2026-05-17",
+      "codified": "2026-05-19",
+      "code_location": "sovereign/forex/forex_backtester.py PAIR_HOLD_OVERRIDES + PAIR_TRAILING_OVERRIDES",
+      "health": "ACTIVE",
+      "lesson_number_in_file": 5
+    }
+  ],
+
+  "proven_hypotheses": [
+    {
+      "id": "HYP-001",
+      "finding": "Carry base generates positive EV",
+      "result": "59% WR, +0.311R",
+      "version_discovered": "v001",
+      "impact": "Confirmed carry as the structural foundation of forex edge",
+      "still_valid": true,
+      "lesson_id": null
+    },
+    {
+      "id": "HYP-002",
+      "finding": "Quarter-end rebalancing works at small sample",
+      "result": "60% WR, n=15",
+      "version_discovered": "v001",
+      "impact": "Confirmed seasonal signal but n too small to scale",
+      "still_valid": true,
+      "note": "Scale test rejected (HYP-010). Valid signal, insufficient frequency."
+    },
+    {
+      "id": "HYP-003",
+      "finding": "v004 macro system (IRP + RRD) is the core forex edge",
+      "result": "Sharpe 0.801, 8/8 pairs positive",
+      "version_discovered": "v004",
+      "impact": "Established the macro layer as foundation. All subsequent versions build on this.",
+      "still_valid": true
+    },
+    {
+      "id": "HYP-004",
+      "finding": "ICT FVG limit entry has positive EV",
+      "result": "+0.40R/trade, replicated across 2 windows",
+      "version_discovered": "v004",
+      "impact": "Validated ICT methodology. London FVG entry is real institutional edge.",
+      "still_valid": true
+    },
+    {
+      "id": "HYP-005",
+      "finding": "ICT walk-forward B replicates training edge (within 1pp)",
+      "result": "76.0% vs MC baseline 76.8%",
+      "version_discovered": "v004",
+      "impact": "Confirmed no overfitting in ICT backtest. Edge is real.",
+      "still_valid": true
+    },
+    {
+      "id": "HYP-018",
+      "finding": "Library bull regime CRITICAL false positive: floor size at 0.5× in bull regime",
+      "result": "GOLDILOCKS_LOW_VOL match at 0.934 caused 0.00× size. Floor fix restored equity trading.",
+      "version_discovered": "v005",
+      "impact": "Equity system was completely blocked. Fix restored live trading.",
+      "still_valid": true
+    },
+    {
+      "id": "HYP-022", "finding": "NY_PM session is anti-edge", "result": "-0.283R avg vs London +0.471R",
+      "version_discovered": "v006", "impact": "MC prop pass rate 58%→90%. L-002.", "still_valid": true
+    },
+    {
+      "id": "HYP-023", "finding": "A+ grade paradox: score anti-correlated with success", "result": "A+: 13% WR. A: 39% WR",
+      "version_discovered": "v006", "impact": "Grade override in pipeline. L-001.", "still_valid": true
+    },
+    {
+      "id": "HYP-024", "finding": "pd_alignment is anti-edge", "result": "pd_alignment>0: 20% WR. =0: 35% WR",
+      "version_discovered": "v006", "impact": "Weight zeroed. L-003.", "still_valid": true
+    },
+    {
+      "id": "HYP-026", "finding": "London+GradeA+committed is the only institutional-grade ICT setup",
+      "result": "WR=41%, avgR=+0.840, Sharpe 2.093",
+      "version_discovered": "v006", "impact": "Three-gate pipeline. L-006.", "still_valid": true
+    },
+    {
+      "id": "HYP-031", "finding": "Counter-momentum sizing: pullback entries 3× better R than aligned",
+      "result": "Same 52% WR. +0.331R vs +0.107R",
+      "version_discovered": "v007", "impact": "Size modifier in signal_engine. L-004.", "still_valid": true
+    },
+    {
+      "id": "HYP-032", "finding": "VIX slope [0,1) is best forex entry environment",
+      "result": "75% WR, +0.697R. IC=-0.095, p=0.008",
+      "version_discovered": "v007", "impact": "VIX slope size modifier. L-005.", "still_valid": true
+    },
+    {
+      "id": "HYP-033", "finding": "No single feature separates forex COMMITMENT_FAILUREs at IC>0.15",
+      "result": "Max IC=0.095 across 5 candidates",
+      "version_discovered": "v007", "impact": "Accept structural ~40% entry failure rate. Size modifiers preferred over gates.", "still_valid": true
+    }
+  ],
+
+  "rejected_hypotheses": [
+    {
+      "id": "HYP-006", "finding": "CPI surprise fade works standalone",
+      "result": "43% WR, -0.320R, n=63", "reason_rejected": "No edge without directional macro filter. Layer 1.5 requires Layer 3 alignment.",
+      "retestable_when": "Only as size booster on top of confirmed macro direction, not standalone"
+    },
+    {
+      "id": "HYP-007", "finding": "Post-CB drift before price confirmation",
+      "result": "36% WR, -0.517R, n=14", "reason_rejected": "Entry before price confirms = fighting drift. TENET 4 violation (being early = being wrong).",
+      "retestable_when": "Never. Principle violation, not a data problem."
+    },
+    {
+      "id": "HYP-008", "finding": "Rate divergence alone at 20-day hold",
+      "result": "44% WR, -0.186R, n=312", "reason_rejected": "Rate divergence is direction only. Without momentum confirmation, 20d hold gives back too much.",
+      "retestable_when": "Rate divergence + momentum confirmation at 20d (not tested yet)"
+    },
+    {
+      "id": "HYP-009", "finding": "March JPY seasonal (2015-2024)",
+      "result": "26% WR, n=9", "reason_rejected": "BOJ and Fed policy cycles overwhelm the seasonal. Sample too small and event-driven.",
+      "retestable_when": "Never at this sample size. Would need 30+ years."
+    },
+    {
+      "id": "HYP-010", "finding": "Quarter-end fade at scale",
+      "result": "39% WR, n=366", "reason_rejected": "Small sample (n=15) was survivorship noise. At n=366, fade has no edge.",
+      "retestable_when": "Never. Scale disproved the signal."
+    },
+    {
+      "id": "HYP-011", "finding": "State allocator outperforms v004 macro",
+      "result": "Sharpe -0.12 vs v004 0.801", "reason_rejected": "Adding complexity (ML state allocation) hurt performance vs simple macro signal. Occam wins.",
+      "retestable_when": "Only if macro signal itself degrades to below 0.5 Sharpe"
+    },
+    {
+      "id": "HYP-012", "finding": "Confirmation protocol outperforms v004",
+      "result": "Sharpe -0.17", "reason_rejected": "Same as HYP-011. Complexity without edge improvement.",
+      "retestable_when": "Same condition as HYP-011"
+    },
+    {
+      "id": "HYP-013", "finding": "Rate divergence at 60-day hold",
+      "result": "60d Sharpe 0.300 vs 20d 0.658", "reason_rejected": "Longer hold HURTS: win rate collapses 38.8%→26.7% at 60d. The macro thesis needs shorter hold periods, not longer.",
+      "retestable_when": "Never at 60d. Shorter holds confirmed superior."
+    },
+    {
+      "id": "HYP-014", "finding": "Calendar edges as v004 size boosts",
+      "result": "+0.0014 Sharpe impact. Only 3.5% of trades in calendar windows.",
+      "reason_rejected": "Calendar windows too infrequent to move portfolio-level Sharpe. March JPY only pair with any signal.",
+      "retestable_when": "If trade frequency increases 3× or if calendar data extends back to 2000"
+    },
+    {
+      "id": "HYP-017", "finding": "Stop width affects Sharpe",
+      "result": "Sharpe invariant across stop widths in 4200-combo sweep",
+      "reason_rejected": "Hold period dominates entirely. Stop width is not a lever.",
+      "retestable_when": "Never. Empirically disproved."
+    },
+    {
+      "id": "HYP-019", "finding": "Pure carry direction (rate sign) works standalone",
+      "result": "Only GBPUSD, AUDUSD positive. USDJPY -0.555, EURUSD -5.636",
+      "reason_rejected": "Large adverse moves dominate carry income. Carry works as income overlay inside macro signal, not as direction signal.",
+      "retestable_when": "As a return enhancer (size boost) inside confirmed macro direction — not standalone"
+    },
+    {
+      "id": "HYP-020", "finding": "March JPY seasonal persists pre-2020",
+      "result": "Pre-2020: 67% WR but avg R barely negative (-0.058, n=6)",
+      "reason_rejected": "2022 Fed hike cycle permanently broke March JPY seasonal. 6 occurrences not sufficient. Event-specific, not structural.",
+      "retestable_when": "Never. Structural break confirmed."
+    },
+    {
+      "id": "HYP-021", "finding": "Library CRITICAL match driven by equity dislocation features",
+      "result": "Features are commodity/macro-driven, not equity crash precursors",
+      "reason_rejected": "Current CRITICAL match (SHALE_SUPPLY_OIL_CRASH) is macro pattern, not equity dislocation. Bull regime floor fix was the correct response.",
+      "retestable_when": "Re-evaluate if SPY goes below 200 SMA"
+    },
+    {
+      "id": "HYP-025", "finding": "Forex COMMITMENT_FAILUREs resolvable by momentum threshold",
+      "result": "Momentum distributions identical between unexplained losses and wins. No clean threshold.",
+      "reason_rejected": "The third factor (if it exists) is not in daily price data. May require intraday data or cross-asset data not currently tracked.",
+      "retestable_when": "When intraday ATR ratio data is added to signal computation"
+    }
+  ],
+
+  "version_sharpe_history": {
+    "v001": 0.1785, "v002": 0.3551, "v002_5": 0.38,
+    "v003": 0.4523, "v004": 0.626,
+    "v005": 1.0237, "v006": 1.0547, "v007": 1.0713,
+    "target": 1.5, "gap": 0.429
+  },
+
+  "oracle_instructions": {
+    "never_re_propose": ["HYP-007", "HYP-009", "HYP-010", "HYP-017", "HYP-019", "HYP-020"],
+    "retestable_with_conditions": ["HYP-006", "HYP-008", "HYP-011", "HYP-014", "HYP-019", "HYP-025"],
+    "build_on_these": ["L-001", "L-002", "L-003", "L-004", "L-005", "L-006", "L-007"],
+    "remaining_gap_ideas": [
+      "USDCAD at 0.326 Sharpe — either find the signal or drop from portfolio",
+      "USDJPY at 1.004 Sharpe — BOJ intervention timing as size signal",
+      "Intraday ATR ratio as commitment proxy for forex (requires new data)",
+      "Cross-pair divergence as size reducer when pairs disagree on direction"
+    ]
+  }
+}

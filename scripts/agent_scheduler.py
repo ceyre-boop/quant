@@ -755,18 +755,55 @@ def run_cycle(dry_run: bool = False, force_heavy: bool = False) -> None:
     except Exception as _bridge_err:
         log.warning(f"Cross-system bridge update failed (non-fatal): {_bridge_err}")
 
-    # 3c. Run prop firm deployment checklist (log gates, post FYI if any change)
+    # 3c. Run prop firm deployment checklist (log gates, post message on any change)
+    _CHECKLIST_STATE_PATH = DATA_AGENT / "checklist_state.json"
     try:
         from sovereign.propfirm.deployment_checklist import run_checklist
         cl = run_checklist()
         log.info(f"Checklist: {cl['overall']} "
                  f"G={cl['gates_green']} Y={cl['gates_yellow']} R={cl['gates_red']}")
+
+        # Load previous gate statuses to detect changes
+        _prev_gates = {}
+        if _CHECKLIST_STATE_PATH.exists():
+            try:
+                _prev_gates = {g["id"]: g["status"]
+                               for g in json.load(open(_CHECKLIST_STATE_PATH)).get("gates", [])}
+            except Exception:
+                pass
+
+        # Save current state
+        try:
+            _CHECKLIST_STATE_PATH.write_text(json.dumps(cl, indent=2, default=str))
+        except Exception:
+            pass
+
+        # Post on significant changes
         if cl["overall"] == "GO":
-            post_message("URGENT", "🟢 PROP FIRM CHECKLIST: ALL GATES GREEN — buy the challenge now!")
+            post_message("URGENT",
+                "PROP CHALLENGE: all gates GREEN — buy the Lucid $100k evaluation now. $399.")
+        else:
+            for gate in cl.get("gates", []):
+                gid, status, val = gate["id"], gate["status"], gate.get("value", "")
+                prev = _prev_gates.get(gid)
+                if prev and prev != status:
+                    # Gate flipped — report it
+                    if status == "GREEN":
+                        post_message("IMPORTANT",
+                            f"Checklist {gid} flipped GREEN: {gate['name']} — {val}")
+                    elif status == "YELLOW" and prev == "RED":
+                        post_message("FYI",
+                            f"Checklist {gid} advancing: {gate['name']} — {val}")
+                elif gid == "G4" and status == "RED":
+                    # Report threat level even without status change so Colin sees it moving
+                    threat = cl.get("gates", [{}])[3].get("value", "")
+                    if threat != _prev_gates.get("G4_value"):
+                        log.info(f"G4 threat: {threat}")
+
     except Exception as _cl_err:
         log.warning(f"Checklist failed (non-fatal): {_cl_err}")
 
-    # 4. Run Oracle (always — it's just one cheap API call)
+    # 4. Run Oracle dashboard agent (always — cheap haiku call)
     oracle_script = ROOT / "sovereign" / "agent" / "oracle_agent.py"
     if oracle_script.exists() and os.environ.get("ANTHROPIC_API_KEY"):
         try:
@@ -775,9 +812,29 @@ def run_cycle(dry_run: bool = False, force_heavy: bool = False) -> None:
                 [sys.executable, str(oracle_script)] + oracle_flags,
                 cwd=str(ROOT), timeout=60, check=False
             )
-            log.info("Oracle cycle complete")
+            log.info("Oracle dashboard agent complete")
         except Exception as e:
-            log.warning(f"Oracle failed (non-fatal): {e}")
+            log.warning(f"Oracle dashboard failed (non-fatal): {e}")
+
+    # 4b. Run Oracle Learning Cycle (harvest → reflect → test → codify)
+    # Only runs between 02:00–04:00 ET to avoid competing with market hours
+    _et_hour = int(datetime.now().strftime("%H"))  # local time (machine is ET)
+    _in_learning_window = _et_hour in {2, 3}
+    if _in_learning_window and os.environ.get("ANTHROPIC_API_KEY"):
+        try:
+            from sovereign.oracle.oracle_cycle import run_daily_cycle
+            cycle_result = run_daily_cycle(dry_run=dry_run)
+            log.info(f"Oracle learning cycle: {cycle_result.get('verdict', '?')} "
+                     f"trades={cycle_result.get('trades_harvested', 0)} "
+                     f"cost=${cycle_result.get('oracle_cost_usd', 0):.4f}")
+            if cycle_result.get("new_lesson_number"):
+                post_message("IMPORTANT", f"📚 New trading lesson #{cycle_result['new_lesson_number']} validated and codified. "
+                             f"Review data/oracle/pending_implementations/ for implementation prompt.")
+            if cycle_result.get("anomalies"):
+                for anomaly in cycle_result["anomalies"]:
+                    post_message("IMPORTANT", f"⚠ Oracle anomaly: {anomaly}")
+        except Exception as e:
+            log.warning(f"Oracle learning cycle failed (non-fatal): {e}")
 
     # 4. Pick and dispatch a research task if budget allows
     task = pick_task(mode)
