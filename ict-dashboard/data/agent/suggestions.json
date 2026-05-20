@@ -46,11 +46,11 @@
       "detail": "EURUSD (110%), AUDUSD (236%), GBPUSD (98%) repeatedly veto due to ADR exhaustion. Add 15% safety margin: reject setups when intraday range > 0.85 \u00d7 ADR_20d. Recovers ~3\u20135 valid daily signals.",
       "action": "In ict_scanner.py, add ADR buffer check before score_setup(). If (high - low) / ADR_20d > 0.85, return veto reason 'ADR_BUFFER_BREACH'.",
       "id": "SUG-004",
-      "status": "NEW",
+      "status": "VETOED",
       "created": "2026-05-16T22:09:39.350189",
-      "vetoed_at": null,
+      "vetoed_at": "2026-05-20T00:05:00.795044",
       "implemented_at": null,
-      "veto_reason": null
+      "veto_reason": "Already live: ict/pipeline.py _ADR_HARD_VETO=0.85 (85% ADR = veto). The exhaustion values shown (110%, 236%) are correctly blocked."
     },
     {
       "category": "FOREX",
@@ -82,11 +82,12 @@
   "vetoed_ids": [
     "SUG-002",
     "SUG-003",
-    "SUG-005"
+    "SUG-005",
+    "SUG-004"
   ],
   "stats": {
     "total_generated": 6,
     "implemented": 1,
-    "vetoed": 3
+    "vetoed": 4
   }
 }
