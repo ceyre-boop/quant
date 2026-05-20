@@ -219,7 +219,8 @@ class SovereignRiskEngine:
                 avg_loss_r: float = 1.0,
                 predict_now_prob: float = None,
                 n_trades: int = 20,
-                library_insight=None) -> RiskOutput:
+                library_insight=None,
+                pegasus_params=None) -> RiskOutput:
         """
         Final trade parameters with fractional Kelly sizing.
 
