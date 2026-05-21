@@ -323,6 +323,9 @@ class RegimePerformanceTracker:
 
         # Historical distribution: compute Sharpe for rolling windows of same size
         sharpe_dist = []
+        # Build rolling Sharpe distribution using 25%-overlap windows.
+        # 75% overlap gives a dense distribution while avoiding pure duplication.
+        # Step = window // 4 balances sample independence vs. distribution density.
         step = max(1, window // 4)
         for i in range(0, len(all_r) - window, step):
             chunk = all_r[i : i + window]

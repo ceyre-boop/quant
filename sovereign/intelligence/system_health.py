@@ -168,7 +168,7 @@ def _compute_health_score(
         0.30 * streak_penalty
         + 0.20 * var_score
         + 0.30 * break_penalty
-        + 0.20 * (1.0 - entropy_score)  # low entropy = not informative
+        + 0.20 * (1.0 - entropy_score)  # low entropy (all wins or all losses) = low uncertainty signal
     )
     health_score = max(0.0, min(1.0, 1.0 - raw_penalty))
 

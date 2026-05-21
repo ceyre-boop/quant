@@ -287,14 +287,14 @@ class TestHealthHelpers:
             recent_wins=2, recent_n=20, historical_wr=0.6
         )
         # 2/20 = 10% WR, well below the 95% CI for 60% historical WR
-        assert is_break == True  # noqa: E712
+        assert is_break
 
     def test_structural_break_no_trigger(self):
         # 12/20 = 60%, consistent with historical WR of 60%
         is_break, lo, hi = _structural_break(
             recent_wins=12, recent_n=20, historical_wr=0.6
         )
-        assert is_break == False  # noqa: E712
+        assert not is_break
 
     def test_structural_break_small_n(self):
         # Insufficient data — should not flag
@@ -324,7 +324,7 @@ class TestComputeHealthScore:
         r = r_hist_long + r_recent
         snap = _compute_health_score(r, historical_wr=0.30)
         # structural break should be flagged (recent above upper CI)
-        assert snap["structural_break"] == True  # noqa: E712
+        assert snap["structural_break"]
 
     def test_empty_returns_default(self):
         snap = _compute_health_score([])
