@@ -51,7 +51,10 @@ _DEFAULT_WEIGHTS: Dict[str, float] = {
     "displacement":     2.0,
     "fvg_tap":          2.0,
     "market_structure": 1.5,
-    "pd_alignment":     1.0,
+    # HYP-024 confirmed anti-edge: pd_alignment>0 → 20% WR, pd_alignment=0 → 35% WR.
+    # Zeroed 2026-05-19. Score still computed and logged for monitoring — weight=0
+    # means it no longer influences the entry decision.
+    "pd_alignment":     0.0,
 }
 
 # Volatility-adaptive threshold adjustments
@@ -179,7 +182,23 @@ class ICTPipeline:
                            score=0.0, grade=ICTGrade.C,
                            reason=f"Invalid direction '{direction}'")
 
-        # ── Cross-system bridge gate (Stage 0) ───────────────────────────
+        # ── Allocation engine gate (Stage 0a) ───────────────────────────
+        # Reads continuous ict_weight from allocation_engine.
+        # ict_weight=0.0 → veto (regime hostile to ICT).
+        # ict_weight<0.5 → raise threshold (only best setups).
+        _ict_alloc_weight = 1.0
+        try:
+            from sovereign.intelligence.allocation_engine import read_allocation as _read_alloc
+            _alloc = _read_alloc()
+            _ict_alloc_weight = _alloc.ict_weight
+            if _ict_alloc_weight == 0.0:
+                return ICTVeto(symbol=symbol, direction=direction, timestamp=timestamp,
+                               score=0.0, grade=ICTGrade.VETOED,
+                               reason=f"ALLOCATION_ZERO: {_alloc.regime_tag} — {_alloc.reason[:60]}")
+        except Exception:
+            _ict_alloc_weight = 1.0
+
+        # ── Cross-system bridge gate (Stage 0b) ──────────────────────────
         # Checks macro environment shared by the quant/forex system.
         # HALT_NEW blocks all new entries when Library convergence is extreme.
         # TIGHTEN adjusts thresholds below (min_score raised to 8.0).
@@ -501,6 +520,13 @@ class ICTPipeline:
                                reason=f"Risk gate: {sz.reason} — {sz.detail}",
                                component_scores=scores,
                                confirmations=confirmations, missing=missing)
+            # Apply allocation weight to position size (continuous dimmer)
+            if _ict_alloc_weight < 1.0 and hasattr(sz, 'units') and sz.units:
+                sz = sz.__class__(**{
+                    **{f: getattr(sz, f) for f in sz.__dataclass_fields__},
+                    'units': max(0, round(sz.units * _ict_alloc_weight)),
+                    'risk_dollars': round(sz.risk_dollars * _ict_alloc_weight, 2),
+                })
             return ICTSignal(
                 symbol=symbol, direction=direction, timestamp=timestamp,
                 score=total_score, grade=grade, sizing=sz,

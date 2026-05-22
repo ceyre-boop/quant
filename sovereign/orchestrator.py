@@ -1372,6 +1372,18 @@ class SovereignOrchestrator:
                                      library_insight=_insight,
                                      pegasus_params=_pegasus_params)
 
+        # Apply regime allocation weight (never inflates, only reduces)
+        try:
+            from sovereign.intelligence.allocation_engine import read_allocation as _read_alloc
+            _eq_weight = _read_alloc().equity_weight
+            if _eq_weight < 1.0 and risk_out.position_size > 0:
+                if hasattr(risk_out, '_replace'):
+                    risk_out = risk_out._replace(
+                        position_size=risk_out.position_size * _eq_weight
+                    )
+        except Exception:
+            pass
+
         # Apply Lo uncertainty size multiplier after Kelly (never inflates, only reduces)
         if _lo_size_mult < 1.0 and risk_out.position_size > 0:
             _lo_size = risk_out.position_size * _lo_size_mult

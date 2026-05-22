@@ -152,6 +152,15 @@ class ForexSignalEngine:
 
             size_mult.loc[date] = round(mult, 4)
 
+        # Apply forex allocation weight from regime engine (continuous dimmer)
+        try:
+            from sovereign.intelligence.allocation_engine import read_allocation as _read_alloc
+            _alloc_weight = _read_alloc().forex_weight
+            if _alloc_weight < 1.0:
+                size_mult = (size_mult * _alloc_weight).round(4)
+        except Exception:
+            pass
+
         return size_mult
 
     def build_signal_arrays(

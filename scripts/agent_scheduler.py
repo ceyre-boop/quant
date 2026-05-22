@@ -764,6 +764,21 @@ def run_cycle(dry_run: bool = False, force_heavy: bool = False) -> None:
     except Exception as _bridge_err:
         log.warning(f"Cross-system bridge update failed (non-fatal): {_bridge_err}")
 
+    # 3b2. Compute allocation weights (continuous dimmer from bridge state)
+    try:
+        from sovereign.intelligence.allocation_engine import compute_allocation
+        alloc = compute_allocation(verbose=False)
+        log.info(f"Allocation: EQUITY={alloc.equity_weight:.1%} "
+                 f"ICT={alloc.ict_weight:.1%} FOREX={alloc.forex_weight:.1%} "
+                 f"regime={alloc.regime_tag}")
+        if alloc.equity_weight == 0.0 and alloc.ict_weight == 0.0 and alloc.forex_weight <= 0.25:
+            post_message("IMPORTANT",
+                f"⚠ ALL SYSTEMS HEAVILY RESTRICTED: {alloc.regime_tag}. "
+                f"Equity={alloc.equity_weight:.0%} ICT={alloc.ict_weight:.0%} Forex={alloc.forex_weight:.0%}. "
+                f"{alloc.reason[:120]}")
+    except Exception as _alloc_err:
+        log.warning(f"Allocation engine failed (non-fatal): {_alloc_err}")
+
     # 3c. Run prop firm deployment checklist (log gates, post message on any change)
     _CHECKLIST_STATE_PATH = DATA_AGENT / "checklist_state.json"
     try:
