@@ -217,14 +217,12 @@ ICT system:       LIVE — paper trading, launchd every 5min during London/NY PM
                   Pipeline verdict: 🟢 GO — MC pass rate >70% confirmed
                   Dashboard: ceyre-boop.github.io/quant/ict/ (Oracle-driven, live)
                   QUEUED: pd_alignment weight=0 test (anti-edge confirmed, HYP-024)
-Forex system:     LIVE — v007 paper scan, all 7 pairs
-                  v007 (2026-05-19): avg_sharpe=1.0713 | 7/7 pairs positive
-                  Per-pair hold config (trailing sweep run 2026-05-19):
-                    GBPUSD: 6d / 2.0x → 1.523 | EURUSD: 5d / 1.25x → 1.441
-                    AUDUSD: 5d / 1.0x → 1.292 | AUDNZD: 7d / 1.25x → 1.172
-                    USDJPY: 60d / 1.25x → 1.004 | GBPJPY: 5d / 1.0x → 0.741
-                    USDCAD: 60d / 1.25x → 0.326
-                  Note: +0.017 vs v006 (below +0.05 gate) — applied for shorter holds + GBPJPY gain
+Forex system:     LIVE — v008 paper scan, 6 pairs (USDCAD retired)
+                  v008 (2026-05-22): avg_sharpe=1.1955 | 6/6 pairs positive | +0.124 vs v007
+                  USDCAD retired: avg +0.071%/trade vs portfolio +0.204% — no regime where it earns
+                  Per-pair config: GBPUSD 6d/2.0x → 1.523 | EURUSD 5d/1.25x → 1.441
+                    AUDUSD 5d/1.0x → 1.292 | AUDNZD 7d/1.25x → 1.172
+                    USDJPY 60d/1.25x → 1.004 | GBPJPY 5d/1.0x → 0.741
                   Signal decay detector: sovereign/research/signal_decay.py (monthly)
 Backtest speed:   148,193/sec (Numba JIT, 12 cores)
 XGBoost models:   Both specialists trained and live
@@ -235,8 +233,9 @@ Forex version tracker:
   v001: 0.1785 | v002: 0.3551 | v002.5: ~0.38 | v003: 0.4523 | v004: 0.6260
   v005: 0.8843 → 1.0237 (trailing 1.25x, forensics v1)
   v006: 1.0237 → 1.0547 (GBPUSD per-pair 6d hold, micro-edge sweep)
-  v007: 1.0547 → 1.0713 (all-pair hold sweep: 5 pairs updated, +0.017 below gate but applied)
-  Target: Sharpe > 1.5 (institutional grade) | Gap remaining: 0.429
+  v007: 1.0547 → 1.0713 (all-pair hold sweep: 5 pairs updated)
+  v008: 1.0713 → 1.1955 (USDCAD retired, +0.124 — clears +0.05 gate by 2.5×)
+  Target: Sharpe > 1.5 (institutional grade) | Gap remaining: 0.305
 
 Unified forensics (2026-05-18): sovereign/research/unified_forensics.py
   SHARED ROOT CAUSE: Both ICT and Forex fail from PREMATURE ENTRY

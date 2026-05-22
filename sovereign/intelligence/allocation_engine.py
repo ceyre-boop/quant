@@ -78,8 +78,8 @@ THREAT_ALLOCATIONS = {
     0.50: (0.85, 0.80, 0.90),   # ELEVATED — equity/ICT reduce, forex near full
     0.70: (0.65, 0.50, 0.85),   # WARNING — forex still strong (divergence active)
     0.85: (0.40, 0.25, 0.80),   # DANGER — forex often thriving (crisis = CB divergence)
-    0.95: (0.20, 0.00, 0.75),   # TIGHTEN — ICT halted, forex continues (macro edge)
-    1.01: (0.00, 0.00, 0.65),   # CRITICAL — equity/ICT halted, forex at 65% (bear = forex edge)
+    0.95: (0.20, 0.30, 0.75),   # TIGHTEN — equity minimal, ICT/forex continue (bear = their edge)
+    1.01: (0.00, 0.25, 0.65),   # CRITICAL — equity halted, ICT+forex deploy at bear allocation
 }
 
 

@@ -133,6 +133,71 @@
       "added": "2026-05-18",
       "updated": "2026-05-18",
       "last_result": ""
+    },
+    {
+      "id": "RQ-AUTO-001",
+      "name": "ICT intraday timing study",
+      "priority": 1,
+      "status": "QUEUED",
+      "description": "Within London session, which hour has highest WR? 8am UTC vs 9am vs 10am vs 11am. Load all ICT trades with entry_dt hour. If hour 8-9 outperforms significantly: add time gate. Expected: first 90min of London has strongest institutional displacement.",
+      "method": "forensics",
+      "system": "ICT",
+      "expected_impact": "+5-10pp WR if early London confirmed",
+      "test_command": "python3 -c \"import json; [print(t[\"entry_dt\"][11:16], t[\"pnl_r\"]) for t in json.load(open(\"logs/ict_backtest_results.json\"))[\"trades\"]]\""
+    },
+    {
+      "id": "RQ-AUTO-002",
+      "name": "USDCAD retirement validation",
+      "priority": 2,
+      "status": "QUEUED",
+      "description": "USDCAD Sharpe=0.326, weakest pair by far. Run regime study on USDCAD specifically: does it have a regime where it earns >0.5 Sharpe? If no: retire from portfolio. Removing it raises portfolio avg mechanically. Run: ForexBacktester on USDCAD only across regime splits.",
+      "method": "regime study",
+      "system": "Forex",
+      "expected_impact": "Portfolio avg Sharpe 1.0713 \u2192 1.12+ if USDCAD retired",
+      "hypothesis": "HYP-QUEUED: USDCAD has no regime where it contributes positive edge"
+    },
+    {
+      "id": "RQ-AUTO-003",
+      "name": "ICT component score decomposition",
+      "priority": 3,
+      "status": "QUEUED",
+      "description": "With pd_alignment removed, remaining scores are: kill_zone, sweep, displacement, fvg_tap, market_structure. Run IC analysis: for each component score (0-2 scale), what is the correlation with pnl_r? Find the highest-IC sub-condition within Grade A that predicts TP2 specifically. That sub-condition = new Grade A+++ (data-driven, not theory-driven).",
+      "method": "feature decomposition",
+      "system": "ICT",
+      "expected_impact": "Find the 30% of Grade A trades that hit TP2 at 80%+ rate",
+      "test_command": "python3 sovereign/forensics/latent_feature_search.py --ict-components"
+    },
+    {
+      "id": "RQ-AUTO-004",
+      "name": "Equity counter-momentum feature importance",
+      "priority": 4,
+      "status": "QUEUED",
+      "description": "Load 1 year META, UNH, AMD, BAC, JPM daily. Compute: 5d_mom, 10d_mom, 20d_mom, RSI_14, dist_50SMA, dist_200SMA, earnings_proximity. Target: next_10d_return. Feature importance with lookahead. Find which combination of weakness signals best predicts a bounce. Then remove lookahead and validate.",
+      "method": "feature search + lookahead first",
+      "system": "Equity",
+      "expected_impact": "Better entry timing \u2192 fewer TIME_EXIT losses (currently 795 trades, -K)"
+    },
+    {
+      "id": "RQ-AUTO-005",
+      "name": "Prop firm: dry run 10 paper challenges sequentially",
+      "priority": 5,
+      "status": "QUEUED",
+      "description": "Run 10 sequential prop firm paper challenges using london_a R-multiples (39 trades, WR=42.9%, avgR=+0.893). Simulate each challenge to completion (PASS/BUST/TIMEOUT). Record: days to pass, peak drawdown, which scenario busts. This gives a live-data analog for the MC simulation. Gate: 30 live ICT trades needed first.",
+      "method": "simulation",
+      "system": "PropFirm",
+      "expected_impact": "Validate 90.3% MC pass rate against post-pd_alignment-fix data",
+      "prerequisite": "G2: 30 live London+GradeA paper trades"
+    },
+    {
+      "id": "RQ-AUTO-006",
+      "name": "ICT bear-market allocation validation",
+      "priority": 6,
+      "status": "QUEUED",
+      "description": "ICT regime study found SPY bull: avgR=-0.111 (n=9 trades, possibly noise). Need more data. Collect: all ICT trades from window_A (106 trades) + window_B (102 trades). Classify each by SPY above/below 200SMA at entry. If SPY bull \u2192 ICT negative holds with n>20: add SPY bull market gate to ICT pipeline. This would further restrict ICT to its best conditions.",
+      "method": "regime study",
+      "system": "ICT",
+      "expected_impact": "Remove ICT trades in hostile regime; WR may reach 50%+",
+      "note": "Current finding n=9 SPY bull too small to act on \u2014 needs validation"
     }
   ]
 }

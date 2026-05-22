@@ -6,7 +6,12 @@ from typing import Dict, List
 
 MAJOR_PAIRS: List[str] = [
     'EURUSD=X', 'GBPUSD=X', 'USDJPY=X',
-    'AUDUSD=X', 'USDCAD=X',
+    'AUDUSD=X',
+    # USDCAD removed 2026-05-22 (regime study, 134 trades 2015-2026):
+    # avg +0.071%/trade vs portfolio avg +0.204%. No regime where it clearly earns.
+    # Bear+calm: only n=3 (too small). Bear+fear: +0.256% (n=24, lower than alternatives).
+    # BOC policy historically lags Fed within 1 quarter — rate differential signal
+    # redundant with USDJPY and GBPUSD. Oil correlation adds noise without edge.
     # NZDUSD removed Oracle audit 2026-05-17: Sharpe 0.22 across 2015-2024, max DD -11%.
     # Lowest in universe, drag on portfolio avg. RBNZ policy too closely tracks RBA
     # (AUDUSD already captures the Oceania macro signal). Slot freed for future pair.
