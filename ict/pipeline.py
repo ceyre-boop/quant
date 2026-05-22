@@ -212,6 +212,22 @@ class ICTPipeline:
         except Exception:
             _bridge_thresholds = {}
 
+        # ── Intraday timing gate (Stage 0c) ──────────────────────────────
+        # Regime study 2026-05-22 (n=732 trades, 2015-2026):
+        # UTC 03:xx (London Open Kill Zone): WR=80%, avgR=+2.100
+        # UTC 04:xx (hour after):            WR=14%, avgR=-0.214
+        # UTC 02:xx and earlier:             WR<35%, noise-dominant
+        # All other hours pull portfolio WR and avgR downward.
+        # Only trade the first hour of London — that is where institutional
+        # order flow is cleanest and retail traps are freshest.
+        _hour_utc = timestamp.hour if hasattr(timestamp, "hour") else 0
+        if _hour_utc != 3:
+            return ICTVeto(symbol=symbol, direction=direction, timestamp=timestamp,
+                           score=0.0, grade=ICTGrade.VETOED,
+                           reason=(f"TIMING_GATE: UTC {_hour_utc:02d}:xx — "
+                                   f"edge only at UTC 03:xx (WR=80%, avgR=+2.100); "
+                                   f"UTC 04:xx is anti-edge (WR=14%, avgR=-0.214)"))
+
         df    = self._normalise(df)
         price = float(df["Close"].iloc[-1])
 

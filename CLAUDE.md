@@ -216,13 +216,13 @@ ICT system:       LIVE — paper trading, launchd every 5min during London/NY PM
                   Prop firm: sovereign/propfirm/ engine built. Paper challenge #1 active.
                   Pipeline verdict: 🟢 GO — MC pass rate >70% confirmed
                   Dashboard: ceyre-boop.github.io/quant/ict/ (Oracle-driven, live)
-                  QUEUED: pd_alignment weight=0 test (anti-edge confirmed, HYP-024)
-Forex system:     LIVE — v008 paper scan, 6 pairs (USDCAD retired)
-                  v008 (2026-05-22): avg_sharpe=1.1955 | 6/6 pairs positive | +0.124 vs v007
-                  USDCAD retired: avg +0.071%/trade vs portfolio +0.204% — no regime where it earns
+                  LIVE: pd_alignment weight=0 (HYP-024 confirmed anti-edge, wired 2026-05-19)
+                  LIVE: Timing gate UTC 03:xx only (2026-05-22): WR=80% avgR=+2.100 vs UTC 04:xx WR=14%
+Forex system:     LIVE — v009 paper scan, 5 pairs (USDCAD + GBPJPY retired)
+                  v009 (2026-05-22): avg_sharpe=1.2864 | 5/5 pairs positive | +0.091 vs v008
+                  GBPJPY retired: Sharpe 0.741, avg +0.168% vs portfolio +0.243%; 2022/2024 negative
                   Per-pair config: GBPUSD 6d/2.0x → 1.523 | EURUSD 5d/1.25x → 1.441
-                    AUDUSD 5d/1.0x → 1.292 | AUDNZD 7d/1.25x → 1.172
-                    USDJPY 60d/1.25x → 1.004 | GBPJPY 5d/1.0x → 0.741
+                    AUDUSD 5d/1.0x → 1.292 | AUDNZD 7d/1.25x → 1.172 | USDJPY 60d/1.25x → 1.004
                   Signal decay detector: sovereign/research/signal_decay.py (monthly)
 Backtest speed:   148,193/sec (Numba JIT, 12 cores)
 XGBoost models:   Both specialists trained and live
@@ -235,7 +235,8 @@ Forex version tracker:
   v006: 1.0237 → 1.0547 (GBPUSD per-pair 6d hold, micro-edge sweep)
   v007: 1.0547 → 1.0713 (all-pair hold sweep: 5 pairs updated)
   v008: 1.0713 → 1.1955 (USDCAD retired, +0.124 — clears +0.05 gate by 2.5×)
-  Target: Sharpe > 1.5 (institutional grade) | Gap remaining: 0.305
+  v009: 1.1955 → 1.2864 (GBPJPY retired, +0.091 — clears +0.05 gate by 1.8×)
+  Target: Sharpe > 1.5 (institutional grade) | Gap remaining: 0.214
 
 Unified forensics (2026-05-18): sovereign/research/unified_forensics.py
   SHARED ROOT CAUSE: Both ICT and Forex fail from PREMATURE ENTRY

@@ -20,12 +20,17 @@ MAJOR_PAIRS: List[str] = [
 ]
 
 CROSSES: List[str] = [
-    'GBPJPY=X', 'AUDNZD=X',
+    'AUDNZD=X',
     # EURJPY removed: dual ECB+BOJ influence creates systematic signal conflicts.
     # CPI fades and calendar signals fight the carry trend → consistent loss.
-    # JPY exposure maintained via USDJPY and GBPJPY.
+    # JPY exposure maintained via USDJPY only.
     # EURGBP removed v004: ECB+BOE historically in lockstep — no consistent rate
     # divergence to capture. Sharpe -0.04 across v003+v004, profit factor 1.00.
+    # GBPJPY removed 2026-05-22 (regime study, 133 trades 2015-2026):
+    # avg +0.168%/trade vs portfolio avg +0.243%. Sharpe 0.741 vs portfolio 1.286.
+    # 2022: -0.207% (BOE crisis); 2024: -0.038% — two most recent years both negative.
+    # BOJ intervention risk compounds BOE volatility → dual-bank noise, no clean signal.
+    # Portfolio improved from 1.1955 → 1.2864 (+0.091) on retirement.
 ]
 
 ALL_PAIRS: List[str] = MAJOR_PAIRS + CROSSES
