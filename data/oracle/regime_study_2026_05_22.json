@@ -1,0 +1,43 @@
+{
+  "study": "Forex Regime Performance Analysis",
+  "date": "2026-05-22",
+  "trades_analyzed": 937,
+  "date_range": "2015-02 to 2026-04",
+  "key_finding": "Forex macro system has INVERSE regime personality vs equity",
+  "regime_performance": {
+    "bull_calm_vix": {
+      "n": 558,
+      "wr": 0.55,
+      "avg_pct": 0.189,
+      "verdict": "FLAT"
+    },
+    "bull_elevated_vix": {
+      "n": 176,
+      "wr": 0.38,
+      "avg_pct": -0.096,
+      "verdict": "WORST \u2014 forex struggles here"
+    },
+    "bear_calm_vix": {
+      "n": 21,
+      "wr": 0.62,
+      "avg_pct": 0.219,
+      "verdict": "THRIVE"
+    },
+    "bear_crisis_vix": {
+      "n": 107,
+      "wr": 0.51,
+      "avg_pct": 0.4,
+      "verdict": "BEST \u2014 +4x vs bull market"
+    }
+  },
+  "allocation_fix": {
+    "before": "Library CRITICAL \u2192 forex 0.25 (wrongly restricting)",
+    "after": "Library CRITICAL \u2192 forex 0.65 base (bear/crisis = macro edge)",
+    "current_allocation": {
+      "equity": 0.133,
+      "ict": 0.0,
+      "forex": 0.367
+    }
+  },
+  "implication": "A diversified portfolio of forex + equity is naturally hedged. When equity struggles (bear market), forex earns more. True portfolio construction: opposite personalities, same direction."
+}

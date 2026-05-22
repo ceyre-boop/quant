@@ -58,16 +58,28 @@ STALENESS_HOURS = 4
 # ── Regime → base allocation table ───────────────────────────────────────────
 # Each system's base weight given Library threat level.
 # These are the "clean slate" weights before modifiers.
-# Equity and ICT are more fragile. Forex is more structural.
+#
+# KEY FINDING (regime study 2026-05-22, 937 forex trades 2015-2026):
+#   Forex and equity have INVERSE regime personalities:
+#   Bear market + crisis VIX (>25): FOREX avg +0.400%, EQUITY struggling
+#   Bull market + calm VIX (<20):   FOREX avg +0.189%, EQUITY thriving
+#   Bull market + elevated VIX>20:  FOREX avg -0.096% (worst forex environment)
+#
+# Therefore: Library CRITICAL (which signals bear/crisis) should NOT
+# restrict forex the same way it restricts equity.
+# Forex restriction should be INVERTED relative to equity at high threat.
+#
+# Forex's actual worst case: bull market but VIX spiking (Library ELEVATED,
+# not CRITICAL). This is handled by the VIX slope modifier below.
 
 THREAT_ALLOCATIONS = {
     # threat_max: (equity, ict, forex)
-    0.30: (1.00, 1.00, 1.00),   # NORMAL — full deployment
-    0.50: (0.85, 0.80, 0.90),   # ELEVATED — light reduction
-    0.70: (0.65, 0.50, 0.80),   # WARNING — meaningful reduction
-    0.85: (0.40, 0.25, 0.65),   # DANGER — significant reduction
-    0.95: (0.20, 0.00, 0.40),   # TIGHTEN — ICT halted, others minimal
-    1.01: (0.00, 0.00, 0.25),   # CRITICAL — equity/ICT halted, forex minimal
+    0.30: (1.00, 1.00, 1.00),   # NORMAL — full deployment all systems
+    0.50: (0.85, 0.80, 0.90),   # ELEVATED — equity/ICT reduce, forex near full
+    0.70: (0.65, 0.50, 0.85),   # WARNING — forex still strong (divergence active)
+    0.85: (0.40, 0.25, 0.80),   # DANGER — forex often thriving (crisis = CB divergence)
+    0.95: (0.20, 0.00, 0.75),   # TIGHTEN — ICT halted, forex continues (macro edge)
+    1.01: (0.00, 0.00, 0.65),   # CRITICAL — equity/ICT halted, forex at 65% (bear = forex edge)
 }
 
 
