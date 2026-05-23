@@ -17,9 +17,17 @@ jobs:
       - uses: actions/checkout@v4
       - name: Build combined site
         run: |
-          mkdir -p _site/ict
+          mkdir -p _site/ict _site/data/agent _site/data/forensics
+          # Dashboard assets (css, js, data from legacy dashboard folder)
           cp -r dashboard/. _site/
+          # Override root with new multi-tab SPA
+          cp index.html _site/index.html
+          # ICT oracle assets from ict-dashboard, then override with new oracle
           cp -r ict-dashboard/. _site/ict/
+          cp ict/index.html _site/ict/index.html
+          # Copy committed data snapshots if present
+          cp data/agent/*.json _site/data/agent/ 2>/dev/null || true
+          cp data/forensics/cross_system_state.json _site/data/forensics/ 2>/dev/null || true
       - uses: actions/upload-pages-artifact@v3
         with:
           path: './_site'
