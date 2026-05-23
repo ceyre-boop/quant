@@ -47,13 +47,15 @@ logger = logging.getLogger(__name__)
 _DEFAULT_MIN_SCORE = 7.5
 _DEFAULT_WEIGHTS: Dict[str, float] = {
     "kill_zone":        2.0,
-    "sweep":            2.5,
-    "displacement":     2.0,
-    "fvg_tap":          2.0,
-    "market_structure": 1.5,
+    "sweep":            4.0,   # HYP-034 2026-05-23: ms zeroed, freed pts → sweep+1.5
+    "displacement":     1.0,
+    "fvg_tap":          3.0,   # HYP-034 2026-05-23: freed pts → fvg_tap+1.0
+    # HYP-034 confirmed anti-edge: ms>=1.5 → commitment failure 87.5% accuracy.
+    # BOS/CHOCH is lagging — by the time structure shifts, displacement is done.
+    # Zeroed 2026-05-23. Score still computed and logged for monitoring.
+    "market_structure": 0.0,
     # HYP-024 confirmed anti-edge: pd_alignment>0 → 20% WR, pd_alignment=0 → 35% WR.
-    # Zeroed 2026-05-19. Score still computed and logged for monitoring — weight=0
-    # means it no longer influences the entry decision.
+    # Zeroed 2026-05-19. Score still computed and logged for monitoring.
     "pd_alignment":     0.0,
 }
 
