@@ -300,6 +300,62 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
 /* misc */
 .link-btn{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border:1px solid var(--border);font-size:10px;color:var(--muted);text-decoration:none;letter-spacing:1px;transition:all .15s}
 .link-btn:hover{border-color:var(--green);color:var(--green)}
+
+/* ══════════════════════
+   TAB 5 — TRADES
+══════════════════════ */
+#trades-panel{padding:24px;max-width:1200px;margin:0 auto}
+.trades-toolbar{display:flex;gap:10px;align-items:center;margin-bottom:20px;flex-wrap:wrap}
+.trades-toolbar select,.trades-toolbar button{background:var(--bg2);border:1px solid var(--border);color:var(--muted);font-family:var(--font);font-size:10px;letter-spacing:1px;padding:6px 12px;cursor:pointer;text-transform:uppercase;transition:all .15s}
+.trades-toolbar button:hover,.trades-toolbar button.active{border-color:var(--green);color:var(--green)}
+.trades-toolbar select:focus{outline:none;border-color:var(--green)}
+.tv-status{display:flex;align-items:center;gap:8px;margin-left:auto;font-size:10px;letter-spacing:1px;color:var(--muted)}
+.tv-status-dot{width:7px;height:7px;border-radius:50%;background:var(--muted);flex-shrink:0}
+.tv-status-dot.live{background:var(--green);box-shadow:0 0 6px var(--green);animation:hb 1.5s infinite}
+#trades-chart-wrap{background:var(--bg2);border:1px solid var(--border);margin-bottom:20px;position:relative;height:340px}
+#trades-chart-wrap .chart-loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--muted);letter-spacing:1px}
+#trades-chart{width:100%;height:100%}
+.trades-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+@media(max-width:800px){.trades-grid{grid-template-columns:1fr}}
+.tg-card{background:var(--bg2);border:1px solid var(--border);padding:16px}
+.tg-card h3{font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin:0 0 12px}
+.open-pos-empty{font-size:11px;color:var(--muted);padding:8px 0}
+.open-pos-row{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--bg3);font-size:11px}
+.open-pos-row:last-child{border-bottom:none}
+.pos-dir{font-size:10px;font-weight:700;letter-spacing:1px;padding:2px 6px;border:1px solid}
+.pos-dir.long{color:var(--green);border-color:rgba(0,212,160,.3);background:rgba(0,212,160,.05)}
+.pos-dir.short{color:var(--red);border-color:rgba(255,77,106,.3);background:rgba(255,77,106,.05)}
+.pos-ticker{font-weight:600;color:var(--text);min-width:60px}
+.pos-entry{color:var(--muted)}
+.pos-tp{color:var(--green);font-size:10px}
+.pos-stop{color:var(--red);font-size:10px}
+.pos-meta{margin-left:auto;font-size:9px;color:var(--muted);letter-spacing:.5px}
+.summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.summ-cell{padding:10px 0}
+.summ-label{font-size:9px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-bottom:4px}
+.summ-val{font-size:22px;font-weight:700;letter-spacing:-0.5px}
+.summ-val.green{color:var(--green)}.summ-val.red{color:var(--red)}.summ-val.muted{color:var(--muted)}
+.trades-log-table{width:100%;border-collapse:collapse}
+.trades-log-table th{font-size:9px;letter-spacing:1.5px;color:var(--muted);text-align:left;padding:5px 10px;border-bottom:1px solid var(--border);text-transform:uppercase;white-space:nowrap}
+.trades-log-table td{padding:6px 10px;font-size:11px;border-bottom:1px solid var(--bg2);white-space:nowrap}
+.trades-log-table tr:hover td{background:rgba(255,255,255,.02)}
+.ev-type{font-weight:700;letter-spacing:.5px;font-size:10px}
+.ev-type.ENTRY{color:var(--blue,#4299e1)}
+.ev-type.TP1{color:var(--yellow,#f6c90e)}
+.ev-type.TP2{color:var(--green)}
+.ev-type.STOP,.ev-type.BE{color:var(--red)}
+.ev-type.SESSION_CLOSE{color:var(--muted)}
+.ev-type.TV_ALERT{color:#a78bfa}
+.ev-src{font-size:9px;letter-spacing:1px;color:var(--muted);text-transform:uppercase}
+.trades-offline{text-align:center;padding:40px 20px;color:var(--muted)}
+.trades-offline .off-title{font-size:13px;color:var(--text);margin-bottom:8px;letter-spacing:1px}
+.trades-offline .off-cmd{font-family:monospace;background:var(--bg2);border:1px solid var(--border);padding:4px 12px;font-size:11px;color:var(--green);margin:6px 0;display:inline-block}
+.trades-webhook-info{background:var(--bg2);border:1px solid var(--border);padding:16px;margin-top:16px}
+.trades-webhook-info h3{font-size:9px;letter-spacing:2px;color:var(--muted);margin:0 0 10px;text-transform:uppercase}
+.webhook-row{display:flex;align-items:center;gap:10px;font-size:11px;margin-bottom:6px}
+.webhook-url{font-family:monospace;background:var(--bg3);border:1px solid var(--border);padding:4px 10px;font-size:11px;color:var(--green);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.copy-btn{background:transparent;border:1px solid var(--border);color:var(--muted);font-size:9px;padding:4px 8px;cursor:pointer;letter-spacing:1px;font-family:var(--font);transition:all .15s;flex-shrink:0}
+.copy-btn:hover{border-color:var(--green);color:var(--green)}
 </style>
 </head>
 <body>
@@ -313,6 +369,7 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
     <div class="hdr-tab active" data-tab="trade">Trade</div>
     <div class="hdr-tab live-tab" data-tab="signals">Signals<div class="tab-dot"></div></div>
     <div class="hdr-tab" data-tab="research">Research</div>
+    <div class="hdr-tab" data-tab="trades">Trades<div class="tab-dot" id="trades-dot" style="display:none"></div></div>
     <div class="hdr-tab" data-tab="chat">Chat</div>
   </div>
   <div class="hdr-right">
@@ -598,6 +655,77 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
     </div>
   </div>
 
+  <!-- ══ TAB 5: TRADES ══ -->
+  <div class="tab-panel" id="tab-trades">
+    <div id="trades-panel">
+      <div class="trades-toolbar">
+        <button id="tr-btn-all" class="active" onclick="trFilter('all')">ALL</button>
+        <button id="tr-btn-ict" onclick="trFilter('ICT')">ICT</button>
+        <button id="tr-btn-forex" onclick="trFilter('FOREX')">FOREX</button>
+        <button id="tr-btn-tv" onclick="trFilter('TRADINGVIEW')">TRADINGVIEW</button>
+        <button onclick="trLoad()">↻ REFRESH</button>
+        <div class="tv-status" id="tr-status">
+          <div class="tv-status-dot" id="tr-dot"></div>
+          <span id="tr-status-text">CHECKING…</span>
+        </div>
+      </div>
+
+      <div id="trades-chart-wrap">
+        <div class="chart-loading" id="tr-chart-loading">Waiting for live data…</div>
+        <div id="trades-chart"></div>
+      </div>
+
+      <div class="trades-grid">
+        <div class="tg-card">
+          <h3>Open Positions</h3>
+          <div id="tr-open-positions"><div class="open-pos-empty">No open positions</div></div>
+        </div>
+        <div class="tg-card">
+          <h3>Session Summary</h3>
+          <div class="summary-grid">
+            <div class="summ-cell"><div class="summ-label">Closed</div><div class="summ-val muted" id="tr-s-closed">—</div></div>
+            <div class="summ-cell"><div class="summ-label">Win Rate</div><div class="summ-val muted" id="tr-s-wr">—</div></div>
+            <div class="summ-cell"><div class="summ-label">Total R</div><div class="summ-val muted" id="tr-s-r">—</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="trades-webhook-info">
+        <h3>TradingView Webhook</h3>
+        <div class="webhook-row">
+          <span style="font-size:10px;color:var(--muted);min-width:80px">LOCAL URL</span>
+          <div class="webhook-url" id="tv-local-url">http://localhost:8765/webhook/tradingview</div>
+          <button class="copy-btn" onclick="copyUrl('tv-local-url')">COPY</button>
+        </div>
+        <div class="webhook-row">
+          <span style="font-size:10px;color:var(--muted);min-width:80px">PUBLIC URL</span>
+          <div class="webhook-url" id="tv-public-url" style="color:var(--muted)">Run: bash scripts/start_tunnel.sh</div>
+          <button class="copy-btn" onclick="copyUrl('tv-public-url')">COPY</button>
+        </div>
+        <div style="margin-top:10px;font-size:10px;color:var(--muted);line-height:1.7">
+          Alert message JSON: <code style="color:var(--green)">{&quot;action&quot;:&quot;{{strategy.order.action}}&quot;,&quot;ticker&quot;:&quot;{{ticker}}&quot;,&quot;price&quot;:{{close}},&quot;strategy&quot;:&quot;{{strategy.title}}&quot;}</code>
+        </div>
+      </div>
+
+      <div id="tr-log-wrap" style="margin-top:20px">
+        <div id="tr-offline" class="trades-offline" style="display:none">
+          <div class="off-title">Server offline</div>
+          <div style="font-size:11px;margin-bottom:12px">Start the signals server to see live trades</div>
+          <div class="off-cmd">python3 scripts/live_signals_server.py</div>
+        </div>
+        <div id="tr-table-wrap">
+          <table class="trades-log-table">
+            <thead><tr>
+              <th>Time (UTC)</th><th>Type</th><th>Source</th>
+              <th>Ticker</th><th>Dir</th><th>Price</th><th>R</th><th>Grade</th><th>Session</th>
+            </tr></thead>
+            <tbody id="tr-tbody"><tr><td colspan="9" style="color:var(--muted);text-align:center;padding:20px">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div><!-- #tabs -->
 
 <script>
@@ -622,6 +750,7 @@ document.querySelectorAll('.hdr-tab').forEach(btn=>{
       tabInited[id]=true;
       if(id==='tab-research')resLoad();
       if(id==='tab-signals'){sigInit();sigRefresh();}
+      if(id==='tab-trades')trLoad();
     }
   });
 });
@@ -986,6 +1115,176 @@ document.getElementById('chat-input').addEventListener('input',function(){
   this.style.height='auto';
   this.style.height=Math.min(this.scrollHeight,120)+'px';
 });
+
+// ══ TAB 5: TRADES ══
+let trEvents=[];
+let trSource='all';
+let trChart=null;
+let trChartSeries=null;
+let trChartMarkers=[];
+
+function trFilter(src){
+  trSource=src;
+  document.querySelectorAll('.trades-toolbar button').forEach(b=>b.classList.remove('active'));
+  const btn=document.getElementById('tr-btn-'+(src==='all'?'all':src.toLowerCase()));
+  if(btn)btn.classList.add('active');
+  trRender(trEvents);
+}
+
+async function trLoad(){
+  const dot=document.getElementById('tr-dot');
+  const statusText=document.getElementById('tr-status-text');
+  try{
+    const r=await fetch('http://localhost:8765/trades?n=200',{signal:AbortSignal.timeout(4000)});
+    const d=await r.json();
+    dot.className='tv-status-dot live';
+    statusText.textContent='SERVER LIVE · '+d.count+' EVENTS';
+    document.getElementById('tr-offline').style.display='none';
+    document.getElementById('tr-table-wrap').style.display='';
+    document.getElementById('trades-dot').style.display='block';
+    trEvents=d.events||[];
+    trRenderOpen(d.open_positions||[]);
+    trRenderSummary(trEvents);
+    trRender(trEvents);
+    trBuildChart(trEvents);
+  }catch{
+    dot.className='tv-status-dot';
+    statusText.textContent='SERVER OFFLINE';
+    document.getElementById('tr-offline').style.display='';
+    document.getElementById('tr-table-wrap').style.display='none';
+    document.getElementById('tr-tbody').innerHTML='<tr><td colspan="9" style="color:var(--muted);text-align:center;padding:20px">Start live_signals_server.py to see events</td></tr>';
+  }
+}
+
+function trRender(events){
+  const src=trSource;
+  const filtered=src==='all'?events:events.filter(e=>e.source===src);
+  const tbody=document.getElementById('tr-tbody');
+  if(!filtered.length){
+    tbody.innerHTML='<tr><td colspan="9" style="color:var(--muted);text-align:center;padding:20px">No events</td></tr>';
+    return;
+  }
+  const TYPE_COL={ENTRY:'color:var(--blue,#4299e1)',TP1:'color:var(--yellow,#f6c90e)',
+    TP2:'color:var(--green)',STOP:'color:var(--red)',BE:'color:var(--red)',
+    SESSION_CLOSE:'color:var(--muted)',TV_ALERT:'color:#a78bfa',EXIT:'color:var(--muted)'};
+  tbody.innerHTML=[...filtered].reverse().map(e=>{
+    const tc=TYPE_COL[e.type]||'';
+    const dir=e.direction==='LONG'?`<span style="color:var(--green)">${e.direction}</span>`
+      :e.direction==='SHORT'?`<span style="color:var(--red)">${e.direction}</span>`
+      :`<span style="color:var(--muted)">${e.direction}</span>`;
+    const r=e.r_value!=null
+      ?(parseFloat(e.r_value)>0?`<span style="color:var(--green)">${(+e.r_value).toFixed(2)}R</span>`
+        :`<span style="color:var(--red)">${(+e.r_value).toFixed(2)}R</span>`)
+      :'—';
+    const ts=e.ts?e.ts.slice(5,16).replace('T',' '):'—';
+    const price=e.price?parseFloat(e.price).toPrecision(6):'—';
+    return `<tr>
+      <td style="color:var(--muted)">${ts}</td>
+      <td><span style="${tc};font-weight:700;font-size:10px;letter-spacing:.5px">${e.type}</span></td>
+      <td style="font-size:9px;color:var(--muted);letter-spacing:1px">${e.source||'—'}</td>
+      <td style="font-weight:600">${e.ticker||'—'}</td>
+      <td>${dir}</td>
+      <td style="font-family:monospace">${price}</td>
+      <td>${r}</td>
+      <td style="color:var(--muted);font-size:10px">${e.grade||'—'}</td>
+      <td style="color:var(--muted);font-size:10px">${e.session||'—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+function trRenderOpen(positions){
+  const el=document.getElementById('tr-open-positions');
+  if(!positions.length){el.innerHTML='<div class="open-pos-empty">No open positions</div>';return;}
+  el.innerHTML=positions.map(p=>{
+    const m=p.meta||{};
+    const dirCls=p.direction==='LONG'?'long':'short';
+    const ts=p.ts?p.ts.slice(5,16).replace('T',' '):'';
+    return `<div class="open-pos-row">
+      <span class="pos-dir ${dirCls}">${p.direction}</span>
+      <span class="pos-ticker">${p.ticker}</span>
+      <span class="pos-entry">@ ${parseFloat(p.price).toPrecision(6)}</span>
+      ${m.stop?`<span class="pos-stop">SL ${parseFloat(m.stop).toPrecision(5)}</span>`:''}
+      ${m.tp1?`<span class="pos-tp">TP1 ${parseFloat(m.tp1).toPrecision(5)}</span>`:''}
+      ${m.tp2?`<span class="pos-tp">TP2 ${parseFloat(m.tp2).toPrecision(5)}</span>`:''}
+      <span class="pos-meta">${p.source} · ${ts}</span>
+    </div>`;
+  }).join('');
+}
+
+function trRenderSummary(events){
+  const closes=events.filter(e=>['TP1','TP2','STOP','BE','SESSION_CLOSE','EXIT'].includes(e.type)&&e.r_value!=null);
+  const closed=document.getElementById('tr-s-closed');
+  const wr=document.getElementById('tr-s-wr');
+  const totalR=document.getElementById('tr-s-r');
+  if(!closes.length){closed.textContent='0';wr.textContent='—';totalR.textContent='—';return;}
+  const wins=closes.filter(e=>parseFloat(e.r_value)>0);
+  const winRate=wins.length/closes.length;
+  const sumR=closes.reduce((a,e)=>a+parseFloat(e.r_value),0);
+  closed.className='summ-val muted';
+  closed.textContent=closes.length;
+  wr.className='summ-val '+(winRate>=0.4?'green':winRate>=0.3?'':'red');
+  wr.textContent=(winRate*100).toFixed(0)+'%';
+  totalR.className='summ-val '+(sumR>0?'green':'red');
+  totalR.textContent=(sumR>=0?'+':'')+sumR.toFixed(2)+'R';
+}
+
+function trBuildChart(events){
+  const wrap=document.getElementById('trades-chart');
+  const loading=document.getElementById('tr-chart-loading');
+  // Collect entry/exit markers for display
+  const entries=events.filter(e=>e.type==='ENTRY');
+  const closes=events.filter(e=>['TP1','TP2','STOP','BE','SESSION_CLOSE'].includes(e.type));
+  if(!entries.length&&!closes.length){
+    loading.textContent='No trade events yet — entries will appear here';
+    return;
+  }
+  loading.style.display='none';
+  // Build a simple marker table using pure HTML/CSS (no LW charts needed for markers-only view)
+  const allEvents=[...entries,...closes].sort((a,b)=>a.ts>b.ts?1:-1);
+  const minPrice=Math.min(...allEvents.map(e=>parseFloat(e.price)||Infinity));
+  const maxPrice=Math.max(...allEvents.map(e=>parseFloat(e.price)||0));
+  const priceRange=maxPrice-minPrice||1;
+  const w=wrap.offsetWidth||800;
+  const h=320;
+  const PAD=40;
+  const tMin=new Date(allEvents[0].ts).getTime();
+  const tMax=new Date(allEvents[allEvents.length-1].ts).getTime()||tMin+1;
+  const tRange=tMax-tMin||1;
+  const markerColour={ENTRY:'#4299e1',TP1:'#f6c90e',TP2:'#00d4a0',STOP:'#ff4d6a',BE:'#ff4d6a',SESSION_CLOSE:'#666',TV_ALERT:'#a78bfa'};
+  const labels=allEvents.map(e=>{
+    const x=PAD+((new Date(e.ts).getTime()-tMin)/tRange)*(w-PAD*2);
+    const y=PAD+((maxPrice-parseFloat(e.price))/(priceRange))*(h-PAD*2);
+    const col=markerColour[e.type]||'#888';
+    const sym=e.type==='ENTRY'?(e.direction==='LONG'?'▲':'▼'):(e.type==='TP2'?'★':e.type==='STOP'?'✕':'●');
+    return `<div style="position:absolute;left:${x}px;top:${y}px;transform:translate(-50%,-50%);
+      color:${col};font-size:14px;cursor:default;text-shadow:0 0 4px ${col}88"
+      title="${e.type} ${e.ticker} ${parseFloat(e.price).toPrecision(5)} @ ${e.ts.slice(0,16)}">${sym}</div>`;
+  }).join('');
+  // Price axis labels
+  const axis=Array.from({length:4},(_, i)=>{
+    const pVal=(maxPrice-(priceRange*i/3)).toPrecision(5);
+    const y=PAD+(i/3)*(h-PAD*2);
+    return `<div style="position:absolute;right:4px;top:${y}px;transform:translateY(-50%);font-size:9px;color:var(--muted)">${pVal}</div>`;
+  }).join('');
+  wrap.style.cssText='position:relative;height:'+h+'px;background:var(--bg2);border:1px solid var(--border);overflow:hidden';
+  wrap.innerHTML=`<div style="position:absolute;inset:0">${labels}${axis}</div>
+    <div style="position:absolute;bottom:8px;left:${PAD}px;font-size:9px;color:var(--muted);letter-spacing:1px">${allEvents[0].ts.slice(0,10)}</div>
+    <div style="position:absolute;bottom:8px;right:${PAD}px;font-size:9px;color:var(--muted);letter-spacing:1px">${allEvents[allEvents.length-1].ts.slice(0,10)}</div>
+    <div style="position:absolute;top:8px;left:${PAD}px;font-size:9px;color:var(--muted);letter-spacing:1px">TRADE MARKERS — ${allEvents.length} EVENTS</div>`;
+}
+
+function copyUrl(id){
+  const txt=document.getElementById(id).textContent;
+  navigator.clipboard.writeText(txt).then(()=>{
+    const btn=document.querySelector(`[onclick="copyUrl('${id}')"]`);
+    if(btn){const orig=btn.textContent;btn.textContent='✓';setTimeout(()=>btn.textContent=orig,1500);}
+  });
+}
+
+// Poll trades every 30s when tab is active
+setInterval(()=>{
+  if(document.getElementById('tab-trades').classList.contains('active'))trLoad();
+},30000);
 </script>
 </body>
 </html>
