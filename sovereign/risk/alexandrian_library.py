@@ -661,6 +661,66 @@ class AlexandrianLibrary:
 
     # ── Convenience interface ─────────────────────────────────────────────── #
 
+    def get_feature_weights(
+        self,
+        spy_prices: np.ndarray,
+        vix_prices: Optional[np.ndarray] = None,
+        gold_prices: Optional[np.ndarray] = None,
+        hy_spread: Optional[np.ndarray] = None,
+        dxy_prices: Optional[np.ndarray] = None,
+        top_n: int = 3,
+    ) -> List[Dict[str, object]]:
+        """
+        Return the features that drive the current library read.
+
+        For each of the top_n most similar patterns, computes the per-feature
+        contribution to the cosine similarity: contribution_i = current_i * match_i.
+        Returns a ranked list of features by average contribution across top matches,
+        so you can see WHAT the library is pattern-matching on right now.
+
+        RQ-009: live decomposition — "why is the library reading CRITICAL?"
+
+        Example return:
+          [
+            {"feature": "consecutive_down_weeks", "contribution": 0.182, "rank": 1},
+            {"feature": "realized_vol_90d",       "contribution": 0.143, "rank": 2},
+            ...
+          ]
+        """
+        if not self._patterns:
+            return []
+        current_feats = extract_features(spy_prices, vix_prices, gold_prices, hy_spread, dxy_prices)
+        if current_feats is None:
+            return []
+
+        # Score all patterns, take top_n
+        scored = sorted(
+            [(pat, float(_cosine_similarity(current_feats, np.array(pat.features))))
+             for pat in self._patterns if len(pat.features) == N_FEATURES],
+            key=lambda x: x[1], reverse=True
+        )[:top_n]
+
+        if not scored:
+            return []
+
+        # Per-feature contribution: element-wise product of current and match vectors
+        contrib_sum = np.zeros(N_FEATURES)
+        for pat, _ in scored:
+            match_vec = np.array(pat.features)
+            contrib_sum += current_feats * match_vec
+
+        contrib_avg = contrib_sum / len(scored)
+
+        ranked = sorted(
+            [{"feature": FEATURE_NAMES[i], "contribution": round(float(contrib_avg[i]), 4), "rank": 0}
+             for i in range(N_FEATURES)],
+            key=lambda x: x["contribution"], reverse=True
+        )
+        for i, item in enumerate(ranked):
+            item["rank"] = i + 1
+
+        return ranked
+
     def get_size_modifier(self, spy_prices: np.ndarray,
                            vix_prices: Optional[np.ndarray] = None, **kwargs) -> Tuple[float, str]:
         """Single-call orchestrator interface: (size_multiplier, advisory)."""
