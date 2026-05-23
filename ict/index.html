@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SOVEREIGN // ICT Oracle</title>
+<style>
+:root {
+  --bg:     #0a0a0a;
+  --bg2:    #111111;
+  --bg3:    #181818;
+  --border: #1e1e1e;
+  --text:   #d0d0d0;
+  --muted:  #484848;
+  --dim:    #2a2a2a;
+  --green:  #00c896;
+  --yellow: #f5c518;
+  --red:    #e05252;
+  --blue:   #4a9eff;
+  --orange: #f4923a;
+  --accent: #00c896;
+  --font:   'SF Mono','Fira Code','Courier New',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13px;line-height:1.6;min-height:100vh;display:flex;flex-direction:column}
+
+/* ── HEADER ── */
+#header{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;height:48px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.hdr-left{display:flex;align-items:center;gap:20px}
+.logo{color:var(--accent);font-size:14px;font-weight:700;letter-spacing:3px}
+.logo-slash{color:var(--muted)}
+.sub{color:var(--muted);font-size:11px;letter-spacing:1px}
+.hdr-nav a{color:var(--muted);font-size:11px;text-decoration:none;letter-spacing:1px;padding:4px 10px;border:1px solid transparent;transition:all .15s}
+.hdr-nav a:hover{color:var(--green);border-color:var(--border)}
+.hdr-right{display:flex;align-items:center;gap:14px}
+#health-pill{display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none}
+#health-dot{width:8px;height:8px;border-radius:50%;background:var(--green)}
+#health-dot.yellow{background:var(--yellow)}
+#health-dot.red{background:var(--red);animation:pulse-dot 1s infinite}
+#health-summary{font-size:11px;color:var(--muted)}
+#health-detail{display:none;position:absolute;top:48px;right:24px;background:var(--bg2);border:1px solid var(--border);padding:12px 16px;min-width:420px;z-index:200}
+#health-detail.open{display:block}
+.hd-row{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--border);font-size:11px}
+.hd-row:last-child{border:none}
+.hd-name{color:var(--muted)}.hd-val{color:var(--text);text-align:right;max-width:280px}
+.hd-green{color:var(--green)}.hd-yellow{color:var(--yellow)}.hd-red{color:var(--red)}
+#last-refresh{font-size:10px;color:var(--muted)}
+#reload-btn{font-family:var(--font);font-size:11px;background:none;border:1px solid var(--border);color:var(--muted);padding:4px 10px;cursor:pointer}
+#reload-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+/* ── BRIDGE ALERT BANNER ── */
+#bridge-banner{background:rgba(224,82,82,.08);border-bottom:2px solid var(--red);padding:7px 24px;display:flex;align-items:center;gap:16px;font-size:11px}
+#bridge-banner.clear{display:none}
+.bb-icon{font-size:14px}
+.bb-mode{color:var(--red);font-weight:700;letter-spacing:1px}
+.bb-detail{color:var(--muted)}
+.bb-threat{margin-left:auto;display:flex;align-items:center;gap:8px}
+.bb-threat-bar-wrap{width:80px;height:4px;background:var(--dim);border-radius:2px}
+.bb-threat-bar{height:4px;border-radius:2px;background:var(--red);transition:width .5s}
+
+@keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ── MAIN LAYOUT ── */
+#main{padding:20px 24px;display:grid;grid-template-columns:1fr 340px;gap:16px;max-width:1400px;margin:0 auto;flex:1}
+
+/* ── ORACLE HERO ── */
+#oracle-hero{background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--accent);padding:20px 24px;animation:fadein .4s ease;margin-bottom:16px}
+.oracle-label{font-size:10px;color:var(--accent);letter-spacing:2px;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse-dot 2s infinite}
+#oracle-text{font-size:14px;color:var(--text);line-height:1.8;font-style:italic}
+#oracle-meta{margin-top:12px;font-size:10px;color:var(--muted);display:flex;gap:16px}
+
+/* ── SYSTEM STATE CARDS ── */
+#state-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.state-card{background:var(--bg2);border:1px solid var(--border);padding:12px 14px}
+.state-card.alert{border-color:var(--red);background:rgba(224,82,82,.04)}
+.state-card.warn{border-color:var(--yellow);background:rgba(245,197,24,.04)}
+.state-card.ok{border-color:var(--green);background:rgba(0,200,150,.04)}
+.sc-label{font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px}
+.sc-value{font-size:18px;font-weight:700}
+.sc-sub{font-size:10px;color:var(--muted);margin-top:3px}
+
+/* ── ICT STATS ── */
+#ict-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.ict-stat{background:var(--bg2);border:1px solid var(--border);padding:12px 14px;display:flex;flex-direction:column;gap:4px}
+.ist-label{font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase}
+.ist-val{font-size:20px;font-weight:700;color:var(--accent)}
+.ist-sub{font-size:10px;color:var(--muted)}
+.ist-sub span{color:var(--text)}
+
+/* ── MESSAGE FEED ── */
+#feed{background:var(--bg2);border:1px solid var(--border);padding:16px}
+.feed-label{font-size:10px;color:var(--muted);letter-spacing:2px;margin-bottom:12px}
+.feed-item{padding:10px 0;border-bottom:1px solid var(--border);display:grid;grid-template-columns:24px 1fr;gap:10px;align-items:start}
+.feed-item:last-child{border:none;padding-bottom:0}
+.feed-item.unread{border-left:2px solid var(--accent);padding-left:8px;margin-left:-8px}
+.feed-emoji{font-size:13px;padding-top:1px}
+.feed-text{font-size:12px;color:var(--text);line-height:1.6}
+.feed-time{font-size:10px;color:var(--muted);margin-top:4px}
+
+/* ── SIDEBAR ── */
+#sidebar{display:flex;flex-direction:column;gap:14px}
+.panel{background:var(--bg2);border:1px solid var(--border);padding:16px}
+.panel-label{font-size:10px;color:var(--muted);letter-spacing:2px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+
+/* ── EDGE METRICS ── */
+.edge-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:11px}
+.edge-row:last-child{border:none}
+.edge-label{color:var(--muted)}
+.edge-val{font-weight:600}
+
+/* ── FOREX PAIRS ── */
+.pair-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);font-size:11px}
+.pair-row:last-child{border:none}
+.pair-name{color:var(--muted)}
+.pair-sharpe{font-weight:700;color:var(--accent)}
+.pair-badge{font-size:9px;color:var(--muted);border:1px solid var(--border);padding:1px 4px}
+
+/* ── GATES ── */
+.gate-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);font-size:11px}
+.gate-row:last-child{border:none}
+.gate-light{font-size:13px;flex-shrink:0}
+.gate-label{flex:1}
+.gate-sub{font-size:10px;color:var(--muted);display:block;margin-top:1px}
+
+/* ── SHARPE TRACKER ── */
+.sharpe-sub{font-size:10px;color:var(--muted);margin-bottom:10px}
+.sharpe-sub span{color:var(--accent)}
+.sv-row{display:flex;align-items:center;gap:8px;margin-bottom:5px;font-size:11px}
+.sv-label{width:48px;color:var(--muted);flex-shrink:0}
+.sv-track{flex:1;height:4px;background:var(--bg3);position:relative}
+.sv-fill{height:100%;background:var(--muted)}
+.sv-fill.current{background:var(--accent)}
+.sv-fill.inst{background:var(--green)}
+.sv-target{position:absolute;right:0;top:-3px;width:1px;height:10px;background:var(--yellow);opacity:.5}
+.sv-val{width:44px;text-align:right;color:var(--muted)}
+.sv-val.current{color:var(--accent)}
+.sv-star{color:var(--green);font-size:9px}
+
+/* ── SUGGESTIONS ── */
+.sug-item{padding:10px 0;border-bottom:1px solid var(--border)}
+.sug-item:last-child{border:none;padding-bottom:0}
+.sug-head{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.sug-id{font-size:10px;color:var(--muted)}
+.sug-cat{font-size:10px;color:var(--accent);border:1px solid var(--border);padding:1px 5px}
+.sug-title{font-size:12px;color:var(--text)}
+.sug-detail{font-size:11px;color:var(--muted);margin:4px 0 6px;line-height:1.5}
+.sug-cmd{font-size:10px;color:var(--dim);cursor:pointer;padding:2px 0}
+.sug-cmd:hover{color:var(--accent)}
+.pri-HIGH{color:var(--red)}.pri-MEDIUM{color:var(--yellow)}.pri-LOW{color:var(--accent)}
+
+/* ── BOTTOM BAR ── */
+#statsbar{background:var(--bg2);border-top:1px solid var(--border);padding:7px 24px;display:flex;gap:32px;font-size:10px;color:var(--muted);flex-shrink:0}
+#statsbar span{color:var(--text)}
+
+@media(max-width:900px){#main{grid-template-columns:1fr}#sidebar{order:-1}#state-cards{grid-template-columns:repeat(2,1fr)}#ict-stats{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+
+<div id="header">
+  <div class="hdr-left">
+    <div class="logo">SOVEREIGN <span class="logo-slash">//</span> ICT</div>
+    <div class="sub">Oracle Intelligence</div>
+    <div class="hdr-nav"><a href="../">← Dashboard</a></div>
+  </div>
+  <div class="hdr-right">
+    <div id="health-pill" onclick="toggleHealth()">
+      <div id="health-dot"></div>
+      <div id="health-summary">checking…</div>
+    </div>
+    <div id="last-refresh">—</div>
+    <button id="reload-btn" onclick="loadAll()">↻ RELOAD</button>
+  </div>
+</div>
+
+<div id="health-detail"><div id="health-rows"></div></div>
+
+<!-- Bridge alert — shown when HALT_NEW or TIGHTEN -->
+<div id="bridge-banner">
+  <div class="bb-icon">🔴</div>
+  <div>
+    <div class="bb-mode" id="bb-mode">ICT: HALT_NEW</div>
+    <div class="bb-detail" id="bb-detail">ASIAN_CURRENCY_CONTAGION — threat score 1.00 · no new entries until threat &lt; 0.85</div>
+  </div>
+  <div class="bb-threat">
+    <span style="font-size:10px;color:var(--muted)">THREAT</span>
+    <div class="bb-threat-bar-wrap"><div class="bb-threat-bar" id="bb-threat-bar" style="width:100%"></div></div>
+    <span style="font-size:11px;font-weight:700;color:var(--red)" id="bb-threat-val">1.00</span>
+  </div>
+</div>
+
+<div id="main">
+  <div>
+    <!-- State cards -->
+    <div id="state-cards">
+      <div class="state-card alert">
+        <div class="sc-label">Bridge Mode</div>
+        <div class="sc-value" style="color:var(--red);font-size:14px" id="sc-bridge">HALT_NEW</div>
+        <div class="sc-sub" id="sc-regime">ASIAN_CURRENCY_CONTAGION</div>
+      </div>
+      <div class="state-card alert">
+        <div class="sc-label">Threat Score</div>
+        <div class="sc-value" style="color:var(--red)" id="sc-threat">1.00</div>
+        <div class="sc-sub">CRITICAL · Lo 3: 0.50×</div>
+      </div>
+      <div class="state-card ok">
+        <div class="sc-label">London + Grade A</div>
+        <div class="sc-value" style="color:var(--accent)">2.093</div>
+        <div class="sc-sub">Sharpe proxy · WR 41%</div>
+      </div>
+      <div class="state-card ok">
+        <div class="sc-label">Prop Challenge</div>
+        <div class="sc-value" style="color:var(--accent);font-size:14px">ACTIVE</div>
+        <div class="sc-sub">Day 0 · $100k · 0/30 trades</div>
+      </div>
+    </div>
+
+    <!-- ICT performance stats -->
+    <div id="ict-stats">
+      <div class="ict-stat">
+        <div class="ist-label">Avg R (London A)</div>
+        <div class="ist-val">+0.840</div>
+        <div class="ist-sub">WR <span>41%</span> · Sharpe <span>2.093</span></div>
+      </div>
+      <div class="ict-stat">
+        <div class="ist-label">Timing Gate</div>
+        <div class="ist-val" style="font-size:14px">UTC 03:xx</div>
+        <div class="ist-sub">WR <span>80%</span> @ 03:xx vs <span style="color:var(--red)">14%</span> @ 04:xx</div>
+      </div>
+      <div class="ict-stat">
+        <div class="ist-label">MC Pass Rate</div>
+        <div class="ist-val">99.7%</div>
+        <div class="ist-sub">London A <span>100%</span> · London all <span>99.7%</span></div>
+      </div>
+    </div>
+
+    <!-- Oracle hero -->
+    <div id="oracle-hero">
+      <div class="oracle-label"><div class="live-dot"></div>ORACLE — LATEST INTELLIGENCE</div>
+      <div id="oracle-text">Loading…</div>
+      <div id="oracle-meta"></div>
+    </div>
+
+    <!-- Feed -->
+    <div id="feed">
+      <div class="feed-label">INTELLIGENCE FEED</div>
+      <div id="feed-items">Loading…</div>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <div id="sidebar">
+
+    <!-- Edge math -->
+    <div class="panel">
+      <div class="panel-label">ICT EDGE MATH</div>
+      <div class="edge-row"><span class="edge-label">TP2 (4.5R)</span><span class="edge-val" style="color:var(--green)">16.8%</span></div>
+      <div class="edge-row"><span class="edge-label">TP1 (1.5R)</span><span class="edge-val" style="color:var(--green)">13.0%</span></div>
+      <div class="edge-row"><span class="edge-label">Stop (-1.0R)</span><span class="edge-val" style="color:var(--red)">70.2%</span></div>
+      <div class="edge-row"><span class="edge-label">EV / trade</span><span class="edge-val" style="color:var(--green)">+0.40R</span></div>
+      <div class="edge-row"><span class="edge-label">pd_alignment weight</span><span class="edge-val">0.0 ✓</span></div>
+      <div class="edge-row"><span class="edge-label">Commitment gate</span><span class="edge-val" style="font-size:10px">mkt_struct ≥ 1.5</span></div>
+    </div>
+
+    <!-- Prop gates -->
+    <div class="panel">
+      <div class="panel-label">PROP CHALLENGE GATES</div>
+      <div class="gate-row"><div class="gate-light">🟢</div><div class="gate-label">G1 MC Pass Rate<span class="gate-sub">99.7–100% ✓ DONE</span></div></div>
+      <div class="gate-row"><div class="gate-light">🔴</div><div class="gate-label">G2 Live Trades<span class="gate-sub">0 / 30 collecting</span></div></div>
+      <div class="gate-row"><div class="gate-light">🟡</div><div class="gate-label">G3 WR Alignment<span class="gate-sub">collecting (need 10+)</span></div></div>
+      <div class="gate-row"><div class="gate-light">🔴</div><div class="gate-label">G4 Bridge Threat<span class="gate-sub">1.00 HALT_NEW</span></div></div>
+      <div class="gate-row"><div class="gate-light">🟡</div><div class="gate-label">G5 Non-Bust Days<span class="gate-sub">collecting</span></div></div>
+      <div style="margin-top:10px;padding:8px 10px;background:rgba(224,82,82,.06);border:1px solid var(--red);font-size:11px;color:var(--red)">
+        ⏸ WAIT — buy when G2 + G4 flip GREEN
+      </div>
+    </div>
+
+    <!-- Forex pairs -->
+    <div class="panel">
+      <div class="panel-label">FOREX v013 — INSTITUTIONAL GRADE ✓</div>
+      <div style="font-size:10px;color:var(--muted);margin-bottom:10px">avg Sharpe: <span style="color:var(--green);font-weight:700">1.8552</span> · next gate: 1.9052</div>
+      <div class="pair-row"><span class="pair-name">AUD/NZD</span><span class="pair-sharpe">2.246</span><span class="pair-badge">VIX&gt;13</span></div>
+      <div class="pair-row"><span class="pair-name">GBP/USD</span><span class="pair-sharpe">1.885</span><span class="pair-badge">VIX&gt;18</span></div>
+      <div class="pair-row"><span class="pair-name">USD/JPY</span><span class="pair-sharpe">1.770</span><span class="pair-badge">VIX&gt;15</span></div>
+      <div class="pair-row"><span class="pair-name">EUR/USD</span><span class="pair-sharpe">1.710</span><span class="pair-badge">VIX&gt;18</span></div>
+      <div class="pair-row"><span class="pair-name">AUD/USD</span><span class="pair-sharpe">1.665</span><span class="pair-badge">VIX&gt;20</span></div>
+    </div>
+
+    <!-- Sharpe tracker -->
+    <div class="panel">
+      <div class="panel-label">SHARPE PROGRESS</div>
+      <div class="sharpe-sub">Target <span>1.9052</span> · Achieved <span>1.8552</span> · Gap <span style="color:var(--yellow)">0.0500</span></div>
+      <div id="sharpe-rows"></div>
+    </div>
+
+    <!-- Suggestions -->
+    <div class="panel">
+      <div class="panel-label">ORACLE SUGGESTIONS</div>
+      <div id="sug-content">Loading…</div>
+    </div>
+
+  </div>
+</div>
+
+<div id="statsbar">
+  <div>ICT config: <span>London + Grade A · UTC 03:xx · 0.75% risk</span></div>
+  <div>Prop balance: <span>$100,000</span></div>
+  <div>Bridge: <span id="stat-bridge" style="color:var(--red)">HALT_NEW</span></div>
+  <div>Forex v013: <span style="color:var(--green)">1.8552 ★</span></div>
+</div>
+
+<script>
+const BASE = '../data/agent/';
+
+async function fetchJSON(path) {
+  try { const r = await fetch(path+'?t='+Date.now()); return r.ok?await r.json():null; } catch { return null; }
+}
+
+function timeAgo(iso) {
+  if (!iso) return '';
+  const d = (Date.now()-new Date(iso))/1000;
+  if (d<60) return Math.round(d)+'s ago';
+  if (d<3600) return Math.round(d/60)+'m ago';
+  return Math.round(d/3600)+'h ago';
+}
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function copy(t){ navigator.clipboard.writeText(t).catch(()=>{}); }
+
+// ── Health ──────────────────────────────────────────────────
+let healthOpen = false;
+function toggleHealth() {
+  healthOpen = !healthOpen;
+  document.getElementById('health-detail').classList.toggle('open', healthOpen);
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('#health-pill') && !e.target.closest('#health-detail')) {
+    healthOpen = false;
+    document.getElementById('health-detail').classList.remove('open');
+  }
+});
+
+function renderHealth(data) {
+  const dot = document.getElementById('health-dot');
+  const sumEl = document.getElementById('health-summary');
+  const rowsEl = document.getElementById('health-rows');
+  if (!data?.components) { sumEl.textContent='no data'; return; }
+  const comps = Object.entries(data.components);
+  const reds = comps.filter(([,v])=>v.status==='RED');
+  const yellows = comps.filter(([,v])=>v.status==='YELLOW');
+  const greens = comps.filter(([,v])=>v.status==='GREEN');
+  if (reds.length) {
+    dot.className='red'; sumEl.textContent=`${reds.length} DOWN`;
+    if (!healthOpen) { healthOpen=true; document.getElementById('health-detail').classList.add('open'); }
+  } else if (yellows.length) {
+    dot.className='yellow'; sumEl.textContent=`${yellows.length} degraded · ${greens.length} green`;
+  } else {
+    dot.className=''; sumEl.textContent=`All ${greens.length} systems green`;
+  }
+  const showAll = !reds.length && !yellows.length;
+  const toShow = showAll ? comps : [...reds,...yellows];
+  rowsEl.innerHTML = toShow.map(([name,v])=>{
+    const cls = v.status==='GREEN'?'hd-green':v.status==='YELLOW'?'hd-yellow':'hd-red';
+    const icon = v.status==='GREEN'?'●':v.status==='YELLOW'?'◐':'○';
+    return `<div class="hd-row"><div class="hd-name"><span class="${cls}">${icon}</span> ${name}</div>
+      <div class="hd-val ${cls}">${esc(v.detail||'')}</div></div>`;
+  }).join('') || `<div class="hd-row"><div class="hd-name" style="color:var(--green)">All systems nominal</div></div>`;
+}
+
+// ── Bridge banner ───────────────────────────────────────────
+function renderBridge(crossState) {
+  if (!crossState) return;
+  const mode = crossState.ict_mode || 'NORMAL';
+  const threat = crossState.library_threat_score ?? 0;
+  const regime = (crossState.library_primary_regime || '').replace(/_/g,' ');
+  const banner = document.getElementById('bridge-banner');
+  banner.className = (mode==='HALT_NEW'||mode==='TIGHTEN') ? '' : 'clear';
+  document.getElementById('bb-mode').textContent = 'ICT: '+mode;
+  document.getElementById('bb-mode').style.color = mode==='HALT_NEW'?'var(--red)':mode==='TIGHTEN'?'var(--yellow)':'var(--green)';
+  document.getElementById('bb-detail').textContent = regime+' — threat score '+threat.toFixed(2)+' · no new entries until threat < 0.85';
+  document.getElementById('bb-threat-bar').style.width = (threat*100)+'%';
+  document.getElementById('bb-threat-bar').style.background = threat>0.85?'var(--red)':threat>0.5?'var(--yellow)':'var(--green)';
+  document.getElementById('bb-threat-val').textContent = threat.toFixed(2);
+  document.getElementById('bb-threat-val').style.color = threat>0.85?'var(--red)':threat>0.5?'var(--yellow)':'var(--green)';
+  // state cards
+  document.getElementById('sc-bridge').textContent = mode;
+  document.getElementById('sc-bridge').style.color = mode==='HALT_NEW'?'var(--red)':mode==='TIGHTEN'?'var(--yellow)':'var(--green)';
+  document.getElementById('sc-regime').textContent = regime;
+  document.getElementById('sc-threat').textContent = threat.toFixed(2);
+  document.getElementById('sc-threat').style.color = threat>0.85?'var(--red)':threat>0.5?'var(--yellow)':'var(--green)';
+  document.getElementById('stat-bridge').textContent = mode;
+  document.getElementById('stat-bridge').style.color = mode==='HALT_NEW'?'var(--red)':mode==='TIGHTEN'?'var(--yellow)':'var(--green)';
+}
+
+// ── Oracle + Feed ───────────────────────────────────────────
+function renderOracle(msgs) {
+  const textEl = document.getElementById('oracle-text');
+  const metaEl = document.getElementById('oracle-meta');
+  const oracleMsgs = (msgs||[]).filter(m=>m.source==='oracle'&&!m.text?.includes('DRY RUN')&&!m.text?.includes('Oracle failed')).slice(-1);
+  if (!oracleMsgs.length) { textEl.textContent='Waiting for first Oracle cycle…'; metaEl.innerHTML=''; return; }
+  const latest = oracleMsgs[0];
+  textEl.textContent = latest.text||'';
+  metaEl.innerHTML = `<span>${latest.emoji||''} ${latest.priority||''}</span><span>${timeAgo(latest.timestamp)}</span>`;
+}
+
+function renderFeed(msgs) {
+  const el = document.getElementById('feed-items');
+  const all = (msgs||[]).filter(m=>!m.text?.includes('DRY RUN')).slice(-12).reverse();
+  const feed = all.filter(m=>m.source==='oracle').slice(1,8)
+    .concat(all.filter(m=>m.source!=='oracle').slice(0,3))
+    .sort((a,b)=>new Date(b.timestamp)-new Date(a.timestamp)).slice(0,8);
+  if (!feed.length) { el.innerHTML='<div style="color:var(--muted);font-size:11px">No messages yet.</div>'; return; }
+  el.innerHTML = feed.map(m=>`
+    <div class="feed-item ${!m.read?'unread':''}">
+      <div class="feed-emoji">${m.emoji||'○'}</div>
+      <div><div class="feed-text">${esc(m.text||'')}</div>
+      <div class="feed-time">${timeAgo(m.timestamp)}</div></div>
+    </div>`).join('');
+}
+
+// ── Suggestions ─────────────────────────────────────────────
+function renderSuggestions(data) {
+  const el = document.getElementById('sug-content');
+  const open = (data?.suggestions||[]).filter(s=>s.status==='NEW');
+  if (!open.length) {
+    el.innerHTML = `<div style="font-size:11px;color:var(--muted)">No open suggestions.</div>
+      <div style="font-size:10px;color:var(--muted);margin-top:6px">${data?.stats?.implemented||0} implemented · ${data?.stats?.vetoed||0} vetoed</div>`;
+    return;
+  }
+  const priIcon = {HIGH:'🔴',MEDIUM:'🟡',LOW:'🟢'};
+  el.innerHTML = open.map(s=>`
+    <div class="sug-item">
+      <div class="sug-head"><span class="pri-${s.priority}">${priIcon[s.priority]||'○'}</span>
+        <span class="sug-id">${s.id}</span><span class="sug-cat">${s.category}</span></div>
+      <div class="sug-title">${esc(s.title)}</div>
+      <div class="sug-detail">${esc(s.detail)}</div>
+      <div class="sug-cmd" onclick="copy('python3 scripts/suggestions.py --implement ${s.id}')">📋 implement ${s.id}</div>
+    </div>`).join('');
+}
+
+// ── Sharpe tracker ──────────────────────────────────────────
+function renderSharpe() {
+  const target = 1.9052;
+  const versions = [
+    {l:'v005',s:0.8843},{l:'v008',s:1.1955},{l:'v009',s:1.2864},
+    {l:'v010',s:1.4396},{l:'v011',s:1.6476},{l:'v012',s:1.7176},
+    {l:'v013',s:1.8552,current:true},
+  ];
+  const pct = v => Math.min(100,(v/target)*100).toFixed(0);
+  document.getElementById('sharpe-rows').innerHTML = versions.map(v=>`
+    <div class="sv-row">
+      <div class="sv-label" style="${v.current?'color:var(--accent)':''}">${v.l}</div>
+      <div class="sv-track">
+        <div class="sv-fill${v.current?' current':v.s>=1.5?' inst':''}" style="width:${pct(v.s)}%"></div>
+        <div class="sv-target"></div>
+      </div>
+      <div class="sv-val${v.current?' current':''}">
+        ${v.s.toFixed(4)}${v.s>=1.5?' <span class="sv-star">★</span>':''}
+      </div>
+    </div>`).join('');
+}
+
+// ── LOAD ALL ─────────────────────────────────────────────────
+async function loadAll() {
+  document.getElementById('last-refresh').textContent = 'refreshing…';
+  const [health, messages, hypotheses, suggestions, crossState] = await Promise.all([
+    fetchJSON(BASE+'health.json'),
+    fetchJSON(BASE+'messages_to_colin.json'),
+    fetchJSON(BASE+'hypothesis_ledger.json'),
+    fetchJSON(BASE+'suggestions.json'),
+    fetchJSON('../data/forensics/cross_system_state.json'),
+  ]);
+  const msgs = messages?.messages||[];
+  renderHealth(health);
+  if (crossState) renderBridge(crossState);
+  renderOracle(msgs);
+  renderFeed(msgs);
+  renderSuggestions(suggestions);
+  renderSharpe();
+  document.getElementById('last-refresh').textContent = 'updated '+new Date().toLocaleTimeString();
+}
+
+loadAll();
+setInterval(loadAll, 2*60*1000);
+</script>
+</body>
+</html>
