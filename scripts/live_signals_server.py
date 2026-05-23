@@ -13,6 +13,12 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 
 sys.path.insert(0, '.')
 
+try:
+    from sovereign.ledger.live_trade_log import LiveTradeLog as _LTL
+    _live_log = _LTL()
+except Exception:
+    _live_log = None
+
 PAIRS = [
     ('EURUSD=X', 'US', 'EU', 'EUR/USD'),
     ('GBPUSD=X', 'US', 'GB', 'GBP/USD'),
@@ -263,9 +269,24 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
 
     def do_GET(self):
-        if self.path.split('?')[0] in ('/', '/data'):
+        path = self.path.split('?')[0]
+        if path in ('/', '/data'):
             try:
                 self._send_json(200, build_payload())
+            except Exception:
+                self._send_json(500, {'error': traceback.format_exc()})
+        elif path == '/trades':
+            try:
+                from sovereign.ledger.live_trade_log import LiveTradeLog
+                import urllib.parse as _up
+                qs = dict(_up.parse_qsl(self.path.split('?')[1] if '?' in self.path else ''))
+                n = int(qs.get('n', 100))
+                events = LiveTradeLog.read(n)
+                self._send_json(200, {
+                    'events': events,
+                    'open_positions': LiveTradeLog.open_positions(),
+                    'count': len(events),
+                })
             except Exception:
                 self._send_json(500, {'error': traceback.format_exc()})
         else:
@@ -273,12 +294,58 @@ class Handler(BaseHTTPRequestHandler):
             self.end_headers()
 
     def do_POST(self):
-        if self.path == '/chat':
+        path = self.path.split('?')[0]
+        if path == '/chat':
             try:
                 length = int(self.headers.get('Content-Length', 0))
                 body = json.loads(self.rfile.read(length))
                 reply = _handle_chat(body.get('message', ''), body.get('context', ''))
                 self._send_json(200, {'reply': reply})
+            except Exception:
+                self._send_json(500, {'error': traceback.format_exc()})
+        elif path == '/webhook/tradingview':
+            # TradingView alert webhook receiver.
+            # Alert message JSON: {"action":"buy","ticker":"GBPUSD","price":1.2500,"strategy":"MySystem","comment":"entry"}
+            # or the TradingView default format with just a text body like "buy GBPUSD 1.2500"
+            try:
+                length = int(self.headers.get('Content-Length', 0))
+                raw = self.rfile.read(length)
+                # Try JSON first, fall back to plain-text parsing
+                try:
+                    body = json.loads(raw)
+                except Exception:
+                    text = raw.decode('utf-8', errors='replace').strip()
+                    parts = text.split()
+                    body = {
+                        'action': parts[0] if parts else 'alert',
+                        'ticker': parts[1] if len(parts) > 1 else 'UNKNOWN',
+                        'price': float(parts[2]) if len(parts) > 2 else 0.0,
+                        'strategy': 'pine_script',
+                        '_raw': text,
+                    }
+
+                action    = body.get('action', 'alert').lower()
+                ticker    = body.get('ticker', body.get('symbol', 'UNKNOWN')).upper()
+                price     = float(body.get('price', body.get('close', 0.0)))
+                strategy  = body.get('strategy', body.get('comment', 'tradingview'))
+
+                direction_map = {
+                    'buy': 'LONG', 'long': 'LONG', 'entry_long': 'LONG',
+                    'sell': 'SHORT', 'short': 'SHORT', 'entry_short': 'SHORT',
+                    'close': 'FLAT', 'exit': 'FLAT', 'close_long': 'FLAT', 'close_short': 'FLAT',
+                }
+                direction = direction_map.get(action, 'FLAT')
+                event_type = 'TV_ALERT' if direction == 'FLAT' else 'ENTRY'
+
+                if _live_log:
+                    event = _live_log.log(
+                        event_type, 'TRADINGVIEW', ticker, direction, price,
+                        meta={'strategy': strategy, 'action': action, 'raw': body}
+                    )
+                    print(f'[TV] {action} {ticker} @ {price} [{strategy}]')
+                    self._send_json(200, {'ok': True, 'logged': event})
+                else:
+                    self._send_json(503, {'ok': False, 'error': 'live_trade_log unavailable'})
             except Exception:
                 self._send_json(500, {'error': traceback.format_exc()})
         else:
