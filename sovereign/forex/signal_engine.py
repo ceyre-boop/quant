@@ -88,7 +88,7 @@ class ForexSignalEngine:
         # Tiered thresholds: JPY/cross pairs VIX>15, USD macro pairs VIX>20.
         _VIX_GATES = {
             'USDJPY=X': 15.0, 'AUDNZD=X': 15.0,
-            'EURUSD=X': 20.0, 'GBPUSD=X': 20.0, 'AUDUSD=X': 20.0,
+            'EURUSD=X': 18.0, 'GBPUSD=X': 18.0, 'AUDUSD=X': 20.0,
         }
         if pair in _VIX_GATES:
             sig_df = self._apply_vix_regime_gate(sig_df, close.index, _VIX_GATES[pair])

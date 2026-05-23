@@ -1,30 +1,30 @@
 {
-  "version": "v011",
-  "date": "2026-05-22",
-  "description": "Universal bull+VIX regime gate across all 5 pairs. Tiered thresholds: JPY/cross VIX>15, USD macro VIX>20.",
+  "version": "v012",
+  "date": "2026-05-23",
+  "description": "EUR/GBP VIX threshold refined 20\u219218. ECB-FED and BOE-FED signals break at VIX>18, not 20. AUDUSD stays at 20 (commodity-linked, more resilient).",
   "pairs": {
+    "GBPUSD=X": {
+      "sharpe": 1.885,
+      "n": 98,
+      "win_rate": 0.6,
+      "gate": "VIX>18"
+    },
     "USDJPY=X": {
       "sharpe": 1.77,
       "n": 70,
       "win_rate": 0.6,
       "gate": "VIX>15"
     },
+    "EURUSD=X": {
+      "sharpe": 1.71,
+      "n": 94,
+      "win_rate": 0.58,
+      "gate": "VIX>18"
+    },
     "AUDUSD=X": {
       "sharpe": 1.665,
       "n": 102,
       "win_rate": 0.51,
-      "gate": "VIX>20"
-    },
-    "GBPUSD=X": {
-      "sharpe": 1.662,
-      "n": 112,
-      "win_rate": 0.58,
-      "gate": "VIX>20"
-    },
-    "EURUSD=X": {
-      "sharpe": 1.583,
-      "n": 107,
-      "win_rate": 0.57,
       "gate": "VIX>20"
     },
     "AUDNZD=X": {
@@ -34,12 +34,8 @@
       "gate": "VIX>15"
     }
   },
-  "portfolio_avg_sharpe": 1.6476,
-  "prev_version": "v010",
-  "prev_sharpe": 1.4396,
-  "delta": 0.208,
-  "n_pairs": 5,
-  "institutional_grade": true,
-  "margin_above_target": 0.1476,
-  "finding": "Bull+VIX elevation is a universal structural failure mode for macro rate-differential signals across all pairs. Fear flows compete with rate signals. Tiered thresholds by pair sensitivity (JPY/cross more reactive, USD pairs more resilient). All pairs now above Sharpe 1.5 individually."
+  "portfolio_avg_sharpe": 1.7176,
+  "prev_version": "v011",
+  "prev_sharpe": 1.6476,
+  "delta": 0.07
 }

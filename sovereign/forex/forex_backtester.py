@@ -97,9 +97,9 @@ class ForexBacktester:
     PAIR_VIX_GATES: dict = {
         'USDJPY=X': 15.0,   # JPY safe-haven bids fight USD rate signal at any VIX elevation
         'AUDNZD=X': 15.0,   # pure cross — both risk currencies, cross-rate noise starts at 15
-        'EURUSD=X': 20.0,   # USD rate differential resilient until true fear (VIX>20)
-        'GBPUSD=X': 20.0,   # same
-        'AUDUSD=X': 20.0,   # same
+        'EURUSD=X': 18.0,   # ECB-FED rate diff survives mild fear, breaks at VIX>18
+        'GBPUSD=X': 18.0,   # BOE-FED rate diff same — confirmed optimal in full sweep
+        'AUDUSD=X': 20.0,   # RBA-FED commodity-linked, more resilient; needs true fear
     }
 
     def __init__(
