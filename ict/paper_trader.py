@@ -35,6 +35,20 @@ from typing import Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
+try:
+    from sovereign.ledger.live_trade_log import LiveTradeLog as _LTL
+    _ltl = _LTL()
+except Exception:
+    _ltl = None
+
+
+def _live_log(*args, **kw):
+    if _ltl:
+        try:
+            _ltl.log(*args, **kw)
+        except Exception:
+            pass
+
 STATE_PATH  = Path('data/ledger/ict_paper_trades.json')
 LOG_PATH    = Path('logs/ict_paper_trade_log.csv')
 ACCOUNT     = 10_000.0
@@ -150,6 +164,10 @@ class PaperTrader:
 
         self._state.setdefault('open', []).append(asdict(trade))
         self._save_state()
+        _live_log("ENTRY", "ICT", trade.pair, trade.direction, trade.entry,
+                  grade=trade.grade, session=trade.session,
+                  meta={"stop": trade.stop, "tp1": trade.tp1, "tp2": trade.tp2,
+                        "risk_dollars": trade.risk_dollars, "score": trade.score, "id": trade.id})
         logger.info("📂 OPENED: %s %s @ %s  stop=%s  TP1=%s  TP2=%s",
                     trade.pair, trade.direction, trade.entry,
                     trade.stop, trade.tp1, trade.tp2)
@@ -206,6 +224,9 @@ class PaperTrader:
                 t.closed     = True
                 t.close_time = datetime.now(timezone.utc).isoformat()
                 self._log_trade(t)
+                _live_log(t.outcome, "ICT", t.pair, t.direction, t.exit_price,
+                          r_value=t.pnl_r, grade=t.grade, session=t.session,
+                          meta={"entry": t.entry, "pnl_dollars": t.pnl_dollars, "id": t.id})
                 closed_this_cycle.append(t)
                 logger.info("🔴 CLOSED %s: %s  pnl=%.2fR ($%.2f)",
                             t.pair, t.outcome, t.pnl_r, t.pnl_dollars)
@@ -232,6 +253,9 @@ class PaperTrader:
                     t.closed      = True
                     t.close_time  = datetime.now(timezone.utc).isoformat()
                     self._log_trade(t)
+                    _live_log("TP2", "ICT", t.pair, t.direction, t.exit_price,
+                              r_value=t.pnl_r, grade=t.grade, session=t.session,
+                              meta={"entry": t.entry, "pnl_dollars": t.pnl_dollars, "id": t.id})
                     closed_this_cycle.append(t)
                     logger.info("🟢 CLOSED %s: TP2  pnl=%.2fR ($%.2f)",
                                 t.pair, t.pnl_r, t.pnl_dollars)
@@ -251,6 +275,9 @@ class PaperTrader:
                     t.partial_closed = True
                     t.stop_moved_be  = True
                     t.stop           = t.entry   # move stop to breakeven
+                    _live_log("TP1", "ICT", t.pair, t.direction, t.tp1,
+                              r_value=TP1_R, grade=t.grade, session=t.session,
+                              meta={"entry": t.entry, "running_to_tp2": t.tp2, "id": t.id})
                     logger.info("🟡 TP1 hit %s — stop moved to BE, running to TP2 @ %s",
                                 t.pair, t.tp2)
 
@@ -280,6 +307,9 @@ class PaperTrader:
             t.closed      = True
             t.close_time  = datetime.now(timezone.utc).isoformat()
             self._log_trade(t)
+            _live_log("SESSION_CLOSE", "ICT", t.pair, t.direction, t.exit_price,
+                      r_value=t.pnl_r, grade=t.grade, session=t.session,
+                      meta={"entry": t.entry, "outcome": t.outcome, "reason": reason, "id": t.id})
             closed.append(t)
             logger.info("⏱ SESSION CLOSE %s: %s  pnl=%.2fR", t.pair, t.outcome, t.pnl_r)
 
