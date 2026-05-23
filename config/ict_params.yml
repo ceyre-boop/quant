@@ -84,12 +84,17 @@ scoring:
   # B grade threshold (logged, not executed); below this = C (rejected)
   grade_b_threshold: 5.0
   # Component weights (must sum to 10.0)
+  # HYP-024 confirmed: pd_alignment anti-edge → 0.0 (wired 2026-05-19)
+  # HYP-034 confirmed: market_structure anti-edge → 0.0 (wired 2026-05-23)
+  # BOS/CHOCH is lagging — by the time structure shifts, displacement is done.
+  # Freed 3.5 pts redistributed: sweep+1.5, fvg_tap+1.0, displacement(kill_zone)+1.0
   weights:
-    kill_zone:    2.0   # timing is non-negotiable
-    sweep:        2.5   # institutional fuel — highest weight
-    fvg_tap:      2.0   # precision entry alignment
-    market_structure: 2.0  # BOS / CHOCH confirmation
-    pd_alignment: 1.5   # premium/discount zone alignment
+    kill_zone:        2.0   # timing is non-negotiable
+    sweep:            4.0   # institutional fuel — primary edge signal
+    fvg_tap:          3.0   # precision entry alignment
+    market_structure: 0.0   # HYP-034: anti-edge, logged only
+    pd_alignment:     0.0   # HYP-024: anti-edge, logged only
+    displacement:     1.0   # body-to-ATR quality gate
 
 pipeline:
   # Hard invariant: ATR spike veto (do not mutate automatically)
