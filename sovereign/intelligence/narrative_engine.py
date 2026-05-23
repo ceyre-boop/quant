@@ -139,10 +139,9 @@ class NarrativeEngine:
         cmd = [
             self.bridge_python,
             str(self.bridge_script),
-            symbol,
-            trade_date,
-            "--mode",
-            "fast",
+            "--symbol", symbol,
+            "--month", trade_date,
+            "--mode", "fast",
         ]
         try:
             completed = subprocess.run(
