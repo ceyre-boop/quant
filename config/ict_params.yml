@@ -8,20 +8,24 @@
 # Risk profile: high leverage, tight stops, selective session participation.
 
 session:
-  # Kill Zone windows in UTC hours (approximates ET DST).  Tune to broker data.
+  # Kill Zone windows in UTC hours.
+  # London Open Kill Zone: 03:00-06:00 AM ET = 07:00-10:00 UTC (EDT) / 08:00-11:00 UTC (EST)
+  # Using 07:00-10:00 UTC (EDT alignment, correct for May-Nov). In winter, actual open
+  # shifts 1h later but the 07:00 start still catches the pre-open institutional flow.
+  # Bug fix 2026-05-23: was incorrectly set to UTC 02:00-05:00 (= 10pm-1am ET, Asian session).
   kill_zones:
     London:
-      start_utc: "02:00"
-      end_utc:   "05:00"
-    NY_Open:
       start_utc: "07:00"
       end_utc:   "10:00"
-    NY_PM:
+    NY_Open:
       start_utc: "13:30"
-      end_utc:   "16:00"
+      end_utc:   "16:30"
+    NY_PM:
+      start_utc: "17:30"
+      end_utc:   "20:00"
     Asia:
-      start_utc: "20:00"
-      end_utc:   "23:59"
+      start_utc: "23:00"
+      end_utc:   "02:00"
   # Block entries during NY lunch consolidation
   ny_lunch_start_utc: "12:00"
   ny_lunch_end_utc:   "13:30"

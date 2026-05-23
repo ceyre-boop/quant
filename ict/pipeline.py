@@ -214,19 +214,29 @@ class ICTPipeline:
 
         # ── Intraday timing gate (Stage 0c) ──────────────────────────────
         # Regime study 2026-05-22 (n=732 trades, 2015-2026):
-        # UTC 03:xx (London Open Kill Zone): WR=80%, avgR=+2.100
-        # UTC 04:xx (hour after):            WR=14%, avgR=-0.214
-        # UTC 02:xx and earlier:             WR<35%, noise-dominant
-        # All other hours pull portfolio WR and avgR downward.
-        # Only trade the first hour of London — that is where institutional
-        # order flow is cleanest and retail traps are freshest.
-        _hour_utc = timestamp.hour if hasattr(timestamp, "hour") else 0
-        if _hour_utc != 3:
+        # ET 03:xx (London Open Kill Zone): WR=80%, avgR=+2.100
+        # ET 04:xx (hour after):            WR=14%, avgR=-0.214
+        # Only trade the first hour of London — institutional flow is
+        # cleanest and retail traps freshest in the 03:xx open window.
+        #
+        # NOTE: study timestamps were in ET (local machine time), not UTC.
+        # Bug fix 2026-05-23: original gate checked UTC hour=3 (= 11pm ET)
+        # which never fired during the scanner window (2-5am ET). Gate now
+        # checks ET hour=3 (3am ET = UTC 07:xx in EDT, UTC 08:xx in EST).
+        try:
+            import zoneinfo
+            _ts_et = timestamp.astimezone(zoneinfo.ZoneInfo("America/New_York"))
+            _hour_et = _ts_et.hour
+        except Exception:
+            # Fallback: assume EDT offset (UTC-4)
+            _utc_hour = getattr(timestamp, "hour", 0)
+            _hour_et = (_utc_hour - 4) % 24
+        if _hour_et != 3:
             return ICTVeto(symbol=symbol, direction=direction, timestamp=timestamp,
                            score=0.0, grade=ICTGrade.VETOED,
-                           reason=(f"TIMING_GATE: UTC {_hour_utc:02d}:xx — "
-                                   f"edge only at UTC 03:xx (WR=80%, avgR=+2.100); "
-                                   f"UTC 04:xx is anti-edge (WR=14%, avgR=-0.214)"))
+                           reason=(f"TIMING_GATE: ET {_hour_et:02d}:xx — "
+                                   f"edge only at ET 03:xx (WR=80%, avgR=+2.100); "
+                                   f"ET 04:xx is anti-edge (WR=14%, avgR=-0.214)"))
 
         df    = self._normalise(df)
         price = float(df["Close"].iloc[-1])
