@@ -1,42 +1,40 @@
 {
-  "version": "v009",
+  "version": "v010",
   "date": "2026-05-22",
-  "description": "GBPJPY retired (Sharpe 0.741, avg +0.168% vs portfolio +0.243%, 2022/2024 negative)",
+  "description": "USDJPY regime gate: suppress signals when SPY > 200SMA AND VIX > 15. Removes 50 trades (avg -0.132%, WR 37%) \u2014 bull+elevated/fear cluster where JPY safe-haven bids fight USD macro signal.",
   "pairs": {
+    "USDJPY=X": {
+      "sharpe": 1.77,
+      "n": 70,
+      "win_rate": 0.6,
+      "note": "gated \u2014 no trade when bull+VIX>15"
+    },
     "GBPUSD=X": {
       "sharpe": 1.523,
       "n": 131,
-      "win_rate": 0.58,
-      "profit_factor": 2.1
+      "win_rate": 0.58
     },
     "EURUSD=X": {
       "sharpe": 1.441,
       "n": 124,
-      "win_rate": 0.55,
-      "profit_factor": 1.89
+      "win_rate": 0.55
     },
     "AUDUSD=X": {
       "sharpe": 1.292,
       "n": 120,
-      "win_rate": 0.47,
-      "profit_factor": 1.65
+      "win_rate": 0.47
     },
     "AUDNZD=X": {
       "sharpe": 1.172,
       "n": 104,
-      "win_rate": 0.53,
-      "profit_factor": 1.72
-    },
-    "USDJPY=X": {
-      "sharpe": 1.004,
-      "n": 120,
-      "win_rate": 0.49,
-      "profit_factor": 1.54
+      "win_rate": 0.53
     }
   },
-  "portfolio_avg_sharpe": 1.2864,
-  "prev_version": "v008",
-  "prev_sharpe": 1.1955,
-  "delta": 0.0909,
-  "n_pairs": 5
+  "portfolio_avg_sharpe": 1.4396,
+  "prev_version": "v009",
+  "prev_sharpe": 1.2864,
+  "delta": 0.1532,
+  "n_pairs": 5,
+  "mechanism": "regime_gate_not_retirement",
+  "finding": "USDJPY has INVERSE regime personality in bull+elevated VIX \u2014 JPY safe-haven bids negate USD rate differential signal. Gate the cluster, keep the pair. Sharpest single improvement since v005."
 }

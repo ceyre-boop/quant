@@ -249,5 +249,26 @@
       "date": "2026-05-19",
       "action": "COMMITMENT_FAILUREs appear irreducible from available daily data. Accept ~40% entry failure rate as structural. Sizing modifiers (HYP-031, HYP-032) improve returns without gating."
     }
-  ]
+  ],
+  "hypotheses": [
+    {
+      "id": "HYP-027",
+      "name": "USDJPY regime gate: suppress signals in bull+elevated VIX",
+      "status": "CONFIRMED",
+      "date_confirmed": "2026-05-22",
+      "result": "Removing 50/120 trades (bull+VIX>15) raises USDJPY Sharpe 1.004\u21921.770. Portfolio 1.2864\u21921.4396 (+0.153). Largest single improvement since v005.",
+      "action": "DEPLOYED as v010 in forex_backtester.py USDJPY_VIX_GATE=15.0",
+      "mechanism": "In bull markets with VIX>15, JPY safe-haven bid fights USD macro signal. Regime mismatch. Filter the cluster, keep the pair."
+    },
+    {
+      "id": "HYP-028",
+      "name": "US10Y divergence from EUR/USD as size modifier (not standalone)",
+      "status": "PARTIAL \u2014 needs formal promotion test",
+      "date_formed": "2026-05-22",
+      "result": "Raw IC: 0.086 (below 0.15 gate). Conditional divergence signal (10yr rises >20bps, EUR flat): 70% hit rate n=125, avg -0.921% 15d forward. p<0.0001. Not promotable as standalone \u2014 test as size_mult boost layered on existing macro signal.",
+      "action": "QUEUED \u2014 backtest as EUR/USD size_mult=1.25x when divergence event AND macro already aligned",
+      "mechanism": "US10Y leads EUR/USD by 5-15 days. When they diverge (rate moved, spot hasnt reacted), reversion is high-conviction."
+    }
+  ],
+  "last_updated": "2026-05-23T00:22:46.360198"
 }
