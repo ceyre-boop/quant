@@ -79,8 +79,47 @@ class ForexSignalEngine:
         # Counter-momentum entries produce 3× better avgR (0.331 vs 0.107).
         # VIX slope [0,1) is best environment; >3 reduces follow-through.
         sig_df['size_mult'] = self._compute_size_multipliers(
-            close=close, signals=sig_df['signal'], prices_df=prices
+            close=close, signals=sig_df['signal'], prices_df=prices, pair=pair
         )
+
+        # ── Bull+VIX regime gate (v011, 2026-05-22) ──────────────────────
+        # Universal finding: macro rate differential signals degrade in bull market
+        # + elevated VIX as fear flows compete with rate signals.
+        # Tiered thresholds: JPY/cross pairs VIX>15, USD macro pairs VIX>20.
+        _VIX_GATES = {
+            'USDJPY=X': 15.0, 'AUDNZD=X': 15.0,
+            'EURUSD=X': 20.0, 'GBPUSD=X': 20.0, 'AUDUSD=X': 20.0,
+        }
+        if pair in _VIX_GATES:
+            sig_df = self._apply_vix_regime_gate(sig_df, close.index, _VIX_GATES[pair])
+
+        return sig_df
+
+    def _apply_vix_regime_gate(
+        self, sig_df: 'pd.DataFrame', date_index: 'pd.DatetimeIndex', vix_threshold: float
+    ) -> 'pd.DataFrame':
+        """Zero signals when SPY > 200 SMA AND VIX > vix_threshold."""
+        try:
+            import yfinance as yf
+            start = str(date_index[0].date())
+            end   = str(date_index[-1].date())
+            spy = yf.download('SPY', start=start, end=end, progress=False)
+            vix = yf.download('^VIX', start=start, end=end, progress=False)
+            for df_ in (spy, vix):
+                if hasattr(df_.columns, 'get_level_values'):
+                    df_.columns = df_.columns.get_level_values(0)
+                df_.index = pd.to_datetime(df_.index).tz_localize(None)
+            spy['sma200'] = spy['Close'].rolling(200).mean()
+            spy['is_bull'] = spy['Close'] > spy['sma200']
+            sig_df = sig_df.copy()
+            for date in sig_df[sig_df['signal'] != 0].index:
+                try:
+                    if bool(spy['is_bull'].asof(date)) and float(vix['Close'].asof(date)) > vix_threshold:
+                        sig_df.loc[date, 'signal'] = 0.0
+                except Exception:
+                    pass
+        except Exception:
+            pass
         return sig_df
 
     def _compute_size_multipliers(
@@ -88,6 +127,7 @@ class ForexSignalEngine:
         close: pd.Series,
         signals: pd.Series,
         prices_df: pd.DataFrame,
+        pair: str = '',
     ) -> pd.Series:
         """
         Size modifiers based on latent feature search (Session 3).
@@ -151,6 +191,42 @@ class ForexSignalEngine:
                     pass
 
             size_mult.loc[date] = round(mult, 4)
+
+        # ── HYP-028: US10Y divergence boost for EUR/USD (2026-05-22) ────────
+        # When US10Y rises >20bps in 10 days AND EUR/USD hasn't responded yet,
+        # the spot price historically follows: 70% hit rate n=125 p<0.0001.
+        # IC = 0.086 (below 0.15 standalone gate) → deploy as 1.25× size boost
+        # only when existing macro signal already aligned with rate move.
+        if pair == 'EURUSD=X':
+            try:
+                us10y_df = yf.download('^TNX', start=str(close.index[0].date()),
+                                       end=str(close.index[-1].date()), progress=False)
+                if hasattr(us10y_df.columns, 'get_level_values'):
+                    us10y_df.columns = us10y_df.columns.get_level_values(0)
+                us10y_df.index = pd.to_datetime(us10y_df.index).tz_localize(None)
+                for date in sig_fired:
+                    if signals.loc[date] == 0:
+                        continue
+                    try:
+                        rate_now = float(us10y_df['Close'].asof(date))
+                        rate_10d_ago = float(us10y_df['Close'].loc[:date].iloc[-11])
+                        eur_now  = float(close.loc[date])
+                        eur_10d  = float(close.loc[:date].iloc[-11])
+                        rate_chg_bps = (rate_now - rate_10d_ago) * 100
+                        eur_chg_pct  = (eur_now / eur_10d - 1) * 100
+                        # Signal long: rate fell (bullish EUR) but EUR didn't rise yet
+                        # Signal short: rate rose (bearish EUR) but EUR didn't fall yet
+                        sig_dir = int(signals.loc[date])
+                        is_divergence = (
+                            (sig_dir > 0 and rate_chg_bps < -20 and eur_chg_pct < 0.5) or
+                            (sig_dir < 0 and rate_chg_bps >  20 and eur_chg_pct > -0.5)
+                        )
+                        if is_divergence:
+                            size_mult.loc[date] = round(size_mult.loc[date] * 1.25, 4)
+                    except Exception:
+                        pass
+            except Exception:
+                pass
 
         # Apply forex allocation weight from regime engine (continuous dimmer)
         try:

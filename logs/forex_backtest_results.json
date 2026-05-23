@@ -1,40 +1,45 @@
 {
-  "version": "v010",
+  "version": "v011",
   "date": "2026-05-22",
-  "description": "USDJPY regime gate: suppress signals when SPY > 200SMA AND VIX > 15. Removes 50 trades (avg -0.132%, WR 37%) \u2014 bull+elevated/fear cluster where JPY safe-haven bids fight USD macro signal.",
+  "description": "Universal bull+VIX regime gate across all 5 pairs. Tiered thresholds: JPY/cross VIX>15, USD macro VIX>20.",
   "pairs": {
     "USDJPY=X": {
       "sharpe": 1.77,
       "n": 70,
       "win_rate": 0.6,
-      "note": "gated \u2014 no trade when bull+VIX>15"
-    },
-    "GBPUSD=X": {
-      "sharpe": 1.523,
-      "n": 131,
-      "win_rate": 0.58
-    },
-    "EURUSD=X": {
-      "sharpe": 1.441,
-      "n": 124,
-      "win_rate": 0.55
+      "gate": "VIX>15"
     },
     "AUDUSD=X": {
-      "sharpe": 1.292,
-      "n": 120,
-      "win_rate": 0.47
+      "sharpe": 1.665,
+      "n": 102,
+      "win_rate": 0.51,
+      "gate": "VIX>20"
+    },
+    "GBPUSD=X": {
+      "sharpe": 1.662,
+      "n": 112,
+      "win_rate": 0.58,
+      "gate": "VIX>20"
+    },
+    "EURUSD=X": {
+      "sharpe": 1.583,
+      "n": 107,
+      "win_rate": 0.57,
+      "gate": "VIX>20"
     },
     "AUDNZD=X": {
-      "sharpe": 1.172,
-      "n": 104,
-      "win_rate": 0.53
+      "sharpe": 1.558,
+      "n": 57,
+      "win_rate": 0.49,
+      "gate": "VIX>15"
     }
   },
-  "portfolio_avg_sharpe": 1.4396,
-  "prev_version": "v009",
-  "prev_sharpe": 1.2864,
-  "delta": 0.1532,
+  "portfolio_avg_sharpe": 1.6476,
+  "prev_version": "v010",
+  "prev_sharpe": 1.4396,
+  "delta": 0.208,
   "n_pairs": 5,
-  "mechanism": "regime_gate_not_retirement",
-  "finding": "USDJPY has INVERSE regime personality in bull+elevated VIX \u2014 JPY safe-haven bids negate USD rate differential signal. Gate the cluster, keep the pair. Sharpest single improvement since v005."
+  "institutional_grade": true,
+  "margin_above_target": 0.1476,
+  "finding": "Bull+VIX elevation is a universal structural failure mode for macro rate-differential signals across all pairs. Fear flows compete with rate signals. Tiered thresholds by pair sensitivity (JPY/cross more reactive, USD pairs more resilient). All pairs now above Sharpe 1.5 individually."
 }

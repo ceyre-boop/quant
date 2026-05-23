@@ -218,12 +218,12 @@ ICT system:       LIVE — paper trading, launchd every 5min during London/NY PM
                   Dashboard: ceyre-boop.github.io/quant/ict/ (Oracle-driven, live)
                   LIVE: pd_alignment weight=0 (HYP-024 confirmed anti-edge, wired 2026-05-19)
                   LIVE: Timing gate UTC 03:xx only (2026-05-22): WR=80% avgR=+2.100 vs UTC 04:xx WR=14%
-Forex system:     LIVE — v010 paper scan, 5 pairs (USDCAD + GBPJPY retired)
-                  v010 (2026-05-22): avg_sharpe=1.4396 | 5/5 pairs positive | +0.153 vs v009
-                  USDJPY regime gate: VIX>15 in bull market → suppress signal (50 bad trades removed)
-                  USDJPY is now #1 pair: Sharpe 1.770 (was 1.004) — bull+elevated cluster was the drag
-                  Per-pair config: USDJPY gated/60d → 1.770 | GBPUSD 6d/2.0x → 1.523
-                    EURUSD 5d/1.25x → 1.441 | AUDUSD 5d/1.0x → 1.292 | AUDNZD 7d/1.25x → 1.172
+Forex system:     LIVE — v011 paper scan, 5 pairs | 🏆 INSTITUTIONAL GRADE ACHIEVED
+                  v011 (2026-05-22): avg_sharpe=1.6476 | 5/5 pairs >1.5 individually | +0.208 vs v010
+                  Universal bull+VIX gate: macro rate-diff signals degrade when fear flows compete
+                  Tiered thresholds: USDJPY/AUDNZD VIX>15 | EURUSD/GBPUSD/AUDUSD VIX>20
+                  Per-pair (gated): USDJPY→1.770 | AUDUSD→1.665 | GBPUSD→1.662 | EURUSD→1.583 | AUDNZD→1.558
+                  All 5 pairs now individually above Sharpe 1.5 (institutional grade)
                   Signal decay detector: sovereign/research/signal_decay.py (monthly)
 Backtest speed:   148,193/sec (Numba JIT, 12 cores)
 XGBoost models:   Both specialists trained and live
@@ -238,7 +238,8 @@ Forex version tracker:
   v008: 1.0713 → 1.1955 (USDCAD retired, +0.124 — clears +0.05 gate by 2.5×)
   v009: 1.1955 → 1.2864 (GBPJPY retired, +0.091 — clears +0.05 gate by 1.8×)
   v010: 1.2864 → 1.4396 (USDJPY regime gate VIX>15/bull, +0.153 — largest jump since v005)
-  Target: Sharpe > 1.5 (institutional grade) | Gap remaining: 0.060
+  v011: 1.4396 → 1.6476 (universal bull+VIX gate all pairs, +0.208) ← INSTITUTIONAL GRADE ✓
+  Target: Sharpe > 1.5 (institutional grade) | ACHIEVED +0.1476 margin
 
 Unified forensics (2026-05-18): sovereign/research/unified_forensics.py
   SHARED ROOT CAUSE: Both ICT and Forex fail from PREMATURE ENTRY

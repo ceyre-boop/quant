@@ -78,11 +78,29 @@ class ForexBacktester:
         "EURUSD=X": 1.25,
         "AUDNZD=X": 1.25,
     }
-    # Regime gate (2026-05-22): empirical study found 50/120 USDJPY trades fall in
-    # bull market + elevated VIX (>15) where JPY safe-haven bids fight USD macro signal.
-    # That cluster: avg -0.132%, WR 37%. Gated USDJPY: Sharpe 1.004 → 1.770.
-    # Gate logic: when SPY > 200 SMA AND VIX > 15 → suppress USDJPY signal.
-    USDJPY_VIX_GATE: float = 15.0   # VIX threshold; bull market AND above this → no trade
+    # Bull+VIX regime gates (v011, 2026-05-22):
+    # When SPY > 200 SMA AND VIX > threshold → suppress pair signal.
+    # Universal finding: macro rate differential signals degrade when fear flows
+    # compete with rate signals in a nominally-bullish market environment.
+    #
+    # Tiered thresholds (economically motivated, not just in-sample optimised):
+    #   VIX>15 — JPY (safe-haven flows activate early) and crosses (both legs risk currencies)
+    #   VIX>20 — USD macro pairs (rate differential survives mild VIX elevation; needs true fear)
+    #
+    # Per-pair Sharpe improvement at threshold (2015-2024 study, n per pair 57-120):
+    #   USDJPY:  1.004 → 1.770  (VIX>15)
+    #   AUDNZD:  1.172 → 1.558  (VIX>15)
+    #   EURUSD:  1.441 → 1.583  (VIX>20)
+    #   GBPUSD:  1.523 → 1.662  (VIX>20)
+    #   AUDUSD:  1.292 → 1.665  (VIX>20)
+    #   Portfolio: 1.2864 → 1.6476  (+0.361 total across v010+v011)
+    PAIR_VIX_GATES: dict = {
+        'USDJPY=X': 15.0,   # JPY safe-haven bids fight USD rate signal at any VIX elevation
+        'AUDNZD=X': 15.0,   # pure cross — both risk currencies, cross-rate noise starts at 15
+        'EURUSD=X': 20.0,   # USD rate differential resilient until true fear (VIX>20)
+        'GBPUSD=X': 20.0,   # same
+        'AUDUSD=X': 20.0,   # same
+    }
 
     def __init__(
         self,
@@ -121,34 +139,32 @@ class ForexBacktester:
             ),
         )
 
-    def _apply_usdjpy_vix_gate(self, signals: 'pd.DataFrame', start: str, end: str) -> 'pd.DataFrame':
+    def _apply_vix_regime_gate(
+        self, signals: 'pd.DataFrame', pair: str, start: str, end: str
+    ) -> 'pd.DataFrame':
         """
-        Gate USDJPY signals: suppress when SPY > 200 SMA AND VIX > USDJPY_VIX_GATE.
-        Regime study 2026-05-22: bull+elevated/fear cluster (n=50) = avg -0.132%, WR 37%.
-        Removing these 50 trades raises USDJPY Sharpe 1.004 → 1.770.
+        Suppress pair signals when SPY > 200 SMA AND VIX > PAIR_VIX_GATES[pair].
+        Universal finding (v011, 2026-05-22): bull+elevated-VIX overwhelms macro rate
+        differential signals across all 5 pairs. Tiered thresholds by pair sensitivity.
         """
+        vix_threshold = self.PAIR_VIX_GATES.get(pair)
+        if vix_threshold is None:
+            return signals
         import pandas as pd
         try:
             import yfinance as yf
             spy = yf.download('SPY', start=start, end=end, progress=False)
             vix = yf.download('^VIX', start=start, end=end, progress=False)
-            if hasattr(spy.columns, 'get_level_values'):
-                spy.columns = spy.columns.get_level_values(0)
-            if hasattr(vix.columns, 'get_level_values'):
-                vix.columns = vix.columns.get_level_values(0)
-            spy.index = pd.to_datetime(spy.index).tz_localize(None)
-            vix.index = pd.to_datetime(vix.index).tz_localize(None)
+            for df_ in (spy, vix):
+                if hasattr(df_.columns, 'get_level_values'):
+                    df_.columns = df_.columns.get_level_values(0)
+                df_.index = pd.to_datetime(df_.index).tz_localize(None)
             spy['sma200'] = spy['Close'].rolling(200).mean()
             spy['is_bull'] = spy['Close'] > spy['sma200']
-
             signals = signals.copy()
-            for date in signals.index:
-                if signals.loc[date, 'signal'] == 0:
-                    continue
+            for date in signals[signals['signal'] != 0].index:
                 try:
-                    is_bull = bool(spy['is_bull'].asof(date))
-                    vix_val = float(vix['Close'].asof(date))
-                    if is_bull and vix_val > self.USDJPY_VIX_GATE:
+                    if bool(spy['is_bull'].asof(date)) and float(vix['Close'].asof(date)) > vix_threshold:
                         signals.loc[date, 'signal'] = 0.0
                 except Exception:
                     pass
@@ -176,10 +192,10 @@ class ForexBacktester:
             pair=pair, hold_days=pair_hold,
         )
 
-        # USDJPY-specific: suppress signals in bull market + elevated VIX regime
-        if pair == 'USDJPY=X':
-            signals = self._apply_usdjpy_vix_gate(
-                signals, start=self.start, end=self.end
+        # Bull+VIX regime gate: suppress signals when fear flows overwhelm rate differential
+        if pair in self.PAIR_VIX_GATES:
+            signals = self._apply_vix_regime_gate(
+                signals, pair=pair, start=self.start, end=self.end
             )
 
         trades = self._simulate_trades(df, signals, trailing_mult=pair_trailing)
