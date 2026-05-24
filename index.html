@@ -181,10 +181,25 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
 #sig-live.hidden{display:none}
 #sig-chart-area{position:relative;background:var(--bg)}
 #sig-chart-container{width:100%;height:100%;display:flex;flex-direction:column}
-#sig-price-pane::after{content:'PRICE';position:absolute;top:6px;left:8px;font-size:9px;color:rgba(255,255,255,.12);letter-spacing:2px;pointer-events:none;z-index:1}
-#sig-conv-pane::after{content:'CONVICTION';position:absolute;top:4px;left:8px;font-size:8px;color:rgba(255,255,255,.12);letter-spacing:2px;pointer-events:none;z-index:1}
-#sig-pair-label{position:absolute;top:12px;left:16px;font-size:16px;font-weight:700;color:#fff;z-index:5;pointer-events:none;letter-spacing:1px}
-#sig-price-label{position:absolute;top:36px;left:16px;font-size:12px;color:var(--muted);z-index:5;pointer-events:none}
+/* chart toolbar */
+#sig-toolbar{display:flex;align-items:center;gap:0;padding:5px 12px;background:var(--bg3);border-bottom:1px solid var(--border);flex-wrap:wrap;gap:6px}
+.sig-tb-group{display:flex;gap:2px}
+.sig-tb-btn{background:#1a2230;color:#8899a6;border:1px solid #1e2a38;border-radius:4px;font-size:9px;padding:3px 9px;cursor:pointer;letter-spacing:1px;font-family:var(--font);transition:all .15s}
+.sig-tb-btn:hover{color:#c8d3de;border-color:#2a3a4e}
+.sig-tb-btn.active{background:rgba(0,212,160,.12);color:var(--green);border-color:rgba(0,212,160,.4)}
+.sig-tb-btn.range-btn{font-size:9px;padding:3px 8px}
+.sig-tb-sep{width:1px;background:var(--border);margin:0 4px;align-self:stretch}
+/* ohlcv legend */
+#sig-ohlcv-legend{position:absolute;top:8px;left:130px;z-index:10;font-size:10px;color:#8899a6;pointer-events:none;display:flex;gap:10px;font-family:var(--font)}
+#sig-ohlcv-legend span{display:flex;gap:3px}
+#sig-ohlcv-legend .leg-label{color:#4a5568}
+/* pane labels */
+#sig-vol-pane::before{content:'VOL';position:absolute;top:4px;left:8px;font-size:8px;color:rgba(255,255,255,.15);letter-spacing:2px;pointer-events:none;z-index:1}
+#sig-rsi-pane::before{content:'RSI (14)';position:absolute;top:4px;left:8px;font-size:8px;color:rgba(255,255,255,.15);letter-spacing:2px;pointer-events:none;z-index:1}
+#sig-conv-pane::before{content:'CONVICTION';position:absolute;top:4px;left:8px;font-size:8px;color:rgba(255,255,255,.15);letter-spacing:2px;pointer-events:none;z-index:1}
+
+#sig-pair-label{font-size:14px;font-weight:700;color:#fff;letter-spacing:1px}
+#sig-price-label{font-size:11px;color:var(--muted)}
 #sig-right{border-left:1px solid var(--border);display:flex;flex-direction:column;background:var(--bg2);overflow-y:auto}
 #sig-right::-webkit-scrollbar{width:4px}
 #sig-right::-webkit-scrollbar-thumb{background:var(--border)}
@@ -596,9 +611,40 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
       </div>
       <div id="sig-live" class="hidden">
         <div style="display:flex;flex-direction:column;flex:1;min-width:0">
-          <div id="sig-chart-area" style="flex:1;position:relative">
-            <div id="sig-pair-label">—</div>
-            <div id="sig-price-label">—</div>
+          <div id="sig-toolbar">
+            <div class="sig-tb-group">
+              <button class="sig-tb-btn range-btn" onclick="sigSetRange(30)">1M</button>
+              <button class="sig-tb-btn range-btn" onclick="sigSetRange(90)">3M</button>
+              <button class="sig-tb-btn range-btn" onclick="sigSetRange(180)">6M</button>
+              <button class="sig-tb-btn range-btn active" onclick="sigSetRange(365)">1Y</button>
+              <button class="sig-tb-btn range-btn" onclick="sigSetRange(504)">2Y</button>
+            </div>
+            <div class="sig-tb-sep"></div>
+            <div class="sig-tb-group">
+              <button class="sig-tb-btn active" id="tb-ma" onclick="sigToggleIndicator('ma')">MA</button>
+              <button class="sig-tb-btn active" id="tb-bb" onclick="sigToggleIndicator('bb')">BB</button>
+              <button class="sig-tb-btn active" id="tb-rsi" onclick="sigToggleIndicator('rsi')">RSI</button>
+              <button class="sig-tb-btn active" id="tb-vol" onclick="sigToggleIndicator('vol')">VOL</button>
+              <button class="sig-tb-btn active" id="tb-conv" onclick="sigToggleIndicator('conv')">SIGNAL</button>
+            </div>
+            <div class="sig-tb-sep"></div>
+            <div class="sig-tb-group">
+              <button class="sig-tb-btn" id="tb-mode" onclick="sigToggleMode()">LINE</button>
+            </div>
+            <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+              <span id="sig-pair-label" style="font-size:14px;font-weight:700;color:#fff;letter-spacing:1px">—</span>
+              <span id="sig-price-label" style="font-size:11px;color:var(--muted)">—</span>
+            </div>
+          </div>
+          <div id="sig-chart-area" style="flex:1;position:relative;overflow:hidden">
+            <div id="sig-ohlcv-legend">
+              <span><span class="leg-label">O</span><span id="leg-o">—</span></span>
+              <span><span class="leg-label">H</span><span id="leg-h">—</span></span>
+              <span><span class="leg-label">L</span><span id="leg-l">—</span></span>
+              <span><span class="leg-label">C</span><span id="leg-c">—</span></span>
+              <span><span class="leg-label">V</span><span id="leg-v">—</span></span>
+              <span id="leg-chg" style="font-weight:700"></span>
+            </div>
             <div id="sig-chart-container" style="width:100%;height:100%"></div>
           </div>
           <div id="sig-pair-bar"></div>
@@ -845,141 +891,321 @@ setInterval(updateBridgeState,60000);
 
 // ══ TAB 2: SIGNALS ══
 const SIG_API='http://localhost:8765/data';
-let sigChart=null,sigCandles=null,sigConvPane=null,sigConvHist=null;
-let sigActivePair=null,sigLastData=null;
-let sigChartMode='candles'; // 'candles' | 'line'
 
-const SIG_CHART_OPTS={
-  layout:{background:{color:'#080b0f'},textColor:'#4a5568'},
-  grid:{vertLines:{color:'#111820'},horzLines:{color:'#111820'}},
-  crosshair:{mode:LightweightCharts.CrosshairMode.Normal},
-  rightPriceScale:{borderColor:'#1e2a38',scaleMargins:{top:0.08,bottom:0.05}},
-  timeScale:{borderColor:'#1e2a38',timeVisible:true,secondsVisible:false},
+// ── indicator compute helpers ───────────────────────────────────────────────
+function _ema(closes,period){
+  const k=2/(period+1),out=[];
+  let prev=closes.slice(0,period).reduce((a,b)=>a+b,0)/period;
+  out.push(...new Array(period-1).fill(null));
+  out.push(prev);
+  for(let i=period;i<closes.length;i++){prev=closes[i]*k+prev*(1-k);out.push(prev);}
+  return out;
+}
+function _bb(closes,period=20,mult=2){
+  const upper=[],lower=[],mid=[];
+  for(let i=0;i<closes.length;i++){
+    if(i<period-1){upper.push(null);lower.push(null);mid.push(null);continue;}
+    const sl=closes.slice(i-period+1,i+1);
+    const m=sl.reduce((a,b)=>a+b,0)/period;
+    const sd=Math.sqrt(sl.reduce((a,b)=>a+(b-m)**2,0)/period);
+    mid.push(m);upper.push(m+mult*sd);lower.push(m-mult*sd);
+  }
+  return{upper,lower,mid};
+}
+function _rsi(closes,period=14){
+  const out=[];
+  for(let i=0;i<closes.length;i++){
+    if(i<period){out.push(null);continue;}
+    const gains=[],losses=[];
+    for(let j=i-period+1;j<=i;j++){
+      const d=closes[j]-closes[j-1];
+      if(d>=0)gains.push(d),losses.push(0);else gains.push(0),losses.push(-d);
+    }
+    const ag=gains.reduce((a,b)=>a+b,0)/period;
+    const al=losses.reduce((a,b)=>a+b,0)/period;
+    out.push(al===0?100:100-100/(1+ag/al));
+  }
+  return out;
+}
+
+// ── chart state ─────────────────────────────────────────────────────────────
+let sigChart=null,sigVolChart=null,sigRsiChart=null,sigConvChart=null;
+let sigCandles=null,sigLineSeries=null;
+let sigVolSeries=null,sigRsiSeries=null,sigConvSeries=null;
+let sigEma20=null,sigEma50=null,sigEma200=null;
+let sigBbUpper=null,sigBbLower=null,sigBbMid=null;
+let sigRsiOb=null,sigRsiOs=null;
+let sigActivePair=null,sigLastData=null,sigChartMode='candles';
+let sigCurrentOhlcv=null;
+let sigIndicators={ma:true,bb:true,rsi:true,vol:true,conv:true};
+let sigCurrentRange=365; // bars to show
+
+const _CHART_BASE={
+  layout:{background:{color:'#080b0f'},textColor:'#6b7a8d'},
+  grid:{vertLines:{color:'#0d1219'},horzLines:{color:'#0d1219'}},
+  crosshair:{mode:LightweightCharts.CrosshairMode.Normal,
+    vertLine:{color:'#2a3a4e',labelBackgroundColor:'#1a2230'},
+    horzLine:{color:'#2a3a4e',labelBackgroundColor:'#1a2230'}},
+  rightPriceScale:{borderColor:'#1e2a38'},
+  timeScale:{borderColor:'#1e2a38',timeVisible:true,secondsVisible:false,
+    tickMarkFormatter:(t)=>new Date(t*1000).toLocaleDateString('en-US',{month:'short',day:'numeric'})},
   handleScroll:true,handleScale:true,
 };
 
 function sigInit(){
   if(sigChart)return;
   const el=document.getElementById('sig-chart-container');
-
-  // Split container: price chart 72%, conviction pane 28%
   el.style.cssText='display:flex;flex-direction:column;height:100%;width:100%';
-  const priceDiv=document.createElement('div');
-  priceDiv.id='sig-price-pane';
-  priceDiv.style.cssText='flex:0 0 72%;position:relative;min-height:0';
-  const convDiv=document.createElement('div');
-  convDiv.id='sig-conv-pane';
-  convDiv.style.cssText='flex:0 0 28%;position:relative;min-height:0;border-top:1px solid #1a2230';
-  el.appendChild(priceDiv);
-  el.appendChild(convDiv);
 
-  sigChart=LightweightCharts.createChart(priceDiv,{...SIG_CHART_OPTS});
+  // Build 4 panes
+  function makePane(id,flex,borderTop=true){
+    const d=document.createElement('div');
+    d.id=id;
+    d.style.cssText=`flex:0 0 ${flex};position:relative;min-height:0;${borderTop?'border-top:1px solid #0d1219':''}`;
+    el.appendChild(d);
+    return d;
+  }
+  const priceDiv=makePane('sig-price-pane','55%',false);
+  const volDiv  =makePane('sig-vol-pane',  '15%');
+  const rsiDiv  =makePane('sig-rsi-pane',  '15%');
+  const convDiv =makePane('sig-conv-pane', '15%');
+
+  // Price chart
+  sigChart=LightweightCharts.createChart(priceDiv,{..._CHART_BASE,
+    rightPriceScale:{borderColor:'#1e2a38',scaleMargins:{top:0.08,bottom:0.02}},
+  });
   sigCandles=sigChart.addCandlestickSeries({
     upColor:'#00d4a0',downColor:'#ff4d6a',
     borderUpColor:'#00d4a0',borderDownColor:'#ff4d6a',
-    wickUpColor:'#00d4a0',wickDownColor:'#ff4d6a',
+    wickUpColor:'#00875a',wickDownColor:'#991f2f',
+    priceLineColor:'#2a3a4e',priceLineWidth:1,
   });
+  sigLineSeries=sigChart.addLineSeries({color:'#00d4a0',lineWidth:2,priceLineVisible:false,lastValueVisible:false,visible:false});
 
-  sigConvPane=LightweightCharts.createChart(convDiv,{
-    ...SIG_CHART_OPTS,
-    layout:{...SIG_CHART_OPTS.layout},
+  // MAs
+  sigEma20 =sigChart.addLineSeries({color:'#f6c90e',lineWidth:1,priceLineVisible:false,lastValueVisible:false,title:'EMA20'});
+  sigEma50 =sigChart.addLineSeries({color:'#ff9f43',lineWidth:1,priceLineVisible:false,lastValueVisible:false,title:'EMA50'});
+  sigEma200=sigChart.addLineSeries({color:'#a78bfa',lineWidth:1,priceLineVisible:false,lastValueVisible:false,title:'EMA200'});
+
+  // Bollinger Bands
+  sigBbUpper=sigChart.addLineSeries({color:'rgba(66,153,225,0.5)',lineWidth:1,priceLineVisible:false,lastValueVisible:false,lineStyle:LightweightCharts.LineStyle.Dashed});
+  sigBbMid  =sigChart.addLineSeries({color:'rgba(66,153,225,0.25)',lineWidth:1,priceLineVisible:false,lastValueVisible:false,lineStyle:LightweightCharts.LineStyle.Dotted});
+  sigBbLower=sigChart.addLineSeries({color:'rgba(66,153,225,0.5)',lineWidth:1,priceLineVisible:false,lastValueVisible:false,lineStyle:LightweightCharts.LineStyle.Dashed});
+
+  // Volume
+  sigVolChart=LightweightCharts.createChart(volDiv,{..._CHART_BASE,
+    rightPriceScale:{borderColor:'#1e2a38',scaleMargins:{top:0.1,bottom:0.0}},
+    timeScale:{..._CHART_BASE.timeScale,visible:false},
+  });
+  sigVolSeries=sigVolChart.addHistogramSeries({priceLineVisible:false,lastValueVisible:false});
+
+  // RSI
+  sigRsiChart=LightweightCharts.createChart(rsiDiv,{..._CHART_BASE,
+    rightPriceScale:{borderColor:'#1e2a38',scaleMargins:{top:0.1,bottom:0.1},autoScale:false,mode:0},
+    timeScale:{..._CHART_BASE.timeScale,visible:false},
+  });
+  sigRsiSeries=sigRsiChart.addLineSeries({color:'#4299e1',lineWidth:1.5,priceLineVisible:false,lastValueVisible:true,
+    priceFormat:{type:'custom',formatter:v=>v!=null?v.toFixed(1):''}});
+  sigRsiChart.priceScale('right').applyOptions({autoScale:false,minimum:0,maximum:100});
+  // Overbought/oversold lines
+  sigRsiOb=sigRsiChart.addLineSeries({color:'rgba(255,77,106,0.3)',lineWidth:1,priceLineVisible:false,lastValueVisible:false,lineStyle:LightweightCharts.LineStyle.Dashed});
+  sigRsiOs=sigRsiChart.addLineSeries({color:'rgba(0,212,160,0.3)',lineWidth:1,priceLineVisible:false,lastValueVisible:false,lineStyle:LightweightCharts.LineStyle.Dashed});
+
+  // Conviction
+  sigConvChart=LightweightCharts.createChart(convDiv,{..._CHART_BASE,
     rightPriceScale:{borderColor:'#1e2a38',scaleMargins:{top:0.05,bottom:0.0}},
+    timeScale:{..._CHART_BASE.timeScale,visible:false},
   });
-  sigConvHist=sigConvPane.addHistogramSeries({
-    color:'#4299e1',priceLineVisible:false,lastValueVisible:false,
-    base:0,
-  });
+  sigConvSeries=sigConvChart.addHistogramSeries({priceLineVisible:false,lastValueVisible:false,base:0});
 
-  // Sync time scales
-  sigChart.timeScale().subscribeVisibleLogicalRangeChange(range=>{
-    if(range)sigConvPane.timeScale().setVisibleLogicalRange(range);
-  });
-  sigConvPane.timeScale().subscribeVisibleLogicalRangeChange(range=>{
-    if(range)sigChart.timeScale().setVisibleLogicalRange(range);
-  });
-
-  // Toggle candles/line button
-  const toggle=document.createElement('button');
-  toggle.id='sig-chart-toggle';
-  toggle.textContent='LINE';
-  toggle.style.cssText='position:absolute;top:6px;right:8px;z-index:10;background:#1a2230;color:#8899a6;border:1px solid #1e2a38;border-radius:4px;font-size:9px;padding:3px 7px;cursor:pointer;letter-spacing:1px';
-  priceDiv.appendChild(toggle);
-  let lineSeries=null;
-  toggle.addEventListener('click',()=>{
-    const p=sigLastData?.forex_signals?.find(s=>s.ticker===sigActivePair);
-    if(!p)return;
-    if(sigChartMode==='candles'){
-      sigChartMode='line';
-      toggle.textContent='CANDLES';
-      sigCandles.applyOptions({visible:false});
-      if(!lineSeries){
-        lineSeries=sigChart.addLineSeries({color:'#00d4a0',lineWidth:2,priceLineVisible:false,lastValueVisible:false});
-      }
-      lineSeries.applyOptions({visible:true});
-      const ld=p.price_history.map(x=>({time:Math.floor(x.t/1000),value:x.v})).sort((a,b)=>a.time-b.time);
-      lineSeries.setData(ld);
-    } else {
-      sigChartMode='candles';
-      toggle.textContent='LINE';
-      sigCandles.applyOptions({visible:true});
-      if(lineSeries)lineSeries.applyOptions({visible:false});
-      _sigSetCandles(p);
-    }
-  });
-
-  new ResizeObserver(()=>{
-    const a=document.getElementById('sig-chart-area');
-    if(!a)return;
-    const h=a.clientHeight;
-    sigChart.applyOptions({width:a.clientWidth,height:Math.floor(h*0.72)});
-    sigConvPane.applyOptions({width:a.clientWidth,height:Math.floor(h*0.28)});
-  }).observe(document.getElementById('sig-chart-area'));
-}
-
-function _sigSetCandles(p){
-  if(!p?.ohlcv?.length)return;
-  const cd=p.ohlcv.map(x=>({time:Math.floor(x.t/1000),open:x.o,high:x.h,low:x.l,close:x.c})).sort((a,b)=>a.time-b.time);
-  sigCandles.setData(cd);
-
-  // Signal markers on candles
-  const markers=[];
-  (p.signal_marks||[]).forEach(m=>{
-    markers.push({
-      time:Math.floor(m.t/1000),
-      position:m.dir>0?'belowBar':'aboveBar',
-      color:m.dir>0?'#00d4a0':'#ff4d6a',
-      shape:m.dir>0?'arrowUp':'arrowDown',
-      text:m.dir>0?`L ${m.hold}d`:`S ${m.hold}d`,
-      size:1.5,
+  // Sync all time scales
+  const allCharts=[sigChart,sigVolChart,sigRsiChart,sigConvChart];
+  allCharts.forEach(src=>{
+    src.timeScale().subscribeVisibleLogicalRangeChange(range=>{
+      if(!range)return;
+      allCharts.forEach(dst=>{if(dst!==src)try{dst.timeScale().setVisibleLogicalRange(range);}catch{}});
     });
   });
-  sigCandles.setMarkers(markers.sort((a,b)=>a.time-b.time));
+
+  // OHLCV crosshair legend
+  sigChart.subscribeCrosshairMove(param=>{
+    if(!param?.time||!sigCurrentOhlcv)return;
+    const bar=sigCurrentOhlcv.find(x=>Math.floor(x.t/1000)===param.time);
+    if(!bar)return;
+    const chg=((bar.c-bar.o)/bar.o*100);
+    const chgCol=chg>=0?'#00d4a0':'#ff4d6a';
+    document.getElementById('leg-o').textContent=bar.o.toFixed(5);
+    document.getElementById('leg-h').textContent=bar.h.toFixed(5);
+    document.getElementById('leg-l').textContent=bar.l.toFixed(5);
+    document.getElementById('leg-c').textContent=bar.c.toFixed(5);
+    document.getElementById('leg-v').textContent=bar.v>0?bar.v.toLocaleString():'—';
+    const chgEl=document.getElementById('leg-chg');
+    chgEl.textContent=(chg>=0?'+':'')+chg.toFixed(3)+'%';
+    chgEl.style.color=chgCol;
+  });
+
+  // Resize observer
+  const area=document.getElementById('sig-chart-area');
+  new ResizeObserver(()=>_sigResize()).observe(area);
 }
 
-function sigRenderChart(p){
-  if(!p)return;
-  document.getElementById('sig-pair-label').textContent=p.label||'';
-  const sigTxt=p.signal>0?'▲ LONG':p.signal<0?'▼ SHORT':'— FLAT';
-  const sigColor=p.signal>0?'#00d4a0':p.signal<0?'#ff4d6a':'#4a5568';
-  const multTxt=p.size_mult&&p.size_mult!==1?` · ${p.size_mult.toFixed(2)}×`:'';
-  const convTxt=p.conviction>0?` · conv ${p.conviction.toFixed(2)}`:'';
-  document.getElementById('sig-price-label').innerHTML=
-    p.price!=null?`${p.price.toFixed(5)} <span style="color:${sigColor}">${sigTxt}</span><span style="color:#4a5568;font-size:10px">${multTxt}${convTxt}</span>`:'No data';
+function _sigResize(){
+  const area=document.getElementById('sig-chart-area');
+  if(!area)return;
+  const w=area.clientWidth;
+  const h=area.clientHeight;
+  const pHgt=Math.floor(h*0.55);
+  const sHgt=Math.floor(h*0.15);
+  sigChart?.applyOptions({width:w,height:pHgt});
+  sigVolChart?.applyOptions({width:w,height:sHgt});
+  sigRsiChart?.applyOptions({width:w,height:sHgt});
+  sigConvChart?.applyOptions({width:w,height:sHgt});
+  document.getElementById('sig-price-pane').style.height=pHgt+'px';
+  document.getElementById('sig-vol-pane').style.height=sHgt+'px';
+  document.getElementById('sig-rsi-pane').style.height=sHgt+'px';
+  document.getElementById('sig-conv-pane').style.height=sHgt+'px';
+}
 
-  _sigSetCandles(p);
+function sigToggleIndicator(name){
+  sigIndicators[name]=!sigIndicators[name];
+  const btn=document.getElementById('tb-'+name);
+  if(btn)btn.classList.toggle('active',sigIndicators[name]);
+  const vis=sigIndicators[name];
+  const hide=(c,...series)=>series.forEach(s=>s?.applyOptions({visible:vis}));
+  if(name==='ma'){
+    [sigEma20,sigEma50,sigEma200].forEach(s=>s?.applyOptions({visible:vis}));
+  } else if(name==='bb'){
+    [sigBbUpper,sigBbMid,sigBbLower].forEach(s=>s?.applyOptions({visible:vis}));
+  } else if(name==='rsi'){
+    const rsiPane=document.getElementById('sig-rsi-pane');
+    rsiPane.style.display=vis?'':'none';
+    _sigResize();
+  } else if(name==='vol'){
+    const vPane=document.getElementById('sig-vol-pane');
+    vPane.style.display=vis?'':'none';
+    _sigResize();
+  } else if(name==='conv'){
+    const cPane=document.getElementById('sig-conv-pane');
+    cPane.style.display=vis?'':'none';
+    _sigResize();
+  }
+}
+
+function sigToggleMode(){
+  const p=sigLastData?.forex_signals?.find(s=>s.ticker===sigActivePair);
+  if(!p)return;
+  if(sigChartMode==='candles'){
+    sigChartMode='line';
+    document.getElementById('tb-mode').textContent='CANDLES';
+    sigCandles.applyOptions({visible:false});
+    sigLineSeries.applyOptions({visible:true});
+    const ld=p.ohlcv.map(x=>({time:Math.floor(x.t/1000),value:x.c})).sort((a,b)=>a.time-b.time);
+    sigLineSeries.setData(ld);
+  } else {
+    sigChartMode='candles';
+    document.getElementById('tb-mode').textContent='LINE';
+    sigCandles.applyOptions({visible:true});
+    sigLineSeries.applyOptions({visible:false});
+  }
+}
+
+function sigSetRange(bars,btn){
+  document.querySelectorAll('.range-btn').forEach(b=>b.classList.remove('active'));
+  (btn||event?.target)?.classList?.add('active');
+  sigCurrentRange=bars;
+  // Set visible range to last N bars
+  try{
+    const ts=sigChart.timeScale();
+    const total=sigCurrentOhlcv?.length||bars;
+    const from=Math.max(0,total-bars);
+    ts.setVisibleLogicalRange({from,to:total-1});
+    [sigVolChart,sigRsiChart,sigConvChart].forEach(c=>{
+      try{c.timeScale().setVisibleLogicalRange({from,to:total-1});}catch{}
+    });
+  }catch{}
+}
+
+function _sigSetData(p){
+  if(!p?.ohlcv?.length)return;
+  sigCurrentOhlcv=p.ohlcv;
+  const ohlcv=p.ohlcv.slice().sort((a,b)=>a.t-b.t);
+  const times=ohlcv.map(x=>Math.floor(x.t/1000));
+  const closes=ohlcv.map(x=>x.c);
+
+  // Candles
+  const cd=ohlcv.map(x=>({time:Math.floor(x.t/1000),open:x.o,high:x.h,low:x.l,close:x.c}));
+  sigCandles.setData(cd);
+
+  // Signal markers
+  const markers=[];
+  (p.signal_marks||[]).forEach(m=>{
+    const t=Math.floor(m.t/1000);
+    if(times.includes(t)){
+      markers.push({time:t,position:m.dir>0?'belowBar':'aboveBar',
+        color:m.dir>0?'#00d4a0':'#ff4d6a',shape:m.dir>0?'arrowUp':'arrowDown',
+        text:m.dir>0?`L ${m.hold}d`:`S ${m.hold}d`,size:1.5});
+    }
+  });
+  sigCandles.setMarkers(markers.sort((a,b)=>a.time-b.time));
+
+  // EMAs
+  const ema20=_ema(closes,20),ema50=_ema(closes,50),ema200=_ema(closes,200);
+  const toSeries=(arr)=>arr.map((v,i)=>v!=null?{time:times[i],value:v}:null).filter(Boolean);
+  if(sigIndicators.ma){
+    sigEma20.setData(toSeries(ema20));
+    sigEma50.setData(toSeries(ema50));
+    sigEma200.setData(toSeries(ema200));
+  }
+
+  // Bollinger Bands
+  if(sigIndicators.bb){
+    const {upper,lower,mid}=_bb(closes,20,2);
+    sigBbUpper.setData(toSeries(upper));
+    sigBbMid.setData(toSeries(mid));
+    sigBbLower.setData(toSeries(lower));
+  }
+
+  // Volume
+  const volData=ohlcv.map(x=>({
+    time:Math.floor(x.t/1000),value:x.v||0,
+    color:x.c>=x.o?'rgba(0,212,160,0.5)':'rgba(255,77,106,0.5)',
+  }));
+  sigVolSeries.setData(volData);
+
+  // RSI
+  const rsiVals=_rsi(closes,14);
+  const rsiData=rsiVals.map((v,i)=>v!=null?{time:times[i],value:v}:null).filter(Boolean);
+  sigRsiSeries.setData(rsiData);
+  // Static ob/os lines
+  if(rsiData.length>=2){
+    const t0=rsiData[0].time,t1=rsiData[rsiData.length-1].time;
+    sigRsiOb.setData([{time:t0,value:70},{time:t1,value:70}]);
+    sigRsiOs.setData([{time:t0,value:30},{time:t1,value:30}]);
+  }
 
   // Conviction histogram
   if(p.conv_history?.length){
     const ch=p.conv_history.map(x=>({
-      time:Math.floor(x.t/1000),
-      value:x.v,
-      color:x.s>0?'rgba(0,212,160,0.7)':x.s<0?'rgba(255,77,106,0.7)':'rgba(74,85,104,0.4)',
+      time:Math.floor(x.t/1000),value:x.v,
+      color:x.s>0?'rgba(0,212,160,0.7)':x.s<0?'rgba(255,77,106,0.7)':'rgba(74,85,104,0.3)',
     })).sort((a,b)=>a.time-b.time);
-    sigConvHist.setData(ch);
-    sigConvPane.timeScale().fitContent();
+    sigConvSeries.setData(ch);
   }
 
+  // Fit then apply stored range
   sigChart.timeScale().fitContent();
+  sigSetRange(sigCurrentRange,null);
+}
+
+function sigRenderChart(p){
+  if(!p)return;
+  const sigTxt=p.signal>0?'▲ LONG':p.signal<0?'▼ SHORT':'— FLAT';
+  const sigColor=p.signal>0?'#00d4a0':p.signal<0?'#ff4d6a':'#4a5568';
+  const multTxt=p.size_mult&&p.size_mult!==1?` · ${p.size_mult.toFixed(2)}×`:'';
+  document.getElementById('sig-pair-label').textContent=p.label||'';
+  document.getElementById('sig-price-label').innerHTML=
+    p.price!=null?`${p.price.toFixed(5)}&nbsp;<span style="color:${sigColor};font-weight:700">${sigTxt}</span>${multTxt?`<span style="color:#4a5568"> ${multTxt}</span>`:''}`:' No data';
+  _sigSetData(p);
 }
 
 function _sigSparkline(history){
