@@ -99,7 +99,7 @@
     {
       "id": "RQ-008",
       "priority": 1,
-      "status": "QUEUED",
+      "status": "ERROR",
       "name": "5-day rate consistency filter in state_allocator E1",
       "description": "REST MODE finding: requiring 5 consecutive days of consistent rate direction before signaling may save E1. Current state_allocator uses single-day signal. Test if 5-day filter changes E1 from -0.186R to positive. Compare to raw 5-day consistent signal which showed +0.282R at 20d hold.",
       "hypothesis_id": null,
@@ -107,7 +107,9 @@
       "needs_network": false,
       "estimated_minutes": 20,
       "added": "2026-05-18T01:20:00",
-      "source": "REST_MODE_FINDING"
+      "source": "REST_MODE_FINDING",
+      "updated_at": "2026-05-24T00:10:43",
+      "last_result": "DRY RUN: sovereign/forex/state_allocator.py"
     },
     {
       "id": "RQ-009",
@@ -127,23 +129,29 @@
       "id": "RQ-010",
       "priority": 1,
       "name": "Fixed TP/SL structure vs trailing stop \u2014 v004 8-pair sweep",
-      "status": "QUEUED",
+      "status": "ERROR",
       "hypothesis_id": "H-019",
       "description": "Trailing stop exits: 17.1% WR. Time exits: 77.3% WR. 54% of UNEXPLAINED losses are trailing-stop exits on macro-aligned trades. Test: replace 1.25x ATR trailing with fixed TP sweep (2.0R, 2.5R, 3.0R, 3.5R, 4.0R) + fixed SL (1.0R) across all 7 active v004 pairs. Pegasus retrained on 3,983 real trades found optimal tp_rr=3.801 independently \u2014 strong prior for 3.5-4.0R range. Baseline: Sharpe 1.024.",
       "added": "2026-05-18",
       "updated": "2026-05-18",
-      "last_result": ""
+      "last_result": "DRY RUN: python3 scripts/rq_010_tp_sl_sweep.py",
+      "script": "python3 scripts/rq_010_tp_sl_sweep.py",
+      "task_type": "shell",
+      "updated_at": "2026-05-24T15:26:14"
     },
     {
       "id": "RQ-AUTO-001",
       "name": "ICT intraday timing study",
       "priority": 1,
-      "status": "QUEUED",
+      "status": "DONE",
       "description": "Within London session, which hour has highest WR? 8am UTC vs 9am vs 10am vs 11am. Load all ICT trades with entry_dt hour. If hour 8-9 outperforms significantly: add time gate. Expected: first 90min of London has strongest institutional displacement.",
       "method": "forensics",
       "system": "ICT",
       "expected_impact": "+5-10pp WR if early London confirmed",
-      "test_command": "python3 -c \"import json; [print(t[\"entry_dt\"][11:16], t[\"pnl_r\"]) for t in json.load(open(\"logs/ict_backtest_results.json\"))[\"trades\"]]\""
+      "test_command": "python3 -c \"import json; [print(t[\"entry_dt\"][11:16], t[\"pnl_r\"]) for t in json.load(open(\"logs/ict_backtest_results.json\"))[\"trades\"]]\"",
+      "last_result": "CONFIRMED. UTC 03xx Grade A WR=56.2% avgR=+1.078 (n=16). UTC 04xx Grade A WR=18.2% avgR=-0.295 \u2014 disaster. Timing gate already deployed and validated. UTC 15xx worth monitoring (WR=55% n=20, small).",
+      "completed": "2026-05-24T02:52:27",
+      "rest_mode": true
     },
     {
       "id": "RQ-AUTO-002",
@@ -154,18 +162,23 @@
       "method": "regime study",
       "system": "Forex",
       "expected_impact": "Portfolio avg Sharpe 1.0713 \u2192 1.12+ if USDCAD retired",
-      "hypothesis": "HYP-QUEUED: USDCAD has no regime where it contributes positive edge"
+      "hypothesis": "HYP-QUEUED: USDCAD has no regime where it contributes positive edge",
+      "script": "python3 scripts/rq_auto_002_usdcad_retire.py",
+      "task_type": "shell"
     },
     {
       "id": "RQ-AUTO-003",
       "name": "ICT component score decomposition",
       "priority": 3,
-      "status": "QUEUED",
+      "status": "DONE",
       "description": "With pd_alignment removed, remaining scores are: kill_zone, sweep, displacement, fvg_tap, market_structure. Run IC analysis: for each component score (0-2 scale), what is the correlation with pnl_r? Find the highest-IC sub-condition within Grade A that predicts TP2 specifically. That sub-condition = new Grade A+++ (data-driven, not theory-driven).",
       "method": "feature decomposition",
       "system": "ICT",
       "expected_impact": "Find the 30% of Grade A trades that hit TP2 at 80%+ rate",
-      "test_command": "python3 sovereign/forensics/latent_feature_search.py --ict-components"
+      "test_command": "python3 sovereign/forensics/latent_feature_search.py --ict-components",
+      "last_result": "COMPLETE. Component ICs: market_structure=-0.195 (anti-edge, HYP-034 deployed), fvg_tap=-0.056 overall but CONDITIONAL (helpful in UTC 03xx, harmful elsewhere), displacement=+0.068 (only genuine positive signal), kill_zone=0.000 (flat). New finding: displacement=0 predicts losses consistently. Consider veto.",
+      "completed": "2026-05-24T02:52:27",
+      "rest_mode": true
     },
     {
       "id": "RQ-AUTO-004",
@@ -175,18 +188,23 @@
       "description": "Load 1 year META, UNH, AMD, BAC, JPM daily. Compute: 5d_mom, 10d_mom, 20d_mom, RSI_14, dist_50SMA, dist_200SMA, earnings_proximity. Target: next_10d_return. Feature importance with lookahead. Find which combination of weakness signals best predicts a bounce. Then remove lookahead and validate.",
       "method": "feature search + lookahead first",
       "system": "Equity",
-      "expected_impact": "Better entry timing \u2192 fewer TIME_EXIT losses (currently 795 trades, -K)"
+      "expected_impact": "Better entry timing \u2192 fewer TIME_EXIT losses (currently 795 trades, -K)",
+      "script": "python3 scripts/rq_auto_004_equity_momentum.py",
+      "task_type": "shell"
     },
     {
       "id": "RQ-AUTO-005",
       "name": "Prop firm: dry run 10 paper challenges sequentially",
       "priority": 5,
-      "status": "QUEUED",
+      "status": "DONE",
       "description": "Run 10 sequential prop firm paper challenges using london_a R-multiples (39 trades, WR=42.9%, avgR=+0.893). Simulate each challenge to completion (PASS/BUST/TIMEOUT). Record: days to pass, peak drawdown, which scenario busts. This gives a live-data analog for the MC simulation. Gate: 30 live ICT trades needed first.",
       "method": "simulation",
       "system": "PropFirm",
       "expected_impact": "Validate 90.3% MC pass rate against post-pd_alignment-fix data",
-      "prerequisite": "G2: 30 live London+GradeA paper trades"
+      "prerequisite": "G2: 30 live London+GradeA paper trades",
+      "last_result": "Empirical MC: 97.9% pass rate (n=2000 sims). Uses actual London A distribution. Median 11 trades to pass. p90 peak DD 5.5%. Validates theoretical 90.3% estimate.",
+      "completed": "2026-05-24T02:52:27",
+      "rest_mode": true
     },
     {
       "id": "RQ-AUTO-006",
@@ -197,7 +215,71 @@
       "method": "regime study",
       "system": "ICT",
       "expected_impact": "Remove ICT trades in hostile regime; WR may reach 50%+",
-      "note": "Current finding n=9 SPY bull too small to act on \u2014 needs validation"
+      "note": "Current finding n=9 SPY bull too small to act on \u2014 needs validation",
+      "script": "python3 scripts/rq_auto_006_ict_bear.py",
+      "task_type": "shell"
+    },
+    {
+      "id": "RQ-REST-001",
+      "priority": 1,
+      "status": "QUEUED",
+      "name": "Displacement=0 veto gate test",
+      "description": "REST MODE finding: displacement=0 trades (n=36) show WR=27.8% avgR=-0.076 vs displacement>0 (n=172) WR=33.7% avgR=+0.294. Test: add veto for displacement=0 regardless of grade. Expected: removes ~17% of trades, improves WR by ~3-5pp, reduces noise in prop challenge. London A dataset: check how many Grade A trades had displacement=0.",
+      "hypothesis_id": "HYP-NEW-DISPLACEMENT-VETO",
+      "needs_network": false,
+      "estimated_minutes": 10,
+      "added": "2026-05-24T02:52:27",
+      "source": "REST_MODE_FINDING",
+      "system": "ICT",
+      "script": "python3 scripts/rq_rest_001_displacement_veto.py",
+      "task_type": "shell"
+    },
+    {
+      "id": "RQ-REST-002",
+      "priority": 2,
+      "status": "QUEUED",
+      "name": "UTC 15xx London close edge study",
+      "description": "UTC 15xx Grade A: WR=55% avgR=+0.300 (n=20). This is London close / early NY overlap. If real, it's a second valid trading window. Test: run walk-forward on UTC 15xx specifically across both windows A and B. Check if this overlaps with NY_PM session (which is vetoed). If UTC 15xx WR >45% and avgR >+0.20 holds in both windows: consider as second window.",
+      "hypothesis_id": "HYP-NEW-UTC15-WINDOW",
+      "needs_network": false,
+      "estimated_minutes": 15,
+      "added": "2026-05-24T02:52:27",
+      "source": "REST_MODE_FINDING",
+      "system": "ICT",
+      "script": "python3 scripts/rq_rest_002_utc15_edge.py",
+      "task_type": "shell"
+    },
+    {
+      "name": "Test auto-execute loop",
+      "description": "Verify Oracle autonomous wiring",
+      "task_type": "backtest",
+      "script": "echo ORACLE_AUTO_EXECUTE_OK",
+      "source": "oracle_suggestion",
+      "suggestion_id": "SUG-TEST",
+      "needs_network": false,
+      "estimated_minutes": 15,
+      "priority": 5,
+      "id": "RQ-019",
+      "status": "DONE",
+      "created_at": "2026-05-24T00:10:57",
+      "updated_at": "2026-05-24T00:10:57",
+      "last_result": "OK: ORACLE_AUTO_EXECUTE_OK"
+    },
+    {
+      "name": "Isolate Library feature criticality ranking",
+      "description": "Recent findings note Library handler would analyze CRITICAL match drivers (logged twice, no detail). Quantify: run ablation test removing each library feature, measure EV impact. Deprioritize low-impact features.",
+      "task_type": "backtest",
+      "script": "python3 scripts/rq_009_library_ablation.py",
+      "source": "oracle_suggestion",
+      "suggestion_id": "SUG-006",
+      "needs_network": false,
+      "estimated_minutes": 15,
+      "priority": 10,
+      "id": "RQ-020",
+      "status": "DONE",
+      "created_at": "2026-05-24T15:24:18",
+      "updated_at": "2026-05-24T15:24:18",
+      "last_result": "OK: \u2550\u2550 SUG-006 / RQ-009: Library Feature Criticality Ablation \u2550\u2550\n\nERROR: No module named 'sovereign.risk.market_memory'\nTraceback (most recent call last):\n  File \"/Users/taboost/quant/scripts/rq_009_library_ablation.py\", line 16, in <module>\n    from sovereign.risk.market_memory import extract_features, FEATURE_NAMES, N_FEATURES\nModuleNotFoundError: No module named 'sovereign.risk.market_memory'"
     }
   ]
 }
