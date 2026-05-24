@@ -54,7 +54,7 @@ def _fetch_forex_signals():
     results = []
     for ticker, base, quote, label in PAIRS:
         try:
-            prices = yf.Ticker(ticker).history(period='90d', interval='1d')
+            prices = yf.Ticker(ticker).history(period='2y', interval='1d')
             if prices.empty:
                 continue
             prices.index = pd.to_datetime(prices.index).tz_localize(None)
@@ -68,7 +68,7 @@ def _fetch_forex_signals():
             conviction = round(abs(signal) * size_mult, 3) if signal != 0 else 0.0
 
             # recent price history (last 90 bars) for the chart
-            n = min(90, len(prices))
+            n = min(504, len(prices))  # up to 2 years of daily bars
             px = prices.iloc[-n:]
             price_history = [
                 {'t': int(ts.timestamp() * 1000), 'v': round(float(v), 5)}
