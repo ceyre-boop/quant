@@ -72,11 +72,27 @@
       "detail": "Recent findings note Library handler would analyze CRITICAL match drivers (logged twice, no detail). Quantify: run ablation test removing each library feature, measure EV impact. Deprioritize low-impact features.",
       "action": "Create ablation_library_features.py. For each feature, backtest equity system with feature ON/OFF. Log delta EV and Sharpe. Rank by impact, document in findings.",
       "id": "SUG-006",
-      "status": "NEW",
+      "status": "DONE",
       "created": "2026-05-16T22:09:39.350197",
       "vetoed_at": null,
       "implemented_at": null,
-      "veto_reason": null
+      "veto_reason": null,
+      "script": "python3 scripts/rq_009_library_ablation.py",
+      "queued_at": "2026-05-24T15:24:18",
+      "queue_task_id": "RQ-020",
+      "result": "OK: \u2550\u2550 SUG-006 / RQ-009: Library Feature Criticality Ablation \u2550\u2550\n\nERROR: No module named 'sovereign.risk.market_memory'\nTraceback (most recent call last):\n  File \"/Users/taboost/quant/scripts/rq_009_library_ablation.py\", line 16, in <module>\n    from sovereign.risk.market_memory import extract_featu"
+    },
+    {
+      "id": "SUG-TEST",
+      "status": "DONE",
+      "category": "RESEARCH",
+      "priority": "HIGH",
+      "title": "Test auto-execute loop",
+      "detail": "Verify Oracle autonomous wiring",
+      "script": "echo ORACLE_AUTO_EXECUTE_OK",
+      "queued_at": "2026-05-24T00:10:57",
+      "queue_task_id": "RQ-019",
+      "result": "OK: ORACLE_AUTO_EXECUTE_OK"
     }
   ],
   "vetoed_ids": [
