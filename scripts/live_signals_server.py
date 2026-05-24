@@ -199,6 +199,95 @@ def _best_trade_today(forex_signals, bridge_state):
     return candidates
 
 
+def _build_oracle_board(forex_signals, bridge_state):
+    """Compute Oracle's board assessment — recommended play, market structure, conviction."""
+    best = None
+    best_score = -1.0
+    for s in forex_signals:
+        if s.get('error') or s['signal'] == 0:
+            continue
+        score = s['conviction'] * s.get('size_mult', 1.0)
+        if score > best_score:
+            best_score = score
+            best = s
+
+    threat = bridge_state.get('library_threat_score', 0.0)
+    ict_mode = bridge_state.get('ict_mode', 'NORMAL')
+    commitment = bridge_state.get('commitment_score_avg', 0.5)
+
+    # Recommended play from best setup
+    play = None
+    if best:
+        direction = 'LONG' if best['signal'] > 0 else 'SHORT'
+        price = best['price'] or 0
+        # Estimate SL/TP from ATR proxy (1% of price per unit conviction)
+        atr_est = price * 0.008
+        sl = round(price - atr_est if direction == 'LONG' else price + atr_est, 5)
+        tp1 = round(price + atr_est * 1.5 if direction == 'LONG' else price - atr_est * 1.5, 5)
+        tp2 = round(price + atr_est * 3.0 if direction == 'LONG' else price - atr_est * 3.0, 5)
+
+        # Oracle reasoning — plain English
+        regime_note = ''
+        if ict_mode == 'HALT_NEW':
+            regime_note = f'CAUTION: bridge HALT_NEW (threat={threat:.2f}). '
+        elif ict_mode == 'TIGHTEN':
+            regime_note = f'Size reduced: bridge TIGHTEN (threat={threat:.2f}). '
+
+        commitment_label = 'COMMITTED' if commitment > 0.6 else ('DEVELOPING' if commitment > 0.3 else 'UNCOMMITTED')
+
+        reasoning = (
+            f"{regime_note}"
+            f"{'Strong' if best['conviction'] > 1.5 else 'Moderate'} {direction} signal on {best['label']} "
+            f"(conviction={best['conviction']:.2f}, size={best.get('size_mult', 1.0):.2f}x). "
+            f"Market commitment: {commitment_label}."
+        )
+
+        play = {
+            'pair': best['label'],
+            'ticker': best['ticker'],
+            'direction': direction,
+            'entry': best['price'],
+            'sl': sl,
+            'tp1': tp1,
+            'tp2': tp2,
+            'conviction': best['conviction'],
+            'size_mult': best.get('size_mult', 1.0),
+            'reasoning': reasoning,
+        }
+
+    # Last Oracle suggestions (read-only)
+    suggestions = []
+    try:
+        with open('data/agent/suggestions.json') as f:
+            d = json.load(f)
+        items = d if isinstance(d, list) else d.get('suggestions', [])
+        suggestions = [s for s in items[-10:] if s.get('status') not in ('VETOED',)][-5:]
+    except Exception:
+        pass
+
+    return {
+        'timestamp': datetime.now(timezone.utc).isoformat(),
+        'board': {
+            'threat': threat,
+            'ict_mode': ict_mode,
+            'commitment': round(commitment, 3),
+            'regime': 'RISK_OFF' if threat > 0.85 else ('CAUTION' if threat > 0.5 else 'NORMAL'),
+        },
+        'recommended_play': play,
+        'active_setups': [
+            {
+                'pair': s['label'],
+                'ticker': s['ticker'],
+                'direction': 'LONG' if s['signal'] > 0 else 'SHORT',
+                'conviction': s['conviction'],
+                'size_mult': s.get('size_mult', 1.0),
+            }
+            for s in forex_signals if s.get('signal', 0) != 0 and not s.get('error')
+        ],
+        'recent_suggestions': suggestions,
+    }
+
+
 def build_payload():
     bridge = _load_cross_system_state()
     ict_trades = _load_ict_trades()
@@ -300,6 +389,13 @@ class Handler(BaseHTTPRequestHandler):
         if path in ('/', '/data'):
             try:
                 self._send_json(200, build_payload())
+            except Exception:
+                self._send_json(500, {'error': traceback.format_exc()})
+        elif path == '/oracle':
+            try:
+                bridge = _load_cross_system_state()
+                forex = _fetch_forex_signals()
+                self._send_json(200, _build_oracle_board(forex, bridge))
             except Exception:
                 self._send_json(500, {'error': traceback.format_exc()})
         elif path == '/trades':
