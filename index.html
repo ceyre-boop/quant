@@ -214,6 +214,36 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
 .sbr-key{color:var(--muted)}.sbr-val{font-weight:700}
 .threat-track{height:3px;background:var(--dim);border-radius:2px;margin-top:8px}
 .threat-fill{height:3px;border-radius:2px;background:var(--green);transition:width .5s,background .5s}
+/* Oracle Intel Panel */
+#oracle-panel{background:rgba(10,20,40,.7);border-top:1px solid #1e3a5f;padding:10px 14px;font-size:11px}
+#oracle-hdr{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.oracle-badge{padding:2px 8px;border-radius:10px;font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase}
+.oracle-badge.risk-off{background:#3d1515;color:#ff6b6b}
+.oracle-badge.caution{background:#3d2e10;color:#f0a500}
+.oracle-badge.normal{background:#0d2e1a;color:#26de81}
+#oracle-cols{display:grid;grid-template-columns:180px 1fr 200px;gap:12px}
+.oracle-col-hdr{color:#5a7a9a;font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid #1e3a5f}
+.oracle-col{min-width:0}
+.oracle-col-play{border-left:1px solid #1e3a5f;border-right:1px solid #1e3a5f;padding:0 12px}
+.oracle-row{display:flex;justify-content:space-between;align-items:center;padding:2px 0}
+.oracle-k{color:#5a7a9a}
+.oracle-v{color:#c0d0e0;font-weight:600}
+.oracle-v.red{color:var(--red)}
+.oracle-v.green{color:var(--green)}
+.oracle-play-pair{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.oracle-play-pair #or-pair{font-size:14px;font-weight:700;color:#fff;letter-spacing:1px}
+.oracle-dir{padding:2px 7px;border-radius:8px;font-size:10px;font-weight:700}
+.oracle-dir.long{background:#0d2e1a;color:#26de81}
+.oracle-dir.short{background:#2e0d0d;color:#ff6b6b}
+.oracle-levels{display:grid;grid-template-columns:1fr 1fr;gap:3px;margin-bottom:8px}
+.or-conv-track{height:4px;background:#1a2a3a;border-radius:2px;margin:4px 0}
+.or-conv-fill{height:4px;border-radius:2px;background:#4a90d9;transition:width .5s}
+#or-suggestions .or-sug{padding:3px 0;border-bottom:1px solid rgba(30,58,95,.3);font-size:10px;color:#8899a6}
+#or-suggestions .or-sug-id{color:#4a90d9;font-weight:600;margin-right:4px}
+#or-suggestions .or-sug-status{font-size:9px;padding:1px 4px;border-radius:3px;margin-left:4px}
+.or-sug-status.done{background:#0d2e1a;color:#26de81}
+.or-sug-status.pending{background:#2e2a0d;color:#f0a500}
+.or-sug-status.error{background:#2e0d0d;color:#ff6b6b}
 #sig-pairs{border-bottom:1px solid var(--border)}
 .sig-pair-row{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:10px 16px;border-bottom:1px solid rgba(30,42,56,.5);cursor:pointer;transition:background .15s}
 .sig-pair-row:hover{background:rgba(255,255,255,.02)}
@@ -687,6 +717,46 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
             <div id="sig-chart-container" style="width:100%;height:100%"></div>
           </div>
           <div id="sig-pair-bar"></div>
+          <!-- Oracle Intel Panel -->
+          <div id="oracle-panel">
+            <div id="oracle-hdr">
+              <span id="oracle-regime-badge" class="oracle-badge">—</span>
+              <span style="font-size:11px;font-weight:700;letter-spacing:1px;color:#a0a0b0">ORACLE INTELLIGENCE</span>
+              <span id="oracle-threat-pct" style="font-size:10px;color:var(--muted)">threat —</span>
+            </div>
+            <div id="oracle-cols">
+              <div class="oracle-col">
+                <div class="oracle-col-hdr">Board State</div>
+                <div class="oracle-row"><span class="oracle-k">Regime</span><span class="oracle-v" id="or-regime">—</span></div>
+                <div class="oracle-row"><span class="oracle-k">ICT Mode</span><span class="oracle-v" id="or-ict-mode">—</span></div>
+                <div class="oracle-row"><span class="oracle-k">Commitment</span><span class="oracle-v" id="or-commitment">—</span></div>
+                <div class="oracle-row"><span class="oracle-k">Active Setups</span><span class="oracle-v" id="or-setups">—</span></div>
+              </div>
+              <div class="oracle-col oracle-col-play">
+                <div class="oracle-col-hdr">Recommended Play</div>
+                <div id="or-play-empty" style="color:var(--muted);font-size:11px;padding:8px 0">No signal — all systems flat</div>
+                <div id="or-play" class="hidden">
+                  <div class="oracle-play-pair"><span id="or-pair">—</span><span id="or-dir-badge" class="oracle-dir">—</span></div>
+                  <div class="oracle-levels">
+                    <div><span class="oracle-k">Entry</span><span class="oracle-v" id="or-entry">—</span></div>
+                    <div><span class="oracle-k">SL</span><span class="oracle-v red" id="or-sl">—</span></div>
+                    <div><span class="oracle-k">TP1</span><span class="oracle-v green" id="or-tp1">—</span></div>
+                    <div><span class="oracle-k">TP2</span><span class="oracle-v green" id="or-tp2">—</span></div>
+                  </div>
+                  <div id="or-conviction-bar-wrap">
+                    <div class="oracle-k">Conviction</div>
+                    <div class="or-conv-track"><div class="or-conv-fill" id="or-conv-fill"></div></div>
+                    <span id="or-conv-val" style="font-size:10px;color:var(--muted)">—</span>
+                  </div>
+                </div>
+                <div id="or-reasoning" style="font-size:10px;color:#888;line-height:1.5;margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">—</div>
+              </div>
+              <div class="oracle-col">
+                <div class="oracle-col-hdr">Latest Suggestions</div>
+                <div id="or-suggestions">—</div>
+              </div>
+            </div>
+          </div>
         </div>
         <div id="sig-right">
           <div class="sig-section-hdr">Bridge State</div>
@@ -860,7 +930,7 @@ document.querySelectorAll('.hdr-tab').forEach(btn=>{
     if(!tabInited[id]){
       tabInited[id]=true;
       if(id==='tab-research')resLoad();
-      if(id==='tab-signals'){sigInit();sigRefresh();}
+      if(id==='tab-signals'){sigInit();sigRefresh();oracleRefresh();}
       if(id==='tab-trades')trLoad();
       if(id==='tab-chat')chatInjectChips();
     }
@@ -1427,6 +1497,110 @@ async function sigRefresh(){
   }
 }
 setInterval(()=>{if(document.getElementById('tab-signals').classList.contains('active'))sigRefresh();},60000);
+
+// ══ ORACLE INTEL PANEL ══
+const ORACLE_API='http://localhost:8765/oracle';
+let _oracleLinesSl=null, _oracleLinesEntry=null, _oracleLinesTP1=null, _oracleLinesTP2=null;
+
+async function oracleRefresh(){
+  try{
+    const r=await fetch(ORACLE_API+'?t='+Date.now(),{signal:AbortSignal.timeout(5000)});
+    if(!r.ok)return;
+    const d=await r.json();
+    oracleRender(d);
+  }catch{}
+}
+
+function oracleRender(d){
+  const board=d.board||{};
+  const play=d.recommended_play;
+  const threat=board.threat||0;
+  const regime=board.regime||'NORMAL';
+  const commitment=board.commitment||0;
+
+  // Badge
+  const badge=document.getElementById('oracle-regime-badge');
+  badge.className='oracle-badge '+(regime==='RISK_OFF'?'risk-off':regime==='CAUTION'?'caution':'normal');
+  badge.textContent=regime;
+  document.getElementById('oracle-threat-pct').textContent=`threat ${(threat*100).toFixed(0)}%`;
+
+  // Board state col
+  document.getElementById('or-regime').textContent=regime;
+  document.getElementById('or-ict-mode').textContent=board.ict_mode||'—';
+  const cLabel=commitment>0.6?'COMMITTED':commitment>0.3?'DEVELOPING':'UNCOMMITTED';
+  document.getElementById('or-commitment').textContent=`${cLabel} (${(commitment*100).toFixed(0)}%)`;
+  const setups=d.active_setups||[];
+  document.getElementById('or-setups').textContent=setups.length?setups.map(s=>`${s.pair.split('/')[0]} ${s.direction}`).join(', '):'Flat';
+
+  // Recommended play col
+  const playEl=document.getElementById('or-play');
+  const emptyEl=document.getElementById('or-play-empty');
+  if(play){
+    playEl.classList.remove('hidden');
+    emptyEl.style.display='none';
+    document.getElementById('or-pair').textContent=play.pair||'—';
+    const dirBadge=document.getElementById('or-dir-badge');
+    dirBadge.textContent=play.direction;
+    dirBadge.className='oracle-dir '+(play.direction==='LONG'?'long':'short');
+    document.getElementById('or-entry').textContent=_fmt(play.entry);
+    document.getElementById('or-sl').textContent=_fmt(play.sl);
+    document.getElementById('or-tp1').textContent=_fmt(play.tp1);
+    document.getElementById('or-tp2').textContent=_fmt(play.tp2);
+    const conv=play.conviction||0;
+    document.getElementById('or-conv-fill').style.width=Math.min(100,conv/3*100)+'%';
+    document.getElementById('or-conv-val').textContent=`${conv.toFixed(3)} × ${play.size_mult?.toFixed(2)||1}x`;
+    document.getElementById('or-reasoning').textContent=play.reasoning||'';
+
+    // Draw chart level lines if chart is active
+    _oracleDrawLevels(play);
+  } else {
+    playEl.classList.add('hidden');
+    emptyEl.style.display='';
+    document.getElementById('or-reasoning').textContent='';
+    _oracleClearLevels();
+  }
+
+  // Suggestions col
+  const sugs=d.recent_suggestions||[];
+  const sugEl=document.getElementById('or-suggestions');
+  if(!sugs.length){sugEl.textContent='No recent suggestions';return;}
+  sugEl.innerHTML=sugs.map(s=>{
+    const st=s.status||'?';
+    const cls=st==='DONE'?'done':st==='PENDING'||st==='QUEUED'?'pending':'error';
+    return `<div class="or-sug"><span class="or-sug-id">${s.id}</span>${(s.title||s.description||'').slice(0,60)}<span class="or-sug-status ${cls}">${st}</span></div>`;
+  }).join('');
+}
+
+function _fmt(v){if(v==null||v===undefined)return'—';return typeof v==='number'?v.toFixed(5):v;}
+
+function _oracleDrawLevels(play){
+  if(!sigChart||!play)return;
+  _oracleClearLevels();
+  const color=(c)=>({color:c,lineWidth:1,lineStyle:2,axisLabelVisible:true}); // dashed
+  try{
+    if(sigCandles){
+      if(play.entry!=null)_oracleLinesEntry=sigCandles.createPriceLine({price:play.entry,color:'#4a90d9',lineWidth:1,lineStyle:2,axisLabelVisible:true,title:'Entry'});
+      if(play.sl!=null)_oracleLinesSl=sigCandles.createPriceLine({price:play.sl,color:'#ff6b6b',lineWidth:1,lineStyle:2,axisLabelVisible:true,title:'SL'});
+      if(play.tp1!=null)_oracleLinesTP1=sigCandles.createPriceLine({price:play.tp1,color:'#26de81',lineWidth:1,lineStyle:2,axisLabelVisible:true,title:'TP1'});
+      if(play.tp2!=null)_oracleLinesTP2=sigCandles.createPriceLine({price:play.tp2,color:'#26de81',lineWidth:1,lineStyle:3,axisLabelVisible:true,title:'TP2'});
+    }
+  }catch{}
+}
+
+function _oracleClearLevels(){
+  try{
+    if(_oracleLinesEntry&&sigCandles)sigCandles.removePriceLine(_oracleLinesEntry);
+    if(_oracleLinesSl&&sigCandles)sigCandles.removePriceLine(_oracleLinesSl);
+    if(_oracleLinesTP1&&sigCandles)sigCandles.removePriceLine(_oracleLinesTP1);
+    if(_oracleLinesTP2&&sigCandles)sigCandles.removePriceLine(_oracleLinesTP2);
+  }catch{}
+  _oracleLinesEntry=_oracleLinesSl=_oracleLinesTP1=_oracleLinesTP2=null;
+}
+
+// Refresh Oracle panel every 30s when signals tab is active
+setInterval(()=>{
+  if(document.getElementById('tab-signals').classList.contains('active'))oracleRefresh();
+},30000);
 
 // ══ TAB 3: RESEARCH ══
 const RES_BASE='data/agent/';
