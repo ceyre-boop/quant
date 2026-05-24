@@ -373,20 +373,20 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
     <div class="hdr-tab" data-tab="chat">Chat</div>
   </div>
   <div class="hdr-right">
-    <div id="nav-bridge-chip" class="status-chip chip-red"><div class="chip-dot pulse"></div>HALT_NEW</div>
-    <div id="nav-threat-chip" class="status-chip chip-red">THREAT 1.00</div>
+    <div id="nav-bridge-chip" class="status-chip chip-green">NORMAL</div>
+    <div id="nav-threat-chip" class="status-chip chip-green">THREAT 0.00</div>
     <div id="hdr-clock">--:--:-- UTC</div>
   </div>
 </nav>
 
-<div id="alert-banner">
+<div id="alert-banner" class="hidden">
   <div class="ab-icon">🔴</div>
   <div><div class="ab-label" id="ab-mode">ICT: HALT_NEW</div>
-  <div class="ab-text" id="ab-text">ASIAN_CURRENCY_CONTAGION — no new entries until threat &lt; 0.85</div></div>
+  <div class="ab-text" id="ab-text">— no new entries until threat &lt; 0.85</div></div>
   <div class="ab-threat-wrap">
     <span style="font-size:9px;color:var(--muted);letter-spacing:1px">THREAT</span>
-    <div class="ab-bar-bg"><div class="ab-bar-fill" id="ab-bar" style="width:100%"></div></div>
-    <span class="ab-threat-val" id="ab-threat">1.00</span>
+    <div class="ab-bar-bg"><div class="ab-bar-fill" id="ab-bar" style="width:0%"></div></div>
+    <span class="ab-threat-val" id="ab-threat">0.00</span>
   </div>
 </div>
 
@@ -435,9 +435,9 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
       <!-- System Status -->
       <div class="sys-status">
         <div class="ss-title">System Status</div>
-        <div class="ss-row"><span class="ss-key">Bridge Mode</span><span class="ss-val val-red" id="ss-bridge">HALT_NEW</span></div>
-        <div class="ss-row"><span class="ss-key">Library Regime</span><span class="ss-val" style="font-size:10px" id="ss-regime">ASIAN_CURRENCY_CONTAGION</span></div>
-        <div class="ss-row"><span class="ss-key">Threat Score</span><span class="ss-val val-red" id="ss-threat">1.00</span></div>
+        <div class="ss-row"><span class="ss-key">Bridge Mode</span><span class="ss-val val-green" id="ss-bridge">NORMAL</span></div>
+        <div class="ss-row"><span class="ss-key">Library Regime</span><span class="ss-val" style="font-size:10px" id="ss-regime">—</span></div>
+        <div class="ss-row"><span class="ss-key">Threat Score</span><span class="ss-val val-green" id="ss-threat">0.00</span></div>
         <div class="ss-row"><span class="ss-key">ICT Session</span><span class="ss-val val-green">London UTC 03:xx</span></div>
         <div class="ss-row"><span class="ss-key">Equity System</span><span class="ss-val val-green">LIVE paper</span></div>
         <div class="ss-row"><span class="ss-key">Forex Version</span><span class="ss-val val-green">v013</span></div>
@@ -638,7 +638,7 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
   <!-- ══ TAB 4: CHAT ══ -->
   <div class="tab-panel" id="tab-chat">
     <div id="chat-panel">
-      <div id="chat-ctx">Context: SOVEREIGN v013 · Forex Sharpe 1.8552 · ICT London+A Sharpe 2.093 · Bridge: HALT_NEW (threat 1.00) · Prop: ACTIVE Day 0</div>
+      <div id="chat-ctx">Context: SOVEREIGN v013 · Forex Sharpe 1.8552 · ICT London+A Sharpe 2.093 · Bridge: NORMAL (threat 0.00) · Prop: ACTIVE Day 0</div>
       <div id="chat-msgs">
         <div class="cb assistant">
           <div class="cb-inner">SOVEREIGN online. Ask me about signals, hypothesis status, system health, or trading decisions.</div>
