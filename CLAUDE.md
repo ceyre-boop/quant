@@ -218,8 +218,8 @@ ICT system:       LIVE — paper trading, launchd every 5min during London/NY PM
                   Dashboard: ceyre-boop.github.io/quant/ict/ (Oracle-driven, live)
                   LIVE: pd_alignment weight=0 (HYP-024 confirmed anti-edge, wired 2026-05-19)
                   LIVE: Timing gate UTC 03:xx only (2026-05-22): WR=80% avgR=+2.100 vs UTC 04:xx WR=14%
-Forex system:     LIVE — v011 paper scan, 5 pairs | 🏆 INSTITUTIONAL GRADE ACHIEVED
-                  v011 (2026-05-22): avg_sharpe=1.6476 | 5/5 pairs >1.5 individually | +0.208 vs v010
+Forex system:     LIVE — v013 paper scan, 5 pairs | 🏆 INSTITUTIONAL GRADE ACHIEVED
+                  v013 (2026-05-24): avg_sharpe=1.8552 | target v014 > 1.9052 (+0.05 gate)
                   Universal bull+VIX gate: macro rate-diff signals degrade when fear flows compete
                   Tiered thresholds: USDJPY/AUDNZD VIX>15 | EURUSD/GBPUSD/AUDUSD VIX>20
                   Per-pair (gated): USDJPY→1.770 | AUDUSD→1.665 | GBPUSD→1.662 | EURUSD→1.583 | AUDNZD→1.558
@@ -239,7 +239,9 @@ Forex version tracker:
   v009: 1.1955 → 1.2864 (GBPJPY retired, +0.091 — clears +0.05 gate by 1.8×)
   v010: 1.2864 → 1.4396 (USDJPY regime gate VIX>15/bull, +0.153 — largest jump since v005)
   v011: 1.4396 → 1.6476 (universal bull+VIX gate all pairs, +0.208) ← INSTITUTIONAL GRADE ✓
-  Target: Sharpe > 1.5 (institutional grade) | ACHIEVED +0.1476 margin
+  v012: 1.6476 → 1.7176 (+0.070)
+  v013: 1.7176 → 1.8552 (+0.138) ← CURRENT LIVE
+  Target: Sharpe > 1.9052 (v014 gate, +0.05 from v013)
 
 Unified forensics (2026-05-18): sovereign/research/unified_forensics.py
   SHARED ROOT CAUSE: Both ICT and Forex fail from PREMATURE ENTRY
@@ -265,7 +267,29 @@ Intelligence Architecture (2026-05-19) — 4 layers complete:
     ICT→QUANT: 3+ stops/commitment-fails in 24h → REDUCE_CONVICTION (0.50×, 48h)
     State: data/forensics/cross_system_state.json (6h TTL)
     Wired: ict/pipeline.py Stage 0 + agent_scheduler.py every 2h
-    Current: HALT_NEW (ASIAN_CURRENCY_CONTAGION, threat=1.00)
+    Current: NORMAL (threat=0.00, cleared 2026-05-24)
+
+Oracle Research Agent (2026-05-24) — autonomous loop now live:
+  sovereign/agent/research_agent.py    — CREATED (was missing). Executor for all queue tasks.
+  sovereign/oracle/oracle_agent.py     — CREATED. Writes SUG-### with auto_execute; fires agent immediately.
+  Wiring: suggestions.json PENDING → research_agent.check_suggestions() → run in milliseconds
+  Wiring: prompt_queue.json auto_execute=true → process_prompt_queue() → run without human gate
+  Safety: auto_execute=False for anything touching live trading params (parameters.yml, execute_daily)
+  agent_scheduler.py: check_suggestions() + process_prompt_queue() run every cycle before queue dispatch
+
+Oracle findings confirmed and deployed (2026-05-24):
+  RQ-AUTO-001 ✅ CONFIRMED: UTC 03xx Grade A WR=56.2%, avgR=+1.078 (n=16). UTC 04xx WR=14% — timing gate LIVE
+  RQ-AUTO-003 ✅ COMPLETE: market_structure IC=-0.195 (anti-edge, deployed as HYP-034, weight=0 wired)
+  RQ-AUTO-005 ✅ CONFIRMED: Empirical MC 97.9% pass rate (n=2000 sims, London+GradeA config)
+  RQ-004     ✅ COMPLETE: Library CRITICAL fingerprint = consecutive_down_weeks (2.22 weight)
+  HYP-027    ✅ CONFIRMED: USDJPY regime gate suppress signals in bull+elevated VIX
+  HYP-036    ❌ REJECTED: RMT portfolio Kelly (Sharpe delta holdout=-0.103)
+  SUG-001    ✅ IMPLEMENTED: Dynamic ADR threshold 1.0→1.2 during high-vol sessions
+
+Oracle suggestion history (6 total):
+  SUG-001 IMPLEMENTED | SUG-002 VETOED (AUDNZD > GBPJPY in backtest) | SUG-003 VETOED (already done)
+  SUG-004 VETOED (already live at 85% ADR) | SUG-005 VETOED (stop width Sharpe-invariant)
+  SUG-006 NEW — isolate Library feature criticality ranking (pending)
 
 Prop firm:        sovereign/propfirm/ — rules engine + MC simulator + paper tracker + checklist
   MC results (2026-05-19): london_a=100% | london_all=99.7% | both clear 70% gate
@@ -273,7 +297,7 @@ Prop firm:        sovereign/propfirm/ — rules engine + MC simulator + paper tr
     G1 MC pass rate:     🟢 99.7-100% (DONE)
     G2 Live trades:      🔴 0/30 (collecting London+GradeA paper trades)
     G3 WR alignment:     🟡 collecting (need 10+ closed trades)
-    G4 Bridge threat:    🔴 1.00 HALT_NEW (wait for macro to clear)
+    G4 Bridge threat:    🟢 0.00 NORMAL (cleared 2026-05-24)
     G5 Non-bust days:    🟡 collecting
     VERDICT: WAIT — buy when G2+G4 flip GREEN
   Paper challenge #1: ACTIVE (Day 0, balance=$100k, floor=$92k, target=$108k)
