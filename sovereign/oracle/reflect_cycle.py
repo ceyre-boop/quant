@@ -41,8 +41,24 @@ ORACLE_SCHEMA = {
 
 ORACLE_PROMPT_TEMPLATE = """You are the trading intelligence Oracle for Alta Investments — a two-person quant operation trading FX and equity using a systematic macro strategy.
 
-## Your role
-Analyze 7 days of trade data and the current proven system lessons. Propose ONE candidate lesson that, if proven, would improve the trading edge. You are identifying principles the system doesn't know yet — not re-stating what's already known.
+## Your primary mission
+Close the Sharpe gap. {sharpe_summary}
+Every suggestion you make must move one needle: Sharpe, win rate, drawdown, or prop challenge readiness.
+
+## The Six Trading Tenets (every suggestion MUST serve at least one)
+{tenets}
+
+## Current system state
+{bridge_state}
+
+## Next milestones (help get these done)
+{next_milestones}
+
+## Hypothesis ledger (what's been tested — do not duplicate)
+{hypothesis_summary}
+
+## Research queue (already queued — do not duplicate)
+{queue_status}
 
 ## Proven research (already known — DO NOT re-propose these)
 {proven_summary}
@@ -59,13 +75,14 @@ A GOOD lesson is:
 - Mechanistic: explains WHY something happens in terms of institutional behavior, not pattern matching
 - Testable: can be expressed as an exact rule applied to trade data
 - Specific: names exact thresholds, not vague directions
-- Novel: not already in the proven research or active lessons above
+- Novel: not already in the proven research, active lessons, or hypothesis ledger above
+- Goal-oriented: directly addresses the Sharpe gap or a next milestone
 
 A BAD lesson is:
 - "The market is uncertain" — not testable
 - "Use wider stops" — not specific
 - "EURUSD is volatile" — no mechanism
-- Anything already in the proven research list above
+- Anything already confirmed, rejected, or queued in the hypothesis ledger
 
 Examples of good lessons:
 - "Trades entered within 3 bars of the London open have 2.1× higher R than trades entered after bar 6 — institutional displacement is concentrated in the first 30 minutes"
@@ -149,7 +166,16 @@ def run_reflect(harvests: list[dict], date: Optional[str] = None) -> dict:
 
     date = date or datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
+    from sovereign.oracle.system_context import build_system_context
+    ctx = build_system_context()
+
     prompt = ORACLE_PROMPT_TEMPLATE.format(
+        sharpe_summary=ctx["sharpe_summary"],
+        tenets=ctx["tenets"],
+        bridge_state=ctx["bridge_state"],
+        next_milestones=ctx["next_milestones"],
+        hypothesis_summary=ctx["hypothesis_summary"],
+        queue_status=ctx["queue_status"],
         proven_summary=_load_proven_summary(),
         active_lessons_summary=_load_active_lessons(),
         harvest_summary=_load_harvest_summary(harvests),
@@ -160,7 +186,7 @@ def run_reflect(harvests: list[dict], date: Optional[str] = None) -> dict:
     client = anthropic.Anthropic(api_key=api_key)
     response = client.messages.create(
         model="claude-haiku-4-5",
-        max_tokens=800,
+        max_tokens=1024,
         messages=[{"role": "user", "content": prompt}],
     )
 
@@ -208,8 +234,16 @@ if __name__ == "__main__":
     harvests = load_recent_harvests(args.days)
 
     if args.dry_run:
+        from sovereign.oracle.system_context import build_system_context
+        ctx = build_system_context()
         print("=== ORACLE PROMPT (dry run) ===")
         print(ORACLE_PROMPT_TEMPLATE.format(
+            sharpe_summary=ctx["sharpe_summary"],
+            tenets=ctx["tenets"],
+            bridge_state=ctx["bridge_state"],
+            next_milestones=ctx["next_milestones"],
+            hypothesis_summary=ctx["hypothesis_summary"],
+            queue_status=ctx["queue_status"],
             proven_summary=_load_proven_summary(),
             active_lessons_summary=_load_active_lessons(),
             harvest_summary=_load_harvest_summary(harvests),

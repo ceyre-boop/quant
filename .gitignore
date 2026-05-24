@@ -74,3 +74,22 @@ outputs/
 
 # Sovereign Cache
 sovereign/cache/
+
+# Large data/cache directories — never commit
+data/cache/
+data/harvest.db
+data/ledger/ict_memory.json
+data/ledger/ict_paper_trades.json
+data/ledger/ict_veto_ledger_*.jsonl
+logs/
+repomix-output.xml
+vendor/
+.harvester.pid
+.retrain.pid
+skills-lock.json
+${HOME}/
+\${HOME}/
+.agents/
+.claude/
+Plans/
+# GOALS.md
