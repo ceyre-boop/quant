@@ -67,10 +67,24 @@ def _fetch_forex_signals():
             # conviction = signal strength * size_mult
             conviction = round(abs(signal) * size_mult, 3) if signal != 0 else 0.0
 
-            # recent price history (last 60 bars) for the sparkline
+            # recent price history (last 90 bars) for the chart
+            n = min(90, len(prices))
+            px = prices.iloc[-n:]
             price_history = [
                 {'t': int(ts.timestamp() * 1000), 'v': round(float(v), 5)}
-                for ts, v in zip(prices.index[-60:], prices['Close'].iloc[-60:])
+                for ts, v in zip(px.index, px['Close'])
+            ]
+            # OHLCV for candlestick chart
+            ohlcv = [
+                {
+                    't': int(ts.timestamp() * 1000),
+                    'o': round(float(row['Open']), 5),
+                    'h': round(float(row['High']), 5),
+                    'l': round(float(row['Low']), 5),
+                    'c': round(float(row['Close']), 5),
+                    'v': int(row.get('Volume', 0)),
+                }
+                for ts, row in px.iterrows()
             ]
 
             # recent signals
@@ -83,6 +97,17 @@ def _fetch_forex_signals():
                         'hold': int(row.get('hold_days', row.get('hold', 60))),
                     })
 
+            # conviction history aligned to price bars
+            conv_history = []
+            for ts, row in df.iloc[-n:].iterrows():
+                sig_val = int(row.get('signal', 0))
+                sm = float(row.get('size_mult', 1.0))
+                conv_history.append({
+                    't': int(pd.Timestamp(ts).timestamp() * 1000),
+                    'v': round(abs(sig_val) * sm, 3) if sig_val != 0 else 0.0,
+                    's': sig_val,
+                })
+
             results.append({
                 'ticker': ticker,
                 'label': label,
@@ -91,6 +116,8 @@ def _fetch_forex_signals():
                 'conviction': conviction,
                 'size_mult': size_mult,
                 'price_history': price_history,
+                'ohlcv': ohlcv,
+                'conv_history': conv_history,
                 'signal_marks': signal_marks[-20:],
                 'error': None,
             })
@@ -280,12 +307,37 @@ class Handler(BaseHTTPRequestHandler):
                 from sovereign.ledger.live_trade_log import LiveTradeLog
                 import urllib.parse as _up
                 qs = dict(_up.parse_qsl(self.path.split('?')[1] if '?' in self.path else ''))
-                n = int(qs.get('n', 100))
+                n = int(qs.get('n', 200))
                 events = LiveTradeLog.read(n)
+
+                # Build equity curve (running R-multiples from closed trades)
+                equity_curve = []
+                equity = 0.0
+                entries = {}
+                for ev in sorted(events, key=lambda x: x.get('ts', '')):
+                    etype = ev.get('type', '')
+                    ticker = ev.get('ticker', '')
+                    price = float(ev.get('price') or 0)
+                    if etype == 'ENTRY':
+                        entries[ticker] = {'price': price, 'dir': ev.get('direction', 'LONG'), 'ts': ev.get('ts', '')}
+                    elif etype in ('TP1', 'TP2', 'STOP', 'SESSION_CLOSE') and ticker in entries:
+                        entry = entries[ticker]
+                        ep = entry['price']
+                        if ep and ep != 0:
+                            raw_r = (price - ep) / ep if entry['dir'] == 'LONG' else (ep - price) / ep
+                            # Normalize to R (assume 1% stop = 1R)
+                            r_val = raw_r * 100
+                            if etype == 'STOP': r_val = max(r_val, -1.0)
+                            equity += r_val
+                            equity_curve.append({'ts': ev.get('ts', ''), 'equity': round(equity, 4), 'r': round(r_val, 4), 'type': etype, 'ticker': ticker})
+                        if etype in ('TP2', 'STOP', 'SESSION_CLOSE'):
+                            entries.pop(ticker, None)
+
                 self._send_json(200, {
                     'events': events,
                     'open_positions': LiveTradeLog.open_positions(),
                     'count': len(events),
+                    'equity_curve': equity_curve,
                 })
             except Exception:
                 self._send_json(500, {'error': traceback.format_exc()})
