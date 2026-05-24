@@ -860,6 +860,19 @@ def run_cycle(dry_run: bool = False, force_heavy: bool = False) -> None:
         except Exception as e:
             log.warning(f"Oracle learning cycle failed (non-fatal): {e}")
 
+    # 4a. Check Oracle suggestions — auto-queue and run any PENDING ones immediately
+    try:
+        sys.path.insert(0, str(ROOT))
+        from sovereign.agent.research_agent import check_suggestions, process_prompt_queue
+        n_sug = check_suggestions(dry_run=dry_run)
+        if n_sug:
+            log.info(f"Oracle: auto-ran {n_sug} pending suggestions")
+        n_pq = process_prompt_queue(dry_run=dry_run)
+        if n_pq:
+            log.info(f"Oracle: processed {n_pq} auto-execute prompt queue items")
+    except Exception as _ora_err:
+        log.warning(f"Oracle suggestion check failed (non-fatal): {_ora_err}")
+
     # 4. Pick and dispatch a research task if budget allows
     task = pick_task(mode)
     if not task:
@@ -955,6 +968,7 @@ def main():
     parser = argparse.ArgumentParser(description="Alta Research Agent Scheduler")
     parser.add_argument("--dry-run",       action="store_true", help="Print what would run, don't execute")
     parser.add_argument("--force-heavy",   action="store_true", help="Override mode to FULL regardless of budget")
+    parser.add_argument("--once",          action="store_true", help="Run one full cycle (including suggestion check) and exit")
     parser.add_argument("--gen-plist",     action="store_true", help="Print research scheduler plist to stdout and exit")
     parser.add_argument("--gen-eod-plist", action="store_true", help="Print EOD challenge plist (17:00 ET daily) and exit")
     parser.add_argument("--health",        action="store_true", help="Run health check only and exit (JSON to stdout)")
@@ -987,6 +1001,10 @@ def main():
 
     if args.eod_challenge:
         run_eod_challenge_update(dry_run=args.dry_run)
+        return
+
+    if args.once:
+        run_cycle(dry_run=args.dry_run, force_heavy=True)
         return
 
     run_cycle(dry_run=args.dry_run, force_heavy=args.force_heavy)
