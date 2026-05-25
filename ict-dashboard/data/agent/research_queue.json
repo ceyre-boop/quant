@@ -300,13 +300,16 @@
     {
       "id": "RQ-021",
       "priority": 1,
-      "status": "QUEUED",
+      "status": "ERROR",
       "name": "HYP-034: Currency Strength Composite",
       "description": "Build 8-currency daily strength index (avg return vs all 7 others). Route LONG strongest vs SHORT weakest. Run portfolio backtest 2015-2024 vs fixed pair universe. Same signal stack. Compare Sharpe delta.",
       "hypothesis_id": "HYP-034",
       "script": "scripts/hyp_034_currency_strength.py",
       "needs_network": true,
-      "estimated_minutes": 30
+      "estimated_minutes": 30,
+      "started": "2026-05-25T19:47:56",
+      "completed": "2026-05-25T19:47:56",
+      "last_result": "DRY RUN: HYP-034: Currency Strength Composite \u2014 not executed"
     },
     {
       "id": "RQ-022",
