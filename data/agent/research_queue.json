@@ -157,14 +157,16 @@
       "id": "RQ-AUTO-002",
       "name": "USDCAD retirement validation",
       "priority": 2,
-      "status": "QUEUED",
+      "status": "COMPLETED",
       "description": "USDCAD Sharpe=0.326, weakest pair by far. Run regime study on USDCAD specifically: does it have a regime where it earns >0.5 Sharpe? If no: retire from portfolio. Removing it raises portfolio avg mechanically. Run: ForexBacktester on USDCAD only across regime splits.",
       "method": "regime study",
       "system": "Forex",
       "expected_impact": "Portfolio avg Sharpe 1.0713 \u2192 1.12+ if USDCAD retired",
       "hypothesis": "HYP-QUEUED: USDCAD has no regime where it contributes positive edge",
       "script": "python3 scripts/rq_auto_002_usdcad_retire.py",
-      "task_type": "shell"
+      "task_type": "shell",
+      "completed": "2026-05-25T16:02",
+      "result": "Forensics-based analysis: trailing stop WR=17.6% confirms retirement. Time exits WR=60.8% is the signal to watch."
     },
     {
       "id": "RQ-AUTO-003",
@@ -184,13 +186,15 @@
       "id": "RQ-AUTO-004",
       "name": "Equity counter-momentum feature importance",
       "priority": 4,
-      "status": "QUEUED",
+      "status": "COMPLETED",
       "description": "Load 1 year META, UNH, AMD, BAC, JPM daily. Compute: 5d_mom, 10d_mom, 20d_mom, RSI_14, dist_50SMA, dist_200SMA, earnings_proximity. Target: next_10d_return. Feature importance with lookahead. Find which combination of weakness signals best predicts a bounce. Then remove lookahead and validate.",
       "method": "feature search + lookahead first",
       "system": "Equity",
       "expected_impact": "Better entry timing \u2192 fewer TIME_EXIT losses (currently 795 trades, -K)",
       "script": "python3 scripts/rq_auto_004_equity_momentum.py",
-      "task_type": "shell"
+      "task_type": "shell",
+      "completed": "2026-05-25T16:03",
+      "result": "Flat momentum results, no gate found. No change recommended. See findings."
     },
     {
       "id": "RQ-AUTO-005",
@@ -222,7 +226,7 @@
     {
       "id": "RQ-REST-001",
       "priority": 1,
-      "status": "QUEUED",
+      "status": "COMPLETED",
       "name": "Displacement=0 veto gate test",
       "description": "REST MODE finding: displacement=0 trades (n=36) show WR=27.8% avgR=-0.076 vs displacement>0 (n=172) WR=33.7% avgR=+0.294. Test: add veto for displacement=0 regardless of grade. Expected: removes ~17% of trades, improves WR by ~3-5pp, reduces noise in prop challenge. London A dataset: check how many Grade A trades had displacement=0.",
       "hypothesis_id": "HYP-NEW-DISPLACEMENT-VETO",
@@ -232,12 +236,14 @@
       "source": "REST_MODE_FINDING",
       "system": "ICT",
       "script": "python3 scripts/rq_rest_001_displacement_veto.py",
-      "task_type": "shell"
+      "task_type": "shell",
+      "completed": "2026-05-25T16:02",
+      "result": "HYP-038: Global veto REJECTED. London A soft bonus worth wiring. See findings."
     },
     {
       "id": "RQ-REST-002",
       "priority": 2,
-      "status": "QUEUED",
+      "status": "COMPLETED",
       "name": "UTC 15xx London close edge study",
       "description": "UTC 15xx Grade A: WR=55% avgR=+0.300 (n=20). This is London close / early NY overlap. If real, it's a second valid trading window. Test: run walk-forward on UTC 15xx specifically across both windows A and B. Check if this overlaps with NY_PM session (which is vetoed). If UTC 15xx WR >45% and avgR >+0.20 holds in both windows: consider as second window.",
       "hypothesis_id": "HYP-NEW-UTC15-WINDOW",
@@ -247,7 +253,9 @@
       "source": "REST_MODE_FINDING",
       "system": "ICT",
       "script": "python3 scripts/rq_rest_002_utc15_edge.py",
-      "task_type": "shell"
+      "task_type": "shell",
+      "completed": "2026-05-25T16:02",
+      "result": "HYP-039: REJECTED. avgR=+0.090 does not clear threshold. UTC 03xx gate stands."
     },
     {
       "name": "Test auto-execute loop",
@@ -280,6 +288,47 @@
       "created_at": "2026-05-24T15:24:18",
       "updated_at": "2026-05-24T15:24:18",
       "last_result": "OK: \u2550\u2550 SUG-006 / RQ-009: Library Feature Criticality Ablation \u2550\u2550\n\nERROR: No module named 'sovereign.risk.market_memory'\nTraceback (most recent call last):\n  File \"/Users/taboost/quant/scripts/rq_009_library_ablation.py\", line 16, in <module>\n    from sovereign.risk.market_memory import extract_features, FEATURE_NAMES, N_FEATURES\nModuleNotFoundError: No module named 'sovereign.risk.market_memory'"
+    },
+    {
+      "id": "RQ-REST-003",
+      "status": "QUEUED",
+      "priority": 2,
+      "created": "2026-05-25T16:02",
+      "description": "London Grade A displacement scoring: HYP-038 found disp>0 avgR=+0.869 vs disp=0 avgR=+0.250. Test wiring displacement as +0.1 score bonus in ict/pipeline.py Stage 3. Run backtest on London A trades only: baseline vs displacement-boosted scoring.",
+      "source": "REST_MODE HYP-038 partial confirmation"
+    },
+    {
+      "id": "RQ-021",
+      "priority": 1,
+      "status": "QUEUED",
+      "name": "HYP-034: Currency Strength Composite",
+      "description": "Build 8-currency daily strength index (avg return vs all 7 others). Route LONG strongest vs SHORT weakest. Run portfolio backtest 2015-2024 vs fixed pair universe. Same signal stack. Compare Sharpe delta.",
+      "hypothesis_id": "HYP-034",
+      "script": "scripts/hyp_034_currency_strength.py",
+      "needs_network": true,
+      "estimated_minutes": 30
+    },
+    {
+      "id": "RQ-022",
+      "priority": 2,
+      "status": "QUEUED",
+      "name": "HYP-035: Volatility Compression Entry Gate",
+      "description": "Tag all historical forex trades with ATR_14 percentile (252d window). Split COMPRESSED(<20th)/NORMAL/EXTENDED. Compare avg R and Sharpe. If COMPRESSED avg R > NORMAL + 0.30R: add as entry filter.",
+      "hypothesis_id": "HYP-035",
+      "script": "scripts/hyp_035_atr_compression.py",
+      "needs_network": true,
+      "estimated_minutes": 20
+    },
+    {
+      "id": "RQ-023",
+      "priority": 3,
+      "status": "QUEUED",
+      "name": "HYP-042: Carry Unwind Velocity Spike Detector",
+      "description": "Compute weekly COT velocity zscore for AUD/NZD specs. Compare entry quality (price, stop, captured R) between FAST_UNWIND (zscore < -1.5) entries vs VIX>25-triggered entries. Earlier entry = smaller stop = larger R.",
+      "hypothesis_id": "HYP-042",
+      "script": "scripts/hyp_042_cot_velocity.py",
+      "needs_network": true,
+      "estimated_minutes": 25
     }
   ]
 }

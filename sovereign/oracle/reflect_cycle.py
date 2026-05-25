@@ -156,7 +156,7 @@ def run_reflect(harvests: list[dict], date: Optional[str] = None) -> dict:
     Saves to data/oracle/reflections/YYYY_MM_DD.json.
     Cost: ~1.5-2 cents.
     """
-    from sovereign.agent.oracle_agent import _load_dotenv
+    from sovereign.oracle.oracle_agent import _load_dotenv
     _load_dotenv()
 
     import anthropic

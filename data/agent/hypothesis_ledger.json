@@ -248,6 +248,116 @@
       "result": "All 5 candidates tested: commitment_score IC=-0.036, cross_pair_divergence IC=-0.021, time_of_month IC=-0.079, VIX_slope IC=-0.095, momentum_5d IC=-0.032. Max IC = 0.095.",
       "date": "2026-05-19",
       "action": "COMMITMENT_FAILUREs appear irreducible from available daily data. Accept ~40% entry failure rate as structural. Sizing modifiers (HYP-031, HYP-032) improve returns without gating."
+    },
+    {
+      "id": "HYP-034",
+      "name": "Currency Strength Composite \u2014 dynamic pair routing vs fixed universe",
+      "status": "QUEUED",
+      "date": "2026-05-25",
+      "result": "",
+      "h0": "Trading strongest G8 currency vs weakest produces no improvement vs fixed pair selection",
+      "h1": "Daily currency strength ranking improves portfolio Sharpe by > 0.20 vs static universe",
+      "method": "Compute 8-currency strength daily (avg return vs all 7 others). Route LONG strongest vs SHORT weakest. Same signal stack, same risk rules. Compare Sharpe dynamic vs static 2015-2024.",
+      "expected_impact": "Large \u2014 always in best available trade"
+    },
+    {
+      "id": "HYP-035",
+      "name": "Volatility Compression Entry Gate \u2014 ATR <20th pct at entry",
+      "status": "QUEUED",
+      "date": "2026-05-25",
+      "result": "",
+      "h0": "ATR compression below 20th percentile at entry has no relationship to subsequent R-multiple",
+      "h1": "Entering when ATR in bottom 20% of 252-day range improves avg R by > 0.30R vs normal/high vol entries",
+      "method": "Tag each historical trade with atr_percentile. Split COMPRESSED/NORMAL/EXTENDED. Compare avg R and Sharpe. ICT connection: compression = Asian range = next move is displacement.",
+      "expected_impact": "Large \u2014 tighter stops, bigger moves from compression"
+    },
+    {
+      "id": "HYP-036",
+      "name": "ICT Exit Ladder Optimization \u2014 MFE data vs current TP1/TP2/TP3",
+      "status": "QUEUED",
+      "date": "2026-05-25",
+      "result": "",
+      "h0": "Current TP1=1.5R(40%) TP2=3R(35%) TP3=5R(25%) is optimal for London+GradeA setup",
+      "h1": "Optimized exit ladder increases avg captured R by > 0.20R per trade",
+      "method": "Load ICT forensic trades. Record MFE, time_to_mfe, retracement_after_mfe for winners. Test 12 configs TP1=[1.0,1.5,2.0] x TP2=[2.5,3.5,4.5,5.0]. Maximize avg_captured_R. Paired t-test, p<0.05.",
+      "expected_impact": "Medium-High \u2014 same edge, more captured"
+    },
+    {
+      "id": "HYP-037",
+      "name": "COT Commercials vs Speculators Divergence Score",
+      "status": "QUEUED",
+      "date": "2026-05-25",
+      "result": "",
+      "h0": "Commercial vs speculator net position divergence has no predictive power beyond current COT percentile gate",
+      "h1": "When commercial_net_zscore - speculator_net_zscore > 2.0, subsequent 20-day return improves by > 0.25R",
+      "method": "Compute divergence_score = commercial_net_zscore - speculator_net_zscore from CFTC COT. Spearman correlation vs forward_R. H1: rho > 0.15, p < 0.05. Validate 2024 holdout.",
+      "expected_impact": "Medium-High \u2014 catches major turning points, 5R+ spike trades"
+    },
+    {
+      "id": "HYP-038",
+      "name": "London Fix Liquidity Window (14:45-15:15 UTC)",
+      "status": "QUEUED",
+      "date": "2026-05-25",
+      "result": "",
+      "h0": "Entries within 15min of London fix produce no different R than other London entries",
+      "h1": "Fix window entries produce > 8pp higher win rate than non-fix London entries",
+      "method": "Tag ICT London trades by entry time. Compare WR/avgR in fix window vs rest of London session. Mechanism: institutional order flow concentrates at fix.",
+      "expected_impact": "Medium \u2014 timing refinement within London session"
+    },
+    {
+      "id": "HYP-039",
+      "name": "CB Meeting 7-Day Blackout Veto",
+      "status": "QUEUED",
+      "date": "2026-05-25",
+      "result": "",
+      "h0": "Trades within 7 days before CB decision show no performance difference vs inter-meeting trades",
+      "h1": "Excluding 7-day pre-decision window improves Sharpe by > 0.10",
+      "method": "Load CB calendar (8 banks, already cached). Tag every trade with days_to_next_cb. Compare PRE_DECISION vs INTER_MEETING WR and avgR. Hypothesis: pre-decision = thin liquidity = commitment never forms.",
+      "expected_impact": "Medium \u2014 removes structurally unfavorable periods"
+    },
+    {
+      "id": "HYP-040",
+      "name": "Monday Gap Fill Rate \u2014 mean reversion entry",
+      "status": "QUEUED",
+      "date": "2026-05-25",
+      "result": "",
+      "h0": "Sunday open gaps fill within 48h at random rates (no edge)",
+      "h1": "Gaps > 15 pips fill within 48h > 70% of the time",
+      "method": "Load all Sunday open vs Friday close 2015-2024. Compute fill rates by pip bucket [0-5][5-10][10-15][15-25][25+]. For fill_rate > 70%: fade gap, 0.3% risk, target=Friday close, stop=1.5x gap size.",
+      "expected_impact": "Low-Medium \u2014 small consistent structural edge"
+    },
+    {
+      "id": "HYP-041",
+      "name": "Time-of-Month Institutional Flow Bias (days 1-3)",
+      "status": "QUEUED",
+      "date": "2026-05-25",
+      "result": "",
+      "h0": "First 3 trading days of month show no systematic directional bias",
+      "h1": "Risk currencies (AUD NZD GBP) show positive bias in days 1-3 > 60% of months when VIX < 20",
+      "method": "Tag days 1-3 as MONTH_OPEN. In VIX<20 regime, compute avg 3-day return AUD/NZD/GBP pairs. Hit rate > 60% and avg return > 0.3% required.",
+      "expected_impact": "Low-Medium \u2014 timing enhancer, +0.1x sizing on month-open signal hits"
+    },
+    {
+      "id": "HYP-042",
+      "name": "Carry Unwind Velocity as Spike Detector (pre-VIX25)",
+      "status": "QUEUED",
+      "date": "2026-05-25",
+      "result": "",
+      "h0": "COT week-over-week velocity has no predictive power for carry unwind moves",
+      "h1": "FAST_UNWIND (cot_velocity_zscore < -1.5) improves subsequent short AUD/NZD return by > 0.40R vs VIX-triggered entries",
+      "method": "Compute weekly cot_velocity_zscore. Compare entry quality (price, stop size, captured R) between FAST_UNWIND entries vs VIX>25 confirmation entries. Earlier entry = smaller stop = larger R.",
+      "expected_impact": "High on spike trades \u2014 the 5R+ events that make the year"
+    },
+    {
+      "id": "HYP-043",
+      "name": "Pair Correlation Breakdown Entry \u2014 lagging pair mean reversion",
+      "status": "QUEUED",
+      "date": "2026-05-25",
+      "result": "",
+      "h0": "Temporary correlation breakdown between correlated pairs has no predictive convergence edge",
+      "h1": "When GBPUSD/EURUSD 5d correlation drops below 0.60 (avg ~0.85), lagging pair trades produce > 65% WR within 10 days",
+      "method": "Rolling 20d correlation for correlated pairs (GBPUSD-EURUSD, AUDUSD-NZDUSD, USDJPY-USDCHF). DIVERGENCE = drops > 0.25 below 252d avg. Enter lagging pair toward leading. Target: correlation restores. Spearman rho > 0.15 required.",
+      "expected_impact": "Medium-High \u2014 clean mechanism, short holds, high WR"
     }
   ],
   "hypotheses": [
@@ -575,15 +685,56 @@
     {
       "id": "HYP-036",
       "name": "RMT Covariance at Portfolio Kelly Level \u2014 monthly rebalance",
-      "status": "QUEUED",
+      "status": "REJECTED",
       "formed": "2026-05-23",
       "hypothesis": "H0: RMT-cleaned covariance at monthly portfolio Kelly rebalance produces no improvement vs raw covariance. H1: RMT cleaning reduces drawdown >15% during stress periods while maintaining Sharpe.",
       "method": "HYP-035 tested per-trade correlation penalty \u2014 wrong application layer. This tests portfolio-level: monthly rebalance of Kelly fractions using RMT-cleaned C vs raw C. Track cumulative drawdown during stress windows (COVID, 2022 rate shock). Script: scripts/hyp_036_rmt_portfolio_kelly.py",
       "accept_if": "Drawdown materially lower during stress AND Sharpe maintained AND 2024 holdout replicates",
       "practical_implication": "Replace portfolio covariance input in kelly_engine.py with RMT-cleaned matrix recomputed monthly.",
       "connection": "Layer 3 of 3-stack. Reframe of HYP-035 (PARTIAL_CONFIRMED) at correct application layer. Tells HOW TO SIZE correctly.",
-      "priority": 3
+      "priority": 3,
+      "result": "H1 REJECTED: holdout Sharpe delta -0.103, no stress drawdown improvement >15%"
+    },
+    {
+      "id": "HYP-037",
+      "name": "fvg_tap anti-edge is timing-conditional",
+      "status": "PARTIAL_CONFIRMED",
+      "formed": "2026-05-24T02:52:43",
+      "system": "ICT",
+      "statement": "The overall IC=-0.056 for fvg_tap is driven by bad timing windows (UTC 04xx, NY session). Within UTC 03xx (live gate), fvg_tap=2 performs well: WR=50% avgR=+1.208 (n=18). The component should NOT be zeroed out \u2014 it's only harmful when combined with bad timing.",
+      "test_method": "IC analysis + conditional breakdown on 208 trades (Window A+B)",
+      "result": "fvg_tap=2 in UTC 03xx: WR=50% avgR=+1.208 (n=18). Overall IC=-0.056.",
+      "conclusion": "No action needed. Current system already constrains timing \u2014 fvg_tap anti-edge is already neutralized by timing gate.",
+      "impact": "Validates existing architecture. Prevents premature zeroing of fvg_tap weight."
+    },
+    {
+      "id": "HYP-038",
+      "name": "displacement=0 as standalone veto",
+      "status": "REJECTED",
+      "formed": "2026-05-24T02:52:43",
+      "system": "ICT",
+      "statement": "Trades with displacement component score = 0 systematically underperform: WR=27.8% avgR=-0.076 (n=36) vs displacement>0 WR=33.7% avgR=+0.294 (n=172). A veto on displacement=0 regardless of overall grade may improve EV without reducing trade count excessively.",
+      "test_method": "Pending \u2014 needs impact analysis on London A dataset specifically",
+      "result": "Global: delta=+0.038 (below threshold). London A+A+ only: delta=+0.059. Not wiring as universal veto.",
+      "conclusion": "TBD",
+      "impact": "TBD \u2014 could remove ~17% of trades. If Grade A displacement=0 n is small, impact is minimal.",
+      "closed": "2026-05-25T16:02",
+      "verdict": "REJECTED_GLOBAL / PARTIAL_LONDON"
+    },
+    {
+      "id": "HYP-039",
+      "name": "UTC 15xx as second valid London close window",
+      "status": "REJECTED",
+      "formed": "2026-05-24T02:52:43",
+      "system": "ICT",
+      "statement": "UTC 15xx Grade A: WR=55% avgR=+0.300 (n=20). This is the London close / early NY overlap window. If this holds in walk-forward, it may be a second valid entry window distinct from the vetoed NY_PM session.",
+      "test_method": "Pending \u2014 needs walk-forward validation across both A and B windows",
+      "result": "UTC 15xx avgR=+0.090 \u2014 not a viable second window. UTC 03xx gate confirmed as sole valid window.",
+      "conclusion": "TBD",
+      "impact": "Could add ~10-15% more valid trade opportunities if confirmed",
+      "closed": "2026-05-25T16:02",
+      "verdict": "REJECTED"
     }
   ],
-  "last_updated": "2026-05-23T04:08:53.983423"
+  "last_updated": "2026-05-25T16:02:39.652653+00:00"
 }

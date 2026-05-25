@@ -12,6 +12,7 @@ Writes to: data/agent/suggestions.json, data/agent/prompt_queue.json,
 
 import argparse
 import json
+import os
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -23,6 +24,19 @@ PQ_PATH = DATA_AGENT / "prompt_queue.json"
 MESSAGES_PATH = DATA_AGENT / "messages_to_colin.json"
 LEDGER_PATH = ROOT / "data" / "ledger"
 FORENSICS_PATH = ROOT / "data" / "forensics" / "cross_system_state.json"
+
+def _load_dotenv(env_path: Path = None):
+    """Load .env file into os.environ if present."""
+    candidates = [env_path, ROOT / ".env", Path.home() / ".env"] if env_path else [ROOT / ".env", Path.home() / ".env"]
+    for p in candidates:
+        if p and Path(p).exists():
+            for line in Path(p).read_text().splitlines():
+                line = line.strip()
+                if line and not line.startswith("#") and "=" in line:
+                    k, _, v = line.partition("=")
+                    os.environ.setdefault(k.strip(), v.strip())
+            return
+
 
 # Research tasks that are safe to auto-execute (no live trading param changes)
 _AUTO_EXECUTE_SAFE = {"backtest", "signal_scan", "forensics", "hypothesis_test", "shell"}
