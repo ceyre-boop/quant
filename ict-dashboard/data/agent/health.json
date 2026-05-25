@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-05-16T23:53:08",
-  "overall": "GREEN",
+  "timestamp": "2026-05-25T19:47:52",
+  "overall": "YELLOW",
   "components": {
     "duckdb": {
       "status": "GREEN",
@@ -16,56 +16,56 @@
     },
     "ict_scanner": {
       "status": "GREEN",
-      "detail": "outside session hours \u2014 last run 7.9h ago"
+      "detail": "outside session hours \u2014 last run 6.2h ago"
     },
     "backtest_engine": {
       "status": "GREEN",
       "detail": "file present"
     },
     "alpaca": {
-      "status": "GREEN",
-      "detail": "paper account equity=$102,521"
+      "status": "YELLOW",
+      "detail": "key missing"
     },
     "fred": {
-      "status": "GREEN",
-      "detail": "fed funds series ok"
+      "status": "YELLOW",
+      "detail": "key missing"
     },
     "alpha_vantage": {
-      "status": "GREEN",
-      "detail": "latest bar 2026-05-15"
+      "status": "YELLOW",
+      "detail": "key missing"
     },
     "tiingo": {
-      "status": "GREEN",
-      "detail": "authenticated"
+      "status": "YELLOW",
+      "detail": "key missing"
     },
     "news_api": {
-      "status": "GREEN",
-      "detail": "34 business articles"
+      "status": "YELLOW",
+      "detail": "key missing"
     },
     "oanda": {
-      "status": "GREEN",
-      "detail": "NAV=$110,000 practice"
+      "status": "YELLOW",
+      "detail": "key or account ID missing"
     },
     "firebase": {
-      "status": "GREEN",
-      "detail": "reachable"
+      "status": "YELLOW",
+      "detail": "FIREBASE_DATABASE_URL missing"
     },
     "polygon": {
-      "status": "GREEN",
-      "detail": "free tier active (reference data)"
+      "status": "YELLOW",
+      "detail": "key missing"
     },
     "openweather": {
-      "status": "GREEN",
-      "detail": "weather data ok"
+      "status": "YELLOW",
+      "detail": "key missing"
     },
     "nasdaq": {
-      "status": "GREEN",
-      "detail": "WIKI prices ok (1 rows)"
+      "status": "YELLOW",
+      "detail": "key missing"
     },
     "reddit": {
       "status": "GREEN",
-      "detail": "50 posts | 2m ago | NVDA(B12), AMD(B10), SPY(B5), MSFT(B4), META(B4), AMZN(B4), "
+      "detail": "68 posts | 0m ago | NVDA(B19), AMD(B10), META(B9), SPY(N8), MSFT(B6), AMZN(B6), "
     }
   },
-  "last_checked": "2026-05-16T23:53:08"
+  "last_checked": "2026-05-25T19:47:52"
 }

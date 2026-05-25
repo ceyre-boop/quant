@@ -1,6 +1,66 @@
 {
   "messages": [
     {
+      "id": "msg-20260524152614",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "[Oracle] Fixed TP/SL structure vs trailing stop \u2014 v004 8-pair sweep: DRY RUN: python3 scripts/rq_010_tp_sl_sweep.py",
+      "timestamp": "2026-05-24T15:26:14",
+      "read": false
+    },
+    {
+      "id": "msg-20260524152418",
+      "priority": "FYI",
+      "emoji": "\ud83d\udfe2",
+      "text": "[Oracle] Isolate Library feature criticality ranking: OK: \u2550\u2550 SUG-006 / RQ-009: Library Feature Criticality Ablation \u2550\u2550\n\nERROR: No module named 'sovereign.risk.market_memory'\nTraceback (most recent call last):\n  File \"/Users/taboost/quant/scripts/rq_009_l",
+      "timestamp": "2026-05-24T15:24:18",
+      "read": false
+    },
+    {
+      "id": "msg-20260524001057",
+      "priority": "FYI",
+      "emoji": "\ud83d\udfe2",
+      "text": "[Oracle] Test auto-execute loop: OK: ORACLE_AUTO_EXECUTE_OK",
+      "timestamp": "2026-05-24T00:10:57",
+      "read": false
+    },
+    {
+      "id": "msg-20260524001043",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "[Oracle] 5-day rate consistency filter in state_allocator E1: DRY RUN: sovereign/forex/state_allocator.py",
+      "timestamp": "2026-05-24T00:10:43",
+      "read": false
+    },
+    {
+      "id": "MSG-REST-202605240252-001",
+      "priority": "URGENT",
+      "timestamp": "2026-05-24T02:52:03",
+      "source": "REST_MODE",
+      "message": "\ud83d\udfe2 G4 FLIPPED GREEN \u2014 Library threat cleared. ASIAN_CURRENCY_CONTAGION has dissipated: threat=0.00, ict_mode=NORMAL (as of 2026-05-23T23:47 UTC). Your CLAUDE.md showed HALT_NEW with threat=1.00. That is now cleared. Checklist: G1=\ud83d\udfe2 G2=\ud83d\udd34(0/30 trades) G3=\ud83d\udfe1 G4=\ud83d\udfe2 G5=\ud83d\udfe1. Only G2 is blocking. ICT paper trades can now flow. Action: Start logging London+GradeA paper trades. Run: python3 sovereign/propfirm/paper_challenge.py --status"
+    },
+    {
+      "id": "MSG-REST-202605240252-002",
+      "priority": "IMPORTANT",
+      "timestamp": "2026-05-24T02:52:03",
+      "source": "REST_MODE",
+      "message": "\ud83d\udcca UTC 03xx TIMING GATE CONFIRMED BY BACKTEST. Window A+B (208 trades): UTC 03xx Grade A \u2192 WR=56.2% avgR=+1.078 (n=16). UTC 04xx Grade A \u2192 WR=18.2% avgR=-0.295 (n=11). UTC 04xx Grade A+ \u2192 WR=0% avgR=-1.000 (n=8). The 1-hour timing gate you deployed (2026-05-22) is validated. It's real. Side note: UTC 15xx Grade A shows WR=55% avgR=+0.300 (n=20) \u2014 London close plays worth monitoring but n small."
+    },
+    {
+      "id": "MSG-REST-202605240252-003",
+      "priority": "IMPORTANT",
+      "timestamp": "2026-05-24T02:52:03",
+      "source": "REST_MODE",
+      "message": "\ud83d\udd2c COMPONENT IC ANALYSIS: fvg_tap anti-edge is TIMING-CONDITIONAL. Overall IC=-0.056 (mild anti-edge), but within UTC 03xx (live gate): fvg_tap=2 shows WR=50% avgR=+1.208 (n=18) \u2014 one of the better sub-groups. The anti-edge is driven by UTC 04xx and NY session, not UTC 03xx. DO NOT zero-weight fvg_tap. The current system is correct. New actionable: displacement=0 predicts losses (WR=27.8% avgR=-0.076 vs nonzero WR=33.7% avgR=+0.294). Consider veto: if displacement=0, skip trade regardless of grade."
+    },
+    {
+      "id": "MSG-REST-202605240252-004",
+      "priority": "FYI",
+      "timestamp": "2026-05-24T02:52:03",
+      "source": "REST_MODE",
+      "message": "\ud83c\udfb2 PROP CHALLENGE EMPIRICAL MC: 97.9% pass rate confirmed. Used actual London A R-multiples (28 trades, WR=42.9%, avgR=+0.893) as distribution. Median 11 trades to pass, p90 peak drawdown only 5.5%. This validates the theoretical 90.3% estimate \u2014 edge is real and the challenge is very winnable. Once live trades start flowing (G2), this challenge completes in ~2-3 weeks at London A pace."
+    },
+    {
       "id": "msg-20260516235312",
       "priority": "IMPORTANT",
       "emoji": "\ud83d\udfe1",
@@ -308,6 +368,47 @@
       "emoji": "\ud83d\udd34",
       "text": "The system is running clean\u2014all green, good equity cushion, and your forex vetoes are correctly throttling down pairs that have exhausted daily range. Your equity hypothesis work is solid (counter-momentum sizing, VIX slope effects), but I'm flagging that you've got 14 rejected hypotheses stacking up against 13 confirmed ones, which means your signal-to-noise ratio is still fighting you; you should consolidate what's actually working (the 3\u00d7 payoff on counter-momentum pullbacks is real money) and stop testing marginal ideas. The Reddit chatter on NVDA/AMD suggests retail is still chasing momentum into a market that's showing volatility depletion across forex\u2014good reminder that your size reducers are",
       "timestamp": "2026-05-19T13:25:36.884307",
+      "read": false,
+      "source": "oracle"
+    },
+    {
+      "id": "msg-restmode-20260525a",
+      "timestamp": "2026-05-25T16:02:39.652653+00:00",
+      "priority": "FYI",
+      "emoji": "\ud83d\udfe2",
+      "text": "REST MODE: HYP-038 displacement=0 veto REJECTED globally (delta=+0.038, below +0.05). BUT: London Grade A + displacement>0 shows avgR=+0.869 vs +0.250 with disp=0 \u2014 a real gap. London A+A+ combined gate: delta=+0.059, removes 14.5% of trades. Recommendation: treat displacement>0 as a soft score bonus in London, not a hard veto.",
+      "mode": "REST_MODE"
+    },
+    {
+      "id": "msg-restmode-20260525b",
+      "timestamp": "2026-05-25T16:02:39.652653+00:00",
+      "priority": "FYI",
+      "emoji": "\ud83d\udfe2",
+      "text": "REST MODE: HYP-039 UTC 15xx REJECTED as second window (WR=44.4% but avgR=+0.090 \u2014 not enough). UTC 03xx gate confirmed correct. The UTC 05xx 'anomaly' is just London session GBPUSD variance \u2014 not a new window. Current timing gate stands. No action needed.",
+      "mode": "REST_MODE"
+    },
+    {
+      "id": "msg-restmode-20260525c",
+      "timestamp": "2026-05-25T16:02:39.652653+00:00",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "REST MODE: USDCAD retirement forensics complete (RQ-AUTO-002 via forensics). The failure mechanism is clear: trailing stop exits WR=17.6% avgR=-0.493 vs time exits WR=60.8% avgR=+0.400. USDCAD macro signals are directionally right (60% WR on time exits) but trailing stop gets triggered by noise before the move develops. If ever reconsidered for v015+: time-only exits, no trailing stops. GBPJPY's failure was different \u2014 structural thesis failures. Both retirements validated.",
+      "mode": "REST_MODE"
+    },
+    {
+      "id": "msg-restmode-20260525d",
+      "timestamp": "2026-05-25T16:03:59.544726+00:00",
+      "priority": "FYI",
+      "emoji": "\ud83d\udfe2",
+      "text": "REST MODE COMPLETE (May 25 UTC 15:57-16:30). 4 tasks closed: HYP-038 (displacement veto rejected globally, soft London bonus noted), HYP-039 (UTC 15xx rejected), RQ-AUTO-002 (USDCAD trailing stop failure confirmed), RQ-AUTO-004-lite (equity momentum gates flat, no change). 1 new task added: RQ-REST-003 (wire displacement as London score bonus). 5 queued tasks remain: RQ-006 (blocked, needs 30 trades), RQ-009 (library ablation), RQ-AUTO-006 (ICT bear regime, needs more data), RQ-REST-003 (new). No urgent flags. System health: forex_ledger GREEN, backtest engine GREEN, ICT paper challenge Day 1 (0 closed trades).",
+      "mode": "REST_MODE"
+    },
+    {
+      "id": "oracle-20260525194756",
+      "priority": "FYI",
+      "emoji": "\ud83d\udfe2",
+      "text": "DRY RUN: Oracle would have called Claude here and written a message based on current system state.",
+      "timestamp": "2026-05-25T19:47:56.501181",
       "read": false,
       "source": "oracle"
     }

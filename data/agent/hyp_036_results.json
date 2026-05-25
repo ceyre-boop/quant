@@ -1,0 +1,49 @@
+{
+  "hypothesis": "HYP-036",
+  "run_date": "2026-05-23T23:42:57.691553",
+  "results": {
+    "train_Raw": {
+      "sharpe": 0.055393403363894866,
+      "max_dd": -0.0016517913971288419,
+      "equity_end": 1.0003177248882422,
+      "stress": {
+        "COVID": -0.0002616349621403878,
+        "Rate_Shock": -0.0016517913971288419
+      }
+    },
+    "train_RMT": {
+      "sharpe": 0.10004632188556596,
+      "max_dd": -0.0017134842208655463,
+      "equity_end": 1.0005908663114074,
+      "stress": {
+        "COVID": -0.00019848188509954734,
+        "Rate_Shock": -0.0017134842208655463
+      }
+    },
+    "holdout_Raw": {
+      "sharpe": 0.2715007050599277,
+      "max_dd": -0.0004987813819029751,
+      "equity_end": 1.0001966340780908,
+      "stress": {
+        "COVID": 0.0,
+        "Rate_Shock": 0.0
+      }
+    },
+    "holdout_RMT": {
+      "sharpe": 0.1681874156815582,
+      "max_dd": -0.0004987813819029751,
+      "equity_end": 1.0001198561505433,
+      "stress": {
+        "COVID": 0.0,
+        "Rate_Shock": 0.0
+      }
+    }
+  },
+  "verdict": "H0_NOT_REJECTED",
+  "train_sharpe_delta": 0.044652918521671095,
+  "holdout_sharpe_delta": -0.10331328937836948,
+  "stress_dd_improvement": {
+    "COVID": 6.315307704084049e-05,
+    "Rate_Shock": -6.169282373670441e-05
+  }
+}

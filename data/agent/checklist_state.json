@@ -1,0 +1,52 @@
+{
+  "timestamp": "2026-05-25T23:47:56.003723+00:00",
+  "overall": "WAIT",
+  "gates_green": 2,
+  "gates_yellow": 2,
+  "gates_red": 1,
+  "gates": [
+    {
+      "id": "G1",
+      "name": "MC pass rate",
+      "status": "GREEN",
+      "value": "74.4% (5,000 sims, window=combined)",
+      "target": "\u226570%",
+      "detail": "Median days to pass: 34.0 | P90: 76.0 days"
+    },
+    {
+      "id": "G2",
+      "name": "Live paper trades",
+      "status": "RED",
+      "value": "0 London+GradeA trades logged",
+      "target": "\u226530 live paper trades",
+      "detail": "Need 30 more \u2014 collecting live since 2026-05-18"
+    },
+    {
+      "id": "G3",
+      "name": "Walk-forward WR alignment",
+      "status": "YELLOW",
+      "value": "Only 0 closed trades (need \u226510 to measure)",
+      "target": "Live WR within \u00b115pp of 41%",
+      "detail": "Collecting data \u2014 check again after 10+ closed trades"
+    },
+    {
+      "id": "G4",
+      "name": "Bridge macro threat",
+      "status": "GREEN",
+      "value": "threat=0.29 mode=NORMAL (2026-05-25T23:47)",
+      "target": "threat < 0.85 (NORMAL mode)",
+      "detail": "Regime: VALUE_RATE_REGIME_SHIFT | Buy window open"
+    },
+    {
+      "id": "G5",
+      "name": "Consecutive non-bust days",
+      "status": "YELLOW",
+      "value": "Paper challenge not yet started",
+      "target": "\u22655 consecutive days without bust",
+      "detail": "Paper challenge #1 active \u2014 days will accumulate"
+    }
+  ],
+  "purchase_url": null,
+  "challenge_price_usd": 399,
+  "challenge_size_usd": 100000
+}

@@ -1,0 +1,127 @@
+{
+  "task": "SUG-006/RQ-009",
+  "n_features": 23,
+  "baseline_max_similarity": 0.30840487714115916,
+  "feature_impacts": [
+    {
+      "name": "regime_composite",
+      "delta": -0.11735020248223527,
+      "ablated_sim": 0.1910546746589239
+    },
+    {
+      "name": "hy_spread_proxy",
+      "delta": -0.09117492570249908,
+      "ablated_sim": 0.21722995143866008
+    },
+    {
+      "name": "vix_60d_change",
+      "delta": -0.023211158236535634,
+      "ablated_sim": 0.2851937189046235
+    },
+    {
+      "name": "vix_30d_change",
+      "delta": -0.010916712348355895,
+      "ablated_sim": 0.29748816479280327
+    },
+    {
+      "name": "spy_200sma_dist",
+      "delta": -0.004005655226681781,
+      "ablated_sim": 0.3043992219144774
+    },
+    {
+      "name": "spy_kurt_30d",
+      "delta": -0.0038647464483580474,
+      "ablated_sim": 0.3045401306928011
+    },
+    {
+      "name": "spy_skew_30d",
+      "delta": -0.0031429458066704608,
+      "ablated_sim": 0.3052619313344887
+    },
+    {
+      "name": "spy_vol_30d",
+      "delta": -0.0008820695131489531,
+      "ablated_sim": 0.3075228076280102
+    },
+    {
+      "name": "spy_vol_60d",
+      "delta": -0.0008117838936823607,
+      "ablated_sim": 0.3075930932474768
+    },
+    {
+      "name": "spy_90d_return",
+      "delta": 0.0,
+      "ablated_sim": 0.30840487714115916
+    },
+    {
+      "name": "consecutive_up_weeks",
+      "delta": 0.0,
+      "ablated_sim": 0.30840487714115916
+    },
+    {
+      "name": "spy_50sma_dist",
+      "delta": 0.0002929610894049084,
+      "ablated_sim": 0.30869783823056407
+    },
+    {
+      "name": "momentum_score",
+      "delta": 0.0004831796899954499,
+      "ablated_sim": 0.3088880568311546
+    },
+    {
+      "name": "gold_spy_corr_60d",
+      "delta": 0.0005477106850947933,
+      "ablated_sim": 0.30895258782625395
+    },
+    {
+      "name": "gold_30d_return",
+      "delta": 0.0007375199510721298,
+      "ablated_sim": 0.3091423970922313
+    },
+    {
+      "name": "spy_60d_return",
+      "delta": 0.0007901799043292246,
+      "ablated_sim": 0.3091950570454884
+    },
+    {
+      "name": "vix_level",
+      "delta": 0.0012105291103677862,
+      "ablated_sim": 0.30961540625152695
+    },
+    {
+      "name": "gold_60d_return",
+      "delta": 0.0014978665401247926,
+      "ablated_sim": 0.30990274368128395
+    },
+    {
+      "name": "reversal_score",
+      "delta": 0.005851734592004387,
+      "ablated_sim": 0.31425661173316355
+    },
+    {
+      "name": "drawdown_from_peak",
+      "delta": 0.007653439886349034,
+      "ablated_sim": 0.3160583170275082
+    },
+    {
+      "name": "spy_30d_return",
+      "delta": 0.009004380347365226,
+      "ablated_sim": 0.3174092574885244
+    },
+    {
+      "name": "consecutive_down_weeks",
+      "delta": 0.03816621792813091,
+      "ablated_sim": 0.34657109506929007
+    },
+    {
+      "name": "vix_spy_beta",
+      "delta": 0.11128253054033144,
+      "ablated_sim": 0.4196874076814906
+    }
+  ],
+  "top_critical": [
+    "regime_composite",
+    "hy_spread_proxy",
+    "vix_60d_change"
+  ]
+}
