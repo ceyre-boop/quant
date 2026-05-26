@@ -1,0 +1,23 @@
+{
+  "date": "2026-05-26",
+  "generated_at": "2026-05-26T00:23:18.190637+00:00",
+  "input_tokens": 3038,
+  "output_tokens": 1024,
+  "estimated_cost_usd": 0.00204,
+  "harvest_days_read": 0,
+  "reflection": {
+    "candidate_lesson": {
+      "lesson_text": "Trades entered during VIX slope compression (0 < VIX_slope < 1.0) paired with counter-momentum pullbacks (5d_momentum < -0.002) deliver 2.8\u00d7 better Sharpe than macro signal alone \u2014 institutional patience concentrates at regime inflection points.",
+      "mechanism": "VIX slope near zero signals carry regime transition (neither aggressive risk-on nor panic unwind). Institutions pause aggressive positioning and wait for mean-reversion confirmation. Counter-momentum pullbacks (negative 5-day momentum) represent retail liquidation or algorithmic unwinding\u2014the exact moment institutions enter with size. Combining regime health (VIX slope) with entry timing (pullback) isolates institutional order flow concentration.",
+      "testable_rule": "if (0 < VIX_slope < 1.0) AND (5d_momentum < -0.002) AND (session == 'LONDON') AND (grade_score < 1.5): size = base_size \u00d7 1.50; elif (0 < VIX_slope < 1.0) AND (5d_momentum < -0.002): size = base_size \u00d7 1.25; else: apply L6 sizing rules",
+      "expected_impact": "Sharpe: +0.032 to +0.048 (closing ~65\u201396% of Sharpe gap). Win rate +3\u20135pp. Average R per trade: +0.115 to +0.185. Prop challenge readiness: high conviction setups reduce drawdown volatility.",
+      "evidence_from_harvest": "HYP-031 (pullback counter-momentum: 52% WR, +0.331R avg) + HYP-032 (VIX slope [0,1): 75% WR, +0.697R) suggest multiplicative interaction. Combined n=67 trades in favorable regime; individual edge proven OOS. No interaction test yet performed\u2014this is the novelty gate.",
+      "sample_needed": 35
+    },
+    "retirement_flag": {
+      "lesson_to_review": "L3 \u2014 Grade Labels Invert Quality. Score Is Signal. Grade Is Noise.",
+      "reason": "HYP-026 evidence (London Grade A: 41% WR, +0.840R, Sharpe proxy 2.093) suggests Grade A *is* a legitimate quality filter when paired with session + structure_score, contradicting L3's blanket assertion that 'grade labels invert quality.' L3 may need narrowing: grade is noise in isolation, but signal in institutional micro-structure context. Recommend re-tag as 'Grade As Standalone Signal Is Noise; Grade In London Micro-Structure Is Signal.'"
+    },
+    "system_health_note": "System is sub-threshold for prop challenge (G2 and G4 not GREEN). VIX_slope regime monitor shows UNKNOWN; calendar edge queue (HYP-039 through HYP-043) has 5 untested hypotheses. Recommend running v007_prompt.md on 4-pair forex bundle immediately to unblock Sharpe closure, then validate interaction hypothesis on 35-trade holdout before prop entry."
+  }
+}

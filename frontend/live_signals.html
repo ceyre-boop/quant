@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SOVEREIGN — Live Signals</title>
+<script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
+<style>
+  :root {
+    --bg: #0d0d0d;
+    --panel: #141414;
+    --border: #222;
+    --text: #e0e0e0;
+    --muted: #666;
+    --green: #26a69a;
+    --red: #ef5350;
+    --yellow: #ffd740;
+    --blue: #2196f3;
+    --orange: #ff9800;
+    --critical: #f44336;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'SF Mono', 'Fira Code', monospace; font-size: 13px; }
+
+  header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 20px; border-bottom: 1px solid var(--border);
+    background: var(--panel);
+  }
+  .logo { font-size: 16px; font-weight: 700; letter-spacing: 2px; color: #fff; }
+  .logo span { color: var(--green); }
+  .status-bar { display: flex; gap: 16px; align-items: center; }
+  .status-pill {
+    padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; letter-spacing: 1px;
+  }
+  .pill-green { background: rgba(38,166,154,.2); color: var(--green); border: 1px solid var(--green); }
+  .pill-red   { background: rgba(239,83,80,.2);  color: var(--red);   border: 1px solid var(--red); }
+  .pill-yellow{ background: rgba(255,215,64,.2); color: var(--yellow); border: 1px solid var(--yellow); }
+  .pill-orange{ background: rgba(255,152,0,.2);  color: var(--orange); border: 1px solid var(--orange); }
+  #refresh-ts { color: var(--muted); font-size: 11px; }
+
+  main { display: grid; grid-template-columns: 1fr 380px; gap: 0; height: calc(100vh - 49px); }
+
+  /* ── LEFT PANEL ── */
+  .left { display: flex; flex-direction: column; overflow: hidden; }
+
+  .section-title {
+    padding: 10px 16px; font-size: 11px; font-weight: 700; letter-spacing: 1.5px;
+    color: var(--muted); text-transform: uppercase; border-bottom: 1px solid var(--border);
+    background: var(--panel);
+  }
+
+  /* Chart area */
+  #chart-area { flex: 1; position: relative; min-height: 0; }
+  #chart-container { width: 100%; height: 100%; }
+  #chart-pair-label {
+    position: absolute; top: 10px; left: 14px; font-size: 15px; font-weight: 700;
+    color: #fff; z-index: 10; pointer-events: none; letter-spacing: 1px;
+  }
+  #chart-price-label {
+    position: absolute; top: 32px; left: 14px; font-size: 12px; color: var(--muted);
+    z-index: 10; pointer-events: none;
+  }
+
+  /* Pair grid */
+  #pair-grid {
+    display: grid; grid-template-columns: repeat(5, 1fr);
+    border-top: 1px solid var(--border);
+  }
+  .pair-card {
+    padding: 10px 12px; border-right: 1px solid var(--border);
+    cursor: pointer; transition: background .15s; user-select: none;
+  }
+  .pair-card:last-child { border-right: none; }
+  .pair-card:hover { background: rgba(255,255,255,.03); }
+  .pair-card.active { background: rgba(38,166,154,.08); border-top: 2px solid var(--green); padding-top: 8px; }
+  .pair-card.signal-long  { border-top: 2px solid var(--green); padding-top: 8px; }
+  .pair-card.signal-short { border-top: 2px solid var(--red); padding-top: 8px; }
+  .pc-label { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+  .pc-price { font-size: 14px; font-weight: 600; color: #fff; }
+  .pc-signal { font-size: 10px; font-weight: 700; margin-top: 3px; letter-spacing: 1px; }
+  .pc-signal.long  { color: var(--green); }
+  .pc-signal.short { color: var(--red); }
+  .pc-signal.none  { color: var(--muted); }
+  .pc-conviction { font-size: 10px; color: var(--muted); margin-top: 1px; }
+
+  /* ── RIGHT PANEL ── */
+  .right {
+    border-left: 1px solid var(--border);
+    display: flex; flex-direction: column; overflow-y: auto;
+  }
+
+  /* Bridge state */
+  #bridge-panel { padding: 14px 16px; border-bottom: 1px solid var(--border); background: var(--panel); }
+  .bridge-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+  .bridge-row:last-child { margin-bottom: 0; }
+  .bridge-key { color: var(--muted); font-size: 11px; }
+  .bridge-val { font-size: 11px; font-weight: 600; }
+  .threat-bar-wrap { height: 4px; background: #222; border-radius: 2px; margin-top: 8px; }
+  .threat-bar { height: 4px; border-radius: 2px; background: var(--green); transition: width .5s, background .5s; }
+
+  /* Best trade panel */
+  #best-trade-panel { border-bottom: 1px solid var(--border); }
+  #best-trade-btn {
+    width: 100%; padding: 12px 16px; background: rgba(33,150,243,.12);
+    border: none; border-bottom: 1px solid var(--border); color: var(--blue);
+    font-family: inherit; font-size: 12px; font-weight: 700; letter-spacing: 1px;
+    cursor: pointer; text-align: left; text-transform: uppercase;
+    transition: background .15s;
+  }
+  #best-trade-btn:hover { background: rgba(33,150,243,.2); }
+  #best-trade-content { padding: 0; }
+  .best-item {
+    padding: 10px 16px; border-bottom: 1px solid var(--border);
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .best-item:last-child { border-bottom: none; }
+  .best-header { display: flex; justify-content: space-between; align-items: center; }
+  .best-label { font-size: 13px; font-weight: 700; }
+  .best-score { font-size: 13px; font-weight: 700; }
+  .best-score.high  { color: var(--green); }
+  .best-score.mid   { color: var(--yellow); }
+  .best-score.low   { color: var(--muted); }
+  .best-dir { font-size: 11px; font-weight: 700; margin-top: 2px; }
+  .best-dir.long  { color: var(--green); }
+  .best-dir.short { color: var(--red); }
+  .best-notes { font-size: 10px; color: var(--muted); }
+  #no-setups { padding: 16px; color: var(--muted); font-size: 11px; text-align: center; }
+
+  /* ICT Trades */
+  #ict-panel { flex: 1; }
+  .ict-item {
+    padding: 10px 16px; border-bottom: 1px solid var(--border);
+    display: grid; grid-template-columns: 1fr auto; gap: 4px;
+  }
+  .ict-pair { font-size: 12px; font-weight: 600; }
+  .ict-meta { font-size: 10px; color: var(--muted); }
+  .ict-status { font-size: 10px; font-weight: 700; text-align: right; align-self: center; }
+  .ict-status.open   { color: var(--blue); }
+  .ict-status.won    { color: var(--green); }
+  .ict-status.lost   { color: var(--red); }
+  #ict-empty { padding: 16px; color: var(--muted); font-size: 11px; text-align: center; }
+
+  /* Equity row */
+  #equity-bar {
+    display: flex; gap: 0; border-top: 1px solid var(--border);
+    background: var(--panel);
+  }
+  .eq-item { flex: 1; padding: 8px 12px; border-right: 1px solid var(--border); }
+  .eq-item:last-child { border-right: none; }
+  .eq-ticker { font-size: 10px; color: var(--muted); }
+  .eq-price { font-size: 13px; font-weight: 600; }
+  .eq-chg { font-size: 11px; }
+  .eq-chg.pos { color: var(--green); }
+  .eq-chg.neg { color: var(--red); }
+
+  /* Loading / error */
+  #loading {
+    position: fixed; inset: 0; background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; color: var(--muted); z-index: 999;
+  }
+  .spinner { border: 2px solid #222; border-top-color: var(--green); border-radius: 50%; width: 20px; height: 20px; animation: spin .8s linear infinite; margin-right: 12px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .error-banner {
+    background: rgba(239,83,80,.15); border: 1px solid var(--red);
+    padding: 8px 16px; font-size: 11px; color: var(--red); display: none;
+  }
+</style>
+</head>
+<body>
+
+<div id="loading"><div class="spinner"></div>Loading signals…</div>
+
+<header>
+  <div class="logo">SOVEREIGN <span>//</span> LIVE</div>
+  <div class="status-bar">
+    <div id="bridge-mode-pill" class="status-pill">—</div>
+    <div id="threat-pill" class="status-pill">—</div>
+    <div id="refresh-ts">—</div>
+  </div>
+</header>
+
+<main>
+  <!-- LEFT -->
+  <div class="left">
+    <div class="error-banner" id="error-banner"></div>
+    <div id="chart-area">
+      <div id="chart-pair-label">—</div>
+      <div id="chart-price-label">—</div>
+      <div id="chart-container"></div>
+    </div>
+    <div id="pair-grid"></div>
+    <div id="equity-bar"></div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="right">
+    <div class="section-title">Bridge State</div>
+    <div id="bridge-panel">
+      <div class="bridge-row">
+        <span class="bridge-key">ICT Mode</span>
+        <span class="bridge-val" id="bp-ict-mode">—</span>
+      </div>
+      <div class="bridge-row">
+        <span class="bridge-key">Quant Signal</span>
+        <span class="bridge-val" id="bp-quant">—</span>
+      </div>
+      <div class="bridge-row">
+        <span class="bridge-key">Library Regime</span>
+        <span class="bridge-val" id="bp-regime">—</span>
+      </div>
+      <div class="bridge-row">
+        <span class="bridge-key">Threat Score</span>
+        <span class="bridge-val" id="bp-threat">—</span>
+      </div>
+      <div class="threat-bar-wrap">
+        <div class="threat-bar" id="threat-bar" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div id="best-trade-panel">
+      <button id="best-trade-btn">⚡ Best Trade Today</button>
+      <div id="best-trade-content"></div>
+    </div>
+
+    <div class="section-title">ICT Paper Trades</div>
+    <div id="ict-panel"></div>
+  </div>
+</main>
+
+<script>
+const API = 'http://localhost:8765/data';
+const REFRESH_MS = 60_000;
+let chart = null;
+let lineSeries = null;
+let markerSeries = null;
+let activePair = null;
+let lastData = null;
+let bestExpanded = false;
+
+// ── Chart init ──────────────────────────────────────────────
+function initChart() {
+  const el = document.getElementById('chart-container');
+  chart = LightweightCharts.createChart(el, {
+    layout: { background: { color: '#0d0d0d' }, textColor: '#666' },
+    grid: { vertLines: { color: '#1a1a1a' }, horzLines: { color: '#1a1a1a' } },
+    crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
+    rightPriceScale: { borderColor: '#222' },
+    timeScale: { borderColor: '#222', timeVisible: true },
+    handleScroll: true,
+    handleScale: true,
+  });
+
+  lineSeries = chart.addLineSeries({
+    color: '#26a69a',
+    lineWidth: 2,
+    priceLineVisible: false,
+  });
+
+  const resizeObs = new ResizeObserver(() => {
+    const area = document.getElementById('chart-area');
+    chart.applyOptions({ width: area.clientWidth, height: area.clientHeight });
+  });
+  resizeObs.observe(document.getElementById('chart-area'));
+}
+
+function renderChart(pairData) {
+  if (!pairData || !pairData.price_history) return;
+
+  const label = document.getElementById('chart-pair-label');
+  const priceLabel = document.getElementById('chart-price-label');
+  label.textContent = pairData.label;
+  priceLabel.textContent = pairData.price != null
+    ? `${pairData.price.toFixed(5)}  ${pairData.signal > 0 ? '▲ LONG' : pairData.signal < 0 ? '▼ SHORT' : '—'}`
+    : 'No data';
+
+  const lineData = pairData.price_history
+    .map(p => ({ time: Math.floor(p.t / 1000), value: p.v }))
+    .sort((a, b) => a.time - b.time);
+
+  lineSeries.setData(lineData);
+
+  // Mark signal entries on chart
+  if (pairData.signal_marks && pairData.signal_marks.length) {
+    const markers = pairData.signal_marks.map(m => ({
+      time: Math.floor(m.t / 1000),
+      position: m.dir > 0 ? 'belowBar' : 'aboveBar',
+      color: m.dir > 0 ? '#26a69a' : '#ef5350',
+      shape: m.dir > 0 ? 'arrowUp' : 'arrowDown',
+      text: m.dir > 0 ? `L ${m.hold}d` : `S ${m.hold}d`,
+    }));
+    lineSeries.setMarkers(markers);
+  } else {
+    lineSeries.setMarkers([]);
+  }
+
+  chart.timeScale().fitContent();
+}
+
+// ── Pair Grid ────────────────────────────────────────────────
+function renderPairGrid(signals) {
+  const grid = document.getElementById('pair-grid');
+  grid.innerHTML = '';
+  signals.forEach(s => {
+    const card = document.createElement('div');
+    card.className = 'pair-card';
+    if (s.signal > 0) card.classList.add('signal-long');
+    else if (s.signal < 0) card.classList.add('signal-short');
+    if (activePair === s.ticker) card.classList.add('active');
+
+    const sigLabel = s.signal > 0 ? 'LONG' : s.signal < 0 ? 'SHORT' : 'FLAT';
+    const sigClass = s.signal > 0 ? 'long' : s.signal < 0 ? 'short' : 'none';
+
+    card.innerHTML = `
+      <div class="pc-label">${s.label}</div>
+      <div class="pc-price">${s.price != null ? s.price.toFixed(5) : '—'}</div>
+      <div class="pc-signal ${sigClass}">${sigLabel}</div>
+      <div class="pc-conviction">${s.conviction > 0 ? `C: ${s.conviction.toFixed(2)}` : ''}</div>
+    `;
+    card.addEventListener('click', () => {
+      activePair = s.ticker;
+      renderPairGrid(signals);
+      renderChart(s);
+    });
+    grid.appendChild(card);
+  });
+}
+
+// ── Equity bar ───────────────────────────────────────────────
+function renderEquityBar(equities) {
+  const bar = document.getElementById('equity-bar');
+  bar.innerHTML = '';
+  equities.forEach(e => {
+    const item = document.createElement('div');
+    item.className = 'eq-item';
+    const chgClass = e.change_pct >= 0 ? 'pos' : 'neg';
+    const sign = e.change_pct >= 0 ? '+' : '';
+    item.innerHTML = `
+      <div class="eq-ticker">${e.ticker}</div>
+      <div class="eq-price">${e.price != null ? e.price.toFixed(2) : '—'}</div>
+      <div class="eq-chg ${chgClass}">${e.price != null ? sign + e.change_pct.toFixed(2) + '%' : ''}</div>
+    `;
+    bar.appendChild(item);
+  });
+}
+
+// ── Bridge panel ─────────────────────────────────────────────
+function renderBridge(bridge) {
+  const mode = bridge.ict_mode || 'UNKNOWN';
+  const quant = bridge.quant_signal || 'NORMAL';
+  const regime = bridge.library_primary_regime || '—';
+  const threat = bridge.library_threat_score ?? 0;
+
+  document.getElementById('bp-ict-mode').textContent = mode;
+  document.getElementById('bp-ict-mode').style.color =
+    mode === 'HALT_NEW' ? '#ef5350' : mode === 'TIGHTEN' ? '#ffd740' : '#26a69a';
+  document.getElementById('bp-quant').textContent = quant;
+  document.getElementById('bp-quant').style.color =
+    quant === 'REDUCE_CONVICTION' ? '#ffd740' : '#26a69a';
+  document.getElementById('bp-regime').textContent = regime.replace(/_/g, ' ');
+  document.getElementById('bp-threat').textContent = threat.toFixed(2);
+
+  const bar = document.getElementById('threat-bar');
+  bar.style.width = (threat * 100) + '%';
+  bar.style.background = threat > 0.85 ? '#ef5350' : threat > 0.5 ? '#ffd740' : '#26a69a';
+
+  // Header pills
+  const modePill = document.getElementById('bridge-mode-pill');
+  modePill.textContent = 'ICT: ' + mode;
+  modePill.className = 'status-pill ' +
+    (mode === 'HALT_NEW' ? 'pill-red' : mode === 'TIGHTEN' ? 'pill-yellow' : 'pill-green');
+
+  const threatPill = document.getElementById('threat-pill');
+  threatPill.textContent = 'THREAT: ' + threat.toFixed(2);
+  threatPill.className = 'status-pill ' +
+    (threat > 0.85 ? 'pill-red' : threat > 0.5 ? 'pill-yellow' : 'pill-green');
+}
+
+// ── Best trade ───────────────────────────────────────────────
+function renderBestTrades(trades) {
+  const content = document.getElementById('best-trade-content');
+  if (!bestExpanded) { content.innerHTML = ''; return; }
+
+  if (!trades || trades.length === 0) {
+    content.innerHTML = '<div id="no-setups">No active setups right now.</div>';
+    return;
+  }
+
+  content.innerHTML = trades.slice(0, 3).map((t, i) => {
+    const scoreClass = t.final_score > 0.5 ? 'high' : t.final_score > 0.2 ? 'mid' : 'low';
+    const dirClass = t.direction === 'LONG' ? 'long' : 'short';
+    const notes = t.gate_notes.length ? t.gate_notes.join(' · ') : 'Gates clear';
+    const rank = ['🥇', '🥈', '🥉'][i];
+    return `
+      <div class="best-item">
+        <div class="best-header">
+          <span class="best-label">${rank} ${t.label}</span>
+          <span class="best-score ${scoreClass}">${t.final_score.toFixed(3)}</span>
+        </div>
+        <div class="best-dir ${dirClass}">${t.direction}  @${t.price != null ? t.price.toFixed(5) : '—'}</div>
+        <div class="best-notes">Raw: ${t.raw_conviction.toFixed(3)} · Penalty: ${t.regime_penalty.toFixed(3)}</div>
+        <div class="best-notes">${notes}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+document.getElementById('best-trade-btn').addEventListener('click', () => {
+  bestExpanded = !bestExpanded;
+  if (lastData) renderBestTrades(lastData.best_trades);
+  document.getElementById('best-trade-btn').textContent =
+    bestExpanded ? '▲ Best Trade Today' : '⚡ Best Trade Today';
+});
+
+// ── ICT trades ───────────────────────────────────────────────
+function renderICTTrades(count, recent) {
+  const panel = document.getElementById('ict-panel');
+  if (count === 0) {
+    panel.innerHTML = `<div id="ict-empty">No paper trades yet.<br><span style="color:#444">Waiting for London session (UTC 03:xx).</span></div>`;
+    return;
+  }
+  panel.innerHTML = recent.map(t => {
+    const status = t.status || t.result || 'OPEN';
+    const statusClass = status === 'OPEN' ? 'open' : status === 'WIN' ? 'won' : 'lost';
+    return `
+      <div class="ict-item">
+        <div>
+          <div class="ict-pair">${t.pair || t.symbol || '—'}</div>
+          <div class="ict-meta">${t.timestamp ? t.timestamp.slice(0,16) : ''} · ${t.direction || ''}</div>
+        </div>
+        <div class="ict-status ${statusClass}">${status}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ── Main refresh ─────────────────────────────────────────────
+async function refresh() {
+  const errBanner = document.getElementById('error-banner');
+  try {
+    const resp = await fetch(API + '?t=' + Date.now());
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const data = await resp.json();
+    if (data.error) throw new Error(data.error);
+
+    lastData = data;
+    errBanner.style.display = 'none';
+    document.getElementById('loading').style.display = 'none';
+
+    renderBridge(data.bridge || {});
+    renderPairGrid(data.forex_signals || []);
+    renderEquityBar(data.equity || []);
+    renderICTTrades(data.ict_trades_count || 0, data.ict_recent || []);
+    if (bestExpanded) renderBestTrades(data.best_trades || []);
+
+    // Auto-select first pair with a signal, else first pair
+    if (!activePair && data.forex_signals?.length) {
+      const withSignal = data.forex_signals.find(s => s.signal !== 0);
+      const target = withSignal || data.forex_signals[0];
+      activePair = target.ticker;
+      renderPairGrid(data.forex_signals);
+      renderChart(target);
+    } else if (activePair) {
+      const current = data.forex_signals?.find(s => s.ticker === activePair);
+      if (current) renderChart(current);
+    }
+
+    document.getElementById('refresh-ts').textContent =
+      'Updated ' + new Date(data.timestamp).toLocaleTimeString();
+  } catch (e) {
+    document.getElementById('loading').style.display = 'none';
+    errBanner.style.display = 'block';
+    errBanner.textContent = '⚠ ' + e.message + ' — is live_signals_server.py running? (python3 scripts/live_signals_server.py)';
+    console.error(e);
+  }
+}
+
+initChart();
+refresh();
+setInterval(refresh, REFRESH_MS);
+</script>
+</body>
+</html>

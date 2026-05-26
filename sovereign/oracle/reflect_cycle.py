@@ -21,6 +21,7 @@ ROOT = Path(__file__).resolve().parents[2]
 PROVEN_RESEARCH  = ROOT / "data" / "oracle" / "proven_research.json"
 WISDOM_FILE      = ROOT / "I_am_a_good_trader.md"
 REFLECTIONS_DIR  = ROOT / "data" / "oracle" / "reflections"
+DECISION_LOG_DIR = ROOT / "data" / "decision_logs"
 REFLECTIONS_DIR.mkdir(parents=True, exist_ok=True)
 
 ORACLE_SCHEMA = {
@@ -30,6 +31,8 @@ ORACLE_SCHEMA = {
         "testable_rule": "string — exact Python-like condition",
         "expected_impact": "string — which metric improves and by how much",
         "evidence_from_harvest": "string — what in the data supports this",
+        "evidence_from_reasoning": "string or null — which decision log reasoning components drove this lesson (e.g. 'trades with commitment_score < 0.70 and rate_diff_z < 1.2 failed at 80% rate')",
+        "reasoning_component_targeted": "string or null — the specific decision field this lesson gates on (e.g. 'commitment_score', 'rate_differential_zscore', 'bars_since_signal', 'library_match')",
         "sample_needed": "int — minimum trades to validate statistically"
     },
     "retirement_flag": {
@@ -69,24 +72,43 @@ Every suggestion you make must move one needle: Sharpe, win rate, drawdown, or p
 ## Last 7 days trade data
 {harvest_summary}
 
+## Decision logs — reasoning behind each recent trade
+These are the actual reasons the system chose to enter and how it sized each position.
+The `outcome` and `r_realized` fields show what happened.
+Look for patterns in the reasoning that PRECEDE failures.
+
+{decision_log_summary}
+
 ## Instructions
 
+You now have two inputs: aggregate harvest stats (what happened) and decision logs (why the system thought it should trade). The most valuable lessons come from connecting those two layers.
+
+When you propose a candidate lesson, look for patterns in the reasoning chain that correlate with failure:
+- Do trades with a specific `commitment_score` threshold fail at a higher rate?
+- Do trades where `bars_since_signal` is high (stale entry) underperform fresh entries?
+- Does a `library_match` at high similarity correlate with better or worse R?
+- Do trades with `rate_differential_zscore` below a threshold fail even with high commitment?
+
+Your lesson should reference the specific reasoning component that drives the pattern.
+
+Not: "trades fail when commitment is low"
+But: "trades with commitment_score < 0.70 that ALSO have rate_diff_z < 1.2 produce -0.XX avg R — the macro thesis is too weak to compensate for uncommitted price action"
+
 A GOOD lesson is:
-- Mechanistic: explains WHY something happens in terms of institutional behavior, not pattern matching
-- Testable: can be expressed as an exact rule applied to trade data
-- Specific: names exact thresholds, not vague directions
+- Mechanistic: explains WHY this reasoning component predicts failure (institutional behavior)
+- Testable: names the exact field and threshold from the decision log schema
 - Novel: not already in the proven research, active lessons, or hypothesis ledger above
-- Goal-oriented: directly addresses the Sharpe gap or a next milestone
+- Grounded: references actual entries from the decision logs above, not hypothetical ones
 
 A BAD lesson is:
 - "The market is uncertain" — not testable
-- "Use wider stops" — not specific
-- "EURUSD is volatile" — no mechanism
+- "Use wider stops" — not specific, not grounded in decision log fields
 - Anything already confirmed, rejected, or queued in the hypothesis ledger
+- A lesson about reasoning components if there are no decision log entries yet (fall back to harvest-only lessons in that case)
 
-Examples of good lessons:
-- "Trades entered within 3 bars of the London open have 2.1× higher R than trades entered after bar 6 — institutional displacement is concentrated in the first 30 minutes"
-- "GBPUSD positions held through the NY_AM session (9-12 ET) give back 40% of London gains on average — the NY continuation bias reverses intraday"
+Examples of good reasoning-grounded lessons:
+- "Trades with bars_since_signal > 3 produce -0.3R avg vs +0.6R for bars_since_signal ≤ 2 — the FVG has partially filled by bar 3 and the limit entry gets a worse fill"
+- "rate_diff_z < 1.0 with commitment_score > 0.80 fails 75% of the time — commitment score captures price action quality, not macro strength; both must pass independently"
 
 ## Rejected hypotheses (NEVER re-propose these)
 {rejected_ids}
@@ -120,6 +142,76 @@ def _load_active_lessons() -> str:
     if not lessons:
         return content[:1000]
     return "\n".join(f"  L{n}: {title} | Rule: {rule[:80]}" for n, title, rule in lessons)
+
+
+def _load_decision_log_summary(days: int = 7, max_entries: int = 20) -> str:
+    """
+    Load recent decision log entries that have outcomes filled.
+    Returns a compact JSON block for the Oracle prompt.
+    Caps at max_entries to keep token cost bounded (~$0.005 per 20 entries).
+    """
+    from datetime import timedelta
+    cutoff = datetime.now(timezone.utc) - timedelta(days=days)
+    entries = []
+
+    if not DECISION_LOG_DIR.exists():
+        return "No decision logs yet — system just wired. Logs will accumulate from this session forward."
+
+    for log_file in sorted(DECISION_LOG_DIR.glob("decisions_*.jsonl")):
+        try:
+            for line in log_file.read_text().splitlines():
+                if not line.strip():
+                    continue
+                rec = json.loads(line)
+                # Only include closed trades (outcome filled)
+                if not rec.get("outcome"):
+                    continue
+                try:
+                    ts = datetime.fromisoformat(rec["entry_timestamp"].replace("Z", "+00:00"))
+                    if ts < cutoff:
+                        continue
+                except Exception:
+                    pass
+                # Compact projection — only fields Oracle needs for pattern analysis
+                entries.append({
+                    "pair":                    rec.get("pair"),
+                    "system":                  rec.get("system"),
+                    "direction":               rec.get("direction"),
+                    "grade":                   rec.get("grade"),
+                    "session":                 rec.get("session"),
+                    "why_this_trade":          rec.get("why_this_trade"),
+                    "why_this_size":           rec.get("why_this_size"),
+                    "signal_layers_active":    rec.get("signal_layers_active"),
+                    "commitment_score":        rec.get("commitment_score"),
+                    "vix_at_entry":            rec.get("vix_at_entry"),
+                    "rate_differential_zscore": rec.get("rate_differential_zscore"),
+                    "bars_since_signal":       rec.get("bars_since_signal"),
+                    "library_match":           rec.get("library_match"),
+                    "risk_pct":                rec.get("risk_pct"),
+                    "outcome":                 rec.get("outcome"),
+                    "r_realized":              rec.get("r_realized"),
+                })
+        except Exception:
+            continue
+
+    if not entries:
+        return (
+            "No closed decision log entries in the last 7 days yet. "
+            "The logger is wired and accumulating — entries will appear as trades close. "
+            "Propose a harvest-based lesson instead."
+        )
+
+    # Newest first, cap at max_entries
+    entries = entries[-max_entries:]
+    n_wins  = sum(1 for e in entries if (e.get("r_realized") or 0) > 0)
+    n_loss  = len(entries) - n_wins
+    avg_r   = round(sum((e.get("r_realized") or 0) for e in entries) / len(entries), 3)
+
+    header = (
+        f"Recent decision logs: {len(entries)} closed trades "
+        f"({n_wins}W / {n_loss}L, avg R={avg_r:+.3f})\n"
+    )
+    return header + json.dumps(entries, indent=2)
 
 
 def _load_harvest_summary(harvests: list[dict]) -> str:
@@ -179,6 +271,7 @@ def run_reflect(harvests: list[dict], date: Optional[str] = None) -> dict:
         proven_summary=_load_proven_summary(),
         active_lessons_summary=_load_active_lessons(),
         harvest_summary=_load_harvest_summary(harvests),
+        decision_log_summary=_load_decision_log_summary(),
         rejected_ids=_get_rejected_ids(),
         schema=json.dumps(ORACLE_SCHEMA, indent=2),
     )
@@ -247,6 +340,7 @@ if __name__ == "__main__":
             proven_summary=_load_proven_summary(),
             active_lessons_summary=_load_active_lessons(),
             harvest_summary=_load_harvest_summary(harvests),
+            decision_log_summary=_load_decision_log_summary(),
             rejected_ids=_get_rejected_ids(),
             schema=json.dumps(ORACLE_SCHEMA, indent=2),
         ))

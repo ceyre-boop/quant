@@ -112,6 +112,36 @@ class ForexSpecialist:
                 report.skipped.append(sig)
                 continue
 
+            try:
+                from sovereign.intelligence.decision_logger import log_forex_decision
+                _macro = sig.macro_signal
+                log_forex_decision(
+                    pair=sig.pair,
+                    direction=sig.direction,
+                    entry_level=sig.entry_price,
+                    stop_loss=sig.stop_price,
+                    hold_days=getattr(_macro, "hold_period_estimate", 60),
+                    risk_pct=pos.risk_pct,
+                    signal_layers=sig.rationale[:6],
+                    rate_diff_z=getattr(_macro, "irp_z", None),
+                    vix_at_entry=None,   # not available at scan time; wire when VIX gate is live
+                    cot_percentile=None,  # COT engine returns z-score not percentile; TODO
+                    library_match=None,   # not yet wired into ForexEntrySignal
+                    commitment_score=None,
+                    freshness_mult=None,
+                    kelly_fraction=None,
+                    size_mult=sig.size_modifier,
+                    extra={
+                        "macro_conviction": sig.macro_conviction,
+                        "score": sig.score,
+                        "rate_differential": getattr(_macro, "rate_differential", None),
+                        "ppp_z": getattr(_macro, "ppp_z", None),
+                        "primary_driver": getattr(_macro, "primary_driver", None),
+                    },
+                )
+            except Exception:
+                pass
+
             report.tradeable.append(ForexTradeCandidate(
                 entry_signal=sig,
                 position=pos,

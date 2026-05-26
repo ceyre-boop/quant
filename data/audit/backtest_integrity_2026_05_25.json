@@ -1,0 +1,354 @@
+{
+  "audit_date": "2026-05-25",
+  "reported_sharpe": 2.097,
+  "lookahead": {
+    "flags": [
+      {
+        "severity": "HIGH",
+        "category": "ENTRY_TIMING",
+        "file": "backtest/fast_engine.py",
+        "lines": [
+          243,
+          351
+        ],
+        "detail": "Entry at closes[i] on the same bar the signal fires. If the signal uses that bar's close to decide direction, the fill is impossible in live trading \u2014 you can't enter at the same close that generated the signal. Fix: shift entry to opens[i+1] (next bar open).",
+        "estimated_impact": "Overstates performance; magnitude depends on bar size."
+      },
+      {
+        "severity": "OK",
+        "category": "ENTRY_TIMING",
+        "file": "sovereign/forex/fast_backtester.py",
+        "lines": [
+          137,
+          170
+        ],
+        "detail": "Forex backtester enters at opens[i+1] \u2014 correct next-bar fill."
+      },
+      {
+        "severity": "HIGH",
+        "category": "COT_LAG",
+        "file": "sovereign/forex/cot_engine.py",
+        "detail": "No publication lag found. CFTC COT data is released each Friday for positions as-of the prior Tuesday \u2014 minimum 3-day lag. If backtest uses COT as-of Tuesday on Tuesday, that's lookahead. Fix: after loading, apply series = series.shift(4) (available Friday = 4 trading days after report date).",
+        "estimated_impact": "Minor directional signal quality improvement."
+      },
+      {
+        "severity": "MEDIUM",
+        "category": "CPI_LAG",
+        "file": "sovereign/forex/data_fetcher.py",
+        "detail": "CPI data fetched via FRED but no publication lag applied. US CPI (CPIAUCSL) is released ~12-15 days after month end. If backtest uses January CPI on Feb 1 when actual release was Feb 14: lookahead. Since macro signal holds 60+ days, this is likely a small but real bias. Fix: apply shift(1) (one month) to all monthly CPI series.",
+        "estimated_impact": "Small; monthly signal, 60d hold reduces sensitivity."
+      },
+      {
+        "severity": "LOW",
+        "category": "IRP_ZSCORE_APPROXIMATION",
+        "file": "sovereign/forex/fair_value.py",
+        "detail": "IRP z-score uses current rates applied backward to historical prices (acknowledged as approximation at line 81). Since rates change slowly this is unlikely to cause material bias for the macro signal. Not a hard lookahead, but worth noting."
+      },
+      {
+        "severity": "LOW",
+        "category": "ZSCORE_WINDOW",
+        "detail": "Some .mean()/.std() calls found without explicit tail() or rolling() context. Verify these are not computing statistics over the full dataset. Samples (first 5):",
+        "samples": [
+          "macro_engine.py:364: mean = chunk.mean()",
+          "macro_engine.py:365: std = chunk.std()",
+          "signal_engine.py:522: irp_z = (irp_dev / (hist.pct_change().std() * np.sqrt(252) + 1e-8)"
+        ]
+      }
+    ]
+  },
+  "parameters": {
+    "total_parameters_audited": 13,
+    "literature_sourced": 3,
+    "optimized_in_sample": 9,
+    "unknown_origin": 1,
+    "parameters_needing_holdout_validation": [
+      "SIGNAL_THRESHOLD",
+      "TRAILING_ATR_MULT",
+      "HOLD_DAYS (default)",
+      "PAIR_HOLD_OVERRIDES (GBPUSD=6, AUDUSD=5, EURUSD=5, AUDNZD=7)",
+      "VIX gate USDJPY/AUDNZD",
+      "VIX gate EURUSD/GBPUSD",
+      "VIX gate AUDUSD",
+      "CONVICTION_NEUTRAL_THRESHOLD",
+      "HISTORY_WINDOW (IRP z-score, 756 days = 3yr)"
+    ],
+    "detail": [
+      {
+        "name": "SIGNAL_THRESHOLD",
+        "value": 0.15,
+        "file": "sovereign/forex/forex_backtester.py",
+        "source": "OPTIMIZED",
+        "note": "Lowered from 0.20 for 'more signals'. Selected by in-sample inspection.",
+        "needs_holdout": true
+      },
+      {
+        "name": "TRAILING_ATR_MULT",
+        "value": 1.25,
+        "file": "sovereign/forex/forex_backtester.py",
+        "source": "OPTIMIZED",
+        "note": "Forensics v1 chose 1.25x over 1.0x based on Sharpe (1.024 vs 0.884). In-sample.",
+        "needs_holdout": true
+      },
+      {
+        "name": "STOP_ATR_MULT",
+        "value": 2.0,
+        "file": "sovereign/forex/forex_backtester.py",
+        "source": "LITERATURE",
+        "note": "2\u00d7 ATR stop is standard across professional swing trading systems.",
+        "needs_holdout": false
+      },
+      {
+        "name": "HOLD_DAYS (default)",
+        "value": 60,
+        "file": "sovereign/forex/signal_engine.py",
+        "source": "OPTIMIZED",
+        "note": "Various hold sweeps (5d, 7d, 20d, 60d) run in-sample. 60d selected.",
+        "needs_holdout": true
+      },
+      {
+        "name": "PAIR_HOLD_OVERRIDES (GBPUSD=6, AUDUSD=5, EURUSD=5, AUDNZD=7)",
+        "value": "per-pair",
+        "file": "sovereign/forex/forex_backtester.py",
+        "source": "OPTIMIZED",
+        "note": "v007 per-pair hold sweep on 2015-2024 full window. In-sample.",
+        "needs_holdout": true
+      },
+      {
+        "name": "VIX gate USDJPY/AUDNZD",
+        "value": 13.0,
+        "file": "sovereign/forex/forex_backtester.py",
+        "source": "OPTIMIZED",
+        "note": "v014: swept from 15\u219213. HYP-044 confirmed on 2015-2024 full backtest.",
+        "needs_holdout": true
+      },
+      {
+        "name": "VIX gate EURUSD/GBPUSD",
+        "value": 18.0,
+        "file": "sovereign/forex/forex_backtester.py",
+        "source": "OPTIMIZED",
+        "note": "Empirically found in full-window sweep (2015-2024). In-sample.",
+        "needs_holdout": true
+      },
+      {
+        "name": "VIX gate AUDUSD",
+        "value": 20.0,
+        "file": "sovereign/forex/forex_backtester.py",
+        "source": "OPTIMIZED",
+        "note": "Empirically found in full-window sweep. In-sample.",
+        "needs_holdout": true
+      },
+      {
+        "name": "CONVICTION_NEUTRAL_THRESHOLD",
+        "value": 0.35,
+        "file": "sovereign/forex/strategy.py",
+        "source": "UNKNOWN",
+        "note": "Origin unclear \u2014 appears in strategy.py without documented sweep.",
+        "needs_holdout": true
+      },
+      {
+        "name": "CROWDED_Z (COT gate)",
+        "value": 1.5,
+        "file": "sovereign/forex/cot_engine.py",
+        "source": "LITERATURE",
+        "note": "1.5\u03c3 crowding is standard in institutional COT analysis.",
+        "needs_holdout": false
+      },
+      {
+        "name": "IRP_Z_THRESHOLD / PPP_Z_THRESHOLD",
+        "value": 1.5,
+        "file": "sovereign/forex/fair_value.py",
+        "source": "LITERATURE",
+        "note": "1.5\u03c3 deviation threshold is standard for mean-reversion signals.",
+        "needs_holdout": false
+      },
+      {
+        "name": "HISTORY_WINDOW (IRP z-score, 756 days = 3yr)",
+        "value": 756,
+        "file": "sovereign/forex/fair_value.py",
+        "source": "OPTIMIZED",
+        "note": "3-year window chosen without documented sweep. UNKNOWN origin.",
+        "needs_holdout": true
+      },
+      {
+        "name": "kelly_fraction",
+        "value": 0.5,
+        "file": "config/parameters.yml",
+        "source": "OPTIMIZED",
+        "note": "Full Kelly (0.5 is already conservative) \u2014 origin not documented.",
+        "needs_holdout": false
+      }
+    ]
+  },
+  "fill_realism": {
+    "missing_cost_components": 3,
+    "combined_sharpe_impact_estimate": "-0.10 to -0.30 if swap is net negative; +0.05 to +0.10 if carry-aligned swaps add P&L.",
+    "findings": [
+      {
+        "missing": "SPREAD_COST",
+        "severity": "MEDIUM",
+        "detail": "No explicit bid-ask spread cost in forex_backtester.py. Typical FX spreads: EURUSD=0.5pip, GBPUSD=0.8pip, USDJPY=0.5pip, AUDUSD=0.8pip, AUDNZD=1.5pip. At 60d hold, entry+exit spread = ~1-3 pips round-trip. For 60 trades/year: ~60-180 pips/year.",
+        "sharpe_impact_estimate": "-0.05 to -0.15 Sharpe (conservative estimate)"
+      },
+      {
+        "missing": "OVERNIGHT_SWAP",
+        "severity": "HIGH",
+        "detail": "No swap/rollover cost modeled. With 60-day average holds, swap is material. POSITIVE for carry-aligned trades (e.g., long AUDUSD when RBA > FED): adds P&L. NEGATIVE for counter-carry trades: subtracts P&L. Net effect depends on direction distribution \u2014 likely net positive since macro signal should align with carry direction most of the time, but this assumption is untested. Typical G10 swap: \u00b11-5 pips/day at current rates. Over 60 days \u00d7 60 trades: this is NOT negligible.",
+        "sharpe_impact_estimate": "+0.05 to +0.20 Sharpe if carry-aligned; -0.10 to -0.25 if misaligned"
+      },
+      {
+        "missing": "SLIPPAGE",
+        "severity": "LOW",
+        "detail": "No slippage model. At daily bar resolution with next-open entry, slippage is minor for liquid G10 pairs.",
+        "sharpe_impact_estimate": "< -0.03 Sharpe"
+      },
+      {
+        "engine": "fast_engine (equity-style)",
+        "commission_modeled": true,
+        "slippage_modeled": true,
+        "swap_modeled": false,
+        "severity": "OK"
+      },
+      {
+        "topic": "STOP_FILL",
+        "severity": "OK",
+        "detail": "fast_backtester.py uses opens[i+1] for entry. Stop fills need verification: ideal stop fill uses min(opens[i], stop_price) to simulate gap-through. Check _simulate_forex_core for stop exit logic."
+      }
+    ]
+  },
+  "holdout": {
+    "contaminated": true,
+    "severity": "HIGH",
+    "detail": "ALL key parameters were selected using the full 2015-2024 dataset. The reported avg_sharpe=2.0970 is in-sample performance, not out-of-sample. The system has never been tested on data it wasn't optimized on. This does NOT mean the edge is fake \u2014 the economic logic is sound \u2014 but the reported Sharpe is an upper bound, not an estimate of live performance.",
+    "parameters_optimized_on_full_window": [
+      "VIX gates (13/18/20) \u2014 HYP-044 used 2015-2024",
+      "PAIR_HOLD_OVERRIDES (v007 sweep) \u2014 used 2015-2024",
+      "TRAILING_ATR_MULT=1.25 \u2014 forensics v1, used 2015-2024",
+      "SIGNAL_THRESHOLD=0.15 \u2014 chose for more signals, evaluated on full window",
+      "Pair retirements (USDCAD, GBPJPY, NZDUSD, etc.) \u2014 decided by 2015-2024 Sharpe",
+      "PAIR_VIX_GATES (EURUSD=18, GBPUSD=18, AUDUSD=20) \u2014 threshold sweep on 2015-2024"
+    ],
+    "recommended_split": {
+      "train": "2015-2019 (choose parameters)",
+      "validation": "2020-2022 (test parameters, never used for selection)",
+      "holdout": "2023-2024 (final report Sharpe \u2014 touch only once)"
+    },
+    "action": "Run backtest with parameters FROZEN as of end-2022, then report Sharpe on 2023-2024 only. If Sharpe > 1.0 on holdout, edge is real. Expect ~30-40% Sharpe decay from in-sample to out-of-sample."
+  },
+  "multiple_testing": {
+    "total_hypotheses": 43,
+    "confirmed": 13,
+    "rejected": 15,
+    "queued_or_testing": 15,
+    "bh_correction_applied": false,
+    "expected_false_positives_at_p05": 2.1,
+    "expected_false_positives_at_p01": 0.4,
+    "low_power_confirmed": [
+      {
+        "id": "HYP-002",
+        "name": "Quarter-end rebalancing (small sample)",
+        "n": 15,
+        "result": "60% WR, n=15",
+        "flag": "LOW_POWER \u2014 n < 50, result may not replicate"
+      },
+      {
+        "id": "HYP-026",
+        "name": "London-only ICT + Grade A: the exact setup for TP2 hits",
+        "n": 39,
+        "result": "London Grade A (n=39): WR=41%, avgR=+0.840, Sharpe proxy=2.093. 11/17 TP2 hits.",
+        "flag": "LOW_POWER \u2014 n < 50, result may not replicate"
+      }
+    ],
+    "severity": "MEDIUM",
+    "detail": "With 43 hypotheses tested, Benjamini-Hochberg correction was never applied. At p<0.05: expect ~2.1 false positives among confirmed results by chance alone. Low-power confirmed hypotheses (n<50) are most at risk. Action: for each confirmed hypothesis, record the actual p-value or CI width and apply BH correction. Results that don't survive correction should be downgraded to TENTATIVE.",
+    "most_at_risk": [
+      "HYP-002",
+      "HYP-026"
+    ]
+  },
+  "regime": {
+    "regime_breakdown_exists": false,
+    "regime_windows": {
+      "pre_covid": [
+        "2015-01-01",
+        "2019-12-31",
+        "Normal rates, low vol"
+      ],
+      "covid": [
+        "2020-01-01",
+        "2021-12-31",
+        "Zero rates, extreme vol then QE"
+      ],
+      "rate_shock": [
+        "2022-01-01",
+        "2023-06-30",
+        "Fastest hiking cycle in 40 years"
+      ],
+      "normalization": [
+        "2023-07-01",
+        "2024-12-31",
+        "Rates plateau, vol subsides"
+      ]
+    },
+    "severity": "HIGH",
+    "detail": "No per-regime Sharpe breakdown found in backtest results. The current avg_sharpe=2.0970 is across the full 2015-2024 window. If this edge only works in rate-trending regimes (2022-2023), performance in stable regimes (2015-2019) may be near zero. Macro rate differential signals are theoretically strongest in rate-trend regimes and weakest in range-bound/QE regimes \u2014 this needs empirical confirmation.",
+    "action": "Run scripts/full_backtest.py with date range per window above. Report Sharpe for each window independently. PASS criterion: Sharpe > 0 in ALL four windows. FAIL: any window negative = regime-dependent edge.",
+    "existing_breakdown": null
+  },
+  "survivor": {
+    "active_pairs": 5,
+    "retired_pairs": [
+      {
+        "pair": "USDCAD=X",
+        "reason": "Structural: BOC policy historically lags Fed \u2014 rate diff signal redundant",
+        "last_sharpe": 0.071,
+        "retired_version": "v008"
+      },
+      {
+        "pair": "GBPJPY=X",
+        "reason": "Performance: dual-bank noise (BOE crisis + BOJ intervention risk)",
+        "last_sharpe": 0.741,
+        "retired_version": "v009"
+      },
+      {
+        "pair": "NZDUSD=X",
+        "reason": "Performance: Sharpe 0.22, RBNZ tracks RBA (AUDUSD already captures signal)",
+        "last_sharpe": 0.22,
+        "retired_version": "oracle_audit"
+      },
+      {
+        "pair": "USDCHF=X",
+        "reason": "Structural: SNB held -0.75% for 8 years \u2014 rate diff signal broken structurally",
+        "last_sharpe": -0.45,
+        "retired_version": "v004"
+      },
+      {
+        "pair": "EURJPY=X",
+        "reason": "Structural: dual ECB+BOJ influence creates systematic signal conflicts",
+        "last_sharpe": null,
+        "retired_version": "pair_universe"
+      },
+      {
+        "pair": "EURGBP=X",
+        "reason": "Performance: ECB+BOE in lockstep \u2014 Sharpe -0.04, profit factor 1.00",
+        "last_sharpe": -0.04,
+        "retired_version": "v004"
+      }
+    ],
+    "total_ever_tested": 11,
+    "active_avg_sharpe": 2.097,
+    "universe_avg_sharpe_estimate": 1.1027,
+    "survivor_bias_delta": 0.9943,
+    "structural_retirements": 3,
+    "performance_retirements": 3,
+    "severity": "MEDIUM",
+    "detail": "Universe avg Sharpe (including retired pairs) \u2248 1.103 vs active avg 2.097. Survivor bias inflates reported Sharpe by ~0.994. 3 retirements are structural (defensible exclusions). 3 retirements are performance-based (caution: these inflate the average). GBPJPY (Sharpe 0.741) and NZDUSD (Sharpe 0.22) are borderline \u2014 they weren't zero-edge, they were below-portfolio-average."
+  },
+  "adjusted_sharpe": {
+    "reported": 2.097,
+    "after_fill_costs_conservative": 1.997,
+    "after_survivor_adjustment": 1.003,
+    "expected_out_of_sample_low": 0.652,
+    "expected_out_of_sample_high": 0.902,
+    "interpretation": "The 'expected OOS' range is the most honest estimate of what live trading will see. This assumes normal parameter decay from in-sample to out-of-sample. If regime robustness holds (all 4 windows positive), expect the higher end of range. Sharpe > 1.0 OOS = institutional grade and safe to trade. Sharpe 0.5-1.0 OOS = viable with tight risk management. Sharpe < 0.5 OOS = marginal \u2014 monitor closely."
+  }
+}

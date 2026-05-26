@@ -551,6 +551,7 @@ def process_ict_trades(verbose: bool = True) -> List[ForensicRecord]:
 
             failure_label, win_driver, metrics = _classify_ict_trade(trade, prices)
             features = _build_features(trade, "ICT", metrics)
+            pnl_r = float(trade.get("pnl_r", 0))
 
             records.append(ForensicRecord(
                 system="ICT",
@@ -559,7 +560,7 @@ def process_ict_trades(verbose: bool = True) -> List[ForensicRecord]:
                 direction=trade.get("direction", "LONG"),
                 entry_date=str(entry_date),
                 outcome=trade.get("outcome", ""),
-                pnl_r=float(trade.get("pnl_r", 0)),
+                pnl_r=pnl_r,
                 hold=int(trade.get("hold_bars", 5)),
                 session=trade.get("session", ""),
                 grade=trade.get("grade", ""),
@@ -570,6 +571,19 @@ def process_ict_trades(verbose: bool = True) -> List[ForensicRecord]:
                 features=features,
                 classified_at=datetime.now(timezone.utc).isoformat(),
             ))
+
+            # Back-fill decision log with forensic classification
+            try:
+                from sovereign.intelligence.decision_logger import update_outcome
+                outcome_label = failure_label or win_driver or trade.get("outcome", "")
+                update_outcome(
+                    pair=pair,
+                    entry_timestamp=str(entry_date),
+                    outcome=outcome_label,
+                    r_realized=pnl_r,
+                )
+            except Exception:
+                pass
 
     return records
 
@@ -606,6 +620,7 @@ def process_forex_trades(verbose: bool = True) -> List[ForensicRecord]:
 
             failure_label, win_driver, metrics = _classify_forex_trade(trade, pair, prices)
             features = _build_features(trade, "FOREX", metrics)
+            pnl_r_fx = float(trade.get("pnl_pct", 0)) * 100
 
             records.append(ForensicRecord(
                 system="FOREX",
@@ -614,7 +629,7 @@ def process_forex_trades(verbose: bool = True) -> List[ForensicRecord]:
                 direction="LONG" if int(trade.get("direction", 1)) == 1 else "SHORT",
                 entry_date=str(entry_date),
                 outcome=trade.get("exit_reason", ""),
-                pnl_r=float(trade.get("pnl_pct", 0)) * 100,
+                pnl_r=pnl_r_fx,
                 hold=int(trade.get("hold_days", 10)),
                 session="MACRO",
                 grade="MACRO",
@@ -625,6 +640,19 @@ def process_forex_trades(verbose: bool = True) -> List[ForensicRecord]:
                 features=features,
                 classified_at=datetime.now(timezone.utc).isoformat(),
             ))
+
+            # Back-fill decision log with forensic classification
+            try:
+                from sovereign.intelligence.decision_logger import update_outcome
+                outcome_label = failure_label or win_driver or trade.get("exit_reason", "")
+                update_outcome(
+                    pair=pair,
+                    entry_timestamp=str(entry_date),
+                    outcome=outcome_label,
+                    r_realized=pnl_r_fx,
+                )
+            except Exception:
+                pass
 
     return records
 

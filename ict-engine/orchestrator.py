@@ -222,12 +222,23 @@ class ICTOrchestrator:
             symbol=pair, direction="SHORT",
             df=df, timestamp=now, account=self._account,
         )
+        self._log_decisions(long_result, short_result)
         return PairScanResult(
             pair=pair,
             timestamp=now,
             long_result=long_result,
             short_result=short_result,
         )
+
+    def _log_decisions(self, long_result, short_result) -> None:
+        try:
+            from sovereign.intelligence.decision_logger import log_ict_decision
+            from ict.pipeline import ICTSignal
+            for result in (long_result, short_result):
+                if isinstance(result, ICTSignal):
+                    log_ict_decision(signal=result, commitment_score=None)
+        except Exception:
+            pass
 
     # ── Firebase publish ──────────────────────────────────────────────── #
 
