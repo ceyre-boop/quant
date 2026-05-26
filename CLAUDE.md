@@ -218,11 +218,12 @@ ICT system:       LIVE — paper trading, launchd every 5min during London/NY PM
                   Dashboard: ceyre-boop.github.io/quant/ict/ (Oracle-driven, live)
                   LIVE: pd_alignment weight=0 (HYP-024 confirmed anti-edge, wired 2026-05-19)
                   LIVE: Timing gate UTC 03:xx only (2026-05-22): WR=80% avgR=+2.100 vs UTC 04:xx WR=14%
-Forex system:     LIVE — v013 paper scan, 5 pairs | 🏆 INSTITUTIONAL GRADE ACHIEVED
-                  v013 (2026-05-24): avg_sharpe=1.8552 | target v014 > 1.9052 (+0.05 gate)
+Forex system:     LIVE — v014 paper scan, 5 pairs | 🏆 INSTITUTIONAL GRADE ACHIEVED
+                  v014 (2026-05-25): avg_sharpe=2.0970 | target v015 > 2.1470 (+0.05 gate)
+                  HYP-044 CONFIRMED: USDJPY/AUDNZD VIX gate 15→13 (+0.242 Sharpe)
                   Universal bull+VIX gate: macro rate-diff signals degrade when fear flows compete
                   Tiered thresholds: USDJPY/AUDNZD VIX>15 | EURUSD/GBPUSD/AUDUSD VIX>20
-                  Per-pair (gated): USDJPY→1.770 | AUDUSD→1.665 | GBPUSD→1.662 | EURUSD→1.583 | AUDNZD→1.558
+                  Per-pair (v014): USDJPY→2.979 | AUDNZD→2.246 | GBPUSD→1.885 | AUDUSD→1.665 | EURUSD→1.710
                   All 5 pairs now individually above Sharpe 1.5 (institutional grade)
                   Signal decay detector: sovereign/research/signal_decay.py (monthly)
 Backtest speed:   148,193/sec (Numba JIT, 12 cores)
@@ -240,8 +241,9 @@ Forex version tracker:
   v010: 1.2864 → 1.4396 (USDJPY regime gate VIX>15/bull, +0.153 — largest jump since v005)
   v011: 1.4396 → 1.6476 (universal bull+VIX gate all pairs, +0.208) ← INSTITUTIONAL GRADE ✓
   v012: 1.6476 → 1.7176 (+0.070)
-  v013: 1.7176 → 1.8552 (+0.138) ← CURRENT LIVE
-  Target: Sharpe > 1.9052 (v014 gate, +0.05 from v013)
+  v013: 1.7176 → 1.8552 (+0.138)
+  v014: 1.8552 → 2.0970 (+0.242) ← CURRENT LIVE (USDJPY/AUDNZD VIX 15→13)
+  Target: Sharpe > 2.1470 (v015 gate, +0.05 from v014)
 
 Unified forensics (2026-05-18): sovereign/research/unified_forensics.py
   SHARED ROOT CAUSE: Both ICT and Forex fail from PREMATURE ENTRY
