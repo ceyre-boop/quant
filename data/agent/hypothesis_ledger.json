@@ -744,6 +744,17 @@
       "h1": "Fresh macro signals (1-2d) produce higher R-multiples than stale signals (5+d)",
       "result": "ARCHITECTURALLY VOID \u2014 all 648 trades tagged as 1-2d fresh. Macro signals fire monthly at BMS; fast backtester enters on bar i+1. Every entry is maximally fresh by design. No staleness variation exists to exploit.",
       "verdict": "REJECTED \u2014 architecture void. Oracle estimated day-1/day-4 WR decay but v013 has no deferred entries. Freshness gate not applicable to monthly-resample signal architecture."
+    },
+    {
+      "id": "HYP-044",
+      "name": "VIX Gate Threshold Sweep \u2014 USDJPY/AUDNZD refinement",
+      "status": "CONFIRMED",
+      "date_formed": "2026-05-25",
+      "date_tested": "2026-05-25",
+      "h1": "Lowering USDJPY/AUDNZD VIX gate threshold from 15\u219213 improves Sharpe by removing confused-regime trades",
+      "result": "CONFIRMED \u2014 USDJPY VIX>13: 46 trades, 67.4% WR, Sharpe 2.979 (was 1.770 at VIX>15). AUDNZD VIX>13: 39 trades, 53.8% WR, Sharpe 2.246 (was 1.558). Portfolio 1.8552\u21922.097 (+0.242). v014 gate cleared.",
+      "verdict": "CONFIRMED \u2014 implemented as v014. USDJPY and AUDNZD thresholds 15\u219213. Monotonic improvement across all tested thresholds (8-15).",
+      "impact": "v014 implemented. Portfolio avg Sharpe 2.0970."
     }
   ],
   "last_updated": "2026-05-25T16:02:39.652653+00:00"

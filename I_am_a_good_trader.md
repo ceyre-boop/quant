@@ -128,5 +128,23 @@
 
 ---
 
+---
+
+### LESSON 8 — The More a Safe-Haven Pair Needs the Safe Haven, the Less Reliable Its Rate Signal. Tighten the Gate When VIX is Rising, Not Falling.
+
+**Discovered:** 2026-05-25 (HYP-044 VIX threshold sweep)
+**Validated:** 2026-05-25 (USDJPY: 46 trades at VIX>13 vs 70 at VIX>15, Sharpe 2.979 vs 1.770; AUDNZD: 39 trades vs 57, Sharpe 2.246 vs 1.558)
+**Evidence:** Portfolio 1.8552→2.097 (+0.242). USDJPY and AUDNZD become highest-Sharpe individual pairs.
+**Rule:** USDJPY/AUDNZD VIX gate: 15→13. Bull market + VIX>13 = veto. Lower threshold = fewer but higher-quality trades.
+**Impact:** v014 → portfolio avg Sharpe 2.097.
+**Code location:** `sovereign/forex/forex_backtester.py` `PAIR_VIX_GATES`; `sovereign/forex/signal_engine.py` `_VIX_GATES`
+**Health:** 🟢 ACTIVE
+**Last validated:** 2026-05-25
+**Linked hypothesis:** HYP-044
+
+*The lesson:* USDJPY is the world's most liquid safe-haven trade. When global equities are rising and VIX is above 13, two signals compete: the macro rate differential says one thing, and the safe-haven flow says another. Between VIX 13 and 15, the safe-haven bid corrupts the rate signal but is not obvious enough to detect from price alone. Lowering the veto threshold removes the confused regime — leaving only trades where the rate differential speaks clearly. AUDNZD: both AUD and NZD are risk currencies, and the cross rate loses its macro signal in any moderately elevated risk environment.
+
+---
+
 *Next lesson will retire the weakest of the above based on health monitoring.*
 *Health monitoring runs monthly. First monitoring cycle: 2026-06-19.*

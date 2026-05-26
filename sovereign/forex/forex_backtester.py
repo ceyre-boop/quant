@@ -95,8 +95,8 @@ class ForexBacktester:
     #   AUDUSD:  1.292 → 1.665  (VIX>20)
     #   Portfolio: 1.2864 → 1.6476  (+0.361 total across v010+v011)
     PAIR_VIX_GATES: dict = {
-        'USDJPY=X': 15.0,   # JPY safe-haven bids fight USD rate signal at any VIX elevation
-        'AUDNZD=X': 15.0,   # pure cross — both risk currencies, cross-rate noise starts at 15
+        'USDJPY=X': 13.0,   # v014: lowered from 15→13. JPY safe-haven overwhelms rate signal at any VIX elevation; VIX>13 in bull market = conflicting signals. 46 trades, 67.4% WR, Sharpe 2.979
+        'AUDNZD=X': 13.0,   # v013: lowered from 15→13. Both risk currencies — cross rate signal degrades faster than G3 pairs. 39 trades, 53.8% WR, Sharpe 2.246
         'EURUSD=X': 18.0,   # ECB-FED rate diff survives mild fear, breaks at VIX>18
         'GBPUSD=X': 18.0,   # BOE-FED rate diff same — confirmed optimal in full sweep
         'AUDUSD=X': 20.0,   # RBA-FED commodity-linked, more resilient; needs true fear

@@ -29,7 +29,8 @@ VERSIONS = [
     ('v010',  1.4396, 'USDJPY VIX gate'),
     ('v011',  1.6476, 'Universal VIX gate'),
     ('v012',  1.7176, 'EUR/GBP VIX 20→18'),
-    ('v013',  1.8552, 'Current live'),
+    ('v013',  1.8552, 'VIX size modifier'),
+    ('v014',  2.0970, 'USDJPY/AUDNZD VIX 15→13'),
 ]
 
 # ── Theme ────────────────────────────────────────────────────────────────────
@@ -87,7 +88,7 @@ for i, (xi, yi) in enumerate(zip(x, sharpes)):
 ref_lines = [
     (1.0,    MUTED,  'First edge'),
     (1.5,    BLUE,   'Institutional grade'),
-    (1.9052, GOLD,   'v014 target (+0.05)'),
+    (1.9052, GOLD,   'v014 gate (cleared ✓)'),
 ]
 for yval, color, label in ref_lines:
     ax.axhline(yval, color=color, lw=1, linestyle='--', alpha=0.55)
@@ -105,8 +106,8 @@ for i, (xi, yi, ann) in enumerate(zip(x, sharpes, annots)):
 ax.set_xlim(-0.5, len(VERSIONS) - 0.3)
 ax.set_ylim(-0.05, 2.15)
 ax.set_xticks([])
-ax.set_yticks([0, 0.5, 1.0, 1.5, 1.8552, 1.9052, 2.0])
-ax.set_yticklabels(['0', '0.5', '1.0', '1.5', '1.8552\n(v013)', '1.9052\n(target)', '2.0'],
+ax.set_yticks([0, 0.5, 1.0, 1.5, 1.8552, 1.9052, 2.0, 2.097])
+ax.set_yticklabels(['0', '0.5', '1.0', '1.5', '1.855\n(v013)', '1.905\n(gate)', '2.0', '2.097\n(v014)'],
                    color=WHITE, fontsize=8)
 ax.tick_params(axis='y', colors=MUTED, length=3)
 for spine in ax.spines.values():
@@ -116,7 +117,7 @@ ax.yaxis.set_tick_params(labelcolor=WHITE)
 # ── Title + legend ────────────────────────────────────────────────────────────
 fig.suptitle('SOVEREIGN FOREX — VERSION PROGRESSION', color=WHITE, fontsize=15,
              fontweight='bold', x=0.5, y=0.97)
-ax.set_title(f'v001 → v013  |  Sharpe 0.178 → 1.855  |  +{1.8552-0.1785:.3f} total',
+ax.set_title(f'v001 → v014  |  Sharpe 0.178 → 2.097  |  +{2.0970-0.1785:.3f} total',
              color=MUTED, fontsize=9, pad=8)
 
 legend_elements = [
@@ -128,8 +129,8 @@ ax.legend(handles=legend_elements, loc='upper left', facecolor=BG, edgecolor=MUT
           labelcolor=WHITE, fontsize=8, framealpha=0.8)
 
 # ── Current version callout ──────────────────────────────────────────────────
-ax.annotate('v013\n1.8552', xy=(x[-1], sharpes[-1]),
-            xytext=(x[-1] - 1.2, sharpes[-1] + 0.22),
+ax.annotate('v014\n2.097', xy=(x[-1], sharpes[-1]),
+            xytext=(x[-1] - 1.2, sharpes[-1] + 0.08),
             color=GREEN, fontsize=9, fontweight='bold',
             arrowprops=dict(arrowstyle='->', color=GREEN, lw=1.5))
 
