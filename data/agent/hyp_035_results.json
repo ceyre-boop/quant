@@ -1,0 +1,26 @@
+{
+  "task": "HYP-035",
+  "n_trades": 2340,
+  "bucket_stats": {
+    "COMPRESSED": {
+      "n": 592,
+      "wr": 49.32432432432432,
+      "avg_r": 0.11688240050322618,
+      "sharpe": 0.5063251335577745
+    },
+    "NORMAL": {
+      "n": 1285,
+      "wr": 49.57198443579767,
+      "avg_r": 0.04320064429197076,
+      "sharpe": 0.23634322694689877
+    },
+    "EXTENDED": {
+      "n": 463,
+      "wr": 51.61987041036718,
+      "avg_r": 0.062321602354404176,
+      "sharpe": 0.3561160565405886
+    }
+  },
+  "compressed_vs_normal_delta": 0.0737,
+  "verdict": "INCONCLUSIVE \u2014 within noise band"
+}

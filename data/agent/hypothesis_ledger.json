@@ -252,9 +252,9 @@
     {
       "id": "HYP-034",
       "name": "Currency Strength Composite \u2014 dynamic pair routing vs fixed universe",
-      "status": "QUEUED",
+      "status": "CANDIDATE",
       "date": "2026-05-25",
-      "result": "",
+      "result": "Dynamic Sharpe=4.16 vs fixed equal-weight -0.16 (baseline flawed \u2014 fixed is unfiltered buy-hold). Currency strength direction signal: WR 75.4% vs 47.9%. Signal is real but needs v013 macro filter as baseline comparison.",
       "h0": "Trading strongest G8 currency vs weakest produces no improvement vs fixed pair selection",
       "h1": "Daily currency strength ranking improves portfolio Sharpe by > 0.20 vs static universe",
       "method": "Compute 8-currency strength daily (avg return vs all 7 others). Route LONG strongest vs SHORT weakest. Same signal stack, same risk rules. Compare Sharpe dynamic vs static 2015-2024.",
@@ -263,9 +263,9 @@
     {
       "id": "HYP-035",
       "name": "Volatility Compression Entry Gate \u2014 ATR <20th pct at entry",
-      "status": "QUEUED",
+      "status": "REJECTED",
       "date": "2026-05-25",
-      "result": "",
+      "result": "COMPRESSED avg R=+0.117 vs NORMAL +0.043, delta=+0.074R. Below 0.30R H1 threshold. Real but marginal \u2014 not a standalone gate. Could work as 0.1x size boost layered on top of existing signal.",
       "h0": "ATR compression below 20th percentile at entry has no relationship to subsequent R-multiple",
       "h1": "Entering when ATR in bottom 20% of 252-day range improves avg R by > 0.30R vs normal/high vol entries",
       "method": "Tag each historical trade with atr_percentile. Split COMPRESSED/NORMAL/EXTENDED. Compare avg R and Sharpe. ICT connection: compression = Asian range = next move is displacement.",
@@ -734,6 +734,16 @@
       "impact": "Could add ~10-15% more valid trade opportunities if confirmed",
       "closed": "2026-05-25T16:02",
       "verdict": "REJECTED"
+    },
+    {
+      "id": "HYP-043",
+      "name": "Macro Signal Freshness Gate",
+      "status": "REJECTED",
+      "date_formed": "2026-05-25",
+      "date_tested": "2026-05-25",
+      "h1": "Fresh macro signals (1-2d) produce higher R-multiples than stale signals (5+d)",
+      "result": "ARCHITECTURALLY VOID \u2014 all 648 trades tagged as 1-2d fresh. Macro signals fire monthly at BMS; fast backtester enters on bar i+1. Every entry is maximally fresh by design. No staleness variation exists to exploit.",
+      "verdict": "REJECTED \u2014 architecture void. Oracle estimated day-1/day-4 WR decay but v013 has no deferred entries. Freshness gate not applicable to monthly-resample signal architecture."
     }
   ],
   "last_updated": "2026-05-25T16:02:39.652653+00:00"
