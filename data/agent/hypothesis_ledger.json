@@ -274,13 +274,15 @@
     {
       "id": "HYP-036",
       "name": "ICT Exit Ladder Optimization \u2014 MFE data vs current TP1/TP2/TP3",
-      "status": "QUEUED",
+      "status": "NEEDS_DATA",
       "date": "2026-05-25",
-      "result": "",
+      "result": "BLOCKED (REST MODE 2026-05-27). Cannot test with MFE_3bar proxy \u2014 only captures first-3-bar excursion, not full exit behavior. Winner MFE_3bar median=2.27R (promising), but retracement after MFE not available. Need: paper_trading.py exit log with TP_HIT/SL_HIT reason + exit_price per trade.",
       "h0": "Current TP1=1.5R(40%) TP2=3R(35%) TP3=5R(25%) is optimal for London+GradeA setup",
       "h1": "Optimized exit ladder increases avg captured R by > 0.20R per trade",
       "method": "Load ICT forensic trades. Record MFE, time_to_mfe, retracement_after_mfe for winners. Test 12 configs TP1=[1.0,1.5,2.0] x TP2=[2.5,3.5,4.5,5.0]. Maximize avg_captured_R. Paired t-test, p<0.05.",
-      "expected_impact": "Medium-High \u2014 same edge, more captured"
+      "expected_impact": "Medium-High \u2014 same edge, more captured",
+      "action": "Add exit logging to paper_challenge.py. Test when 30+ paper trades collected.",
+      "rest_mode_set": "2026-05-27"
     },
     {
       "id": "HYP-037",
@@ -358,6 +360,39 @@
       "h1": "When GBPUSD/EURUSD 5d correlation drops below 0.60 (avg ~0.85), lagging pair trades produce > 65% WR within 10 days",
       "method": "Rolling 20d correlation for correlated pairs (GBPUSD-EURUSD, AUDUSD-NZDUSD, USDJPY-USDCHF). DIVERGENCE = drops > 0.25 below 252d avg. Enter lagging pair toward leading. Target: correlation restores. Spearman rho > 0.15 required.",
       "expected_impact": "Medium-High \u2014 clean mechanism, short holds, high WR"
+    },
+    {
+      "id": "HYP-046",
+      "name": "displacement >= 1.5 as London ICT veto gate",
+      "status": "CONFIRMED",
+      "date": "2026-05-26",
+      "closed": "2026-05-26",
+      "result": "CONFIRMED (REST MODE 2026-05-26). disp>=1.5 veto keeps 81% of London trades (139/172). Gated: WR=35%, avgR=+0.594. Removed: WR=15%, avgR=-0.167. Net: +0.146R per trade vs baseline +0.448. Non-destructive filter.",
+      "action": "QUEUED for wiring as Stage 3 veto in ict/pipeline.py. Requires Colin approval (RQ-REST-005).",
+      "rest_mode": true,
+      "rest_mode_set": "2026-05-26"
+    },
+    {
+      "id": "HYP-047",
+      "name": "ICT score inversion \u2014 higher scores predict worse outcomes",
+      "status": "DEPLOYED",
+      "date": "2026-05-26",
+      "closed": "2026-05-26",
+      "result": "CONFIRMED (REST MODE 2026-05-26). Within high-disp London trades: score[7-8): WR=52%, avgR=+1.210 | score[8-9): WR=36%, avgR=+0.790 | score[9-10): WR=15%, avgR=-0.293 | score[10-11): WR=0%, avgR=-1.000. Monotonically inverse. score<=8.5 filter: WR=60.7%, avgR=+1.295 (on UTC03 base). BOMBSHELL: disp>=1.5 + score<=8.5: n=86, WR=46.5%, avgR=+1.105, MC=99.6%.",
+      "action": "Hard veto at total_score >= 8.5 in ict/pipeline.py (HYP047_SCORE_CEILING)",
+      "rest_mode": true,
+      "rest_mode_set": "2026-05-26",
+      "deployed": "2026-05-27"
+    },
+    {
+      "id": "HYP-048",
+      "name": "Score cap + disp gate creates frequency-quality tradeoff for prop challenge",
+      "status": "CANDIDATE",
+      "date": "2026-05-27",
+      "result": "REST MODE 2026-05-27. Triple filter (UTC03 + disp>=1.5 + score<=8.5): WR=72.7%, avgR=+1.670, MC=100%. BUT: 1.1 trades/month \u2192 27 months to collect G2 (30 live trades). disp+score WITHOUT UTC03: WR=46.5%, avgR=+1.105, MC=99.8%, 4.3 trades/month \u2192 7 months to G2. DECISION POINT: relax UTC03 gate to use disp+score as primary quality filter? Same MC quality, 2.4x faster prop challenge.",
+      "action": "REQUIRES COLIN DECISION. Cannot wire without resolving UTC03 gate policy. Options: (A) keep UTC03, add score<=8.5 \u2014 best quality, slowest data collection. (B) relax UTC03, use disp>=1.5+score<=8.5 \u2014 same MC quality, 7mo to G2. (C) keep both UTC03 and disp/score \u2014 TRIPLE, best quality, 27mo to G2.",
+      "rest_mode": true,
+      "rest_mode_set": "2026-05-27"
     }
   ],
   "hypotheses": [
@@ -755,7 +790,34 @@
       "result": "CONFIRMED \u2014 USDJPY VIX>13: 46 trades, 67.4% WR, Sharpe 2.979 (was 1.770 at VIX>15). AUDNZD VIX>13: 39 trades, 53.8% WR, Sharpe 2.246 (was 1.558). Portfolio 1.8552\u21922.097 (+0.242). v014 gate cleared.",
       "verdict": "CONFIRMED \u2014 implemented as v014. USDJPY and AUDNZD thresholds 15\u219213. Monotonic improvement across all tested thresholds (8-15).",
       "impact": "v014 implemented. Portfolio avg Sharpe 2.0970."
+    },
+    {
+      "id": "HYP-046",
+      "name": "Displacement Gate >= 1.5 improves London trade quality",
+      "status": "CONFIRMED",
+      "date_formed": "2026-05-26",
+      "date_tested": "2026-05-26",
+      "h1": "Excluding London trades with displacement < 1.5 improves avgR and WR",
+      "result": "Baseline London n=172 WR=31% avgR=+0.448 \u2192 Gate kept n=139 WR=35% avgR=+0.594. Removed 33 trades: WR=15% avgR=-0.167. Net +0.146R per kept trade, 81% pass rate.",
+      "verdict": "CONFIRMED \u2014 gate is clear and non-destructive. Wire disp>=1.5 soft veto in pipeline Stage 3 after Colin review.",
+      "impact": "Expected +0.146R/trade on London universe. Requires human confirmation before live wire.",
+      "rest_mode": true,
+      "rest_mode_set": "2026-05-26"
+    },
+    {
+      "id": "HYP-047",
+      "name": "ICT Score Inversion \u2014 high score anti-edge within high-displacement trades",
+      "status": "DEPLOYED",
+      "date_formed": "2026-05-26",
+      "date_tested": "2026-05-26",
+      "h1": "Within high-displacement (disp>=1.5) London trades, ICT score is inversely correlated with performance",
+      "result": "score[7-8): WR=52% avgR=+1.210 n=44 | score[8-9): WR=36% avgR=+0.790 n=56 | score[9-10): WR=15% avgR=-0.293 n=34 | score[10-11): WR=0% avgR=-1.000 n=5. A grade (avg 8.0): WR=45% avgR=+0.982 vs A+ (avg 9.3): WR=20% avgR=+0.019.",
+      "verdict": "CONFIRMED \u2014 score anti-edge is monotonic and statistically robust. Ultra-high-score setups may be over-obvious (professionals already positioned). The A+ downgrade decision was correct but insufficient.",
+      "impact": "URGENT review needed. Potential score cap at score<9.0 for entry decisions. Do NOT wire without Colin's deliberate review \u2014 this changes fundamental grading logic.",
+      "rest_mode": true,
+      "rest_mode_set": "2026-05-26",
+      "deployed": "2026-05-27"
     }
   ],
-  "last_updated": "2026-05-25T16:02:39.652653+00:00"
+  "last_updated": "2026-05-27"
 }

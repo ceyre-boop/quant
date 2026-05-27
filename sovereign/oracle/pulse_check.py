@@ -1,0 +1,342 @@
+"""
+Oracle Tier 1 — PULSE CHECK
+sovereign/oracle/pulse_check.py
+
+Runs every 2 hours. No LLM call. Pure computation.
+Detects anomalies in decision logs, updates running stats, writes to dashboard.
+
+Cost: $0.00
+"""
+from __future__ import annotations
+
+import json
+import logging
+from datetime import datetime, timezone, timedelta
+from pathlib import Path
+from typing import Optional
+
+from sovereign.utils.timestamps import canonical_timestamp
+
+ROOT           = Path(__file__).resolve().parents[2]
+PULSE_DIR      = ROOT / "data" / "oracle" / "pulses"
+PULSE_STATE    = ROOT / "data" / "oracle" / ".pulse_state.json"
+DECISION_LOG_DIR = ROOT / "data" / "decision_logs"
+MESSAGES_PATH  = ROOT / "data" / "agent" / "messages_to_colin.json"
+HEALTH_PATH    = ROOT / "data" / "agent" / "health.json"
+LEDGER_PATH    = ROOT / "data" / "agent" / "hypothesis_ledger.json"
+
+log = logging.getLogger("oracle.pulse")
+
+
+# ─── State helpers ────────────────────────────────────────────────────────────
+
+def _load_pulse_state() -> dict:
+    if PULSE_STATE.exists():
+        try:
+            return json.loads(PULSE_STATE.read_text())
+        except Exception:
+            pass
+    return {}
+
+
+def _save_pulse_state(last_pulse_time: Optional[str] = None, last_micro_time: Optional[str] = None) -> None:
+    state = _load_pulse_state()
+    if last_pulse_time is not None:
+        state["last_pulse_time"] = last_pulse_time
+    if last_micro_time is not None:
+        state["last_micro_time"] = last_micro_time
+    PULSE_STATE.write_text(json.dumps(state, indent=2))
+
+
+def _get_last_pulse_time() -> datetime:
+    state = _load_pulse_state()
+    ts = state.get("last_pulse_time")
+    if ts:
+        try:
+            dt = datetime.fromisoformat(ts)
+            if dt.tzinfo is None:
+                dt = dt.replace(tzinfo=timezone.utc)
+            return dt
+        except Exception:
+            pass
+    return datetime.now(timezone.utc) - timedelta(hours=24)
+
+
+# ─── Decision log loader ──────────────────────────────────────────────────────
+
+def _load_entries_since(cutoff: datetime) -> list[dict]:
+    """Load all decision log entries with entry_timestamp >= cutoff."""
+    if not DECISION_LOG_DIR.exists():
+        return []
+    entries = []
+    for log_file in sorted(DECISION_LOG_DIR.glob("decisions_*.jsonl")):
+        try:
+            for line in log_file.read_text().splitlines():
+                if not line.strip():
+                    continue
+                rec = json.loads(line)
+                ts_str = rec.get("entry_timestamp", "")
+                try:
+                    ts = datetime.fromisoformat(ts_str.replace("Z", "+00:00"))
+                    if ts.tzinfo is None:
+                        ts = ts.replace(tzinfo=timezone.utc)
+                    if ts >= cutoff:
+                        entries.append(rec)
+                except Exception:
+                    entries.append(rec)
+        except Exception:
+            continue
+    return entries
+
+
+# ─── rest_mode escalation ────────────────────────────────────────────────────
+
+def _check_rest_mode_escalation() -> list[dict]:
+    """Flag hypotheses validated but not yet implemented or explicitly rejected."""
+    if not LEDGER_PATH.exists():
+        return []
+    try:
+        data = json.loads(LEDGER_PATH.read_text())
+        hyps = []
+        if isinstance(data, dict):
+            hyps = data.get("hypotheses", []) + data.get("ledger", [])
+        else:
+            hyps = data
+    except Exception:
+        return []
+
+    issues = []
+    today = datetime.now(timezone.utc).date()
+    seen = set()
+    for h in hyps:
+        hid = h.get("id", "")
+        if hid in seen:
+            continue
+        seen.add(hid)
+        if not h.get("rest_mode"):
+            continue
+        if h.get("status") in ("REJECTED", "DEPLOYED"):
+            continue
+
+        rest_date_str = h.get("rest_mode_set") or h.get("closed") or h.get("date")
+        if not rest_date_str:
+            issues.append({
+                "type": "REST_MODE_NO_DATE",
+                "priority": "IMPORTANT",
+                "message": f"{hid} is validated + rest_mode but has no rest_mode_set date — add it.",
+            })
+            continue
+
+        try:
+            rest_date = datetime.strptime(rest_date_str[:10], "%Y-%m-%d").date()
+            days = (today - rest_date).days
+        except Exception:
+            continue
+
+        name_snippet = h.get("name", "")[:50]
+        if days >= 14:
+            issues.append({
+                "type": "REST_MODE_EXPIRED",
+                "priority": "URGENT",
+                "message": (
+                    f"{hid} ({name_snippet}) validated and unimplemented for {days} days. "
+                    f"Implement it or explicitly reject it. Validated knowledge has an expiry date."
+                ),
+            })
+        elif days >= 7:
+            issues.append({
+                "type": "REST_MODE_WEEK_TWO",
+                "priority": "IMPORTANT",
+                "message": f"{hid} validated {days} days ago, still in rest_mode. Week 2 — decision needed.",
+            })
+        elif days >= 2:
+            issues.append({
+                "type": "REST_MODE_PENDING",
+                "priority": "FYI",
+                "message": f"{hid} validated {days} days ago, awaiting implementation.",
+            })
+
+    return issues
+
+
+# ─── Anomaly detection ────────────────────────────────────────────────────────
+
+def _count_consecutive_losses(r_values: list[float]) -> int:
+    count = 0
+    for r in reversed(r_values):
+        if r < 0:
+            count += 1
+        else:
+            break
+    return count
+
+
+def _detect_anomalies(recent_24h: list[dict]) -> list[dict]:
+    anomalies = []
+
+    # Consecutive losses
+    outcomes_seq = [
+        e["r_realized"] for e in recent_24h
+        if e.get("r_realized") is not None and e.get("outcome") not in (None, "OPEN")
+    ]
+    if len(outcomes_seq) >= 3:
+        n_consec = _count_consecutive_losses(outcomes_seq)
+        if n_consec >= 3:
+            anomalies.append({
+                "type": "CONSECUTIVE_LOSSES",
+                "priority": "URGENT",
+                "message": f"{n_consec} consecutive losses detected in last 24h — review system health",
+            })
+
+    # Commitment score stuck (all entries share same value)
+    scores = [
+        e.get("commitment_score") for e in recent_24h
+        if e.get("commitment_score") is not None
+    ]
+    if len(scores) >= 2 and len(set(scores)) == 1:
+        anomalies.append({
+            "type": "COMMITMENT_SCORE_STUCK",
+            "priority": "IMPORTANT",
+            "message": (
+                f"All {len(scores)} entries have commitment_score={scores[0]}. "
+                "Detector may be defaulting — check ict.pipeline logs for 'Commitment detector failed'."
+            ),
+        })
+
+    # Stale entries (bars_since_signal > 5)
+    stale = [e for e in recent_24h if (e.get("bars_since_signal") or 0) > 5]
+    if stale:
+        anomalies.append({
+            "type": "STALE_ENTRY",
+            "priority": "FYI",
+            "message": f"{len(stale)} entries with bars_since_signal > 5 — entries may be chasing stale FVGs",
+        })
+
+    # Old open trades (entry > 7 days ago, no outcome)
+    cutoff_7d = datetime.now(timezone.utc) - timedelta(days=7)
+    missing_outcome = []
+    for e in recent_24h:
+        if e.get("outcome") is not None:
+            continue
+        ts_str = e.get("entry_timestamp", "")
+        try:
+            ts = datetime.fromisoformat(ts_str.replace("Z", "+00:00"))
+            if ts.tzinfo is None:
+                ts = ts.replace(tzinfo=timezone.utc)
+            if ts < cutoff_7d:
+                missing_outcome.append(e.get("pair", "?"))
+        except Exception:
+            pass
+    if missing_outcome:
+        anomalies.append({
+            "type": "MISSING_OUTCOMES",
+            "priority": "IMPORTANT",
+            "message": f"{len(missing_outcome)} trades >7d old with no outcome: {', '.join(missing_outcome[:5])}",
+        })
+
+    return anomalies
+
+
+# ─── Stats ────────────────────────────────────────────────────────────────────
+
+def _compute_running_stats(outcomes: list[float]) -> dict:
+    if not outcomes:
+        return {}
+    wins = [r for r in outcomes if r > 0]
+    return {
+        "trades_24h": len(outcomes),
+        "win_rate_24h": round(len(wins) / len(outcomes), 3),
+        "avg_r_24h": round(sum(outcomes) / len(outcomes), 3),
+        "best_r": max(outcomes),
+        "worst_r": min(outcomes),
+    }
+
+
+# ─── Health + messages ────────────────────────────────────────────────────────
+
+def _update_health_json(pulse: dict) -> None:
+    try:
+        health = json.loads(HEALTH_PATH.read_text()) if HEALTH_PATH.exists() else {}
+        if "components" not in health:
+            health["components"] = {}
+        n_anomalies = len(pulse.get("anomalies", []))
+        urgent = any(a["priority"] == "URGENT" for a in pulse.get("anomalies", []))
+        status = "RED" if urgent else ("YELLOW" if n_anomalies > 0 else "GREEN")
+        health["components"]["oracle_pulse"] = {
+            "status": status,
+            "detail": f"{pulse['new_entries_since_last']} new entries, {n_anomalies} anomalies",
+            "last_pulse": pulse["timestamp"],
+        }
+        HEALTH_PATH.write_text(json.dumps(health, indent=2))
+    except Exception as e:
+        log.warning("Failed to update health.json: %s", e)
+
+
+def _write_messages(anomalies: list[dict]) -> None:
+    try:
+        data = json.loads(MESSAGES_PATH.read_text()) if MESSAGES_PATH.exists() else {}
+        if "messages" not in data:
+            data["messages"] = []
+        emoji_map = {"URGENT": "🔴", "IMPORTANT": "🟡", "FYI": "🟢"}
+        for a in anomalies:
+            priority = a.get("priority", "FYI")
+            data["messages"].insert(0, {
+                "id": f"pulse-{canonical_timestamp()[:16].replace(':', '').replace('-', '')}",
+                "priority": priority,
+                "emoji": emoji_map.get(priority, "🟢"),
+                "text": f"[PULSE] {a['type']}: {a['message']}",
+                "timestamp": canonical_timestamp(),
+                "read": False,
+                "source": "oracle_pulse",
+            })
+        data["messages"] = data["messages"][:50]
+        data["last_updated"] = canonical_timestamp()
+        MESSAGES_PATH.write_text(json.dumps(data, indent=2))
+    except Exception as e:
+        log.warning("Failed to write messages: %s", e)
+
+
+# ─── Main ─────────────────────────────────────────────────────────────────────
+
+def run_pulse() -> dict:
+    """Run pulse check. No LLM call. Writes pulse report, updates health.json."""
+    last = _get_last_pulse_time()
+    new_entries = _load_entries_since(last)
+    recent_24h = _load_entries_since(datetime.now(timezone.utc) - timedelta(hours=24))
+
+    outcomes = [
+        e["r_realized"] for e in recent_24h
+        if e.get("r_realized") is not None and e.get("outcome") not in (None, "OPEN")
+    ]
+    anomalies = _detect_anomalies(recent_24h) + _check_rest_mode_escalation()
+
+    pulse = {
+        "timestamp": canonical_timestamp(),
+        "new_entries_since_last": len(new_entries),
+        "new_outcomes_since_last": sum(1 for e in new_entries if e.get("outcome")),
+        "anomalies": anomalies,
+        "running_stats": _compute_running_stats(outcomes),
+    }
+
+    PULSE_DIR.mkdir(parents=True, exist_ok=True)
+    ts_slug = pulse["timestamp"][:16].replace(":", "").replace("-", "").replace("T", "")
+    (PULSE_DIR / f"pulse_{ts_slug}.json").write_text(json.dumps(pulse, indent=2))
+
+    _save_pulse_state(last_pulse_time=pulse["timestamp"])
+    _update_health_json(pulse)
+    if anomalies:
+        _write_messages(anomalies)
+
+    return pulse
+
+
+if __name__ == "__main__":
+    result = run_pulse()
+    print(f"Pulse complete. New entries: {result['new_entries_since_last']}, "
+          f"Outcomes: {result['new_outcomes_since_last']}, "
+          f"Anomalies: {len(result['anomalies'])}")
+    for a in result["anomalies"]:
+        print(f"  [{a['priority']}] {a['type']}: {a['message']}")
+    if result["running_stats"]:
+        s = result["running_stats"]
+        print(f"  24h stats: {s['trades_24h']} trades | WR={s['win_rate_24h']:.0%} | avgR={s['avg_r_24h']:+.3f}")

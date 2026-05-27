@@ -94,15 +94,18 @@ class SessionClassifier:
         Classify *ts* into session/kill-zone membership.
 
         *ts* may be timezone-aware or naive (assumed UTC if naive).
+        Kill zone constants are defined in US/Eastern time, so comparison
+        uses ET. The output struct still records UTC for auditability.
         """
         utc_t = self._to_utc_time(ts)
+        et_t = self._to_et_time(ts)   # kill zone windows are in ET
         active_window: Optional[SessionWindow] = None
         for w in self._windows:
-            if w.contains(utc_t):
+            if w.contains(et_t):      # compare ET time against ET constants
                 active_window = w
                 break
 
-        in_lunch = self._lunch_start <= utc_t <= self._lunch_end
+        in_lunch = self._lunch_start <= et_t <= self._lunch_end
         in_kz = active_window is not None
         is_hp = in_kz and active_window.is_high_probability  # type: ignore[union-attr]
         should_trade = is_hp and not in_lunch
@@ -163,6 +166,13 @@ class SessionClassifier:
         if ts.tzinfo is not None:
             ts = ts.astimezone(timezone.utc).replace(tzinfo=None)
         return ts.time()
+
+    @staticmethod
+    def _to_et_time(ts: datetime) -> time:
+        from zoneinfo import ZoneInfo
+        if ts.tzinfo is None:
+            ts = ts.replace(tzinfo=timezone.utc)
+        return ts.astimezone(ZoneInfo("America/New_York")).time().replace(tzinfo=None)
 
 
 # ── Module-level helper ───────────────────────────────────────────────────── #

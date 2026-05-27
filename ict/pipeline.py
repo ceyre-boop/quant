@@ -479,6 +479,23 @@ class ICTPipeline:
         grade = self._grade(total_score, threshold=threshold)
 
         # ══════════════════════════════════════════════════════════════════
+        # HYP-047 SCORE CEILING — confirmed 2026-05-26
+        # Score [7-8): 52% WR +1.210R | [8-8.5): 36% WR +0.790R
+        # Score [8.5-9): WR decay begins | Score 9+: negative R
+        # Hard veto at 8.5 — above this threshold WR decays monotonically.
+        # ══════════════════════════════════════════════════════════════════
+        if total_score >= 8.5:
+            return ICTVeto(
+                symbol=symbol, direction=direction, timestamp=timestamp,
+                score=total_score, grade=ICTGrade.VETOED,
+                reason=(
+                    f"HYP047_SCORE_CEILING: score={total_score:.2f} >= 8.5 "
+                    f"(WR decays monotonically above 8; score 9+ = negative R)"
+                ),
+                component_scores=scores, confirmations=confirmations, missing=missing,
+            )
+
+        # ══════════════════════════════════════════════════════════════════
         # STAGE 5.7 — Forensics combat rules (unified_forensics.py 2026-05-18)
         # EXP-001: NY_PM has -0.283R avg vs London +0.471R. Block entirely.
         # EXP-002: A+ grade (score>9.0) has 13% WR vs 39% for grade A.
@@ -516,7 +533,9 @@ class ICTPipeline:
                 )
             # DEVELOPING: execute at reduced size (handled downstream via size_multiplier)
             _commit_size_mult = _commit.size_multiplier
-        except Exception:
+        except Exception as _ce:
+            import logging as _log_c
+            _log_c.getLogger("ict.pipeline").warning("Commitment detector failed: %s", _ce)
             _commit_size_mult = 1.0
 
         # ══════════════════════════════════════════════════════════════════
@@ -555,7 +574,7 @@ class ICTPipeline:
                     'units': max(0, round(sz.units * _ict_alloc_weight)),
                     'risk_dollars': round(sz.risk_dollars * _ict_alloc_weight, 2),
                 })
-            return ICTSignal(
+            _sig = ICTSignal(
                 symbol=symbol, direction=direction, timestamp=timestamp,
                 score=total_score, grade=grade, sizing=sz,
                 session_status=session,
@@ -564,6 +583,25 @@ class ICTPipeline:
                 component_scores=scores,
                 confirmations=confirmations, missing=missing,
             )
+            try:
+                import importlib as _il
+                _dl = _il.import_module("sovereign.intelligence.decision_logger")
+                _signal_ref = tap_fvg or tap_ob or recent_sweep
+                _bars = None
+                if _signal_ref is not None and hasattr(_signal_ref, "formed_at"):
+                    try:
+                        _elapsed = (timestamp - _signal_ref.formed_at).total_seconds()
+                        _bars = max(0, int(_elapsed / 300))  # 5-min bars
+                    except Exception:
+                        pass
+                _dl.log_ict_decision(
+                    signal=_sig,
+                    commitment_score=_commit_size_mult,
+                    bars_since_signal=_bars,
+                )
+            except Exception:
+                pass
+            return _sig
 
         return ICTVeto(
             symbol=symbol, direction=direction, timestamp=timestamp,

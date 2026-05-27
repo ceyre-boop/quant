@@ -41,10 +41,10 @@ def _default_account() -> MicroRiskParams:
 
 # ── Kill Zone timestamps ──────────────────────────────────────────────────── #
 
-LONDON_TS = datetime(2024, 3, 15, 3, 0, 0)        # 03:00 UTC → London KZ
-NY_OPEN_TS = datetime(2024, 3, 15, 8, 0, 0)       # 08:00 UTC → NY Open KZ
-OFF_HOURS_TS = datetime(2024, 3, 15, 17, 0, 0)    # 17:00 UTC → Off hours
-NY_LUNCH_TS = datetime(2024, 3, 15, 12, 30, 0)    # 12:30 UTC → NY Lunch
+LONDON_TS = datetime(2024, 3, 15, 7, 0, 0, tzinfo=timezone.utc)        # 07:00 UTC = 03:00 ET (EDT) → London KZ
+NY_OPEN_TS = datetime(2024, 3, 15, 12, 0, 0, tzinfo=timezone.utc)     # 12:00 UTC = 08:00 ET (EDT) → NY Open KZ
+OFF_HOURS_TS = datetime(2024, 3, 15, 22, 0, 0, tzinfo=timezone.utc)   # 22:00 UTC = 18:00 ET (EDT) → Off hours
+NY_LUNCH_TS = datetime(2024, 3, 15, 17, 0, 0, tzinfo=timezone.utc)    # 17:00 UTC = 13:00 ET (EDT) → NY Lunch
 
 
 # ── Pipeline construction ─────────────────────────────────────────────────── #

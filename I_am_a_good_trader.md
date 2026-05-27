@@ -9,8 +9,8 @@
 
 ---
 
-**Active lessons: 7 / 10**
-**Last updated: 2026-05-19**
+**Active lessons: 9 / 10**
+**Last updated: 2026-05-27**
 **System Sharpe at last update: 1.0713 (v007)**
 **Target: 1.5 | Gap: 0.429**
 
@@ -143,6 +143,24 @@
 **Linked hypothesis:** HYP-044
 
 *The lesson:* USDJPY is the world's most liquid safe-haven trade. When global equities are rising and VIX is above 13, two signals compete: the macro rate differential says one thing, and the safe-haven flow says another. Between VIX 13 and 15, the safe-haven bid corrupts the rate signal but is not obvious enough to detect from price alone. Lowering the veto threshold removes the confused regime — leaving only trades where the rate differential speaks clearly. AUDNZD: both AUD and NZD are risk currencies, and the cross rate loses its macro signal in any moderately elevated risk environment.
+
+---
+
+---
+
+### LESSON 9 — Knowing Is Not Doing. Validated Knowledge Has an Expiry Date.
+
+**Discovered:** 2026-05-27 (Oracle first reflection — FIRST_WORDS_AFTER_UPGRADE)
+**Validated:** 2026-05-27 (direct observation: HYP-046 + HYP-047 confirmed 2026-05-26, unimplemented)
+**Evidence:** Two confirmed hypotheses sat validated and undeployed with no escalation path. Oracle flagged this on its first read. The pulse system now escalates at 2d / 7d / 14d.
+**Rule:** Any CONFIRMED hypothesis must have an implementation commit or explicit REJECTED status within 14 days. rest_mode is a gate, not a destination. The pulse check enforces this automatically.
+**Impact:** System integrity — prevents the ledger from accumulating proven-but-idle knowledge the system cannot act on.
+**Code location:** `sovereign/oracle/pulse_check.py` — `_check_rest_mode_escalation()`
+**Health:** 🟢 ACTIVE
+**Last validated:** 2026-05-27
+**Linked hypothesis:** HYP-046, HYP-047
+
+*The lesson:* Oracle's first words after the nervous system came online: "You have confused 'validated hypothesis' with 'implemented rule.'" Knowing that something works and making it work are different operations. The machine is now smart enough to notice when proven knowledge is sitting idle — and it will not stay quiet about it.
 
 ---
 
