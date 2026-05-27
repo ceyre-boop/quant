@@ -8,7 +8,7 @@ import json
 import os
 import sys
 import traceback
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 sys.path.insert(0, '.')
@@ -57,7 +57,7 @@ def _fetch_forex_signals():
             prices = yf.Ticker(ticker).history(period='2y', interval='1d')
             if prices.empty:
                 continue
-            prices.index = pd.to_datetime(prices.index).tz_localize(None)
+            prices.index = prices.index.tz_convert(None)
             df = build_signal_frame(ticker, prices, base, quote)
             last = df.iloc[-1]
             close = float(prices['Close'].iloc[-1])
@@ -437,6 +437,127 @@ class Handler(BaseHTTPRequestHandler):
                 })
             except Exception:
                 self._send_json(500, {'error': traceback.format_exc()})
+
+        elif path == '/scanner_state':
+            try:
+                with open('logs/scanner_state.json') as f:
+                    self._send_json(200, json.load(f))
+            except FileNotFoundError:
+                self._send_json(200, {'pairs': {}, 'error': 'not_ready'})
+            except Exception:
+                self._send_json(500, {'error': traceback.format_exc()})
+
+        elif path == '/activity':
+            try:
+                now_s = datetime.now(timezone.utc).strftime('%Y_%m')
+                ledger = f'data/ledger/ict_veto_ledger_{now_s}.jsonl'
+                veto_log = []
+                try:
+                    with open(ledger) as f:
+                        lines = f.readlines()
+                    for line in lines[-30:]:
+                        try: veto_log.append(json.loads(line.strip()))
+                        except Exception: pass
+                except FileNotFoundError:
+                    pass
+                paper = {'open': [], 'closed': []}
+                try:
+                    with open('data/ledger/ict_paper_trades.json') as f:
+                        paper = json.load(f)
+                except Exception:
+                    pass
+                self._send_json(200, {'veto_log': veto_log[-20:], 'paper_trades': paper})
+            except Exception:
+                self._send_json(500, {'error': traceback.format_exc()})
+
+        elif path == '/session_levels':
+            try:
+                import urllib.parse as _up
+                _qs = dict(_up.parse_qsl(self.path.split('?')[1] if '?' in self.path else ''))
+                pair = (_qs.get('pair', 'GBPUSD') or 'GBPUSD').upper()
+                _YTICKER = {
+                    'GBPUSD': 'GBPUSD=X', 'EURUSD': 'EURUSD=X',
+                    'AUDUSD': 'AUDUSD=X', 'AUDNZD': 'AUDNZD=X',
+                    'USDJPY': 'USDJPY=X',
+                }
+                yticker = _YTICKER.get(pair, pair + '=X')
+                import yfinance as yf
+                df = yf.download(yticker, period='5d', interval='1h', progress=False, auto_adjust=True)
+                if df is None or df.empty:
+                    self._send_json(200, {'error': 'no_data'})
+                    return
+                if hasattr(df.columns, 'levels'):
+                    df.columns = df.columns.get_level_values(0)
+                df.index = df.index.tz_convert('UTC')
+                today = datetime.now(timezone.utc).date()
+                yesterday = today - timedelta(days=1)
+                yday = df[df.index.date == yesterday]
+                pdh = float(yday['High'].max()) if not yday.empty else None
+                pdl = float(yday['Low'].min()) if not yday.empty else None
+                todays = df[df.index.date == today]
+                asian = todays[(todays.index.hour >= 0) & (todays.index.hour < 8)]
+                london = todays[(todays.index.hour >= 8) & (todays.index.hour < 16)]
+                levels = {
+                    'pair': pair,
+                    'date': str(today),
+                    'pdh': pdh,
+                    'pdl': pdl,
+                    'asian_high': float(asian['High'].max()) if not asian.empty else None,
+                    'asian_low': float(asian['Low'].min()) if not asian.empty else None,
+                    'london_high': float(london['High'].max()) if not london.empty else None,
+                    'london_low': float(london['Low'].min()) if not london.empty else None,
+                }
+                import pathlib, json as _json
+                pathlib.Path('logs').mkdir(parents=True, exist_ok=True)
+                pathlib.Path('logs/session_levels.json').write_text(_json.dumps(levels, indent=2))
+                self._send_json(200, levels)
+            except Exception:
+                self._send_json(500, {'error': traceback.format_exc()})
+
+        elif path == '/ohlcv':
+            try:
+                import urllib.parse as _up
+                import yfinance as yf
+                _qs = dict(_up.parse_qsl(self.path.split('?')[1] if '?' in self.path else ''))
+                pair = (_qs.get('pair', 'GBPUSD') or 'GBPUSD').upper()
+                _YTICKER = {
+                    'GBPUSD': 'GBPUSD=X', 'EURUSD': 'EURUSD=X',
+                    'AUDUSD': 'AUDUSD=X', 'AUDNZD': 'AUDNZD=X',
+                    'USDJPY': 'USDJPY=X',
+                }
+                yticker = _YTICKER.get(pair, pair + '=X')
+                prices = yf.Ticker(yticker).history(period='2y', interval='1d')
+                if prices.empty:
+                    self._send_json(200, {'error': 'no_data', 'pair': pair})
+                    return
+                prices.index = prices.index.tz_convert(None)
+                n = min(504, len(prices))
+                px = prices.iloc[-n:]
+                ohlcv = [
+                    {
+                        't': int(ts.timestamp() * 1000),
+                        'o': round(float(row['Open']), 5),
+                        'h': round(float(row['High']), 5),
+                        'l': round(float(row['Low']), 5),
+                        'c': round(float(row['Close']), 5),
+                        'v': int(row.get('Volume', 0)),
+                    }
+                    for ts, row in px.iterrows()
+                ]
+                price_history = [
+                    {'t': int(ts.timestamp() * 1000), 'v': round(float(v), 5)}
+                    for ts, v in zip(px.index, px['Close'])
+                ]
+                self._send_json(200, {
+                    'pair': pair,
+                    'ticker': yticker,
+                    'ohlcv': ohlcv,
+                    'price_history': price_history,
+                    'current': round(float(prices['Close'].iloc[-1]), 5),
+                })
+            except Exception:
+                self._send_json(500, {'error': traceback.format_exc()})
+
         else:
             self.send_response(404)
             self.end_headers()
