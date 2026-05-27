@@ -43,6 +43,28 @@ ORACLE_SCHEMA = {
 }
 
 REASONING_ANALYSIS_DIR = ROOT / "data" / "oracle" / "reasoning_analysis"
+PULSE_DIR = ROOT / "data" / "oracle" / "pulses"
+
+
+def _load_recent_prices() -> str:
+    """Load live_prices from the most recent pulse file."""
+    if not PULSE_DIR.exists():
+        return "N/A — no pulse data"
+    pulse_files = sorted(PULSE_DIR.glob("pulse_*.json"))
+    if not pulse_files:
+        return "N/A — no pulse data"
+    try:
+        data = json.loads(pulse_files[-1].read_text())
+        lp = data.get('live_prices', {})
+        if not lp:
+            return "N/A — price data not yet in pulse (upgrade pulse_check.py)"
+        lines = [
+            f"{pair}: {v['current']} (H: {v['high_today']} L: {v['low_today']})"
+            for pair, v in lp.items()
+        ]
+        return '\n'.join(lines)
+    except Exception:
+        return "N/A — error reading pulse"
 
 
 def _load_reasoning_summary() -> str:
@@ -83,6 +105,9 @@ Every suggestion you make must move one needle: Sharpe, win rate, drawdown, or p
 
 ## Current system state
 {bridge_state}
+
+## Current market prices (from last pulse)
+{prices_json}
 
 ## Next milestones (help get these done)
 {next_milestones}
@@ -300,6 +325,7 @@ def run_reflect(harvests: list[dict], date: Optional[str] = None) -> dict:
         sharpe_summary=ctx["sharpe_summary"],
         tenets=ctx["tenets"],
         bridge_state=ctx["bridge_state"],
+        prices_json=_load_recent_prices(),
         next_milestones=ctx["next_milestones"],
         hypothesis_summary=ctx["hypothesis_summary"],
         queue_status=ctx["queue_status"],
@@ -370,6 +396,7 @@ if __name__ == "__main__":
             sharpe_summary=ctx["sharpe_summary"],
             tenets=ctx["tenets"],
             bridge_state=ctx["bridge_state"],
+            prices_json=_load_recent_prices(),
             next_milestones=ctx["next_milestones"],
             hypothesis_summary=ctx["hypothesis_summary"],
             queue_status=ctx["queue_status"],

@@ -40,6 +40,9 @@ Last 6 hours of trades:
 Pulse anomalies flagged:
 {anomalies_json}
 
+Current prices (from last pulse):
+{prices_json}
+
 Active lessons: {lessons_list}
 
 System state: {state}
@@ -130,6 +133,16 @@ def run_micro_correction() -> dict:
     pulses = _load_pulses_since(hours=6)
     all_anomalies = [a for p in pulses for a in p.get("anomalies", [])]
 
+    # Extract live prices from most recent pulse
+    prices_txt = "N/A — no recent price data"
+    if pulses:
+        lp = pulses[-1].get('live_prices', {})
+        if lp:
+            prices_txt = '\n'.join(
+                f"{pair}: {v['current']} (H: {v['high_today']} L: {v['low_today']})"
+                for pair, v in lp.items()
+            )
+
     compact_trades = [
         {k: e[k] for k in ("pair", "direction", "why_this_trade", "commitment_score", "outcome", "r_realized")
          if k in e}
@@ -151,6 +164,7 @@ def run_micro_correction() -> dict:
         messages=[{"role": "user", "content": MICRO_PROMPT.format(
             trades_json=json.dumps(compact_trades, indent=2),
             anomalies_json=json.dumps(all_anomalies),
+            prices_json=prices_txt,
             lessons_list=", ".join(_load_active_lessons_compact()) or "none yet",
             state=_one_line_system_state(),
         )}],

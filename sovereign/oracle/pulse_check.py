@@ -27,6 +27,36 @@ LEDGER_PATH    = ROOT / "data" / "agent" / "hypothesis_ledger.json"
 
 log = logging.getLogger("oracle.pulse")
 
+_PRICE_PAIRS = {
+    'GBPUSD': 'GBPUSD=X',
+    'EURUSD': 'EURUSD=X',
+    'USDJPY': 'USDJPY=X',
+    'AUDUSD': 'AUDUSD=X',
+    'AUDNZD': 'AUDNZD=X',
+}
+
+
+# ─── Live price fetch ─────────────────────────────────────────────────────────
+
+def _fetch_live_prices() -> dict:
+    """Fetch current price snapshot for ICT pairs. Returns {} on any failure — never blocks pulse."""
+    import yfinance as yf
+    prices = {}
+    for pair, ticker in _PRICE_PAIRS.items():
+        try:
+            hist = yf.Ticker(ticker).history(period='1d', interval='5m')
+            if len(hist) == 0:
+                continue
+            prices[pair] = {
+                'current':    round(float(hist['Close'].iloc[-1]), 5),
+                'high_today': round(float(hist['High'].max()), 5),
+                'low_today':  round(float(hist['Low'].min()), 5),
+                'bars_today': len(hist),
+            }
+        except Exception:
+            continue
+    return prices
+
 
 # ─── State helpers ────────────────────────────────────────────────────────────
 
@@ -303,6 +333,7 @@ def run_pulse() -> dict:
     last = _get_last_pulse_time()
     new_entries = _load_entries_since(last)
     recent_24h = _load_entries_since(datetime.now(timezone.utc) - timedelta(hours=24))
+    live_prices = _fetch_live_prices()
 
     outcomes = [
         e["r_realized"] for e in recent_24h
@@ -316,6 +347,7 @@ def run_pulse() -> dict:
         "new_outcomes_since_last": sum(1 for e in new_entries if e.get("outcome")),
         "anomalies": anomalies,
         "running_stats": _compute_running_stats(outcomes),
+        "live_prices": live_prices,
     }
 
     PULSE_DIR.mkdir(parents=True, exist_ok=True)
