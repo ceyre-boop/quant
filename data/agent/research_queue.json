@@ -114,7 +114,7 @@
     {
       "id": "RQ-009",
       "priority": 2,
-      "status": "QUEUED",
+      "status": "ERROR",
       "name": "Add get_feature_weights() to AlexandrianLibrary",
       "description": "REST MODE finding: library analysis requires live feature decomposition. Add method that returns per-feature contribution to primary match similarity. Enables real-time understanding of why library is reading CRITICAL. Implementation: compute A[i]*B[i]/(|A|*|B|) per feature for top match.",
       "hypothesis_id": null,
@@ -123,7 +123,10 @@
       "estimated_minutes": 30,
       "added": "2026-05-18T01:20:00",
       "source": "REST_MODE_FINDING",
-      "is_code_change": true
+      "is_code_change": true,
+      "started": "2026-05-25T19:48:02",
+      "completed": "2026-05-25T19:48:02",
+      "last_result": "DRY RUN: Add get_feature_weights() to AlexandrianLibrary \u2014 not executed"
     },
     {
       "id": "RQ-010",
@@ -291,11 +294,14 @@
     },
     {
       "id": "RQ-REST-003",
-      "status": "QUEUED",
+      "status": "DONE",
       "priority": 2,
       "created": "2026-05-25T16:02",
       "description": "London Grade A displacement scoring: HYP-038 found disp>0 avgR=+0.869 vs disp=0 avgR=+0.250. Test wiring displacement as +0.1 score bonus in ict/pipeline.py Stage 3. Run backtest on London A trades only: baseline vs displacement-boosted scoring.",
-      "source": "REST_MODE HYP-038 partial confirmation"
+      "source": "REST_MODE HYP-038 partial confirmation",
+      "completed": "2026-05-26T01:12:03.835860+00:00",
+      "last_result": "Displacement gate >= 1.5 CONFIRMED (HYP-046). London: baseline avgR=+0.448 \u2192 gated avgR=+0.594 (+0.146R, 81% kept). BONUS FIND: Score inversion confirmed (HYP-047) \u2014 score 7-8 is best, score 9-11 is worst. Both queued for Colin review.",
+      "rest_mode": true
     },
     {
       "id": "RQ-021",
@@ -332,6 +338,48 @@
       "script": "scripts/hyp_042_cot_velocity.py",
       "needs_network": true,
       "estimated_minutes": 25
+    },
+    {
+      "id": "RQ-REST-004",
+      "status": "DONE",
+      "priority": 1,
+      "created": "2026-05-26T01:12:03.835860+00:00",
+      "name": "HYP-047 Score Cap Study: test score < 9.0 as ICT entry filter",
+      "description": "HYP-047 confirmed score inversion in forensics. Test: on London A/A+ trades, apply score < 9.0 filter and measure Sharpe improvement. Compare: baseline WR=31% avgR=+0.448 vs score<9 filtered. If confirmed: determine exact threshold (8.5? 9.0? 9.5?) via sweep. This can be run against forensics data \u2014 no network needed.",
+      "needs_network": false,
+      "estimated_minutes": 10,
+      "source": "REST_MODE HYP-047 confirmation",
+      "hypothesis_id": "HYP-047",
+      "completed": "2026-05-27T01:15:00+00:00",
+      "last_result": "COMPLETE (REST MODE 2026-05-27). Score cap sweep confirms: score<=8.5 optimal (not 9.0 or 8.0). UTC03 + score<=8.5: WR=60.7%, avgR=+1.295, MC=100%, n=28. TRIPLE filter (UTC03+disp+score<=8.5): WR=72.7%, avgR=+1.670, MC=100%, n=22. KEY FINDING: frequency-quality tradeoff. UTC03 gate limits to 1.1-1.4 trades/month making G2 (30 trades) take 17-27 months. disp>=1.5+score<=8.5 WITHOUT UTC03: 99.8% MC, 4.3/month, 7mo to G2. HYP-048 added for Colin decision.",
+      "rest_mode": true
+    },
+    {
+      "id": "RQ-REST-005",
+      "status": "QUEUED",
+      "priority": 2,
+      "created": "2026-05-26T01:12:03.835860+00:00",
+      "name": "Wire disp>=1.5 veto in pipeline Stage 3 (Colin review required)",
+      "description": "HYP-046 confirmed. disp>=1.5 gate improves London avgR from +0.448 to +0.594. Task: add displacement threshold check in ict/pipeline.py Stage 3. If features['displacement'] < 1.5: veto with reason='DISPLACEMENT_INSUFFICIENT'. This touches live pipeline logic \u2014 requires Colin explicit approval before wiring.",
+      "needs_network": false,
+      "requires_human": true,
+      "estimated_minutes": 15,
+      "source": "HYP-046 confirmed by REST_MODE",
+      "hypothesis_id": "HYP-046"
+    },
+    {
+      "id": "RQ-REST-006",
+      "status": "QUEUED",
+      "priority": 1,
+      "created": "2026-05-27T01:15:00+00:00",
+      "name": "Colin decision: UTC03 gate policy for prop challenge",
+      "description": "HYP-048 identifies a strategic tradeoff. Current UTC03 gate limits trades to ~1.8/month \u2192 G2 requires 17 months. Options: (A) Keep UTC03 + add score<=8.5: MC=100%, 21 months to G2. (B) Relax UTC03, use disp>=1.5+score<=8.5: MC=99.8%, 7 months to G2. (C) Use TRIPLE (UTC03+disp+score): MC=100%, 27 months to G2. Recommend Option B for prop challenge phase. Revisit UTC03 gate post-challenge. Requires Colin explicit decision \u2014 agent will not change gates autonomously.",
+      "requires_human": true,
+      "needs_network": false,
+      "estimated_minutes": 10,
+      "source": "REST_MODE HYP-048",
+      "hypothesis_id": "HYP-048"
     }
-  ]
+  ],
+  "last_updated": "2026-05-27T01:15:00+00:00"
 }

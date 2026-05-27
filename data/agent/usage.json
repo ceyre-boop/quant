@@ -8,44 +8,40 @@
   },
   "week": {
     "start_date": "2026-05-16",
-    "weekly_used": 16700,
+    "weekly_used": 21200,
     "weekly_remaining": 191300,
     "last_synced": null,
     "note": "REST MODE May 18 01:12-01:20 UTC added ~3500 tokens (4 backtests, file updates)"
   },
   "today": {
-    "date": "2026-05-25",
+    "date": "2026-05-27",
     "human_used": 0,
-    "agent_used": 8000,
+    "agent_used": 4500,
     "daily_human_budget": 20000,
     "daily_agent_budget": 8571,
-    "agent_extra_from_rollover": 15000,
-    "agent_allowed_today": 23571,
-    "note": "REST MODE May 25 \u2014 HYP-038, HYP-039, RQ-AUTO-002 forensics analysis"
+    "agent_extra_from_rollover": 10000,
+    "agent_allowed_today": 18571,
+    "note": "REST MODE May 27 01:07-01:15 UTC \u2014 RQ-REST-004 complete, HYP-046/047/048, score cap sweep + triple filter MC, HYP-036 proxy failure"
   },
   "session": {
-    "started": "2026-05-25T16:02:39.652653+00:00",
+    "started": "2026-05-27T01:07:55+00:00",
+    "ended": "2026-05-27T01:15:00+00:00",
     "mode": "REST_MODE",
     "tasks_completed": [
-      "HYP-038",
-      "HYP-039",
-      "RQ-AUTO-002-FORENSICS",
-      "RQ-AUTO-004-LITE"
+      "RQ-REST-004"
     ],
     "findings_written": 4,
     "hypotheses_closed": [
-      "HYP-038",
-      "HYP-039"
-    ],
-    "queue_tasks_completed": [
-      "RQ-REST-001",
-      "RQ-REST-002",
-      "RQ-AUTO-002"
+      "HYP-046 (confirmed)",
+      "HYP-047 (confirmed)",
+      "HYP-048 (candidate)"
     ],
     "new_tasks_added": [
-      "RQ-REST-003"
+      "RQ-REST-006"
     ],
-    "ended": "2026-05-25T16:03:59.544726+00:00"
+    "queue_tasks_completed": [
+      "RQ-REST-004"
+    ]
   },
   "mode": "NORMAL",
   "thresholds": {

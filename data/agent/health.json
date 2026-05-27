@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-05-25T19:47:59",
+  "timestamp": "2026-05-26T21:37:02",
   "overall": "YELLOW",
   "components": {
     "duckdb": {
@@ -16,7 +16,7 @@
     },
     "ict_scanner": {
       "status": "GREEN",
-      "detail": "outside session hours \u2014 last run 6.2h ago"
+      "detail": "outside session hours \u2014 last run 5.7h ago"
     },
     "backtest_engine": {
       "status": "GREEN",
@@ -63,9 +63,17 @@
       "detail": "key missing"
     },
     "reddit": {
+      "status": "YELLOW",
+      "detail": "cache 138m old \u2014 needs refresh"
+    },
+    "decision_logs": {
+      "status": "YELLOW",
+      "detail": "health check unavailable: No module named 'sovereign'"
+    },
+    "oracle_pulse": {
       "status": "GREEN",
-      "detail": "68 posts | 0m ago | NVDA(B19), AMD(B10), META(B9), SPY(N8), MSFT(B6), AMZN(B6), "
+      "detail": "1 new entries, 0 anomalies"
     }
   },
-  "last_checked": "2026-05-25T19:47:59"
+  "last_checked": "2026-05-26T21:37:02"
 }

@@ -1,23 +1,57 @@
-{
-  "version": "v014",
-  "date": "2026-05-25",
-  "description": "VIX gate refinement: USDJPY/AUDNZD threshold 15\u219213. JPY safe-haven and AUD/NZD cross both overwhelmed by conflicting macro at VIX>13 in bull markets. Lower threshold removes noise, raises quality.",
-  "pairs": {
-    "AUDNZD=X": {
-      "sharpe": 2.246,
-      "n": 39,
-      "win_rate": 0.538,
-      "gate": "VIX>13 (was VIX>15)"
-    },
-    "USDJPY=X": {
-      "sharpe": 2.979,
-      "n": 46,
-      "win_rate": 0.674,
-      "gate": "VIX>13 (was VIX>15)"
-    }
+[
+  {
+    "pair": "EURUSD=X",
+    "win_rate": 0.543,
+    "profit_factor": 1.819,
+    "sharpe": 1.258,
+    "max_drawdown": -0.049,
+    "avg_hold_days": 5.8,
+    "trades_per_year": 8.5,
+    "total_trades": 70,
+    "years": 8.3
   },
-  "portfolio_avg_sharpe": 2.097,
-  "prev_version": "v013",
-  "prev_sharpe": 1.8552,
-  "delta": 0.2418
-}
+  {
+    "pair": "GBPUSD=X",
+    "win_rate": 0.573,
+    "profit_factor": 2.258,
+    "sharpe": 1.661,
+    "max_drawdown": -0.063,
+    "avg_hold_days": 6.7,
+    "trades_per_year": 9.1,
+    "total_trades": 75,
+    "years": 8.3
+  },
+  {
+    "pair": "USDJPY=X",
+    "win_rate": 0.643,
+    "profit_factor": 3.629,
+    "sharpe": 2.661,
+    "max_drawdown": -0.048,
+    "avg_hold_days": 7.0,
+    "trades_per_year": 5.1,
+    "total_trades": 42,
+    "years": 8.3
+  },
+  {
+    "pair": "AUDUSD=X",
+    "win_rate": 0.494,
+    "profit_factor": 1.985,
+    "sharpe": 1.68,
+    "max_drawdown": -0.039,
+    "avg_hold_days": 5.4,
+    "trades_per_year": 9.3,
+    "total_trades": 77,
+    "years": 8.3
+  },
+  {
+    "pair": "AUDNZD=X",
+    "win_rate": 0.514,
+    "profit_factor": 2.996,
+    "sharpe": 2.107,
+    "max_drawdown": -0.031,
+    "avg_hold_days": 7.3,
+    "trades_per_year": 4.2,
+    "total_trades": 35,
+    "years": 8.3
+  }
+]
