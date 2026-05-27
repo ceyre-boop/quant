@@ -1412,13 +1412,11 @@ function drawFvgZones(ohlcv) {
   _fvgSeries.forEach(s => { try { sigChart.removeSeries(s); } catch {} });
   _fvgSeries = [];
 
-  const now = Date.now();
-  const cutoff = now - 48 * 3600 * 1000;
   const fvgs = [];
+  const startIdx = Math.max(1, ohlcv.length - 30);
 
-  for (let i = 1; i < ohlcv.length - 1; i++) {
+  for (let i = startIdx; i < ohlcv.length - 1; i++) {
     const prev = ohlcv[i - 1], cur = ohlcv[i], next = ohlcv[i + 1];
-    if (cur.t < cutoff) continue;
     if (prev.h < next.l) {
       fvgs.push({ type: 'bull', high: next.l, low: prev.h, time: Math.floor(cur.t / 1000) });
     }
@@ -1760,6 +1758,24 @@ function oracleRender(d, scannerData){
   // Suggestions col
   const sugs=d.recent_suggestions||[];
   const sugEl=document.getElementById('or-suggestions');
+  if(!sugEl) return;
+  const activeSugs=sugs.filter(s=>s.status!=='DONE'&&s.status!=='IMPLEMENTED');
+  if(!activeSugs.length&&scannerData?.pairs){
+    const pairs=scannerData.pairs||{};
+    const lib=scannerData.library||{};
+    const lines=[];
+    for(const [pair,pd] of Object.entries(pairs)){
+      if(pd.status==='BLACKOUT'){
+        lines.push(`<div class="or-sug"><span class="or-sug-id">${pair}</span>ADR exhausted<span class="or-sug-status error">BLACKOUT</span></div>`);
+      }else if(pd.score>0){
+        const gate=pd.blocking_gate?` — waiting: ${pd.blocking_gate.toUpperCase()}`:'';
+        lines.push(`<div class="or-sug"><span class="or-sug-id">${pair}</span>Grade ${pd.grade} · ${pd.score.toFixed(1)}${gate}<span class="or-sug-status pending">${pd.status}</span></div>`);
+      }
+    }
+    if(lib.regime) lines.unshift(`<div class="or-sug"><span class="or-sug-id">LIB</span>${lib.regime.replace(/_/g,' ')}<span class="or-sug-status done">${lib.threat||'NORMAL'}</span></div>`);
+    sugEl.innerHTML=lines.slice(0,5).join('')||'<span style="color:var(--muted);font-size:11px">No scanner data</span>';
+    return;
+  }
   if(!sugs.length){sugEl.textContent='No recent suggestions';return;}
   sugEl.innerHTML=sugs.map(s=>{
     const st=s.status||'?';
@@ -1821,6 +1837,16 @@ function oracleRenderFromScanner(scanner) {
       missingText,
       blockText,
     ].filter(Boolean).join('\n');
+  }
+
+  const sugEl=document.getElementById('or-suggestions');
+  if(sugEl&&scanner?.pairs){
+    const lines=Object.entries(scanner.pairs).map(([pair,p])=>{
+      if(p.status==='BLACKOUT') return `<div class="or-sug"><span class="or-sug-id">${pair}</span>ADR exhausted<span class="or-sug-status error">BLACKOUT</span></div>`;
+      if(p.score>0){const gate=p.blocking_gate?` — ${p.blocking_gate.toUpperCase()}`:'';return `<div class="or-sug"><span class="or-sug-id">${pair}</span>Grade ${p.grade}${gate}<span class="or-sug-status pending">${p.status}</span></div>`;}
+      return null;
+    }).filter(Boolean);
+    sugEl.innerHTML=lines.slice(0,5).join('')||'<span style="color:var(--muted);font-size:11px">Scanning…</span>';
   }
 }
 
@@ -1888,7 +1914,7 @@ function resMsgs(data){
   const msgs=data.messages.slice(0,12).map(m=>`
     <div class="rp-msg ${m.priority}">
       <div style="font-size:14px;flex-shrink:0">${m.emoji||'🟢'}</div>
-      <div><div class="rp-msg-body">${m.text||''}</div>
+      <div><div class="rp-msg-body">${m.text||m.message||m.content||''}</div>
       <div class="rp-msg-time">${m.timestamp?new Date(m.timestamp).toLocaleString():''}</div></div>
     </div>`).join('');
   el.innerHTML='<div class="rp-title">Messages to Colin</div><div class="rp-scroll">'+msgs+'</div>';

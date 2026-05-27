@@ -540,7 +540,7 @@ class Handler(BaseHTTPRequestHandler):
                         'h': round(float(row['High']), 5),
                         'l': round(float(row['Low']), 5),
                         'c': round(float(row['Close']), 5),
-                        'v': int(row.get('Volume', 0)),
+                        'v': int(row.get('Volume', 0)) or round((float(row['High']) - float(row['Low'])) * 100000),
                     }
                     for ts, row in px.iterrows()
                 ]
