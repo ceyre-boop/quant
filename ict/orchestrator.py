@@ -161,6 +161,30 @@ class ICTOrchestrator:
         from ict.pipeline import ICTSignal, ICTVeto, ICTGrade
         from ict._atr_utils import compute_atr
 
+        # ICT_SKIP_TIMING_GATE=1: allow out-of-hours paper trade runs by bypassing
+        # the hard ET-03:xx timing gate in pipeline Stage 0c. Retries any TIMING_GATE
+        # veto with a synthetic 03:15 ET timestamp (data analysis is timestamp-agnostic).
+        if os.getenv('ICT_SKIP_TIMING_GATE', '') in ('1', 'true', 'yes'):
+            _orig_eval = self._pipeline.__class__.evaluate
+
+            def _timing_skipped(self_p, symbol, direction, df, timestamp, account, atr=None):
+                result = _orig_eval(self_p, symbol, direction, df, timestamp, account, atr)
+                if isinstance(result, ICTVeto) and 'TIMING_GATE' in result.reason:
+                    try:
+                        import zoneinfo as _zi
+                        from datetime import timezone as _tz
+                        ts_3am = (
+                            timestamp.astimezone(_zi.ZoneInfo("America/New_York"))
+                            .replace(hour=3, minute=15, second=0, microsecond=0)
+                            .astimezone(_tz.utc)
+                        )
+                        return _orig_eval(self_p, symbol, direction, df, ts_3am, account, atr)
+                    except Exception:
+                        pass
+                return result
+
+            self._pipeline.__class__.evaluate = _timing_skipped
+
         now     = datetime.now(timezone.utc)
         session = self._sess_clf.classify(now)
         results = []
@@ -499,7 +523,69 @@ class ICTOrchestrator:
         if log_all:
             _print_results(results, actionable, now, session)
 
+        self._write_scanner_state(results, session, library_ctx, pair_biases, now)
         return results
+
+    def _write_scanner_state(self, results, session, library_ctx, pair_biases, now):
+        """Write logs/scanner_state.json after every scan for the live dashboard."""
+        from pathlib import Path as _P
+        pairs_data = {}
+        for r in results:
+            gates = {
+                'kill_zone':    any('Kill Zone' in c for c in r.confirmations),
+                'sweep':        any('Sweep' in c for c in r.confirmations),
+                'displacement': any('Displacement' in c or 'displacement' in c.lower()
+                                    for c in r.confirmations),
+                'fvg':          any('FVG' in c or 'fvg' in c.lower() for c in r.confirmations),
+                'session':      r.session not in ('OFF-HOURS', ''),
+            }
+            blocking_gate = None
+            blocking_reason = r.veto_reason or ''
+            for m in r.missing:
+                ml = m.lower()
+                if 'fvg' in ml or 'ob' in ml:
+                    blocking_gate = 'fvg'; blocking_reason = m; break
+                if 'sweep' in ml:
+                    blocking_gate = 'sweep'; blocking_reason = m; break
+                if 'displacement' in ml:
+                    blocking_gate = 'displacement'; blocking_reason = m; break
+            bias_info = pair_biases.get(r.pair, {})
+            blackout  = bias_info.get('blackout', False)
+            status = ('BLACKOUT' if blackout
+                      else 'WATCHING' if r.grade in ('A+', 'A', 'B')
+                      else 'SCANNING')
+            pairs_data[r.pair] = {
+                'score': r.score, 'grade': r.grade, 'status': status,
+                'signal': r.signal, 'session': r.session,
+                'gates': gates, 'blocking_gate': blocking_gate,
+                'blocking_reason': blocking_reason,
+                'entry_if_fires': r.entry_level,
+                'stop_if_fires':  r.stop,
+                'tp1_if_fires':   r.tp1,
+                'tp2_if_fires':   r.tp2,
+                'confirmations':  list(r.confirmations),
+                'missing':        list(r.missing),
+                'component_scores': dict(r.component_scores),
+                'veto_reason':    r.veto_reason,
+            }
+        import zoneinfo as _zi
+        from datetime import timedelta as _td, timezone as _tz
+        et_tz  = _zi.ZoneInfo('America/New_York')
+        et_now = now.astimezone(et_tz)
+        equity_scan = et_now.replace(hour=13, minute=35, second=0, microsecond=0)
+        if et_now >= equity_scan:
+            equity_scan += _td(days=1)
+        state = {
+            'last_scan':        now.isoformat(),
+            'session_status':   session.kill_zone_name or 'OFF-HOURS',
+            'library':          library_ctx,
+            'pairs':            pairs_data,
+            'next_equity_scan': equity_scan.astimezone(_tz.utc).isoformat(),
+        }
+        try:
+            _P('logs/scanner_state.json').write_text(__import__('json').dumps(state, indent=2))
+        except Exception:
+            pass
 
     def watch(self, interval: int = 300):
         """Scan every `interval` seconds. Ctrl-C to stop."""

@@ -375,6 +375,58 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
 .tv-status{display:flex;align-items:center;gap:8px;margin-left:auto;font-size:10px;letter-spacing:1px;color:var(--muted)}
 .tv-status-dot{width:7px;height:7px;border-radius:50%;background:var(--muted);flex-shrink:0}
 .tv-status-dot.live{background:var(--green);box-shadow:0 0 6px var(--green);animation:hb 1.5s infinite}
+/* ── Signal Pipeline Live Panels ─────────────────────────────── */
+#sp-alert-banner{display:none;position:sticky;top:0;z-index:100;background:#00d4a0;
+  color:#0a0e1a;padding:16px 24px;border-radius:8px;margin-bottom:16px;font-weight:700}
+#sp-alert-banner.active{display:block}
+.sp-row{display:grid;gap:12px;margin-bottom:12px}
+.sp-row-2col{grid-template-columns:1fr 1fr}
+.sp-card{background:var(--card);border:1px solid var(--border);border-radius:8px;
+  padding:16px;margin-bottom:12px}
+.sp-card-title{font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.08em;
+  text-transform:uppercase;margin-bottom:10px}
+.sp-session-name{font-size:22px;font-weight:700;margin-bottom:4px}
+.sp-countdown{font-size:13px;color:var(--muted);margin-bottom:8px;font-variant-numeric:tabular-nums}
+.sp-session-sub{font-size:11px;color:var(--muted);display:flex;gap:16px;flex-wrap:wrap}
+.sp-session-sub span{white-space:nowrap}
+.sp-mkt-row{font-size:12px;margin-bottom:6px;display:flex;justify-content:space-between}
+.sp-mkt-label{color:var(--muted)}
+.sp-pair-row{padding:10px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.sp-pair-row:last-child{border-bottom:none}
+.sp-pair-header{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.sp-pair-name{font-weight:700;font-size:13px;min-width:60px}
+.sp-score-bar{flex:1;height:6px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden}
+.sp-score-fill{height:100%;border-radius:3px;transition:width .4s}
+.sp-score-fill.grade-a{background:#00d4a0}
+.sp-score-fill.grade-b{background:#f6ad55}
+.sp-score-fill.grade-c{background:rgba(255,255,255,.2)}
+.sp-score-fill.vetoed{background:#ff4d6a}
+.sp-score-fill.blackout{background:rgba(255,255,255,.1)}
+.sp-pair-score{font-size:11px;color:var(--muted);min-width:40px;text-align:right}
+.sp-pair-grade{font-size:10px;font-weight:700;padding:2px 6px;border-radius:3px;min-width:40px;text-align:center}
+.sp-pair-grade.grade-a{background:rgba(0,212,160,.15);color:#00d4a0}
+.sp-pair-grade.grade-b{background:rgba(246,173,85,.15);color:#f6ad55}
+.sp-pair-grade.blackout{background:rgba(255,255,255,.05);color:var(--muted)}
+.sp-pair-grade.vetoed{background:rgba(255,77,106,.1);color:#ff4d6a}
+.sp-gates{font-size:11px;color:var(--muted);margin-bottom:3px}
+.sp-reason{font-size:10px;color:var(--muted);font-style:italic}
+.sp-check-row{display:flex;align-items:flex-start;gap:8px;padding:6px 0;
+  border-bottom:1px solid rgba(255,255,255,.04);font-size:12px}
+.sp-check-row:last-child{border-bottom:none}
+.sp-check-icon{min-width:16px;font-size:13px}
+.sp-check-label{flex:1}
+.sp-check-value{color:var(--muted);font-size:11px;font-variant-numeric:tabular-nums}
+.sp-activity-row{display:flex;gap:10px;padding:5px 0;
+  border-bottom:1px solid rgba(255,255,255,.04);font-size:11px}
+.sp-activity-row:last-child{border-bottom:none}
+.sp-act-time{color:var(--muted);min-width:90px;font-variant-numeric:tabular-nums}
+.sp-act-pair{font-weight:700;min-width:56px}
+.sp-act-body{flex:1;color:var(--muted)}
+.sp-act-grade{padding:1px 5px;border-radius:3px;font-size:10px;font-weight:700}
+.sp-when-fires{margin-top:12px;padding:10px 12px;background:rgba(0,212,160,.07);
+  border-left:3px solid #00d4a0;border-radius:0 4px 4px 0;font-size:12px;color:#00d4a0;font-weight:600}
+@keyframes sp-flash{0%,100%{box-shadow:none}50%{box-shadow:0 0 0 3px #00d4a0}}
+.sp-flash{animation:sp-flash .6s ease 5}
 </style>
 </head>
 <body>
@@ -772,6 +824,45 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
   <!-- ══ TAB 5: TRADES ══ -->
   <div class="tab-panel" id="tab-trades">
     <div id="trades-panel">
+      <!-- ══ SIGNAL PIPELINE LIVE PANELS ══════════════════════════════════ -->
+      <div id="sp-alert-banner"></div>
+
+      <div class="sp-row sp-row-2col">
+        <div class="sp-card">
+          <div class="sp-card-title">SESSION CLOCK</div>
+          <div class="sp-session-name" id="sp-session-name">—</div>
+          <div class="sp-countdown" id="sp-countdown">—</div>
+          <div class="sp-session-sub">
+            <span>London: <span id="sp-london-status">—</span></span>
+            <span>NY Equities: <span id="sp-ny-status">—</span></span>
+            <span>ICT Kill Zone: <span id="sp-kz-status">—</span></span>
+          </div>
+        </div>
+        <div class="sp-card">
+          <div class="sp-card-title">MARKET CONDITIONS</div>
+          <div class="sp-mkt-row"><span class="sp-mkt-label">Library</span><span id="sp-library">—</span></div>
+          <div class="sp-mkt-row"><span class="sp-mkt-label">Regime</span><span id="sp-regime">—</span></div>
+          <div class="sp-mkt-row"><span class="sp-mkt-label">Bridge</span><span id="sp-bridge">—</span></div>
+          <div class="sp-mkt-row"><span class="sp-mkt-label">Eq. Scan</span><span id="sp-equity-scan">—</span></div>
+        </div>
+      </div>
+
+      <div class="sp-card">
+        <div class="sp-card-title">SIGNAL PIPELINE — LIVE &nbsp;<span id="sp-last-scan" style="font-weight:400;text-transform:none;letter-spacing:0">—</span></div>
+        <div id="sp-pipeline"><div style="color:var(--muted);font-size:12px">Loading scanner state…</div></div>
+      </div>
+
+      <div class="sp-card" id="sp-checklist-card">
+        <div class="sp-card-title">PRE-TRADE CHECKLIST — <span id="sp-checklist-pair">—</span></div>
+        <div id="sp-checklist"><div style="color:var(--muted);font-size:12px">No active setup</div></div>
+      </div>
+
+      <div class="sp-card">
+        <div class="sp-card-title">TODAY'S ACTIVITY LOG</div>
+        <div id="sp-activity"><div style="color:var(--muted);font-size:12px">Loading…</div></div>
+      </div>
+      <!-- ══ END SIGNAL PIPELINE PANELS ════════════════════════════════════ -->
+
       <div class="trades-toolbar">
         <button id="tr-btn-all" class="active" onclick="trFilter('all')">ALL</button>
         <button id="tr-btn-ict" onclick="trFilter('ICT')">ICT</button>
@@ -820,7 +911,7 @@ document.querySelectorAll('.hdr-tab').forEach(btn=>{
       tabInited[id]=true;
       if(id==='tab-research')resLoad();
       if(id==='tab-signals'){sigInit();sigRefresh();oracleRefresh();}
-      if(id==='tab-trades')trLoad();
+      if(id==='tab-trades'){trLoad();spLoad();}
       if(id==='tab-chat')chatInjectChips();
     }
   });
@@ -1054,7 +1145,7 @@ function sigInit(){
 
   // Price chart
   sigChart=LightweightCharts.createChart(priceDiv,{..._CHART_BASE,
-    rightPriceScale:{borderColor:'#1e2a38',scaleMargins:{top:0.08,bottom:0.02}},
+    rightPriceScale:{borderColor:'#1e2a38',scaleMargins:{top:0.08,bottom:0.02},autoScale:true},
   });
   sigCandles=sigChart.addCandlestickSeries({
     upColor:'#00d4a0',downColor:'#ff4d6a',
@@ -1558,6 +1649,12 @@ async function sigRefresh(){
       sigActivePair=t.ticker;
       sigRenderPairBar(data.forex_signals);
       sigRenderChart(t);
+      // Fetch fresh OHLCV for initial pair (ensures correct scale for all pairs incl USDJPY)
+      const _pc=sigActivePair.replace('=X','');
+      fetch('http://localhost:8765/ohlcv?pair='+_pc+'&t='+Date.now(),{signal:AbortSignal.timeout(8000)})
+        .then(r=>r.ok?r.json():null)
+        .then(d=>{if(d?.ohlcv?.length){t.ohlcv=d.ohlcv;if(d.current)t.price=d.current;_sigSetData(t);}})
+        .catch(()=>{});
     } else if(sigActivePair){
       const cur=data.forex_signals?.find(s=>s.ticker===sigActivePair);
       if(cur)sigRenderChart(cur);
@@ -2119,9 +2216,213 @@ function trRenderLiveFeed(d) {
   }
 }
 
+// ── Signal Pipeline Live Panels ───────────────────────────────────────────
+let _spState = null;
+let _spClockTimer = null;
+
+function spLoad() {
+  const AC = new AbortController();
+  const tid = setTimeout(() => AC.abort(), 6000);
+  Promise.all([
+    fetch('http://localhost:8765/scanner_state', {signal: AC.signal}).then(r => r.json()),
+    fetch('http://localhost:8765/activity',      {signal: AC.signal}).then(r => r.json()),
+  ]).then(([state, activity]) => {
+    clearTimeout(tid);
+    const prev = _spState;
+    _spState = state;
+    spRenderMarket(state);
+    spRenderPipeline(state);
+    spRenderChecklist(state);
+    spRenderActivity(state, activity);
+    spCheckAlert(prev, activity);
+  }).catch(() => {
+    const el = document.getElementById('sp-pipeline');
+    if (el) el.innerHTML = '<div style="color:var(--muted);font-size:11px">Scanner offline — waiting for next scan</div>';
+  });
+}
+
+function spRenderMarket(s) {
+  const lib = s.library || {};
+  const libEl = document.getElementById('sp-library');
+  if (libEl) libEl.textContent = (lib.threat || '—') + (lib.size_modifier ? ' · ' + lib.size_modifier + 'x' : '');
+  const regEl = document.getElementById('sp-regime');
+  if (regEl) regEl.textContent = lib.regime || '—';
+  const brEl = document.getElementById('sp-bridge');
+  if (brEl) brEl.textContent = lib.threat || '—';
+  if (s.next_equity_scan) {
+    const d = new Date(s.next_equity_scan);
+    const eqEl = document.getElementById('sp-equity-scan');
+    if (eqEl) eqEl.textContent = d.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit', timeZone:'America/New_York'}) + ' ET';
+  }
+  if (s.last_scan) {
+    const d = new Date(s.last_scan);
+    const lsEl = document.getElementById('sp-last-scan');
+    if (lsEl) lsEl.textContent = 'last scan ' + d.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit', second:'2-digit', timeZone:'UTC', hour12:false}) + ' UTC';
+  }
+}
+
+function spRenderPipeline(s) {
+  const pairs = s.pairs || {};
+  const el = document.getElementById('sp-pipeline');
+  if (!el) return;
+  if (!Object.keys(pairs).length) {
+    el.innerHTML = '<div style="color:var(--muted);font-size:12px">No scan data yet</div>';
+    return;
+  }
+  const ORDER = ['GBPUSD','EURUSD','AUDUSD','AUDNZD','USDJPY'];
+  const sorted = ORDER.filter(p => pairs[p]).concat(Object.keys(pairs).filter(p => !ORDER.includes(p)));
+  let html = '';
+  for (const pair of sorted) {
+    const d = pairs[pair];
+    const score = d.score || 0;
+    const grade = d.grade || 'C';
+    const status = d.status || 'SCANNING';
+    const pct = Math.min(score / 10 * 100, 100);
+    const grCls = status === 'BLACKOUT' ? 'blackout'
+                : grade === 'A+' || grade === 'A' ? 'grade-a'
+                : grade === 'B' ? 'grade-b'
+                : grade === 'VETOED' ? 'vetoed' : 'grade-c';
+    const gates = d.gates || {};
+    const gateHtml = [
+      gates.kill_zone    !== undefined ? (gates.kill_zone    ? '✅ KZ'    : '❌ KZ')    : '',
+      gates.sweep        !== undefined ? (gates.sweep        ? '✅ Sweep' : '❌ Sweep') : '',
+      gates.displacement !== undefined ? (gates.displacement ? '✅ Disp'  : '❌ Disp')  : '',
+      gates.fvg          !== undefined ? (gates.fvg          ? '✅ FVG'   : '❌ FVG')   : '',
+    ].filter(Boolean).join('  ');
+    const statusLabel = status === 'BLACKOUT' ? '⛔ BLACKOUT' : score > 0 ? status : 'SCANNING';
+    html += `<div class="sp-pair-row">
+      <div class="sp-pair-header">
+        <span class="sp-pair-name">${pair}</span>
+        <div class="sp-score-bar"><div class="sp-score-fill ${grCls}" style="width:${pct}%"></div></div>
+        <span class="sp-pair-score">${score > 0 ? score.toFixed(1)+'/10' : '—'}</span>
+        <span class="sp-pair-grade ${grCls}">${status === 'BLACKOUT' ? 'BLACKOUT' : grade}</span>
+        <span style="font-size:10px;color:var(--muted)">${statusLabel}</span>
+      </div>
+      ${gateHtml ? `<div class="sp-gates">${gateHtml}</div>` : ''}
+      ${d.blocking_reason ? `<div class="sp-reason">${d.blocking_reason.replace(/^[✗⚠] /,'')}</div>` : ''}
+    </div>`;
+  }
+  el.innerHTML = html;
+}
+
+function spRenderChecklist(s) {
+  const pairs = s.pairs || {};
+  let best = null, bestScore = -1;
+  for (const [pair, d] of Object.entries(pairs)) {
+    if (d.status !== 'BLACKOUT' && d.score > bestScore) { best = pair; bestScore = d.score; }
+  }
+  const pairEl = document.getElementById('sp-checklist-pair');
+  const checkEl = document.getElementById('sp-checklist');
+  if (!best || bestScore === 0) {
+    if (pairEl) pairEl.textContent = '—';
+    if (checkEl) checkEl.innerHTML = '<div style="color:var(--muted);font-size:12px">No scoreable setup</div>';
+    return;
+  }
+  const d = pairs[best];
+  if (pairEl) pairEl.textContent = best + ' ' + (d.signal || '') + '  (' + (d.grade || '—') + ' · ' + bestScore.toFixed(1) + ')';
+  const gates = d.gates || {};
+  const rows = [
+    { ok: d.session !== 'OFF-HOURS',                          label: 'Session',      value: d.session || 'OFF-HOURS' },
+    { ok: !!(s.library && s.library.threat === 'NORMAL'),     label: 'Library',      value: (s.library||{}).threat || '—' },
+    { ok: gates.kill_zone,                                     label: 'Kill Zone',    value: d.session || '—' },
+    { ok: gates.sweep,                                         label: 'Sweep',        value: (d.confirmations||[]).find(c => c.includes('Sweep')) || '—' },
+    { ok: gates.displacement,                                  label: 'Displacement', value: (d.confirmations||[]).find(c => /displacement/i.test(c)) || '—' },
+    { ok: gates.fvg,                                           label: 'FVG',          value: gates.fvg ? 'Formed ✓' : 'NOT FORMED (blocking entry)' },
+  ];
+  let html = rows.map(r => `<div class="sp-check-row">
+    <span class="sp-check-icon">${r.ok ? '✅' : '❌'}</span>
+    <span class="sp-check-label">${r.label}</span>
+    <span class="sp-check-value">${r.value}</span>
+  </div>`).join('');
+  if (d.grade === 'B' && d.blocking_gate) {
+    html += `<div class="sp-when-fires">⏳ WHEN ${d.blocking_gate.toUpperCase()} FORMS → GRADE A → TRADE FIRES</div>`;
+  } else if (d.grade === 'A' || d.grade === 'A+') {
+    html += `<div class="sp-when-fires">🟢 GRADE ${d.grade} — TRADE SHOULD FIRE</div>`;
+  }
+  if (checkEl) checkEl.innerHTML = html;
+}
+
+function spRenderActivity(s, activity) {
+  const el = document.getElementById('sp-activity');
+  if (!el) return;
+  const veto = (activity.veto_log || []).slice().reverse();
+  let rows = [];
+  for (const v of veto.slice(0, 15)) {
+    const ts  = v.timestamp ? new Date(v.timestamp) : null;
+    const utc = ts ? ts.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit', hour12:false, timeZone:'UTC'}) + ' UTC' : '—';
+    const grCls = v.grade === 'A+' || v.grade === 'A' ? 'grade-a' : v.grade === 'B' ? 'grade-b' : 'vetoed';
+    rows.push(`<div class="sp-activity-row">
+      <span class="sp-act-time">${utc}</span>
+      <span class="sp-act-pair">${v.pair || '—'}</span>
+      <span class="sp-act-grade ${grCls}">${v.grade || '—'}</span>
+      <span class="sp-act-body">${(v.veto_reason || v.reason || '').slice(0, 80)}</span>
+    </div>`);
+  }
+  if (s.next_equity_scan) {
+    const d = new Date(s.next_equity_scan);
+    const etStr = d.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit', timeZone:'America/New_York'}) + ' ET';
+    rows.push(`<div class="sp-activity-row" style="color:var(--muted)">
+      <span class="sp-act-time">${etStr}</span>
+      <span class="sp-act-pair">EQUITIES</span>
+      <span class="sp-act-grade" style="background:rgba(66,153,225,.1);color:#63b3ed">SCHED</span>
+      <span class="sp-act-body">Sovereign equity scan fires (launchd)</span>
+    </div>`);
+  }
+  el.innerHTML = rows.length ? rows.join('') : '<div style="color:var(--muted);font-size:12px">No activity yet today</div>';
+}
+
+function spCheckAlert(prev, activity) {
+  const paper = activity.paper_trades || {};
+  const open  = paper.open || [];
+  const banner = document.getElementById('sp-alert-banner');
+  if (!banner) return;
+  if (!open.length) { banner.classList.remove('active'); return; }
+  const prevOpen = (prev && prev._openCount) || 0;
+  if (open.length > prevOpen) {
+    const newest = open[open.length - 1];
+    banner.innerHTML = `🟢 TRADE FIRED &nbsp;|&nbsp; ${newest.pair||''} ${newest.signal||''} &nbsp; Entry: ${newest.entry||'—'} &nbsp; Stop: ${newest.stop||'—'} &nbsp; TP1: ${newest.tp1||'—'}`;
+    banner.classList.add('active');
+  }
+  if (_spState) _spState._openCount = open.length;
+}
+
+function spUpdateClock() {
+  const now = new Date();
+  const utcMin = now.getUTCHours() * 60 + now.getUTCMinutes();
+  const utcSec = now.getUTCSeconds();
+  const LONDON_START = 8*60, LONDON_END = 16*60;
+  const NY_START = 13*60+30, NY_END = 20*60;
+  const KZ_START = 7*60, KZ_END = 8*60;
+  let session = 'CLOSED', color = '#ff4d6a', openInSec = 0, nextLabel = '';
+  if      (utcMin >= LONDON_START && utcMin < LONDON_END) { session = 'LONDON OPEN';  color = '#00d4a0'; }
+  else if (utcMin >= NY_START     && utcMin < NY_END)     { session = 'NY OPEN';      color = '#00d4a0'; }
+  else if (utcMin < LONDON_START) { session = 'PRE-LONDON'; color = '#f6ad55';
+    openInSec = (LONDON_START - utcMin) * 60 - utcSec; nextLabel = 'London opens in'; }
+  else { session = 'AFTER-HOURS'; color = '#ff4d6a';
+    openInSec = (LONDON_START + 24*60 - utcMin) * 60 - utcSec; nextLabel = 'London opens in'; }
+  const snEl = document.getElementById('sp-session-name');
+  if (snEl) { snEl.textContent = session; snEl.style.color = color; }
+  const cdEl = document.getElementById('sp-countdown');
+  if (cdEl) {
+    if (openInSec > 0) {
+      const h = Math.floor(openInSec / 3600), m = Math.floor((openInSec % 3600) / 60), sec = openInSec % 60;
+      cdEl.textContent = nextLabel + ': ' + String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':' + String(sec).padStart(2,'0');
+    } else { cdEl.textContent = 'Session active'; }
+  }
+  const lEl = document.getElementById('sp-london-status');
+  if (lEl) lEl.textContent = (utcMin >= LONDON_START && utcMin < LONDON_END) ? '🟢 OPEN' : '⚫ CLOSED';
+  const nyEl = document.getElementById('sp-ny-status');
+  if (nyEl) nyEl.textContent = (utcMin >= NY_START && utcMin < NY_END) ? '🟢 OPEN' : '⚫ CLOSED';
+  const kzEl = document.getElementById('sp-kz-status');
+  if (kzEl) kzEl.textContent = (utcMin >= KZ_START && utcMin < KZ_END) ? '🟢 ACTIVE (3am ET)' : '⚫ NEXT: 03:00 ET';
+}
+spUpdateClock();
+if (_spClockTimer) clearInterval(_spClockTimer);
+_spClockTimer = setInterval(spUpdateClock, 1000);
+
 // Poll trades every 30s when tab is active
 setInterval(()=>{
-  if(document.getElementById('tab-trades').classList.contains('active'))trLoad();
+  if(document.getElementById('tab-trades').classList.contains('active')){trLoad();spLoad();}
 },30000);
 </script>
 </body>

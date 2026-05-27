@@ -12,6 +12,7 @@ ISOLATION: No imports from sovereign/, layer1/, layer2/, layer3/.
 from __future__ import annotations
 
 import logging
+import os
 from dataclasses import dataclass
 from datetime import datetime, time, timezone
 from typing import Optional, List
@@ -97,6 +98,29 @@ class SessionClassifier:
         Kill zone constants are defined in US/Eastern time, so comparison
         uses ET. The output struct still records UTC for auditability.
         """
+        forced = os.getenv('ICT_FORCE_SESSION', '').strip()
+        if forced:
+            for w in self._windows:
+                if w.name == forced:
+                    return KillZoneStatus(
+                        timestamp=ts,
+                        utc_time=self._to_utc_time(ts),
+                        in_kill_zone=True,
+                        kill_zone_name=forced,
+                        is_high_probability=w.is_high_probability,
+                        in_ny_lunch=False,
+                        should_trade=True,
+                    )
+            return KillZoneStatus(
+                timestamp=ts,
+                utc_time=self._to_utc_time(ts),
+                in_kill_zone=True,
+                kill_zone_name=forced,
+                is_high_probability=True,
+                in_ny_lunch=False,
+                should_trade=True,
+            )
+
         utc_t = self._to_utc_time(ts)
         et_t = self._to_et_time(ts)   # kill zone windows are in ET
         active_window: Optional[SessionWindow] = None

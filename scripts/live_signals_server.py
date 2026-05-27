@@ -558,6 +558,16 @@ class Handler(BaseHTTPRequestHandler):
             except Exception:
                 self._send_json(500, {'error': traceback.format_exc()})
 
+        elif path.startswith('/data/'):
+            try:
+                file_path = path.lstrip('/')
+                with open(file_path) as f:
+                    self._send_json(200, json.load(f))
+            except FileNotFoundError:
+                self._send_json(404, {'error': 'not_found', 'path': path})
+            except Exception:
+                self._send_json(500, {'error': traceback.format_exc()})
+
         else:
             self.send_response(404)
             self.end_headers()
