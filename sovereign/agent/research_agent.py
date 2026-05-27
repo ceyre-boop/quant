@@ -20,7 +20,7 @@ import json
 import subprocess
 import sys
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).parent.parent.parent
@@ -228,6 +228,83 @@ DISPATCHERS = {
     "hypothesis_test":  _dispatch_hypothesis_test,
     "shell":            _dispatch_shell,
 }
+
+
+# ── Decision log health monitor ───────────────────────────────────────────────
+
+DECISION_LOG_DIR = ROOT / "data" / "decision_logs"
+
+
+def check_decision_log_health() -> list[str]:
+    """
+    Inspect decision logs for staleness, missing outcomes, and schema gaps.
+    Returns a list of issue strings — empty list means healthy.
+    Called by agent_scheduler's run_health_check() every 2 hours.
+    """
+    issues = []
+    import time
+    now = time.time()
+
+    # 1. Log file freshness — warn if no update in 48 hours during trading week
+    if DECISION_LOG_DIR.exists():
+        recent_files = sorted(DECISION_LOG_DIR.glob("decisions_*.jsonl"))[-2:]
+        for f in recent_files:
+            age_h = (now - f.stat().st_mtime) / 3600
+            if age_h > 48:
+                issues.append(f"WARNING: {f.name} not updated in {age_h:.0f}h — pipeline may be silent")
+    else:
+        issues.append("WARNING: data/decision_logs/ directory missing — no trades logged yet")
+        return issues
+
+    # 2. Load records from last 30 days
+    from datetime import timedelta
+    cutoff_date = (datetime.now(timezone.utc) - timedelta(days=30)).strftime("%Y-%m-%d")
+    cutoff_close = (datetime.now(timezone.utc) - timedelta(days=7)).strftime("%Y-%m-%d")
+    all_records: list[dict] = []
+    for log_file in sorted(DECISION_LOG_DIR.glob("decisions_*.jsonl")):
+        try:
+            for line in log_file.read_text().splitlines():
+                if not line.strip():
+                    continue
+                rec = json.loads(line)
+                ts = (rec.get("entry_timestamp") or "")[:10]
+                if ts >= cutoff_date:
+                    all_records.append(rec)
+        except Exception:
+            continue
+
+    if not all_records:
+        return issues  # no data yet — not an error
+
+    # 3. Outcome backfill — entries older than 7 days should be closed
+    stale_open = [
+        r for r in all_records
+        if not r.get("outcome")
+        and (r.get("entry_timestamp") or "")[:10] < cutoff_close
+    ]
+    if stale_open:
+        pairs = ", ".join(r.get("pair", "?") for r in stale_open[:3])
+        issues.append(
+            f"WARNING: {len(stale_open)} trades >7d old missing outcome backfill ({pairs}...)"
+        )
+
+    # 4. Required field completeness
+    required = {"why_this_trade", "why_this_size", "pair", "direction", "entry_level"}
+    for rec in all_records[-20:]:
+        missing_fields = {k for k in required if not rec.get(k)}
+        if missing_fields:
+            issues.append(
+                f"DATA QUALITY: {rec.get('pair', '?')} "
+                f"{(rec.get('entry_timestamp') or '')[:10]} "
+                f"missing {missing_fields}"
+            )
+
+    # 5. Schema completeness — every record must have entry_timestamp
+    no_ts = [r for r in all_records if not r.get("entry_timestamp")]
+    if no_ts:
+        issues.append(f"SCHEMA: {len(no_ts)} records missing entry_timestamp — logger may be broken")
+
+    return issues
 
 
 # ── Main task runner ──────────────────────────────────────────────────────────

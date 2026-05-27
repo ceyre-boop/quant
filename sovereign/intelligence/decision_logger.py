@@ -16,11 +16,13 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Optional
 
+from sovereign.utils.timestamps import canonical_timestamp, timestamps_match
+
 LOG_DIR = Path("data/decision_logs")
 
 
 def _now_iso() -> str:
-    return datetime.now(timezone.utc).isoformat()
+    return canonical_timestamp()
 
 
 def _log_path() -> Path:
@@ -79,10 +81,22 @@ class DecisionRecord:
     exit_timestamp:         Optional[str]    = None
 
 
+import logging as _logging
+_dlog = _logging.getLogger("decision_logger")
+
+
 def _append(record: DecisionRecord) -> None:
     path = _log_path()
     with open(path, "a") as f:
         f.write(json.dumps(asdict(record), default=str) + "\n")
+
+
+def _safe_append(record: DecisionRecord) -> None:
+    """Append record; log warning on failure — never raise. Trades must not be blocked."""
+    try:
+        _append(record)
+    except Exception as exc:
+        _dlog.warning("Decision log write failed (trade continues): %s", exc)
 
 
 # ─── ICT builder ─────────────────────────────────────────────────────────────
@@ -167,7 +181,7 @@ def log_ict_decision(
         missing=list(signal.missing),
     )
 
-    _append(record)
+    _safe_append(record)
     return record
 
 
@@ -250,7 +264,7 @@ def log_forex_decision(
         missing=[],
     )
 
-    _append(record)
+    _safe_append(record)
     return record
 
 
@@ -262,16 +276,22 @@ def update_outcome(
     outcome: str,
     r_realized: float,
     exit_timestamp: Optional[str] = None,
+    system: Optional[str] = None,
 ) -> bool:
     """
     Back-fill outcome into the matching decision record.
     Rewrites the monthly log file — only call this on trade close, not frequently.
     Returns True if a matching record was found and updated.
+
+    Matching strategy: exact timestamp first, then fuzzy date-prefix match
+    (handles forensic engine passing truncated dates like "2026-05-26 03:45").
+    Only updates records still OPEN (outcome is None).
     """
-    # Find the file that would contain this entry_timestamp
+    # Derive month key from the timestamp so we open the right file
+    from sovereign.utils.timestamps import normalize_timestamp
+    normalized = normalize_timestamp(entry_timestamp)
     try:
-        ts = datetime.fromisoformat(entry_timestamp.replace("Z", "+00:00"))
-        month = ts.strftime("%Y_%m")
+        month = datetime.fromisoformat(normalized).strftime("%Y_%m")
     except Exception:
         month = datetime.now(timezone.utc).strftime("%Y_%m")
 
@@ -286,11 +306,16 @@ def update_outcome(
             continue
         try:
             obj = json.loads(line)
-            if obj.get("pair") == pair and obj.get("entry_timestamp") == entry_timestamp:
-                obj["outcome"] = outcome
-                obj["r_realized"] = r_realized
-                obj["exit_timestamp"] = exit_timestamp or _now_iso()
-                found = True
+            if not found and obj.get("pair") == pair and obj.get("outcome") is None:
+                if system and obj.get("system") != system:
+                    records.append(obj)
+                    continue
+                stored_ts = obj.get("entry_timestamp", "")
+                if timestamps_match(stored_ts, entry_timestamp):
+                    obj["outcome"] = outcome
+                    obj["r_realized"] = r_realized
+                    obj["exit_timestamp"] = exit_timestamp or _now_iso()
+                    found = True
             records.append(obj)
         except Exception:
             records.append({"_raw": line})

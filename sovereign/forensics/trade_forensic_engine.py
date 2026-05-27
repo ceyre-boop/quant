@@ -581,6 +581,7 @@ def process_ict_trades(verbose: bool = True) -> List[ForensicRecord]:
                     entry_timestamp=str(entry_date),
                     outcome=outcome_label,
                     r_realized=pnl_r,
+                    system="ICT",
                 )
             except Exception:
                 pass
@@ -650,6 +651,7 @@ def process_forex_trades(verbose: bool = True) -> List[ForensicRecord]:
                     entry_timestamp=str(entry_date),
                     outcome=outcome_label,
                     r_realized=pnl_r_fx,
+                    system="FOREX",
                 )
             except Exception:
                 pass

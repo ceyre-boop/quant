@@ -168,6 +168,47 @@ def decision_to_mode(decision: dict) -> str:
 # HEALTH CHECK
 # ─────────────────────────────────────────────────────────────────────────────
 
+def _check_decision_logs() -> tuple:
+    """
+    Check decision logging pipeline health via research_agent.check_decision_log_health().
+    GREEN = no issues. YELLOW = data quality warnings. RED = critical failures.
+    """
+    try:
+        from sovereign.agent.research_agent import check_decision_log_health
+        issues = check_decision_log_health()
+        if not issues:
+            return "GREEN", "all decision logs healthy"
+        critical = [i for i in issues if i.startswith("SCHEMA") or i.startswith("CRITICAL")]
+        if critical:
+            return "RED", critical[0]
+        return "YELLOW", issues[0]
+    except Exception as e:
+        return "YELLOW", f"health check unavailable: {e}"
+
+
+def _check_oracle_pulse() -> tuple:
+    """Report last pulse status from health.json. GREEN if run in last 3h."""
+    try:
+        health = load_json(HEALTH_PATH)
+        pulse_comp = health.get("components", {}).get("oracle_pulse", {})
+        if not pulse_comp:
+            return "YELLOW", "pulse not yet run"
+        last = pulse_comp.get("last_pulse", "")
+        if last:
+            try:
+                dt = datetime.fromisoformat(last)
+                if dt.tzinfo is None:
+                    dt = dt.replace(tzinfo=timezone.utc)
+                age_h = (datetime.now(timezone.utc) - dt).total_seconds() / 3600
+                if age_h > 3:
+                    return "YELLOW", f"last pulse {age_h:.1f}h ago"
+            except Exception:
+                pass
+        return pulse_comp.get("status", "GREEN"), pulse_comp.get("detail", "ok")
+    except Exception as e:
+        return "YELLOW", f"pulse status unavailable: {e}"
+
+
 def run_health_check() -> dict:
     """Check each system component. Returns health snapshot."""
     health = {
@@ -195,6 +236,8 @@ def run_health_check() -> dict:
         "nasdaq":         _check_nasdaq,
         "reddit":         _check_reddit,
         # twitter removed — X API requires paid plan ($100+/mo), not worth it
+        "decision_logs":  _check_decision_logs,
+        "oracle_pulse":   _check_oracle_pulse,
     }
 
     issues = []
@@ -859,6 +902,29 @@ def run_cycle(dry_run: bool = False, force_heavy: bool = False) -> None:
                     post_message("IMPORTANT", f"⚠ Oracle anomaly: {anomaly}")
         except Exception as e:
             log.warning(f"Oracle learning cycle failed (non-fatal): {e}")
+
+    # 4b2. Oracle Tier 1 — Pulse check (every cycle = every 2h, free)
+    try:
+        from sovereign.oracle.pulse_check import run_pulse as _oracle_pulse
+        pulse_result = _oracle_pulse()
+        n_anom = len(pulse_result.get("anomalies", []))
+        log.info(f"Oracle pulse: {pulse_result['new_entries_since_last']} new entries, {n_anom} anomalies")
+    except Exception as _pulse_err:
+        log.warning(f"Oracle pulse failed (non-fatal): {_pulse_err}")
+
+    # 4b3. Oracle Tier 2 — Micro-correction (every 6h, ~$0.005, gated internally)
+    try:
+        from sovereign.oracle.micro_correct import run_micro_correction as _oracle_micro
+        micro_result = _oracle_micro()
+        if micro_result.get("skipped"):
+            log.info(f"Oracle micro: skipped — {micro_result['reason']}")
+        else:
+            n_items = sum(
+                len(v) for v in micro_result.get("corrections", {}).values() if isinstance(v, list)
+            )
+            log.info(f"Oracle micro: ${micro_result['cost_usd']:.4f}, {n_items} items")
+    except Exception as _micro_err:
+        log.warning(f"Oracle micro-correction failed (non-fatal): {_micro_err}")
 
     # 4a. Check Oracle suggestions — auto-queue and run any PENDING ones immediately
     try:

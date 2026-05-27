@@ -365,6 +365,7 @@ const SYMBOL = "NAS100";
     <div class="nav-section">System</div>
     <div class="nav-item" data-page="controls"><span class="nav-icon">⊞</span> Risk Controls</div>
     <div class="nav-item" data-page="logs"><span class="nav-icon">≡</span> System Logs</div>
+    <div class="nav-item" data-page="decision-health"><span class="nav-icon">◉</span> Decision Logs</div>
   </nav>
 
   <div class="main">
@@ -569,6 +570,38 @@ const SYMBOL = "NAS100";
       </div>
     </div>
 
+    <!-- Decision Log Health Page -->
+    <div class="page" id="page-decision-health">
+      <div class="page-title">Decision Log Health</div>
+      <div class="card">
+        <div class="card-title">Pipeline status</div>
+        <div class="model-row">
+          <span class="model-key">Status</span>
+          <span class="model-val" id="dl-status" style="font-weight:700;">—</span>
+        </div>
+        <div class="model-row">
+          <span class="model-key">ICT entries (7d)</span>
+          <span class="model-val" id="dl-ict-count">—</span>
+        </div>
+        <div class="model-row">
+          <span class="model-key">Forex entries (7d)</span>
+          <span class="model-val" id="dl-forex-count">—</span>
+        </div>
+        <div class="model-row">
+          <span class="model-key">Outcomes backfilled</span>
+          <span class="model-val" id="dl-outcomes">—</span>
+        </div>
+        <div class="model-row">
+          <span class="model-key">Last log update</span>
+          <span class="model-val" id="dl-last-update">—</span>
+        </div>
+      </div>
+      <div class="card" id="dl-issues-card" style="display:none;">
+        <div class="card-title" style="color:#ef4444;">Issues detected</div>
+        <div id="dl-issues-list" style="font-size:13px;line-height:1.7;"></div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -580,6 +613,7 @@ document.querySelectorAll('.nav-item').forEach(el => {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     el.classList.add('active');
     document.getElementById('page-' + el.dataset.page).classList.add('active');
+    if (el.dataset.page === 'decision-health') loadDecisionLogHealth();
   });
 });
 
@@ -883,6 +917,51 @@ async function runBacktest() {
   addSysLog('INFO', 'Backtest complete');
   addSysLog('INFO', 'Results: Sharpe 1.42 | Win rate 58.7% | Max DD -3.8% | 142 trades');
   addSysLog('INFO', 'Statistical significance: CONFIRMED');
+}
+
+// Decision Log Health — reads data/agent/health.json["decision_logs"]
+async function loadDecisionLogHealth() {
+  const statusEl = document.getElementById('dl-status');
+  const ictEl    = document.getElementById('dl-ict-count');
+  const fxEl     = document.getElementById('dl-forex-count');
+  const outEl    = document.getElementById('dl-outcomes');
+  const lastEl   = document.getElementById('dl-last-update');
+  const issuesCard = document.getElementById('dl-issues-card');
+  const issuesList = document.getElementById('dl-issues-list');
+  if (!statusEl) return;
+
+  try {
+    const resp = await fetch('/data/agent/health.json');
+    if (!resp.ok) throw new Error('health.json not available');
+    const health = await resp.json();
+    const dl = health.components && health.components.decision_logs;
+
+    if (!dl) {
+      statusEl.textContent = '⏳ Health check not yet run';
+      return;
+    }
+
+    const s = dl.status;
+    const icon = s === 'GREEN' ? '✅' : s === 'YELLOW' ? '⚠️' : '🔴';
+    statusEl.textContent = `${icon} ${dl.detail || s}`;
+    statusEl.style.color = s === 'GREEN' ? '#22c55e' : s === 'YELLOW' ? '#f59e0b' : '#ef4444';
+    lastEl.textContent = health.timestamp ? new Date(health.timestamp).toLocaleString() : '—';
+
+    // Summarize entry counts from decision_log_summary if available
+    if (dl.ict_entries !== undefined) ictEl.textContent = dl.ict_entries;
+    if (dl.forex_entries !== undefined) fxEl.textContent = dl.forex_entries;
+    if (dl.outcomes_pct !== undefined) outEl.textContent = dl.outcomes_pct;
+
+    // Show issues if any
+    if (dl.issues && dl.issues.length > 0) {
+      issuesCard.style.display = '';
+      issuesList.innerHTML = dl.issues.map(i => `<div>• ${i}</div>`).join('');
+    } else {
+      issuesCard.style.display = 'none';
+    }
+  } catch (e) {
+    if (statusEl) statusEl.textContent = '⏳ Not yet available — run agent_scheduler.py to populate';
+  }
 }
 
 // Initialize

@@ -212,6 +212,16 @@ def run_monthly_monitor() -> dict:
         _log(f"  Lesson {num}: {health} (decay_ratio={decay_ratio:.3f})" if decay_ratio is not None
              else f"  Lesson {num}: {health}")
 
+    # Phase 5b: Reasoning pattern analysis
+    try:
+        from sovereign.forensics.reasoning_analyzer import run_analysis
+        reasoning_report = run_analysis()
+        _log(f"  Reasoning analysis: {reasoning_report.n_trades_analyzed} trades analyzed, "
+             f"{len(reasoning_report.best_chains)} best chains, "
+             f"{len(reasoning_report.worst_chains)} worst chains")
+    except Exception as e:
+        _log(f"  Reasoning analysis failed (non-fatal): {e}")
+
     # Handle retirements
     from sovereign.oracle.codify_cycle import retire_lesson
     for lesson_num, delta in retirements_needed:

@@ -42,6 +42,36 @@ ORACLE_SCHEMA = {
     "system_health_note": "string — one sentence on current system state"
 }
 
+REASONING_ANALYSIS_DIR = ROOT / "data" / "oracle" / "reasoning_analysis"
+
+
+def _load_reasoning_summary() -> str:
+    """Load the most recent monthly reasoning analysis as Oracle context."""
+    if not REASONING_ANALYSIS_DIR.exists():
+        return "No reasoning analysis yet — will populate after first monthly run."
+    reports = sorted(REASONING_ANALYSIS_DIR.glob("*.json"))
+    if not reports:
+        return "No reasoning analysis yet — will populate after first monthly run."
+    try:
+        data = json.loads(reports[-1].read_text())
+        summary = data.get("oracle_context_summary")
+        if summary:
+            return summary
+        # Fallback: compact reconstruction
+        month = data.get("month", "unknown")
+        n = data.get("n_trades_analyzed", 0)
+        best = data.get("best_chains", [])
+        worst = data.get("worst_chains", [])
+        lines = [f"Reasoning analysis ({month}, n={n}):"]
+        if best:
+            lines.append("  BEST: " + " | ".join(f"{b['condition']}→{b['avg_r']:+.2f}R" for b in best[:3]))
+        if worst:
+            lines.append("  WORST: " + " | ".join(f"{w['condition']}→{w['avg_r']:+.2f}R" for w in worst[:3]))
+        return "\n".join(lines)
+    except Exception:
+        return "Reasoning analysis file present but unreadable."
+
+
 ORACLE_PROMPT_TEMPLATE = """You are the trading intelligence Oracle for Alta Investments — a two-person quant operation trading FX and equity using a systematic macro strategy.
 
 ## Your primary mission
@@ -68,6 +98,11 @@ Every suggestion you make must move one needle: Sharpe, win rate, drawdown, or p
 
 ## Current active lessons (already codified — build on these, don't repeat them)
 {active_lessons_summary}
+
+## Monthly reasoning pattern analysis (updated once/month)
+This is a decision-tree clustering of ALL closed trades by their reasoning fields.
+Use this to find threshold combinations that consistently predict good or bad outcomes.
+{reasoning_summary}
 
 ## Last 7 days trade data
 {harvest_summary}
@@ -270,6 +305,7 @@ def run_reflect(harvests: list[dict], date: Optional[str] = None) -> dict:
         queue_status=ctx["queue_status"],
         proven_summary=_load_proven_summary(),
         active_lessons_summary=_load_active_lessons(),
+        reasoning_summary=_load_reasoning_summary(),
         harvest_summary=_load_harvest_summary(harvests),
         decision_log_summary=_load_decision_log_summary(),
         rejected_ids=_get_rejected_ids(),
@@ -339,6 +375,7 @@ if __name__ == "__main__":
             queue_status=ctx["queue_status"],
             proven_summary=_load_proven_summary(),
             active_lessons_summary=_load_active_lessons(),
+            reasoning_summary=_load_reasoning_summary(),
             harvest_summary=_load_harvest_summary(harvests),
             decision_log_summary=_load_decision_log_summary(),
             rejected_ids=_get_rejected_ids(),
