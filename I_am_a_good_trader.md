@@ -24,8 +24,8 @@
 **Rule:** London session AND Grade A AND market_structure_score < 1.5 → execute. Any condition missing → veto.
 **Impact:** ICT system MC prop pass rate 58% → 90%. The system's primary edge lives entirely in this configuration.
 **Code location:** `ict/pipeline.py` Stage 5.7 — three-part gate (session + grade + commitment)
-**Health:** 🟢 ACTIVE
-**Last validated:** 2026-05-18
+**Health:** 🟢 ACTIVE — retro Gate A passed (delta=+0.1243), p-value inconclusive (0.24), OOS validated
+**Last validated:** 2026-05-27 (retro: passes effect size, fails significance — use with confidence)
 **Linked hypothesis:** HYP-022, HYP-026
 
 *The lesson:* Not every setup that scores well is worth trading. The London+A+committed configuration is the only one where institutional order flow is reliably accessible. Outside this configuration, you are not edge-trading — you are noise-trading at ICT scoring thresholds.
@@ -40,8 +40,8 @@
 **Rule:** if session == 'NY_PM': return ICTVeto. No exceptions. No override.
 **Impact:** Prop pass rate recovery was entirely attributable to this veto.
 **Code location:** `ict/pipeline.py` Stage 5.7 — first check in evaluate()
-**Health:** 🟢 ACTIVE
-**Last validated:** 2026-05-18
+**Health:** 🟡 LOW_CONFIDENCE — delta=+0.031 (below 0.05 threshold), p=0.000 (effect is real)
+**Last validated:** 2026-05-27 (retro: NY_PM veto real, effect smaller than gate threshold)
 **Linked hypothesis:** HYP-022
 
 *The lesson:* The difference between London and NY_PM is not that one is harder — it is that NY_PM is systematically wrong. Smart money distributes in the PM session into retail continuation buyers. The setup looks the same. The execution looks the same. The result is structurally negative. The sessions are not unequal versions of the same thing. They are different things.
@@ -56,8 +56,8 @@
 **Rule:** if grade == 'A+': treat as 'A' for trade decision. Log original grade. Never block A+ — the commitment gate handles the bad ones.
 **Impact:** A+ trades entering at overconfirmed setups stopped distorting the grade filter.
 **Code location:** `ict/pipeline.py` Stage 5.7 — `_effective_grade = ICTGrade.A if grade == ICTGrade.A_PLUS else grade`
-**Health:** 🟢 ACTIVE
-**Last validated:** 2026-05-18
+**Health:** 🟡 LOW_CONFIDENCE — delta=+0.003, p=0.840 (weak signal at current n)
+**Last validated:** 2026-05-27 (retro: grade inversion directionally correct, needs more trades)
 **Linked hypothesis:** HYP-023
 
 *The lesson:* The scoring system was working. The grade interpretation was broken. A+ selects for setups where every confirmation is firing — which means price has already moved, entry is late, and the "confirmation" is a trap. The market was teaching this lesson in every A+ trade. The system was awarding gold stars to late entries.
@@ -72,8 +72,8 @@
 **Rule:** pd_alignment weight = 0.0 in scoring. Still computed and logged for monitoring.
 **Impact:** Removing the pd_alignment contribution to score eliminates a systematic anti-signal.
 **Code location:** `ict/pipeline.py` `_DEFAULT_WEIGHTS['pd_alignment'] = 0.0`
-**Health:** 🟢 ACTIVE
-**Last validated:** 2026-05-19
+**Health:** 🔴 SUSPENDED — delta=-0.034, p=0.831, holdout=0.00. All 3 gates failed.
+**Last validated:** 2026-05-27 (retro: entry rule, forensics valid test. pd_alignment weight already 0.0 — no code change required. Monitor for recovery.)
 **Linked hypothesis:** HYP-024
 
 *The lesson:* ICT theory holds that price in discount = institutional accumulation zone = go long. The data says the opposite. When price is "in discount" (pd_alignment scoring positively), it is more likely to continue down. Possible explanation: institutions accumulate at prices that look wrong to retail — aggressive entries, not passive zone fills. The discount zone theory describes where retail waits. Institutions don't wait where retail waits.
@@ -88,8 +88,8 @@
 **Rule:** GBPUSD: 6d/2.0×. AUDUSD: 5d/1.0×. EURUSD: 5d/1.25×. AUDNZD: 7d/1.25×. GBPJPY: 5d/1.0×. USDCAD/USDJPY: 60d/1.25×.
 **Impact:** +0.017 portfolio Sharpe. More importantly: 5 pairs now exit before momentum exhausts instead of giving back gains.
 **Code location:** `sovereign/forex/forex_backtester.py` PAIR_HOLD_OVERRIDES + PAIR_TRAILING_OVERRIDES
-**Health:** 🟢 ACTIVE
-**Last validated:** 2026-05-19
+**Health:** 🟢 ACTIVE — UNTESTABLE_EXIT (forensics blind to forced exits)
+**Last validated:** 2026-05-27 (backtester: removing overrides costs -0.09 Sharpe. Exit rules validate via backtester only, not retro_validate.py.)
 **Linked hypothesis:** HYP-033 (no universal hold) + v006/v007
 
 *The lesson:* The 60-day hold period was chosen because it approximates a central bank meeting cycle. But each currency pair responds to its CB's decisions at a different rate. BOE-Fed divergence (GBPUSD) exhausts in 6 days. RBA-Fed (AUDUSD) exhausts in 5. The hold period should match the momentum half-life of the specific policy divergence, not a generic cycle estimate.
@@ -104,8 +104,8 @@
 **Rule:** 5d_momentum < -0.002 → size ×1.25. 5d_momentum > +0.002 → size ×0.75. Flat → no adjustment.
 **Impact:** +0.029 Sharpe proxy from size adjustment. Real impact on R-multiple distribution.
 **Code location:** `sovereign/forex/signal_engine.py` `_compute_size_multipliers()` — counter-momentum block
-**Health:** 🟢 ACTIVE
-**Last validated:** 2026-05-19
+**Health:** 🟢 ACTIVE — UNTESTABLE (momentum_5d not in trade_forensics.jsonl)
+**Last validated:** 2026-05-27 (action needed: capture momentum_5d at trade entry time to enable future retro testing)
 **Linked hypothesis:** HYP-031
 
 *The lesson:* Entering a long trade when 5-day momentum is already strongly positive means you are buying something that just rallied. Entering when momentum is negative means you are buying the pullback within the macro thesis. Both trades have 52% win rates because direction is correct in both cases. But the pullback entry is more efficient — price is closer to the entry that institutions used, stops are tighter relative to targets, and the R-multiple is 3× larger. The lesson: be right about direction, then be early about timing.
@@ -120,8 +120,8 @@
 **Rule:** VIX_slope (VIX3M - VIX) > 3.0 → size ×0.85. VIX_slope < 0.0 → size ×0.90.
 **Impact:** Size discounts applied in environments with proven adverse carry conditions.
 **Code location:** `sovereign/forex/signal_engine.py` `_compute_size_multipliers()` — VIX slope block
-**Health:** 🟢 ACTIVE
-**Last validated:** 2026-05-19
+**Health:** 🟢 ACTIVE — UNTESTABLE (vix_slope not in trade_forensics.jsonl)
+**Last validated:** 2026-05-27 (action needed: capture vix_slope at trade entry time to enable future retro testing)
 **Linked hypothesis:** HYP-032
 
 *The lesson:* VIX measures spot fear. VIX3M measures intermediate-term fear. The difference (VIX slope) measures whether the market is pricing near-term risk above or below medium-term risk. When the slope is near zero, the market views all time horizons as equally risky — carry trades flow freely. When the slope is steep positive, the market is calm in spot but nervous about what comes next — carry is fragile. When the slope inverts (backwardation), something is already breaking. The carry regime is not binary (safe/unsafe). It has a gradient that the VIX curve reveals.
@@ -138,8 +138,8 @@
 **Rule:** USDJPY/AUDNZD VIX gate: 15→13. Bull market + VIX>13 = veto. Lower threshold = fewer but higher-quality trades.
 **Impact:** v014 → portfolio avg Sharpe 2.097.
 **Code location:** `sovereign/forex/forex_backtester.py` `PAIR_VIX_GATES`; `sovereign/forex/signal_engine.py` `_VIX_GATES`
-**Health:** 🟢 ACTIVE
-**Last validated:** 2026-05-25
+**Health:** 🟢 ACTIVE — UNTESTABLE_EXIT (exit rule + n=46/39 too small)
+**Last validated:** 2026-05-27 (retest when n >= 100 per pair via backtester sweep)
 **Linked hypothesis:** HYP-044
 
 *The lesson:* USDJPY is the world's most liquid safe-haven trade. When global equities are rising and VIX is above 13, two signals compete: the macro rate differential says one thing, and the safe-haven flow says another. Between VIX 13 and 15, the safe-haven bid corrupts the rate signal but is not obvious enough to detect from price alone. Lowering the veto threshold removes the confused regime — leaving only trades where the rate differential speaks clearly. AUDNZD: both AUD and NZD are risk currencies, and the cross rate loses its macro signal in any moderately elevated risk environment.
@@ -156,11 +156,39 @@
 **Rule:** Any CONFIRMED hypothesis must have an implementation commit or explicit REJECTED status within 14 days. rest_mode is a gate, not a destination. The pulse check enforces this automatically.
 **Impact:** System integrity — prevents the ledger from accumulating proven-but-idle knowledge the system cannot act on.
 **Code location:** `sovereign/oracle/pulse_check.py` — `_check_rest_mode_escalation()`
-**Health:** 🟢 ACTIVE
+**Health:** 🟢 ACTIVE — meta-process lesson, statistical validation not applicable
 **Last validated:** 2026-05-27
 **Linked hypothesis:** HYP-046, HYP-047
 
 *The lesson:* Oracle's first words after the nervous system came online: "You have confused 'validated hypothesis' with 'implemented rule.'" Knowing that something works and making it work are different operations. The machine is now smart enough to notice when proven knowledge is sitting idle — and it will not stay quiet about it.
+
+---
+
+## LESSONS NEEDING DATA
+
+**HYP-049 — Short Natural Duration Underperformance** (`NEEDS_DATA`)
+Why do GBPUSD trades closing naturally in 1-3 days underperform trades holding 4+ days?
+- Forensics signal: delta_sharpe=-0.087, p=0.008 (real, but not what we thought it measured)
+- Mechanism: fast closes = stops or TP1 scalps that never developed momentum
+- Action: split forensics by hold_days bucket (1-3, 4-7, 8+) within London+GradeA subset
+- Minimum sample per bucket: 20 trades before drawing conclusions
+
+**L-6, L-7** — capture `momentum_5d` and `vix_slope` at trade entry time in decision_logger.py
+These fields are not in trade_forensics.jsonl. Without them, counter-momentum and VIX lessons
+cannot be retroactively validated. Wire them into `log_forex_decision()` calls.
+
+---
+
+## VALIDATION METHODOLOGY NOTE (2026-05-27)
+
+**Entry rules** (session, grade, pd_alignment, score thresholds):
+→ `retro_validate.py` is valid. Forensics captures entry conditions cleanly.
+
+**Exit rules** (hold caps, trailing multipliers, VIX gates that filter trade frequency):
+→ Backtester only. `retro_validate.py` is blind to exit rules.
+→ Proof: L-5 retro showed delta=-0.087 (harmful). Backtester showed removing L-5 costs -0.09 Sharpe.
+→ The forensics `hold` field records actual trade duration, not whether a forced cap fired.
+→ Never auto-suspend exit rules from retro results. Use `run_forex_scan.py --backtest`.
 
 ---
 
