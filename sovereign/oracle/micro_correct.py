@@ -2,11 +2,11 @@
 Oracle Tier 2 — MICRO CORRECTION
 sovereign/oracle/micro_correct.py
 
-Runs every 6 hours. Small Haiku call (~0.5 cents).
+Runs every 2 hours. Small Haiku call (~0.5 cents).
 Asks 3 targeted questions: lesson violations, parameter adjustments, veto changes.
 Queues corrections to data/oracle/pending_corrections/ — never auto-applies.
 
-Cost: ~$0.005/run, ~$0.02/day
+Cost: ~$0.005/run, ~$0.06/day (12 micro-corrections vs 4)
 """
 from __future__ import annotations
 
@@ -124,13 +124,13 @@ def run_micro_correction() -> dict:
             if dt.tzinfo is None:
                 dt = dt.replace(tzinfo=timezone.utc)
             elapsed = (datetime.now(timezone.utc) - dt).total_seconds()
-            if elapsed < 6 * 3600 - 300:  # 5-min tolerance
-                return {"skipped": True, "reason": f"less than 6h since last micro ({elapsed/3600:.1f}h ago)"}
+            if elapsed < 2 * 3600 - 300:  # 5-min tolerance
+                return {"skipped": True, "reason": f"less than 2h since last micro ({elapsed/3600:.1f}h ago)"}
         except Exception:
             pass
 
-    recent = _load_entries_since(datetime.now(timezone.utc) - timedelta(hours=6))
-    pulses = _load_pulses_since(hours=6)
+    recent = _load_entries_since(datetime.now(timezone.utc) - timedelta(hours=2))
+    pulses = _load_pulses_since(hours=2)
     all_anomalies = [a for p in pulses for a in p.get("anomalies", [])]
 
     # Extract live prices from most recent pulse
@@ -150,7 +150,7 @@ def run_micro_correction() -> dict:
     ]
 
     if not compact_trades and not all_anomalies:
-        return {"skipped": True, "reason": "no trades or anomalies in last 6h"}
+        return {"skipped": True, "reason": "no trades or anomalies in last 2h"}
 
     import anthropic
     api_key = os.environ.get("ANTHROPIC_API_KEY")

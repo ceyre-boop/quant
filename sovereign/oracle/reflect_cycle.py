@@ -3,8 +3,9 @@ Oracle Learning Cycle — Phase 2: REFLECT
 sovereign/oracle/reflect_cycle.py
 
 Reads last 7 days of harvests + proven_research.json + I_am_a_good_trader.md.
-Makes ONE Oracle (Claude haiku) call to propose a candidate lesson.
-Cost: ≤2 cents per cycle.
+Makes ONE Oracle (Claude Opus 4.8) call to propose a candidate lesson.
+Micro-corrections stay on Haiku (micro_correct.py).
+Cost: ≤8 cents per cycle.
 
 Output: data/oracle/reflections/YYYY_MM_DD.json
 """
@@ -340,7 +341,7 @@ def run_reflect(harvests: list[dict], date: Optional[str] = None) -> dict:
 
     client = anthropic.Anthropic(api_key=api_key)
     response = client.messages.create(
-        model="claude-haiku-4-5",
+        model="claude-opus-4-8",
         max_tokens=1024,
         messages=[{"role": "user", "content": prompt}],
     )
@@ -364,8 +365,8 @@ def run_reflect(harvests: list[dict], date: Optional[str] = None) -> dict:
         "input_tokens": response.usage.input_tokens,
         "output_tokens": response.usage.output_tokens,
         "estimated_cost_usd": round(
-            response.usage.input_tokens * 0.00000025 +
-            response.usage.output_tokens * 0.00000125, 6
+            response.usage.input_tokens * 0.000015 +
+            response.usage.output_tokens * 0.000075, 6
         ),
         "harvest_days_read": len(harvests),
         "reflection": reflection,
