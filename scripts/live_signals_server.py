@@ -306,10 +306,20 @@ def build_payload():
     }
 
 
-_CHAT_SYSTEM = """You are SOVEREIGN, an AI trading research assistant for a quant trading system.
-Current state: Forex system v013 (Sharpe 1.8552, institutional grade). ICT system: London+GradeA,
-WR=41%, avgR=+0.840. Bridge: HALT_NEW (ASIAN_CURRENCY_CONTAGION, threat=1.00).
-Prop challenge: ACTIVE Day 0, $100k balance. Answer concisely using system data when relevant."""
+def _build_chat_system() -> str:
+    bridge  = _load_cross_system_state()
+    mode    = bridge.get('ict_mode', 'UNKNOWN')
+    threat  = bridge.get('library_threat_score', 0.0)
+    regime  = bridge.get('library_primary_regime', 'UNKNOWN')
+    updated = bridge.get('last_updated', '')[:19]
+    return (
+        f"You are SOVEREIGN, an AI trading research assistant for a quant trading system.\n"
+        f"Current state: Forex system v014 (Sharpe 2.0970, institutional grade). "
+        f"ICT system: London+GradeA, WR=41%, avgR=+0.840. "
+        f"Bridge: {mode} ({regime}, threat={threat:.2f}). "
+        f"State as of {updated} UTC. "
+        f"Answer concisely using system data when relevant."
+    )
 
 _chat_history: list[dict] = []
 
@@ -326,7 +336,7 @@ def _handle_chat(message: str, context: str) -> str:
     messages = _chat_history[-20:]
 
     payload = json.dumps({
-        'system': _CHAT_SYSTEM,
+        'system': _build_chat_system(),
         'messages': messages,
         'max_tokens': 512,
     })
@@ -355,7 +365,7 @@ def _handle_chat(message: str, context: str) -> str:
         resp = client.messages.create(
             model='claude-haiku-4-5-20251001',
             max_tokens=512,
-            system=_CHAT_SYSTEM,
+            system=_build_chat_system(),
             messages=messages,
         )
         reply = resp.content[0].text
