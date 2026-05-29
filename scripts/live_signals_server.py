@@ -568,6 +568,29 @@ class Handler(BaseHTTPRequestHandler):
             except Exception:
                 self._send_json(500, {'error': traceback.format_exc()})
 
+        elif path == '/macro':
+            try:
+                import subprocess, time as _time
+                snap_path = 'data/macro/macro_snapshot.json'
+                stale = True
+                try:
+                    mtime = os.path.getmtime(snap_path)
+                    stale = (_time.time() - mtime) > 4 * 3600  # 4h
+                except FileNotFoundError:
+                    pass
+                if stale:
+                    subprocess.Popen(
+                        [sys.executable, 'scripts/fetch_macro_cache.py'],
+                        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                    )
+                try:
+                    with open(snap_path) as f:
+                        self._send_json(200, json.load(f))
+                except FileNotFoundError:
+                    self._send_json(200, {'series': {}, 'summary': {}, 'fetched_at': None})
+            except Exception:
+                self._send_json(500, {'error': traceback.format_exc()})
+
         elif path.startswith('/data/'):
             try:
                 file_path = path.lstrip('/')

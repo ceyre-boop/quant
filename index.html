@@ -440,6 +440,23 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
   border-left:3px solid #00d4a0;border-radius:0 4px 4px 0;font-size:12px;color:#00d4a0;font-weight:600}
 @keyframes sp-flash{0%,100%{box-shadow:none}50%{box-shadow:0 0 0 3px #00d4a0}}
 .sp-flash{animation:sp-flash .6s ease 5}
+/* Macro bar */
+#macro-bar{display:flex;gap:16px;align-items:center;padding:8px 14px;
+  background:var(--card);border:1px solid var(--border);border-radius:6px;
+  margin-bottom:10px;flex-wrap:wrap}
+.mb-item{display:flex;flex-direction:column;align-items:center;min-width:54px}
+.mb-label{font-size:9px;color:var(--muted);letter-spacing:.06em;font-weight:600;text-transform:uppercase}
+.mb-value{font-size:13px;font-weight:700;color:#e8e8f0;font-variant-numeric:tabular-nums}
+.mb-chg{font-size:10px;font-variant-numeric:tabular-nums}
+.mb-chg.up{color:#26de81}.mb-chg.down{color:#ff6b6b}.mb-chg.flat{color:var(--muted)}
+.mb-sep{width:1px;height:32px;background:var(--border)}
+.mb-tag{font-size:9px;padding:2px 6px;border-radius:10px;font-weight:700;letter-spacing:.06em}
+.mb-tag.normal{background:#0d2e1a;color:#26de81}
+.mb-tag.caution{background:#3d2e10;color:#f0a500}
+.mb-tag.inverted{background:#3d1515;color:#ff6b6b}
+.mb-tag.risk-off{background:#3d1515;color:#ff6b6b}
+.mb-tag.stress{background:#3d1515;color:#ff6b6b}
+#macro-bar .mb-updated{margin-left:auto;font-size:9px;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -726,6 +743,21 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
             <div id="sig-chart-container" style="width:100%;height:100%"></div>
           </div>
           <div id="sig-pair-bar"></div>
+          <!-- Macro Bar -->
+          <div id="macro-bar">
+            <div class="mb-item"><span class="mb-label">VIX</span><span class="mb-value" id="mb-vix">—</span><span class="mb-chg flat" id="mb-vix-chg">—</span></div>
+            <div class="mb-sep"></div>
+            <div class="mb-item"><span class="mb-label">10Y</span><span class="mb-value" id="mb-10y">—</span><span class="mb-chg flat" id="mb-10y-chg">—</span></div>
+            <div class="mb-item"><span class="mb-label">2Y</span><span class="mb-value" id="mb-2y">—</span><span class="mb-chg flat" id="mb-2y-chg">—</span></div>
+            <div class="mb-item"><span class="mb-label">3M</span><span class="mb-value" id="mb-3m">—</span><span class="mb-chg flat" id="mb-3m-chg">—</span></div>
+            <div class="mb-sep"></div>
+            <div class="mb-item"><span class="mb-label">Curve</span><span class="mb-value" id="mb-curve">—</span><span class="mb-chg flat" id="mb-curve-chg">—</span></div>
+            <div class="mb-sep"></div>
+            <div class="mb-item"><span class="mb-label">HYG</span><span class="mb-value" id="mb-hyg">—</span><span class="mb-chg flat" id="mb-hyg-chg">—</span></div>
+            <div class="mb-sep"></div>
+            <div id="mb-tags" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap"></div>
+            <span class="mb-updated" id="mb-updated">—</span>
+          </div>
           <!-- Oracle Intel Panel -->
           <div id="oracle-panel">
             <div id="oracle-hdr">
@@ -926,7 +958,7 @@ document.querySelectorAll('.hdr-tab').forEach(btn=>{
     if(!tabInited[id]){
       tabInited[id]=true;
       if(id==='tab-research')resLoad();
-      if(id==='tab-signals'){sigInit();sigRefresh();oracleRefresh();}
+      if(id==='tab-signals'){sigInit();sigRefresh();oracleRefresh();macroRefresh();}
       if(id==='tab-trades'){trLoad();spLoad();}
       if(id==='tab-chat')chatInjectChips();
     }
@@ -1721,6 +1753,71 @@ async function oracleRefresh(){
   }catch{}
 }
 
+async function macroRefresh(){
+  try{
+    const r = await fetch('http://localhost:8765/macro?t='+Date.now(), {signal: AbortSignal.timeout(6000)});
+    if(!r.ok) return;
+    const d = await r.json();
+    const s = d.summary||{};
+    const ser = d.series||{};
+
+    function _fmtChg(chg, decimals=2){
+      if(chg==null) return {text:'—', cls:'flat'};
+      const txt=(chg>=0?'+':'')+chg.toFixed(decimals);
+      return {text:txt, cls:chg>0.001?'up':chg<-0.001?'down':'flat'};
+    }
+    function _set(id, val, suffix=''){
+      const el=document.getElementById(id);
+      if(el) el.textContent=val!=null?val+suffix:'—';
+    }
+    function _setChg(id, chg, decimals=2){
+      const el=document.getElementById(id);
+      if(!el) return;
+      const {text,cls}=_fmtChg(chg,decimals);
+      el.textContent=text; el.className='mb-chg '+cls;
+    }
+
+    _set('mb-vix', s.vix!=null?s.vix.toFixed(2):null);
+    _setChg('mb-vix-chg', (ser.vix||{}).chg, 2);
+    _set('mb-10y', s.dgs10!=null?s.dgs10.toFixed(3)+'%':null);
+    _setChg('mb-10y-chg', (ser.dgs10||{}).chg, 3);
+    _set('mb-2y', s.dgs2!=null?s.dgs2.toFixed(3)+'%':null);
+    _setChg('mb-2y-chg', (ser.dgs2||{}).chg, 3);
+    _set('mb-3m', s.dgs3m!=null?s.dgs3m.toFixed(3)+'%':null);
+    _setChg('mb-3m-chg', (ser.dgs3m||{}).chg, 3);
+
+    // Yield curve spread (10Y-2Y)
+    const curveVal = s.t10y2y;
+    const curvePrev = (ser.t10y2y||{}).prev;
+    _set('mb-curve', curveVal!=null?(curveVal>=0?'+':'')+curveVal.toFixed(2)+'%':null);
+    _setChg('mb-curve-chg', (ser.t10y2y||{}).chg, 2);
+
+    _set('mb-hyg', s.hyg!=null?s.hyg.toFixed(2):null);
+    _setChg('mb-hyg-chg', (ser.hyg||{}).chg, 2);
+
+    // Regime tags
+    const tagsEl=document.getElementById('mb-tags');
+    if(tagsEl){
+      const tags=[];
+      if(s.yield_curve==='INVERTED') tags.push(['INVERTED','inverted']);
+      else if(s.yield_curve==='FLAT') tags.push(['FLAT CURVE','caution']);
+      else tags.push(['CURVE OK','normal']);
+      if(s.risk_regime==='RISK_OFF') tags.push(['RISK OFF','risk-off']);
+      else if(s.risk_regime==='CAUTION') tags.push(['CAUTION','caution']);
+      if(s.credit_regime==='STRESS') tags.push(['CREDIT STRESS','stress']);
+      else if(s.credit_regime==='CAUTION') tags.push(['CREDIT CAUTION','caution']);
+      tagsEl.innerHTML=tags.map(([t,c])=>`<span class="mb-tag ${c}">${t}</span>`).join('');
+    }
+
+    // Updated timestamp
+    const updEl=document.getElementById('mb-updated');
+    if(updEl && d.fetched_at){
+      const mins=Math.round((Date.now()-new Date(d.fetched_at).getTime())/60000);
+      updEl.textContent=mins<2?'updated now':`updated ${mins}m ago`;
+    }
+  }catch{}
+}
+
 function oracleRender(d, scannerData){
   const board=d.board||{};
   const play=d.recommended_play;
@@ -1892,9 +1989,9 @@ function _oracleClearLevels(){
   _oracleLinesEntry=_oracleLinesSl=_oracleLinesTP1=_oracleLinesTP2=null;
 }
 
-// Refresh Oracle panel every 30s when signals tab is active
+// Refresh Oracle + Macro panel every 30s when signals tab is active
 setInterval(()=>{
-  if(document.getElementById('tab-signals').classList.contains('active'))oracleRefresh();
+  if(document.getElementById('tab-signals').classList.contains('active')){oracleRefresh();macroRefresh();}
 },30000);
 
 // ══ TAB 3: RESEARCH ══
