@@ -180,6 +180,15 @@ class OandaBridge:
         logger.info("[OandaBridge] Initialised | environment=%s | account=%s",
                     environment, account_id)
 
+        # Confirm connectivity and surface account ID+NAV immediately at startup
+        # so account mismatches (e.g. bridge vs TradingView) are caught in the log.
+        try:
+            nav = self.get_account_balance()
+            logger.info("[OandaBridge] Account confirmed | id=%s | NAV=%.2f %s",
+                        account_id, nav, environment.upper())
+        except Exception as exc:
+            logger.warning("[OandaBridge] Could not confirm account NAV at startup: %s", exc)
+
     # ── Account info ─────────────────────────────────────────────────────────
 
     def get_account_balance(self) -> float:
