@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-05-26T21:37:02",
-  "overall": "YELLOW",
+  "timestamp": "2026-05-28T20:32:00",
+  "overall": "RED",
   "components": {
     "duckdb": {
       "status": "GREEN",
@@ -16,65 +16,64 @@
     },
     "ict_scanner": {
       "status": "GREEN",
-      "detail": "outside session hours \u2014 last run 5.7h ago"
+      "detail": "outside session hours \u2014 last run 4.7h ago"
     },
     "backtest_engine": {
       "status": "GREEN",
       "detail": "file present"
     },
     "alpaca": {
-      "status": "YELLOW",
-      "detail": "key missing"
+      "status": "GREEN",
+      "detail": "paper account equity=$104,029"
     },
     "fred": {
-      "status": "YELLOW",
-      "detail": "key missing"
+      "status": "RED",
+      "detail": "HTTPSConnectionPool(host='api.stlouisfed.org', port=443): Read timed out. (read timeout=6)"
     },
     "alpha_vantage": {
-      "status": "YELLOW",
-      "detail": "key missing"
+      "status": "GREEN",
+      "detail": "latest bar 2026-05-27"
     },
     "tiingo": {
-      "status": "YELLOW",
-      "detail": "key missing"
+      "status": "GREEN",
+      "detail": "authenticated"
     },
     "news_api": {
-      "status": "YELLOW",
-      "detail": "key missing"
+      "status": "GREEN",
+      "detail": "54 business articles"
     },
     "oanda": {
-      "status": "YELLOW",
-      "detail": "key or account ID missing"
+      "status": "GREEN",
+      "detail": "NAV=$110,000 practice"
     },
     "firebase": {
-      "status": "YELLOW",
-      "detail": "FIREBASE_DATABASE_URL missing"
+      "status": "GREEN",
+      "detail": "reachable"
     },
     "polygon": {
-      "status": "YELLOW",
-      "detail": "key missing"
+      "status": "GREEN",
+      "detail": "free tier active (reference data)"
     },
     "openweather": {
-      "status": "YELLOW",
-      "detail": "key missing"
+      "status": "GREEN",
+      "detail": "weather data ok"
     },
     "nasdaq": {
-      "status": "YELLOW",
-      "detail": "key missing"
+      "status": "GREEN",
+      "detail": "WIKI prices ok (1 rows)"
     },
     "reddit": {
       "status": "YELLOW",
-      "detail": "cache 138m old \u2014 needs refresh"
+      "detail": "cache 2953m old \u2014 needs refresh"
     },
     "decision_logs": {
       "status": "YELLOW",
-      "detail": "health check unavailable: No module named 'sovereign'"
+      "detail": "WARNING: decisions_2026_05.jsonl not updated in 49h \u2014 pipeline may be silent"
     },
     "oracle_pulse": {
       "status": "YELLOW",
-      "detail": "0 new entries, 2 anomalies",
-      "last_pulse": "2026-05-29T00:03:38+00:00"
+      "detail": "0 new entries, 2 anomalies"
     }
   },
-  "last_checked": "2026-05-26T21:37:02"
+  "last_checked": "2026-05-28T20:32:00"
 }
