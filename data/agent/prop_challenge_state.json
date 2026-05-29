@@ -1,0 +1,11 @@
+{
+  "timestamp": "2026-05-29T00:32:10Z",
+  "overall": "WAIT",
+  "gates": [
+    {"id":"G1","name":"MC Pass Rate","status":"GREEN","value":"74.4% (5,000 sims)","detail":"Median days to pass: 34.0 | P90: 76.0 days"},
+    {"id":"G2","name":"Live Paper Trades","status":"RED","value":"1/30","detail":"Need 29 more — OANDA bridge live since 2026-05-28"},
+    {"id":"G3","name":"WR Alignment","status":"YELLOW","value":"collecting","detail":"Need ≥10 closed trades to measure"},
+    {"id":"G4","name":"Bridge Macro Threat","status":"GREEN","value":"0.29 NORMAL","detail":"Regime: VALUE_RATE_REGIME_SHIFT | Buy window open"},
+    {"id":"G5","name":"Non-Bust Days","status":"YELLOW","value":"collecting","detail":"Needs more closed trade data"}
+  ]
+}

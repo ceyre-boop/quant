@@ -28,6 +28,9 @@ jobs:
           # Copy committed data snapshots if present
           cp data/agent/*.json _site/data/agent/ 2>/dev/null || true
           cp data/forensics/cross_system_state.json _site/data/forensics/ 2>/dev/null || true
+          mkdir -p _site/data/oracle
+          cp data/oracle/latest_reflection.json _site/data/oracle/ 2>/dev/null || true
+          cp data/oracle/version_history.json _site/data/oracle/ 2>/dev/null || true
       - uses: actions/upload-pages-artifact@v3
         with:
           path: './_site'

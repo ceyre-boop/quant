@@ -405,6 +405,16 @@
       "mechanism": "Fast natural closures are stops or TP1 scalps \u2014 price moved briefly in the right direction then reversed. These trades entered before institutional commitment was fully expressed. The commitment score was passing but the actual momentum had not formed yet. A minimum hold expectation gate (bars_since_signal or displacement threshold) at entry might filter these.",
       "linked_lesson": "L-5 retro validation \u2014 methodological finding 2026-05-27",
       "source": "retro_validate.py forensics surface 2026-05-27"
+    },
+    {
+      "id": "HYP-050",
+      "status": "CONFIRMED",
+      "name": "Tuesday+Thursday DOW veto \u2014 London ICT"
+    },
+    {
+      "id": "HYP-051",
+      "status": "CANDIDATE",
+      "name": "Day-of-month bias: days 1-7 negative, days 8-15 exceptional"
     }
   ],
   "hypotheses": [
@@ -841,7 +851,23 @@
       "mechanism": "Fast natural closures are stops or TP1 scalps \u2014 price moved briefly in the right direction then reversed. These trades entered before institutional commitment was fully expressed. The commitment score was passing but the actual momentum had not formed yet. A minimum hold expectation gate (bars_since_signal or displacement threshold) at entry might filter these.",
       "linked_lesson": "L-5 retro validation \u2014 methodological finding 2026-05-27",
       "source": "retro_validate.py forensics surface 2026-05-27"
+    },
+    {
+      "id": "HYP-050",
+      "name": "Tuesday+Thursday DOW veto \u2014 London ICT",
+      "status": "CONFIRMED",
+      "result": "CONFIRMED. Tue WR=11.5%/-0.490R, Thu WR=14.3%/-0.214R. Walk-forward replicated in Window A and B independently. DOW veto alone: MC=98.6%, 3.2/mo, G2 in 9mo. Dominates UTC03 gate at 3x frequency.",
+      "added": "2026-05-29T01:21:10.206153+00:00",
+      "source": "REST_MODE"
+    },
+    {
+      "id": "HYP-051",
+      "name": "Day-of-month bias: days 1-7 negative, days 8-15 exceptional",
+      "status": "CANDIDATE",
+      "result": "CANDIDATE. Days 1-7: WR=15.0%, avgR=-0.175 (n=20). Days 8-15: WR=51.5%, avgR=+1.538 (n=33). n=20 insufficient for gate. Monitor 3 more months.",
+      "added": "2026-05-29T01:21:10.206153+00:00",
+      "source": "REST_MODE"
     }
   ],
-  "last_updated": "2026-05-27"
+  "last_updated": "2026-05-29T01:21:10.206153+00:00"
 }

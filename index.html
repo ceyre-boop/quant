@@ -1998,11 +1998,11 @@ setInterval(()=>{
 const RES_BASE='data/agent/';
 const RES_VERSIONS=[
   {l:'v001',s:.1785},{l:'v002',s:.3551},{l:'v002.5',s:.38},{l:'v003',s:.4523},
-  {l:'v004',s:.6260},{l:'v005',s:.8843},{l:'v006',s:1.0547},{l:'v007',s:1.0713},
+  {l:'v004',s:.626},{l:'v005',s:.8843},{l:'v006',s:1.0547},{l:'v007',s:1.0713},
   {l:'v008',s:1.1955},{l:'v009',s:1.2864},{l:'v010',s:1.4396},
-  {l:'v011',s:1.6476},{l:'v012',s:1.7176},{l:'v013',s:1.8552,cur:true},
+  {l:'v011',s:1.6476},{l:'v012',s:1.7176},{l:'v013',s:1.8552},{l:'v014',s:2.097,cur:true},
 ];
-const RES_TARGET=1.9052;
+const RES_TARGET=2.1470;
 
 async function resFetch(f){try{const r=await fetch(RES_BASE+f+'?t='+Date.now());return r.ok?await r.json():null;}catch{return null;}}
 async function fetchPath(p){try{const r=await fetch(p+'?t='+Date.now());return r.ok?await r.json():null;}catch{return null;}}
@@ -2040,21 +2040,27 @@ function resReflection(data){
     ${cl.sample_needed?`<div style="font-size:9px;color:var(--dim);margin-top:4px">Needs ${cl.sample_needed} trades to confirm</div>`:''}
     ${retire}`;
 }
-function resFills(fills){
+function resFills(data){
   const el=document.getElementById('rp-fills');
-  const arr=Array.isArray(fills)?fills:[];
-  const n=arr.length,target=30,pct=Math.min(100,Math.round(n/target*100));
+  let n=0,target=30,rows='';
+  if(Array.isArray(data)){
+    n=data.length;
+    rows=data.slice(-8).reverse().map(f=>`<div class="rp-fill-row">
+      <span style="color:var(--muted)">${(f.timestamp||'').slice(0,10)}</span>
+      <span>${f.pair||'—'}</span>
+      <span style="color:${f.direction==='LONG'?'var(--green)':'var(--red)'}">${f.direction||'—'}</span>
+      <span style="color:var(--muted)">${f.units||0}u @ ${f.fill_price||0}</span>
+    </div>`).join('');
+  } else if(data?.total!=null){
+    n=data.total; target=data.target||30;
+    if(data.latest_fill) rows=`<div class="rp-fill-row" style="color:var(--muted);font-size:11px">${data.latest_fill}</div>`;
+  }
+  const pct=Math.min(100,Math.round(n/target*100));
   const sc=n>=target?'var(--green)':n>=10?'var(--yellow)':'var(--red)';
-  const rows=arr.slice(-8).reverse().map(f=>`<div class="rp-fill-row">
-    <span style="color:var(--muted)">${(f.timestamp||'').slice(0,10)}</span>
-    <span>${f.pair||'—'}</span>
-    <span style="color:${f.direction==='LONG'?'var(--green)':'var(--red)'}">${f.direction||'—'}</span>
-    <span style="color:var(--muted)">${f.units||0}u @ ${f.fill_price||0}</span>
-  </div>`).join('');
-  el.innerHTML=`<div class="rp-title">G2 Progress — Paper Fills <span style="color:${sc};font-weight:700;margin-left:8px">${n}/30</span></div>
+  el.innerHTML=`<div class="rp-title">G2 Progress — Paper Fills <span style="color:${sc};font-weight:700;margin-left:8px">${n}/${target}</span></div>
     <div class="g2-bar-wrap"><div class="g2-bar-fill" style="width:${pct}%"></div></div>
     <div style="font-size:9px;color:var(--muted);margin-bottom:8px">${pct}% — ${Math.max(0,target-n)} more fills needed to unlock G2</div>
-    ${rows||'<div class="rp-empty" style="margin:0">No OANDA fills yet — bridge running</div>'}`;
+    ${rows||'<div class="rp-empty" style="margin:0">No fills yet — bridge running</div>'}`;
 }
 
 function resHealth(data){
@@ -2154,10 +2160,16 @@ function resQueue(data){
 }
 
 let _verChart=null,_verLine=null,_verInstLine=null;
-function resVersions(){
+function resVersions(externalVers){
+  const vers=externalVers
+    ? externalVers.map(v=>({l:v.version||v.l,s:v.sharpe??v.s,cur:v.current||v.cur||false}))
+    : RES_VERSIONS;
+  const cur=vers.find(v=>v.cur);
+  const curSharpe=cur?.s??2.097;
+  const lastLabel=vers[vers.length-1]?.l||'v014';
   const el=document.getElementById('rp-versions');
-  el.innerHTML=`<div class="rp-title">Sharpe Progress — v001 → v013</div>
-    <div style="font-size:10px;color:var(--muted);margin-bottom:6px">Target: <span style="color:var(--yellow)">${RES_TARGET}</span> · Current: <span style="color:var(--green);font-weight:700">1.8552 ✓</span> · Gap to target: <span style="color:var(--text)">${(RES_TARGET-1.8552).toFixed(4)}</span></div>
+  el.innerHTML=`<div class="rp-title">Sharpe Progress — v001 → ${lastLabel}</div>
+    <div style="font-size:10px;color:var(--muted);margin-bottom:6px">Target: <span style="color:var(--yellow)">${RES_TARGET}</span> · Current: <span style="color:var(--green);font-weight:700">${curSharpe} ✓</span> · Gap to target: <span style="color:var(--text)">${(RES_TARGET-curSharpe).toFixed(4)}</span></div>
     <div id="rp-versions-chart" style="height:160px;width:100%"></div>`;
 
   if(typeof LightweightCharts==='undefined')return;
@@ -2179,12 +2191,11 @@ function resVersions(){
   _verInstLine=_verChart.addLineSeries({color:'rgba(246,201,14,0.5)',lineWidth:1,
     priceLineVisible:false,lastValueVisible:false,lineStyle:LightweightCharts.LineStyle.Dashed});
 
-  const pts=RES_VERSIONS.map((v,i)=>({time:i+1,value:v.s}));
+  const pts=vers.map((v,i)=>({time:i+1,value:v.s}));
   _verLine.setData(pts);
-  _verInstLine.setData([{time:1,value:1.5},{time:RES_VERSIONS.length,value:1.5}]);
+  _verInstLine.setData([{time:1,value:1.5},{time:vers.length,value:1.5}]);
 
-  // Version labels as markers
-  _verLine.setMarkers(RES_VERSIONS.map((v,i)=>({
+  _verLine.setMarkers(vers.map((v,i)=>({
     time:i+1,position:'inBar',color:v.cur?'#00d4a0':v.s>=1.5?'#00d4a0':'#4a5568',
     shape:'circle',text:v.l,size:v.cur?1.5:1,
   })));
@@ -2193,18 +2204,19 @@ function resVersions(){
 }
 
 async function resLoad(){
-  const today=new Date().toISOString().slice(0,10);
-  const yest=new Date(Date.now()-86400000).toISOString().slice(0,10);
-  const[health,msgs,usage,hyp,queue,gates,todayRef,fills]=await Promise.all([
-    resFetch('health.json'),resFetch('messages_to_colin.json'),resFetch('usage.json'),
-    resFetch('hypothesis_ledger.json'),resFetch('research_queue.json'),
-    fetchPath('data/agent/checklist_state.json'),
-    fetchPath(`data/oracle/reflections/${today}.json`),
-    fetchPath('data/ledger/oanda_fills.json'),
+  const[health,msgs,usage,hyp,queue,gates,reflection,g2,verHistory]=await Promise.all([
+    resFetch('health.json'),
+    resFetch('messages_to_colin.json'),
+    resFetch('usage.json'),
+    resFetch('hypothesis_ledger.json'),
+    resFetch('research_queue.json'),
+    fetchPath('data/agent/prop_challenge_state.json').then(d=>d||fetchPath('data/agent/checklist_state.json')),
+    fetchPath('data/oracle/latest_reflection.json'),
+    fetchPath('data/agent/g2_progress.json'),
+    fetchPath('data/oracle/version_history.json'),
   ]);
-  const reflection=todayRef||await fetchPath(`data/oracle/reflections/${yest}.json`);
-  resHealth(health);resMsgs(msgs);resUsage(usage);resHyp(hyp);resQueue(queue);resVersions();
-  resGates(gates);resReflection(reflection);resFills(fills);
+  resHealth(health);resMsgs(msgs);resUsage(usage);resHyp(hyp);resQueue(queue);
+  resGates(gates);resReflection(reflection);resFills(g2);resVersions(verHistory||null);
 }
 setInterval(()=>{if(document.getElementById('tab-research').classList.contains('active'))resLoad();},300000);
 

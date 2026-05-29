@@ -1,0 +1,25 @@
+{
+  "date": "2026-05-29",
+  "generated_at": "2026-05-29T00:03:57.296040+00:00",
+  "input_tokens": 5351,
+  "output_tokens": 858,
+  "estimated_cost_usd": 0.144615,
+  "harvest_days_read": 0,
+  "reflection": {
+    "candidate_lesson": {
+      "lesson_text": "A maxed commitment_score (1.0) with a null rate_differential_zscore is a false-confidence trap: price-action perfection without macro confirmation produces COMMITMENT_FAILURE.",
+      "mechanism": "commitment_score measures price-structure quality (sweep + FVG tap + kill zone) but is blind to macro thesis. When rate_differential_zscore is null, there is no independent macro vote \u2014 institutions are not defending the level for a fundamental reason, so the sweep is retail-driven liquidity churn that reverts. The two signals must pass independently; one cannot substitute for the other.",
+      "testable_rule": "if commitment_score >= 0.90 and rate_differential_zscore is None: return ICTVeto  # require non-null macro confirmation when price-action is maximal",
+      "expected_impact": "Removes a class of high-conviction-but-unconfirmed losers; estimated +0.02-0.03 Sharpe by eliminating -0.94R outliers that drag the tail, improving win rate on remaining London A setups.",
+      "evidence_from_harvest": "Only 1 closed trade (0W/1L, avg R=-0.940) \u2014 a London Grade A setup that matches the L6 'exact setup' on price-action criteria yet still failed, suggesting the missing macro vote is the differentiator.",
+      "evidence_from_reasoning": "The single COMMITMENT_FAILURE had commitment_score=1.0 (maximal) but rate_differential_zscore=null \u2014 perfect price action with zero macro confirmation produced -0.94R; the library_match (2022_RATE_SHOCK at 0.61) was a weak/moderate similarity that did not save it.",
+      "reasoning_component_targeted": "rate_differential_zscore",
+      "sample_needed": 25
+    },
+    "retirement_flag": {
+      "lesson_to_review": "L1",
+      "reason": "L1 defines the 'exact setup' as London + Grade A + structure_score < 1.5 but does not require a non-null macro vote \u2014 the failed trade satisfied L1 fully yet lost, suggesting L1 needs a macro-confirmation sub-clause."
+    },
+    "system_health_note": "Regime is UNKNOWN with only 1 closed trade \u2014 sample is far below any statistical gate, so this lesson is a hypothesis to queue, not a rule to commit; HYP-033 already showed commitment_score has no standalone IC, reinforcing that the macro field is the missing factor."
+  }
+}

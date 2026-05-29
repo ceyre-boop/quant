@@ -385,7 +385,20 @@
       "estimated_minutes": 10,
       "source": "REST_MODE HYP-048",
       "hypothesis_id": "HYP-048"
+    },
+    {
+      "id": "RQ-REST-007",
+      "status": "QUEUED",
+      "priority": 1,
+      "created": "2026-05-29T01:20:52.138864+00:00",
+      "name": "Wire DOW veto (Tue+Thu) in ICT pipeline Stage 3",
+      "description": "REST MODE finding: Tuesday WR=11.5% avgR=-0.490, Thursday WR=14.3% avgR=-0.214. Both replicated independently in Window A and Window B. Implementation: in ict/pipeline.py Stage 3, add: if entry_dt.weekday() in [1, 3]: veto with reason='TUE_THU_EXCLUDED'. MC sim: DOW veto alone achieves 98.6% pass rate at 3.2/month (G2 in 9 months). Recommend replacing UTC03 gate with DOW veto for dramatically better data collection rate.",
+      "requires_human": true,
+      "needs_network": false,
+      "estimated_minutes": 15,
+      "source": "REST_MODE DOW analysis",
+      "hypothesis_id": "HYP-NEW-DOW-VETO"
     }
   ],
-  "last_updated": "2026-05-28T23:46:04.166991+00:00"
+  "last_updated": "2026-05-29T01:20:52.138864+00:00"
 }
