@@ -401,11 +401,19 @@ def _check_fred() -> tuple:
     k = os.environ.get("FRED_API_KEY", "")
     if not k:
         return "YELLOW", "key missing"
-    code, body, err = _http_get(f"https://api.stlouisfed.org/fred/series?series_id=FEDFUNDS&api_key={k}&file_type=json")
+    code, body, err = _http_get(
+        f"https://api.stlouisfed.org/fred/series?series_id=FEDFUNDS&api_key={k}&file_type=json",
+        timeout=15,
+    )
     if err:
+        # Network/timeout issues are not key errors — degrade to YELLOW
+        if "timed out" in err.lower() or "timeout" in err.lower() or "504" in err:
+            return "YELLOW", f"FRED unreachable (network): {err[:80]}"
         return "RED", err
     if code == 200:
         return "GREEN", "fed funds series ok"
+    if code == 403:
+        return "RED", "invalid API key (403)"
     return "YELLOW", f"status {code}"
 
 
