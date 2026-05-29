@@ -393,6 +393,18 @@
       "action": "REQUIRES COLIN DECISION. Cannot wire without resolving UTC03 gate policy. Options: (A) keep UTC03, add score<=8.5 \u2014 best quality, slowest data collection. (B) relax UTC03, use disp>=1.5+score<=8.5 \u2014 same MC quality, 7mo to G2. (C) keep both UTC03 and disp/score \u2014 TRIPLE, best quality, 27mo to G2.",
       "rest_mode": true,
       "rest_mode_set": "2026-05-27"
+    },
+    {
+      "id": "HYP-049",
+      "name": "Short natural-duration trades underperform \u2014 entries before commitment formed",
+      "status": "NEEDS_DATA",
+      "date": "2026-05-27",
+      "hypothesis": "GBPUSD trades that close naturally within 3 days consistently underperform trades held 4+ days. Fast closures = stops or TP1 scalps that never developed momentum, suggesting entry before full commitment formed.",
+      "result": "Surface finding from L-5 retro validation 2026-05-27. Rule tested: pair-specific hold<=N underperforms forensics baseline (delta_sharpe=-0.087, p=0.008). Backtester contradicts the rule-as-written (forced exits improve Sharpe), but the forensics signal \u2014 natural short-duration trades underperform \u2014 may be real and separate from the hold cap effect. n=~310 ICT trades. Needs clean isolation: split forensics by natural_hold_days, compare R-multiple distribution 1-3d vs 4+d, control for session and grade.",
+      "action": "Run forensics split: group ICT trades by hold_days bucket (1-3, 4-7, 8+). Compare avg R-multiple and Sharpe within London+GradeA subset. If 4+ days consistently outperforms: the commitment detector may need a minimum-bars-since-signal gate at entry. Minimum sample per bucket: 20 trades.",
+      "mechanism": "Fast natural closures are stops or TP1 scalps \u2014 price moved briefly in the right direction then reversed. These trades entered before institutional commitment was fully expressed. The commitment score was passing but the actual momentum had not formed yet. A minimum hold expectation gate (bars_since_signal or displacement threshold) at entry might filter these.",
+      "linked_lesson": "L-5 retro validation \u2014 methodological finding 2026-05-27",
+      "source": "retro_validate.py forensics surface 2026-05-27"
     }
   ],
   "hypotheses": [
@@ -817,6 +829,18 @@
       "rest_mode": true,
       "rest_mode_set": "2026-05-26",
       "deployed": "2026-05-27"
+    },
+    {
+      "id": "HYP-049",
+      "name": "Short natural-duration trades underperform \u2014 entries before commitment formed",
+      "status": "NEEDS_DATA",
+      "date": "2026-05-27",
+      "hypothesis": "GBPUSD trades that close naturally within 3 days consistently underperform trades held 4+ days. Fast closures = stops or TP1 scalps that never developed momentum, suggesting entry before full commitment formed.",
+      "result": "Surface finding from L-5 retro validation 2026-05-27. Rule tested: pair-specific hold<=N underperforms forensics baseline (delta_sharpe=-0.087, p=0.008). Backtester contradicts the rule-as-written (forced exits improve Sharpe), but the forensics signal \u2014 natural short-duration trades underperform \u2014 may be real and separate from the hold cap effect. n=~310 ICT trades. Needs clean isolation: split forensics by natural_hold_days, compare R-multiple distribution 1-3d vs 4+d, control for session and grade.",
+      "action": "Run forensics split: group ICT trades by hold_days bucket (1-3, 4-7, 8+). Compare avg R-multiple and Sharpe within London+GradeA subset. If 4+ days consistently outperforms: the commitment detector may need a minimum-bars-since-signal gate at entry. Minimum sample per bucket: 20 trades.",
+      "mechanism": "Fast natural closures are stops or TP1 scalps \u2014 price moved briefly in the right direction then reversed. These trades entered before institutional commitment was fully expressed. The commitment score was passing but the actual momentum had not formed yet. A minimum hold expectation gate (bars_since_signal or displacement threshold) at entry might filter these.",
+      "linked_lesson": "L-5 retro validation \u2014 methodological finding 2026-05-27",
+      "source": "retro_validate.py forensics surface 2026-05-27"
     }
   ],
   "last_updated": "2026-05-27"

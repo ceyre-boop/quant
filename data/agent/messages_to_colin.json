@@ -1,6 +1,24 @@
 {
   "messages": [
     {
+      "id": "pulse-20260529T0003",
+      "priority": "FYI",
+      "emoji": "\ud83d\udfe2",
+      "text": "[PULSE] REST_MODE_PENDING: HYP-048 validated 2 days ago, awaiting implementation.",
+      "timestamp": "2026-05-29T00:03:38+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260529T0003",
+      "priority": "FYI",
+      "emoji": "\ud83d\udfe2",
+      "text": "[PULSE] REST_MODE_PENDING: HYP-046 validated 3 days ago, awaiting implementation.",
+      "timestamp": "2026-05-29T00:03:38+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
       "id": "MSG-REST-MAY27-001",
       "timestamp": "2026-05-27T01:15:00+00:00",
       "priority": "URGENT",
@@ -417,115 +435,7 @@
       "timestamp": "2026-05-19T13:15:28.434101",
       "read": false,
       "source": "oracle"
-    },
-    {
-      "id": "oracle-20260519132536",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "The system is running clean\u2014all green, good equity cushion, and your forex vetoes are correctly throttling down pairs that have exhausted daily range. Your equity hypothesis work is solid (counter-momentum sizing, VIX slope effects), but I'm flagging that you've got 14 rejected hypotheses stacking up against 13 confirmed ones, which means your signal-to-noise ratio is still fighting you; you should consolidate what's actually working (the 3\u00d7 payoff on counter-momentum pullbacks is real money) and stop testing marginal ideas. The Reddit chatter on NVDA/AMD suggests retail is still chasing momentum into a market that's showing volatility depletion across forex\u2014good reminder that your size reducers are",
-      "timestamp": "2026-05-19T13:25:36.884307",
-      "read": false,
-      "source": "oracle"
-    },
-    {
-      "id": "msg-restmode-20260525a",
-      "timestamp": "2026-05-25T16:02:39.652653+00:00",
-      "priority": "FYI",
-      "emoji": "\ud83d\udfe2",
-      "text": "REST MODE: HYP-038 displacement=0 veto REJECTED globally (delta=+0.038, below +0.05). BUT: London Grade A + displacement>0 shows avgR=+0.869 vs +0.250 with disp=0 \u2014 a real gap. London A+A+ combined gate: delta=+0.059, removes 14.5% of trades. Recommendation: treat displacement>0 as a soft score bonus in London, not a hard veto.",
-      "mode": "REST_MODE"
-    },
-    {
-      "id": "msg-restmode-20260525b",
-      "timestamp": "2026-05-25T16:02:39.652653+00:00",
-      "priority": "FYI",
-      "emoji": "\ud83d\udfe2",
-      "text": "REST MODE: HYP-039 UTC 15xx REJECTED as second window (WR=44.4% but avgR=+0.090 \u2014 not enough). UTC 03xx gate confirmed correct. The UTC 05xx 'anomaly' is just London session GBPUSD variance \u2014 not a new window. Current timing gate stands. No action needed.",
-      "mode": "REST_MODE"
-    },
-    {
-      "id": "msg-restmode-20260525c",
-      "timestamp": "2026-05-25T16:02:39.652653+00:00",
-      "priority": "IMPORTANT",
-      "emoji": "\ud83d\udfe1",
-      "text": "REST MODE: USDCAD retirement forensics complete (RQ-AUTO-002 via forensics). The failure mechanism is clear: trailing stop exits WR=17.6% avgR=-0.493 vs time exits WR=60.8% avgR=+0.400. USDCAD macro signals are directionally right (60% WR on time exits) but trailing stop gets triggered by noise before the move develops. If ever reconsidered for v015+: time-only exits, no trailing stops. GBPJPY's failure was different \u2014 structural thesis failures. Both retirements validated.",
-      "mode": "REST_MODE"
-    },
-    {
-      "id": "msg-restmode-20260525d",
-      "timestamp": "2026-05-25T16:03:59.544726+00:00",
-      "priority": "FYI",
-      "emoji": "\ud83d\udfe2",
-      "text": "REST MODE COMPLETE (May 25 UTC 15:57-16:30). 4 tasks closed: HYP-038 (displacement veto rejected globally, soft London bonus noted), HYP-039 (UTC 15xx rejected), RQ-AUTO-002 (USDCAD trailing stop failure confirmed), RQ-AUTO-004-lite (equity momentum gates flat, no change). 1 new task added: RQ-REST-003 (wire displacement as London score bonus). 5 queued tasks remain: RQ-006 (blocked, needs 30 trades), RQ-009 (library ablation), RQ-AUTO-006 (ICT bear regime, needs more data), RQ-REST-003 (new). No urgent flags. System health: forex_ledger GREEN, backtest engine GREEN, ICT paper challenge Day 1 (0 closed trades).",
-      "mode": "REST_MODE"
-    },
-    {
-      "id": "oracle-20260525194756",
-      "priority": "FYI",
-      "emoji": "\ud83d\udfe2",
-      "text": "DRY RUN: Oracle would have called Claude here and written a message based on current system state.",
-      "timestamp": "2026-05-25T19:47:56.501181",
-      "read": false,
-      "source": "oracle"
-    },
-    {
-      "id": "MSG-REST-MAY26-001",
-      "timestamp": "2026-05-26T01:11:48.137128+00:00",
-      "priority": "URGENT",
-      "source": "REST_MODE",
-      "subject": "HYP-047 CONFIRMED: ICT Score Inversion \u2014 score 9-10 worst, score 7-8 best",
-      "message": "REST MODE finding (01:07 UTC May 26): Within high-displacement London trades (disp>=1.5), ICT score is MONOTONICALLY INVERSELY correlated with performance. score[7-8): WR=52%, avgR=+1.210 | score[8-9): WR=36%, avgR=+0.790 | score[9-10): WR=15%, avgR=-0.293 | score[10-11): WR=0%, avgR=-1.000. A grade (avg score=8.0): WR=45%, avgR=+0.982. A+ grade (avg score=9.3): WR=20%, avgR=+0.019. The A+ downgrade was the right call but understates the problem. Recommend: review score cap at < 9.0, or invert score's role in entry sizing. Do NOT wire without deliberate review \u2014 this changes the fundamental grading logic. Sample: n=139 high-disp London trades from trade_forensics.jsonl.",
-      "action_required": true,
-      "hypothesis": "HYP-047"
-    },
-    {
-      "id": "MSG-REST-MAY26-002",
-      "timestamp": "2026-05-26T01:11:48.137128+00:00",
-      "priority": "IMPORTANT",
-      "source": "REST_MODE",
-      "subject": "HYP-046 CONFIRMED: disp>=1.5 gate \u2014 +0.146R/trade, 81% kept, recommend wiring",
-      "message": "REST MODE finding: displacement >= 1.5 as London veto is confirmed effective. Removes 33 worst trades (WR=15%, avgR=-0.167) while keeping 139 trades (WR=35%, avgR=+0.594). Baseline was avgR=+0.448 across 172 London trades. 81% of trades pass the gate \u2014 non-destructive filter. Previous REST MODE found disp>0 vs disp=0 split; this confirms the threshold is 1.5, not just binary. Recommend: wire disp>=1.5 as soft veto in ict/pipeline.py Stage 3. Awaiting Colin confirmation before any code change.",
-      "action_required": true,
-      "hypothesis": "HYP-046"
-    },
-    {
-      "id": "MSG-REST-MAY26-003",
-      "timestamp": "2026-05-26T01:11:48.137128+00:00",
-      "priority": "FYI",
-      "source": "REST_MODE",
-      "subject": "System health check: NORMAL \u2014 threat 0.29, no stops, both systems clear",
-      "message": "01:07 UTC May 26 health check: library_threat_score=0.29 (NORMAL \u2014 was 1.00 CRITICAL 2026-05-24, fully cleared). ict_mode=NORMAL, quant_signal=NORMAL. commitment_score_avg=0.47 (borderline \u2014 watch if drops below 0.4). ict_stops_24h=0, ict_commitment_failures_24h=0. All systems green. Prop challenge G4 (bridge threat) remains GREEN.",
-      "action_required": false
-    },
-    {
-      "id": "MSG-REST-MAY26-004",
-      "timestamp": "2026-05-26T01:11:48.137128+00:00",
-      "priority": "FYI",
-      "source": "REST_MODE",
-      "subject": "RQ-022 (HYP-035 ATR Compression) needs live session \u2014 network required",
-      "message": "Attempted HYP-035 ATR compression gate analysis in REST MODE using forensics proxy data. forensics.jsonl has post_entry_atr_ratio, not pre-entry ATR percentile rank. Cannot properly test without raw OHLC + 252d ATR window \u2014 needs network (yfinance). Task stays QUEUED for live session. Proxy finding: trades with atr_ratio [1.0-1.5) post-entry are worst performing (WR=46%, avgR=+0.092, n=370) \u2014 directionally consistent with hypothesis but not definitive.",
-      "action_required": false
-    },
-    {
-      "id": "MSG-REST-MAY26-005",
-      "timestamp": "2026-05-26T01:12:54.258072+00:00",
-      "priority": "URGENT",
-      "source": "REST_MODE",
-      "subject": "BOMBSHELL: score<=8.5 + disp>=1.5 combo gives WR=47%, avgR=+1.105 (baseline: 31%, +0.448)",
-      "message": "Score cap sweep reveals the optimal combined filter for London ICT trades. COMBINED FILTER \u2014 score<=8.5 AND disp>=1.5: n=86 (50% of trades kept) | WR=47% | avgR=+1.105 vs BASELINE n=172 | WR=31% | avgR=+0.448. Delta: +16ppt WR, +0.657R per trade, keeping HALF the trade opportunities. Tighter version \u2014 score<=8.0 AND disp>=1.5: n=44 (26% kept) | WR=52% | avgR=+1.210 \u2014 best R/trade but too few trades for prop challenge. RECOMMENDATION: score<=8.5 + disp>=1.5 is the sweet spot. This is the single biggest ICT improvement since the UTC 03xx timing gate. Do NOT wire without Monte Carlo re-validation. But this MUST be tested in the next live session. HYP-047 confirmed. New task RQ-REST-004 added to queue.",
-      "action_required": true,
-      "hypothesis": "HYP-047",
-      "data": {
-        "combo_filter": "score<=8.5 AND disp>=1.5",
-        "kept_n": 86,
-        "kept_pct": 0.5,
-        "kept_wr": 0.47,
-        "kept_avg_r": 1.105,
-        "baseline_n": 172,
-        "baseline_wr": 0.31,
-        "baseline_avg_r": 0.448
-      }
     }
   ],
-  "last_updated": "2026-05-27T01:15:00+00:00"
+  "last_updated": "2026-05-29T00:03:38+00:00"
 }

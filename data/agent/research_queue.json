@@ -217,14 +217,16 @@
       "id": "RQ-AUTO-006",
       "name": "ICT bear-market allocation validation",
       "priority": 6,
-      "status": "QUEUED",
+      "status": "DONE",
       "description": "ICT regime study found SPY bull: avgR=-0.111 (n=9 trades, possibly noise). Need more data. Collect: all ICT trades from window_A (106 trades) + window_B (102 trades). Classify each by SPY above/below 200SMA at entry. If SPY bull \u2192 ICT negative holds with n>20: add SPY bull market gate to ICT pipeline. This would further restrict ICT to its best conditions.",
       "method": "regime study",
       "system": "ICT",
       "expected_impact": "Remove ICT trades in hostile regime; WR may reach 50%+",
       "note": "Current finding n=9 SPY bull too small to act on \u2014 needs validation",
       "script": "python3 scripts/rq_auto_006_ict_bear.py",
-      "task_type": "shell"
+      "task_type": "shell",
+      "last_result": "\u2550\u2550 RQ-AUTO-006: ICT Bear-Market Allocation \u2550\u2550\n\nTotal trades: 0\nSPY BULL regime: n=0 \u2014 no r data\nSPY BEAR regime: n=0 \u2014 no r data\n\nSaved to data/agent/rq_auto_006_results.json",
+      "completed": "2026-05-28T23:46:04.166991+00:00"
     },
     {
       "id": "RQ-REST-001",
@@ -320,24 +322,28 @@
     {
       "id": "RQ-022",
       "priority": 2,
-      "status": "QUEUED",
+      "status": "DONE",
       "name": "HYP-035: Volatility Compression Entry Gate",
       "description": "Tag all historical forex trades with ATR_14 percentile (252d window). Split COMPRESSED(<20th)/NORMAL/EXTENDED. Compare avg R and Sharpe. If COMPRESSED avg R > NORMAL + 0.30R: add as entry filter.",
       "hypothesis_id": "HYP-035",
       "script": "scripts/hyp_035_atr_compression.py",
       "needs_network": true,
-      "estimated_minutes": 20
+      "estimated_minutes": 20,
+      "last_result": "\u2550\u2550 HYP-035: ATR Compression Entry Gate \u2550\u2550\n\nTotal simulated trades: 2340\n\nResults by ATR compression bucket:\nBucket            N     WR%     AvgR    Sharpe\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n  COMPRESSED      592    49.3%   +0.117R     0.506\n  NORMAL         1285    49.6%   +0.043R     0.236\n  EXTENDED        463    51.6%   +0.062R     0.356\n\n  Delta (COMPRESSED vs NORMAL): +0.0737R\n  H1 threshold: > +0.30R\n\nVERDICT: INCONCLUSIVE \u2014 within noise band\n\nSaved to data/agent/hyp_035_re",
+      "completed": "2026-05-28T23:46:04.166991+00:00"
     },
     {
       "id": "RQ-023",
       "priority": 3,
-      "status": "QUEUED",
+      "status": "ERROR",
       "name": "HYP-042: Carry Unwind Velocity Spike Detector",
       "description": "Compute weekly COT velocity zscore for AUD/NZD specs. Compare entry quality (price, stop, captured R) between FAST_UNWIND (zscore < -1.5) entries vs VIX>25-triggered entries. Earlier entry = smaller stop = larger R.",
       "hypothesis_id": "HYP-042",
       "script": "scripts/hyp_042_cot_velocity.py",
       "needs_network": true,
-      "estimated_minutes": 25
+      "estimated_minutes": 25,
+      "last_result": "/opt/homebrew/Cellar/python@3.14/3.14.4_1/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python: can't open file '/Users/taboost/quant/scripts/hyp_042_cot_velocity.py': [Errno 2] No such file or directory",
+      "completed": "2026-05-28T23:46:04.166991+00:00"
     },
     {
       "id": "RQ-REST-004",
@@ -381,5 +387,5 @@
       "hypothesis_id": "HYP-048"
     }
   ],
-  "last_updated": "2026-05-27T01:15:00+00:00"
+  "last_updated": "2026-05-28T23:46:04.166991+00:00"
 }
