@@ -270,7 +270,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
       <div class="gate-row"><div class="gate-light">🟢</div><div class="gate-label">G1 MC Pass Rate<span class="gate-sub">99.7–100% ✓ DONE</span></div></div>
       <div class="gate-row"><div class="gate-light">🔴</div><div class="gate-label">G2 Live Trades<span class="gate-sub">0 / 30 collecting</span></div></div>
       <div class="gate-row"><div class="gate-light">🟡</div><div class="gate-label">G3 WR Alignment<span class="gate-sub">collecting (need 10+)</span></div></div>
-      <div class="gate-row"><div class="gate-light">🔴</div><div class="gate-label">G4 Bridge Threat<span class="gate-sub">1.00 HALT_NEW</span></div></div>
+      <div class="gate-row"><div class="gate-light" id="g4-light">🔴</div><div class="gate-label">G4 Bridge Threat<span class="gate-sub" id="g4-sub">1.00 HALT_NEW</span></div></div>
       <div class="gate-row"><div class="gate-light">🟡</div><div class="gate-label">G5 Non-Bust Days<span class="gate-sub">collecting</span></div></div>
       <div style="margin-top:10px;padding:8px 10px;background:rgba(224,82,82,.06);border:1px solid var(--red);font-size:11px;color:var(--red)">
         ⏸ WAIT — buy when G2 + G4 flip GREEN
@@ -391,6 +391,14 @@ function renderBridge(crossState) {
   document.getElementById('sc-threat').style.color = threat>0.85?'var(--red)':threat>0.5?'var(--yellow)':'var(--green)';
   document.getElementById('stat-bridge').textContent = mode;
   document.getElementById('stat-bridge').style.color = mode==='HALT_NEW'?'var(--red)':mode==='TIGHTEN'?'var(--yellow)':'var(--green)';
+  // G4 gate — live threat
+  const g4Light = document.getElementById('g4-light');
+  const g4Sub = document.getElementById('g4-sub');
+  if (g4Light && g4Sub) {
+    const halted = threat > 0.85 || mode === 'HALT_NEW';
+    g4Light.textContent = halted ? '🔴' : threat > 0.5 ? '🟡' : '🟢';
+    g4Sub.textContent = threat.toFixed(2) + ' ' + mode;
+  }
 }
 
 // ── Oracle + Feed ───────────────────────────────────────────
@@ -417,6 +425,40 @@ function renderFeed(msgs) {
       <div><div class="feed-text">${esc(m.text||'')}</div>
       <div class="feed-time">${timeAgo(m.timestamp)}</div></div>
     </div>`).join('');
+}
+
+async function renderReflectionFeed() {
+  const el = document.getElementById('feed-items');
+  const today = new Date();
+  const candidates = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(today); d.setDate(d.getDate() - i);
+    candidates.push('../data/oracle/reflections/' + d.toISOString().slice(0,10) + '.json');
+  }
+  candidates.push('../data/oracle/latest_reflection.json');
+  const results = await Promise.all(candidates.map(p => fetchJSON(p)));
+  const seen = new Set();
+  const entries = results
+    .filter(Boolean)
+    .filter(r => { const k = r.date||r.generated_at||''; if (seen.has(k)) return false; seen.add(k); return true; })
+    .sort((a,b) => new Date(b.date||b.generated_at||0) - new Date(a.date||a.generated_at||0))
+    .slice(0, 5);
+  if (!entries.length) {
+    el.innerHTML = '<div style="color:var(--muted);font-size:11px">No reflection files yet.</div>';
+    return;
+  }
+  const priIcon = {HIGH:'🔴',MEDIUM:'🟡',LOW:'🟢'};
+  el.innerHTML = entries.map(r => {
+    const lesson = r.reflection?.candidate_lesson?.lesson_text || r.reflection?.system_health_note || '';
+    const truncated = lesson.length > 300 ? lesson.slice(0, 300) + '…' : lesson;
+    const ts = r.generated_at || r.date || '';
+    const pri = r.reflection?.candidate_lesson ? 'HIGH' : 'LOW';
+    return `<div class="feed-item">
+      <div class="feed-emoji">${priIcon[pri]||'○'}</div>
+      <div><div class="feed-text">${esc(truncated)}</div>
+      <div class="feed-time">${timeAgo(ts)||r.date||''}</div></div>
+    </div>`;
+  }).join('');
 }
 
 // ── Suggestions ─────────────────────────────────────────────
@@ -475,7 +517,7 @@ async function loadAll() {
   renderHealth(health);
   if (crossState) renderBridge(crossState);
   renderOracle(msgs);
-  renderFeed(msgs);
+  renderReflectionFeed();
   renderSuggestions(suggestions);
   renderSharpe();
   document.getElementById('last-refresh').textContent = 'updated '+new Date().toLocaleTimeString();

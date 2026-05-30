@@ -23,6 +23,7 @@ git add \
   data/agent/checklist_state.json \
   data/oracle/latest_reflection.json \
   data/oracle/version_history.json \
+  data/oracle/reflections/ \
   2>/dev/null || true
 
 git diff --staged --quiet && echo "Nothing to commit — data is up to date" && exit 0
