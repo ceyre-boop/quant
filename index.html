@@ -838,6 +838,7 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
         <div class="rp half" id="rp-reflection"><div class="rp-title">Oracle Reflection</div><div class="rp-empty">Loading…</div></div>
         <div class="rp" id="rp-fills"><div class="rp-title">G2 Progress — Paper Fills</div><div class="rp-empty">Loading…</div></div>
         <div class="rp full" id="rp-regime"><div class="rp-title">TV Regime Alignment</div><div class="rp-empty">Loading…</div></div>
+        <div class="rp full" id="rp-indicators"><div class="rp-title">Indicator Consensus (30-panel)</div><div class="rp-empty">Loading…</div></div>
         <div id="hyp-filter">
           <button class="sig-tb-btn active" data-status="ALL">ALL</button>
           <button class="sig-tb-btn" data-status="TESTING">TESTING</button>
@@ -2099,6 +2100,49 @@ function resRegime(signals, gates){
       <span>TIME</span><span>PAIR</span><span>REGIME</span><span>TF</span><span>STR</span></div>${rows}`
       :'<div class="rp-empty" style="margin:0">No signals yet — webhook ready at POST /webhook/tradingview</div>'}`;
 }
+function resIndicators(snap){
+  const el=document.getElementById('rp-indicators');
+  if(!el)return;
+  if(!snap||!snap.pairs||Object.keys(snap.pairs).length===0){
+    el.innerHTML='<div class="rp-title">Indicator Consensus (30-panel)</div><div class="rp-empty">No data — run: python3 scripts/build_indicator_ontology.py</div>';
+    return;
+  }
+  const ts=(snap.timestamp||'').slice(0,16).replace('T',' ');
+  const DIR_COLOR={'LONG':'var(--green)','SHORT':'var(--red)','NEUTRAL':'var(--yellow)','FLAT':'var(--muted)'};
+  const rows=Object.entries(snap.pairs).map(([pair,c])=>{
+    const total=c.bullish+c.bearish+c.neutral||30;
+    const bPct=Math.round(c.bullish/total*100);
+    const brPct=Math.round(c.bearish/total*100);
+    const nPct=100-bPct-brPct;
+    const dirCol=DIR_COLOR[c.direction]||'var(--muted)';
+    const hrPct=c.hit_rate?Math.round(c.hit_rate*100):0;
+    return `<div style="display:grid;grid-template-columns:56px 1fr 52px 48px 54px 48px;gap:4px;align-items:center;padding:3px 0;border-bottom:1px solid var(--border)">
+      <span style="font-weight:600;color:var(--accent)">${pair}</span>
+      <div style="height:6px;background:var(--surface);border-radius:3px;overflow:hidden;display:flex">
+        <div style="width:${bPct}%;background:var(--green)"></div>
+        <div style="width:${brPct}%;background:var(--red)"></div>
+        <div style="width:${nPct}%;background:var(--muted);opacity:.4"></div>
+      </div>
+      <span style="color:${dirCol};font-weight:600;font-size:9px">${c.direction}</span>
+      <span style="color:var(--dim);font-size:9px">${c.bullish}B/${c.bearish}b</span>
+      <span style="color:${c.matching_green>0?'var(--green)':'var(--muted)'};font-size:9px">${c.matching_green}✓ combos</span>
+      <span style="color:${hrPct>=65?'var(--green)':hrPct>=50?'var(--yellow)':'var(--muted)'};font-size:9px">${hrPct}% HR</span>
+    </div>`;
+  }).join('');
+
+  el.innerHTML=`<div class="rp-title">Indicator Consensus (30-panel)
+    <span style="color:var(--muted);font-size:9px;margin-left:8px">as of ${ts} UTC</span></div>
+    <div style="display:grid;grid-template-columns:56px 1fr 52px 48px 54px 48px;gap:4px;padding:0 0 4px;border-bottom:1px solid var(--border);margin-bottom:4px">
+      <span style="font-size:8px;color:var(--dim)">PAIR</span>
+      <span style="font-size:8px;color:var(--dim)">BULL ▓ / BEAR ▓ / NEUTRAL</span>
+      <span style="font-size:8px;color:var(--dim)">DIR</span>
+      <span style="font-size:8px;color:var(--dim)">COUNT</span>
+      <span style="font-size:8px;color:var(--dim)">GREEN</span>
+      <span style="font-size:8px;color:var(--dim)">HIST HR</span>
+    </div>
+    ${rows}
+    <div style="font-size:8px;color:var(--dim);margin-top:6px">B=bullish indicators (of 30) · combos=matched historical green conditions · HR=historical hit rate</div>`;
+}
 function resFills(data){
   const el=document.getElementById('rp-fills');
   let n=0,target=30,rows='';
@@ -2263,7 +2307,7 @@ function resVersions(externalVers){
 }
 
 async function resLoad(){
-  const[health,msgs,usage,hyp,queue,gates,reflection,g2,verHistory,tvSignals]=await Promise.all([
+  const[health,msgs,usage,hyp,queue,gates,reflection,g2,verHistory,tvSignals,indSnap]=await Promise.all([
     resFetch('health.json'),
     resFetch('messages_to_colin.json'),
     resFetch('usage.json'),
@@ -2274,10 +2318,12 @@ async function resLoad(){
     fetchPath('data/agent/g2_progress.json'),
     fetchPath('data/oracle/version_history.json'),
     fetchPath('data/agent/tv_regime_signals.json'),
+    fetchPath('data/indicators/live_snapshot.json'),
   ]);
   resHealth(health);resMsgs(msgs);resUsage(usage);resHyp(hyp);resQueue(queue);
   resGates(gates);resReflection(reflection);resFills(g2);resVersions(verHistory||null);
   resRegime(tvSignals||[],gates);
+  resIndicators(indSnap||null);
 }
 setInterval(()=>{if(document.getElementById('tab-research').classList.contains('active'))resLoad();},300000);
 

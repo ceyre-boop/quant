@@ -1,0 +1,310 @@
+{
+  "timestamp": "2026-05-30T23:31:21+00:00",
+  "new_entries_since_last": 0,
+  "new_outcomes_since_last": 0,
+  "anomalies": [
+    {
+      "type": "REST_MODE_PENDING",
+      "priority": "FYI",
+      "message": "HYP-046 validated 4 days ago, awaiting implementation."
+    },
+    {
+      "type": "REST_MODE_PENDING",
+      "priority": "FYI",
+      "message": "HYP-048 validated 3 days ago, awaiting implementation."
+    }
+  ],
+  "running_stats": {},
+  "live_prices": {
+    "GBPUSD": {
+      "current": 1.3457,
+      "high_today": 1.34849,
+      "low_today": 1.3409,
+      "bars_today": 270
+    },
+    "EURUSD": {
+      "current": 1.16591,
+      "high_today": 1.16877,
+      "low_today": 1.16293,
+      "bars_today": 270
+    },
+    "USDJPY": {
+      "current": 159.255,
+      "high_today": 159.37801,
+      "low_today": 159.09,
+      "bars_today": 265
+    },
+    "AUDUSD": {
+      "current": 0.7186,
+      "high_today": 0.72025,
+      "low_today": 0.71526,
+      "bars_today": 270
+    },
+    "AUDNZD": {
+      "current": 1.19905,
+      "high_today": 1.20704,
+      "low_today": 1.19806,
+      "bars_today": 270
+    }
+  },
+  "indicator_consensus": {
+    "GBPUSD": {
+      "bullish": 3,
+      "bearish": 3,
+      "neutral": 24,
+      "direction": "FLAT",
+      "conviction": 0.0,
+      "hit_rate": 0.0,
+      "matching_green": 0,
+      "matching_green_short": 0,
+      "top_bullish": [
+        "supertrend",
+        "ichimoku",
+        "parabolic_sar"
+      ],
+      "top_bearish": [
+        "donchian",
+        "hist_vol",
+        "fvg"
+      ],
+      "snapshot": {
+        "adx": 0,
+        "ema_cross": 0,
+        "supertrend": 1,
+        "ichimoku": 1,
+        "parabolic_sar": 1,
+        "aroon": 0,
+        "vwap_dev": 0,
+        "rsi": 0,
+        "macd": 0,
+        "stochastic": 0,
+        "cci": 0,
+        "williams_r": 0,
+        "roc": 0,
+        "mfi": 0,
+        "bollinger_bands": 0,
+        "atr_ratio": 0,
+        "keltner": 0,
+        "donchian": -1,
+        "hist_vol": -1,
+        "obv": 0,
+        "vol_trend": 0,
+        "vwap_ratio": 0,
+        "acc_dist": 0,
+        "cmf": 0,
+        "fvg": -1,
+        "bos": 0,
+        "session_hl": 0,
+        "displacement": 0,
+        "liq_sweep": 0,
+        "order_block": 0
+      }
+    },
+    "EURUSD": {
+      "bullish": 1,
+      "bearish": 7,
+      "neutral": 22,
+      "direction": "SHORT",
+      "conviction": 0.5,
+      "hit_rate": 0.6571,
+      "matching_green": 0,
+      "matching_green_short": 3,
+      "top_bullish": [
+        "parabolic_sar"
+      ],
+      "top_bearish": [
+        "ema_cross",
+        "supertrend",
+        "ichimoku",
+        "rsi",
+        "donchian"
+      ],
+      "snapshot": {
+        "adx": 0,
+        "ema_cross": -1,
+        "supertrend": -1,
+        "ichimoku": -1,
+        "parabolic_sar": 1,
+        "aroon": 0,
+        "vwap_dev": 0,
+        "rsi": -1,
+        "macd": 0,
+        "stochastic": 0,
+        "cci": 0,
+        "williams_r": 0,
+        "roc": 0,
+        "mfi": 0,
+        "bollinger_bands": 0,
+        "atr_ratio": 0,
+        "keltner": 0,
+        "donchian": -1,
+        "hist_vol": -1,
+        "obv": 0,
+        "vol_trend": 0,
+        "vwap_ratio": 0,
+        "acc_dist": 0,
+        "cmf": 0,
+        "fvg": -1,
+        "bos": 0,
+        "session_hl": 0,
+        "displacement": 0,
+        "liq_sweep": 0,
+        "order_block": 0
+      }
+    },
+    "USDJPY": {
+      "bullish": 8,
+      "bearish": 1,
+      "neutral": 21,
+      "direction": "LONG",
+      "conviction": 0.583,
+      "hit_rate": 0.0,
+      "matching_green": 0,
+      "matching_green_short": 0,
+      "top_bullish": [
+        "ema_cross",
+        "ichimoku",
+        "parabolic_sar",
+        "rsi",
+        "williams_r"
+      ],
+      "top_bearish": [
+        "liq_sweep"
+      ],
+      "snapshot": {
+        "adx": 0,
+        "ema_cross": 1,
+        "supertrend": 0,
+        "ichimoku": 1,
+        "parabolic_sar": 1,
+        "aroon": 0,
+        "vwap_dev": 0,
+        "rsi": 1,
+        "macd": 0,
+        "stochastic": 0,
+        "cci": 0,
+        "williams_r": 1,
+        "roc": 0,
+        "mfi": 0,
+        "bollinger_bands": 0,
+        "atr_ratio": 0,
+        "keltner": 0,
+        "donchian": 1,
+        "hist_vol": 1,
+        "obv": 0,
+        "vol_trend": 0,
+        "vwap_ratio": 0,
+        "acc_dist": 0,
+        "cmf": 0,
+        "fvg": 1,
+        "bos": 0,
+        "session_hl": 0,
+        "displacement": 0,
+        "liq_sweep": -1,
+        "order_block": 0
+      }
+    },
+    "AUDUSD": {
+      "bullish": 7,
+      "bearish": 0,
+      "neutral": 23,
+      "direction": "LONG",
+      "conviction": 0.583,
+      "hit_rate": 0.6818,
+      "matching_green": 2,
+      "matching_green_short": 0,
+      "top_bullish": [
+        "ema_cross",
+        "ichimoku",
+        "parabolic_sar",
+        "roc",
+        "donchian"
+      ],
+      "top_bearish": [],
+      "snapshot": {
+        "adx": 0,
+        "ema_cross": 1,
+        "supertrend": 0,
+        "ichimoku": 1,
+        "parabolic_sar": 1,
+        "aroon": 0,
+        "vwap_dev": 0,
+        "rsi": 0,
+        "macd": 0,
+        "stochastic": 0,
+        "cci": 0,
+        "williams_r": 0,
+        "roc": 1,
+        "mfi": 0,
+        "bollinger_bands": 0,
+        "atr_ratio": 0,
+        "keltner": 0,
+        "donchian": 1,
+        "hist_vol": 0,
+        "obv": 0,
+        "vol_trend": 0,
+        "vwap_ratio": 0,
+        "acc_dist": 0,
+        "cmf": 0,
+        "fvg": 1,
+        "bos": 0,
+        "session_hl": 1,
+        "displacement": 0,
+        "liq_sweep": 0,
+        "order_block": 0
+      }
+    },
+    "AUDNZD": {
+      "bullish": 1,
+      "bearish": 15,
+      "neutral": 14,
+      "direction": "SHORT",
+      "conviction": 1.0,
+      "hit_rate": 0.875,
+      "matching_green": 0,
+      "matching_green_short": 6,
+      "top_bullish": [
+        "ema_cross"
+      ],
+      "top_bearish": [
+        "adx",
+        "parabolic_sar",
+        "rsi",
+        "macd",
+        "stochastic"
+      ],
+      "snapshot": {
+        "adx": -1,
+        "ema_cross": 1,
+        "supertrend": 0,
+        "ichimoku": 0,
+        "parabolic_sar": -1,
+        "aroon": 0,
+        "vwap_dev": 0,
+        "rsi": -1,
+        "macd": -1,
+        "stochastic": -1,
+        "cci": -1,
+        "williams_r": -1,
+        "roc": -1,
+        "mfi": 0,
+        "bollinger_bands": -1,
+        "atr_ratio": 0,
+        "keltner": 0,
+        "donchian": -1,
+        "hist_vol": -1,
+        "obv": 0,
+        "vol_trend": 0,
+        "vwap_ratio": 0,
+        "acc_dist": 0,
+        "cmf": 0,
+        "fvg": -1,
+        "bos": -1,
+        "session_hl": -1,
+        "displacement": 0,
+        "liq_sweep": -1,
+        "order_block": 0
+      }
+    }
+  }
+}

@@ -113,6 +113,9 @@ Every suggestion you make must move one needle: Sharpe, win rate, drawdown, or p
 ## External regime confirmation (TradingView vs internal)
 {regime_alignment}
 
+## 30-indicator consensus (live state vs historical memory)
+{indicator_consensus}
+
 ## Next milestones (help get these done)
 {next_milestones}
 
@@ -278,6 +281,34 @@ def _load_decision_log_summary(days: int = 7, max_entries: int = 20) -> str:
     return header + json.dumps(entries, indent=2)
 
 
+def _load_indicator_consensus() -> str:
+    """Load live 30-indicator consensus from the latest pulse for Oracle context."""
+    pulse_files = sorted(PULSE_DIR.glob("pulse_*.json"))
+    if not pulse_files:
+        return "No indicator consensus yet — run pulse_check.py first."
+    try:
+        data = json.loads(pulse_files[-1].read_text())
+        ic = data.get("indicator_consensus", {})
+        if not ic:
+            return "Indicator consensus not yet computed — run build_indicator_ontology.py then pulse_check.py."
+        lines = []
+        for pair, c in ic.items():
+            bull = c.get("bullish", 0)
+            bear = c.get("bearish", 0)
+            direction = c.get("direction", "?")
+            conv = c.get("conviction", 0)
+            green = c.get("matching_green", 0)
+            hr = c.get("hit_rate", 0)
+            lines.append(
+                f"{pair}: {bull}/30 bull | {bear}/30 bear | dir={direction} "
+                f"| conv={conv:.0%} | green_matches={green} | hist_hr={hr:.0%}"
+            )
+        ts = data.get("timestamp", "unknown")
+        return f"[as of {ts[:16]}]\n" + "\n".join(lines)
+    except Exception:
+        return "Indicator consensus unavailable — check data/indicators/live_snapshot.json"
+
+
 def _load_regime_alignment() -> str:
     """Load internal vs TradingView regime alignment for Oracle context."""
     try:
@@ -348,6 +379,7 @@ def run_reflect(harvests: list[dict], date: Optional[str] = None) -> dict:
         bridge_state=ctx["bridge_state"],
         prices_json=_load_recent_prices(),
         regime_alignment=_load_regime_alignment(),
+        indicator_consensus=_load_indicator_consensus(),
         next_milestones=ctx["next_milestones"],
         hypothesis_summary=ctx["hypothesis_summary"],
         queue_status=ctx["queue_status"],
@@ -420,6 +452,7 @@ if __name__ == "__main__":
             bridge_state=ctx["bridge_state"],
             prices_json=_load_recent_prices(),
             regime_alignment=_load_regime_alignment(),
+            indicator_consensus=_load_indicator_consensus(),
             next_milestones=ctx["next_milestones"],
             hypothesis_summary=ctx["hypothesis_summary"],
             queue_status=ctx["queue_status"],

@@ -120,6 +120,35 @@ def _parse_ts_utc(ts_str: str):
         return datetime.min.replace(tzinfo=timezone.utc)
 
 
+def _sync_indicators() -> tuple[bool, bool]:
+    """Ensure indicator data files are tracked for GitHub Pages. Returns (memory_ok, snapshot_ok)."""
+    ind_dir = ROOT / "data" / "indicators"
+    memory_path = ind_dir / "oracle_indicator_memory.json"
+    snap_path   = ind_dir / "live_snapshot.json"
+
+    if not memory_path.exists():
+        print("  Indicators: oracle_indicator_memory.json missing — run build_indicator_ontology.py first")
+        memory_ok = False
+    else:
+        data = json.loads(memory_path.read_text())
+        total_obs = data.get("total_observations", 0)
+        green_cnt = data.get("green_conditions_found", 0)
+        print(f"  Indicators: {total_obs:,} obs, {green_cnt} green conditions — data/indicators/oracle_indicator_memory.json")
+        memory_ok = True
+
+    if not snap_path.exists():
+        print("  Indicators: live_snapshot.json missing — run pulse_check.py to generate it")
+        snapshot_ok = False
+    else:
+        data = json.loads(snap_path.read_text())
+        n_pairs = len(data.get("pairs", {}))
+        ts = data.get("timestamp", "")[:16]
+        print(f"  Indicators: {n_pairs} pairs live as of {ts} — data/indicators/live_snapshot.json")
+        snapshot_ok = True
+
+    return memory_ok, snapshot_ok
+
+
 def _sync_reflections() -> str | None:
     ref_dir = ROOT / "data" / "oracle" / "reflections"
     files = sorted(ref_dir.glob("20??-??-??.json"))
@@ -140,6 +169,7 @@ def main() -> None:
     fill_count = _sync_fills()
     _sync_checklist(fill_count)
     _sync_tv_regime_signals()
+    _sync_indicators()
     ref_date = _sync_reflections()
 
     print(f"\n{'─'*54}")
@@ -148,13 +178,13 @@ def main() -> None:
     print("  data/agent/checklist_state.json")
     print("  data/ledger/oanda_fills.json")
     print("  data/agent/tv_regime_signals.json")
+    print("  data/indicators/oracle_indicator_memory.json  (if built)")
+    print("  data/indicators/live_snapshot.json            (if pulse ran)")
     if ref_date:
         print(f"  data/oracle/reflections/{ref_date}.json")
     print("\nNext:")
-    print("  git add data/agent/health.json data/agent/checklist_state.json \\")
-    print("          data/ledger/oanda_fills.json data/agent/tv_regime_signals.json \\")
-    print("          data/oracle/reflections/ scripts/sync_dashboard_data.py index.html")
-    print("  git commit -m '[DASHBOARD] Add TV regime alignment layer'")
+    print("  git add data/agent/ data/ledger/ data/indicators/ data/oracle/reflections/ index.html")
+    print("  git commit -m '[DASHBOARD] Add indicator ontology + consensus panel'")
     print("  git push origin HEAD:master")
 
 

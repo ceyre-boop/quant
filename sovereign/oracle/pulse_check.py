@@ -24,6 +24,7 @@ DECISION_LOG_DIR = ROOT / "data" / "decision_logs"
 MESSAGES_PATH  = ROOT / "data" / "agent" / "messages_to_colin.json"
 HEALTH_PATH    = ROOT / "data" / "agent" / "health.json"
 LEDGER_PATH    = ROOT / "data" / "agent" / "hypothesis_ledger.json"
+INDICATORS_DIR = ROOT / "data" / "indicators"
 
 log = logging.getLogger("oracle.pulse")
 
@@ -354,6 +355,54 @@ def _check_regime_alignment() -> list[dict]:
     return []
 
 
+# ─── Indicator consensus ──────────────────────────────────────────────────────
+
+def _compute_indicator_consensus_for_pulse() -> dict:
+    """
+    Runs all 30 indicators on latest 90d of daily data for all PRICE_PAIRS.
+    Writes data/indicators/live_snapshot.json. Returns {} on any error.
+    """
+    try:
+        import yfinance as yf
+        from sovereign.intelligence.indicator_library import compute_all_indicators
+        from sovereign.intelligence.indicator_consensus import score_indicator_consensus
+
+        result = {}
+        for pair, ticker in _PRICE_PAIRS.items():
+            try:
+                df = yf.Ticker(ticker).history(period="90d", interval="1d", auto_adjust=True)
+                if len(df) < 30:
+                    continue
+                consensus = score_indicator_consensus(pair, df)
+                result[pair] = {
+                    "bullish": consensus.bullish_count,
+                    "bearish": consensus.bearish_count,
+                    "neutral": consensus.neutral_count,
+                    "direction": consensus.direction,
+                    "conviction": round(consensus.conviction, 3),
+                    "hit_rate": consensus.historical_hit_rate,
+                    "matching_green": len(consensus.matching_green_long),
+                    "matching_green_short": len(consensus.matching_green_short),
+                    "top_bullish": consensus.top_bullish[:5],
+                    "top_bearish": consensus.top_bearish[:5],
+                    "snapshot": consensus.snapshot,
+                }
+            except Exception as pair_exc:
+                log.debug("indicator_consensus(%s) failed: %s", pair, pair_exc)
+                continue
+
+        snap_path = INDICATORS_DIR / "live_snapshot.json"
+        snap_path.parent.mkdir(parents=True, exist_ok=True)
+        snap_path.write_text(json.dumps({
+            "timestamp": canonical_timestamp(),
+            "pairs": result,
+        }, indent=2))
+        return result
+    except Exception as exc:
+        log.warning("_compute_indicator_consensus_for_pulse failed: %s", exc)
+        return {}
+
+
 # ─── Main ─────────────────────────────────────────────────────────────────────
 
 def run_pulse() -> dict:
@@ -368,6 +417,7 @@ def run_pulse() -> dict:
         if e.get("r_realized") is not None and e.get("outcome") not in (None, "OPEN")
     ]
     anomalies = _detect_anomalies(recent_24h) + _check_rest_mode_escalation() + _check_regime_alignment()
+    indicator_consensus = _compute_indicator_consensus_for_pulse()
 
     pulse = {
         "timestamp": canonical_timestamp(),
@@ -376,6 +426,7 @@ def run_pulse() -> dict:
         "anomalies": anomalies,
         "running_stats": _compute_running_stats(outcomes),
         "live_prices": live_prices,
+        "indicator_consensus": indicator_consensus,
     }
 
     PULSE_DIR.mkdir(parents=True, exist_ok=True)
