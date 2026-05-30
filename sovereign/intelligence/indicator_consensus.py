@@ -149,6 +149,8 @@ def _score(pair: str, ohlcv_df: pd.DataFrame) -> IndicatorConsensus:
 def _match_conditions(snapshot: dict[str, int], conditions: list[dict], direction: int) -> list[dict]:
     matched = []
     for cond in conditions:
+        if cond.get("holdout_verdict") in ("MONITOR", "OVERFIT", "INSUFFICIENT_DATA"):
+            continue
         inds = cond.get("indicators", [])
         if all(snapshot.get(ind) == direction for ind in inds):
             matched.append(cond)

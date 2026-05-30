@@ -487,5 +487,18 @@
       "green_long_count": 10,
       "green_short_count": 10
     }
+  },
+  "holdout_validation": {
+    "validated_at": "2026-05-30",
+    "holdout_period": "2024-01-01 to 2024-12-16",
+    "total_conditions_tested": 160,
+    "real_signal": 42,
+    "weak_signal": 23,
+    "overfit": 3,
+    "insufficient_data": 92,
+    "conditions_removed": 3,
+    "conditions_after_pruning": 157,
+    "fvg_universal_finding": "FVG present in 100% of holdout-validated (REAL_SIGNAL) green conditions across all 8 pairs and both directions \u2014 structural, not coincidental",
+    "audnzd_status": "MONITOR \u2014 all 20 combos fire n=1\u20137 per year, insufficient holdout statistical power; combos excluded from live green-condition matching; re-evaluate after 2026 data available"
   }
 }

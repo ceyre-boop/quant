@@ -2,14 +2,14 @@
   "_meta": {
     "description": "Alta Investments \u2014 Sovereign Trading System. Complete research history v001\u2192present.",
     "purpose": "Oracle reads this every reflection cycle. Never re-proposes rejected hypotheses unless rejection_reason is addressed. Builds on proven findings, not from scratch.",
-    "last_updated": "2026-05-27",
+    "last_updated": "2026-05-30",
     "version_at_build": "v007",
     "sharpe_at_build": 1.0713,
     "sharpe_target": 1.5,
     "gap_remaining": 0.429,
     "methodology_notes": {
       "retro_validation_blind_spot": "Exit rules (hold caps, trailing multipliers, VIX gates) cannot be validated by retro_validate.py. The forensics 'hold' field records actual trade duration, not whether a forced cap fired. Proved 2026-05-27: L-5 retro delta=-0.087, backtester showed opposite direction. Always use run_forex_scan.py --backtest for exit rule validation.",
-      "entry_vs_exit_rule_classification": "Entry rules: session, grade, pd_alignment, score thresholds, commitment gates — retro valid. Exit rules: PAIR_HOLD_OVERRIDES, PAIR_TRAILING_OVERRIDES, PAIR_VIX_GATES — backtester only.",
+      "entry_vs_exit_rule_classification": "Entry rules: session, grade, pd_alignment, score thresholds, commitment gates \u2014 retro valid. Exit rules: PAIR_HOLD_OVERRIDES, PAIR_TRAILING_OVERRIDES, PAIR_VIX_GATES \u2014 backtester only.",
       "noted": "2026-05-27"
     }
   },
@@ -73,7 +73,7 @@
       "retro_status": "SUSPENDED",
       "retro_p_value": 0.831,
       "retro_holdout_ratio": 0.0,
-      "retro_note": "All 3 gates failed. pd_alignment weight already 0.0 — no code change required."
+      "retro_note": "All 3 gates failed. pd_alignment weight already 0.0 \u2014 no code change required."
     },
     {
       "id": "L-004",
@@ -161,8 +161,8 @@
       "health": "ACTIVE",
       "lesson_number_in_file": 8,
       "retro_status": "UNTESTABLE_EXIT",
-      "retro_note": "Exit rule — VIX value at entry not in forensics. Validate via backtester sweep at n>=100 per pair.",
-      "caution": "n=46 USDJPY, n=39 AUDNZD — retest when sample doubles"
+      "retro_note": "Exit rule \u2014 VIX value at entry not in forensics. Validate via backtester sweep at n>=100 per pair.",
+      "caution": "n=46 USDJPY, n=39 AUDNZD \u2014 retest when sample doubles"
     },
     {
       "id": "L-009",
@@ -180,7 +180,7 @@
       "health": "ACTIVE",
       "lesson_number_in_file": 9,
       "retro_status": "NOT_APPLICABLE",
-      "retro_note": "Meta-process lesson — statistical validation not applicable."
+      "retro_note": "Meta-process lesson \u2014 statistical validation not applicable."
     }
   ],
   "proven_hypotheses": [
@@ -292,12 +292,22 @@
     },
     {
       "id": "HYP-049",
-      "finding": "Short natural-duration trades underperform — entries before commitment formed",
+      "finding": "Short natural-duration trades underperform \u2014 entries before commitment formed",
       "mechanism": "Fast closes = stops or TP1 scalps. Price moved briefly right then reversed. Entry before institutional commitment fully expressed.",
       "status": "NEEDS_DATA",
       "discovered": "2026-05-27",
       "source": "L-5 retro validation side-effect (forensics signal, not the rule being tested)",
       "action": "Split forensics by hold_days bucket (1-3, 4-7, 8+) within London+GradeA subset. Minimum 20 trades per bucket."
+    },
+    {
+      "id": "HYP-IND-001",
+      "finding": "FVG (Fair Value Gap) is the universal structural backbone of all validated green conditions",
+      "result": "FVG present in 100% (42/42) of REAL_SIGNAL green conditions across 8 forex pairs, both directions, 2015\u20132024 training data confirmed by 2024 holdout. Zero REAL_SIGNAL combos exist without FVG as a component.",
+      "version_discovered": "v014",
+      "impact": "Confirms ICT framework is not theory \u2014 FVG is the statistically proven structural backbone of the system's edge. The 30-indicator sweep across 4,060 triple combos produced this independently, without any prior assumption that FVG would dominate.",
+      "still_valid": true,
+      "note": "Discovered 2026-05-30 via 10-year quantitative sweep: 30 indicators \u00d7 8 pairs \u00d7 C(30,3)=4,060 triple combos. Holdout validation 2026-05-30: 42 REAL_SIGNAL, 23 WEAK_SIGNAL, 3 OVERFIT, 92 INSUFFICIENT_DATA. AUDNZD combos unverifiable (n=1-7 per holdout year) \u2014 marked MONITOR. Three GBPUSD LONG combos removed as statistically unreliable (large train/holdout variance).",
+      "discovered": "2026-05-30"
     }
   ],
   "rejected_hypotheses": [
