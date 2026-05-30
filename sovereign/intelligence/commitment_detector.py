@@ -88,6 +88,7 @@ class CommitmentState:
     components: Dict[str, float]
     size_multiplier: float   # 1.0, 0.5, or 0.0
     reason: str
+    indicator_note: str = ""  # INDICATOR_AGREE / INDICATOR_CONFLICT / "" if unavailable
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -288,6 +289,51 @@ def _score_failed_auction(df_slice: pd.DataFrame, direction: int) -> float:
         return 0.15 if (swept and rejected) else 0.0
 
 
+# ── Indicator consensus component ────────────────────────────────────────
+
+def _score_indicator_consensus(
+    pair: str,
+    direction_int: int,
+    df: pd.DataFrame,
+    date_str: str,
+) -> tuple[float, str]:
+    """
+    6th commitment component: do 30 independent indicators agree with our direction?
+    Returns (score_delta, note):
+      +0.00 to +0.20 if consensus agrees (scaled by conviction)
+      -0.15          if consensus actively opposes direction
+       0.00          if FLAT/NEUTRAL or any error
+    """
+    try:
+        from sovereign.intelligence.indicator_consensus import score_indicator_consensus
+        sl = _slice_at(df, date_str, lookback=90)
+        if sl is None or len(sl) < 60:
+            return 0.0, ""
+
+        clean_pair = pair.replace("=X", "")
+        consensus = score_indicator_consensus(clean_pair, sl)
+        dir_label = "LONG" if direction_int == 1 else "SHORT"
+
+        if consensus.direction in ("FLAT", "NEUTRAL"):
+            return 0.0, f"indicator_consensus={consensus.direction} ({consensus.bullish_count}B/{consensus.bearish_count}b)"
+
+        if consensus.direction == dir_label:
+            boost = round(consensus.conviction * 0.20, 4)
+            green_note = f" | {len(consensus.matching_green_long) + len(consensus.matching_green_short)} green combos" if consensus.matching_green_long or consensus.matching_green_short else ""
+            return boost, (
+                f"INDICATOR_AGREE: {consensus.bullish_count if direction_int==1 else consensus.bearish_count}/30 "
+                f"agree {dir_label} | conv={consensus.conviction:.0%}{green_note} | boost=+{boost:.3f}"
+            )
+        else:
+            opp_count = consensus.bearish_count if direction_int == 1 else consensus.bullish_count
+            return -0.15, (
+                f"INDICATOR_CONFLICT: system says {dir_label} but "
+                f"{opp_count}/30 indicators say {consensus.direction} | penalty=-0.150"
+            )
+    except Exception:
+        return 0.0, ""
+
+
 # ── Main detector ─────────────────────────────────────────────────────────
 
 class CommitmentDetector:
@@ -390,8 +436,14 @@ class CommitmentDetector:
         c_session    = _score_session(session)
         c_auction    = _score_failed_auction(df_slice, direction_int)
 
-        total = c_volume + c_multi_pair + c_atr + c_session + c_auction
-        total = round(min(total, 1.0), 4)
+        # 6th component: 30-indicator consensus (graceful — returns 0 if library not built)
+        c_indicator, indicator_note = (
+            _score_indicator_consensus(pair, direction_int, df, date_str)
+            if df is not None else (0.0, "")
+        )
+
+        base_total = c_volume + c_multi_pair + c_atr + c_session + c_auction
+        total = round(min(base_total + c_indicator, 1.0), 4)
 
         if total >= self.COMMITTED_THRESHOLD:
             label = "COMMITTED"
@@ -410,14 +462,16 @@ class CommitmentDetector:
             score=total,
             label=label,
             components={
-                "volume":      c_volume,
-                "multi_pair":  c_multi_pair,
-                "atr_expand":  c_atr,
-                "session":     c_session,
-                "failed_auct": c_auction,
+                "volume":         c_volume,
+                "multi_pair":     c_multi_pair,
+                "atr_expand":     c_atr,
+                "session":        c_session,
+                "failed_auct":    c_auction,
+                "indicator_cons": c_indicator,
             },
             size_multiplier=size,
             reason=reason,
+            indicator_note=indicator_note,
         )
 
         if self._log:

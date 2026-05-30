@@ -8,11 +8,13 @@ against historical memory. No recomputation of history.
 
 Public API:
     score_indicator_consensus(pair, ohlcv_df) → IndicatorConsensus
+    validate_on_holdout(start, end) → dict  — holdout overfitting check
 """
 from __future__ import annotations
 
 import json
 import logging
+import math
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
@@ -168,16 +170,165 @@ def _flat_consensus(pair: str) -> IndicatorConsensus:
     )
 
 
+# ─── Holdout validation ───────────────────────────────────────────────────────
+
+_MIN_HOLDOUT_N = 10   # combos with fewer holdout samples → INSUFFICIENT_DATA
+_OVERFIT_DELTA = 0.20  # train-holdout gap > 20% → OVERFIT
+
+
+@dataclass
+class HoldoutResult:
+    indicators: list[str]
+    direction: str          # LONG | SHORT
+    train_hit_rate: float
+    holdout_hit_rate: Optional[float]
+    delta: Optional[float]  # train - holdout (positive = optimistic on train)
+    n_holdout: int
+    verdict: str            # REAL_SIGNAL | WEAK_SIGNAL | OVERFIT | INSUFFICIENT_DATA
+
+
+def validate_on_holdout(
+    start: str = "2024-01-01",
+    end: str = "2024-12-31",
+) -> dict[str, list[HoldoutResult]]:
+    """
+    Test every green condition against an out-of-sample holdout window.
+
+    The green conditions in green_conditions.json were found on the FULL 2015-2024 dataset.
+    This function re-tests each combo on the holdout slice only to detect overfitting.
+
+    Verdicts:
+        REAL_SIGNAL      — delta < 10%  (holds up on unseen data)
+        WEAK_SIGNAL      — delta 10-20% (some decay, still tradeable)
+        OVERFIT          — delta > 20%  (train bias, do not trade)
+        INSUFFICIENT_DATA — n_holdout < 10 (can't tell, need more bars)
+    """
+    hist_path = ROOT / "data" / "indicators" / "history.parquet"
+    if not hist_path.exists():
+        raise FileNotFoundError("history.parquet not found — run build_indicator_ontology.py first")
+
+    hist = pd.read_parquet(hist_path)
+    hist["date"] = pd.to_datetime(hist["date"])
+
+    holdout_full = hist[
+        (hist["date"] >= start) & (hist["date"] <= end)
+    ].dropna(subset=["fwd_10d"]).copy()
+
+    green = _load_green_conditions()
+    results: dict[str, list[HoldoutResult]] = {}
+
+    for pair, conditions in green.items():
+        g = holdout_full[holdout_full["pair"] == pair]
+        pair_results: list[HoldoutResult] = []
+
+        for dir_key, sign in [("best_long", 1), ("best_short", -1)]:
+            direction_label = "LONG" if sign == 1 else "SHORT"
+            fwd = g["fwd_10d"].astype(float)
+
+            for cond in conditions.get(dir_key, []):
+                inds = cond["indicators"]
+                ca, cb, cc = f"state_{inds[0]}", f"state_{inds[1]}", f"state_{inds[2]}"
+
+                if ca not in g.columns or cb not in g.columns or cc not in g.columns:
+                    continue
+
+                mask = (g[ca] == sign) & (g[cb] == sign) & (g[cc] == sign)
+                n_holdout = int(mask.sum())
+
+                if n_holdout == 0:
+                    holdout_hr = None
+                    delta = None
+                    verdict = "INSUFFICIENT_DATA"
+                else:
+                    subset = fwd[mask]
+                    holdout_hr = float((subset > 0).mean() if sign == 1 else (subset < 0).mean())
+                    delta = round(cond["hit_rate"] - holdout_hr, 4)
+
+                    if n_holdout < _MIN_HOLDOUT_N:
+                        verdict = "INSUFFICIENT_DATA"
+                    elif abs(delta) < 0.10:
+                        verdict = "REAL_SIGNAL"
+                    elif abs(delta) < _OVERFIT_DELTA:
+                        verdict = "WEAK_SIGNAL"
+                    else:
+                        verdict = "OVERFIT"
+
+                pair_results.append(HoldoutResult(
+                    indicators=inds,
+                    direction=direction_label,
+                    train_hit_rate=cond["hit_rate"],
+                    holdout_hit_rate=round(holdout_hr, 4) if holdout_hr is not None else None,
+                    delta=delta,
+                    n_holdout=n_holdout,
+                    verdict=verdict,
+                ))
+
+        results[pair] = pair_results
+
+    return results
+
+
+def print_holdout_report(results: dict[str, list[HoldoutResult]]) -> None:
+    verdicts_all: list[str] = []
+    print(f"\n{'='*70}")
+    print("INDICATOR GREEN CONDITIONS — HOLDOUT VALIDATION")
+    print(f"{'='*70}")
+    print(f"{'PAIR':<8} {'DIRECTION':<6} {'INDICATORS':<40} {'TRAIN':>6} {'HOLD':>6} {'DELTA':>7} {'N':>4}  VERDICT")
+    print("-" * 90)
+
+    for pair, pair_results in sorted(results.items()):
+        for r in pair_results:
+            ind_str = "+".join(r.indicators)
+            hold_str = f"{r.holdout_hit_rate:.0%}" if r.holdout_hit_rate is not None else "  n/a"
+            delta_str = f"{r.delta:+.0%}" if r.delta is not None else "   n/a"
+            v_icon = {"REAL_SIGNAL": "✓", "WEAK_SIGNAL": "~", "OVERFIT": "✗", "INSUFFICIENT_DATA": "?"}.get(r.verdict, " ")
+            print(
+                f"{pair:<8} {r.direction:<6} {ind_str:<40} "
+                f"{r.train_hit_rate:.0%}{'':<1} {hold_str:<6} {delta_str:<7} {r.n_holdout:>4}  {v_icon} {r.verdict}"
+            )
+            verdicts_all.append(r.verdict)
+
+    print()
+    from collections import Counter
+    vc = Counter(verdicts_all)
+    total = len(verdicts_all)
+    print(f"Summary: {vc.get('REAL_SIGNAL',0)} REAL | {vc.get('WEAK_SIGNAL',0)} WEAK | "
+          f"{vc.get('OVERFIT',0)} OVERFIT | {vc.get('INSUFFICIENT_DATA',0)} INSUFFICIENT_DATA  "
+          f"(of {total} conditions)")
+    real_pct = vc.get("REAL_SIGNAL", 0) / max(total, 1)
+    print(f"Signal quality: {real_pct:.0%} of green conditions hold up on holdout data")
+    if vc.get("OVERFIT", 0) / max(total, 1) > 0.40:
+        print("\n⚠ WARNING: >40% overfit — thresholds too loose. Raise MIN_HIT_RATE before live use.")
+    elif vc.get("REAL_SIGNAL", 0) / max(total, 1) > 0.50:
+        print("\n✓ CONCLUSION: >50% REAL_SIGNAL — green conditions are statistically robust.")
+    else:
+        print("\n~ CONCLUSION: Mixed signal quality — use REAL_SIGNAL combos only, discard OVERFIT.")
+
+
 # ─── CLI smoke-test ───────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
+    import argparse
     import yfinance as yf
-    pair = "GBPUSD"
-    df = yf.Ticker("GBPUSD=X").history(period="90d", interval="1d", auto_adjust=True)
-    c = score_indicator_consensus(pair, df)
-    print(f"{pair}: {c.bullish_count}/30 bull | {c.bearish_count}/30 bear | dir={c.direction} | conv={c.conviction:.0%}")
-    print(f"  Historical hit rate: {c.historical_hit_rate:.0%}")
-    print(f"  Matching green long:  {len(c.matching_green_long)}")
-    print(f"  Matching green short: {len(c.matching_green_short)}")
-    print(f"  Top bullish:  {c.top_bullish[:5]}")
-    print(f"  Top bearish:  {c.top_bearish[:5]}")
+
+    parser = argparse.ArgumentParser(description="Indicator consensus — live score or holdout validation")
+    parser.add_argument("--validate-holdout", action="store_true", help="Run green condition holdout validation")
+    parser.add_argument("--holdout-start", default="2024-01-01")
+    parser.add_argument("--holdout-end",   default="2024-12-31")
+    parser.add_argument("--pair", default="GBPUSD", help="Pair for live score (default: GBPUSD)")
+    args = parser.parse_args()
+
+    if args.validate_holdout:
+        results = validate_on_holdout(args.holdout_start, args.holdout_end)
+        print_holdout_report(results)
+    else:
+        pair = args.pair
+        ticker = pair if "=X" in pair else f"{pair}=X"
+        df = yf.Ticker(ticker).history(period="90d", interval="1d", auto_adjust=True)
+        c = score_indicator_consensus(pair, df)
+        print(f"{pair}: {c.bullish_count}/30 bull | {c.bearish_count}/30 bear | dir={c.direction} | conv={c.conviction:.0%}")
+        print(f"  Historical hit rate: {c.historical_hit_rate:.0%}")
+        print(f"  Matching green long:  {len(c.matching_green_long)}")
+        print(f"  Matching green short: {len(c.matching_green_short)}")
+        print(f"  Top bullish:  {c.top_bullish[:5]}")
+        print(f"  Top bearish:  {c.top_bearish[:5]}")
