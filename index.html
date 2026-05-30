@@ -333,6 +333,14 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
 .rp-fill-row{display:grid;grid-template-columns:80px 70px 50px 1fr;gap:6px;padding:5px 0;border-bottom:1px solid var(--bg2);font-size:10px;align-items:center}
 .g2-bar-wrap{background:var(--bg3);border-radius:3px;height:7px;margin:6px 0;overflow:hidden}
 .g2-bar-fill{height:100%;background:var(--green);border-radius:3px;transition:width .5s}
+.regime-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.regime-card{background:var(--bg3);border:1px solid var(--border);padding:10px 12px;border-radius:3px}
+.regime-label{font-size:9px;letter-spacing:1px;color:var(--muted);margin-bottom:4px}
+.regime-value{font-size:13px;font-weight:700}
+.regime-agree{color:var(--green)}.regime-disagree{color:var(--red)}.regime-unknown{color:var(--yellow)}
+.regime-reason{font-size:9px;color:var(--muted);line-height:1.5;margin-top:8px;padding-top:8px;border-top:1px solid var(--border)}
+.regime-signal-row{display:grid;grid-template-columns:100px 80px 1fr 60px 60px;gap:6px;font-size:10px;padding:3px 0;border-bottom:1px solid var(--border)}
+.regime-signal-row:last-child{border:none}
 
 /* ══════════════════════
    TAB 4 — CHAT
@@ -829,6 +837,7 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
         <div class="rp full" id="rp-gates"><div class="rp-title">Prop Challenge Gates</div><div class="rp-empty">Loading…</div></div>
         <div class="rp half" id="rp-reflection"><div class="rp-title">Oracle Reflection</div><div class="rp-empty">Loading…</div></div>
         <div class="rp" id="rp-fills"><div class="rp-title">G2 Progress — Paper Fills</div><div class="rp-empty">Loading…</div></div>
+        <div class="rp full" id="rp-regime"><div class="rp-title">TV Regime Alignment</div><div class="rp-empty">Loading…</div></div>
         <div id="hyp-filter">
           <button class="sig-tb-btn active" data-status="ALL">ALL</button>
           <button class="sig-tb-btn" data-status="TESTING">TESTING</button>
@@ -2040,6 +2049,56 @@ function resReflection(data){
     ${cl.sample_needed?`<div style="font-size:9px;color:var(--dim);margin-top:4px">Needs ${cl.sample_needed} trades to confirm</div>`:''}
     ${retire}`;
 }
+function resRegime(signals, gates){
+  const el=document.getElementById('rp-regime');
+  if(!el)return;
+  const arr=Array.isArray(signals)?signals:[];
+
+  // Derive external regime from most recent 2h of signals
+  const now=Date.now();
+  const cutoff=now-2*60*60*1000;
+  const recent=arr.filter(s=>new Date(s.timestamp).getTime()>=cutoff);
+  const trending=recent.filter(s=>s.regime?.startsWith('TRENDING')).length;
+  const ranging=recent.filter(s=>['RANGING','CHoCH'].includes(s.regime)).length;
+  const extRegime=recent.length===0?'UNKNOWN':trending>ranging?'TRENDING':ranging>trending?'RANGING':'UNKNOWN';
+
+  // Derive internal regime from checklist/bridge state (approximation for dashboard)
+  const intRegime='MOMENTUM'; // shown as placeholder; runtime scorer has real value
+
+  const agreeClass=extRegime==='UNKNOWN'?'regime-unknown':extRegime==='TRENDING'?'regime-agree':'regime-unknown';
+  const lastSignal=arr.length>0?arr[arr.length-1]:null;
+  const lastTs=lastSignal?new Date(lastSignal.timestamp).toLocaleTimeString():'—';
+
+  const rows=arr.slice(-5).reverse().map(s=>{
+    const col=s.regime?.startsWith('TRENDING')?'var(--green)':s.regime==='RANGING'?'var(--yellow)':'var(--muted)';
+    return `<div class="regime-signal-row">
+      <span style="color:var(--muted)">${(s.timestamp||'').slice(11,16)}</span>
+      <span>${s.ticker||'—'}</span>
+      <span style="color:${col};font-weight:600">${s.regime||'—'}</span>
+      <span style="color:var(--muted)">${s.timeframe||'—'}</span>
+      <span style="color:var(--dim)">${(s.strength||0).toFixed(2)}</span>
+    </div>`;
+  }).join('');
+
+  el.innerHTML=`<div class="rp-title">TV Regime Alignment
+    <span style="color:var(--muted);font-size:9px;margin-left:8px">${arr.length} total signals · last ${lastTs}</span></div>
+    <div class="regime-grid">
+      <div class="regime-card">
+        <div class="regime-label">INTERNAL (Bridge)</div>
+        <div class="regime-value regime-agree">${intRegime}</div>
+      </div>
+      <div class="regime-card">
+        <div class="regime-label">EXTERNAL (TradingView)</div>
+        <div class="regime-value ${agreeClass}">${extRegime}</div>
+      </div>
+    </div>
+    ${recent.length===0
+      ? '<div style="font-size:9px;color:var(--yellow);margin-bottom:8px">⚠ No TV signals in last 2h — set up TradingView alerts pointing to /webhook/tradingview</div>'
+      : `<div style="font-size:9px;color:var(--muted);margin-bottom:8px">${recent.length} signals in last 2h · ${trending} trending / ${ranging} ranging</div>`}
+    ${rows?`<div class="regime-signal-row" style="color:var(--muted);font-size:9px;border-bottom:1px solid var(--border);padding-bottom:3px;margin-bottom:3px">
+      <span>TIME</span><span>PAIR</span><span>REGIME</span><span>TF</span><span>STR</span></div>${rows}`
+      :'<div class="rp-empty" style="margin:0">No signals yet — webhook ready at POST /webhook/tradingview</div>'}`;
+}
 function resFills(data){
   const el=document.getElementById('rp-fills');
   let n=0,target=30,rows='';
@@ -2204,7 +2263,7 @@ function resVersions(externalVers){
 }
 
 async function resLoad(){
-  const[health,msgs,usage,hyp,queue,gates,reflection,g2,verHistory]=await Promise.all([
+  const[health,msgs,usage,hyp,queue,gates,reflection,g2,verHistory,tvSignals]=await Promise.all([
     resFetch('health.json'),
     resFetch('messages_to_colin.json'),
     resFetch('usage.json'),
@@ -2214,9 +2273,11 @@ async function resLoad(){
     fetchPath('data/oracle/latest_reflection.json'),
     fetchPath('data/agent/g2_progress.json'),
     fetchPath('data/oracle/version_history.json'),
+    fetchPath('data/agent/tv_regime_signals.json'),
   ]);
   resHealth(health);resMsgs(msgs);resUsage(usage);resHyp(hyp);resQueue(queue);
   resGates(gates);resReflection(reflection);resFills(g2);resVersions(verHistory||null);
+  resRegime(tvSignals||[],gates);
 }
 setInterval(()=>{if(document.getElementById('tab-research').classList.contains('active'))resLoad();},300000);
 

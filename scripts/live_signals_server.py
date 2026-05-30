@@ -29,6 +29,50 @@ PAIRS = [
 EQUITY_PAIRS = ['SPY', 'QQQ']
 
 
+TV_REGIME_PATH = 'data/agent/tv_regime_signals.json'
+_TV_RETAIN_HOURS = 48
+
+
+def _ingest_tv_regime(payload: dict) -> None:
+    """Append a regime_update alert to tv_regime_signals.json, pruning entries >48h old."""
+    from pathlib import Path
+    path = Path(TV_REGIME_PATH)
+    try:
+        signals = json.loads(path.read_text()) if path.exists() else []
+        if not isinstance(signals, list):
+            signals = []
+    except Exception:
+        signals = []
+
+    cutoff = datetime.now(timezone.utc) - timedelta(hours=_TV_RETAIN_HOURS)
+    signals = [
+        s for s in signals
+        if _parse_ts(s.get("timestamp", "")) >= cutoff
+    ]
+
+    entry = {
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "ticker":    str(payload.get("ticker", payload.get("symbol", "UNKNOWN"))).upper(),
+        "regime":    str(payload.get("regime", "UNKNOWN")).upper(),
+        "strength":  float(payload.get("strength", 0.0)),
+        "indicator": str(payload.get("indicator", "UNKNOWN")),
+        "timeframe": str(payload.get("timeframe", "UNKNOWN")),
+        "raw":       payload,
+    }
+    signals.append(entry)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(signals, indent=2))
+    print(f"[TV-REGIME] {entry['regime']} {entry['ticker']} str={entry['strength']:.2f} [{entry['indicator']}]")
+
+
+def _parse_ts(ts_str: str) -> datetime:
+    try:
+        dt = datetime.fromisoformat(ts_str.replace("Z", "+00:00"))
+        return dt if dt.tzinfo else dt.replace(tzinfo=timezone.utc)
+    except Exception:
+        return datetime.min.replace(tzinfo=timezone.utc)
+
+
 def _load_cross_system_state():
     try:
         with open('data/forensics/cross_system_state.json') as f:
@@ -635,6 +679,12 @@ class Handler(BaseHTTPRequestHandler):
                         'strategy': 'pine_script',
                         '_raw': text,
                     }
+
+                # Regime-update alerts are stored separately and don't go to trade log
+                if body.get('action', '').lower() == 'regime_update':
+                    _ingest_tv_regime(body)
+                    self._send_json(200, {'ok': True, 'type': 'regime_update'})
+                    return
 
                 action    = body.get('action', 'alert').lower()
                 ticker    = body.get('ticker', body.get('symbol', 'UNKNOWN')).upper()

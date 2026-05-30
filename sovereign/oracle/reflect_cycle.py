@@ -110,6 +110,9 @@ Every suggestion you make must move one needle: Sharpe, win rate, drawdown, or p
 ## Current market prices (from last pulse)
 {prices_json}
 
+## External regime confirmation (TradingView vs internal)
+{regime_alignment}
+
 ## Next milestones (help get these done)
 {next_milestones}
 
@@ -275,6 +278,23 @@ def _load_decision_log_summary(days: int = 7, max_entries: int = 20) -> str:
     return header + json.dumps(entries, indent=2)
 
 
+def _load_regime_alignment() -> str:
+    """Load internal vs TradingView regime alignment for Oracle context."""
+    try:
+        from sovereign.intelligence.regime_confidence import score_regime_confidence
+        conf = score_regime_confidence()
+        age_str = f"{conf.tv_signal_age_min:.0f}min ago" if conf.tv_signal_age_min >= 0 else "none"
+        return (
+            f"Internal: {conf.internal_regime} | "
+            f"TradingView: {conf.external_regime} ({conf.tv_signal_count} signals, newest {age_str})\n"
+            f"Agreement: {conf.agreement} | Confidence: {conf.confidence:.0%} | "
+            f"Sizing multiplier: {conf.sizing_multiplier:.0%}\n"
+            f"Reason: {conf.reason}"
+        )
+    except Exception:
+        return "Regime confidence unavailable — run sovereign/intelligence/regime_confidence.py"
+
+
 def _load_harvest_summary(harvests: list[dict]) -> str:
     if not harvests:
         return "No harvest data available. System may not have trades yet — propose a hypothesis about the existing backtest data instead."
@@ -327,6 +347,7 @@ def run_reflect(harvests: list[dict], date: Optional[str] = None) -> dict:
         tenets=ctx["tenets"],
         bridge_state=ctx["bridge_state"],
         prices_json=_load_recent_prices(),
+        regime_alignment=_load_regime_alignment(),
         next_milestones=ctx["next_milestones"],
         hypothesis_summary=ctx["hypothesis_summary"],
         queue_status=ctx["queue_status"],
@@ -398,6 +419,7 @@ if __name__ == "__main__":
             tenets=ctx["tenets"],
             bridge_state=ctx["bridge_state"],
             prices_json=_load_recent_prices(),
+            regime_alignment=_load_regime_alignment(),
             next_milestones=ctx["next_milestones"],
             hypothesis_summary=ctx["hypothesis_summary"],
             queue_status=ctx["queue_status"],

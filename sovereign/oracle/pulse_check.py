@@ -326,6 +326,34 @@ def _write_messages(anomalies: list[dict]) -> None:
         log.warning("Failed to write messages: %s", e)
 
 
+# ─── TV regime alignment check ────────────────────────────────────────────────
+
+def _check_regime_alignment() -> list[dict]:
+    """Flag when internal and external (TradingView) regimes disagree."""
+    try:
+        from sovereign.intelligence.regime_confidence import score_regime_confidence
+        conf = score_regime_confidence()
+    except Exception as exc:
+        log.debug("regime_confidence unavailable: %s", exc)
+        return []
+
+    if conf.external_regime == "UNKNOWN":
+        return []  # no TV signals → no anomaly
+
+    if not conf.agreement:
+        return [{
+            "type": "REGIME_DISAGREEMENT",
+            "priority": "IMPORTANT",
+            "message": (
+                f"Internal regime ({conf.internal_regime}) conflicts with "
+                f"TradingView ({conf.external_regime}). "
+                f"Sizing reduced to {conf.sizing_multiplier:.0%}. {conf.reason}"
+            ),
+        }]
+
+    return []
+
+
 # ─── Main ─────────────────────────────────────────────────────────────────────
 
 def run_pulse() -> dict:
@@ -339,7 +367,7 @@ def run_pulse() -> dict:
         e["r_realized"] for e in recent_24h
         if e.get("r_realized") is not None and e.get("outcome") not in (None, "OPEN")
     ]
-    anomalies = _detect_anomalies(recent_24h) + _check_rest_mode_escalation()
+    anomalies = _detect_anomalies(recent_24h) + _check_rest_mode_escalation() + _check_regime_alignment()
 
     pulse = {
         "timestamp": canonical_timestamp(),

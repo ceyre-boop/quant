@@ -83,6 +83,43 @@ def _sync_checklist(fill_count: int) -> None:
     print(f"  Checklist: G2 updated to {fill_count}/30 trades")
 
 
+def _sync_tv_regime_signals() -> int:
+    """Ensure tv_regime_signals.json exists and is tracked. Prune entries older than 48h."""
+    path = ROOT / "data" / "agent" / "tv_regime_signals.json"
+    if not path.exists():
+        path.write_text("[]")
+        print("  TV regime signals: created empty data/agent/tv_regime_signals.json")
+        return 0
+
+    try:
+        signals = json.loads(path.read_text())
+        if not isinstance(signals, list):
+            signals = []
+    except Exception:
+        signals = []
+
+    from datetime import timezone, timedelta
+    cutoff = datetime.now(timezone.utc) - timedelta(hours=48)
+    before = len(signals)
+    signals = [
+        s for s in signals
+        if _parse_ts_utc(s.get("timestamp", "")) >= cutoff
+    ]
+    if len(signals) != before:
+        path.write_text(json.dumps(signals, indent=2))
+    print(f"  TV regime signals: {len(signals)} signals (last 48h) → data/agent/tv_regime_signals.json")
+    return len(signals)
+
+
+def _parse_ts_utc(ts_str: str):
+    from datetime import timezone
+    try:
+        dt = datetime.fromisoformat(ts_str.replace("Z", "+00:00"))
+        return dt if dt.tzinfo else dt.replace(tzinfo=timezone.utc)
+    except Exception:
+        return datetime.min.replace(tzinfo=timezone.utc)
+
+
 def _sync_reflections() -> str | None:
     ref_dir = ROOT / "data" / "oracle" / "reflections"
     files = sorted(ref_dir.glob("20??-??-??.json"))
@@ -102,20 +139,22 @@ def main() -> None:
     print()
     fill_count = _sync_fills()
     _sync_checklist(fill_count)
+    _sync_tv_regime_signals()
     ref_date = _sync_reflections()
 
     print(f"\n{'─'*54}")
     print("Files ready to commit:")
     print("  data/agent/health.json")
     print("  data/agent/checklist_state.json")
-    print("  data/ledger/oanda_fills.json       (new)")
+    print("  data/ledger/oanda_fills.json")
+    print("  data/agent/tv_regime_signals.json")
     if ref_date:
         print(f"  data/oracle/reflections/{ref_date}.json")
     print("\nNext:")
     print("  git add data/agent/health.json data/agent/checklist_state.json \\")
-    print("          data/ledger/oanda_fills.json data/oracle/reflections/ \\")
-    print("          scripts/sync_dashboard_data.py index.html")
-    print("  git commit -m '[DASHBOARD] Surface live trading state'")
+    print("          data/ledger/oanda_fills.json data/agent/tv_regime_signals.json \\")
+    print("          data/oracle/reflections/ scripts/sync_dashboard_data.py index.html")
+    print("  git commit -m '[DASHBOARD] Add TV regime alignment layer'")
     print("  git push origin HEAD:master")
 
 
