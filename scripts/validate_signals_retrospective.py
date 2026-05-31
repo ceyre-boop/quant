@@ -102,6 +102,20 @@ def evaluate_day_pair(
             account=ACCOUNT,
         )
         if isinstance(result, ICTSignal) and result.passed:
+            # Mirror live orchestrator's bias_agrees gate — signals blocked there
+            # won't appear in live results, so exclude them here too.
+            try:
+                from ict.daily_bias import DailyBiasEngine
+                biases = DailyBiasEngine().get_biases()
+                bias = biases.get(symbol.replace("=X", ""), {})
+                if bias.get("blackout", False):
+                    continue
+                bias_dir = bias.get("bias", "NEUTRAL")
+                if bias_dir != "NEUTRAL" and bias_dir != direction:
+                    continue
+            except Exception:
+                pass  # no bias data → don't block
+
             outcome = classify_outcome(full_df, cutoff_ts, result)
             return {
                 "date": str(cutoff_ts.date()),
