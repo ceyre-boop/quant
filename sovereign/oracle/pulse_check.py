@@ -25,6 +25,8 @@ MESSAGES_PATH  = ROOT / "data" / "agent" / "messages_to_colin.json"
 HEALTH_PATH    = ROOT / "data" / "agent" / "health.json"
 LEDGER_PATH    = ROOT / "data" / "agent" / "hypothesis_ledger.json"
 INDICATORS_DIR = ROOT / "data" / "indicators"
+G2_PROGRESS_PATH = ROOT / "data" / "agent" / "g2_progress.json"
+G2_TARGET = 30
 
 log = logging.getLogger("oracle.pulse")
 
@@ -403,6 +405,86 @@ def _compute_indicator_consensus_for_pulse() -> dict:
         return {}
 
 
+# ─── G2 progress tracker ─────────────────────────────────────────────────────
+
+def _update_g2_progress() -> dict:
+    """
+    Count closed OANDA trades, compute win_rate / avg_r, estimate G2 completion.
+    Writes data/agent/g2_progress.json. Returns {} on any error.
+    """
+    try:
+        from sovereign.execution.oanda_bridge import OandaBridge
+        bridge = OandaBridge()
+        closed = bridge.get_closed_trades(limit=100)
+        total = len(closed)
+
+        wins = [t for t in closed if float(t.get("realizedPL", 0)) > 0]
+        win_rate = round(len(wins) / total, 3) if total else None
+
+        # Avg R from fills cross-reference
+        avg_r = _avg_r_from_fills(closed)
+
+        first_date  = closed[-1]["openTime"][:10]  if closed else None
+        latest_date = closed[0].get("closeTime", closed[0].get("openTime", ""))[:10] if closed else None
+
+        est_completion = _estimate_g2_date(total, first_date)
+
+        progress = {
+            "total_closed":           total,
+            "target":                 G2_TARGET,
+            "pct_complete":           round(total / G2_TARGET, 3),
+            "win_rate":               win_rate,
+            "avg_r":                  avg_r,
+            "first_trade_date":       first_date,
+            "latest_trade_date":      latest_date,
+            "estimated_g2_completion": est_completion,
+            "last_updated":           canonical_timestamp(),
+        }
+        G2_PROGRESS_PATH.parent.mkdir(parents=True, exist_ok=True)
+        G2_PROGRESS_PATH.write_text(json.dumps(progress, indent=2))
+        log.info("G2 progress: %d/%d (%.0f%%)", total, G2_TARGET, total / G2_TARGET * 100)
+        return progress
+    except Exception as exc:
+        log.warning("_update_g2_progress failed: %s", exc)
+        return {}
+
+
+def _avg_r_from_fills(closed_oanda: list[dict]) -> Optional[float]:
+    """Cross-reference OANDA closed trades with oanda_fills.jsonl to get R-multiples."""
+    fills_path = ROOT / "data" / "ledger" / "oanda_fills.jsonl"
+    if not fills_path.exists() or not closed_oanda:
+        return None
+    try:
+        fill_ids = {str(t.get("id", "")) for t in closed_oanda}
+        r_values = []
+        for line in fills_path.read_text().splitlines():
+            if not line.strip():
+                continue
+            rec = json.loads(line)
+            if str(rec.get("trade_id", "")) in fill_ids and rec.get("r_realized") is not None:
+                r_values.append(float(rec["r_realized"]))
+        return round(sum(r_values) / len(r_values), 3) if r_values else None
+    except Exception:
+        return None
+
+
+def _estimate_g2_date(total: int, first_date: Optional[str]) -> Optional[str]:
+    """Project G2 completion date based on current pace."""
+    if total < 2 or first_date is None:
+        return None
+    try:
+        start = datetime.strptime(first_date, "%Y-%m-%d").replace(tzinfo=timezone.utc)
+        elapsed_days = (datetime.now(timezone.utc) - start).days
+        if elapsed_days <= 0:
+            return None
+        rate_per_day = total / elapsed_days
+        days_remaining = (G2_TARGET - total) / rate_per_day
+        est = datetime.now(timezone.utc) + timedelta(days=days_remaining)
+        return est.strftime("%Y-%m-%d")
+    except Exception:
+        return None
+
+
 # ─── Main ─────────────────────────────────────────────────────────────────────
 
 def run_pulse() -> dict:
@@ -418,6 +500,7 @@ def run_pulse() -> dict:
     ]
     anomalies = _detect_anomalies(recent_24h) + _check_rest_mode_escalation() + _check_regime_alignment()
     indicator_consensus = _compute_indicator_consensus_for_pulse()
+    g2_progress = _update_g2_progress()
 
     pulse = {
         "timestamp": canonical_timestamp(),
@@ -427,6 +510,7 @@ def run_pulse() -> dict:
         "running_stats": _compute_running_stats(outcomes),
         "live_prices": live_prices,
         "indicator_consensus": indicator_consensus,
+        "g2_progress": g2_progress,
     }
 
     PULSE_DIR.mkdir(parents=True, exist_ok=True)

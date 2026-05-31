@@ -127,9 +127,10 @@ class ICTPublisher:
 
 class ICTOrchestrator:
 
-    def __init__(self, pairs: Optional[List[str]] = None):
-        self.pairs     = pairs or PROVEN_PAIRS
-        self.publisher = ICTPublisher()
+    def __init__(self, pairs: Optional[List[str]] = None, ny_am_mode: bool = False):
+        self.pairs      = pairs or PROVEN_PAIRS
+        self.ny_am_mode = ny_am_mode
+        self.publisher  = ICTPublisher()
 
         from ict.pipeline import ICTPipeline
         from ict.micro_risk import MicroRiskParams
@@ -229,6 +230,7 @@ class ICTOrchestrator:
                         r = self._pipeline.evaluate(
                             symbol=clean, direction=direction,
                             df=df, timestamp=now, account=account, atr=atr,
+                            ny_am_mode=self.ny_am_mode,
                         )
                         if best is None or r.score > best.score:
                             best = r
@@ -303,15 +305,17 @@ class ICTOrchestrator:
                         pass
 
                     # London session: only GBPUSD trades (has BOE/FED structure)
+                    # NY AM mode: session gate handled by launcher script (UTC check)
                     session_ok = (
-                        sess_name == PRIMARY_SESSION
+                        self.ny_am_mode
+                        or sess_name == PRIMARY_SESSION
                         or (sess_name == 'London' and clean in LONDON_PAIRS)
                     )
 
-                    # A-grade + session + no blackout + bias agrees + memory + heatmap
+                    # A-grade (+ Grade B in NY AM) + session + no blackout + bias + memory + heatmap
+                    _accepted_grades = (ICTGrade.A_PLUS, ICTGrade.A, ICTGrade.B) if self.ny_am_mode else (ICTGrade.A_PLUS, ICTGrade.A)
                     is_actionable = (
-                        best.passed
-                        and best.grade == ICTGrade.A
+                        best.grade in _accepted_grades
                         and session_ok
                         and not blackout
                         and bias_agrees
@@ -642,9 +646,16 @@ if __name__ == '__main__':
     parser.add_argument('--watch',   action='store_true', help='Scan every 5min continuously')
     parser.add_argument('--interval',type=int, default=300)
     parser.add_argument('--pairs',   nargs='+', default=None, help='Override pair list')
+    parser.add_argument('--ny-am',   action='store_true', help='NY AM mode: Grade B accepted, 0.50%% risk, bypasses NY_PM veto')
     args = parser.parse_args()
 
-    orch = ICTOrchestrator(pairs=args.pairs)
+    if args.ny_am:
+        ny_am_pairs = args.pairs or [
+            'GBPUSD=X', 'EURUSD=X', 'AUDUSD=X', 'AUDNZD=X', 'USDJPY=X'
+        ]
+        orch = ICTOrchestrator(pairs=ny_am_pairs, ny_am_mode=True)
+    else:
+        orch = ICTOrchestrator(pairs=args.pairs)
 
     if args.watch:
         orch.watch(interval=args.interval)

@@ -207,3 +207,12 @@ ml_lab:
       mutable_by_ml: false
       min: null
       max: null
+
+# ── NY AM Session (G2 acceleration — data collection trades) ──────────────── #
+ny_am_session:
+  enabled: true
+  hours_utc: "12:00-15:00"
+  pairs: [GBPUSD, EURUSD, AUDUSD, AUDNZD, USDJPY]
+  min_score: 6.0
+  risk_pct: 0.005
+  bypass_ny_pm_veto: true

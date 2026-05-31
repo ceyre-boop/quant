@@ -380,6 +380,25 @@ class OandaBridge:
             'timestamp':  datetime.now(timezone.utc).isoformat(),
         }
 
+    def get_closed_trades(self, limit: int = 50) -> list[dict]:
+        """
+        Returns recently closed trades from OANDA.
+
+        Each entry has: id, instrument, realizedPL, openTime, closeTime,
+        initialUnits, currentUnits, price (open price), averageClosePrice.
+        Returns [] on any failure — never raises.
+        """
+        try:
+            req = trades.TradesList(
+                self._account_id,
+                params={"state": "CLOSED", "count": str(limit)},
+            )
+            resp = self._api.request(req)
+            return resp.get("trades", [])
+        except Exception as exc:
+            logger.warning("[OandaBridge] get_closed_trades failed: %s", exc)
+            return []
+
     # ── Unit sizing helper ───────────────────────────────────────────────────
 
     def compute_units(

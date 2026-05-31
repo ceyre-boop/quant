@@ -27,6 +27,7 @@ No imports from: sovereign/, layer1/, layer2/, layer3/
 from __future__ import annotations
 
 import logging
+import os
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
@@ -177,6 +178,14 @@ class ICTPipeline:
         timestamp: datetime,
         account:   MicroRiskParams,
         atr:       Optional[float] = None,
+        # ── Sovereign context injected by ict-engine/orchestrator.py ──────
+        # Pre-fetched by the orchestrator (the designated cross-layer bridge)
+        # and passed in here to keep this module isolated.
+        ict_alloc_weight: float = 1.0,
+        ict_alloc_veto_reason: str = "",
+        bridge_thresholds: Optional[Dict] = None,
+        commitment_result: Optional[object] = None,
+        ny_am_mode: bool = False,
     ) -> "ICTSignal | ICTVeto":
 
         if direction not in ("LONG", "SHORT"):
@@ -185,34 +194,23 @@ class ICTPipeline:
                            reason=f"Invalid direction '{direction}'")
 
         # ── Allocation engine gate (Stage 0a) ───────────────────────────
-        # Reads continuous ict_weight from allocation_engine.
+        # ict_alloc_weight pre-fetched by orchestrator from allocation_engine.
         # ict_weight=0.0 → veto (regime hostile to ICT).
-        # ict_weight<0.5 → raise threshold (only best setups).
-        _ict_alloc_weight = 1.0
-        try:
-            from sovereign.intelligence.allocation_engine import read_allocation as _read_alloc
-            _alloc = _read_alloc()
-            _ict_alloc_weight = _alloc.ict_weight
-            if _ict_alloc_weight == 0.0:
-                return ICTVeto(symbol=symbol, direction=direction, timestamp=timestamp,
-                               score=0.0, grade=ICTGrade.VETOED,
-                               reason=f"ALLOCATION_ZERO: {_alloc.regime_tag} — {_alloc.reason[:60]}")
-        except Exception:
-            _ict_alloc_weight = 1.0
+        _ict_alloc_weight = ict_alloc_weight
+        if _ict_alloc_weight == 0.0:
+            return ICTVeto(symbol=symbol, direction=direction, timestamp=timestamp,
+                           score=0.0, grade=ICTGrade.VETOED,
+                           reason=ict_alloc_veto_reason or "ALLOCATION_ZERO: regime hostile to ICT")
 
         # ── Cross-system bridge gate (Stage 0b) ──────────────────────────
-        # Checks macro environment shared by the quant/forex system.
+        # bridge_thresholds pre-fetched by orchestrator from cross_system_bridge.
         # HALT_NEW blocks all new entries when Library convergence is extreme.
         # TIGHTEN adjusts thresholds below (min_score raised to 8.0).
-        try:
-            from sovereign.intelligence.cross_system_bridge import get_bridge as _get_bridge
-            _bridge_thresholds = _get_bridge().get_ict_thresholds()
-            if not _bridge_thresholds.get("active", True):
-                return ICTVeto(symbol=symbol, direction=direction, timestamp=timestamp,
-                               score=0.0, grade=ICTGrade.VETOED,
-                               reason=f"BRIDGE_HALT_NEW: {_bridge_thresholds.get('reason', '')[:80]}")
-        except Exception:
-            _bridge_thresholds = {}
+        _bridge_thresholds: Dict = bridge_thresholds or {}
+        if not _bridge_thresholds.get("active", True):
+            return ICTVeto(symbol=symbol, direction=direction, timestamp=timestamp,
+                           score=0.0, grade=ICTGrade.VETOED,
+                           reason=f"BRIDGE_HALT_NEW: {_bridge_thresholds.get('reason', '')[:80]}")
 
         # ── Intraday timing gate (Stage 0c) ──────────────────────────────
         # Regime study 2026-05-22 (n=732 trades, 2015-2026):
@@ -502,7 +500,7 @@ class ICTPipeline:
         #          A+ in any session is anti-edge — treat as A for trade decision.
         # ══════════════════════════════════════════════════════════════════
         _current_session = getattr(session_pre, "session_name", "")
-        if _current_session == "NY_PM":
+        if _current_session == "NY_PM" and not ny_am_mode:
             return ICTVeto(
                 symbol=symbol, direction=direction, timestamp=timestamp,
                 score=total_score, grade=ICTGrade.VETOED,
@@ -516,33 +514,23 @@ class ICTPipeline:
         # ── Commitment detector (2026-05-19) ──────────────────────────────
         # market_structure >= 1.5 predicts commitment failure at 87.5% accuracy.
         # London+GradeA+mkt<1.5: Sharpe 3.314 vs 1.864 unfiltered.
-        try:
-            from sovereign.intelligence.commitment_detector import CommitmentDetector as _CD
-            _commit = _CD(log=False).compute_ict(
-                component_scores=scores,
-                session=_current_session,
-                grade=grade.value if hasattr(grade, 'value') else str(grade),
-                score=total_score,
+        # commitment_result pre-computed by orchestrator from CommitmentDetector.
+        _commit = commitment_result
+        if _commit is not None and getattr(_commit, "label", None) == "UNCOMMITTED":
+            return ICTVeto(
+                symbol=symbol, direction=direction, timestamp=timestamp,
+                score=total_score, grade=ICTGrade.VETOED,
+                reason=f"COMMITMENT_DETECTOR: {_commit.reason}",
+                component_scores=scores, confirmations=confirmations, missing=missing,
             )
-            if _commit.label == "UNCOMMITTED":
-                return ICTVeto(
-                    symbol=symbol, direction=direction, timestamp=timestamp,
-                    score=total_score, grade=ICTGrade.VETOED,
-                    reason=f"COMMITMENT_DETECTOR: {_commit.reason}",
-                    component_scores=scores, confirmations=confirmations, missing=missing,
-                )
-            # DEVELOPING: execute at reduced size (handled downstream via size_multiplier)
-            _commit_size_mult = _commit.size_multiplier
-        except Exception as _ce:
-            import logging as _log_c
-            _log_c.getLogger("ict.pipeline").warning("Commitment detector failed: %s", _ce)
-            _commit_size_mult = 1.0
+        # DEVELOPING: execute at reduced size (handled downstream via size_multiplier)
+        _commit_size_mult = getattr(_commit, "size_multiplier", 1.0) if _commit is not None else 1.0
 
         # ══════════════════════════════════════════════════════════════════
         # STAGE 6 — Risk engine gate
         # Entry price = FVG midpoint (limit), not current market price.
         # ══════════════════════════════════════════════════════════════════
-        if _effective_grade in (ICTGrade.A_PLUS, ICTGrade.A):
+        if _effective_grade in (ICTGrade.A_PLUS, ICTGrade.A) or (ny_am_mode and _effective_grade == ICTGrade.B):
             ep = entry_level if entry_level is not None else price
 
             # Use structural stop (swept level) when a sweep is confirmed.
