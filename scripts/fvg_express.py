@@ -110,24 +110,47 @@ def _place_trade(pair: str, direction: str, df, dry_run: bool) -> dict:
         return {"status": "VETOED", "reason": "ZERO_RISK_DISTANCE"}
     tp = entry + TP_R * risk_dist if direction == "LONG" else entry - TP_R * risk_dist
 
+    from sovereign.execution.oanda_bridge import OandaBridge
+    from sovereign.execution.execution_tracker import record_fill
+    from sovereign.oracle.decision_chain import DecisionChain
+    bridge = OandaBridge()
+
     if dry_run:
         log.info("[DRY RUN] %s %s entry=%.5f stop=%.5f tp=%.5f", pair, direction, entry, stop, tp)
-        return {"status": "DRY_RUN", "entry": entry, "stop": stop, "tp": tp}
+    result = DecisionChain().evaluate(pair, direction, df, bridge=bridge, dry_run=dry_run)
 
-    from sovereign.execution.oanda_bridge import OandaBridge
-    bridge = OandaBridge()
-    units = bridge.compute_units(oanda_pair, entry, stop, RISK_PCT)
-    if units == 0:
-        return {"status": "VETOED", "reason": "ZERO_UNITS"}
-    return bridge.place_trade(oanda_pair, direction, units, stop, tp)
+    if result.get("status") == "FILLED":
+        from datetime import datetime, timezone
+        session = "LONDON" if 2 <= datetime.now(timezone.utc).hour < 5 else "NY_AM"
+        record_fill(
+            pair=oanda_pair,
+            direction=direction,
+            signal_price=entry,
+            fill_price=result.get("fill_price", entry),
+            stop_price=stop,
+            trade_id=result.get("trade_id", ""),
+            session=session,
+        )
+
+    return result
 
 
 # ─── Scan loop ───────────────────────────────────────────────────────────────
 
 def scan(dry_run: bool = False) -> list[dict]:
     import yfinance as yf
+    from sovereign.oracle.daily_readiness import DailyReadiness
 
     SCAN_LOG.parent.mkdir(parents=True, exist_ok=True)
+
+    readiness = DailyReadiness().assess()
+    if readiness.status == "SIT":
+        log.info("FVG_EXPRESS_SIT: %s", readiness.reason)
+        return []
+    size_multiplier = 0.5 if readiness.status == "REDUCE" else 1.0
+    if readiness.status == "REDUCE":
+        log.info("FVG_EXPRESS_REDUCE: %s (size×0.5)", readiness.reason)
+
     regime = _check_regime()
     results = []
 

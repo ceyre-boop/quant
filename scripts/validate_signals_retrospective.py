@@ -18,6 +18,7 @@ Output:
 """
 from __future__ import annotations
 
+import argparse
 import json
 import sys
 from datetime import date, datetime, timedelta, timezone
@@ -29,6 +30,13 @@ import yfinance as yf
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
+
+_parser = argparse.ArgumentParser(add_help=False)
+_parser.add_argument("--disable-weekly-gate", action="store_true")
+_parser.add_argument("--days", type=int, default=90)
+_args, _ = _parser.parse_known_args()
+WEEKLY_GATE_ENABLED = not _args.disable_weekly_gate
+SCAN_DAYS = _args.days
 
 from ict.pipeline import ICTPipeline, ICTSignal, ICTVeto, ICTGrade
 from ict.micro_risk import MicroRiskParams
@@ -135,13 +143,14 @@ def evaluate_day_pair(
 
 
 def main() -> None:
+    gate_label = "WITH weekly gate (v015)" if WEEKLY_GATE_ENABLED else "WITHOUT weekly gate (v014)"
     print("G2a — Signal Validation Retrospective")
-    print(f"Scanning last 30 trading days × {len(PAIRS)} pairs\n")
+    print(f"Scanning last {SCAN_DAYS} trading days × {len(PAIRS)} pairs | {gate_label}\n")
 
-    start_dt = (date.today() - timedelta(days=92)).isoformat()
+    start_dt = (date.today() - timedelta(days=SCAN_DAYS * 2 + 30)).isoformat()
     end_dt = date.today().isoformat()
 
-    print("Downloading historical data (90-day 1h window)…")
+    print(f"Downloading historical data ({SCAN_DAYS * 2 + 30}-day 1h window)…")
     all_data: dict[str, pd.DataFrame] = {}
     for pair in PAIRS:
         try:
@@ -165,22 +174,25 @@ def main() -> None:
 
     print("\nDownloading weekly data (2y 1W window for Stage 5.6 trend gate)…")
     weekly_data: dict[str, pd.DataFrame] = {}
-    for pair in PAIRS:
-        try:
-            wdf = yf.download(pair, period="2y", interval="1wk",
-                              progress=False, auto_adjust=True)
-            if wdf.empty:
-                continue
-            if isinstance(wdf.columns, pd.MultiIndex):
-                wdf.columns = wdf.columns.get_level_values(0)
-            wdf = wdf.rename(columns=str.capitalize)
-            wdf.index = pd.to_datetime(wdf.index, utc=True)
-            weekly_data[pair] = wdf
-            print(f"  {pair}: {len(wdf)} weekly bars")
-        except Exception as exc:
-            print(f"  {pair}: weekly download failed — {exc}")
+    if WEEKLY_GATE_ENABLED:
+        for pair in PAIRS:
+            try:
+                wdf = yf.download(pair, period="2y", interval="1wk",
+                                  progress=False, auto_adjust=True)
+                if wdf.empty:
+                    continue
+                if isinstance(wdf.columns, pd.MultiIndex):
+                    wdf.columns = wdf.columns.get_level_values(0)
+                wdf = wdf.rename(columns=str.capitalize)
+                wdf.index = pd.to_datetime(wdf.index, utc=True)
+                weekly_data[pair] = wdf
+                print(f"  {pair}: {len(wdf)} weekly bars")
+            except Exception as exc:
+                print(f"  {pair}: weekly download failed — {exc}")
+    else:
+        print("  [--disable-weekly-gate] Stage 5.6 skipped — weekly_df=None\n")
 
-    target_days = trading_days_back(30)
+    target_days = trading_days_back(SCAN_DAYS)
     print(f"\nRunning pipeline across {len(target_days)} trading days…")
 
     pipeline = ICTPipeline()

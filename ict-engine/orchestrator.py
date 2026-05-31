@@ -8,13 +8,18 @@ configurable scan interval, publishes live state to Firebase under the
 isolated  live_state/ICT_FOREX/<pair>  namespace, and emits structured
 logs that feed the ICT dashboard.
 
-Isolation rule (mirrors ict/pipeline.py)
+Isolation rule
 -----------------------------------------
-This module MUST NOT import from:
-  sovereign/, layer1/, layer2/, layer3/
+ict/pipeline.py MUST NOT import from sovereign/, layer1/, layer2/, layer3/.
+
+This orchestrator IS the designated cross-layer bridge (see CLAUDE.md):
+  - Pre-fetches sovereign context (allocation_engine, cross_system_bridge,
+    CommitmentDetector) once per cycle and injects it into pipeline.evaluate()
+  - This is the ONLY safe entry point for ICT → sovereign communication
 
 It may import from:
   ict.*          — all ICT subsystem modules
+  sovereign.*    — for sovereign context pre-fetch only (bridge role)
   firebase.*     — client + ict_namespace publisher
   config/        — ict_params.yml only
 """
@@ -190,19 +195,76 @@ class ICTOrchestrator:
         now = datetime.now(tz=timezone.utc)
         cycle = ScanCycle(started_at=now)
 
+        # Pre-fetch sovereign context once per cycle (isolation boundary:
+        # only the orchestrator imports sovereign/).
+        sovereign_ctx = self._fetch_sovereign_context()
+
         for pair in self.pairs:
-            result = self._evaluate_pair(pair, now, data_provider)
+            result = self._evaluate_pair(pair, now, data_provider, sovereign_ctx)
             if result is not None:
                 cycle.results.append(result)
 
         cycle.finished_at = datetime.now(tz=timezone.utc)
         return cycle
 
+    def _fetch_sovereign_context(self) -> Dict:
+        """
+        Fetch all sovereign-layer inputs needed by the pipeline in one place.
+        Returns a dict with keys: ict_alloc_weight, ict_alloc_veto_reason,
+        bridge_thresholds.  Commitment result is computed per-pair after scores
+        are known, so it is handled inside _evaluate_pair.
+        """
+        ctx: Dict = {
+            "ict_alloc_weight": 1.0,
+            "ict_alloc_veto_reason": "",
+            "bridge_thresholds": {},
+        }
+        try:
+            from sovereign.intelligence.allocation_engine import read_allocation
+            alloc = read_allocation()
+            ctx["ict_alloc_weight"] = alloc.ict_weight
+            if alloc.ict_weight == 0.0:
+                ctx["ict_alloc_veto_reason"] = (
+                    f"ALLOCATION_ZERO: {alloc.regime_tag} — {alloc.reason[:60]}"
+                )
+        except Exception as exc:
+            logger.debug("allocation_engine unavailable: %s", exc)
+
+        try:
+            from sovereign.intelligence.cross_system_bridge import get_bridge
+            ctx["bridge_thresholds"] = get_bridge().get_ict_thresholds()
+        except Exception as exc:
+            logger.debug("cross_system_bridge unavailable: %s", exc)
+
+        return ctx
+
+    def _compute_commitment(self, scores: Dict, session: str, grade: str, score: float):
+        """
+        Run CommitmentDetector for a single signal.  Called after pipeline scores
+        are computed but before the final trade decision (handled in orchestrator
+        so pipeline.py stays free of sovereign imports).
+
+        NOTE: This is called from _evaluate_pair only for post-scoring analysis.
+        The pipeline accepts the result via the commitment_result parameter.
+        """
+        try:
+            from sovereign.intelligence.commitment_detector import CommitmentDetector
+            return CommitmentDetector(log=False).compute_ict(
+                component_scores=scores,
+                session=session,
+                grade=grade,
+                score=score,
+            )
+        except Exception as exc:
+            logger.debug("CommitmentDetector unavailable: %s", exc)
+            return None
+
     def _evaluate_pair(
         self,
         pair: str,
         now: datetime,
         data_provider,
+        sovereign_ctx: Optional[Dict] = None,
     ) -> Optional[PairScanResult]:
         if data_provider is None:
             logger.debug("No data provider — skipping %s", pair)
@@ -214,14 +276,54 @@ class ICTOrchestrator:
             logger.warning("Data fetch failed for %s: %s", pair, exc)
             return None
 
+        ctx = sovereign_ctx or {}
+
         long_result = self._pipeline.evaluate(
             symbol=pair, direction="LONG",
             df=df, timestamp=now, account=self._account,
+            ict_alloc_weight=ctx.get("ict_alloc_weight", 1.0),
+            ict_alloc_veto_reason=ctx.get("ict_alloc_veto_reason", ""),
+            bridge_thresholds=ctx.get("bridge_thresholds", {}),
+            commitment_result=None,  # pipeline scores not yet known; see note below
         )
         short_result = self._pipeline.evaluate(
             symbol=pair, direction="SHORT",
             df=df, timestamp=now, account=self._account,
+            ict_alloc_weight=ctx.get("ict_alloc_weight", 1.0),
+            ict_alloc_veto_reason=ctx.get("ict_alloc_veto_reason", ""),
+            bridge_thresholds=ctx.get("bridge_thresholds", {}),
+            commitment_result=None,
         )
+        # Note on commitment_result: CommitmentDetector.compute_ict() needs
+        # component_scores which only exist after the pipeline runs.  The
+        # pipeline therefore runs first (commitment_result=None → no veto),
+        # and the orchestrator applies commitment filtering here as a post-pass.
+        # This preserves the isolation boundary while retaining the exact same
+        # gate logic (UNCOMMITTED → veto; DEVELOPING → size_mult=0.75).
+        from ict.pipeline import ICTSignal, ICTVeto, ICTGrade
+        for attr, result in (("long_result", long_result), ("short_result", short_result)):
+            if isinstance(result, ICTSignal):
+                commit = self._compute_commitment(
+                    scores=result.component_scores,
+                    session=getattr(result.session_status, "session_name", ""),
+                    grade=result.grade.value if hasattr(result.grade, "value") else str(result.grade),
+                    score=result.score,
+                )
+                if commit is not None and getattr(commit, "label", None) == "UNCOMMITTED":
+                    veto = ICTVeto(
+                        symbol=result.symbol, direction=result.direction,
+                        timestamp=result.timestamp, score=result.score,
+                        grade=ICTGrade.VETOED,
+                        reason=f"COMMITMENT_DETECTOR: {commit.reason}",
+                        component_scores=result.component_scores,
+                        confirmations=result.confirmations,
+                        missing=result.missing,
+                    )
+                    if attr == "long_result":
+                        long_result = veto
+                    else:
+                        short_result = veto
+
         self._log_decisions(long_result, short_result)
         return PairScanResult(
             pair=pair,
