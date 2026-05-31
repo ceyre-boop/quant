@@ -57,30 +57,94 @@ def _sync_fills() -> int:
     return len(fills)
 
 
-def _sync_checklist(fill_count: int) -> None:
-    path = ROOT / "data" / "agent" / "checklist_state.json"
+G2B_TARGET = 8  # execution validation threshold (reduced from 30)
+
+
+def _read_g2a() -> dict:
+    """Return g2a_validation.json summary or empty defaults if not run yet."""
+    path = ROOT / "data" / "agent" / "g2a_validation.json"
     if not path.exists():
-        return
-    state = json.loads(path.read_text())
-    for gate in state.get("gates", []):
-        if gate.get("id") == "G2":
-            needed = 30
-            have = fill_count
-            remaining = max(0, needed - have)
-            gate["value"] = f"{have} London+GradeA trades logged"
-            gate["status"] = "GREEN" if have >= needed else ("YELLOW" if have >= 10 else "RED")
-            gate["detail"] = (
-                f"Gate clear!" if have >= needed
-                else f"Need {remaining} more — OANDA bridge live since 2026-05-28"
-            )
-    state["timestamp"] = datetime.now(timezone.utc).isoformat()
-    green = sum(1 for g in state.get("gates", []) if g["status"] == "GREEN")
-    state["gates_green"] = green
-    state["gates_yellow"] = sum(1 for g in state.get("gates", []) if g["status"] == "YELLOW")
-    state["gates_red"] = sum(1 for g in state.get("gates", []) if g["status"] == "RED")
-    state["overall"] = "GO" if green == len(state.get("gates", [])) else "WAIT"
-    path.write_text(json.dumps(state, indent=2))
-    print(f"  Checklist: G2 updated to {fill_count}/30 trades")
+        return {"status": "PENDING", "signals_generated": 0, "win_rate": None}
+    try:
+        data = json.loads(path.read_text())
+        return {
+            "status": data.get("status", "PENDING"),
+            "signals_generated": data.get("signals_generated", 0),
+            "win_rate": data.get("win_rate"),
+        }
+    except Exception:
+        return {"status": "PENDING", "signals_generated": 0, "win_rate": None}
+
+
+def _sync_checklist(fill_count: int) -> None:
+    g2a = _read_g2a()
+
+    # Update checklist_state.json (legacy G2 gate — keep in sync for fallback)
+    path = ROOT / "data" / "agent" / "checklist_state.json"
+    if path.exists():
+        state = json.loads(path.read_text())
+        for gate in state.get("gates", []):
+            if gate.get("id") == "G2":
+                remaining = max(0, G2B_TARGET - fill_count)
+                gate["value"] = f"{fill_count}/{G2B_TARGET} execution trades"
+                gate["status"] = "GREEN" if fill_count >= G2B_TARGET else ("YELLOW" if fill_count >= 4 else "RED")
+                gate["detail"] = (
+                    "Gate clear!" if fill_count >= G2B_TARGET
+                    else f"Need {remaining} more — OANDA bridge live since 2026-05-28"
+                )
+        state["timestamp"] = datetime.now(timezone.utc).isoformat()
+        green = sum(1 for g in state.get("gates", []) if g["status"] == "GREEN")
+        state["gates_green"] = green
+        state["gates_yellow"] = sum(1 for g in state.get("gates", []) if g["status"] == "YELLOW")
+        state["gates_red"] = sum(1 for g in state.get("gates", []) if g["status"] == "RED")
+        state["overall"] = "GO" if green == len(state.get("gates", [])) else "WAIT"
+        path.write_text(json.dumps(state, indent=2))
+        print(f"  Checklist: G2b updated to {fill_count}/{G2B_TARGET} trades")
+
+    # Update prop_challenge_state.json (primary dashboard source)
+    prop_path = ROOT / "data" / "agent" / "prop_challenge_state.json"
+    if prop_path.exists():
+        prop = json.loads(prop_path.read_text())
+        for gate in prop.get("gates", []):
+            if gate.get("id") == "G2a":
+                if g2a["status"] == "PASS":
+                    gate["status"] = "GREEN"
+                    wr = f"{g2a['win_rate']:.1%}" if g2a["win_rate"] is not None else "?"
+                    gate["value"] = f"PASS — {g2a['signals_generated']} signals, WR {wr}"
+                    gate["detail"] = "Signal pipeline validated against 30 days of real data"
+                elif g2a["status"] == "FAIL":
+                    gate["status"] = "RED"
+                    gate["value"] = f"FAIL — {g2a['signals_generated']} signals"
+                    gate["detail"] = "Re-run validate_signals_retrospective.py and investigate"
+                else:
+                    gate["status"] = "YELLOW"
+                    gate["value"] = "not run"
+                    gate["detail"] = "Run: python3 scripts/validate_signals_retrospective.py"
+            elif gate.get("id") == "G2b":
+                remaining = max(0, G2B_TARGET - fill_count)
+                gate["value"] = f"{fill_count}/{G2B_TARGET}"
+                gate["status"] = "GREEN" if fill_count >= G2B_TARGET else ("YELLOW" if fill_count >= 4 else "RED")
+                gate["detail"] = (
+                    "Execution pipeline validated!" if fill_count >= G2B_TARGET
+                    else f"Need {remaining} more — use run_fvg_express.py to accelerate"
+                )
+        prop["timestamp"] = datetime.now(timezone.utc).isoformat()
+        greens = sum(1 for g in prop.get("gates", []) if g["status"] == "GREEN")
+        prop["overall"] = "GO" if greens == len(prop.get("gates", [])) else "WAIT"
+        prop_path.write_text(json.dumps(prop, indent=2))
+        print(f"  Prop challenge: G2a={g2a['status']} G2b={fill_count}/{G2B_TARGET}")
+
+    # Update g2_progress.json
+    g2p_path = ROOT / "data" / "agent" / "g2_progress.json"
+    if g2p_path.exists():
+        g2p = json.loads(g2p_path.read_text())
+        g2p["total"] = fill_count
+        g2p["target"] = G2B_TARGET
+        g2p["g2a_status"] = g2a["status"]
+        g2p["g2a_signals"] = g2a["signals_generated"]
+        g2p["g2a_win_rate"] = g2a["win_rate"]
+        g2p_path.write_text(json.dumps(g2p, indent=2))
+        print(f"  G2 progress: total={fill_count} target={G2B_TARGET} g2a={g2a['status']}")
 
 
 def _sync_tv_regime_signals() -> int:

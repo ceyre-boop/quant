@@ -268,12 +268,13 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
     <div class="panel">
       <div class="panel-label">PROP CHALLENGE GATES</div>
       <div class="gate-row"><div class="gate-light">🟢</div><div class="gate-label">G1 MC Pass Rate<span class="gate-sub">99.7–100% ✓ DONE</span></div></div>
-      <div class="gate-row"><div class="gate-light">🔴</div><div class="gate-label">G2 Live Trades<span class="gate-sub">1 / 30 collecting</span></div></div>
+      <div class="gate-row"><div class="gate-light">🟡</div><div class="gate-label">G2a Signal Validation<span class="gate-sub">not run — python3 scripts/validate_signals_retrospective.py</span></div></div>
+      <div class="gate-row"><div class="gate-light">🔴</div><div class="gate-label">G2b Execution<span class="gate-sub">1 / 8 trades</span></div></div>
       <div class="gate-row"><div class="gate-light">🟡</div><div class="gate-label">G3 WR Alignment<span class="gate-sub">collecting (need 10+)</span></div></div>
       <div class="gate-row"><div class="gate-light" id="g4-light">🔴</div><div class="gate-label">G4 Bridge Threat<span class="gate-sub" id="g4-sub">1.00 HALT_NEW</span></div></div>
       <div class="gate-row"><div class="gate-light">🟡</div><div class="gate-label">G5 Non-Bust Days<span class="gate-sub">collecting</span></div></div>
       <div style="margin-top:10px;padding:8px 10px;background:rgba(224,82,82,.06);border:1px solid var(--red);font-size:11px;color:var(--red)">
-        ⏸ WAIT — buy when G2 + G4 flip GREEN
+        ⏸ WAIT — buy when G2a + G2b + G4 flip GREEN
       </div>
     </div>
 
