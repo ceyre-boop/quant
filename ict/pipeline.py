@@ -213,32 +213,6 @@ class ICTPipeline:
                            score=0.0, grade=ICTGrade.VETOED,
                            reason=f"BRIDGE_HALT_NEW: {_bridge_thresholds.get('reason', '')[:80]}")
 
-        # ── Intraday timing gate (Stage 0c) ──────────────────────────────
-        # Regime study 2026-05-22 (n=732 trades, 2015-2026):
-        # ET 03:xx (London Open Kill Zone): WR=80%, avgR=+2.100
-        # ET 04:xx (hour after):            WR=14%, avgR=-0.214
-        # Only trade the first hour of London — institutional flow is
-        # cleanest and retail traps freshest in the 03:xx open window.
-        #
-        # NOTE: study timestamps were in ET (local machine time), not UTC.
-        # Bug fix 2026-05-23: original gate checked UTC hour=3 (= 11pm ET)
-        # which never fired during the scanner window (2-5am ET). Gate now
-        # checks ET hour=3 (3am ET = UTC 07:xx in EDT, UTC 08:xx in EST).
-        try:
-            import zoneinfo
-            _ts_et = timestamp.astimezone(zoneinfo.ZoneInfo("America/New_York"))
-            _hour_et = _ts_et.hour
-        except Exception:
-            # Fallback: assume EDT offset (UTC-4)
-            _utc_hour = getattr(timestamp, "hour", 0)
-            _hour_et = (_utc_hour - 4) % 24
-        if _hour_et != 3:
-            return ICTVeto(symbol=symbol, direction=direction, timestamp=timestamp,
-                           score=0.0, grade=ICTGrade.VETOED,
-                           reason=(f"TIMING_GATE: ET {_hour_et:02d}:xx — "
-                                   f"edge only at ET 03:xx (WR=80%, avgR=+2.100); "
-                                   f"ET 04:xx is anti-edge (WR=14%, avgR=-0.214)"))
-
         df    = self._normalise(df)
         price = float(df["Close"].iloc[-1])
 
@@ -368,6 +342,26 @@ class ICTPipeline:
             confirmations.append(f"✓ Displacement: {disp_label}")
         else:
             missing.append(f"✗ No displacement after sweep — {disp_label}")
+
+        # ══════════════════════════════════════════════════════════════════
+        # HYP-046 DISPLACEMENT GATE — confirmed 2026-05-26
+        # disp<1.5 trades: WR=15%, avgR=-0.167 (19% of London trades)
+        # disp>=1.5 trades: WR=35%, avgR=+0.594 (81% of London trades)
+        # Net: +0.146R/trade vs keeping all. Hard veto at threshold.
+        # Weight=1.0 (_DEFAULT_WEIGHTS) → component max=1.0 → threshold=0.75
+        # (same 75th-percentile cut as 1.5 threshold at weight=2.0)
+        # ══════════════════════════════════════════════════════════════════
+        _disp_component = scores.get("displacement", 0.0)
+        if _disp_component < 0.75:
+            return ICTVeto(
+                symbol=symbol, direction=direction, timestamp=timestamp,
+                score=0.0, grade=ICTGrade.VETOED,
+                reason=(
+                    f"HYP046_DISP_GATE: disp_component={_disp_component:.2f} < 0.75 "
+                    f"(low-disp trades: WR=15%, avgR=-0.167; confirmed 2026-05-26)"
+                ),
+                component_scores=scores, confirmations=confirmations, missing=missing,
+            )
 
         # ══════════════════════════════════════════════════════════════════
         # STAGE 3 — Post-sweep FVG + retracement
