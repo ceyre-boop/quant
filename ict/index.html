@@ -268,7 +268,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
     <div class="panel">
       <div class="panel-label">PROP CHALLENGE GATES</div>
       <div class="gate-row"><div class="gate-light">🟢</div><div class="gate-label">G1 MC Pass Rate<span class="gate-sub">99.7–100% ✓ DONE</span></div></div>
-      <div class="gate-row"><div class="gate-light">🔴</div><div class="gate-label">G2 Live Trades<span class="gate-sub">0 / 30 collecting</span></div></div>
+      <div class="gate-row"><div class="gate-light">🔴</div><div class="gate-label">G2 Live Trades<span class="gate-sub">1 / 30 collecting</span></div></div>
       <div class="gate-row"><div class="gate-light">🟡</div><div class="gate-label">G3 WR Alignment<span class="gate-sub">collecting (need 10+)</span></div></div>
       <div class="gate-row"><div class="gate-light" id="g4-light">🔴</div><div class="gate-label">G4 Bridge Threat<span class="gate-sub" id="g4-sub">1.00 HALT_NEW</span></div></div>
       <div class="gate-row"><div class="gate-light">🟡</div><div class="gate-label">G5 Non-Bust Days<span class="gate-sub">collecting</span></div></div>
@@ -279,8 +279,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
 
     <!-- Forex pairs -->
     <div class="panel">
-      <div class="panel-label">FOREX v013 — INSTITUTIONAL GRADE ✓</div>
-      <div style="font-size:10px;color:var(--muted);margin-bottom:10px">avg Sharpe: <span style="color:var(--green);font-weight:700">1.8552</span> · next gate: 1.9052</div>
+      <div class="panel-label">FOREX v014 — INSTITUTIONAL GRADE ✓</div>
+      <div style="font-size:10px;color:var(--muted);margin-bottom:10px">avg Sharpe: <span style="color:var(--green);font-weight:700">2.0970</span> · next gate: 2.1470</div>
       <div class="pair-row"><span class="pair-name">AUD/NZD</span><span class="pair-sharpe">2.246</span><span class="pair-badge">VIX&gt;13</span></div>
       <div class="pair-row"><span class="pair-name">GBP/USD</span><span class="pair-sharpe">1.885</span><span class="pair-badge">VIX&gt;18</span></div>
       <div class="pair-row"><span class="pair-name">USD/JPY</span><span class="pair-sharpe">1.770</span><span class="pair-badge">VIX&gt;15</span></div>
@@ -291,7 +291,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
     <!-- Sharpe tracker -->
     <div class="panel">
       <div class="panel-label">SHARPE PROGRESS</div>
-      <div class="sharpe-sub">Target <span>1.9052</span> · Achieved <span>1.8552</span> · Gap <span style="color:var(--yellow)">0.0500</span></div>
+      <div class="sharpe-sub">Target <span>2.1470</span> · Achieved <span>2.0970</span> · Gap <span style="color:var(--yellow)">0.0500</span></div>
       <div id="sharpe-rows"></div>
     </div>
 
@@ -308,7 +308,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
   <div>ICT config: <span>London + Grade A · UTC 03:xx · 0.75% risk</span></div>
   <div>Prop balance: <span>$100,000</span></div>
   <div>Bridge: <span id="stat-bridge" style="color:var(--red)">HALT_NEW</span></div>
-  <div>Forex v013: <span style="color:var(--green)">1.8552 ★</span></div>
+  <div>Forex v014: <span style="color:var(--green)">2.0970 ★</span></div>
 </div>
 
 <script>
@@ -483,11 +483,11 @@ function renderSuggestions(data) {
 
 // ── Sharpe tracker ──────────────────────────────────────────
 function renderSharpe() {
-  const target = 1.9052;
+  const target = 2.1470;
   const versions = [
     {l:'v005',s:0.8843},{l:'v008',s:1.1955},{l:'v009',s:1.2864},
     {l:'v010',s:1.4396},{l:'v011',s:1.6476},{l:'v012',s:1.7176},
-    {l:'v013',s:1.8552,current:true},
+    {l:'v013',s:1.8552},{l:'v014',s:2.0970,current:true},
   ];
   const pct = v => Math.min(100,(v/target)*100).toFixed(0);
   document.getElementById('sharpe-rows').innerHTML = versions.map(v=>`
