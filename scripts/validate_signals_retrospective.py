@@ -69,7 +69,7 @@ def classify_outcome(df: pd.DataFrame, cutoff_ts: pd.Timestamp, signal: ICTSigna
     future = df[df.index > cutoff_ts].head(OUTCOME_BARS)
     if future.empty:
         return "PENDING"
-    stop = signal.sizing.stop
+    stop = signal.sizing.stop_loss
     tp1 = signal.sizing.tp1
     for _, row in future.iterrows():
         if signal.direction == "LONG":
@@ -110,7 +110,7 @@ def evaluate_day_pair(
                 "grade": result.grade.value,
                 "score": round(result.score, 2),
                 "entry": round(result.entry_level, 5) if result.entry_level else None,
-                "stop": round(result.sizing.stop, 5),
+                "stop": round(result.sizing.stop_loss, 5),
                 "tp1": round(result.sizing.tp1, 5),
                 "outcome": outcome,
             }
@@ -133,6 +133,9 @@ def main() -> None:
             if df.empty:
                 print(f"  {pair}: no data returned")
                 continue
+            if isinstance(df.columns, pd.MultiIndex):
+                df.columns = df.columns.get_level_values(0)
+            df = df.rename(columns=str.capitalize)
             df.index = pd.to_datetime(df.index, utc=True)
             all_data[pair] = df
             print(f"  {pair}: {len(df)} bars")

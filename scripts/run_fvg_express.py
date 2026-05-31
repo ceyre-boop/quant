@@ -37,7 +37,7 @@ load_dotenv(ROOT / ".env")
 
 PAIRS_YF = ["GBPUSD=X", "EURUSD=X", "AUDUSD=X", "AUDNZD=X", "USDJPY=X"]
 FVG_LOOKBACK = 40       # bars to scan for FVGs
-FVG_MIN_BODY = 0.0002   # minimum gap size (in price) to qualify
+FVG_MIN_BODY = 0.0001   # minimum gap size (in price) to qualify
 RISK_PCT = 0.0025       # 0.25% per express trade
 ACCOUNT_SIZE = 100_000
 TP_R = 2.0              # take-profit in R multiples
@@ -130,10 +130,13 @@ def main() -> None:
     signals_found = []
     for pair in PAIRS_YF:
         try:
-            df = yf.download(pair, period="5d", interval="1h",
+            df = yf.download(pair, period="10d", interval="1h",
                              progress=False, auto_adjust=True)
             if df.empty:
                 continue
+            if isinstance(df.columns, pd.MultiIndex):
+                df.columns = df.columns.get_level_values(0)
+            df = df.rename(columns=str.capitalize)
             df.index = pd.to_datetime(df.index, utc=True)
             fvg = find_fvg(df, pair)
             if fvg:
