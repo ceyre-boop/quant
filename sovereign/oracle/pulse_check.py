@@ -26,7 +26,7 @@ HEALTH_PATH    = ROOT / "data" / "agent" / "health.json"
 LEDGER_PATH    = ROOT / "data" / "agent" / "hypothesis_ledger.json"
 INDICATORS_DIR = ROOT / "data" / "indicators"
 G2_PROGRESS_PATH = ROOT / "data" / "agent" / "g2_progress.json"
-G2_TARGET = 30
+G2_TARGET = 8
 
 log = logging.getLogger("oracle.pulse")
 
@@ -429,16 +429,24 @@ def _update_g2_progress() -> dict:
 
         est_completion = _estimate_g2_date(total, first_date)
 
+        existing: dict = {}
+        if G2_PROGRESS_PATH.exists():
+            try:
+                existing = json.loads(G2_PROGRESS_PATH.read_text())
+            except Exception:
+                pass
+
         progress = {
-            "total_closed":           total,
-            "target":                 G2_TARGET,
-            "pct_complete":           round(total / G2_TARGET, 3),
-            "win_rate":               win_rate,
-            "avg_r":                  avg_r,
-            "first_trade_date":       first_date,
-            "latest_trade_date":      latest_date,
+            **existing,                                      # preserve g2a_status, ict_fills, latest_fill
+            "total_closed":            total,
+            "target":                  G2_TARGET,
+            "pct_complete":            round(total / G2_TARGET, 3),
+            "win_rate":                win_rate,
+            "avg_r":                   avg_r,
+            "first_trade_date":        first_date,
+            "latest_trade_date":       latest_date,
             "estimated_g2_completion": est_completion,
-            "last_updated":           canonical_timestamp(),
+            "last_updated":            canonical_timestamp(),
         }
         G2_PROGRESS_PATH.parent.mkdir(parents=True, exist_ok=True)
         G2_PROGRESS_PATH.write_text(json.dumps(progress, indent=2))
