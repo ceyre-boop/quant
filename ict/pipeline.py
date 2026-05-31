@@ -186,6 +186,7 @@ class ICTPipeline:
         bridge_thresholds: Optional[Dict] = None,
         commitment_result: Optional[object] = None,
         ny_am_mode: bool = False,
+        weekly_df: Optional[pd.DataFrame] = None,
     ) -> "ICTSignal | ICTVeto":
 
         if direction not in ("LONG", "SHORT"):
@@ -475,6 +476,46 @@ class ICTPipeline:
         )
         # Re-grade after sentiment adjustment
         grade = self._grade(total_score, threshold=threshold)
+
+        # ══════════════════════════════════════════════════════════════════
+        # STAGE 5.6 — Weekly trend alignment (2026-05-30)
+        # Weekly EMA20/EMA50 cross: EMA20>EMA50 = bullish, EMA20<EMA50 = bearish.
+        # Shorts against a bullish weekly trend and longs against a bearish
+        # weekly trend have statistically negative R — block them.
+        # Gate skipped (not vetoed) when weekly_df is None or has <20 bars.
+        # weekly_df passed by caller — needs 2y of 1W bars for EMA convergence.
+        # ══════════════════════════════════════════════════════════════════
+        if weekly_df is not None and len(weekly_df) >= 20:
+            _wema20 = float(weekly_df["Close"].ewm(span=20, adjust=False).mean().iloc[-1])
+            _wema50 = float(weekly_df["Close"].ewm(span=50, adjust=False).mean().iloc[-1])
+            _weekly_bullish = _wema20 > _wema50
+            _weekly_bearish = _wema20 < _wema50
+            if direction == "SHORT" and _weekly_bullish:
+                return ICTVeto(
+                    symbol=symbol, direction=direction, timestamp=timestamp,
+                    score=total_score, grade=ICTGrade.VETOED,
+                    reason=(
+                        f"WEEKLY_TREND_CONFLICT: shorting against weekly uptrend "
+                        f"(EMA20={_wema20:.5f} > EMA50={_wema50:.5f})"
+                    ),
+                    component_scores=scores, confirmations=confirmations, missing=missing,
+                )
+            elif direction == "LONG" and _weekly_bearish:
+                return ICTVeto(
+                    symbol=symbol, direction=direction, timestamp=timestamp,
+                    score=total_score, grade=ICTGrade.VETOED,
+                    reason=(
+                        f"WEEKLY_TREND_CONFLICT: longing against weekly downtrend "
+                        f"(EMA20={_wema20:.5f} < EMA50={_wema50:.5f})"
+                    ),
+                    component_scores=scores, confirmations=confirmations, missing=missing,
+                )
+            elif _weekly_bullish or _weekly_bearish:
+                _trend_dir = "bullish" if _weekly_bullish else "bearish"
+                confirmations.append(
+                    f"✓ Weekly trend aligned — {_trend_dir} "
+                    f"(EMA20={_wema20:.5f} EMA50={_wema50:.5f})"
+                )
 
         # ══════════════════════════════════════════════════════════════════
         # HYP-047 SCORE CEILING — confirmed 2026-05-26

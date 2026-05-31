@@ -35,7 +35,7 @@ from ict.micro_risk import MicroRiskParams
 
 PAIRS = ["GBPUSD=X", "EURUSD=X", "AUDUSD=X", "AUDNZD=X", "USDJPY=X"]
 LOOKBACK_H = 120        # 5 trading days × ~24h of bars fed into pipeline per day
-OUTCOME_BARS = 48       # look 48h forward to classify WIN/LOSS/PENDING
+OUTCOME_BARS = 120      # look 120h (5 trading days) forward to classify WIN/LOSS/PENDING
 WIN_RATE_FLOOR = 0.30
 MIN_SIGNALS = 3
 BACKTEST_EXPECTATION = 0.41
@@ -86,12 +86,14 @@ def evaluate_day_pair(
     cutoff_ts: pd.Timestamp,
     symbol: str,
     pipeline: ICTPipeline,
+    weekly_df: Optional[pd.DataFrame] = None,
 ) -> Optional[dict]:
     slice_df = full_df[full_df.index <= cutoff_ts].tail(LOOKBACK_H)
     if len(slice_df) < 20:
         return None
 
     ts = cutoff_ts.to_pydatetime()
+    weekly_slice = weekly_df[weekly_df.index <= cutoff_ts] if weekly_df is not None else None
 
     for direction in ("LONG", "SHORT"):
         result = pipeline.evaluate(
@@ -100,6 +102,7 @@ def evaluate_day_pair(
             df=slice_df.copy(),
             timestamp=ts,
             account=ACCOUNT,
+            weekly_df=weekly_slice,
         )
         if isinstance(result, ICTSignal) and result.passed:
             # Mirror live orchestrator's bias_agrees gate — signals blocked there
@@ -160,6 +163,23 @@ def main() -> None:
         print("\nERROR: No data downloaded. Check network/yfinance.")
         sys.exit(1)
 
+    print("\nDownloading weekly data (2y 1W window for Stage 5.6 trend gate)…")
+    weekly_data: dict[str, pd.DataFrame] = {}
+    for pair in PAIRS:
+        try:
+            wdf = yf.download(pair, period="2y", interval="1wk",
+                              progress=False, auto_adjust=True)
+            if wdf.empty:
+                continue
+            if isinstance(wdf.columns, pd.MultiIndex):
+                wdf.columns = wdf.columns.get_level_values(0)
+            wdf = wdf.rename(columns=str.capitalize)
+            wdf.index = pd.to_datetime(wdf.index, utc=True)
+            weekly_data[pair] = wdf
+            print(f"  {pair}: {len(wdf)} weekly bars")
+        except Exception as exc:
+            print(f"  {pair}: weekly download failed — {exc}")
+
     target_days = trading_days_back(30)
     print(f"\nRunning pipeline across {len(target_days)} trading days…")
 
@@ -174,7 +194,7 @@ def main() -> None:
         for pair in PAIRS:
             if pair not in all_data:
                 continue
-            result = evaluate_day_pair(all_data[pair], cutoff_ts, pair, pipeline)
+            result = evaluate_day_pair(all_data[pair], cutoff_ts, pair, pipeline, weekly_data.get(pair))
             if result:
                 signals.append(result)
                 pb = pairs_breakdown[pair]

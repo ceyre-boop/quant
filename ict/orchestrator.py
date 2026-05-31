@@ -206,6 +206,24 @@ class ICTOrchestrator:
             flag = ' [BLACKOUT]' if b['blackout'] else f" bias={b['bias']} conf={b['confidence']:.2f}"
             logger.info("  %s:%s", p, flag)
 
+        # ── Weekly trend data (once per scan, fed to pipeline Stage 5.6) ──────────
+        weekly_data: dict[str, Optional[pd.DataFrame]] = {}
+        for _wp in self.pairs:
+            try:
+                _wdf = yf.download(_wp, period="2y", interval="1wk",
+                                   progress=False, auto_adjust=True)
+                if not _wdf.empty:
+                    if isinstance(_wdf.columns, pd.MultiIndex):
+                        _wdf.columns = _wdf.columns.get_level_values(0)
+                    _wdf = _wdf.rename(columns=str.capitalize)
+                    _wdf.index = pd.to_datetime(_wdf.index, utc=True)
+                    weekly_data[_wp] = _wdf
+                else:
+                    weekly_data[_wp] = None
+            except Exception as _exc:
+                logger.debug("Weekly data for %s failed: %s", _wp, _exc)
+                weekly_data[_wp] = None
+
         for pair in self.pairs:
             clean = pair.replace('=X', '')
             try:
@@ -231,6 +249,7 @@ class ICTOrchestrator:
                             symbol=clean, direction=direction,
                             df=df, timestamp=now, account=account, atr=atr,
                             ny_am_mode=self.ny_am_mode,
+                            weekly_df=weekly_data.get(pair),
                         )
                         if best is None or r.score > best.score:
                             best = r
