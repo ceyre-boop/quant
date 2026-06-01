@@ -80,10 +80,52 @@ def _already_queued() -> set:
     return keys
 
 
+def _sensitivity_variants(base_delta: dict) -> list[dict]:
+    """Stress-test a VALIDATED seed: small neighbor perturbations of its params, to confirm
+    the edge isn't knife-edge dependent on one number (the user's correct reframe of
+    combinatorial search — stress survivors, don't fish)."""
+    out = []
+    sw = base_delta.get("signal_weights")
+    if sw:
+        for d in (-0.2, -0.1, 0.1, 0.2):
+            v = dict(sw)
+            if "rate_weight" in v:
+                v["rate_weight"] = round(min(max(v["rate_weight"] + d, 0.0), 1.0), 2)
+            if "irp_weight" in v:
+                v["irp_weight"] = round(min(max(v.get("irp_weight", 0.0) - d, 0.0), 1.0), 2)
+            out.append({"subsystem": "forex", "param_delta": {"signal_weights": v},
+                        "priority": 1.0, "label": f"sensitivity rate={v.get('rate_weight')}/irp={v.get('irp_weight')}"})
+    gates = base_delta.get("PAIR_VIX_GATES")
+    if gates:
+        for pair, thr in gates.items():
+            for d in (-2, -1, 1, 2):
+                out.append({"subsystem": "forex", "param_delta": {"PAIR_VIX_GATES": {pair: float(thr + d)}},
+                            "priority": 1.0, "label": f"sensitivity {pair} VIX {thr}->{thr+d}"})
+    return out
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--n", type=int, default=20, help="max hypotheses to append this run")
+    ap.add_argument("--sensitivity", metavar="HYP_ID",
+                    help="stress-test a validated hypothesis: queue neighbor perturbations of its params")
     args = ap.parse_args()
+
+    if args.sensitivity:
+        items = [json.loads(l) for l in QUEUE.read_text().splitlines() if l.strip()] if QUEUE.exists() else []
+        base = next((q for q in items if q.get("id") == args.sensitivity), None)
+        if not base or not base.get("param_delta"):
+            raise SystemExit(f"{args.sensitivity} not found / has no param_delta.")
+        variants = _sensitivity_variants(base["param_delta"])
+        with open(QUEUE, "a") as f:
+            for i, v in enumerate(variants, 1):
+                rec = {"id": f"SENS-{args.sensitivity}-{i:02d}", "subsystem": v["subsystem"],
+                       "param_delta": v["param_delta"], "source": "sensitivity",
+                       "of_seed": args.sensitivity, "priority": v["priority"], "label": v["label"],
+                       "status": "QUEUED", "queued_at": _now()}
+                f.write(json.dumps(rec) + "\n")
+        print(f"Sensitivity: queued {len(variants)} neighbor variant(s) of {args.sensitivity}.")
+        return
 
     from sovereign.oracle.edge_pipeline import EdgePipeline
     ep = EdgePipeline()

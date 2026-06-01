@@ -167,10 +167,15 @@ class ForexBacktester:
         use_macro_overlay: bool = False,
         allow_pyramiding: bool = True,
         max_pyramid_units: int = 4,
+        signal_weights: Optional[dict] = None,
     ):
         self.start = start
         self.end = end
         self.strict_mode = strict_mode
+        # Seed-library factor-replication hook: override the macro signal's factor
+        # weights (irp_weight / rate_weight / use_momentum_filter). None → engine defaults
+        # (unchanged behavior). Keys absent from the dict keep their defaults.
+        self._signal_weights = signal_weights or {}
         self.allow_pyramiding = allow_pyramiding and strict_mode
         self.max_pyramid_units = max_pyramid_units if strict_mode else 1
         self._compliance = ForexComplianceConfig(
@@ -192,6 +197,7 @@ class ForexBacktester:
                 cb_surprise_threshold=self.CB_SURPRISE_THRESHOLD,
                 strict_mode=strict_mode,
                 use_macro_overlay=use_macro_overlay,
+                **self._signal_weights,
             ),
         )
 
@@ -347,6 +353,7 @@ class ForexBacktester:
                 signal_threshold=self.SIGNAL_THRESHOLD,
                 cb_surprise_threshold=self.CB_SURPRISE_THRESHOLD,
                 strict_mode=self.strict_mode,
+                **self._signal_weights,
             ),
         )
         return engine.build_signal_frame(

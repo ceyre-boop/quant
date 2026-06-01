@@ -44,8 +44,8 @@ WINDOWS = [
 ]
 
 
-def _run(start: str, end: str, pair_vix_gates: dict | None = None):
-    bt = ForexBacktester(start=start, end=end)
+def _run(start: str, end: str, pair_vix_gates: dict | None = None, signal_weights: dict | None = None):
+    bt = ForexBacktester(start=start, end=end, signal_weights=signal_weights or None)
     if pair_vix_gates is not None:
         gates = dict(bt.PAIR_VIX_GATES)
         gates.update(pair_vix_gates)
@@ -54,7 +54,8 @@ def _run(start: str, end: str, pair_vix_gates: dict | None = None):
     return _sharpe_from_results(results), _total_trades(results)
 
 
-def run_walkforward(pair_vix_gates: dict | None = None, save: bool = True, verbose: bool = True) -> dict:
+def run_walkforward(pair_vix_gates: dict | None = None, signal_weights: dict | None = None,
+                    save: bool = True, verbose: bool = True) -> dict:
     """Rolling walk-forward. Optional pair_vix_gates injects a parameter delta
     (e.g. {'USDJPY=X': 13.0}) so EdgePipeline can test a candidate before committing.
     Returns the result dict (also saved to data/research/ when save=True and no override)."""
@@ -67,8 +68,8 @@ def run_walkforward(pair_vix_gates: dict | None = None, save: bool = True, verbo
     for w in WINDOWS:
         if verbose:
             print(f"\n  [{w['label']}] test {w['test'][0]}→{w['test'][1]}")
-        train_sharpe, train_n = _run(*w["train"], pair_vix_gates=pair_vix_gates)
-        test_sharpe, test_n = _run(*w["test"], pair_vix_gates=pair_vix_gates)
+        train_sharpe, train_n = _run(*w["train"], pair_vix_gates=pair_vix_gates, signal_weights=signal_weights)
+        test_sharpe, test_n = _run(*w["test"], pair_vix_gates=pair_vix_gates, signal_weights=signal_weights)
         ci_low, ci_high, se = sharpe_ci(test_sharpe, test_n)
         decay = round(test_sharpe / train_sharpe, 3) if train_sharpe > 0 else None
         rows.append({

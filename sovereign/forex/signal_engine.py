@@ -39,6 +39,12 @@ class SignalConfig:
     use_macro_overlay: bool = False
     donchian_fast_entry_days: int = DONCHIAN_FAST_ENTRY_DAYS
     donchian_slow_entry_days: int = DONCHIAN_SLOW_ENTRY_DAYS
+    # Factor weights for the backtest macro signal (parameterized for seed-library
+    # factor replication). DEFAULTS = the historical hardcoded literals → zero behavior
+    # change. A pure-carry seed sets irp_weight=0, rate_weight=1, use_momentum_filter=False.
+    irp_weight: float = 0.50            # IRP mean-reversion (value-ish) component
+    rate_weight: float = 0.50           # real rate differential (carry) component
+    use_momentum_filter: bool = True    # 63-day momentum confirmation gate
 
 
 class ForexSignalEngine:
@@ -525,16 +531,19 @@ class ForexSignalEngine:
                  if len(hist) > 252 else 0.0)
 
         macro_score = (
-            0.50 * np.clip(-irp_z / 1.5, -1, 1) +
-            0.50 * np.clip(real_rate_diff / 4.0, -1, 1)
+            self.config.irp_weight * np.clip(-irp_z / 1.5, -1, 1) +
+            self.config.rate_weight * np.clip(real_rate_diff / 4.0, -1, 1)
         )
+
+        macro_sign = int(np.sign(macro_score)) if abs(macro_score) > self.config.signal_threshold else 0
+        if not self.config.use_momentum_filter:
+            return macro_sign
 
         mom_sign = 0
         if len(hist) > 63:
             mom = float(hist.iloc[-1] / hist.iloc[-63] - 1)
             mom_sign = int(np.sign(mom)) if abs(mom) > 0.005 else 0
 
-        macro_sign = int(np.sign(macro_score)) if abs(macro_score) > self.config.signal_threshold else 0
         if macro_sign != 0 and (mom_sign == 0 or mom_sign == macro_sign):
             return macro_sign
         return 0

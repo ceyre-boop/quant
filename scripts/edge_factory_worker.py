@@ -89,7 +89,7 @@ def _holdout_confirm(hyp: dict) -> tuple[bool, str]:
         if sub == "forex":
             from sovereign.forex.forex_backtester import ForexBacktester
             from scripts.holdout_validation_v014 import _sharpe_from_results, _total_trades
-            bt = ForexBacktester(start=HOLDOUT_START, end=end)
+            bt = ForexBacktester(start=HOLDOUT_START, end=end, signal_weights=delta.get("signal_weights") or None)
             gates = dict(bt.PAIR_VIX_GATES); gates.update(delta.get("PAIR_VIX_GATES", {})); bt.PAIR_VIX_GATES = gates
             res = bt.backtest_all()
             s, n = _sharpe_from_results(res), _total_trades(res)
@@ -118,11 +118,11 @@ def _holdout_confirm(hyp: dict) -> tuple[bool, str]:
     return False, "unknown subsystem"
 
 
-def _record(hid: str, p, status: str, holdout: str = "") -> None:
+def _record(hid: str, p, status: str, holdout: str = "", preregistered: bool = False) -> None:
     FACTORY_LEDGER.parent.mkdir(parents=True, exist_ok=True)
     with open(FACTORY_LEDGER, "a") as f:
-        f.write(json.dumps({"id": hid, "p_value": p, "status": status,
-                            "holdout": holdout, "tested_at": _now()}) + "\n")
+        f.write(json.dumps({"id": hid, "p_value": p, "status": status, "holdout": holdout,
+                            "preregistered": preregistered, "tested_at": _now()}) + "\n")
     cnt = json.loads(TEST_COUNT.read_text()) if TEST_COUNT.exists() else {"total": 0}
     cnt["total"] = cnt.get("total", 0) + 1; cnt["updated"] = _now()
     TEST_COUNT.write_text(json.dumps(cnt, indent=2))
@@ -147,7 +147,7 @@ def main():
         skip, why = ep.should_skip_hypothesis(it)
         if skip:
             it["status"] = "SKIPPED_DUPLICATE"; it["reason"] = why
-            _record(hid, None, "SKIPPED_DUPLICATE"); processed += 1
+            _record(hid, None, "SKIPPED_DUPLICATE", preregistered=it.get("preregistered", False)); processed += 1
             print(f"  {hid}: SKIPPED ({why[:60]})"); continue
 
         verdict = ep.process({"id": hid, "subsystem": it["subsystem"], "param_delta": it["param_delta"]})
@@ -169,7 +169,7 @@ def main():
             it["reason"] = verdict.get("reason", "")
 
         it["status"] = status; it["p_value"] = p; it["tested_at"] = _now()
-        _record(hid, p, status, it.get("holdout", ""))
+        _record(hid, p, status, it.get("holdout", ""), preregistered=it.get("preregistered", False))
         processed += 1
         print(f"  {hid} [{it['subsystem']}] {it.get('label','')}: {status}"
               + (f" (p={p})" if p is not None else ""))

@@ -135,7 +135,9 @@ class EdgePipeline:
         # ── Stage 2: rolling walk-forward (forex only) ─────────────────────
         wf = None
         if sub == "forex":
-            wf = run_walkforward(pair_vix_gates=wf_gates, save=False, verbose=False)
+            wf = run_walkforward(pair_vix_gates=delta.get("PAIR_VIX_GATES"),
+                                 signal_weights=delta.get("signal_weights"),
+                                 save=False, verbose=False)
             if not wf["all_positive"]:
                 fragile = [r["test_year"] for r in wf["windows"] if r["test_sharpe"] <= 0]
                 return self._finalize(hid, "FRAGILE",
@@ -156,22 +158,26 @@ class EdgePipeline:
                               hypothesis, p_value=p_value, walkforward=wf, stage=True)
 
     # ── significance runners ──────────────────────────────────────────────
-    def _forex_returns(self, pair_vix_gates: dict | None, affected: list) -> list:
+    def _forex_returns(self, pair_vix_gates: dict | None, signal_weights: dict | None,
+                       only_pairs: list | None) -> list:
         from sovereign.forex.forex_backtester import ForexBacktester
-        bt = ForexBacktester(start="2015-01-01", end="2024-12-31")
+        bt = ForexBacktester(start="2015-01-01", end="2024-12-31", signal_weights=signal_weights or None)
         if pair_vix_gates:
             gates = dict(bt.PAIR_VIX_GATES); gates.update(pair_vix_gates); bt.PAIR_VIX_GATES = gates
         bt.backtest_all()
         data = json.loads(TRADES.read_text())
-        return [t["pnl_pct"] for pair, trades in data.items() if pair in affected for t in trades]
+        return [t["pnl_pct"] for pair, trades in data.items()
+                if (only_pairs is None or pair in only_pairs) for t in trades]
 
     def _forex_significance(self, delta: dict):
         gates = delta.get("PAIR_VIX_GATES", {})
-        affected = list(gates.keys()) or None
-        r_with = self._forex_returns(gates, affected or [])
-        r_base = self._forex_returns(None, affected or [])
+        weights = delta.get("signal_weights", {})
+        # VIX-gate deltas affect only the gated pairs; signal-weight deltas affect ALL pairs.
+        only_pairs = list(gates.keys()) if (gates and not weights) else None
+        r_with = self._forex_returns(gates or None, weights or None, only_pairs)
+        r_base = self._forex_returns(None, None, only_pairs)
         p = bootstrap_diff_pvalue(r_with, r_base, self.n_boot, self.rng)
-        return p, f"meanR_with={np.mean(r_with):.4f}(n={len(r_with)}) vs base={np.mean(r_base):.4f}", affected
+        return p, f"meanR_with={np.mean(r_with):.4f}(n={len(r_with)}) vs base={np.mean(r_base):.4f}", only_pairs
 
     def _ict_returns(self, weight_delta: dict | None) -> list:
         """Run the ICT backtest with an optional scoring delta via a temp config."""
