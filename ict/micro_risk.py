@@ -32,7 +32,7 @@ logger = logging.getLogger(__name__)
 
 # ── Defaults (mirrors ict_params.yml) ─────────────────────────────────────── #
 
-_MAX_RISK_PER_TRADE = 0.02     # 2 %
+_MAX_RISK_PER_TRADE = 0.0075   # 0.75 % prop-safe ceiling (was flat 2 %)
 _MAX_CONCURRENT_RISK = 0.06    # 6 %
 _MAX_POSITIONS = 3
 _MAX_DAILY_LOSS_PCT = 0.05     # 5 %
@@ -42,6 +42,13 @@ _STOP_ATR_MULT = 1.0
 _TP1_R = 2.0
 _TP2_R = 4.0
 _TP1_SIZE_FRAC = 0.5
+
+# Conviction sizing by ICT grade (honors the repo's "conviction sizing only" rule).
+# Stays inside ict/ — no sovereign import. Risk scales with setup quality and is
+# hard-clamped at 1% per trade. Falls back to the prop-safe default when no grade
+# is supplied (e.g. callers that don't pass one).
+_GRADE_RISK = {'A+': 0.010, 'A': 0.0075, 'B': 0.005, 'C': 0.0025}
+_RISK_CEILING = 0.010          # never risk more than 1 % on a single ICT trade
 
 
 # ── Contracts ─────────────────────────────────────────────────────────────── #
@@ -125,6 +132,7 @@ class MicroRiskEngine:
         atr: float,
         params: MicroRiskParams,
         pip_value: float = 1.0,
+        grade: Optional[str] = None,
     ) -> "PositionSizing | RiskVeto":
         """
         Compute sizing for a proposed trade.
@@ -138,10 +146,20 @@ class MicroRiskEngine:
             pip_value: value of 1 unit × 1 price-unit move in account currency.
                        For 1 standard forex lot: pip_value = 10 per pip.
                        Pass 1.0 if working in dimensionless units.
+            grade: ICT setup grade ('A+'|'A'|'B'|'C'). Drives conviction sizing —
+                   risk scales with setup quality, clamped at 1%. When None, falls
+                   back to the prop-safe default (no flat 2%).
 
         Returns:
             PositionSizing if approved, RiskVeto if blocked.
         """
+        # ── Conviction-scaled per-trade risk (no flat sizing) ───────────
+        # Computed up-front so the concurrent-risk gate reserves the ACTUAL
+        # risk this trade will take (an A+ trade risks more than the default).
+        graded_risk = _GRADE_RISK.get(grade) if grade else None
+        risk_pct = graded_risk if graded_risk is not None else self.max_risk_per_trade
+        risk_pct = min(risk_pct, _RISK_CEILING)
+
         # ── Gate 1: daily loss limit ─────────────────────────────────────
         if params.daily_loss_pct >= self.max_daily_loss_pct:
             return RiskVeto(
@@ -157,12 +175,12 @@ class MicroRiskEngine:
             )
 
         # ── Gate 3: max concurrent portfolio risk ─────────────────────
-        if params.open_risk_pct + self.max_risk_per_trade > self.max_concurrent_risk:
+        if params.open_risk_pct + risk_pct > self.max_concurrent_risk:
             return RiskVeto(
                 reason="MAX_CONCURRENT_RISK",
                 detail=(
-                    f"Adding {self.max_risk_per_trade:.1%} would bring total risk to "
-                    f"{params.open_risk_pct + self.max_risk_per_trade:.1%} "
+                    f"Adding {risk_pct:.1%} would bring total risk to "
+                    f"{params.open_risk_pct + risk_pct:.1%} "
                     f"(max {self.max_concurrent_risk:.1%})."
                 ),
             )
@@ -199,8 +217,8 @@ class MicroRiskEngine:
                 detail=f"R:R {rr_ratio:.1f} < minimum {self.min_rr:.1f}.",
             )
 
-        # ── Compute position size ────────────────────────────────────────
-        risk_dollars = params.account_size * self.max_risk_per_trade
+        # ── Compute position size (risk_pct conviction-scaled above) ─────
+        risk_dollars = params.account_size * risk_pct
         position_units = risk_dollars / (stop_distance * pip_value) if pip_value > 0 else 0.0
 
         # ── Gate 6: leverage cap ─────────────────────────────────────────

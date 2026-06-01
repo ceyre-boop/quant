@@ -12,6 +12,11 @@ cd "$(dirname "$0")/.." || exit 1
 LOG="logs/ict_scanner.log"
 mkdir -p logs
 
+# Loop-liveness heartbeat — written EVERY invocation, BEFORE the session gate, so the
+# monitor distinguishes "launchd stopped firing me" (genuinely down) from "running fine,
+# no qualifying signals" (healthy, just quiet). The decision log is NOT a heartbeat.
+date -u +"%Y-%m-%dT%H:%M:%SZ" > logs/.heartbeat_ict_scanner
+
 # ET time — strip leading zeros so bash doesn't treat 08/09 as octal
 ET_HOUR=$(TZ="America/New_York" date +"%H" | sed 's/^0//')
 ET_MIN=$(TZ="America/New_York" date +"%M" | sed 's/^0//')

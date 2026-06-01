@@ -35,6 +35,58 @@ logger = logging.getLogger(__name__)
 RESULTS_PATH = Path(__file__).parents[2] / 'logs' / 'forex_backtest_results.json'
 RESULTS_PATH.parent.mkdir(exist_ok=True)
 
+# ── Transaction costs ─────────────────────────────────────────────────────── #
+# Round-trip spread in PRICE units (yen pairs are in yen, ~150-price scale).
+# Applied as a fraction of entry price in _simulate_trades, since trade pnl_pct
+# is a fractional return — a raw price-unit subtraction would over-charge JPY
+# pairs by ~150×. OANDA practice is spread-only (no commission).
+SPREAD_COST = {
+    'GBPUSD=X': 0.00012,   # ~1.2 pips
+    'EURUSD=X': 0.00010,   # ~1.0 pips
+    'USDJPY=X': 0.012,     # ~1.2 pips (yen)
+    'AUDUSD=X': 0.00014,   # ~1.4 pips
+    'AUDNZD=X': 0.00020,   # ~2.0 pips (cross, wider)
+}
+SLIPPAGE_PER_SIDE = 0.00005   # ~0.5 pips, charged on entry and exit
+_DEFAULT_SPREAD = 0.00015     # fallback for pairs without an explicit entry
+
+# Annual swap/financing rate per pair/direction (fraction of notional per year).
+# Negative = you PAY to hold; positive = you EARN (carry). Applied per trade scaled
+# by hold_days with a Wednesday-triple / weekend approximation. News-spread widening
+# is intentionally NOT modeled: the array backtest path has no per-trade high-impact-
+# news flag, so a per-trade multiplier would be fabricated rather than measured.
+SWAP_RATES_ANNUAL = {
+    'GBPUSD=X': {'LONG': -0.0012, 'SHORT': -0.0008},
+    'EURUSD=X': {'LONG': -0.0015, 'SHORT': -0.0010},
+    'USDJPY=X': {'LONG':  0.0020, 'SHORT': -0.0035},   # positive carry long
+    'AUDUSD=X': {'LONG': -0.0008, 'SHORT': -0.0012},
+    'AUDNZD=X': {'LONG': -0.0003, 'SHORT': -0.0003},   # near-zero carry cross
+}
+_DEFAULT_SWAP = {'LONG': -0.0010, 'SHORT': -0.0010}
+
+# Gap 1: live-calibrated per-side slippage (price units), written by
+# cost_calibrator.py from real fills. Absent → modeled SLIPPAGE_PER_SIDE is used.
+_CALIBRATED_COSTS_PATH = Path(__file__).resolve().parents[2] / 'data' / 'execution' / 'calibrated_costs.json'
+_calibrated_slippage_cache: Optional[dict] = None
+
+
+def _calibrated_slippage(pair: Optional[str]) -> Optional[float]:
+    """Per-side slippage (price units) from calibrated_costs.json, or None to fall back."""
+    global _calibrated_slippage_cache
+    if _calibrated_slippage_cache is None:
+        try:
+            data = json.loads(_CALIBRATED_COSTS_PATH.read_text())
+            _calibrated_slippage_cache = {
+                k: v.get("slippage_price_per_side")
+                for k, v in data.get("slippage_by_pair", {}).items()
+            }
+        except Exception:
+            _calibrated_slippage_cache = {}
+    if not pair:
+        return None
+    norm = str(pair).replace("=X", "").replace("_", "").upper()
+    return _calibrated_slippage_cache.get(norm)
+
 
 @dataclass
 class ForexBacktestResult:
@@ -66,6 +118,10 @@ class ForexBacktester:
     # USDCAD/USDJPY: below sweep threshold, 60d hold unchanged.
     # Portfolio: 1.0713 (+0.017 vs v006 1.0547) — below +0.05 version gate but all-pair consistency
     # warrants apply: shorter holds reduce overnight exposure, GBPJPY gains are real.
+    # NOTE: Retro validation 2026-05-27 flagged this as harmful (delta_sharpe=-0.087, p=0.008)
+    # but live backtester CONTRADICTS that finding: removing overrides drops GBPUSD 1.89→1.70,
+    # AUDUSD 1.67→1.43. Retro test was flawed — forensics 'hold' reflects natural trade duration,
+    # not the effect of forced hold caps. Rule remains active pending redesigned validation.
     PAIR_HOLD_OVERRIDES: dict = {
         "GBPUSD=X": 6,
         "AUDUSD=X": 5,
@@ -95,8 +151,8 @@ class ForexBacktester:
     #   AUDUSD:  1.292 → 1.665  (VIX>20)
     #   Portfolio: 1.2864 → 1.6476  (+0.361 total across v010+v011)
     PAIR_VIX_GATES: dict = {
-        'USDJPY=X': 13.0,   # v014: lowered from 15→13. JPY safe-haven overwhelms rate signal at any VIX elevation; VIX>13 in bull market = conflicting signals. 46 trades, 67.4% WR, Sharpe 2.979
-        'AUDNZD=X': 13.0,   # v013: lowered from 15→13. Both risk currencies — cross rate signal degrades faster than G3 pairs. 39 trades, 53.8% WR, Sharpe 2.246
+        'USDJPY=X': 15.0,   # HYP-044 ROLLED BACK 2026-05-31: 15→13 showed delta 0.000 on the 2023-24 holdout — in-sample noise. Reverted to v013 threshold.
+        'AUDNZD=X': 15.0,   # HYP-044 ROLLED BACK 2026-05-31: 15→13 showed delta 0.000 on the 2023-24 holdout — in-sample noise. Reverted to v013 threshold.
         'EURUSD=X': 18.0,   # ECB-FED rate diff survives mild fear, breaks at VIX>18
         'GBPUSD=X': 18.0,   # BOE-FED rate diff same — confirmed optimal in full sweep
         'AUDUSD=X': 20.0,   # RBA-FED commodity-linked, more resilient; needs true fear
@@ -198,7 +254,7 @@ class ForexBacktester:
                 signals, pair=pair, start=self.start, end=self.end
             )
 
-        trades = self._simulate_trades(df, signals, trailing_mult=pair_trailing)
+        trades = self._simulate_trades(df, signals, pair=pair, trailing_mult=pair_trailing)
 
         if not trades:
             return None
@@ -226,7 +282,7 @@ class ForexBacktester:
                     df=df, base_country=base_country, quote_country=quote_country,
                     pair=pair, hold_days=pair_hold,
                 )
-                trades = self._simulate_trades(df, pair_signals, trailing_mult=pair_trailing)
+                trades = self._simulate_trades(df, pair_signals, pair=pair, trailing_mult=pair_trailing)
                 if not trades:
                     continue
                 all_trades[pair] = trades
@@ -299,11 +355,12 @@ class ForexBacktester:
         )
 
     def _simulate_trades(
-        self, df: pd.DataFrame, signals: pd.DataFrame, trailing_mult: float = None
+        self, df: pd.DataFrame, signals: pd.DataFrame, pair: str = None,
+        trailing_mult: float = None
     ) -> list:
         close = df['Close'] if 'Close' in df.columns else df.iloc[:, 0]
         atr_series = self._signals._compute_atr_pct(close, df)
-        return simulate_forex_trades(
+        trades = simulate_forex_trades(
             df,
             signals,
             stop_pct=self.STOP_PCT,
@@ -318,6 +375,38 @@ class ForexBacktester:
             max_risk_pct=self.MAX_RISK_PER_TRADE_PCT,
             enable_cb_refresh=not self.strict_mode,
         )
+        return self._apply_costs(trades, pair)
+
+    @staticmethod
+    def _apply_costs(trades: list, pair: str = None) -> list:
+        """Deduct round-trip spread + slippage + swap/financing from each trade's
+        fractional pnl.
+
+        pnl_pct is a fractional return (price/entry - 1), so the price-unit spread
+        cost is normalised by the entry price before subtraction. Swap is a signed
+        fraction of notional (negative = pay, positive = earn carry) scaled by the
+        hold duration with a Wednesday-triple/weekend approximation.
+        """
+        spread = SPREAD_COST.get(pair, _DEFAULT_SPREAD)
+        # Overlay LIVE-calibrated slippage (Gap 1) when available, else the modeled
+        # default. Spread stays modeled (execution_tracker doesn't measure it).
+        per_side = _calibrated_slippage(pair)
+        slip = per_side if per_side is not None else SLIPPAGE_PER_SIDE
+        cost_price = spread + 2 * slip
+        swap_tbl = SWAP_RATES_ANNUAL.get(pair, _DEFAULT_SWAP)
+        for t in trades:
+            entry = max(t.get('entry', 0.0), 1e-9)
+            spread_frac = cost_price / entry
+            # Swap: signed annual rate / 365, scaled by hold days + weekend triple.
+            side = 'LONG' if t.get('direction', 1) >= 0 else 'SHORT'
+            hold_days = max(int(t.get('hold_days', 0)), 0)
+            swap_days = hold_days + (hold_days // 5) * 2   # ~Wed-triple/weekend uplift
+            swap_frac = (swap_tbl[side] / 365.0) * swap_days   # signed: +earn / -pay
+            t['pnl_pct'] = t.get('pnl_pct', 0.0) - spread_frac + swap_frac
+            t['cost_spread_frac'] = round(spread_frac, 6)
+            t['cost_swap_frac'] = round(swap_frac, 6)
+            t['risk_adjusted_pnl_pct'] = t['pnl_pct'] * t.get('risk_pct', 1.0)
+        return trades
 
     def _apply_correlation_caps(self, all_trades: dict[str, list]) -> dict[str, list]:
         flattened = []
@@ -365,7 +454,10 @@ class ForexBacktester:
         # Equity curve → Sharpe and max drawdown
         equity = np.cumprod([1 + p for p in pnls])
         returns = np.diff(np.log(equity), prepend=0)
-        ann_factor = np.sqrt(252 / max(avg_hold, 1))
+        # Annualize by EMPIRICAL trades/year (n/years), NOT 252/avg_hold.
+        # 252/avg_hold assumes the book is always in a trade; with flat periods
+        # that overcounts trades-per-year and inflates the Sharpe.
+        ann_factor = np.sqrt(max(n, 1) / max(years, 1e-9))
         sharpe = (np.mean(returns) / (np.std(returns) + 1e-9)) * ann_factor if n > 1 else 0.0
 
         rolling_max = np.maximum.accumulate(equity)

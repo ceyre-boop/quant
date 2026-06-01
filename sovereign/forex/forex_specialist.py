@@ -138,6 +138,19 @@ class ForexSpecialist:
                         "ppp_z": getattr(_macro, "ppp_z", None),
                         "primary_driver": getattr(_macro, "primary_driver", None),
                     },
+                    # Loop 2: forex entry-time snapshot (this path has no equity
+                    # PresentState object; assemble the equivalent from the macro signal).
+                    present_state_snapshot={
+                        "score": sig.score,
+                        "macro_conviction": sig.macro_conviction,
+                        "rate_diff_z": getattr(_macro, "irp_z", None),
+                        "rate_differential": getattr(_macro, "rate_differential", None),
+                        "ppp_z": getattr(_macro, "ppp_z", None),
+                        "primary_driver": getattr(_macro, "primary_driver", None),
+                        "size_modifier": sig.size_modifier,
+                        "hold_days_est": getattr(_macro, "hold_period_estimate", 60),
+                    },
+                    active_lessons=[],
                 )
             except Exception:
                 pass

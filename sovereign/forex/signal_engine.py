@@ -87,7 +87,9 @@ class ForexSignalEngine:
         # + elevated VIX as fear flows compete with rate signals.
         # Tiered thresholds: JPY/cross pairs VIX>15, USD macro pairs VIX>20.
         _VIX_GATES = {
-            'USDJPY=X': 13.0, 'AUDNZD=X': 13.0,
+            # HYP-044 rolled back — VIX 13→15 for USDJPY/AUDNZD: delta 0.000 OOS,
+            # confirmed in-sample noise (holdout 2026-05-31).
+            'USDJPY=X': 15.0, 'AUDNZD=X': 15.0,
             'EURUSD=X': 18.0, 'GBPUSD=X': 18.0, 'AUDUSD=X': 20.0,
         }
         if pair in _VIX_GATES:

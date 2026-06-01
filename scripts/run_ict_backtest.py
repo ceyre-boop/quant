@@ -373,9 +373,17 @@ def compute_stats(trades: List[Trade]) -> dict:
         equity.append(equity[-1] * (1 + p * RISK_PER_TRADE))
     equity_arr = np.array(equity)
 
-    # Sharpe (annualised, assuming ~252 trading days, avg 2 trades/day during killzones)
+    # Sharpe annualised by EMPIRICAL trades/year (was √(252×4) ≈ √1008 — it assumed
+    # ~1000 trades/yr and massively inflated the figure). These are killzone-gated
+    # signals firing a few times per pair per month, not 4/day.
     returns = np.diff(equity_arr) / equity_arr[:-1]
-    sharpe = (np.mean(returns) / (np.std(returns) + 1e-9)) * np.sqrt(252 * 4) if len(returns) > 1 else 0.0
+    try:
+        _dts = sorted(datetime.strptime(t.entry_dt, '%Y-%m-%d %H:%M') for t in trades)
+        _span_yrs = max((_dts[-1] - _dts[0]).days / 365.25, 1e-6)
+        _trades_per_year = len(trades) / _span_yrs
+    except Exception:
+        _trades_per_year = len(trades)  # fallback: treat window as ~1 year
+    sharpe = (np.mean(returns) / (np.std(returns) + 1e-9)) * np.sqrt(max(_trades_per_year, 1.0)) if len(returns) > 1 else 0.0
 
     # Max drawdown
     peak = equity_arr[0]

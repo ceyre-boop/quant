@@ -582,7 +582,8 @@ class ICTPipeline:
                 stop = self.risk_engine.suggest_stop(ep, direction, atr)
 
             sz   = self.risk_engine.size(
-                direction=direction, entry=ep, stop_loss=stop, atr=atr, params=account
+                direction=direction, entry=ep, stop_loss=stop, atr=atr, params=account,
+                grade=getattr(_effective_grade, "value", None),
             )
             if isinstance(sz, RiskVeto):
                 return ICTVeto(symbol=symbol, direction=direction, timestamp=timestamp,
@@ -617,10 +618,29 @@ class ICTPipeline:
                         _bars = max(0, int(_elapsed / 300))  # 5-min bars
                     except Exception:
                         pass
+                # Loop 2: ICT-LOCAL entry-time snapshot (no sovereign import — the
+                # importlib hook above is the sanctioned isolation-safe logger access).
+                _snapshot = {
+                    "score": round(float(total_score), 3),
+                    "grade": getattr(_effective_grade, "value", str(_effective_grade)),
+                    "commitment_score": _commit_size_mult,
+                    "component_scores": {k: round(float(v), 3) for k, v in scores.items()},
+                    "n_confirmations": len(confirmations),
+                    "n_missing": len(missing),
+                    "has_fvg": (tap_fvg is not None or tap_ob is not None),
+                    "has_sweep": recent_sweep is not None,
+                    "session": getattr(session, "kill_zone_name", None),
+                }
+                # Codified ICT lessons structurally applied to this decision.
+                _lessons = []
+                if getattr(_effective_grade, "value", None) != getattr(grade, "value", None):
+                    _lessons.append("L-001")  # grade-quality-inversion downgrade (A+→A)
                 _dl.log_ict_decision(
                     signal=_sig,
                     commitment_score=_commit_size_mult,
                     bars_since_signal=_bars,
+                    present_state_snapshot=_snapshot,
+                    active_lessons=_lessons,
                 )
             except Exception:
                 pass

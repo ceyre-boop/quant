@@ -54,8 +54,10 @@ order_block:
   impulse_atr_multiple: 1.5
 
 micro_risk:
-  # Hard cap: never risk more than this fraction of account per trade
-  max_risk_per_trade: 0.02          # 2 %
+  # Fallback/ceiling per-trade risk. Sizing is conviction-scaled by ICT grade
+  # in micro_risk.py (_GRADE_RISK: A+ 1.0% / A 0.75% / B 0.5% / C 0.25%); this
+  # value is the prop-safe default used only when no grade is supplied.
+  max_risk_per_trade: 0.0075        # 0.75 % (was flat 2 %)
   # Hard cap: max total open risk at any time
   max_concurrent_risk: 0.06         # 6 % combined (3 × 2 %)
   # Max concurrent ICT positions
