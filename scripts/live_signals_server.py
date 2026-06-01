@@ -358,7 +358,8 @@ def _build_chat_system() -> str:
     updated = bridge.get('last_updated', '')[:19]
     return (
         f"You are SOVEREIGN, an AI trading research assistant for a quant trading system.\n"
-        f"Current state: Forex system v014 (Sharpe 2.0970, institutional grade). "
+        f"Current state: Forex system v014 (fully-costed OOS Sharpe 0.76, 95% CI [0.55, 0.96]; IS 0.67; "
+        f"edge proven vs random p<0.001 but regime-fragile; ICT patterns NOT proven p=0.52). "
         f"ICT system: London+GradeA, WR=41%, avgR=+0.840. "
         f"Bridge: {mode} ({regime}, threat={threat:.2f}). "
         f"State as of {updated} UTC. "

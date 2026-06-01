@@ -41,8 +41,28 @@ from sovereign.forex.pair_universe import ALL_PAIRS
 # ─── helpers ─────────────────────────────────────────────────────────────────
 
 def _sharpe_from_results(results) -> float:
-    sharpes = [r.sharpe for r in results if r.sharpe and not np.isnan(r.sharpe)]
-    return float(np.mean(sharpes)) if sharpes else 0.0
+    """Portfolio Sharpe = √n-weighted mean of per-pair Sharpes.
+
+    A Sharpe estimate's standard error scales as 1/√n, so a pair with 8 trades
+    must not count the same as one with 46. Inverse-variance (√n) weighting is
+    the honest aggregate; the prior unweighted np.mean overstated thin pairs.
+    """
+    pairs = [(r.sharpe, r.total_trades) for r in results
+             if r.sharpe and not np.isnan(r.sharpe) and r.total_trades > 0]
+    if not pairs:
+        return 0.0
+    weights = [np.sqrt(n) for _, n in pairs]
+    return float(sum(s * w for (s, _), w in zip(pairs, weights)) / sum(weights))
+
+
+def _total_trades(results) -> int:
+    return int(sum(r.total_trades for r in results if r.total_trades))
+
+
+def sharpe_ci(sharpe: float, n: int, z: float = 1.96) -> tuple[float, float, float]:
+    """95% CI for a Sharpe estimate (Lo 2002 / Jorion): SE ≈ √((1 + ½·SR²)/n)."""
+    se = float(np.sqrt((1 + 0.5 * sharpe ** 2) / max(n, 1)))
+    return round(sharpe - z * se, 3), round(sharpe + z * se, 3), round(se, 3)
 
 
 def _format_pair(r) -> dict:
@@ -181,9 +201,14 @@ def main():
     print("\n[A] IN-SAMPLE: 2015-2022 (parameters were chosen on this data)")
     is_results, is_avg = run_window("IN-SAMPLE", "2015-01-01", "2022-12-31")
     is_pairs = [_format_pair(r) for r in is_results]
+    is_n = _total_trades(is_results)
+    is_ci_low, is_ci_high, is_se = sharpe_ci(is_avg, is_n)
     output["in_sample"] = {
         "window": "2015-01-01 → 2022-12-31",
         "avg_sharpe": round(is_avg, 4),
+        "n_trades": is_n,
+        "sharpe_se": is_se,
+        "sharpe_ci_95": [is_ci_low, is_ci_high],
         "pairs": is_pairs,
     }
 
@@ -191,9 +216,14 @@ def main():
     print("\n[B] OUT-OF-SAMPLE: 2023-2024 (NEVER touched during optimization)")
     oos_results, oos_avg = run_window("OOS", "2023-01-01", "2024-12-31")
     oos_pairs = [_format_pair(r) for r in oos_results]
+    oos_n = _total_trades(oos_results)
+    oos_ci_low, oos_ci_high, oos_se = sharpe_ci(oos_avg, oos_n)
     output["out_of_sample"] = {
         "window": "2023-01-01 → 2024-12-31",
         "avg_sharpe": round(oos_avg, 4),
+        "n_trades": oos_n,
+        "sharpe_se": oos_se,
+        "sharpe_ci_95": [oos_ci_low, oos_ci_high],
         "pairs": oos_pairs,
     }
 
@@ -223,11 +253,17 @@ def main():
     print("RESULTS")
     print("=" * 60)
 
-    print(f"\n  IN-SAMPLE SHARPE  (2015-2022): {is_avg:.4f}")
-    print(f"  OUT-OF-SAMPLE     (2023-2024): {oos_avg:.4f}")
+    print(f"\n  IN-SAMPLE SHARPE  (2015-2022): {is_avg:.4f}  "
+          f"95% CI [{is_ci_low:+.3f}, {is_ci_high:+.3f}]  n={is_n} (costed, √n-weighted)")
+    print(f"  OUT-OF-SAMPLE     (2023-2024): {oos_avg:.4f}  "
+          f"95% CI [{oos_ci_low:+.3f}, {oos_ci_high:+.3f}]  n={oos_n} (costed, √n-weighted)")
     print(f"  DECAY RATIO:                   {decay_ratio}")
     print(f"  VERDICT: {verdict}")
     print(f"  {verdict_detail}")
+    if oos_ci_low <= 0:
+        print("  ⚠ OOS 95% CI includes 0 — edge is NOT statistically significant at this sample size.")
+    elif oos_ci_low > 1.0:
+        print("  ✓ OOS 95% CI lower bound > 1.0 — genuinely strong after costs.")
 
     print(f"\n  PER-PAIR HOLDOUT:")
     for p in oos_pairs:
@@ -251,12 +287,12 @@ def main():
     print("INTERPRETATION")
     print("=" * 60)
     if oos_avg >= 1.4:
-        print("""
+        print(f"""
   System is GENUINELY STRONG.
-  In-sample 2.097 is somewhat optimistic, but the underlying
-  edge is real and durable. OOS > 1.4 exceeds institutional grade.
-  Proceed to prop firm deployment with confidence.
-  The 0.65-0.90 conservative estimate was too pessimistic.
+  Costed, √n-weighted OOS Sharpe {oos_avg:.3f} (95% CI [{oos_ci_low:+.3f},
+  {oos_ci_high:+.3f}], n={oos_n}) exceeds institutional grade. The earlier
+  uncosted, unweighted 2.097 was optimistic; this number is the honest one.
+  Proceed to prop firm deployment — but size to the CI lower bound, not the point.
 """)
     elif oos_avg >= 0.8:
         print(f"""

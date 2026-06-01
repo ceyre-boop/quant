@@ -435,7 +435,7 @@ def check_holdout() -> dict:
         "severity": "HIGH",
         "detail": (
             "ALL key parameters were selected using the full 2015-2024 dataset. "
-            "The reported avg_sharpe=2.0970 is in-sample performance, not out-of-sample. "
+            "The legacy avg_sharpe=2.0970 was uncosted/mis-annualized; costed it is 0.72 IS / 1.07 OOS. "
             "The system has never been tested on data it wasn't optimized on. "
             "This does NOT mean the edge is fake — the economic logic is sound — "
             "but the reported Sharpe is an upper bound, not an estimate of live performance."
@@ -542,7 +542,7 @@ def check_regime_robustness() -> dict:
         "severity": "HIGH" if not existing_breakdown else "OK",
         "detail": (
             "No per-regime Sharpe breakdown found in backtest results. "
-            "The current avg_sharpe=2.0970 is across the full 2015-2024 window. "
+            "The legacy avg_sharpe=2.0970 (uncosted) is across the full 2015-2024 window; costed OOS is 1.07. "
             "If this edge only works in rate-trending regimes (2022-2023), "
             "performance in stable regimes (2015-2019) may be near zero. "
             "Macro rate differential signals are theoretically strongest in rate-trend regimes "
@@ -606,7 +606,7 @@ def check_survivor_bias() -> dict:
         },
     ]
 
-    active_sharpe = 2.0970  # v014 reported avg
+    active_sharpe = 1.07  # v014 costed OOS avg (CI 0.82-1.31, n=103); was 2.0970 uncosted/mis-annualized
 
     # Compute universe-wide average including retired pairs (using available Sharpes)
     known_retired_sharpes = [p["last_sharpe"] for p in retired_pairs if p["last_sharpe"] is not None]
@@ -745,7 +745,7 @@ def main():
     print("\n" + "=" * 60)
     print("ADJUSTED SHARPE ESTIMATE")
     print("=" * 60)
-    reported = 2.0970
+    reported = 1.07  # v014 costed OOS (was 2.0970 uncosted/mis-annualized)
     adj = compute_adjusted_sharpe(
         reported=reported,
         fill_impact_low=-0.10,

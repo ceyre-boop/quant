@@ -157,7 +157,15 @@ try:
             )
             sharpes[pair] = (sharpe_from_trades(trades), len(trades))
 
-        avg_sharpe = np.mean([s for s, _ in sharpes.values()]) if sharpes else 0.0
+        # √n-weighted portfolio Sharpe (SE(Sharpe) ∝ 1/√n). NOTE: the 1.9052 gate
+        # literals below were set under the old unweighted np.mean and uncosted
+        # per-trade Sharpe — they are stale historical baselines, not live targets.
+        _pairs = [(s, n) for s, n in sharpes.values() if n > 0]
+        if _pairs:
+            _w = [np.sqrt(n) for _, n in _pairs]
+            avg_sharpe = float(sum(s * w for (s, _), w in zip(_pairs, _w)) / sum(_w))
+        else:
+            avg_sharpe = 0.0
         return {'config': config_name, 'avg_sharpe': avg_sharpe, 'per_pair': sharpes}
 
     # ── Baseline v013 (AUDUSD=20, NZDUSD=None) ──────────────────────────────

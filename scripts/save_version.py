@@ -45,6 +45,17 @@ def _load_results() -> list[dict]:
         return json.load(f)
 
 
+def _weighted_avg_sharpe(results: list[dict]) -> float:
+    """√n-weighted portfolio Sharpe (SE(Sharpe) ∝ 1/√n) — thin pairs count less."""
+    import math
+    pairs = [(r['sharpe'], r.get('total_trades', 0)) for r in results
+             if r.get('total_trades', 0) > 0]
+    if not pairs:
+        return 0.0
+    weights = [math.sqrt(n) for _, n in pairs]
+    return sum(s * w for (s, _), w in zip(pairs, weights)) / sum(weights)
+
+
 def _metrics(results: list[dict]) -> dict:
     return {
         'sharpe_by_pair':        {r['pair']: r['sharpe'] for r in results},
@@ -54,7 +65,7 @@ def _metrics(results: list[dict]) -> dict:
         'trades_by_pair':        {r['pair']: r['total_trades'] for r in results},
         'positive_sharpe_count': sum(1 for r in results if r['sharpe'] > 0),
         'total_pairs':           len(results),
-        'avg_sharpe':            round(sum(r['sharpe'] for r in results) / len(results), 4),
+        'avg_sharpe':            round(_weighted_avg_sharpe(results), 4),
         'best_pair':             max(results, key=lambda r: r['sharpe'])['pair'],
         'best_sharpe':           round(max(r['sharpe'] for r in results), 4),
         'worst_pair':            min(results, key=lambda r: r['sharpe'])['pair'],

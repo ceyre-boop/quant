@@ -230,8 +230,9 @@ def _load_decision_log_summary(days: int = 7, max_entries: int = 20) -> str:
                 if not line.strip():
                     continue
                 rec = json.loads(line)
-                # Only include closed trades (outcome filled)
-                if not rec.get("outcome"):
+                # Only REAL closed trades — exclude OPEN and EXPIRED (never-filled
+                # scan signals), which are not trade outcomes and would pollute analysis.
+                if rec.get("outcome") in (None, "OPEN", "EXPIRED"):
                     continue
                 try:
                     ts = datetime.fromisoformat(rec["entry_timestamp"].replace("Z", "+00:00"))
@@ -255,6 +256,10 @@ def _load_decision_log_summary(days: int = 7, max_entries: int = 20) -> str:
                     "bars_since_signal":       rec.get("bars_since_signal"),
                     "library_match":           rec.get("library_match"),
                     "risk_pct":                rec.get("risk_pct"),
+                    # Loop 2: entry-time context — lets the Oracle reason over WHY,
+                    # not just THAT, a trade won/lost.
+                    "entry_context":           rec.get("present_state_snapshot") or {},
+                    "active_lessons":          rec.get("active_lessons") or [],
                     "outcome":                 rec.get("outcome"),
                     "r_realized":              rec.get("r_realized"),
                 })
@@ -275,8 +280,13 @@ def _load_decision_log_summary(days: int = 7, max_entries: int = 20) -> str:
     avg_r   = round(sum((e.get("r_realized") or 0) for e in entries) / len(entries), 3)
 
     header = (
-        f"Recent decision logs: {len(entries)} closed trades "
+        f"## Trade Outcome Analysis — {len(entries)} closed trades "
         f"({n_wins}W / {n_loss}L, avg R={avg_r:+.3f})\n"
+        "Each entry includes `entry_context` (the state snapshot at entry). Look for "
+        "context that CLUSTERS with losses — e.g. low constraint_score, weak consensus, "
+        "trend-misaligned, FLAT regime. If you find a loss-clustering threshold, propose a "
+        "lesson with a concrete `param_delta` (e.g. raise a min-score/threshold) so the "
+        "EdgePipeline can auto-validate it. Do NOT over-fit to <10 trades.\n"
     )
     return header + json.dumps(entries, indent=2)
 
@@ -412,6 +422,24 @@ def run_reflect(harvests: list[dict], date: Optional[str] = None) -> dict:
         else:
             reflection = {"raw_response": raw_text, "parse_error": True}
 
+    # Auto-validate a param-delta candidate through EdgePipeline (GATED — runs the
+    # full significance + walk-forward + BH pipeline and stages a verdict; it NEVER
+    # commits to live config. Text-only lessons carry no param_delta → skipped, so
+    # this is fully non-breaking for the existing reflection flow).
+    auto_validation = None
+    try:
+        cand = reflection.get("candidate_lesson") if isinstance(reflection, dict) else None
+        if isinstance(cand, dict) and cand.get("param_delta"):
+            from sovereign.oracle.edge_pipeline import EdgePipeline
+            auto_validation = EdgePipeline().process({
+                "id": cand.get("id", f"L-{date}"),
+                "subsystem": cand.get("subsystem", "forex"),
+                "param_delta": cand["param_delta"],
+                "label": cand.get("lesson_text", ""),
+            })
+    except Exception as exc:
+        auto_validation = {"status": "ERROR", "reason": f"auto-validation failed: {exc}"}
+
     output = {
         "date": date,
         "generated_at": datetime.now(timezone.utc).isoformat(),
@@ -423,6 +451,7 @@ def run_reflect(harvests: list[dict], date: Optional[str] = None) -> dict:
         ),
         "harvest_days_read": len(harvests),
         "reflection": reflection,
+        "auto_validation": auto_validation,
     }
 
     out_path = REFLECTIONS_DIR / f"{date}.json"

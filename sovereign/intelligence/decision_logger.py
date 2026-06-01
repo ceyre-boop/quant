@@ -75,6 +75,10 @@ class DecisionRecord:
     confirmations:          list[str]        = field(default_factory=list)
     missing:                list[str]        = field(default_factory=list)
 
+    # Entry-time context (Loop 2 — lets Oracle reason over WHY, not just THAT)
+    present_state_snapshot: dict[str, Any]   = field(default_factory=dict)
+    active_lessons:         list[str]        = field(default_factory=list)
+
     # Outcome (filled in later by forensic engine on close)
     outcome:                Optional[str]    = None   # WIN | LOSS | OPEN
     r_realized:             Optional[float]  = None
@@ -110,10 +114,17 @@ def log_ict_decision(
     adr_pct_used: Optional[float] = None,
     cot_percentile: Optional[float] = None,
     rate_diff_z: Optional[float] = None,
+    present_state_snapshot: Optional[dict] = None,
+    active_lessons: Optional[list[str]] = None,
 ) -> DecisionRecord:
     """
     Build and persist a decision record from an approved ICTSignal.
     Call this immediately before returning/yielding the signal for execution.
+
+    present_state_snapshot / active_lessons (Loop 2): entry-time context so the
+    Oracle can reason over WHY a trade won/lost, and EdgeMonitor can attribute
+    outcomes to lessons. ICT callers pass ICT-LOCAL context only (no sovereign
+    import — isolation rule #1).
     """
     sz = signal.sizing
 
@@ -179,6 +190,8 @@ def log_ict_decision(
         component_scores=dict(signal.component_scores),
         confirmations=list(signal.confirmations),
         missing=list(signal.missing),
+        present_state_snapshot=present_state_snapshot or {},
+        active_lessons=list(active_lessons or []),
     )
 
     _safe_append(record)
@@ -205,10 +218,15 @@ def log_forex_decision(
     size_mult: Optional[float] = None,
     bars_since_signal: Optional[int] = None,
     extra: Optional[dict] = None,
+    present_state_snapshot: Optional[dict] = None,
+    active_lessons: Optional[list[str]] = None,
 ) -> DecisionRecord:
     """
     Build and persist a decision record for an approved forex macro signal.
     Call from the live scan or paper trading execution path.
+
+    present_state_snapshot / active_lessons (Loop 2): entry-time context. The
+    sovereign/forex path MAY pass the full PresentState snapshot here.
     """
     # why_this_trade
     parts = []
@@ -262,6 +280,8 @@ def log_forex_decision(
         component_scores=extra or {},
         confirmations=signal_layers,
         missing=[],
+        present_state_snapshot=present_state_snapshot or {},
+        active_lessons=list(active_lessons or []),
     )
 
     _safe_append(record)
