@@ -38,7 +38,7 @@ log = logging.getLogger("oracle.loop_health")
 # file every invocation, before any session/signal gate).
 HEARTBEAT_EXPECTATIONS = {
     "ict_scanner":       {"max_silence_hours": 0.5, "during": "market_hours", "kind": "periodic"},
-    "forex_scanner":     {"max_silence_hours": 30,  "during": "market_hours", "kind": "periodic"},
+    "forex_scan":        {"max_silence_hours": 30,  "during": "market_hours", "kind": "periodic"},
     "pulse_check":       {"max_silence_hours": 3,   "during": "always",       "kind": "periodic"},
     "decision_backfill": {"max_silence_hours": 3,   "during": "always",       "kind": "periodic"},
     "oracle_reflection": {"max_silence_hours": 26,  "during": "always",       "kind": "periodic"},
