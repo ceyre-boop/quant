@@ -1,0 +1,67 @@
+{
+  "run_at": "2026-06-01T03:09:04.655742+00:00",
+  "months": 3,
+  "min_trades": 10,
+  "n_lessons": 9,
+  "n_closed_trades": 1,
+  "suspended": [],
+  "decaying": [],
+  "rows": [
+    {
+      "id": "L-001",
+      "status": "INSUFFICIENT_DATA",
+      "n_trades": 0,
+      "need": 10
+    },
+    {
+      "id": "L-002",
+      "status": "INSUFFICIENT_DATA",
+      "n_trades": 0,
+      "need": 10
+    },
+    {
+      "id": "L-003",
+      "status": "INSUFFICIENT_DATA",
+      "n_trades": 0,
+      "need": 10
+    },
+    {
+      "id": "L-004",
+      "status": "INSUFFICIENT_DATA",
+      "n_trades": 0,
+      "need": 10
+    },
+    {
+      "id": "L-005",
+      "status": "INSUFFICIENT_DATA",
+      "n_trades": 0,
+      "need": 10
+    },
+    {
+      "id": "L-006",
+      "status": "INSUFFICIENT_DATA",
+      "n_trades": 0,
+      "need": 10
+    },
+    {
+      "id": "L-007",
+      "status": "INSUFFICIENT_DATA",
+      "n_trades": 0,
+      "need": 10
+    },
+    {
+      "id": "L-008",
+      "status": "INSUFFICIENT_DATA",
+      "n_trades": 0,
+      "need": 10
+    },
+    {
+      "id": "L-009",
+      "status": "INSUFFICIENT_DATA",
+      "n_trades": 0,
+      "need": 10
+    }
+  ],
+  "summary": "9 lessons | 9 insufficient-data, 0 decaying, 0 suspended | 1 real closed trades in window",
+  "note": "Inert until \u226510 real closed trades per lesson accumulate AND trades carry active_lessons tags. Gated: suspends the record + messages; never edits live config."
+}

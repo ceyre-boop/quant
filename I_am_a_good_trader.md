@@ -16,6 +16,30 @@
 
 ---
 
+## ICT SYSTEM STATUS — 2026-05-31
+
+Two permutation tests, 1000 iterations each, settle the ICT question:
+
+| Test | Real mean R | Null mean R | p-value | Verdict |
+|------|-------------|-------------|---------|---------|
+| ICT entry selection, vanilla exits | −0.211 | −0.207 | **0.52** | NOT PROVEN |
+| ICT FULL machinery (FVG-limit + structural stop + regime TP) vs random + default exits | −0.092 | −0.055 | **0.59** | NOT PROVEN |
+
+The full ICT pipeline does NOT beat random entries — in both tests random did *as well or better*.
+The sweep / grade (A+/A/B/C) / commitment / pd_alignment / market_structure scoring adds **no
+measurable edge**. (FVG standalone's 71% hit-rate claim was never permutation-tested and is the only
+ICT component with prior support.)
+
+**Forex macro edge, by contrast: PROVEN** (permutation p<0.001, survives Benjamini-Hochberg) — though
+regime-fragile (walk-forward 2/4 years negative). Fully-costed OOS Sharpe 0.76.
+
+**Decision (pending Colin): A — simplify ICT to FVG-only, or C — park ICT, trade the proven forex
+macro edge.** Until validated, ICT is capped at **≤0.25% risk** (reduced conviction); do NOT allocate
+full prop capital to unproven signals.
+Evidence: `data/research/permutation_test_ict.json`, `permutation_test_ict_realexits.json`.
+
+---
+
 ### LESSON 1 — The Exact Setup Exists. Trade Only That.
 
 **Discovered:** 2026-05-18 (forensics unified analysis)
@@ -134,9 +158,15 @@
 
 **Discovered:** 2026-05-25 (HYP-044 VIX threshold sweep)
 **Validated:** 2026-05-25 (USDJPY: 46 trades at VIX>13 vs 70 at VIX>15, Sharpe 2.979 vs 1.770; AUDNZD: 39 trades vs 57, Sharpe 2.246 vs 1.558)
-**Evidence:** Portfolio 1.8552→2.097 (+0.242). USDJPY and AUDNZD become highest-Sharpe individual pairs.
+**Evidence:** Portfolio 1.8552→2.097 (+0.242) — IN-SAMPLE, UNCOSTED. ⚠️ REVISED 2026-05-31: on the
+2023-2024 holdout this VIX gate shows delta **0.000** (v014 vs v013 identical) — the "+0.242" was
+in-sample noise. HYP-044 ROLLED BACK 2026-05-31 (bootstrap p=0.50, REJECTED_OOS). Fully-costed
+(spread+slip+swap) √n-weighted portfolio Sharpe is **0.67 IS / 0.76 OOS**, not 2.097. The forex edge
+is PROVEN vs random (permutation p<0.001, survives BH) but REGIME-FRAGILE (walk-forward 2/4 yrs
+negative); the ICT pattern edge is NOT proven (permutation p=0.52).
 **Rule:** USDJPY/AUDNZD VIX gate: 15→13. Bull market + VIX>13 = veto. Lower threshold = fewer but higher-quality trades.
-**Impact:** v014 → portfolio avg Sharpe 2.097.
+**Impact:** v014 → portfolio avg Sharpe 2.097 (uncosted/mis-annualized; honest fully-costed OOS is 0.76).
+⚠️ This lesson did NOT validate out-of-sample — candidate for retirement, not active reliance.
 **Code location:** `sovereign/forex/forex_backtester.py` `PAIR_VIX_GATES`; `sovereign/forex/signal_engine.py` `_VIX_GATES`
 **Health:** 🟢 ACTIVE — UNTESTABLE_EXIT (exit rule + n=46/39 too small)
 **Last validated:** 2026-05-27 (retest when n >= 100 per pair via backtester sweep)

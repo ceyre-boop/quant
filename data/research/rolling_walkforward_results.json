@@ -1,0 +1,58 @@
+{
+  "test_date": "2026-05-31T16:46:25.071934+00:00",
+  "framing": "multi-window OOS stability (no per-window parameter fitting)",
+  "windows": [
+    {
+      "test_year": "2021",
+      "train_sharpe": 0.694,
+      "train_n": 233,
+      "test_sharpe": -0.128,
+      "test_n": 54,
+      "test_ci_95": [
+        -0.396,
+        0.14
+      ],
+      "decay_ratio": -0.185
+    },
+    {
+      "test_year": "2022",
+      "train_sharpe": 0.676,
+      "train_n": 250,
+      "test_sharpe": 0.506,
+      "test_n": 88,
+      "test_ci_95": [
+        0.284,
+        0.728
+      ],
+      "decay_ratio": 0.748
+    },
+    {
+      "test_year": "2023",
+      "train_sharpe": 0.672,
+      "train_n": 321,
+      "test_sharpe": 1.263,
+      "test_n": 70,
+      "test_ci_95": [
+        0.949,
+        1.577
+      ],
+      "decay_ratio": 1.879
+    },
+    {
+      "test_year": "2024",
+      "train_sharpe": 0.781,
+      "train_n": 372,
+      "test_sharpe": -0.092,
+      "test_n": 64,
+      "test_ci_95": [
+        -0.337,
+        0.154
+      ],
+      "decay_ratio": -0.117
+    }
+  ],
+  "avg_oos_sharpe": 0.387,
+  "min_oos_sharpe": -0.128,
+  "all_positive": false,
+  "verdict": "FRAGILE"
+}

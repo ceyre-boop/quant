@@ -1,0 +1,20 @@
+{
+  "test_date": "2026-05-31T17:54:05.005606+00:00",
+  "system": "ict_real_exits",
+  "test_type": "real ICT (FVG-limit+structural stop+regime TP) vs random entries + default exits",
+  "n_permutations": 1000,
+  "seed": 7,
+  "real_mean_R": -0.0915,
+  "real_n_trades": 161,
+  "real_n_by_pair": {
+    "GBPUSD": 124,
+    "EURUSD": 10,
+    "AUDUSD": 14,
+    "AUDNZD": 13
+  },
+  "null_mean_R": -0.0547,
+  "null_pct95": 0.1693,
+  "null_max": 0.3693,
+  "p_value": 0.594,
+  "verdict": "NOT_PROVEN"
+}

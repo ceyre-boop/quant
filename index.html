@@ -2006,11 +2006,15 @@ setInterval(()=>{
 
 // ══ TAB 3: RESEARCH ══
 const RES_BASE='data/agent/';
+// NOTE: v001–v013 s-values are LEGACY (uncosted, annualized as if trading daily).
+// v014 shown as the CORRECTED fully-costed figure (0.76 OOS, 95% CI [0.55,0.96]; IS 0.67).
+// The v013→v014 step-down is a methodology fix, NOT a performance regression — the
+// legacy method roughly doubled the number. Prior v014 headline was 2.097 (uncosted).
 const RES_VERSIONS=[
   {l:'v001',s:.1785},{l:'v002',s:.3551},{l:'v002.5',s:.38},{l:'v003',s:.4523},
   {l:'v004',s:.626},{l:'v005',s:.8843},{l:'v006',s:1.0547},{l:'v007',s:1.0713},
   {l:'v008',s:1.1955},{l:'v009',s:1.2864},{l:'v010',s:1.4396},
-  {l:'v011',s:1.6476},{l:'v012',s:1.7176},{l:'v013',s:1.8552},{l:'v014',s:2.097,cur:true},
+  {l:'v011',s:1.6476},{l:'v012',s:1.7176},{l:'v013',s:1.8552},{l:'v014',s:0.76,cur:true},
 ];
 const RES_TARGET=2.1470;
 
@@ -2268,7 +2272,7 @@ function resVersions(externalVers){
     ? externalVers.map(v=>({l:v.version||v.l,s:v.sharpe??v.s,cur:v.current||v.cur||false}))
     : RES_VERSIONS;
   const cur=vers.find(v=>v.cur);
-  const curSharpe=cur?.s??2.097;
+  const curSharpe=cur?.s??0.76;
   const lastLabel=vers[vers.length-1]?.l||'v014';
   const el=document.getElementById('rp-versions');
   el.innerHTML=`<div class="rp-title">Sharpe Progress — v001 → ${lastLabel}</div>

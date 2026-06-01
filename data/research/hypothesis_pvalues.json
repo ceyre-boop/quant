@@ -1,0 +1,58 @@
+{
+  "test_date": "2026-05-31T16:50:22.414208+00:00",
+  "alpha": 0.05,
+  "n_boot": 10000,
+  "confirmed_hypotheses": 27,
+  "stored_pvalues_before": 0,
+  "expected_false_discoveries_uncontrolled": 1.4,
+  "derived": [
+    {
+      "id": "HYP-003",
+      "label": "Forex macro edge (rate-diff signal timing)",
+      "p_value": 0.0,
+      "source": "permutation_test_forex",
+      "detail": "real Sharpe 0.3184 vs null; costed",
+      "bh_rank": 1,
+      "bh_threshold": 0.01667,
+      "bh_status": "SURVIVES_BH"
+    },
+    {
+      "id": "HYP-004",
+      "label": "ICT pattern edge (entry selection)",
+      "p_value": 0.517,
+      "source": "permutation_test_ict",
+      "detail": "real meanR -0.2112 vs null -0.2072",
+      "bh_rank": 3,
+      "bh_threshold": 0.05,
+      "bh_status": "FAILS_BH"
+    },
+    {
+      "id": "HYP-044",
+      "label": "VIX gate 15\u219213 (USDJPY/AUDNZD)",
+      "p_value": 0.5008,
+      "source": "toggle_bootstrap",
+      "detail": "meanR@13=0.0032 (n=127) vs meanR@15=0.0032 (n=127)",
+      "bh_rank": 2,
+      "bh_threshold": 0.03333,
+      "bh_status": "FAILS_BH"
+    }
+  ],
+  "deferred": {
+    "HYP-024": "pd_alignment weight \u2014 config-toggleable, but parent ICT entry edge insignificant (perm p\u22480.52); moot",
+    "HYP-034": "market_structure weight \u2014 same: parent ICT edge insignificant; moot",
+    "HYP-046": "displacement gate \u2014 same: parent ICT edge insignificant; moot",
+    "HYP-047": "ICT score inversion \u2014 same: parent ICT edge insignificant; moot",
+    "HYP-037": "fvg_tap timing \u2014 same: parent ICT edge insignificant; moot",
+    "HYP-050": "DOW veto \u2014 same: parent ICT edge insignificant; moot",
+    "HYP-022": "NY_PM anti-edge \u2014 same: parent ICT edge insignificant; moot"
+  },
+  "unreconstructable": {
+    "HYP-001": "Carry base \u2014 foundational, no generic on/off toggle",
+    "HYP-005": "ICT walk-forward \u2014 superseded by permutation_test_ict",
+    "HYP-018": "Library regime fix \u2014 bug fix, not a return-edge hypothesis",
+    "HYP-030": "Three-confirmation term-structure gate \u2014 bespoke, not generically toggleable",
+    "HYP-035": "RMT covariance cleaning \u2014 bespoke, not generically toggleable",
+    "HYP-033": "Null result (no latent feature) \u2014 nothing to test"
+  },
+  "note": "Multiple-testing exposure remains PARTIALLY uncontrolled: only the decision-relevant edges + HYP-044 were re-derived. The remaining confirmed hypotheses never recorded p-values; going forward every test must log one."
+}

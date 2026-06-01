@@ -1,0 +1,52 @@
+{
+  "checked_at": "2026-06-01T03:31:17.136145+00:00",
+  "market_hours": true,
+  "down": [
+    "pulse_check",
+    "decision_backfill"
+  ],
+  "loops": {
+    "ict_scanner": {
+      "status": "ALIVE",
+      "last": "2026-06-01T03:31:17.108664+00:00",
+      "silence_hours": 0.0,
+      "threshold": 0.5,
+      "kind": "periodic"
+    },
+    "forex_scanner": {
+      "status": "NO_DATA",
+      "last": null,
+      "silence_hours": null,
+      "threshold": 30,
+      "kind": "periodic"
+    },
+    "pulse_check": {
+      "status": "DOWN",
+      "last": "2026-05-31T05:55:56+00:00",
+      "silence_hours": 21.6,
+      "threshold": 3,
+      "kind": "periodic"
+    },
+    "decision_backfill": {
+      "status": "DOWN",
+      "last": "2026-05-31T05:55:56+00:00",
+      "silence_hours": 21.6,
+      "threshold": 3,
+      "kind": "periodic"
+    },
+    "oracle_reflection": {
+      "status": "ALIVE",
+      "last": "2026-05-31T06:03:21.388322+00:00",
+      "silence_hours": 21.5,
+      "threshold": 26,
+      "kind": "periodic"
+    },
+    "edge_pipeline": {
+      "status": "EVENT_DRIVEN",
+      "last": null,
+      "silence_hours": null,
+      "threshold": 999,
+      "kind": "event"
+    }
+  }
+}

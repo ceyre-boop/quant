@@ -1,132 +1,144 @@
 {
-  "audit_date": "2026-05-25",
+  "audit_date": "2026-05-31",
   "system_version": "v014",
   "in_sample": {
     "window": "2015-01-01 \u2192 2022-12-31",
-    "avg_sharpe": 1.8734,
+    "avg_sharpe": 0.6722,
+    "n_trades": 321,
+    "sharpe_se": 0.062,
+    "sharpe_ci_95": [
+      0.551,
+      0.793
+    ],
     "pairs": [
       {
         "pair": "EURUSD=X",
-        "sharpe": 1.258,
+        "sharpe": 0.503,
         "win_rate": 0.543,
         "trade_count": 70,
-        "max_drawdown": -0.049,
+        "max_drawdown": -0.054,
         "trades_per_yr": 8.5
       },
       {
         "pair": "GBPUSD=X",
-        "sharpe": 1.661,
-        "win_rate": 0.573,
+        "sharpe": 0.776,
+        "win_rate": 0.547,
         "trade_count": 75,
-        "max_drawdown": -0.063,
+        "max_drawdown": -0.064,
         "trades_per_yr": 9.1
       },
       {
         "pair": "USDJPY=X",
-        "sharpe": 2.661,
-        "win_rate": 0.643,
-        "trade_count": 42,
-        "max_drawdown": -0.048,
-        "trades_per_yr": 5.1
+        "sharpe": 0.736,
+        "win_rate": 0.574,
+        "trade_count": 54,
+        "max_drawdown": -0.049,
+        "trades_per_yr": 6.5
       },
       {
         "pair": "AUDUSD=X",
-        "sharpe": 1.68,
-        "win_rate": 0.494,
+        "sharpe": 0.67,
+        "win_rate": 0.481,
         "trade_count": 77,
-        "max_drawdown": -0.039,
+        "max_drawdown": -0.042,
         "trades_per_yr": 9.3
       },
       {
         "pair": "AUDNZD=X",
-        "sharpe": 2.107,
-        "win_rate": 0.514,
-        "trade_count": 35,
-        "max_drawdown": -0.031,
-        "trades_per_yr": 4.2
+        "sharpe": 0.682,
+        "win_rate": 0.489,
+        "trade_count": 45,
+        "max_drawdown": -0.04,
+        "trades_per_yr": 5.4
       }
     ]
   },
   "out_of_sample": {
     "window": "2023-01-01 \u2192 2024-12-31",
-    "avg_sharpe": 1.9618,
+    "avg_sharpe": 0.7582,
+    "n_trades": 119,
+    "sharpe_se": 0.104,
+    "sharpe_ci_95": [
+      0.554,
+      0.962
+    ],
     "pairs": [
       {
         "pair": "EURUSD=X",
-        "sharpe": 2.598,
-        "win_rate": 0.63,
+        "sharpe": 1.488,
+        "win_rate": 0.593,
         "trade_count": 27,
-        "max_drawdown": -0.017,
+        "max_drawdown": -0.018,
         "trades_per_yr": 13.1
       },
       {
         "pair": "GBPUSD=X",
-        "sharpe": 2.682,
-        "win_rate": 0.643,
+        "sharpe": 1.601,
+        "win_rate": 0.571,
         "trade_count": 28,
         "max_drawdown": -0.016,
         "trades_per_yr": 13.5
       },
       {
         "pair": "USDJPY=X",
-        "sharpe": 2.382,
-        "win_rate": 0.467,
-        "trade_count": 15,
+        "sharpe": 0.514,
+        "win_rate": 0.478,
+        "trade_count": 23,
         "max_drawdown": -0.028,
-        "trades_per_yr": 7.3
+        "trades_per_yr": 11.1
       },
       {
         "pair": "AUDUSD=X",
-        "sharpe": 1.51,
+        "sharpe": 0.652,
         "win_rate": 0.52,
         "trade_count": 25,
-        "max_drawdown": -0.049,
+        "max_drawdown": -0.051,
         "trades_per_yr": 12.1
       },
       {
         "pair": "AUDNZD=X",
-        "sharpe": 0.637,
-        "win_rate": 0.625,
-        "trade_count": 8,
-        "max_drawdown": -0.008,
-        "trades_per_yr": 3.9
+        "sharpe": -0.879,
+        "win_rate": 0.438,
+        "trade_count": 16,
+        "max_drawdown": -0.036,
+        "trades_per_yr": 7.7
       }
     ]
   },
   "decay_verdict": {
-    "in_sample_sharpe": 1.8734,
-    "oos_sharpe": 1.9618,
-    "decay_ratio": 1.047,
+    "in_sample_sharpe": 0.6722,
+    "oos_sharpe": 0.7582,
+    "decay_ratio": 1.128,
     "verdict": "ROBUST",
-    "detail": "OOS is 105% of in-sample \u2014 edge holds well."
+    "detail": "OOS is 113% of in-sample \u2014 edge holds well."
   },
   "vix_gate_validation": {
     "window": "2023-01-01 \u2192 2024-12-31",
-    "avg_sharpe_v014": 1.9618,
-    "avg_sharpe_v013": 1.9618,
+    "avg_sharpe_v014": 0.7582,
+    "avg_sharpe_v013": 0.7582,
     "portfolio_delta": 0.0,
     "pairs": {
       "USDJPY=X": {
-        "v014_sharpe_vix13": 2.382,
-        "v013_sharpe_vix15": 2.382,
+        "v014_sharpe_vix13": 0.514,
+        "v013_sharpe_vix15": 0.514,
         "delta": 0.0,
-        "v014_trades": 15,
-        "v013_trades": 15,
+        "v014_trades": 23,
+        "v013_trades": 23,
         "validated_on_holdout": "False"
       },
       "AUDNZD=X": {
-        "v014_sharpe_vix13": 0.637,
-        "v013_sharpe_vix15": 0.637,
+        "v014_sharpe_vix13": -0.879,
+        "v013_sharpe_vix15": -0.879,
         "delta": 0.0,
-        "v014_trades": 8,
-        "v013_trades": 8,
+        "v014_trades": 16,
+        "v013_trades": 16,
         "validated_on_holdout": "False"
       }
     }
   },
   "cot_lag_impact": {
     "window": "2015-01-01 \u2192 2022-12-31",
-    "in_sample_sharpe_with_cot": 1.8734,
+    "in_sample_sharpe_with_cot": 0.6722,
     "note": "COT gate halves position size when z > 1.5\u03c3 crowded. A 4-day publication lag means the COT signal fires slightly later than modeled. Expected impact: small (<0.05 Sharpe) since COT is a size modifier, not a direction gate. Full measurement requires patching COTEngine._load_or_fetch() to shift series by 4 days.",
     "estimated_lag_impact": "< -0.05 Sharpe (COT is size gate only, not direction gate)"
   }

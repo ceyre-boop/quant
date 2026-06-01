@@ -31,7 +31,9 @@
       "lesson_number_in_file": 3,
       "retro_validation_date": "2026-05-27",
       "retro_verdict": "REJECTED",
-      "retro_delta_sharpe": 0.0031
+      "retro_delta_sharpe": 0.0031,
+      "monitor_status": "INSUFFICIENT_DATA",
+      "last_checked": "2026-06-01T03:09:04.654773+00:00"
     },
     {
       "id": "L-002",
@@ -50,7 +52,9 @@
       "lesson_number_in_file": 2,
       "retro_validation_date": "2026-05-27",
       "retro_verdict": "REJECTED",
-      "retro_delta_sharpe": 0.0314
+      "retro_delta_sharpe": 0.0314,
+      "monitor_status": "INSUFFICIENT_DATA",
+      "last_checked": "2026-06-01T03:09:04.654791+00:00"
     },
     {
       "id": "L-003",
@@ -73,7 +77,9 @@
       "retro_status": "SUSPENDED",
       "retro_p_value": 0.831,
       "retro_holdout_ratio": 0.0,
-      "retro_note": "All 3 gates failed. pd_alignment weight already 0.0 \u2014 no code change required."
+      "retro_note": "All 3 gates failed. pd_alignment weight already 0.0 \u2014 no code change required.",
+      "monitor_status": "INSUFFICIENT_DATA",
+      "last_checked": "2026-06-01T03:09:04.654793+00:00"
     },
     {
       "id": "L-004",
@@ -89,7 +95,9 @@
       "codified": "2026-05-19",
       "code_location": "sovereign/forex/signal_engine.py _compute_size_multipliers()",
       "health": "ACTIVE",
-      "lesson_number_in_file": 6
+      "lesson_number_in_file": 6,
+      "monitor_status": "INSUFFICIENT_DATA",
+      "last_checked": "2026-06-01T03:09:04.654795+00:00"
     },
     {
       "id": "L-005",
@@ -105,7 +113,9 @@
       "codified": "2026-05-19",
       "code_location": "sovereign/forex/signal_engine.py _compute_size_multipliers()",
       "health": "ACTIVE",
-      "lesson_number_in_file": 7
+      "lesson_number_in_file": 7,
+      "monitor_status": "INSUFFICIENT_DATA",
+      "last_checked": "2026-06-01T03:09:04.654797+00:00"
     },
     {
       "id": "L-006",
@@ -124,7 +134,9 @@
       "lesson_number_in_file": 1,
       "retro_validation_date": "2026-05-27",
       "retro_verdict": "REJECTED",
-      "retro_delta_sharpe": 0.1243
+      "retro_delta_sharpe": 0.1243,
+      "monitor_status": "INSUFFICIENT_DATA",
+      "last_checked": "2026-06-01T03:09:04.654797+00:00"
     },
     {
       "id": "L-007",
@@ -143,7 +155,9 @@
       "lesson_number_in_file": 5,
       "retro_validation_date": "2026-05-27",
       "retro_verdict": "REJECTED",
-      "retro_delta_sharpe": -0.087
+      "retro_delta_sharpe": -0.087,
+      "monitor_status": "INSUFFICIENT_DATA",
+      "last_checked": "2026-06-01T03:09:04.654798+00:00"
     },
     {
       "id": "L-008",
@@ -162,7 +176,9 @@
       "lesson_number_in_file": 8,
       "retro_status": "UNTESTABLE_EXIT",
       "retro_note": "Exit rule \u2014 VIX value at entry not in forensics. Validate via backtester sweep at n>=100 per pair.",
-      "caution": "n=46 USDJPY, n=39 AUDNZD \u2014 retest when sample doubles"
+      "caution": "n=46 USDJPY, n=39 AUDNZD \u2014 retest when sample doubles",
+      "monitor_status": "INSUFFICIENT_DATA",
+      "last_checked": "2026-06-01T03:09:04.654799+00:00"
     },
     {
       "id": "L-009",
@@ -180,7 +196,9 @@
       "health": "ACTIVE",
       "lesson_number_in_file": 9,
       "retro_status": "NOT_APPLICABLE",
-      "retro_note": "Meta-process lesson \u2014 statistical validation not applicable."
+      "retro_note": "Meta-process lesson \u2014 statistical validation not applicable.",
+      "monitor_status": "INSUFFICIENT_DATA",
+      "last_checked": "2026-06-01T03:09:04.654800+00:00"
     }
   ],
   "proven_hypotheses": [
@@ -456,5 +474,6 @@
       "Intraday ATR ratio as commitment proxy for forex (requires new data)",
       "Cross-pair divergence as size reducer when pairs disagree on direction"
     ]
-  }
+  },
+  "edge_monitor_last_run": "2026-06-01T03:09:04.654801+00:00"
 }
