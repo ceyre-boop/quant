@@ -1,0 +1,33 @@
+{
+  "id": "ESNQ-LL-01",
+  "name": "NQ-leads-ES entry",
+  "signal": "nq_leads_es",
+  "threshold": 0.003,
+  "traded": "ES=F",
+  "date_tested": "2026-06-02T23:33:31.923255+00:00",
+  "is_sharpe": -0.739,
+  "oos_sharpe": 0.012,
+  "oos_ci": [
+    -0.092,
+    0.115
+  ],
+  "oos_p_value": 0.4750830564784053,
+  "decay_ratio": null,
+  "holdout_2025_sharpe": -1.596,
+  "walk_forward": {
+    "2021": -0.606,
+    "2022": -0.563,
+    "2023": 0.392,
+    "2024": -0.496,
+    "2025": -1.596
+  },
+  "oos_trades": 360,
+  "gates": {
+    "oos_sharpe_positive": true,
+    "oos_p_lt_005": false,
+    "decay_ok": false,
+    "holdout_positive": false,
+    "bh_survives": false
+  },
+  "verdict": "REJECTED"
+}
