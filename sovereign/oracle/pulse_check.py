@@ -584,7 +584,50 @@ def _backfill_decision_outcomes() -> int:
         except Exception as exc:
             log.warning("backfill: trade %s failed: %s", trade.get("id"), exc)
 
+    # Venue-aware: also backfill Tradovate (CME futures) outcomes. Fully guarded — a no-op
+    # without TRADOVATE creds, and can never break the OANDA backfill above.
+    try:
+        n_backfilled += _backfill_tradovate_outcomes()
+    except Exception as exc:
+        log.warning("backfill: tradovate venue skipped: %s", exc)
+
     return n_backfilled
+
+
+def _backfill_tradovate_outcomes() -> int:
+    """Backfill outcomes for the Tradovate (CME futures) venue.
+
+    UNTESTED pending demo creds — early-returns 0 when TRADOVATE_ACCOUNT_ID is absent, so on a
+    machine without Tradovate configured this is a pure no-op. The fill-schema parsing below is
+    provisional and must be validated against a real demo account before it's relied upon.
+    """
+    import os
+    if not os.environ.get("TRADOVATE_ACCOUNT_ID"):
+        return 0
+    try:
+        from sovereign.execution.tradovate_bridge import TradovateBridge
+        from sovereign.intelligence.decision_logger import update_outcome
+        closed = TradovateBridge().get_closed_trades(limit=100)
+    except Exception as exc:
+        log.warning("tradovate backfill: cannot fetch fills: %s", exc)
+        return 0
+
+    n = 0
+    for f in closed:
+        try:
+            symbol = str(f.get("symbol") or f.get("contract") or "")
+            pnl = float(f.get("pnl") or f.get("realizedPnl") or 0.0)
+            ts = str(f.get("timestamp") or f.get("tradeDate") or "")[:19]
+            if not symbol or not ts:
+                continue
+            outcome = _classify_realized(pnl)
+            if update_outcome(pair=symbol, entry_timestamp=ts, outcome=outcome,
+                              r_realized=0.0, exit_timestamp=f.get("timestamp"),
+                              system="FUTURES"):
+                n += 1
+        except Exception as exc:
+            log.warning("tradovate backfill: fill failed: %s", exc)
+    return n
 
 
 def _norm_pair(p: str) -> str:
