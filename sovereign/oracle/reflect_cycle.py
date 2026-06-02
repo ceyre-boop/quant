@@ -47,6 +47,18 @@ REASONING_ANALYSIS_DIR = ROOT / "data" / "oracle" / "reasoning_analysis"
 PULSE_DIR = ROOT / "data" / "oracle" / "pulses"
 
 
+def _load_market_briefing() -> str:
+    """Latest morning market briefing (Oracle's journal). Flagged unverified — qualitative
+    regime context only. Returns a short note if none exists yet."""
+    p = ROOT / "data" / "oracle" / "market_briefings" / "latest.json"
+    try:
+        d = json.loads(p.read_text())
+        return (f"[{d.get('date')}] regime={d.get('meta_regime')} (verified={d['provenance']['verified']}). "
+                f"{d.get('regime_read','')}\n{d.get('narrative','')[:1200]}")
+    except Exception:
+        return "No morning market briefing yet (run morning_market_briefing.py). Treat as no context."
+
+
 def _load_recent_prices() -> str:
     """Load live_prices from the most recent pulse file."""
     if not PULSE_DIR.exists():
@@ -109,6 +121,9 @@ Every suggestion you make must move one needle: Sharpe, win rate, drawdown, or p
 
 ## Current market prices (from last pulse)
 {prices_json}
+
+## Morning market briefing (analyst narrative — UNVERIFIED qualitative context, NOT a data feed)
+{market_briefing}
 
 ## External regime confirmation (TradingView vs internal)
 {regime_alignment}
@@ -388,6 +403,7 @@ def run_reflect(harvests: list[dict], date: Optional[str] = None) -> dict:
         tenets=ctx["tenets"],
         bridge_state=ctx["bridge_state"],
         prices_json=_load_recent_prices(),
+        market_briefing=_load_market_briefing(),
         regime_alignment=_load_regime_alignment(),
         indicator_consensus=_load_indicator_consensus(),
         next_milestones=ctx["next_milestones"],
@@ -480,6 +496,7 @@ if __name__ == "__main__":
             tenets=ctx["tenets"],
             bridge_state=ctx["bridge_state"],
             prices_json=_load_recent_prices(),
+        market_briefing=_load_market_briefing(),
             regime_alignment=_load_regime_alignment(),
             indicator_consensus=_load_indicator_consensus(),
             next_milestones=ctx["next_milestones"],

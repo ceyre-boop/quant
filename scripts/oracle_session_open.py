@@ -66,6 +66,14 @@ def _loops_down() -> list[str]:
         return []
 
 
+def _read_regime() -> dict:
+    try:
+        d = json.loads((ROOT / "data" / "research" / "nqes_regime.json").read_text())
+        return {"regime": d.get("regime"), "nq_last": d.get("nq_last"), "es_last": d.get("es_last")}
+    except Exception:
+        return {}
+
+
 def build_briefing() -> dict:
     scan = _latest_scan()
     positions = _open_positions()
@@ -92,7 +100,14 @@ def build_briefing() -> dict:
     pos_line = (f"{len(positions)} open position(s)." if positions else "No open positions.")
     health_line = (f"⚠️ loops down: {', '.join(down)}." if down else "All monitored loops alive.")
 
-    briefing = (f"Session open {_now()[:16]}Z. {scan_line} {pos_line} {health_line} "
+    # NQ/ES regime (research input — what kind of market, for sizing/trust; not a trade signal).
+    try:
+        nq = json.loads((ROOT / "data" / "research" / "nqes_regime.json").read_text())
+        nqes_line = f"NQ/ES regime: {nq.get('regime')} ({nq.get('read','')[:80]})."
+    except Exception:
+        nqes_line = "NQ/ES regime: not computed yet."
+
+    briefing = (f"Session open {_now()[:16]}Z. {scan_line} {pos_line} {health_line} {nqes_line} "
                 f"Forex macro is a swing edge (~1 trade/pair/month) — a no-signal day is the strategy "
                 f"working, not failing. Watching for rate-differential divergence to widen past threshold.")
 
@@ -102,6 +117,7 @@ def build_briefing() -> dict:
         "scan_verdicts": [r.get("verdict") for r in scan],
         "open_positions": len(positions),
         "loops_down": down,
+        "nqes_regime": _read_regime(),
     }
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps(payload, indent=2))
