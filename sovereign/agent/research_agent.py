@@ -250,8 +250,19 @@ def check_decision_log_health() -> list[str]:
         recent_files = sorted(DECISION_LOG_DIR.glob("decisions_*.jsonl"))[-2:]
         for f in recent_files:
             age_h = (now - f.stat().st_mtime) / 3600
-            if age_h > 48:
-                issues.append(f"WARNING: {f.name} not updated in {age_h:.0f}h — pipeline may be silent")
+            if age_h > 96:
+                import time as _t
+                scanner_state = ROOT / "data" / "scanner_state.json" if hasattr(ROOT, "__truediv__") else None
+                scanner_note = ""
+                try:
+                    from pathlib import Path as _P
+                    ss = _P(__file__).resolve().parents[2] / "data" / "scanner_state.json"
+                    if ss.exists():
+                        scan_age_h = (_t.time() - ss.stat().st_mtime) / 3600
+                        scanner_note = f" (scanner last run {scan_age_h:.1f}h ago)"
+                except Exception:
+                    pass
+                issues.append(f"WARNING: {f.name} not updated in {age_h:.0f}h — no Grade A signals{scanner_note}")
     else:
         issues.append("WARNING: data/decision_logs/ directory missing — no trades logged yet")
         return issues

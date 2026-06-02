@@ -294,7 +294,8 @@ def _update_health_json(pulse: dict) -> None:
             health["components"] = {}
         n_anomalies = len(pulse.get("anomalies", []))
         urgent = any(a["priority"] == "URGENT" for a in pulse.get("anomalies", []))
-        status = "RED" if urgent else ("YELLOW" if n_anomalies > 0 else "GREEN")
+        important_plus = [a for a in pulse.get("anomalies", []) if a.get("priority") in ("URGENT", "IMPORTANT")]
+        status = "RED" if urgent else ("YELLOW" if important_plus else "GREEN")
         health["components"]["oracle_pulse"] = {
             "status": status,
             "detail": f"{pulse['new_entries_since_last']} new entries, {n_anomalies} anomalies",

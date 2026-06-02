@@ -408,6 +408,11 @@ def _check_fred() -> tuple:
     if err:
         # Network/timeout issues are not key errors — degrade to YELLOW
         if "timed out" in err.lower() or "timeout" in err.lower() or "504" in err:
+            import time as _t
+            macro_snap = ROOT / "data" / "macro" / "macro_snapshot.json"
+            if macro_snap.exists() and (_t.time() - macro_snap.stat().st_mtime) / 3600 < 6:
+                snap_age_h = (_t.time() - macro_snap.stat().st_mtime) / 3600
+                return "GREEN", f"yfinance macro fallback active ({snap_age_h:.1f}h old) — FRED unreachable"
             return "YELLOW", f"FRED unreachable (network): {err[:80]}"
         return "RED", err
     if code == 200:
