@@ -1,14 +1,14 @@
 {
-  "audit_date": "2026-05-31",
+  "audit_date": "2026-06-02",
   "system_version": "v014",
   "in_sample": {
     "window": "2015-01-01 \u2192 2022-12-31",
-    "avg_sharpe": 0.6722,
-    "n_trades": 321,
-    "sharpe_se": 0.062,
+    "avg_sharpe": 0.6702,
+    "n_trades": 276,
+    "sharpe_se": 0.067,
     "sharpe_ci_95": [
-      0.551,
-      0.793
+      0.54,
+      0.801
     ],
     "pairs": [
       {
@@ -42,25 +42,17 @@
         "trade_count": 77,
         "max_drawdown": -0.042,
         "trades_per_yr": 9.3
-      },
-      {
-        "pair": "AUDNZD=X",
-        "sharpe": 0.682,
-        "win_rate": 0.489,
-        "trade_count": 45,
-        "max_drawdown": -0.04,
-        "trades_per_yr": 5.4
       }
     ]
   },
   "out_of_sample": {
     "window": "2023-01-01 \u2192 2024-12-31",
-    "avg_sharpe": 0.7582,
-    "n_trades": 119,
-    "sharpe_se": 0.104,
+    "avg_sharpe": 1.0811,
+    "n_trades": 103,
+    "sharpe_se": 0.124,
     "sharpe_ci_95": [
-      0.554,
-      0.962
+      0.838,
+      1.324
     ],
     "pairs": [
       {
@@ -94,28 +86,20 @@
         "trade_count": 25,
         "max_drawdown": -0.051,
         "trades_per_yr": 12.1
-      },
-      {
-        "pair": "AUDNZD=X",
-        "sharpe": -0.879,
-        "win_rate": 0.438,
-        "trade_count": 16,
-        "max_drawdown": -0.036,
-        "trades_per_yr": 7.7
       }
     ]
   },
   "decay_verdict": {
-    "in_sample_sharpe": 0.6722,
-    "oos_sharpe": 0.7582,
-    "decay_ratio": 1.128,
+    "in_sample_sharpe": 0.6702,
+    "oos_sharpe": 1.0811,
+    "decay_ratio": 1.613,
     "verdict": "ROBUST",
-    "detail": "OOS is 113% of in-sample \u2014 edge holds well."
+    "detail": "OOS is 161% of in-sample \u2014 edge holds well."
   },
   "vix_gate_validation": {
     "window": "2023-01-01 \u2192 2024-12-31",
-    "avg_sharpe_v014": 0.7582,
-    "avg_sharpe_v013": 0.7582,
+    "avg_sharpe_v014": 1.0811,
+    "avg_sharpe_v013": 1.0811,
     "portfolio_delta": 0.0,
     "pairs": {
       "USDJPY=X": {
@@ -127,18 +111,18 @@
         "validated_on_holdout": "False"
       },
       "AUDNZD=X": {
-        "v014_sharpe_vix13": -0.879,
-        "v013_sharpe_vix15": -0.879,
-        "delta": 0.0,
-        "v014_trades": 16,
-        "v013_trades": 16,
-        "validated_on_holdout": "False"
+        "v014_sharpe_vix13": null,
+        "v013_sharpe_vix15": null,
+        "delta": null,
+        "v014_trades": null,
+        "v013_trades": null,
+        "validated_on_holdout": false
       }
     }
   },
   "cot_lag_impact": {
     "window": "2015-01-01 \u2192 2022-12-31",
-    "in_sample_sharpe_with_cot": 0.6722,
+    "in_sample_sharpe_with_cot": 0.6702,
     "note": "COT gate halves position size when z > 1.5\u03c3 crowded. A 4-day publication lag means the COT signal fires slightly later than modeled. Expected impact: small (<0.05 Sharpe) since COT is a size modifier, not a direction gate. Full measurement requires patching COTEngine._load_or_fetch() to shift series by 4 days.",
     "estimated_lag_impact": "< -0.05 Sharpe (COT is size gate only, not direction gate)"
   }

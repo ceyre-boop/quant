@@ -1,0 +1,46 @@
+{
+  "id": "HYP-045",
+  "name": "AUDNZD exclusion (4-pair)",
+  "run_at": "2026-06-02T23:20:14.827305+00:00",
+  "config": {
+    "EXCLUDE_PAIRS": [
+      "AUDNZD=X"
+    ]
+  },
+  "baseline": {
+    "is_sharpe": 0.6702,
+    "oos_sharpe": 1.0811
+  },
+  "is_sharpe": 0.6702,
+  "is_n": 276,
+  "is_ci": [
+    0.54,
+    0.801
+  ],
+  "is_delta": 0.0,
+  "oos_sharpe": 1.0811,
+  "oos_n": 103,
+  "oos_ci": [
+    0.838,
+    1.324
+  ],
+  "oos_delta": 0.0,
+  "decay_ratio": 1.613,
+  "perm": {
+    "real_sharpe": 0.7006,
+    "null_mean": -0.3414,
+    "null_std": 0.3825,
+    "null_p95": 0.216,
+    "p_value": 0.0033,
+    "n_perms": 300,
+    "verdict": "REAL"
+  },
+  "bh_survives": true,
+  "gates": {
+    "oos_delta_positive": false,
+    "oos_p_lt_005": true,
+    "bh_survives": true,
+    "decay_ok": true
+  },
+  "verdict": "REJECTED"
+}

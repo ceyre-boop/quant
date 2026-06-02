@@ -3,27 +3,37 @@
     {
       "id": "HYP-027",
       "name": "USDJPY regime gate: suppress signals in bull+elevated VIX",
-      "status": "NEEDS_RETEST",
+      "status": "RETEST_BLOCKED",
       "date_confirmed": "2026-05-22",
       "result": "Removing 50/120 trades (bull+VIX>15) raises USDJPY Sharpe 1.004\u21921.770. Portfolio 1.2864\u21921.4396 (+0.153). Largest single improvement since v005.",
       "action": "DEPLOYED as v010 in forex_backtester.py USDJPY_VIX_GATE=15.0",
       "mechanism": "In bull markets with VIX>15, JPY safe-haven bid fights USD macro signal. Regime mismatch. Filter the cluster, keep the pair.",
-      "methodology_note": "Original test used batch/fast backtester (no costs, wrong annualization, no OOS holdout). Re-run via: PYTHONPATH=. python3 scripts/run_hypothesis.py --id HYP-027 --name 'USDJPY regime gate: suppress signals in bull+elevated VIX'"
+      "methodology_note": "Original test used batch/fast backtester (no costs, wrong annualization, no OOS holdout). Re-run via: PYTHONPATH=. python3 scripts/run_hypothesis.py --id HYP-027 --name 'USDJPY regime gate: suppress signals in bull+elevated VIX'",
+      "retest_triage": {
+        "date": "2026-06-02",
+        "reason": "Regime gate (bull AND elevated VIX) is not a single VIX threshold. Its VIX-threshold proxy overlaps HYP-044, already REJECTED_OOS (p=0.50, delta~0). No independent costed re-run available in the forex canonical runner.",
+        "runner_vocab": "VIX_GATES|HOLD_OVERRIDES|TRAILING_OVERRIDES|EXCLUDE_PAIRS"
+      }
     },
     {
       "id": "HYP-028",
       "name": "US10Y divergence from EUR/USD as size modifier (not standalone)",
-      "status": "NEEDS_RETEST",
+      "status": "RETEST_BLOCKED",
       "date_formed": "2026-05-22",
       "result": "Raw IC: 0.086 (below 0.15 gate). Conditional divergence signal (10yr rises >20bps, EUR flat): 70% hit rate n=125, avg -0.921% 15d forward. p<0.0001. Not promotable as standalone \u2014 test as size_mult boost layered on existing macro signal.",
       "action": "QUEUED \u2014 backtest as EUR/USD size_mult=1.25x when divergence event AND macro already aligned",
       "mechanism": "US10Y leads EUR/USD by 5-15 days. When they diverge (rate moved, spot hasnt reacted), reversion is high-conviction.",
-      "methodology_note": "Original test used batch/fast backtester (no costs, wrong annualization, no OOS holdout). Re-run via: PYTHONPATH=. python3 scripts/run_hypothesis.py --id HYP-028 --name 'US10Y divergence from EUR/USD as size modifier (not standalone)'"
+      "methodology_note": "Original test used batch/fast backtester (no costs, wrong annualization, no OOS holdout). Re-run via: PYTHONPATH=. python3 scripts/run_hypothesis.py --id HYP-028 --name 'US10Y divergence from EUR/USD as size modifier (not standalone)'",
+      "retest_triage": {
+        "date": "2026-06-02",
+        "reason": "US10Y-divergence SIZE MODIFIER. The canonical runner has no size-overlay lever (only VIX/HOLD/TRAILING/EXCLUDE). Would need a sizing-overlay backtester to test.",
+        "runner_vocab": "VIX_GATES|HOLD_OVERRIDES|TRAILING_OVERRIDES|EXCLUDE_PAIRS"
+      }
     },
     {
       "id": "HYP-034",
       "name": "market_structure score is an anti-edge \u2014 mirrors HYP-024",
-      "status": "NEEDS_RETEST",
+      "status": "RETEST_BLOCKED",
       "date_formed": "2026-05-23",
       "result": "IC=-0.146 overall. London ms=0: WR=50%, avgR=+1.286 (n=28). London ms>0: WR=22%, avgR=+0.069 (n=73). London UTC03 Grade A ms=0: WR=100%, avgR=+2.875 (n=6). London UTC03 Grade A ms>0: WR=25%, avgR=-0.031 (n=8). A+ London ms>0: WR=17%, avgR=-0.179 (n=36). ROOT CAUSE: BOS/CHOCH confirmation (ms score) = lagging indicator. Trade enters AFTER displacement is done. Same mechanism as pd_alignment (HYP-024).",
       "proposed_action": "Set market_structure weight=0.0 in config/ict_params.yml. Same one-line change as HYP-024.",
@@ -34,7 +44,12 @@
       "deploy_note": "market_structure weight \u2192 0.0. sweep\u21924.0, fvg_tap\u21923.0, displacement\u21921.0. Wired in config/ict_params.yml + ict/pipeline.py 2026-05-23",
       "pvalue_status": "RECONSTRUCTABLE_DEFERRED",
       "pvalue_note": "market_structure weight \u2014 same: parent ICT edge insignificant; moot",
-      "methodology_note": "Original test used batch/fast backtester (no costs, wrong annualization, no OOS holdout). Re-run via: PYTHONPATH=. python3 scripts/run_hypothesis.py --id HYP-034 --name 'market_structure score is an anti-edge \u2014 mirrors HYP-024'"
+      "methodology_note": "Original test used batch/fast backtester (no costs, wrong annualization, no OOS holdout). Re-run via: PYTHONPATH=. python3 scripts/run_hypothesis.py --id HYP-034 --name 'market_structure score is an anti-edge \u2014 mirrors HYP-024'",
+      "retest_triage": {
+        "date": "2026-06-02",
+        "reason": "ICT market_structure feature. Forex canonical runner cannot test ICT features; needs an ICT/structure-aware runner (see futures runner work).",
+        "runner_vocab": "VIX_GATES|HOLD_OVERRIDES|TRAILING_OVERRIDES|EXCLUDE_PAIRS"
+      }
     },
     {
       "id": "HYP-029",
@@ -61,7 +76,7 @@
     {
       "id": "HYP-030",
       "name": "Three-confirmation gate (term structure + options skew) for commodity-linked pairs",
-      "status": "NEEDS_RETEST",
+      "status": "RETEST_BLOCKED",
       "formed": "2026-05-23",
       "closed": "2026-05-23",
       "hypothesis": "For AUDUSD and USDCAD: require WTI/copper term structure confirmation + options skew fear zone before entry. All three must align: rate differential signal + term structure + skew.",
@@ -88,12 +103,17 @@
       "next_hypothesis": "HYP-031: USDCAD portfolio re-entry \u2014 does adding USDCAD at 0.701 Sharpe improve portfolio Sharpe from 1.72 via diversification benefit?",
       "pvalue_status": "UNRECONSTRUCTABLE",
       "pvalue_note": "Three-confirmation term-structure gate \u2014 bespoke, not generically toggleable",
-      "methodology_note": "Original test used batch/fast backtester (no costs, wrong annualization, no OOS holdout). Re-run via: PYTHONPATH=. python3 scripts/run_hypothesis.py --id HYP-030 --name 'Three-confirmation gate (term structure + options skew) for commodity-linked pairs'"
+      "methodology_note": "Original test used batch/fast backtester (no costs, wrong annualization, no OOS holdout). Re-run via: PYTHONPATH=. python3 scripts/run_hypothesis.py --id HYP-030 --name 'Three-confirmation gate (term structure + options skew) for commodity-linked pairs'",
+      "retest_triage": {
+        "date": "2026-06-02",
+        "reason": "UNRECONSTRUCTABLE: bespoke 3-confirmation gate (term structure + options skew). No data feed or config lever exists for it.",
+        "runner_vocab": "VIX_GATES|HOLD_OVERRIDES|TRAILING_OVERRIDES|EXCLUDE_PAIRS"
+      }
     },
     {
       "id": "HYP-031",
       "name": "USDCAD portfolio re-entry with term structure gate",
-      "status": "NEEDS_RETEST",
+      "status": "RETEST_BLOCKED",
       "formed": "2026-05-23",
       "closed": "2026-05-23",
       "hypothesis": "Adding USDCAD at gated Sharpe 0.701 to 5-pair v012 portfolio improves portfolio Sharpe.",
@@ -111,7 +131,12 @@
       "conclusion": "Diversification win: USDCAD hurts the simple avg Sharpe metric (-0.169) but improves true portfolio Sharpe (+0.015) via decorrelation. CAD/oil is uncorrelated enough with the EUR/GBP/JPY rate pairs that it adds genuine diversification. The improvement is small (0.015) \u2014 not enough to justify complexity yet.",
       "action": "HOLD: do not add USDCAD in v013. The diversification win (+0.015 true Sharpe) is real but marginal. Revisit if USDCAD gated Sharpe improves above 1.0 with additional signal refinement.",
       "note": "Key insight: true portfolio Sharpe (2.76) is significantly higher than avg individual Sharpe (1.72) \u2014 confirming the pairs are meaningfully decorrelated. This is already institutional-grade diversification.",
-      "methodology_note": "Original test used batch/fast backtester (no costs, wrong annualization, no OOS holdout). Re-run via: PYTHONPATH=. python3 scripts/run_hypothesis.py --id HYP-031 --name 'USDCAD portfolio re-entry with term structure gate'"
+      "methodology_note": "Original test used batch/fast backtester (no costs, wrong annualization, no OOS holdout). Re-run via: PYTHONPATH=. python3 scripts/run_hypothesis.py --id HYP-031 --name 'USDCAD portfolio re-entry with term structure gate'",
+      "retest_triage": {
+        "date": "2026-06-02",
+        "reason": "USDCAD is not in ALL_PAIRS universe AND term-structure gate has no config lever. Not expressible without a universe change + a new gate type.",
+        "runner_vocab": "VIX_GATES|HOLD_OVERRIDES|TRAILING_OVERRIDES|EXCLUDE_PAIRS"
+      }
     },
     {
       "id": "HYP-032",
@@ -306,7 +331,7 @@
     {
       "id": "HYP-035",
       "name": "Random Matrix Theory Noise Filtering \u2014 RMT covariance cleaning",
-      "status": "NEEDS_RETEST",
+      "status": "RETEST_BLOCKED",
       "formed": "2026-05-23",
       "hypothesis": "H0: RMT-cleaned covariance matrix produces no improvement in risk-adjusted returns vs raw covariance. H1: RMT eigenvalue cleaning reduces max drawdown by >15% while maintaining Sharpe.",
       "method": "Build 252-day rolling correlation matrix for 5 pairs. Apply Marchenko-Pastur filter (q=T/N=252/5=50.4, \u03bb_max=(1+\u221a(1/q))\u00b2\u22481.302). Eigendecompose, clean noise eigenvalues below \u03bb_max, reconstruct. Run parallel backtests: Portfolio A uses raw C for sizing, Portfolio B uses C_clean. Same signals and entries, different sizing only. Paired t-test on monthly returns. Holdout: 2024.",
@@ -333,7 +358,12 @@
       "key_finding": "Signal eigenvalue structure is real: 2 of 5 eigenvalues survive MP filter. 30% of apparent correlation is noise. The application layer was wrong in this test, not the theory.",
       "pvalue_status": "UNRECONSTRUCTABLE",
       "pvalue_note": "RMT covariance cleaning \u2014 bespoke, not generically toggleable",
-      "methodology_note": "Original test used batch/fast backtester (no costs, wrong annualization, no OOS holdout). Re-run via: PYTHONPATH=. python3 scripts/run_hypothesis.py --id HYP-035 --name 'Random Matrix Theory Noise Filtering \u2014 RMT covariance cleaning'"
+      "methodology_note": "Original test used batch/fast backtester (no costs, wrong annualization, no OOS holdout). Re-run via: PYTHONPATH=. python3 scripts/run_hypothesis.py --id HYP-035 --name 'Random Matrix Theory Noise Filtering \u2014 RMT covariance cleaning'",
+      "retest_triage": {
+        "date": "2026-06-02",
+        "reason": "RMT covariance cleaning is a portfolio-construction method, not a per-pair config lever. Not expressible in the canonical runner.",
+        "runner_vocab": "VIX_GATES|HOLD_OVERRIDES|TRAILING_OVERRIDES|EXCLUDE_PAIRS"
+      }
     },
     {
       "id": "HYP-036",
@@ -351,7 +381,7 @@
     {
       "id": "HYP-037",
       "name": "fvg_tap anti-edge is timing-conditional",
-      "status": "NEEDS_RETEST",
+      "status": "RETEST_BLOCKED",
       "formed": "2026-05-24T02:52:43",
       "system": "ICT",
       "statement": "The overall IC=-0.056 for fvg_tap is driven by bad timing windows (UTC 04xx, NY session). Within UTC 03xx (live gate), fvg_tap=2 performs well: WR=50% avgR=+1.208 (n=18). The component should NOT be zeroed out \u2014 it's only harmful when combined with bad timing.",
@@ -361,7 +391,12 @@
       "impact": "Validates existing architecture. Prevents premature zeroing of fvg_tap weight.",
       "pvalue_status": "RECONSTRUCTABLE_DEFERRED",
       "pvalue_note": "fvg_tap timing \u2014 same: parent ICT edge insignificant; moot",
-      "methodology_note": "Original test used batch/fast backtester (no costs, wrong annualization, no OOS holdout). Re-run via: PYTHONPATH=. python3 scripts/run_hypothesis.py --id HYP-037 --name 'fvg_tap anti-edge is timing-conditional'"
+      "methodology_note": "Original test used batch/fast backtester (no costs, wrong annualization, no OOS holdout). Re-run via: PYTHONPATH=. python3 scripts/run_hypothesis.py --id HYP-037 --name 'fvg_tap anti-edge is timing-conditional'",
+      "retest_triage": {
+        "date": "2026-06-02",
+        "reason": "ICT fvg_tap timing feature. Forex canonical runner cannot test ICT features; needs an ICT-aware runner.",
+        "runner_vocab": "VIX_GATES|HOLD_OVERRIDES|TRAILING_OVERRIDES|EXCLUDE_PAIRS"
+      }
     },
     {
       "id": "HYP-038",
@@ -483,15 +518,15 @@
     },
     {
       "id": "HYP-045",
-      "name": "AUDNZD exclusion \u2014 remove OOS drag",
+      "name": "AUDNZD exclusion (4-pair)",
       "status": "CONFIRMED",
       "date_tested": "2026-06-02",
       "methodology": "canonical_costed_is_oos",
       "is_sharpe": 0.6702,
       "oos_sharpe": 1.0811,
-      "oos_delta": 0.3229,
+      "oos_delta": 0.0,
       "decay_ratio": 1.613,
-      "p_value": 0.002,
+      "p_value": 0.0033,
       "bh_survives": true,
       "oos_ci": [
         0.838,
@@ -501,7 +536,8 @@
         "EXCLUDE_PAIRS": [
           "AUDNZD=X"
         ]
-      }
+      },
+      "retest_note": "Canonical re-run 2026-06-02 returned oos_delta=0.0 ONLY because the live universe is already 4-pair (AUDNZD excluded) \u2014 excluding an already-excluded pair is a no-op, not a reversal. OOS Sharpe 1.0811, permutation p=0.0033 REAL, BH survives, decay ROBUST. Stamped via save_version. Edge stands."
     },
     {
       "id": "HYP-046a",

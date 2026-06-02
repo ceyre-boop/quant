@@ -138,7 +138,8 @@ def run_vix_gate_comparison(start: str, end: str) -> dict:
             "validated_on_holdout": validated,
         }
         icon = "✓" if validated else "✗"
-        print(f"    {p}: v014={s14} ({n14}tr) vs v013={s13} ({n13}tr) → delta={delta:+.3f} [{icon}]")
+        delta_str = f"{delta:+.3f}" if delta is not None else "n/a (pair not in universe)"
+        print(f"    {p}: v014={s14} ({n14}tr) vs v013={s13} ({n13}tr) → delta={delta_str} [{icon}]")
 
     avg_v014 = _sharpe_from_results(results_v014)
     avg_v013 = _sharpe_from_results(results_v013)
@@ -278,7 +279,8 @@ def main():
     print(f"    Portfolio: v014={vix_comparison['avg_sharpe_v014']:.4f}  v013={vix_comparison['avg_sharpe_v013']:.4f}  delta={vix_comparison['portfolio_delta']:+.4f}")
     for pair, d in vix_comparison["pairs"].items():
         icon = "VALIDATED ✓" if d["validated_on_holdout"] else "NOT VALIDATED ✗"
-        print(f"    {pair}: {icon}  (delta {d['delta']:+.3f} on holdout)")
+        dstr = f"{d['delta']:+.3f}" if d["delta"] is not None else "n/a (pair not in universe)"
+        print(f"    {pair}: {icon}  (delta {dstr} on holdout)")
 
     print(f"\n  COT LAG: {cot_result['estimated_lag_impact']}")
 

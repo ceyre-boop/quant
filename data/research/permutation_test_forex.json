@@ -1,16 +1,12 @@
 {
-  "test_date": "2026-05-31T16:43:20.141076+00:00",
+  "test_date": "2026-06-02T23:17:50.095738+00:00",
   "system": "forex_macro",
   "n_permutations": 1000,
   "seed": 7,
   "costed": true,
-  "real_portfolio_sharpe": 0.3184,
-  "real_n_trades": 632,
+  "real_portfolio_sharpe": 0.3568,
+  "real_n_trades": 521,
   "real_per_pair": {
-    "AUDNZD": {
-      "sharpe": 0.152,
-      "n": 111
-    },
     "AUDUSD": {
       "sharpe": 0.469,
       "n": 122
@@ -28,10 +24,10 @@
       "n": 126
     }
   },
-  "null_mean": -0.1565,
-  "null_std": 0.1424,
-  "null_pct95": 0.0624,
-  "null_max": 0.3003,
+  "null_mean": -0.1378,
+  "null_std": 0.1631,
+  "null_pct95": 0.1189,
+  "null_max": 0.2586,
   "p_value": 0.0,
   "edge_above_95th": true,
   "verdict": "REAL"
