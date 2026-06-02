@@ -154,7 +154,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
 #statsbar{background:var(--bg2);border-top:1px solid var(--border);padding:7px 24px;display:flex;gap:32px;font-size:10px;color:var(--muted);flex-shrink:0}
 #statsbar span{color:var(--text)}
 
-@media(max-width:900px){#main{grid-template-columns:1fr}#sidebar{order:-1}#state-cards{grid-template-columns:repeat(2,1fr)}#ict-stats{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:900px){#main{grid-template-columns:1fr}#state-cards{grid-template-columns:repeat(2,1fr)}#ict-stats{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:480px){#header{flex-wrap:wrap;height:auto;padding:10px 16px;gap:8px}.hdr-left{flex-wrap:wrap;gap:8px}}
 </style>
 </head>
 <body>
@@ -390,6 +391,10 @@ function renderBridge(crossState) {
   document.getElementById('sc-regime').textContent = regime;
   document.getElementById('sc-threat').textContent = threat.toFixed(2);
   document.getElementById('sc-threat').style.color = threat>0.85?'var(--red)':threat>0.5?'var(--yellow)':'var(--green)';
+  const bridgeCard=document.getElementById('sc-bridge')?document.getElementById('sc-bridge').closest('.state-card'):null;
+  const threatCard=document.getElementById('sc-threat')?document.getElementById('sc-threat').closest('.state-card'):null;
+  if(bridgeCard)bridgeCard.className='state-card '+(mode==='HALT_NEW'?'alert':mode==='TIGHTEN'?'warn':'ok');
+  if(threatCard)threatCard.className='state-card '+(threat>0.85?'alert':threat>0.5?'warn':'ok');
   document.getElementById('stat-bridge').textContent = mode;
   document.getElementById('stat-bridge').style.color = mode==='HALT_NEW'?'var(--red)':mode==='TIGHTEN'?'var(--yellow)':'var(--green)';
   // G4 gate — live threat
