@@ -1,0 +1,26 @@
+{
+  "date": "2026-06-02",
+  "generated_at": "2026-06-02T23:14:38.439368+00:00",
+  "input_tokens": 5255,
+  "output_tokens": 747,
+  "estimated_cost_usd": 0.13485,
+  "harvest_days_read": 1,
+  "reflection": {
+    "candidate_lesson": {
+      "lesson_text": "When the 30-indicator consensus shows max conviction (100%) but green_matches=0 and hist_hr=0%, the live directional signal has no historical analog and should be sized down, not up.",
+      "mechanism": "A 15/30 bull / 0/30 bear reading on USDJPY looks maximally clean, but green_matches=0 means no prior instance of this exact indicator configuration has ever resolved profitably in the memory bank. Institutional flow that produces unanimous indicator agreement with no historical precedent is typically a late-stage momentum extension into a liquidity pocket \u2014 the consensus is measuring crowding, not edge. The conviction number captures agreement among indicators, not agreement with what historically paid.",
+      "testable_rule": "if consensus_conviction >= 0.90 and green_matches == 0 and hist_hr == 0.0: size_multiplier *= 0.5 (treat as unconfirmed; require library_match before full size)",
+      "expected_impact": "Reduces drawdown on false-confidence MOMENTUM entries; expected Sharpe +0.02-0.03 by cutting variance from high-conviction/zero-history trades like the current USDJPY 100% conv signal.",
+      "evidence_from_harvest": "Current live state: USDJPY dir=LONG conv=100% but green_matches=0 hist_hr=0%; EURUSD conv=50% green_matches=0 hist_hr=0%; every pair shows hist_hr=0% despite conviction up to 100% \u2014 conviction is fully decoupled from historical hit rate right now.",
+      "evidence_from_reasoning": null,
+      "reasoning_component_targeted": "consensus_conviction (gated against green_matches and hist_hr)",
+      "sample_needed": 30
+    },
+    "retirement_flag": {
+      "lesson_to_review": null,
+      "reason": null
+    },
+    "system_health_note": "Regime=UNKNOWN with TradingView showing 0 signals and internal MOMENTUM at 75% sizing \u2014 system is correctly de-risked, but zero closed trades in 7 days means all lessons remain harvest-inferred, not trade-validated."
+  },
+  "auto_validation": null
+}

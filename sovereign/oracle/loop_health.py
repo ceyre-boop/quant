@@ -152,7 +152,7 @@ def _message(subject: str, body: str, priority: str = "RED") -> None:
         data.setdefault("messages", []).insert(0, {
             "id": f"loophealth-{_now().isoformat()[:19].replace(':','').replace('-','')}",
             "timestamp": _now().isoformat(), "priority": priority, "source": "LOOP_HEALTH",
-            "subject": subject, "message": body, "action_required": priority == "RED",
+            "subject": subject, "message": body, "action_required": priority in ("RED", "CRITICAL"),
         })
         data["messages"] = data["messages"][:80]
         MESSAGES.write_text(json.dumps(data, indent=2))
@@ -184,11 +184,26 @@ def check_all_loops(message: bool = True) -> dict:
     if dead and message:
         for loop, silence in dead:
             thr = HEARTBEAT_EXPECTATIONS[loop]["max_silence_hours"]
-            _message(f"LOOP DOWN: {loop} silent {silence:.0f}h",
-                     f"{loop} has not run for {silence:.0f}h (expected < {thr}h). "
-                     f"The self-improvement machinery is degraded — investigate the scheduler "
-                     f"(execute_daily.py / launchd) before relying on downstream loops.",
-                     priority="RED")
+            # Escalate: beyond 2x the threshold a loop is not "late", it's broken — CRITICAL.
+            critical = silence > 2 * thr
+            tier = "CRITICAL" if critical else "RED"
+            remediation = (
+                "oracle_reflection runs via launchd com.alta.oracle.reflect.plist "
+                "(scripts/com.alta.oracle.reflect.plist → sovereign/oracle/oracle_cycle.py). "
+                "Check `launchctl list | grep alta`, logs/oracle_cycle.err, and the "
+                "logs/.heartbeat_oracle_reflection mtime."
+                if loop == "oracle_reflection" else
+                "Check the loop's launchd plist is loaded (`launchctl list | grep alta`) and its "
+                "logs/.heartbeat_<loop> mtime."
+            )
+            _message(
+                f"{'🚨 LOOP CRITICAL' if critical else 'LOOP DOWN'}: {loop} silent {silence:.0f}h",
+                f"{loop} has not run for {silence:.0f}h (expected < {thr}h"
+                f"{f'; >2x threshold = broken, not late' if critical else ''}). "
+                f"The self-improvement machinery is degraded — a system that doesn't reflect "
+                f"doesn't compound. {remediation}",
+                priority=tier,
+            )
 
     result = {"checked_at": now.isoformat(), "market_hours": _is_market_hours(now),
               "down": [d[0] for d in dead], "loops": loops}

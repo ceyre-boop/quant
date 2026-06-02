@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key><string>com.alta.oracle.reflect</string>
+    <!-- Dedicated trigger for the Oracle daily learning cycle (harvest → reflect → test → codify).
+         Replaces the unloaded/sprawling agent_scheduler as the reflection trigger; pulse already
+         runs loop_health, the briefing engine has its own news. oracle_cycle.py writes
+         logs/.heartbeat_oracle_reflection at the start of every run so loop_health measures
+         EXECUTION, not output. NOTE: launchd StartCalendarInterval fires in the machine's LOCAL
+         timezone (America/Los_Angeles). 02:30 PT, daily. `launchctl load` to enable. -->
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string><string>-c</string>
+        <string>cd /Users/taboost/quant &amp;&amp; /opt/homebrew/bin/python3 sovereign/oracle/oracle_cycle.py</string>
+    </array>
+    <key>WorkingDirectory</key><string>/Users/taboost/quant</string>
+    <key>StartCalendarInterval</key>
+    <dict><key>Hour</key><integer>2</integer><key>Minute</key><integer>30</integer></dict>
+    <key>StandardOutPath</key><string>/Users/taboost/quant/logs/oracle_cycle.log</string>
+    <key>StandardErrorPath</key><string>/Users/taboost/quant/logs/oracle_cycle.err</string>
+    <key>EnvironmentVariables</key><dict><key>PATH</key><string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string></dict>
+</dict>
+</plist>

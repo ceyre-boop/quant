@@ -360,8 +360,8 @@ def _load_harvest_summary(harvests: list[dict]) -> str:
         dominant = h.get("dominant_failure_mode", "UNKNOWN")
         lines.append(
             f"  {h['date']}: {h['trades_closed']} trades | "
-            f"WR={h.get('win_rate', 0)*100:.0f}% | "
-            f"avgR={h.get('avg_r', 0):.3f} | "
+            f"WR={(h.get('win_rate') or 0)*100:.0f}% | "
+            f"avgR={(h.get('avg_r') or 0):.3f} | "
             f"dominant_fail={dominant} | "
             f"anomalies={len(h.get('anomalies', []))}"
         )

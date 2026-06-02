@@ -18,14 +18,20 @@ from __future__ import annotations
 import json
 import re
 import statistics
+import sys
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 from typing import Optional
 
 ROOT = Path(__file__).resolve().parents[2]
+# Allow direct invocation (`python3 sovereign/oracle/oracle_cycle.py`): when run as a script,
+# sys.path[0] is this file's dir, not the repo root, so `import sovereign` would fail.
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 WISDOM_FILE     = ROOT / "I_am_a_good_trader.md"
 ARCHIVE_FILE    = ROOT / "I_was_a_good_trader.md"
 ORACLE_LOG      = ROOT / "logs" / "oracle_cycle.log"
+HEARTBEAT       = ROOT / "logs" / ".heartbeat_oracle_reflection"
 ORACLE_LOG.parent.mkdir(parents=True, exist_ok=True)
 
 
@@ -45,6 +51,12 @@ def run_daily_cycle(dry_run: bool = False) -> dict:
     from sovereign.oracle.codify_cycle import run_codify
 
     date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    # Execution heartbeat FIRST (before any phase/gate) — loop_health measures EXECUTION,
+    # not output. Written even if a phase later fails, so "did the cycle run" is unambiguous.
+    try:
+        HEARTBEAT.write_text(datetime.now(timezone.utc).isoformat())
+    except Exception:
+        pass
     _log(f"Oracle daily cycle starting — {date}")
 
     # Phase 1: Harvest
