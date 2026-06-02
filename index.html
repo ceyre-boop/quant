@@ -874,13 +874,6 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
       </div>
       <div id="chat-err"></div>
       <div id="chat-input-outer">
-        <div class="chat-chip-row">
-          <button class="chat-chip" type="button">What's the best setup right now?</button>
-          <button class="chat-chip" type="button">ICT system status?</button>
-          <button class="chat-chip" type="button">Which forex pair has highest conviction?</button>
-          <button class="chat-chip" type="button">Should I take a trade today?</button>
-          <button class="chat-chip" type="button">Bridge state?</button>
-        </div>
         <div class="chat-inner-row">
           <textarea id="chat-input" placeholder="Ask about the system…" rows="1"></textarea>
           <button id="chat-send">SEND</button>
@@ -1744,6 +1737,14 @@ async function sigRefresh(){
     loading.style.display='none';
     live.classList.add('hidden');
     offline.classList.remove('hidden');
+    if(!document.getElementById('dash-offline-banner')){
+      const b=document.createElement('div');
+      b.id='dash-offline-banner';
+      b.style.cssText='position:fixed;bottom:16px;right:16px;background:var(--bg2);border:1px solid var(--border);padding:8px 14px;font-size:10px;color:var(--muted);z-index:1000;letter-spacing:.5px';
+      b.textContent='Static view · live data requires local backend';
+      document.body.appendChild(b);
+      setTimeout(()=>b.remove(),8000);
+    }
   }
 }
 setInterval(()=>{if(document.getElementById('tab-signals').classList.contains('active'))sigRefresh();},60000);
