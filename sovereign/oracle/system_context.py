@@ -18,6 +18,8 @@ HYPOTHESIS_LEDGER = ROOT / "data" / "agent" / "hypothesis_ledger.json"
 RESEARCH_QUEUE   = ROOT / "data" / "agent" / "research_queue.json"
 BRIDGE_STATE     = ROOT / "data" / "forensics" / "cross_system_state.json"
 SUGGESTIONS      = ROOT / "data" / "agent" / "suggestions.json"
+PERM_TEST        = ROOT / "data" / "research" / "permutation_test_forex.json"
+HOLDOUT_RESULT   = ROOT / "data" / "audit" / "holdout_validation_v014.json"
 
 # Six tenets — compact version (avoids re-reading full doc each cycle)
 _TENETS_COMPACT = """1. Statistical Utility > Narrative Coherence — features must pass formal gates (IC>0.15 OOS, walk-forward, holdout).
@@ -119,6 +121,48 @@ def _load_bridge_state() -> str:
         return "Could not parse bridge state."
 
 
+def _load_methodology_health() -> dict:
+    """Current validation state — Oracle must not suggest CONFIRMED without OOS p-value."""
+    health: dict = {
+        "rule": "NEVER recommend CONFIRMED unless OOS p-value exists in hypothesis_ledger.json",
+        "permutation_test": None,
+        "holdout": None,
+        "hypotheses_without_oos_pvalue": 0,
+    }
+    if PERM_TEST.exists():
+        try:
+            perm = json.loads(PERM_TEST.read_text())
+            health["permutation_test"] = {
+                "p_value": perm.get("p_value"),
+                "verdict": perm.get("verdict"),
+                "run_date": perm.get("run_date"),
+            }
+        except Exception:
+            pass
+    if HOLDOUT_RESULT.exists():
+        try:
+            holdout = json.loads(HOLDOUT_RESULT.read_text())
+            health["holdout"] = {
+                "oos_sharpe": holdout.get("oos_sharpe"),
+                "decay_verdict": holdout.get("decay_verdict"),
+                "run_date": holdout.get("run_date"),
+            }
+        except Exception:
+            pass
+    if HYPOTHESIS_LEDGER.exists():
+        try:
+            data = json.loads(HYPOTHESIS_LEDGER.read_text())
+            hyps = data.get("hypotheses", data.get("ledger", []))
+            claimed = {"CONFIRMED", "PARTIAL_CONFIRMED", "DEPLOYED", "PARTIAL"}
+            health["hypotheses_without_oos_pvalue"] = sum(
+                1 for h in hyps
+                if h.get("status") in claimed and not isinstance(h.get("p_value"), (int, float))
+            )
+        except Exception:
+            pass
+    return health
+
+
 def _load_next_milestones() -> str:
     if not CLAUDE_MD.exists():
         return ""
@@ -146,4 +190,5 @@ def build_system_context() -> dict:
         "queue_status": _load_queue_status(),
         "bridge_state": _load_bridge_state(),
         "next_milestones": _load_next_milestones(),
+        "methodology_health": _load_methodology_health(),
     }

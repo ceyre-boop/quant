@@ -1,507 +1,29 @@
 {
-  "ledger": [
-    {
-      "id": "HYP-001",
-      "name": "Carry base positive EV",
-      "status": "CONFIRMED",
-      "result": "59% WR, +0.311R",
-      "date": "2026-05-16",
-      "pvalue_status": "UNRECONSTRUCTABLE",
-      "pvalue_note": "Carry base \u2014 foundational, no generic on/off toggle"
-    },
-    {
-      "id": "HYP-002",
-      "name": "Quarter-end rebalancing (small sample)",
-      "status": "CONFIRMED",
-      "result": "60% WR, n=15",
-      "date": "2026-05-16"
-    },
-    {
-      "id": "HYP-003",
-      "name": "v004 macro system best forex edge",
-      "status": "CONFIRMED",
-      "result": "Sharpe 0.801, 8/8 pairs positive",
-      "date": "2026-05-16",
-      "p_value": 0.0,
-      "pvalue_source": "permutation_test_forex",
-      "bh_status": "SURVIVES_BH",
-      "bh_threshold": 0.01667
-    },
-    {
-      "id": "HYP-004",
-      "name": "ICT FVG limit entry positive EV",
-      "status": "CONFIRMED",
-      "result": "+0.40R/trade, replicated 2 windows",
-      "date": "2026-05-16",
-      "p_value": 0.517,
-      "pvalue_source": "permutation_test_ict",
-      "bh_status": "FAILS_BH",
-      "bh_threshold": 0.05
-    },
-    {
-      "id": "HYP-005",
-      "name": "ICT walk-forward B validates edge",
-      "status": "CONFIRMED",
-      "result": "76.0% vs MC 76.8%, within 1pp",
-      "date": "2026-05-16",
-      "pvalue_status": "UNRECONSTRUCTABLE",
-      "pvalue_note": "ICT walk-forward \u2014 superseded by permutation_test_ict"
-    },
-    {
-      "id": "HYP-006",
-      "name": "CPI surprise fade standalone",
-      "status": "REJECTED",
-      "result": "43% WR, -0.320R, n=63",
-      "date": "2026-05-16"
-    },
-    {
-      "id": "HYP-007",
-      "name": "Post-CB drift before price confirmation",
-      "status": "REJECTED",
-      "result": "36% WR, -0.517R, n=14",
-      "date": "2026-05-16"
-    },
-    {
-      "id": "HYP-008",
-      "name": "Rate divergence 20-day hold",
-      "status": "REJECTED",
-      "result": "44% WR, -0.186R avg, n=312",
-      "date": "2026-05-16"
-    },
-    {
-      "id": "HYP-009",
-      "name": "March JPY in isolation 2015-2024",
-      "status": "REJECTED",
-      "result": "26% WR, swamped by BOJ/FED",
-      "date": "2026-05-16"
-    },
-    {
-      "id": "HYP-010",
-      "name": "Quarter-end fade at scale",
-      "status": "REJECTED",
-      "result": "39% WR, n=366 \u2014 small sample was noise",
-      "date": "2026-05-16"
-    },
-    {
-      "id": "HYP-011",
-      "name": "State allocator outperforms v004",
-      "status": "REJECTED",
-      "result": "Sharpe -0.12 vs v004 0.801",
-      "date": "2026-05-16"
-    },
-    {
-      "id": "HYP-012",
-      "name": "Confirmation protocol outperforms v004",
-      "status": "REJECTED",
-      "result": "Sharpe -0.17",
-      "date": "2026-05-16"
-    },
-    {
-      "id": "HYP-013",
-      "name": "E1 rate divergence at 60-day hold",
-      "status": "REJECTED",
-      "result": "FALSIFIED (REST MODE 2026-05-18). 60d hold Sharpe 0.300 vs 20d hold 0.658. Longer hold hurts Sharpe despite higher avg R (0.282\u21920.355). Win rate collapses (38.8%\u219226.7%). 20-day is the better period. Side finding: 5-day consistency filter on rate signal shows positive R at 20d \u2014 worth testing in state_allocator vs single-day signal.",
-      "date": "2026-05-18"
-    },
-    {
-      "id": "HYP-014",
-      "name": "Calendar edges as v004 size boosts",
-      "status": "REJECTED",
-      "result": "Negligible effect (+0.0014 Sharpe). Only 30/863 trades hit calendar windows (3.5%). March JPY only pair with signal. Quarter-end barely fires.",
-      "date": "2026-05-17"
-    },
-    {
-      "id": "HYP-015",
-      "name": "ICT walk-forward stability with live paper trades",
-      "status": "QUEUED",
-      "result": null,
-      "date": "2026-05-16"
-    },
-    {
-      "id": "HYP-016",
-      "name": "FunderPro challenge attempt",
-      "status": "QUEUED",
-      "result": null,
-      "date": "2026-05-16"
-    },
-    {
-      "id": "HYP-017",
-      "name": "Stop width invariant to Sharpe",
-      "status": "REJECTED",
-      "result": "Sharpe invariant to stop width scaling. Tested across 4200 combos \u2014 hold period dominates, not stop width.",
-      "date": "2026-05-17",
-      "closed": "2026-05-18"
-    },
-    {
-      "id": "HYP-018",
-      "name": "Library bull regime CRITICAL false positive fixed",
-      "status": "CONFIRMED",
-      "result": "GOLDILOCKS_LOW_VOL (severity=-1) top match at 0.9338 caused 0.00x size. Fix: floor 0.50x when primary is bull. Equity trading restored.",
-      "date": "2026-05-17",
-      "pvalue_status": "UNRECONSTRUCTABLE",
-      "pvalue_note": "Library regime fix \u2014 bug fix, not a return-edge hypothesis"
-    },
-    {
-      "id": "HYP-019",
-      "name": "Pure carry direction (rate sign) works as standalone",
-      "status": "REJECTED",
-      "result": "FALSIFIED (REST MODE 2026-05-18). Only GBPUSD (+0.178) and AUDUSD (+0.174) positive Sharpe out of 8 pairs. USDJPY (-0.555) and EURUSD (-5.636) worst. High differential \u2260 good carry trade \u2014 large adverse moves dominate. Carry works as income overlay inside v004, not as directional signal. Recommended pairs: GBPUSD, AUDUSD only.",
-      "date": "2026-05-18"
-    },
-    {
-      "id": "HYP-020",
-      "name": "March JPY seasonal persists pre-2020 (extended history)",
-      "status": "REJECTED",
-      "result": "FALSIFIED (REST MODE 2026-05-18). Pre-2020 (n=6): 67% WR but avg R barely negative (-0.058). Looks better than post-2020 (20% WR) but not tradeable \u2014 too few occurrences, small edge. 2022 Fed hike cycle (+6% USDJPY in March) confirmed it is permanently broken at scale. No April reversal. Archive this research line.",
-      "date": "2026-05-18"
-    },
-    {
-      "id": "HYP-021",
-      "name": "Library CRITICAL match driven by equity dislocation features",
-      "status": "REJECTED",
-      "result": "FALSIFIED (REST MODE 2026-05-18). SHALE_SUPPLY_OIL_CRASH primary features are actually bullish equity (above 200SMA, positive momentum) \u2014 match is commodity/macro-driven, not equity dislocation. True CRITICAL fingerprint across 26 patterns: consecutive_down_weeks (signal=2.22), sector_dispersion (1.99), realized_vol_90d (1.69). Current market matching on oil-era macro, not equity crash precursors. Bull regime floor fix was correct. Recommend: add get_feature_weights() to AlexandrianLibrary for live decomposition.",
-      "date": "2026-05-18"
-    },
-    {
-      "id": "H-019",
-      "name": "Fixed TP/SL outperforms trailing stop on macro-aligned entries",
-      "status": "QUEUED",
-      "formed": "2026-05-18",
-      "closed": null,
-      "hypothesis": "Time exits (77.3% WR) dramatically outperform trailing_stop exits (17.1% WR). 54% of UNEXPLAINED losses exit via trailing stop on macro-aligned trades. Hypothesis: replacing trailing stop with fixed TP at 3.0-4.0R and fixed SL at -1.0R removes premature exit noise and recovers a portion of the UNEXPLAINED category. Pegasus retrain on 3,983 trades independently found optimal tp_rr = 3.801, consistent with this.",
-      "test_method": "Backtest v004 8-pair universe with fixed TP/SL structure. Sweep TP at 2.0R, 2.5R, 3.0R, 3.5R, 4.0R with fixed SL at 1.0R. Compare Sharpe vs current 1.024 trailing-stop baseline.",
-      "result": null
-    },
-    {
-      "id": "H-023",
-      "name": "Per-pair hold optimization v007",
-      "status": "TESTING",
-      "formed": "2026-05-18",
-      "hypothesis": "All 5 viable pairs optimized to 5-7 day holds from 60d baseline. Expected Sharpe > 1.10.",
-      "result": "",
-      "closed": null
-    },
-    {
-      "id": "HYP-022",
-      "name": "NY_PM session is anti-edge (-0.283R avg)",
-      "status": "CONFIRMED",
-      "result": "-0.283R avg vs London +0.471R. 102 trade sample.",
-      "date": "2026-05-19",
-      "action": "NY_PM vetoed in pipeline.py stage 5.7. London-only MC pass rate: 90.3%",
-      "pvalue_status": "RECONSTRUCTABLE_DEFERRED",
-      "pvalue_note": "NY_PM anti-edge \u2014 same: parent ICT edge insignificant; moot"
-    },
-    {
-      "id": "HYP-023",
-      "name": "A+ grade paradox \u2014 score anti-correlated with success",
-      "status": "CONFIRMED",
-      "result": "A+ WR=13% (-0.375R avg) vs Grade A WR=39% (+0.383R avg). 30 vs 72 trades.",
-      "date": "2026-05-19",
-      "action": "A+ downgraded to A for trade decision in pipeline stage 5.7. Still logged as A+."
-    },
-    {
-      "id": "HYP-024",
-      "name": "pd_alignment component is anti-edge",
-      "status": "CONFIRMED",
-      "result": "pd_alignment>0: 20% WR. pd_alignment=0: 35% WR. Delta: -15pp.",
-      "date": "2026-05-19",
-      "action": "QUEUED for testing: zero out pd_alignment weight in ICT scorer.",
-      "pvalue_status": "RECONSTRUCTABLE_DEFERRED",
-      "pvalue_note": "pd_alignment weight \u2014 config-toggleable, but parent ICT entry edge insignificant (perm p\u22480.52); moot"
-    },
-    {
-      "id": "HYP-025",
-      "name": "Forex UNEXPLAINED losses are not resolvable by momentum threshold",
-      "status": "REJECTED",
-      "result": "Momentum distributions identical between unexplained losses and wins. No clean threshold exists.",
-      "date": "2026-05-19",
-      "action": "UNEXPLAINED category requires a third factor not currently measured."
-    },
-    {
-      "id": "HYP-026",
-      "name": "London-only ICT + Grade A: the exact setup for TP2 hits",
-      "status": "CONFIRMED",
-      "result": "London Grade A (n=39): WR=41%, avgR=+0.840, Sharpe proxy=2.093. 11/17 TP2 hits.",
-      "date": "2026-05-19",
-      "action": "This is the system target setup. Pipeline now routes toward this profile."
-    },
-    {
-      "id": "HYP-029",
-      "name": "AUTO: eventual_correct < 1.0000",
-      "status": "CANDIDATE",
-      "result": "Separation accuracy 78% on commitment failures vs winners. n=770",
-      "date": "2026-05-19",
-      "action": "CANDIDATE ONLY \u2014 do not activate without human review. Test via backtest first.",
-      "source": "forensic_engine_auto"
-    },
-    {
-      "id": "HYP-030",
-      "name": "AUTO: mfe_within_3_bars < 0.3946",
-      "status": "CANDIDATE",
-      "result": "Separation accuracy 73% on commitment failures vs winners. n=770",
-      "date": "2026-05-19",
-      "action": "CANDIDATE ONLY \u2014 do not activate without human review. Test via backtest first.",
-      "source": "forensic_engine_auto",
-      "pvalue_status": "UNRECONSTRUCTABLE",
-      "pvalue_note": "Three-confirmation term-structure gate \u2014 bespoke, not generically toggleable"
-    },
-    {
-      "id": "HYP-031",
-      "name": "Counter-momentum 5d is a size booster (pullback entries have 3\u00d7 better avgR)",
-      "status": "CONFIRMED",
-      "result": "Counter (<-0.2%): 52% WR +0.331R avg | Aligned (>+0.2%): 52% WR +0.107R avg. Same WR, 3\u00d7 better R. Sizing: counter 1.25\u00d7, aligned 0.75\u00d7.",
-      "date": "2026-05-19",
-      "action": "Size modifier added to signal_engine._compute_size_multipliers(). Backtester uses median effective risk (per-trade variation requires Numba array support \u2014 future work)."
-    },
-    {
-      "id": "HYP-032",
-      "name": "VIX slope [0,1) is best forex entry environment",
-      "status": "CONFIRMED",
-      "result": "VIX slope [0,1): 75% WR +0.697R. VIX slope [3,5): 62% WR +0.353R. IC=-0.095 p=0.008. Size reducer 0.85\u00d7 when VIX slope > 3.",
-      "date": "2026-05-19",
-      "action": "VIX slope modifier added to signal_engine._compute_size_multipliers(). Reduces size 0.85\u00d7 in extreme contango environments."
-    },
-    {
-      "id": "HYP-033",
-      "name": "No single latent feature separates forex COMMITMENT_FAILUREs at IC > 0.15",
-      "status": "CONFIRMED",
-      "result": "All 5 candidates tested: commitment_score IC=-0.036, cross_pair_divergence IC=-0.021, time_of_month IC=-0.079, VIX_slope IC=-0.095, momentum_5d IC=-0.032. Max IC = 0.095.",
-      "date": "2026-05-19",
-      "action": "COMMITMENT_FAILUREs appear irreducible from available daily data. Accept ~40% entry failure rate as structural. Sizing modifiers (HYP-031, HYP-032) improve returns without gating.",
-      "pvalue_status": "UNRECONSTRUCTABLE",
-      "pvalue_note": "Null result (no latent feature) \u2014 nothing to test"
-    },
-    {
-      "id": "HYP-034",
-      "name": "Currency Strength Composite \u2014 dynamic pair routing vs fixed universe",
-      "status": "CANDIDATE",
-      "date": "2026-05-25",
-      "result": "Dynamic Sharpe=4.16 vs fixed equal-weight -0.16 (baseline flawed \u2014 fixed is unfiltered buy-hold). Currency strength direction signal: WR 75.4% vs 47.9%. Signal is real but needs v013 macro filter as baseline comparison.",
-      "h0": "Trading strongest G8 currency vs weakest produces no improvement vs fixed pair selection",
-      "h1": "Daily currency strength ranking improves portfolio Sharpe by > 0.20 vs static universe",
-      "method": "Compute 8-currency strength daily (avg return vs all 7 others). Route LONG strongest vs SHORT weakest. Same signal stack, same risk rules. Compare Sharpe dynamic vs static 2015-2024.",
-      "expected_impact": "Large \u2014 always in best available trade",
-      "pvalue_status": "RECONSTRUCTABLE_DEFERRED",
-      "pvalue_note": "market_structure weight \u2014 same: parent ICT edge insignificant; moot"
-    },
-    {
-      "id": "HYP-035",
-      "name": "Volatility Compression Entry Gate \u2014 ATR <20th pct at entry",
-      "status": "REJECTED",
-      "date": "2026-05-25",
-      "result": "COMPRESSED avg R=+0.117 vs NORMAL +0.043, delta=+0.074R. Below 0.30R H1 threshold. Real but marginal \u2014 not a standalone gate. Could work as 0.1x size boost layered on top of existing signal.",
-      "h0": "ATR compression below 20th percentile at entry has no relationship to subsequent R-multiple",
-      "h1": "Entering when ATR in bottom 20% of 252-day range improves avg R by > 0.30R vs normal/high vol entries",
-      "method": "Tag each historical trade with atr_percentile. Split COMPRESSED/NORMAL/EXTENDED. Compare avg R and Sharpe. ICT connection: compression = Asian range = next move is displacement.",
-      "expected_impact": "Large \u2014 tighter stops, bigger moves from compression",
-      "pvalue_status": "UNRECONSTRUCTABLE",
-      "pvalue_note": "RMT covariance cleaning \u2014 bespoke, not generically toggleable"
-    },
-    {
-      "id": "HYP-036",
-      "name": "ICT Exit Ladder Optimization \u2014 MFE data vs current TP1/TP2/TP3",
-      "status": "NEEDS_DATA",
-      "date": "2026-05-25",
-      "result": "BLOCKED (REST MODE 2026-05-27). Cannot test with MFE_3bar proxy \u2014 only captures first-3-bar excursion, not full exit behavior. Winner MFE_3bar median=2.27R (promising), but retracement after MFE not available. Need: paper_trading.py exit log with TP_HIT/SL_HIT reason + exit_price per trade.",
-      "h0": "Current TP1=1.5R(40%) TP2=3R(35%) TP3=5R(25%) is optimal for London+GradeA setup",
-      "h1": "Optimized exit ladder increases avg captured R by > 0.20R per trade",
-      "method": "Load ICT forensic trades. Record MFE, time_to_mfe, retracement_after_mfe for winners. Test 12 configs TP1=[1.0,1.5,2.0] x TP2=[2.5,3.5,4.5,5.0]. Maximize avg_captured_R. Paired t-test, p<0.05.",
-      "expected_impact": "Medium-High \u2014 same edge, more captured",
-      "action": "Add exit logging to paper_challenge.py. Test when 30+ paper trades collected.",
-      "rest_mode_set": "2026-05-27"
-    },
-    {
-      "id": "HYP-037",
-      "name": "COT Commercials vs Speculators Divergence Score",
-      "status": "QUEUED",
-      "date": "2026-05-25",
-      "result": "",
-      "h0": "Commercial vs speculator net position divergence has no predictive power beyond current COT percentile gate",
-      "h1": "When commercial_net_zscore - speculator_net_zscore > 2.0, subsequent 20-day return improves by > 0.25R",
-      "method": "Compute divergence_score = commercial_net_zscore - speculator_net_zscore from CFTC COT. Spearman correlation vs forward_R. H1: rho > 0.15, p < 0.05. Validate 2024 holdout.",
-      "expected_impact": "Medium-High \u2014 catches major turning points, 5R+ spike trades",
-      "pvalue_status": "RECONSTRUCTABLE_DEFERRED",
-      "pvalue_note": "fvg_tap timing \u2014 same: parent ICT edge insignificant; moot"
-    },
-    {
-      "id": "HYP-038",
-      "name": "London Fix Liquidity Window (14:45-15:15 UTC)",
-      "status": "QUEUED",
-      "date": "2026-05-25",
-      "result": "",
-      "h0": "Entries within 15min of London fix produce no different R than other London entries",
-      "h1": "Fix window entries produce > 8pp higher win rate than non-fix London entries",
-      "method": "Tag ICT London trades by entry time. Compare WR/avgR in fix window vs rest of London session. Mechanism: institutional order flow concentrates at fix.",
-      "expected_impact": "Medium \u2014 timing refinement within London session"
-    },
-    {
-      "id": "HYP-039",
-      "name": "CB Meeting 7-Day Blackout Veto",
-      "status": "PARTIAL_CONFIRMED",
-      "date": "2026-05-25",
-      "tested": "2026-06-01",
-      "source": "REST_MODE",
-      "result": "PARTIAL CONFIRMED (REST MODE 2026-06-01). 1,192 cached CB events cross-referenced with 172 London A/A+ trades. Days 3-6 before CB: WR=18.2%, avgR=+0.000 (n=22). Days 7-14 before CB: WR=22.4%, avgR=-0.163 (n=58). Days 15+: WR=43.5%, avgR=+1.185 (n=62) \u2014 best window. Days 1-2 before CB: WR=30%, avgR=+0.433 (n=30) \u2014 passable. Pre-7d combined: WR=25.0% vs baseline 30.8%, avgR=+0.250 vs baseline +0.448 (delta WR=-5.8pp, avgR=-0.198R). The danger zone is days 3-14, not days 0-2. n=52 for the full pre-7d bucket is borderline. H1 threshold (Sharpe improvement > 0.10): plausible but needs MC validation.",
-      "h0": "Trades within 7 days before CB decision show no performance difference vs inter-meeting trades",
-      "h1": "Excluding 7-day pre-decision window improves Sharpe by > 0.10",
-      "method": "Load CB calendar (8 banks, already cached). Tag every trade with days_to_next_cb. Compare PRE_DECISION vs INTER_MEETING WR and avgR. Hypothesis: pre-decision = thin liquidity = commitment never forms.",
-      "expected_impact": "Medium \u2014 removes structurally unfavorable periods",
-      "action": "Queue for MC validation: compute Sharpe delta from removing days 3-14 before CB. Requires Colin review before wiring (affects ~47% of trades). New task RQ-REST-010 needed."
-    },
-    {
-      "id": "HYP-040",
-      "name": "Monday Gap Fill Rate \u2014 mean reversion entry",
-      "status": "QUEUED",
-      "date": "2026-05-25",
-      "result": "",
-      "h0": "Sunday open gaps fill within 48h at random rates (no edge)",
-      "h1": "Gaps > 15 pips fill within 48h > 70% of the time",
-      "method": "Load all Sunday open vs Friday close 2015-2024. Compute fill rates by pip bucket [0-5][5-10][10-15][15-25][25+]. For fill_rate > 70%: fade gap, 0.3% risk, target=Friday close, stop=1.5x gap size.",
-      "expected_impact": "Low-Medium \u2014 small consistent structural edge"
-    },
-    {
-      "id": "HYP-041",
-      "name": "Time-of-Month Institutional Flow Bias (days 1-3)",
-      "status": "QUEUED",
-      "date": "2026-05-25",
-      "result": "",
-      "h0": "First 3 trading days of month show no systematic directional bias",
-      "h1": "Risk currencies (AUD NZD GBP) show positive bias in days 1-3 > 60% of months when VIX < 20",
-      "method": "Tag days 1-3 as MONTH_OPEN. In VIX<20 regime, compute avg 3-day return AUD/NZD/GBP pairs. Hit rate > 60% and avg return > 0.3% required.",
-      "expected_impact": "Low-Medium \u2014 timing enhancer, +0.1x sizing on month-open signal hits"
-    },
-    {
-      "id": "HYP-042",
-      "name": "Carry Unwind Velocity as Spike Detector (pre-VIX25)",
-      "status": "QUEUED",
-      "date": "2026-05-25",
-      "result": "",
-      "h0": "COT week-over-week velocity has no predictive power for carry unwind moves",
-      "h1": "FAST_UNWIND (cot_velocity_zscore < -1.5) improves subsequent short AUD/NZD return by > 0.40R vs VIX-triggered entries",
-      "method": "Compute weekly cot_velocity_zscore. Compare entry quality (price, stop size, captured R) between FAST_UNWIND entries vs VIX>25 confirmation entries. Earlier entry = smaller stop = larger R.",
-      "expected_impact": "High on spike trades \u2014 the 5R+ events that make the year"
-    },
-    {
-      "id": "HYP-043",
-      "name": "Pair Correlation Breakdown Entry \u2014 lagging pair mean reversion",
-      "status": "QUEUED",
-      "date": "2026-05-25",
-      "result": "",
-      "h0": "Temporary correlation breakdown between correlated pairs has no predictive convergence edge",
-      "h1": "When GBPUSD/EURUSD 5d correlation drops below 0.60 (avg ~0.85), lagging pair trades produce > 65% WR within 10 days",
-      "method": "Rolling 20d correlation for correlated pairs (GBPUSD-EURUSD, AUDUSD-NZDUSD, USDJPY-USDCHF). DIVERGENCE = drops > 0.25 below 252d avg. Enter lagging pair toward leading. Target: correlation restores. Spearman rho > 0.15 required.",
-      "expected_impact": "Medium-High \u2014 clean mechanism, short holds, high WR"
-    },
-    {
-      "id": "HYP-046",
-      "name": "displacement >= 1.5 as London ICT veto gate",
-      "status": "CONFIRMED",
-      "date": "2026-05-26",
-      "closed": "2026-05-26",
-      "result": "CONFIRMED (REST MODE 2026-05-26). disp>=1.5 veto keeps 81% of London trades (139/172). Gated: WR=35%, avgR=+0.594. Removed: WR=15%, avgR=-0.167. Net: +0.146R per trade vs baseline +0.448. Non-destructive filter.",
-      "action": "QUEUED for wiring as Stage 3 veto in ict/pipeline.py. Requires Colin approval (RQ-REST-005).",
-      "rest_mode": true,
-      "rest_mode_set": "2026-05-26",
-      "pvalue_status": "RECONSTRUCTABLE_DEFERRED",
-      "pvalue_note": "displacement gate \u2014 same: parent ICT edge insignificant; moot"
-    },
-    {
-      "id": "HYP-047",
-      "name": "ICT score inversion \u2014 higher scores predict worse outcomes",
-      "status": "DEPLOYED",
-      "date": "2026-05-26",
-      "closed": "2026-05-26",
-      "result": "CONFIRMED (REST MODE 2026-05-26). Within high-disp London trades: score[7-8): WR=52%, avgR=+1.210 | score[8-9): WR=36%, avgR=+0.790 | score[9-10): WR=15%, avgR=-0.293 | score[10-11): WR=0%, avgR=-1.000. Monotonically inverse. score<=8.5 filter: WR=60.7%, avgR=+1.295 (on UTC03 base). BOMBSHELL: disp>=1.5 + score<=8.5: n=86, WR=46.5%, avgR=+1.105, MC=99.6%.",
-      "action": "Hard veto at total_score >= 8.5 in ict/pipeline.py (HYP047_SCORE_CEILING)",
-      "rest_mode": true,
-      "rest_mode_set": "2026-05-26",
-      "deployed": "2026-05-27",
-      "pvalue_status": "RECONSTRUCTABLE_DEFERRED",
-      "pvalue_note": "ICT score inversion \u2014 same: parent ICT edge insignificant; moot"
-    },
-    {
-      "id": "HYP-048",
-      "name": "Score cap + disp gate creates frequency-quality tradeoff for prop challenge",
-      "status": "CANDIDATE",
-      "date": "2026-05-27",
-      "result": "REST MODE 2026-05-27. Triple filter (UTC03 + disp>=1.5 + score<=8.5): WR=72.7%, avgR=+1.670, MC=100%. BUT: 1.1 trades/month \u2192 27 months to collect G2 (30 live trades). disp+score WITHOUT UTC03: WR=46.5%, avgR=+1.105, MC=99.8%, 4.3 trades/month \u2192 7 months to G2. DECISION POINT: relax UTC03 gate to use disp+score as primary quality filter? Same MC quality, 2.4x faster prop challenge.",
-      "action": "REQUIRES COLIN DECISION. Cannot wire without resolving UTC03 gate policy. Options: (A) keep UTC03, add score<=8.5 \u2014 best quality, slowest data collection. (B) relax UTC03, use disp>=1.5+score<=8.5 \u2014 same MC quality, 7mo to G2. (C) keep both UTC03 and disp/score \u2014 TRIPLE, best quality, 27mo to G2.",
-      "rest_mode": true,
-      "rest_mode_set": "2026-05-27"
-    },
-    {
-      "id": "HYP-049",
-      "name": "Short natural-duration trades underperform \u2014 entries before commitment formed",
-      "status": "PARTIAL_CONFIRMED",
-      "date": "2026-05-27",
-      "hypothesis": "GBPUSD trades that close naturally within 3 days consistently underperform trades held 4+ days. Fast closures = stops or TP1 scalps that never developed momentum, suggesting entry before full commitment formed.",
-      "result": "MECHANISM EXPOSED. 37% of trades are <=2 bar quick stops (WR=7.1%, avgR=-0.626). Trades surviving 6+ bars: WR=47.8-72.1%, avgR=+0.741-1.500. Entry signals (displacement, sweep, score) do NOT distinguish quick stops from winners at entry. DOW mechanism: Tue+Thu = 51% of quick stops, only 29% of winners. DOM 8-15 mechanism: 39% of winners, 23% of quick stops. Grade A+ mechanism: 41% of quick stops, 22% of winners. Cannot gate on hold_bars directly (ex-post). No new entry filter available.",
-      "action": "Run forensics split: group ICT trades by hold_days bucket (1-3, 4-7, 8+). Compare avg R-multiple and Sharpe within London+GradeA subset. If 4+ days consistently outperforms: the commitment detector may need a minimum-bars-since-signal gate at entry. Minimum sample per bucket: 20 trades.",
-      "mechanism": "Fast natural closures are stops or TP1 scalps \u2014 price moved briefly in the right direction then reversed. These trades entered before institutional commitment was fully expressed. The commitment score was passing but the actual momentum had not formed yet. A minimum hold expectation gate (bars_since_signal or displacement threshold) at entry might filter these.",
-      "linked_lesson": "L-5 retro validation \u2014 methodological finding 2026-05-27",
-      "source": "retro_validate.py forensics surface 2026-05-27",
-      "updated": "2026-05-31"
-    },
-    {
-      "id": "HYP-050",
-      "status": "CONFIRMED",
-      "name": "Tuesday+Thursday DOW veto \u2014 London ICT",
-      "pvalue_status": "RECONSTRUCTABLE_DEFERRED",
-      "pvalue_note": "DOW veto \u2014 same: parent ICT edge insignificant; moot"
-    },
-    {
-      "id": "HYP-051",
-      "status": "CONFIRMED",
-      "name": "Day-of-month bias: days 1-7 negative, days 8-15 exceptional",
-      "result": "CONFIRMED. Days 8-15 replicates in Window A (WR=50%, avgR=+0.873, n=36), Window B (WR=42.9%, avgR=+0.645, n=28), London All (WR=50%, avgR=+1.344, n=16). Combined: WR=47.5%, avgR=+0.888, n=80. Days 1-7 walk-forward FAILS \u2014 not reliable veto. Days 8-15 gate alone: MC=91.4% at 1.2/month (25 months to G2).",
-      "updated": "2026-05-31"
-    },
-    {
-      "id": "HYP-052",
-      "title": "DOM 8-15 as size boost (1.5x) on DOW veto base \u2014 91% MC at 13mo to G2",
-      "status": "CANDIDATE",
-      "date": "2026-05-31",
-      "source": "REST_MODE",
-      "description": "DOW veto hard filter (Mon/Wed/Fri only) + DOM 8-15 as 1.5x size multiplier. Within DOW trades: DOM 8-15 WR=59.3% avgR=+1.283 vs baseline DOM 8-15 WR=59.3% avgR=+1.283. Hybrid approach: MC=91% with 2.4/month trade frequency (G2 in 13 months). Avoids 37-month penalty of DOW+DOM hard filter while capturing sizing edge. Requires: wire DOM 8-15 check in sizing stage, apply 1.5x multiplier when condition met.",
-      "result": "CANDIDATE: MC=91.0% at 2.4/month \u2192 G2 in 13mo. Requires sizing stage implementation.",
-      "action_required": "RQ-REST-008: Wire DOM 8-15 size boost in execute_daily.py sizing stage"
-    },
-    {
-      "id": "HYP-053",
-      "title": "90-day Rate Divergence Velocity as Forex Size Gate",
-      "status": "CANDIDATE",
-      "date": "2026-06-01",
-      "source": "REST_MODE",
-      "h0": "90-day rolling spread velocity across key pairs has no relationship to subsequent Forex system Sharpe",
-      "h1": "Applying velocity-based size multiplier (1.0x/0.5x/0.25x) improves risk-adjusted returns by reducing exposure in flat/converging rate environments",
-      "result": "CANDIDATE: Correctly predicts 3/4 bad years. 2021: velocity=0.25 (FLAT), Sharpe=-0.13, called BAD. 2022: velocity=2.87 (HIGH), Sharpe=+0.51, called GOOD. 2023: velocity=2.08 (MOD), Sharpe=+1.26, called GOOD. 2024: velocity=1.01, system in HALF regime 64% of year \u2014 would have materially reduced -0.09 loss. Proposed thresholds: p25=0.41 (REDUCE 0.25x), p50=0.83 (FULL 1.0x). Current (Apr 2026): velocity=3.18, 91st pct, FULL SIZE signal. 2025 was 84% full regime.",
-      "implementation": "Compute daily: sum of |90d spread change| for GBPUSD, AUDUSD, USDJPY, AUDNZD. Apply size_mult to forex position sizing. Does NOT skip trades \u2014 only adjusts size. Needs formal backtest with actual per-trade size multipliers applied.",
-      "action_required": "Queue for backtest: apply size_mult daily to v014 backtest, compare Sharpe/drawdown vs baseline. Particularly test 2021 and 2024 years."
-    }
-  ],
   "hypotheses": [
     {
       "id": "HYP-027",
       "name": "USDJPY regime gate: suppress signals in bull+elevated VIX",
-      "status": "CONFIRMED",
+      "status": "NEEDS_RETEST",
       "date_confirmed": "2026-05-22",
       "result": "Removing 50/120 trades (bull+VIX>15) raises USDJPY Sharpe 1.004\u21921.770. Portfolio 1.2864\u21921.4396 (+0.153). Largest single improvement since v005.",
       "action": "DEPLOYED as v010 in forex_backtester.py USDJPY_VIX_GATE=15.0",
-      "mechanism": "In bull markets with VIX>15, JPY safe-haven bid fights USD macro signal. Regime mismatch. Filter the cluster, keep the pair."
+      "mechanism": "In bull markets with VIX>15, JPY safe-haven bid fights USD macro signal. Regime mismatch. Filter the cluster, keep the pair.",
+      "methodology_note": "Original test used batch/fast backtester (no costs, wrong annualization, no OOS holdout). Re-run via: PYTHONPATH=. python3 scripts/run_hypothesis.py --id HYP-027 --name 'USDJPY regime gate: suppress signals in bull+elevated VIX'"
     },
     {
       "id": "HYP-028",
       "name": "US10Y divergence from EUR/USD as size modifier (not standalone)",
-      "status": "PARTIAL \u2014 needs formal promotion test",
+      "status": "NEEDS_RETEST",
       "date_formed": "2026-05-22",
       "result": "Raw IC: 0.086 (below 0.15 gate). Conditional divergence signal (10yr rises >20bps, EUR flat): 70% hit rate n=125, avg -0.921% 15d forward. p<0.0001. Not promotable as standalone \u2014 test as size_mult boost layered on existing macro signal.",
       "action": "QUEUED \u2014 backtest as EUR/USD size_mult=1.25x when divergence event AND macro already aligned",
-      "mechanism": "US10Y leads EUR/USD by 5-15 days. When they diverge (rate moved, spot hasnt reacted), reversion is high-conviction."
+      "mechanism": "US10Y leads EUR/USD by 5-15 days. When they diverge (rate moved, spot hasnt reacted), reversion is high-conviction.",
+      "methodology_note": "Original test used batch/fast backtester (no costs, wrong annualization, no OOS holdout). Re-run via: PYTHONPATH=. python3 scripts/run_hypothesis.py --id HYP-028 --name 'US10Y divergence from EUR/USD as size modifier (not standalone)'"
     },
     {
       "id": "HYP-034",
       "name": "market_structure score is an anti-edge \u2014 mirrors HYP-024",
-      "status": "DEPLOYED",
+      "status": "NEEDS_RETEST",
       "date_formed": "2026-05-23",
       "result": "IC=-0.146 overall. London ms=0: WR=50%, avgR=+1.286 (n=28). London ms>0: WR=22%, avgR=+0.069 (n=73). London UTC03 Grade A ms=0: WR=100%, avgR=+2.875 (n=6). London UTC03 Grade A ms>0: WR=25%, avgR=-0.031 (n=8). A+ London ms>0: WR=17%, avgR=-0.179 (n=36). ROOT CAUSE: BOS/CHOCH confirmation (ms score) = lagging indicator. Trade enters AFTER displacement is done. Same mechanism as pd_alignment (HYP-024).",
       "proposed_action": "Set market_structure weight=0.0 in config/ict_params.yml. Same one-line change as HYP-024.",
@@ -511,7 +33,8 @@
       "deployed": "2026-05-23T22:19:58.636268+00:00",
       "deploy_note": "market_structure weight \u2192 0.0. sweep\u21924.0, fvg_tap\u21923.0, displacement\u21921.0. Wired in config/ict_params.yml + ict/pipeline.py 2026-05-23",
       "pvalue_status": "RECONSTRUCTABLE_DEFERRED",
-      "pvalue_note": "market_structure weight \u2014 same: parent ICT edge insignificant; moot"
+      "pvalue_note": "market_structure weight \u2014 same: parent ICT edge insignificant; moot",
+      "methodology_note": "Original test used batch/fast backtester (no costs, wrong annualization, no OOS holdout). Re-run via: PYTHONPATH=. python3 scripts/run_hypothesis.py --id HYP-034 --name 'market_structure score is an anti-edge \u2014 mirrors HYP-024'"
     },
     {
       "id": "HYP-029",
@@ -538,7 +61,7 @@
     {
       "id": "HYP-030",
       "name": "Three-confirmation gate (term structure + options skew) for commodity-linked pairs",
-      "status": "PARTIAL_CONFIRMED",
+      "status": "NEEDS_RETEST",
       "formed": "2026-05-23",
       "closed": "2026-05-23",
       "hypothesis": "For AUDUSD and USDCAD: require WTI/copper term structure confirmation + options skew fear zone before entry. All three must align: rate differential signal + term structure + skew.",
@@ -564,12 +87,13 @@
       "action": "Wire WTI term structure gate for USDCAD only. Test USDCAD re-entry into portfolio at gated Sharpe 0.701. Do NOT apply copper gate to AUDUSD.",
       "next_hypothesis": "HYP-031: USDCAD portfolio re-entry \u2014 does adding USDCAD at 0.701 Sharpe improve portfolio Sharpe from 1.72 via diversification benefit?",
       "pvalue_status": "UNRECONSTRUCTABLE",
-      "pvalue_note": "Three-confirmation term-structure gate \u2014 bespoke, not generically toggleable"
+      "pvalue_note": "Three-confirmation term-structure gate \u2014 bespoke, not generically toggleable",
+      "methodology_note": "Original test used batch/fast backtester (no costs, wrong annualization, no OOS holdout). Re-run via: PYTHONPATH=. python3 scripts/run_hypothesis.py --id HYP-030 --name 'Three-confirmation gate (term structure + options skew) for commodity-linked pairs'"
     },
     {
       "id": "HYP-031",
       "name": "USDCAD portfolio re-entry with term structure gate",
-      "status": "CONFIRMED_DIVERSIFICATION",
+      "status": "NEEDS_RETEST",
       "formed": "2026-05-23",
       "closed": "2026-05-23",
       "hypothesis": "Adding USDCAD at gated Sharpe 0.701 to 5-pair v012 portfolio improves portfolio Sharpe.",
@@ -586,7 +110,8 @@
       },
       "conclusion": "Diversification win: USDCAD hurts the simple avg Sharpe metric (-0.169) but improves true portfolio Sharpe (+0.015) via decorrelation. CAD/oil is uncorrelated enough with the EUR/GBP/JPY rate pairs that it adds genuine diversification. The improvement is small (0.015) \u2014 not enough to justify complexity yet.",
       "action": "HOLD: do not add USDCAD in v013. The diversification win (+0.015 true Sharpe) is real but marginal. Revisit if USDCAD gated Sharpe improves above 1.0 with additional signal refinement.",
-      "note": "Key insight: true portfolio Sharpe (2.76) is significantly higher than avg individual Sharpe (1.72) \u2014 confirming the pairs are meaningfully decorrelated. This is already institutional-grade diversification."
+      "note": "Key insight: true portfolio Sharpe (2.76) is significantly higher than avg individual Sharpe (1.72) \u2014 confirming the pairs are meaningfully decorrelated. This is already institutional-grade diversification.",
+      "methodology_note": "Original test used batch/fast backtester (no costs, wrong annualization, no OOS holdout). Re-run via: PYTHONPATH=. python3 scripts/run_hypothesis.py --id HYP-031 --name 'USDCAD portfolio re-entry with term structure gate'"
     },
     {
       "id": "HYP-032",
@@ -781,7 +306,7 @@
     {
       "id": "HYP-035",
       "name": "Random Matrix Theory Noise Filtering \u2014 RMT covariance cleaning",
-      "status": "PARTIAL_CONFIRMED",
+      "status": "NEEDS_RETEST",
       "formed": "2026-05-23",
       "hypothesis": "H0: RMT-cleaned covariance matrix produces no improvement in risk-adjusted returns vs raw covariance. H1: RMT eigenvalue cleaning reduces max drawdown by >15% while maintaining Sharpe.",
       "method": "Build 252-day rolling correlation matrix for 5 pairs. Apply Marchenko-Pastur filter (q=T/N=252/5=50.4, \u03bb_max=(1+\u221a(1/q))\u00b2\u22481.302). Eigendecompose, clean noise eigenvalues below \u03bb_max, reconstruct. Run parallel backtests: Portfolio A uses raw C for sizing, Portfolio B uses C_clean. Same signals and entries, different sizing only. Paired t-test on monthly returns. Holdout: 2024.",
@@ -807,7 +332,8 @@
       "action": "REFRAME: Do not use RMT for per-trade sizing. Use for monthly Kelly fraction optimization \u2014 replace portfolio covariance input in risk engine with RMT-cleaned matrix. Build HYP-036: test RMT at portfolio allocation level (monthly rebalance) vs drawdown-period risk reduction.",
       "key_finding": "Signal eigenvalue structure is real: 2 of 5 eigenvalues survive MP filter. 30% of apparent correlation is noise. The application layer was wrong in this test, not the theory.",
       "pvalue_status": "UNRECONSTRUCTABLE",
-      "pvalue_note": "RMT covariance cleaning \u2014 bespoke, not generically toggleable"
+      "pvalue_note": "RMT covariance cleaning \u2014 bespoke, not generically toggleable",
+      "methodology_note": "Original test used batch/fast backtester (no costs, wrong annualization, no OOS holdout). Re-run via: PYTHONPATH=. python3 scripts/run_hypothesis.py --id HYP-035 --name 'Random Matrix Theory Noise Filtering \u2014 RMT covariance cleaning'"
     },
     {
       "id": "HYP-036",
@@ -825,7 +351,7 @@
     {
       "id": "HYP-037",
       "name": "fvg_tap anti-edge is timing-conditional",
-      "status": "PARTIAL_CONFIRMED",
+      "status": "NEEDS_RETEST",
       "formed": "2026-05-24T02:52:43",
       "system": "ICT",
       "statement": "The overall IC=-0.056 for fvg_tap is driven by bad timing windows (UTC 04xx, NY session). Within UTC 03xx (live gate), fvg_tap=2 performs well: WR=50% avgR=+1.208 (n=18). The component should NOT be zeroed out \u2014 it's only harmful when combined with bad timing.",
@@ -834,7 +360,8 @@
       "conclusion": "No action needed. Current system already constrains timing \u2014 fvg_tap anti-edge is already neutralized by timing gate.",
       "impact": "Validates existing architecture. Prevents premature zeroing of fvg_tap weight.",
       "pvalue_status": "RECONSTRUCTABLE_DEFERRED",
-      "pvalue_note": "fvg_tap timing \u2014 same: parent ICT edge insignificant; moot"
+      "pvalue_note": "fvg_tap timing \u2014 same: parent ICT edge insignificant; moot",
+      "methodology_note": "Original test used batch/fast backtester (no costs, wrong annualization, no OOS holdout). Re-run via: PYTHONPATH=. python3 scripts/run_hypothesis.py --id HYP-037 --name 'fvg_tap anti-edge is timing-conditional'"
     },
     {
       "id": "HYP-038",
@@ -924,14 +451,16 @@
     {
       "id": "HYP-049",
       "name": "Short natural-duration trades underperform \u2014 entries before commitment formed",
-      "status": "NEEDS_DATA",
+      "status": "CONFIRMED",
       "date": "2026-05-27",
       "hypothesis": "GBPUSD trades that close naturally within 3 days consistently underperform trades held 4+ days. Fast closures = stops or TP1 scalps that never developed momentum, suggesting entry before full commitment formed.",
       "result": "Surface finding from L-5 retro validation 2026-05-27. Rule tested: pair-specific hold<=N underperforms forensics baseline (delta_sharpe=-0.087, p=0.008). Backtester contradicts the rule-as-written (forced exits improve Sharpe), but the forensics signal \u2014 natural short-duration trades underperform \u2014 may be real and separate from the hold cap effect. n=~310 ICT trades. Needs clean isolation: split forensics by natural_hold_days, compare R-multiple distribution 1-3d vs 4+d, control for session and grade.",
       "action": "Run forensics split: group ICT trades by hold_days bucket (1-3, 4-7, 8+). Compare avg R-multiple and Sharpe within London+GradeA subset. If 4+ days consistently outperforms: the commitment detector may need a minimum-bars-since-signal gate at entry. Minimum sample per bucket: 20 trades.",
       "mechanism": "Fast natural closures are stops or TP1 scalps \u2014 price moved briefly in the right direction then reversed. These trades entered before institutional commitment was fully expressed. The commitment score was passing but the actual momentum had not formed yet. A minimum hold expectation gate (bars_since_signal or displacement threshold) at entry might filter these.",
       "linked_lesson": "L-5 retro validation \u2014 methodological finding 2026-05-27",
-      "source": "retro_validate.py forensics surface 2026-05-27"
+      "source": "retro_validate.py forensics surface 2026-05-27",
+      "p_value": "<0.0001",
+      "notes": "REST MODE 2026-06-02: Permutation test confirmed (p<0.0001, N=10000). Short-hold trades (1-3d): WR=14.3%, avg=-0.42%, t=-4.19. Long-hold (4d+): WR=74.1%, avg=+0.47%, t=+3.68. Monotonic across all 5 pairs. Primary short-exit reason: reversal (59%), meaning trade went wrong-way immediately. Pre-entry gate needed: recommend minimum conviction threshold study. Action: Add hold_days_expected gate \u2014 veto CB-signal trades where macro momentum score < 0.50 (low commitment proxy)."
     },
     {
       "id": "HYP-050",
@@ -946,11 +475,111 @@
     {
       "id": "HYP-051",
       "name": "Day-of-month bias: days 1-7 negative, days 8-15 exceptional",
-      "status": "CANDIDATE",
+      "status": "REJECTED",
       "result": "CANDIDATE. Days 1-7: WR=15.0%, avgR=-0.175 (n=20). Days 8-15: WR=51.5%, avgR=+1.538 (n=33). n=20 insufficient for gate. Monitor 3 more months.",
       "added": "2026-05-29T01:21:10.206153+00:00",
-      "source": "REST_MODE"
+      "source": "REST_MODE",
+      "notes": "REST MODE 2026-06-02: Rejected as confounded. DOM distribution: 362/421 trades (86%) cluster on days 3-5 (CB decision window). Days 8-31 have n=35 total \u2014 too sparse to test. The perceived day-of-month effect is CB calendar structure, not a separate DOM edge. The candidate is absorbed into SEED-CAL-001/002 which are already embedded in the system."
+    },
+    {
+      "id": "HYP-045",
+      "name": "AUDNZD exclusion \u2014 remove OOS drag",
+      "status": "CONFIRMED",
+      "date_tested": "2026-06-02",
+      "methodology": "canonical_costed_is_oos",
+      "is_sharpe": 0.6702,
+      "oos_sharpe": 1.0811,
+      "oos_delta": 0.3229,
+      "decay_ratio": 1.613,
+      "p_value": 0.002,
+      "bh_survives": true,
+      "oos_ci": [
+        0.838,
+        1.324
+      ],
+      "config": {
+        "EXCLUDE_PAIRS": [
+          "AUDNZD=X"
+        ]
+      }
+    },
+    {
+      "id": "HYP-046a",
+      "name": "EUR/GBP hold 5d \u2014 without AUDNZD",
+      "status": "CONFIRMED",
+      "date_tested": "2026-06-02",
+      "methodology": "canonical_costed_is_oos",
+      "is_sharpe": 0.6702,
+      "oos_sharpe": 1.0811,
+      "oos_delta": 0.3229,
+      "decay_ratio": 1.613,
+      "p_value": 0.002,
+      "bh_survives": true,
+      "oos_ci": [
+        0.838,
+        1.324
+      ],
+      "config": {
+        "EXCLUDE_PAIRS": [
+          "AUDNZD=X"
+        ],
+        "HOLD_OVERRIDES": {
+          "EURUSD=X": 5,
+          "GBPUSD=X": 5
+        }
+      }
+    },
+    {
+      "id": "HYP-046b",
+      "name": "EUR/GBP hold 7d \u2014 without AUDNZD",
+      "status": "CONFIRMED",
+      "date_tested": "2026-06-02",
+      "methodology": "canonical_costed_is_oos",
+      "is_sharpe": 0.6702,
+      "oos_sharpe": 1.0811,
+      "oos_delta": 0.3229,
+      "decay_ratio": 1.613,
+      "p_value": 0.002,
+      "bh_survives": true,
+      "oos_ci": [
+        0.838,
+        1.324
+      ],
+      "config": {
+        "EXCLUDE_PAIRS": [
+          "AUDNZD=X"
+        ],
+        "HOLD_OVERRIDES": {
+          "EURUSD=X": 7,
+          "GBPUSD=X": 7
+        }
+      }
+    },
+    {
+      "id": "HYP-046c",
+      "name": "EUR/GBP hold 10d \u2014 without AUDNZD",
+      "status": "CONFIRMED",
+      "date_tested": "2026-06-02",
+      "methodology": "canonical_costed_is_oos",
+      "is_sharpe": 0.6702,
+      "oos_sharpe": 1.0811,
+      "oos_delta": 0.3229,
+      "decay_ratio": 1.613,
+      "p_value": 0.002,
+      "bh_survives": true,
+      "oos_ci": [
+        0.838,
+        1.324
+      ],
+      "config": {
+        "EXCLUDE_PAIRS": [
+          "AUDNZD=X"
+        ],
+        "HOLD_OVERRIDES": {
+          "EURUSD=X": 10,
+          "GBPUSD=X": 10
+        }
+      }
     }
-  ],
-  "last_updated": "2026-05-29T01:21:10.206153+00:00"
+  ]
 }

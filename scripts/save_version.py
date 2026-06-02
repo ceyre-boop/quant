@@ -121,7 +121,49 @@ def compare() -> None:
     print(f"  Verdict: {verdict}  (Δ avg_sharpe = {avg_delta:+.4f})\n")
 
 
+def _check_methodology_guard() -> bool:
+    """
+    Refuse to save a version unless:
+      1. A current permutation test exists with p_value < 0.10
+      2. The holdout validation does not show SIGNIFICANT_OVERFIT
+
+    This makes it structurally impossible to commit a version backed only by
+    uncosted in-sample numbers.
+    """
+    errors = []
+
+    perm_path = ROOT / "data" / "research" / "permutation_test_forex.json"
+    if not perm_path.exists():
+        errors.append("MISSING: data/research/permutation_test_forex.json — run permutation_test_forex.py first")
+    else:
+        perm = json.loads(perm_path.read_text())
+        p = perm.get("p_value", 1.0)
+        if p >= 0.10:
+            errors.append(f"METHODOLOGY GUARD: permutation p={p:.4f} ≥ 0.10 — edge not statistically supported")
+
+    holdout_path = ROOT / "data" / "audit" / "holdout_validation_v014.json"
+    if not holdout_path.exists():
+        errors.append("MISSING: data/audit/holdout_validation_v014.json — run holdout_validation_v014.py first")
+    else:
+        holdout = json.loads(holdout_path.read_text())
+        verdict = holdout.get("decay_verdict", "")
+        if "SIGNIFICANT_OVERFIT" in verdict:
+            errors.append(f"METHODOLOGY GUARD: holdout decay_verdict='{verdict}' — OOS < 50% of IS, cannot save")
+
+    if errors:
+        print("\n❌  METHODOLOGY GUARD FAILED — version save blocked:")
+        for e in errors:
+            print(f"    • {e}")
+        print("\n  Fix the above issues before saving a new version.")
+        print("  All versions must be backed by OOS-validated costed performance.")
+        return False
+    return True
+
+
 def save(label: str) -> None:
+    if not _check_methodology_guard():
+        return
+
     version = _next_version()
     out_dir = RESEARCH / version
     out_dir.mkdir(parents=True, exist_ok=True)

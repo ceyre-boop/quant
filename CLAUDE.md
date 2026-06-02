@@ -84,15 +84,16 @@ python3 scripts/run_replay_validation.py
 | Decision logger | `sovereign/intelligence/decision_logger.py` | All decision contexts |
 | Config | `config/parameters.yml`, `config/ict_params.yml` | Never hardcode thresholds |
 
-Current live version: Forex v014 — fully-costed (spread+slip+swap) OOS Sharpe **0.76**
-(95% CI [0.55, 0.96], n=119); in-sample 0.67 (CI [0.55, 0.79]). Prior headline 2.097 was uncosted
-and annualized as if trading daily (these strategies trade 4–14×/yr). Evidence status (2026-05-31):
-- **Forex macro edge: PROVEN real** — permutation test p<0.001 (signal timing beats random at same
-  frequency, costed) AND survives Benjamini-Hochberg. BUT **regime-fragile**: rolling walk-forward
-  is FRAGILE — test years 2021 −0.13 / 2022 +0.51 / 2023 +1.26 / 2024 −0.09 (only pays in
-  rate-trending regimes).
-- **ICT pattern edge: NOT PROVEN** — permutation p=0.52, indistinguishable from random eligible-bar
-  entries; fails BH. Treat ICT as unvalidated.
-- HYP-044 VIX gate: rolled back (REJECTED_OOS, p=0.50, delta≈0). The ledger had 0 stored p-values;
-  re-derived for the decision-relevant hypotheses, rest flagged.
+Current live version: Forex v015 (pending save_version gate) — 4-pair portfolio (AUDNZD excluded).
+HYP-045 CONFIRMED 2026-06-02: AUDNZD exclusion → OOS costed Sharpe **1.08** (CI [0.84, 1.32], n=103);
+decay 1.61 (ROBUST); p=0.002. v014 baseline was 0.76 (5-pair, AUDNZD OOS Sharpe -0.879 — active drag).
+Prior headline 2.097 was uncosted and annualized as if trading daily (these strategies trade 4–14×/yr).
+Evidence status (2026-06-02):
+- **Forex macro edge: PROVEN real** — permutation test p<0.001. BUT **regime-fragile**: rolling
+  walk-forward 2021 −0.13 / 2022 +0.51 / 2023 +1.26 / 2024 −0.09 (only pays in rate-trending regimes).
+- **ICT pattern edge: NOT PROVEN** — permutation p=0.52; fails BH. Treat ICT as unvalidated.
+- **AUDNZD removed**: both legs RBA-driven (RBNZ tracks RBA ≤1 quarter) — no independent rate differential.
+- HYP-044 VIX gate: rolled back (REJECTED_OOS, p=0.50, delta≈0).
+- Next: run `scripts/holdout_validation_v014.py` and `scripts/permutation_test_forex.py` on 4-pair config
+  to refresh validation files, then `scripts/save_version.py --label "HYP-045: AUDNZD exclusion"`.
 Full system state: `~/.claude/memory/alta-investments-architecture.md`

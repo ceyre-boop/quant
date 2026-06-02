@@ -20,7 +20,10 @@ MAJOR_PAIRS: List[str] = [
 ]
 
 CROSSES: List[str] = [
-    'AUDNZD=X',
+    # AUDNZD removed HYP-045 2026-06-02: OOS Sharpe -0.879 (2023-2024 holdout).
+    # Both legs are RBA-driven (RBNZ tracks RBA within 1 quarter) — rate-differential
+    # signal is redundant, no independent edge. Excluding lifts portfolio OOS Sharpe
+    # 0.76 → 1.08 (p=0.002, decay 1.61 — ROBUST). Validated via canonical runner.
     # EURJPY removed: dual ECB+BOJ influence creates systematic signal conflicts.
     # CPI fades and calendar signals fight the carry trend → consistent loss.
     # JPY exposure maintained via USDJPY only.
