@@ -1,30 +1,97 @@
 {
   "date": "2026-06-02",
-  "generated_at": "2026-06-02T22:17:17.510896+00:00",
+  "generated_at": "2026-06-02T22:44:35.113537+00:00",
   "meta_regime": "CONCENTRATION",
   "regime_read": "NQ leading / pulling away from ES \u2014 narrow, tech/AI-driven, FRAGILE. Trust directional moves less; watch for reversal when AI names cool.",
-  "nqes_leadlag_class": {
+  "narrative": "PRE-US-OPEN BRIEFING \u2014 ES/NQ (research only; no execution path on these via OANDA). All times approximate.\n\n1) RECENT MOVE-BY-MOVE READ\nBoth indices are pressing fresh highs into the close of the prior session. NQ (+0.61% on the day, +2.26% on the week) printed a new prior-day AND prior-week high at 30,693 and is now trading above it at ~30,752 \u2014 clean breakout behavior. ES (+0.17% day, +1.18% week) is the laggard, sitting at 7,626, BELOW its prior-day/prior-week high of 7,632.25 \u2014 it has NOT confirmed NQ's breakout. That gap is the whole story: tech is doing the heavy lifting while the broad index hesitates. Catalyst-wise the tape is noisy: geopolitics dominates the headlines (oil holding gains, a reported Israel/Hezbollah ceasefire claim juxtaposed against fresh Iran-related war confusion, plus a combative Trump/Netanyahu story) \u2014 that 'war confusion' is exactly the kind of thing that slipped US futures intraday. Layer on a bond-market inflation warning and a soft labor undertone ('sector growth without job growth'). Net: risk-on price action led by AI/tech, but the macro backdrop underneath it is unsettled, not clean.\n\n2) VOLUME-PROFILE READ (where volume traded \u2014 NOT order-flow delta; respect that)\nThis is volume-at-price, not aggression. ES: POC 7,595.16, value area 7,582.93\u20137,625.75, with a thick high-volume shelf clustered 7,582\u20137,598. ES is currently trading right at the TOP edge of its value area (7,625.75) and just under the prior high \u2014 that is the line in the sand for ES. NQ: POC 30,399.72, value area 30,302.65\u201330,666.65, high-volume nodes stacked 30,302\u201330,424. NQ at ~30,752 is trading ABOVE its entire 5-day value area \u2014 price has left the accumulation zone to the upside, which is breakout-confirming for NQ but also means there is little traded volume directly beneath it to cushion a pullback; the air pocket back to the VAH (30,666) and then VWAP (30,612) is where a fade would accelerate. Accumulation zone = the POC shelves listed above; those are where price would need to revert to find real support.\n\n3) NQ/ES LEAD-LAG REGIME \u2014 CONCENTRATION (size/trust implication)\nThe system flags CONCENTRATION: NQ is pulling away from ES (cumulative return spread +4.93%, 1d spread +0.439%), contemporaneous correlation high at 0.912, but the lead-lag matrix shows no durable leader (best lag \u22121 at only 0.066 vs 0.862 contemporaneous; leader = NONE). Translation: the two move together intraday, but the WIDENING spread means breadth is narrowing \u2014 this is a tech/AI-driven, FRAGILE advance, not a broad-based one. RSI confirms the stretch: NQ RSI 75 (overbought), ES RSI 70.2 (overbought). CONCENTRATION regimes say: trust directional follow-through LESS, respect reversal risk when AI names cool, and SIZE DOWN. The fact that ES has NOT confirmed NQ's new high is a textbook non-confirmation warning inside this regime.\n\n4) EVENT-CALENDAR AWARENESS\nNonfarm Payrolls in ~3 days (2026-06-05, 8:30 ET) \u2014 high-impact; widen stops / cut size into it (and note the soft-labor news angle makes this a live catalyst). CPI ~10 days out (06-12), FOMC ~15 days out (06-17). NFP is the near-term gravity well: do NOT carry oversized overbought-breakout longs into a payrolls print. Cadence dates are estimates, not verified releases \u2014 treat as approximate.\n\n5) SYNTHESIS \u2014 META-REGIME + NARROWED BIAS\nMeta-regime: a stretched, overbought, CONCENTRATION-driven uptrend (both well above 200-SMA: ES +11%, NQ +20%) led by tech, with ES non-confirmation and a messy geopolitical/inflation news backdrop. The trend is up and structurally intact above the 200-SMA, but the quality of this leg is low: narrow, overbought, and into NFP. That keeps me modestly LONG-biased with the trend but with LOW conviction \u2014 this is intelligence, not an edge, and this scorecard has zero settled calls, so humility is mandatory.\n\nBIAS: long-with-trend but reduced-trust, ~52%, valid only while NQ holds above session VWAP 30,612.5; invalidated below 30,612.5 (loss of VWAP opens the air pocket back to VAH 30,666 already broken and then POC shelf 30,400). A clean reclaim and ES confirming above 7,632.25 would upgrade conviction; failure of NQ at VWAP plus ES rejecting its prior high would flip this toward a fade-the-overbought stance. Confidence is deliberately capped in the low-50s: news is mixed (geopolitics unresolved, inflation/labor warnings) AND the lead-lag is concentrated/fragile rather than clean \u2014 both conditions argue against high confidence. Size down into NFP regardless of direction.",
+  "directional_bias": "LONG",
+  "confidence": 52,
+  "regime_call": "CONCENTRATION",
+  "key_level": 30612.5,
+  "synthesis_source": "claude-opus-4-8",
+  "lead_lag": {
     "regime": "CONCENTRATION",
-    "spread_avg": 0.00243,
-    "lead_lag": {
-      "es_leads_nq": -0.168,
-      "nq_leads_es": -0.059
-    },
-    "corr": 0.913
+    "spread_avg": 0.00246,
+    "leader": "NONE",
+    "corr": 0.912,
+    "divergence": false
   },
-  "forex_proximity": "NO_TRADE_TODAY \u2014 USDJPY=X closest at 97%",
+  "volume_profile": {
+    "ES=F": {
+      "symbol": "ES=F",
+      "as_of": "2026-06-02T22:44:04.574730+00:00",
+      "days": 5,
+      "bins": 40,
+      "poc": 7595.16,
+      "value_area_low": 7582.93,
+      "value_area_high": 7625.75,
+      "high_volume_nodes": [
+        7595.16,
+        7598.22,
+        7589.05,
+        7592.1,
+        7582.93
+      ],
+      "price_range": [
+        7508.0,
+        7630.33
+      ],
+      "limitation": "Volume profile = WHERE volume traded (volume-at-price). NOT order-flow delta (buy/sell aggression). True delta needs a CME order-flow feed (Databento/CQG)."
+    },
+    "NQ=F": {
+      "symbol": "NQ=F",
+      "as_of": "2026-06-02T22:44:04.616759+00:00",
+      "days": 5,
+      "bins": 40,
+      "poc": 30399.72,
+      "value_area_low": 30302.65,
+      "value_area_high": 30666.65,
+      "high_volume_nodes": [
+        30399.72,
+        30423.98,
+        30302.65,
+        30375.45,
+        30326.92
+      ],
+      "price_range": [
+        29780.92,
+        30751.58
+      ],
+      "limitation": "Volume profile = WHERE volume traded (volume-at-price). NOT order-flow delta (buy/sell aggression). True delta needs a CME order-flow feed (Databento/CQG)."
+    }
+  },
+  "news_count": 10,
   "event_calendar": [
     {
-      "date": "2026-06-16/17",
+      "event": "Nonfarm Payrolls",
+      "date": "2026-06-05",
+      "source": "cadence_estimate",
+      "action": "high-impact 8:30 ET \u2014 widen stops / size down",
+      "days_until": 3,
+      "note": "in 3d \u2014 high-impact 8:30 ET \u2014 widen stops / size down"
+    },
+    {
+      "event": "CPI",
+      "date": "2026-06-12",
+      "source": "cadence_estimate",
+      "action": "inflation print 8:30 ET \u2014 reduce size into window",
+      "days_until": 10,
+      "note": "in 10d \u2014 inflation print 8:30 ET \u2014 reduce size into window"
+    },
+    {
       "event": "FOMC meeting",
-      "action": "reduce size / widen stops into the window"
+      "date": "2026-06-17",
+      "source": "seed",
+      "action": "reduce size / widen stops into the window",
+      "days_until": 15,
+      "note": "in 15d \u2014 reduce size / widen stops into the window"
     }
   ],
-  "bias": "size to regime: trust direction more in BREADTH, less in CONCENTRATION; ROTATION_DIVERGENCE = treat tech-led longs as suspect",
+  "scorecard_summary": "Briefing scorecard: no scored calls yet (starts once a session settles).",
+  "bias": "size to regime: trust direction more in BREADTH, less in CONCENTRATION; ROTATION_WARN = treat tech-led longs as suspect",
   "provenance": {
     "source": "oracle_morning_briefing",
     "verified": false,
-    "note": "Analyst/Oracle narrative \u2014 qualitative regime context, NOT a verified data feed. Numbers here are not ingested as trading inputs."
-  },
-  "narrative": "# Morning Market Briefing \u2014 Week of May 26\u2013Jun 2, 2026 (analyst narrative, UNVERIFIED)\n\n> Provenance: analyst/Oracle narrative. Price structure (NQ\u224830,700) matches NQ=F; several macro\n> claims (specific prints, dates) are unverified and possibly inconsistent \u2014 treat as qualitative\n> regime context, NOT a data feed.\n\n**Setup:** Fri May 22 record close into Memorial Day (Mon May 25 US closed = the chart gap). Iran\nstrikes over the long weekend = the loaded spring.\n\n**Move-by-move (NQ chart):**\n- May 26 (Tue): the shrug \u2014 market digested geopolitics, bought the open. First leg up.\n- May 27 (Wed): chop / chip pullback toward 30,275; Dow record but NQ weak as tech/energy sold off.\n  First lead-lag signal: NQ weak, breadth held = rotation OUT of tech (divergence warning).\n- May 28 (Thu): hot PCE (claimed 3.8% y/y) but tech reversed up through 30,400 \u2014 AI capex (Snowflake,\n  Microsoft) overpowered the inflation print.\n- May 29 (Fri): melt-up continues; Dell surge; fresh highs. Pure tech-concentration momentum, NQ leading.\n- Jun 1 (Mon): gap-down open on Iran headline + oil, then ramp to record ~30,690 on Nvidia. Fear AM,\n  greed by close.\n- Jun 2 (today): pullback 30,690 \u2192 ~30,425-475, recovery to ~30,640. Healthy profit-taking; dips bought.\n\n**Volume profile (30m):** institutional buying absorption stacked through 30,375\u201330,550 during the\nMay 28\u201331 rally (POC/accumulation ~30,375\u201330,425 = the launch base). Line in the sand: a clean break\nbelow with negative delta = distribution starting.\n\n**NQ/ES lead-lag = a regime classifier (the core read):**\n- NQ leads ES \u2192 CONCENTRATION (tech/AI, narrow, fragile \u2014 watch reversal when AI names cool).\n- ES & NQ lockstep / ES leads \u2192 BREADTH (macro, broad agreement, more durable; trust direction more).\n- NQ weak while ES holds \u2192 ROTATION_DIVERGENCE (rotation warning, e.g. May 27).\n\n**How the system uses it (honest):** exogenous shocks (PCE, Dell, Iran) are unpredictable \u2014 no\nindicator forecasts them. What narrows probability: (1) respect the event calendar (PCE past, ISM\ntoday, FOMC Jun 16-17) \u2014 reduce size/widen stops into windows; (2) read NQ/ES lead-lag each morning to\nclassify concentration vs breadth; (3) use volume-profile absorption to know where institutions sit\n(accumulation zone bought until broken); (4) recognize the meta-regime \u2014 a market rallying on the\nhottest inflation in 3 years is an AI-momentum melt-up looking through macro \u2192 bias long-the-dip until\nthe regime breaks (AI capex cracking, or the Fed actually hiking). The market tells you what KIND of\nmarket you're in; that's enough to size correctly.\n\n---\n[auto-appended signal read]\nSession open 2026-06-02. NQ/ES regime: CONCENTRATION \u2014 NQ leading / pulling away from ES \u2014 narrow, tech/AI-driven, FRAGILE. Trust directional moves less; watch for reversal when AI names cool. NQ 30724.5 / ES 7623.5, contemporaneous corr 0.913. Forex: NO_TRADE_TODAY \u2014 USDJPY=X closest at 97%. Event watch: FOMC meeting (2026-06-16/17) \u2014 reduce size / widen stops into known event windows (that is when unpredictable shocks cluster). Regime read is an INPUT for sizing/trust, not a trade signal."
+    "note": "Analyst/Oracle journal \u2014 qualitative regime context + a self-scored directional call, NOT a verified data feed or validated edge. Numbers here are never ingested as trading inputs."
+  }
 }

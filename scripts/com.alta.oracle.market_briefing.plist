@@ -3,19 +3,24 @@
 <plist version="1.0">
 <dict>
     <key>Label</key><string>com.alta.oracle.market_briefing</string>
+    <!-- The orchestrator runs the full briefing pipeline (market_data, lead_lag, volume_profile,
+         news, calendar, scorecard, Opus synthesis). NOTE: launchd StartCalendarInterval fires in
+         the machine's LOCAL timezone (America/Los_Angeles), NOT UTC. 05:00 PT ≈ 08:00 ET (EDT),
+         ~90 min before the 06:30 PT cash open. Adjust by an hour across DST if needed.
+         UNLOADED by default — `launchctl load` to enable. -->
     <key>ProgramArguments</key>
     <array>
         <string>/bin/bash</string><string>-c</string>
-        <string>cd /Users/taboost/quant &amp;&amp; /opt/homebrew/bin/python3 scripts/nqes_regime.py &amp;&amp; /opt/homebrew/bin/python3 scripts/morning_market_briefing.py</string>
+        <string>cd /Users/taboost/quant &amp;&amp; /opt/homebrew/bin/python3 scripts/morning_market_briefing.py</string>
     </array>
     <key>WorkingDirectory</key><string>/Users/taboost/quant</string>
     <key>StartCalendarInterval</key>
     <array>
-        <dict><key>Weekday</key><integer>1</integer><key>Hour</key><integer>8</integer><key>Minute</key><integer>20</integer></dict>
-        <dict><key>Weekday</key><integer>2</integer><key>Hour</key><integer>8</integer><key>Minute</key><integer>20</integer></dict>
-        <dict><key>Weekday</key><integer>3</integer><key>Hour</key><integer>8</integer><key>Minute</key><integer>20</integer></dict>
-        <dict><key>Weekday</key><integer>4</integer><key>Hour</key><integer>8</integer><key>Minute</key><integer>20</integer></dict>
-        <dict><key>Weekday</key><integer>5</integer><key>Hour</key><integer>8</integer><key>Minute</key><integer>20</integer></dict>
+        <dict><key>Weekday</key><integer>1</integer><key>Hour</key><integer>5</integer><key>Minute</key><integer>0</integer></dict>
+        <dict><key>Weekday</key><integer>2</integer><key>Hour</key><integer>5</integer><key>Minute</key><integer>0</integer></dict>
+        <dict><key>Weekday</key><integer>3</integer><key>Hour</key><integer>5</integer><key>Minute</key><integer>0</integer></dict>
+        <dict><key>Weekday</key><integer>4</integer><key>Hour</key><integer>5</integer><key>Minute</key><integer>0</integer></dict>
+        <dict><key>Weekday</key><integer>5</integer><key>Hour</key><integer>5</integer><key>Minute</key><integer>0</integer></dict>
     </array>
     <key>StandardOutPath</key><string>/Users/taboost/quant/logs/market_briefing.log</string>
     <key>StandardErrorPath</key><string>/Users/taboost/quant/logs/market_briefing.err</string>

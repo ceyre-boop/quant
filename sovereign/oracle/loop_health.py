@@ -42,6 +42,7 @@ HEARTBEAT_EXPECTATIONS = {
     "pulse_check":       {"max_silence_hours": 3,   "during": "always",       "kind": "periodic"},
     "decision_backfill": {"max_silence_hours": 3,   "during": "always",       "kind": "periodic"},
     "oracle_reflection": {"max_silence_hours": 26,  "during": "always",       "kind": "periodic"},
+    "morning_briefing":  {"max_silence_hours": 26,  "during": "always",       "kind": "periodic"},
     "edge_pipeline":     {"max_silence_hours": 999, "during": "always",       "kind": "event"},
 }
 
