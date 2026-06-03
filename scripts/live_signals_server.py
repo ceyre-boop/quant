@@ -502,6 +502,18 @@ class Handler(BaseHTTPRequestHandler):
             except Exception:
                 self._send_json(500, {'error': traceback.format_exc()})
 
+        elif path == '/prop-challenge':
+            # Monte Carlo prop-challenge risk (bootstrap of the real v015 edge).
+            # Regenerate with: python3 -m sovereign.risk.monte_carlo_prop
+            try:
+                with open('data/risk/prop_monte_carlo.json') as f:
+                    self._send_json(200, json.load(f))
+            except FileNotFoundError:
+                self._send_json(200, {'error': 'no_data',
+                                      'hint': 'run: python3 -m sovereign.risk.monte_carlo_prop'})
+            except Exception:
+                self._send_json(500, {'error': traceback.format_exc()})
+
         elif path == '/activity':
             try:
                 now_s = datetime.now(timezone.utc).strftime('%Y_%m')
