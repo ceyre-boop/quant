@@ -48,10 +48,17 @@ drawdown:
     - [0.10, 0.25]
   min_factor: 0.25
 
-# ── Layer 5: regime modulation (uses AlexandrianLibrary size_modifier, already in [0,1])
+# ── Layer 5: regime modulation (maps AlexandrianLibrary threat_score -> factor in [0,1])
 regime:
   factor_floor: 0.0              # CRITICAL regime can size to zero
-  default_factor: 1.0            # if library unavailable, no reduction (other layers still bind)
+  default_factor: 1.0            # if threat unavailable, no reduction (other layers still bind)
+  # threat_score -> factor (ascending threat, non-increasing factor; mirrors library THREAT_THRESHOLDS)
+  threat_table:
+    - [0.00, 1.00]   # NORMAL
+    - [0.35, 0.80]   # ELEVATED
+    - [0.52, 0.50]   # WARNING
+    - [0.68, 0.25]   # DANGER
+    - [0.82, 0.00]   # CRITICAL
 
 # ── Layer 6: portfolio / CVaR ceiling
 portfolio:

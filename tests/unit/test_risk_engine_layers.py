@@ -71,3 +71,57 @@ def test_kelly_real_forex_pool_sane():
     st = _state(edge={"forex_macro": {"win_rate": 0.59, "payoff": 1.8, "n_trades": 103}})
     c = ceiling(SIG, st, CFG)
     assert 0.0 <= c <= CFG["kelly"]["hard_cap"] + 1e-12
+
+
+# ── Layer 3: volatility ──────────────────────────────────────────────────────
+def _vstate(est=None, base=None):
+    st = _state()
+    if est is not None:
+        st.vol_estimates = {"EURUSD=X": est}
+    if base is not None:
+        st.vol_baseline = {"EURUSD=X": base}
+    return st
+
+
+def test_volatility_high_vol_shrinks():
+    from sovereign.risk.layers.volatility import factor
+    f = factor(SIG, _vstate(est=0.02, base=0.01), CFG)   # vol 2x baseline → 0.5
+    assert abs(f - 0.5) < 1e-9
+
+
+def test_volatility_calm_never_amplifies():
+    from sovereign.risk.layers.volatility import factor
+    assert factor(SIG, _vstate(est=0.005, base=0.01), CFG) == 1.0   # vol < baseline → capped at 1
+
+
+def test_volatility_missing_data_no_reduction():
+    from sovereign.risk.layers.volatility import factor
+    assert factor(SIG, _vstate(), CFG) == 1.0
+
+
+def test_volatility_floor_respected():
+    from sovereign.risk.layers.volatility import factor
+    f = factor(SIG, _vstate(est=10.0, base=0.01), CFG)   # extreme vol → clamped to floor
+    assert f == CFG["volatility"]["factor_floor"]
+
+
+# ── Layer 5: regime ──────────────────────────────────────────────────────────
+def test_regime_monotonic_and_bounded():
+    from sovereign.risk.layers.regime import factor
+    prev = 1.01
+    for i in range(0, 21):
+        threat = i / 20.0
+        st = _state()
+        st.threat_score = threat
+        f = factor(SIG, st, CFG)
+        assert 0.0 <= f <= 1.0
+        assert f <= prev + 1e-9, "regime factor increased with threat"
+        prev = f
+
+
+def test_regime_extremes():
+    from sovereign.risk.layers.regime import factor
+    calm = _state(); calm.threat_score = 0.0
+    crit = _state(); crit.threat_score = 0.95
+    assert factor(SIG, calm, CFG) == 1.0
+    assert factor(SIG, crit, CFG) == 0.0
