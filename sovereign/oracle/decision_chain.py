@@ -101,7 +101,8 @@ class DecisionChain:
         _entry = float(df["Close"].iloc[-1])
         _stop = (float(df["Low"].tail(5).min()) if direction == "LONG"
                  else float(df["High"].tail(5).max()))
-        _decision = engine_adapter.size(pair, direction, _entry, _stop, grade="A")
+        _grade = getattr(_commit, "grade", None) or "B"
+        _decision = engine_adapter.size(pair, direction, _entry, _stop, grade=_grade)
         risk_pct = _decision.final_risk_pct
         if readiness.status == "REDUCE":
             risk_pct = round(risk_pct * 0.5, 5)     # readiness only ever reduces further
