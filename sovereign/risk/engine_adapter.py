@@ -59,7 +59,7 @@ def grade_from_risk(risk_pct: float) -> str:
     return "C"
 
 
-def size(pair, direction, entry, stop, *, grade="A", equity=None, point_value=1.0,
+def size(pair, direction, entry, stop, *, grade="B", equity=None, point_value=1.0,
          open_positions=None, threat_score=0.0, regime="UNKNOWN", health_ok=True, cfg=None):
     cfg = cfg or load_risk_config()
     start = float(cfg["prop"]["account_size"])
