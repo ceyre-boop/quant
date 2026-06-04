@@ -1,0 +1,81 @@
+# Alta Dynamic Risk Engine — ALL tunable params (zero magic numbers in code).
+# Every layer can only REDUCE risk. Edit here, never in code.
+
+# ── Layer 1: grade-scaled base (mirrors ict/micro_risk._GRADE_RISK; a parity test enforces no drift)
+base:
+  grade_risk:
+    "A+": 0.010
+    "A":  0.0075
+    "B":  0.005
+    "C":  0.0025
+  ceiling: 0.010          # hard clamp — base can never exceed 1%
+
+# ── Layer 0: hard gates (force final_risk = 0)
+gates:
+  daily_loss_limit_pct: 0.05     # daily realized+open <= -(this * starting_balance) -> halt
+  max_dd_floor_pct: 0.08         # trailing drawdown floor
+  max_dd_buffer_pct: 0.005       # halt if within this of the floor
+  threat_critical: 0.82          # AlexandrianLibrary threat_score >= this -> halt
+  mc_breach_halt: 0.30           # mc_breach_prob >= this -> halt
+  require_health_ok: true        # state.health_ok False -> halt
+  # PropRiskManager's stricter guards expressed as pure-state gates (it needs a live broker
+  # bridge, so we replicate its limits here from RiskState; the live path still calls it directly).
+  internal_guard:
+    daily_loss_pct: 0.02         # PropRiskManager MAX_DAILY_LOSS_PCT
+    trailing_dd_pct: 0.05        # PropRiskManager MAX_DRAWDOWN_PCT (trailing)
+
+# ── Layer 2: quarter-Kelly ceiling
+kelly:
+  fraction: 0.25
+  min_sample: 50                 # n_trades < this -> distrust Kelly, use fixed_fractional_floor
+  fixed_fractional_floor: 0.0025 # safe fallback on thin data
+  hard_cap: 0.010                # clamp so a bad estimate can't explode
+  floor: 0.0
+  edge_stats_source: "logs/forex_backtest_results.json"
+
+# ── Layer 3: volatility targeting (factor in [0,1])
+volatility:
+  factor_floor: 0.25             # never shrink below this from vol alone
+
+# ── Layer 4: drawdown modulation (smooth, MONOTONIC taper; interpolated)
+drawdown:
+  # breakpoints: [drawdown_fraction, factor] — factor must be non-increasing in drawdown
+  table:
+    - [0.00, 1.00]
+    - [0.03, 1.00]
+    - [0.05, 0.65]
+    - [0.07, 0.40]
+    - [0.10, 0.25]
+  min_factor: 0.25
+
+# ── Layer 5: regime modulation (uses AlexandrianLibrary size_modifier, already in [0,1])
+regime:
+  factor_floor: 0.0              # CRITICAL regime can size to zero
+  default_factor: 1.0            # if library unavailable, no reduction (other layers still bind)
+
+# ── Layer 6: portfolio / CVaR ceiling
+portfolio:
+  max_portfolio_heat: 0.06       # total correlated risk cap
+  correlation_stress_mult: 1.5   # assume correlations spike toward 1 under stress
+  cvar_alpha: 0.05               # 95% CVaR (worst 5% tail)
+  cvar_limit: 0.04               # cap new risk so portfolio CVaR <= this
+  enabled: true
+
+# ── Layer 7: prop real-time ceiling (FunderPro-style 8%/8% — TUNE to your firm)
+prop:
+  account_size: 100000
+  profit_target_pct: 0.08
+  max_drawdown_pct: 0.08
+  drawdown_type: "trailing"      # "trailing" (from peak) or "static" (from start)
+  daily_loss_limit_pct: 0.05
+  equity_basis: "equity"         # "equity" or "balance"
+  safety_buffer_pct: 0.005       # slippage/safety cushion subtracted from the floor
+
+# ── Size conversion (engine outputs risk_pct = authority; final_size for audit, rounded DOWN)
+sizing:
+  lot_granularity: 1.0           # round tradable units DOWN to this
+  default_point_value: 1.0
+
+# ── Audit
+audit:
+  decisions_log: "data/risk/risk_decisions.jsonl"
