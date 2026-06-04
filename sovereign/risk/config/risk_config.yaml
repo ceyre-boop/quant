@@ -66,6 +66,8 @@ portfolio:
   correlation_stress_mult: 1.5   # assume correlations spike toward 1 under stress
   cvar_alpha: 0.05               # 95% CVaR (worst 5% tail)
   cvar_limit: 0.04               # cap new risk so portfolio CVaR <= this
+  cvar_embedded_risk: 0.0075     # per-trade risk embedded in the bootstrap pool's pnl_pct
+  unknown_correlation: 1.0       # assume worst case when a pair's correlation is missing
   enabled: true
 
 # ── Layer 7: prop real-time ceiling (FunderPro-style 8%/8% — TUNE to your firm)

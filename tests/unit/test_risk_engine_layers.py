@@ -125,3 +125,37 @@ def test_regime_extremes():
     crit = _state(); crit.threat_score = 0.95
     assert factor(SIG, calm, CFG) == 1.0
     assert factor(SIG, crit, CFG) == 0.0
+
+
+# ── Layer 6: portfolio / CVaR ────────────────────────────────────────────────
+def test_portfolio_no_positions_does_not_bind_low():
+    from sovereign.risk.layers.portfolio import ceiling
+    c = ceiling(SIG, _state(), CFG)
+    assert c >= CFG["base"]["ceiling"]      # empty book → ceiling above any base, never binds < base
+
+
+def test_portfolio_heat_reduces_with_open_risk():
+    from sovereign.risk.layers.portfolio import _heat_ceiling
+    from sovereign.risk.risk_state import Position
+    st0 = _state()
+    st1 = _state(); st1.open_positions = [Position("GBPUSD=X", 1, 1, 1.0, 0.99, 0.01),
+                                          Position("AUDUSD=X", 1, 1, 1.0, 0.99, 0.01)]
+    p = CFG["portfolio"]
+    assert _heat_ceiling(SIG, st1, p) < _heat_ceiling(SIG, st0, p)
+
+
+def test_portfolio_higher_correlation_lower_ceiling():
+    from sovereign.risk.layers.portfolio import _heat_ceiling
+    from sovereign.risk.risk_state import Position
+    pos = [Position("GBPUSD=X", 1, 1, 1.0, 0.99, 0.01)]
+    low = _state(); low.open_positions = pos; low.correlation_matrix = {("EURUSD=X", "GBPUSD=X"): 0.1}
+    high = _state(); high.open_positions = pos; high.correlation_matrix = {("EURUSD=X", "GBPUSD=X"): 0.9}
+    p = CFG["portfolio"]
+    assert _heat_ceiling(SIG, high, p) < _heat_ceiling(SIG, low, p)
+
+
+def test_portfolio_cvar_finite_on_real_pool():
+    from sovereign.risk.layers.portfolio import _cvar_ceiling
+    import math as _m
+    c = _cvar_ceiling(SIG, _state(), CFG["portfolio"])
+    assert c == _m.inf or c >= 0.0      # finite >=0 if pool present, +inf if deferred
