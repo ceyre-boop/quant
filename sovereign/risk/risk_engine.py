@@ -130,7 +130,8 @@ def decide(signal, state, cfg=None) -> RiskDecision:
         instrument=signal.instrument, strategy=signal.strategy,
     )
 
-    _safe_append({
+    if cfg["audit"].get("enabled", True):
+        _safe_append({
         "timestamp": decision.timestamp, "instrument": decision.instrument,
         "strategy": decision.strategy, "grade": signal.grade,
         "final_risk_pct": decision.final_risk_pct, "base_risk_pct": decision.base_risk_pct,

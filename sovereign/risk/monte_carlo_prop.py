@@ -24,6 +24,7 @@ import argparse
 import json
 import sys
 from datetime import datetime, timezone
+from functools import lru_cache
 from pathlib import Path
 
 import numpy as np
@@ -42,8 +43,10 @@ def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
+@lru_cache(maxsize=1)
 def load_pool():
-    """Flatten the real per-trade %-equity returns. FAIL LOUD if missing/empty."""
+    """Flatten the real per-trade %-equity returns. FAIL LOUD if missing/empty.
+    Cached — the trades file is static within a run (the risk engine calls this per decision)."""
     if not TRADES.exists():
         raise SystemExit(f"FATAL: real trade pool not found: {TRADES}. "
                          f"Run the v015 backtest first — this tool refuses to assume returns.")

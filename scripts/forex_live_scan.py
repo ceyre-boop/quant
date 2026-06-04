@@ -37,6 +37,9 @@ for lib in ("yfinance", "peewee", "urllib3", "requests", "oandapyV20"):
 
 LOG = ROOT / "logs" / "forex_scan.log"
 HEARTBEAT = ROOT / "logs" / ".heartbeat_forex_scan"
+PROX_PATH = ROOT / "data" / "agent" / "forex_proximity.json"
+
+_CONVICTION_ENTRY = 0.35   # CONVICTION_NEUTRAL_THRESHOLD from entry_engine.py:324
 
 
 def _now() -> str:
@@ -49,11 +52,84 @@ def _log(record: dict) -> None:
         f.write(json.dumps(record) + "\n")
 
 
+def _report_proximity(report: "ForexScanReport", verbose: bool = False) -> dict:
+    """Compute proximity-to-trigger for all pairs; write PROX_PATH on every run."""
+    prev: dict[str, float] = {}
+    if PROX_PATH.exists():
+        try:
+            prev_data = json.loads(PROX_PATH.read_text())
+            prev = {p["pair"]: p.get("rate_differential", 0.0)
+                    for p in prev_data.get("pairs", [])}
+        except Exception:
+            pass
+
+    all_signals = [c.entry_signal for c in report.tradeable] + list(report.skipped)
+
+    rows = []
+    for sig in sorted(all_signals, key=lambda s: s.macro_signal.conviction, reverse=True):
+        ms = sig.macro_signal
+        pct = min(100.0, (ms.conviction / _CONVICTION_ENTRY) * 100)
+        trend = "OK" if ms.hurst > 0.55 else "BLOCKED"
+        regime = "TRENDING" if ms.hurst > 0.55 else "RANGING"
+
+        prev_diff = prev.get(sig.pair)
+        if prev_diff is not None:
+            diff_dir = "WIDENING" if abs(ms.rate_differential) > abs(prev_diff) else "NARROWING"
+            diff_str = f"{diff_dir} ({prev_diff:.2f} → {ms.rate_differential:.2f})"
+        else:
+            diff_dir = "NEW"
+            diff_str = "NEW (no previous scan)"
+
+        est_days = None
+        if pct >= 50 and diff_dir == "WIDENING":
+            est_days = max(1, round((100.0 - pct) / 5))
+
+        rows.append({
+            "pair":                sig.pair,
+            "pct_to_trigger":      round(pct, 1),
+            "conviction":          round(ms.conviction, 3),
+            "direction":           sig.direction,
+            "trend":               trend,
+            "regime":              regime,
+            "hurst":               round(ms.hurst, 2),
+            "rate_differential":   round(ms.rate_differential, 4),
+            "differential_trend":  diff_dir,
+            "est_days_to_trigger": est_days,
+        })
+
+        if verbose:
+            flag = ">>>" if pct >= 80 and trend == "OK" else "   "
+            print(f"  {flag} {sig.pair}: {pct:.0f}% to trigger | "
+                  f"dir={sig.direction} trend={trend} regime={regime}")
+            print(f"       rate_diff={ms.rate_differential:.3f} | "
+                  f"conviction={ms.conviction:.3f} | {diff_str}")
+
+    closest = max(rows, key=lambda r: r["pct_to_trigger"]) if rows else {}
+    if closest.get("pct_to_trigger", 0) >= 80 and closest.get("trend") == "OK":
+        est = closest.get("est_days_to_trigger")
+        days_str = f", ~{est}d out" if est else ""
+        verdict = (f"NO_TRADE_TODAY — {closest['pair']} closest at "
+                   f"{closest['pct_to_trigger']:.0f}%{days_str}")
+    else:
+        verdict = "NO_TRADE_TODAY"
+
+    PROX_PATH.parent.mkdir(parents=True, exist_ok=True)
+    PROX_PATH.write_text(json.dumps({
+        "last_scan": datetime.now(timezone.utc).isoformat(),
+        "pairs":     rows,
+        "verdict":   verdict,
+    }, indent=2))
+
+    return {"rows": rows, "verdict": verdict}
+
+
 def main() -> dict:
     ap = argparse.ArgumentParser(description="Forex macro live scanner")
     ap.add_argument("--live", action="store_true",
                     help="Place real orders on the OANDA PRACTICE account (default: dry-run).")
     ap.add_argument("--balance", type=float, default=100_000)
+    ap.add_argument("--verbose", action="store_true",
+                    help="Print per-pair proximity-to-trigger breakdown.")
     args = ap.parse_args()
     dry_run = not args.live
     mode = "DRY-RUN" if dry_run else "LIVE-PRACTICE"
@@ -81,6 +157,9 @@ def main() -> dict:
     tradeable = report.tradeable
     print(f"  Generated {len(tradeable)} tradeable candidate(s).")
 
+    prox = _report_proximity(report, verbose=args.verbose)
+    print(f"  Proximity: {prox['verdict']}")
+
     if not tradeable:
         _log({"timestamp": ts, "mode": mode, "verdict": "NO_SIGNALS",
               "reason": "No pair meets forex macro entry criteria today.",
@@ -95,12 +174,23 @@ def main() -> dict:
     prop = PropRiskManager(bridge)
     results = []
 
+    from sovereign.risk import engine_adapter
+    try:
+        _equity = bridge.get_account_balance()
+    except Exception:
+        _equity = None
+
     for c in tradeable:
         s, p = c.entry_signal, c.position
         pair, direction = s.pair, s.direction
-        risk_pct = p.risk_pct
+        # Dynamic Risk Engine is the SOLE sizing authority. Map the forex conviction onto a grade
+        # base, then let the cascade govern. ForexSpecialist no longer sizes around the engine.
+        _decision = engine_adapter.size(pair, direction, s.entry_price, s.stop_price,
+                                        grade=engine_adapter.grade_from_risk(p.risk_pct),
+                                        equity=_equity)
+        risk_pct = _decision.final_risk_pct
         if readiness.status == "REDUCE":
-            risk_pct = round(risk_pct * 0.5, 5)  # half size per readiness
+            risk_pct = round(risk_pct * 0.5, 5)  # readiness only ever reduces further
 
         risk_check = prop.check_trade_allowed(pair, direction, risk_pct)
         base = {"timestamp": ts, "mode": mode, "pair": pair, "direction": direction,

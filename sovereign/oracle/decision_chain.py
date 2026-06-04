@@ -96,9 +96,16 @@ class DecisionChain:
             self._log(rec)
             return {"status": "DENIED", "reason": f"EV_LOW: {outcomes['expected_value_r']:.3f}R"}
 
-        # ── Q4: How much to risk? ─────────────────────────────────────────
-        # Stub: base risk — plug in DynamicSizer when Component 4 is built
-        sizing = _sizing_stub(readiness)
+        # ── Q4: How much to risk? — Dynamic Risk Engine (SOLE sizing authority) ──
+        from sovereign.risk import engine_adapter
+        _entry = float(df["Close"].iloc[-1])
+        _stop = (float(df["Low"].tail(5).min()) if direction == "LONG"
+                 else float(df["High"].tail(5).max()))
+        _decision = engine_adapter.size(pair, direction, _entry, _stop, grade="A")
+        risk_pct = _decision.final_risk_pct
+        if readiness.status == "REDUCE":
+            risk_pct = round(risk_pct * 0.5, 5)     # readiness only ever reduces further
+        sizing = {"risk_pct": risk_pct, "reasoning": _decision.reasoning}
         rec.q4_risk      = sizing["risk_pct"]
         rec.q4_reasoning = sizing["reasoning"]
 
