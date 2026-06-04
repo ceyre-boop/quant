@@ -1,0 +1,107 @@
+{
+  "generated_at": "2026-06-04T16:28:23.942496+00:00",
+  "meta": {
+    "universe": "v015 4-pair OOS (2023-2024)",
+    "n_trades": 103,
+    "per_pair": {
+      "EURUSD=X": 27,
+      "GBPUSD=X": 28,
+      "USDJPY=X": 23,
+      "AUDUSD=X": 25
+    },
+    "metric": "R via trade_forensics._to_r(pnl_pct, pair) (per-pair avg-stop conversion)",
+    "features_reconstructed": true,
+    "reconstruction_note": "real_rate_diff/momentum_63d/atr_14d_pct/macro_vs_direction recomputed per (pair,entry_date) via trade_forensics functions \u2014 NOT stored with the v015 trades.",
+    "missing_price_pairs": [],
+    "permutations": 10000,
+    "seed": 7,
+    "method": "ALL trades partitioned WITH vs WITHOUT (never conditioned on outcome); one-sided permutation test on mean-R difference."
+  },
+  "conditions": [
+    {
+      "condition": "MACRO_AGAINST",
+      "hypothesis": "veto",
+      "n_with": 53,
+      "mean_R_with": 0.5605849056603772,
+      "net_R_with": 29.71,
+      "loss_only_R_with": -17.11,
+      "n_without": 50,
+      "mean_R_without": 0.25744,
+      "p_value": 0.8534146585341466,
+      "verdict": "NOT_SIGNIFICANT"
+    },
+    {
+      "condition": "COUNTER_MOMENTUM",
+      "hypothesis": "veto",
+      "n_with": 35,
+      "mean_R_with": 0.7472285714285715,
+      "net_R_with": 26.15,
+      "loss_only_R_with": -6.92,
+      "n_without": 68,
+      "mean_R_without": 0.24161764705882352,
+      "p_value": 0.9495050494950505,
+      "verdict": "NOT_SIGNIFICANT"
+    },
+    {
+      "condition": "WEAK_RATE",
+      "hypothesis": "veto",
+      "n_with": 9,
+      "mean_R_with": 0.12011111111111109,
+      "net_R_with": 1.08,
+      "loss_only_R_with": -4.03,
+      "n_without": 94,
+      "mean_R_without": 0.4415106382978723,
+      "p_value": 0.2702729727027297,
+      "verdict": "NOT_SIGNIFICANT"
+    },
+    {
+      "condition": "LOW_VOLATILITY",
+      "hypothesis": "veto",
+      "n_with": 13,
+      "mean_R_with": 0.5104615384615385,
+      "net_R_with": 6.64,
+      "loss_only_R_with": -3.55,
+      "n_without": 90,
+      "mean_R_without": 0.39941111111111116,
+      "p_value": 0.615038496150385,
+      "verdict": "NOT_SIGNIFICANT"
+    },
+    {
+      "condition": "LOW_MOM_LOW_VOL",
+      "hypothesis": "veto",
+      "n_with": 3,
+      "mean_R_with": -0.6830000000000002,
+      "net_R_with": -2.05,
+      "loss_only_R_with": -2.18,
+      "n_without": 100,
+      "mean_R_without": 0.44632,
+      "p_value": 0.0796920307969203,
+      "verdict": "NOT_SIGNIFICANT"
+    },
+    {
+      "condition": "STRONG_ALIGNED",
+      "hypothesis": "boost",
+      "n_with": 17,
+      "mean_R_with": 0.06547058823529409,
+      "net_R_with": 1.11,
+      "loss_only_R_with": -7.28,
+      "n_without": 86,
+      "mean_R_without": 0.4822093023255814,
+      "p_value": 0.8529147085291471,
+      "verdict": "NOT_SIGNIFICANT"
+    },
+    {
+      "condition": "STRONG_RATE",
+      "hypothesis": "boost",
+      "n_with": 59,
+      "mean_R_with": 0.45264406779661015,
+      "net_R_with": 26.71,
+      "loss_only_R_with": -20.32,
+      "n_without": 44,
+      "mean_R_without": 0.36084090909090905,
+      "p_value": 0.3718628137186281,
+      "verdict": "NOT_SIGNIFICANT"
+    }
+  ],
+  "summary": "0 of 7 conditions clear the bar (p<0.05, net sign as hypothesized). Valid vetoes: NONE. Valid boosts: NONE. The combat-rules forensic's veto thesis is REFUTED \u2014 no condition is a statistically significant net-negative veto. Recommendation: no selection gate is justified on this universe \u2014 the entry engine is geometry (Phase 1); sizing on these conditions would be sizing on noise. [n=103, small sample \u2192 low power; many NOT_SIGNIFICANT verdicts are sample-size, not proof of no effect.]"
+}
