@@ -1,0 +1,25 @@
+# Combat vetoes — DISABLED. DO NOT WIRE INTO LIVE TRADING. See COMBAT_VETOES_FINDING.md.
+#
+# The combat-rules forensic (data/research/combat_rules.json) claimed these 4 vetoes recover
+# -273R of losses. That number is a SURVIVORSHIP ILLUSION: it counted only the LOSING trades of
+# each condition and ignored the WINNERS the same condition produced. Honest replay
+# (scripts/validate_combat_vetoes.py) shows blanket force-skipping these conditions skips 82% of
+# all trades and is NET -143R (forgoes +424R of winners to recover +280R of losses).
+# e.g. MACRO_AGAINST trades net +0.221R/trade — ABOVE the whole-set average of +0.182R/trade.
+#
+# Kept only as an analysis instrument. enabled=false so nothing sizes around the live system on it.
+enabled: false                # master switch — OFF. Not a validated production gate.
+
+rules:
+  C-001:                       # MACRO_AGAINST — real rate differential opposes trade direction
+    enabled: true
+    deadband: 0.2              # |real_rate_diff| must exceed this for the macro sign to count
+  C-005:                       # RATE_SIGNAL_WEAK — rate differential too narrow (<50bp real)
+    enabled: true
+    weak_rate: 0.5
+  C-006:                       # VOLATILITY_FLOOR — ATR compressed, can't reach targets
+    enabled: true
+    atr_floor: 0.006           # atr_14d_pct (decimal) below this -> veto
+  C-003:                       # COUNTER_MOMENTUM — 63d price momentum opposes direction by >1%
+    enabled: true
+    momentum_opp: 0.01         # veto when momentum_63d * direction < -momentum_opp
