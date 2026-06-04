@@ -69,3 +69,13 @@ def test_adversarial_kelly_cannot_blow_account():
     d = decide(sig, st, CFG)
     assert d.final_risk_pct <= d.base_risk_pct + 1e-12     # never above the 1% A+ base
     assert d.final_risk_pct <= CFG["base"]["ceiling"] + 1e-12
+
+
+def test_grade_parity_ict_vs_sovereign():
+    """risk_config.yaml grades must match ict/micro_risk._GRADE_RISK — no silent drift."""
+    from ict.micro_risk import _GRADE_RISK as ict_grades
+    sov_grades = load_risk_config()["base"]["grade_risk"]
+    for grade, ict_val in ict_grades.items():
+        assert grade in sov_grades, f"grade {grade!r} in ICT but missing in sovereign config"
+        assert abs(sov_grades[grade] - ict_val) < 1e-6, (
+            f"grade {grade!r} drift: ICT={ict_val} sovereign={sov_grades[grade]}")
