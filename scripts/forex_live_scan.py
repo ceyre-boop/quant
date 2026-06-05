@@ -178,8 +178,8 @@ def main() -> dict:
     try:
         _equity = bridge.get_account_balance()
     except Exception as e:
-        import logging as _log
-        _log.warning(f"FOREX_LIVE_SCAN equity fetch failed, sizing without equity context: {type(e).__name__}: {e}")
+        import logging as _logmod
+        _logmod.warning(f"FOREX_LIVE_SCAN equity fetch failed, sizing without equity context: {type(e).__name__}: {e}")
         _equity = None
 
     for c in tradeable:
