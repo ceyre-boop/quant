@@ -1,0 +1,43 @@
+{
+  "generated_at": "2026-06-05T13:37:16.385461+00:00",
+  "meta": {
+    "universe": "v015 4-pair OOS (2023-2024)",
+    "n_trades": 103,
+    "metric": "R via trade_forensics._to_r(pnl_pct, pair) \u2014 FULLY COSTED (pnl_pct net of spread+swap)",
+    "features_reconstructed": true,
+    "missing_price_pairs": [],
+    "permutations": 10000,
+    "seed": 7,
+    "method": "ALL trades partitioned WITH vs AGAINST (never conditioned on outcome); one-sided 10k-shuffle permutation on mean-R difference."
+  },
+  "hypothesis": {
+    "id": "MOMENTUM-CARRY-ORTHO",
+    "name": "Currency momentum as an orthogonal overlay on carry (WITH vs AGAINST 63d spot momentum)",
+    "pre_registered": "WITH_MOMENTUM (carry agrees with 63d spot momentum sign) has higher mean R",
+    "groups": {
+      "WITH_MOMENTUM": {
+        "n": 54,
+        "mean_R": 0.2701,
+        "net_R": 14.59,
+        "loss_only_R": -22.16,
+        "sharpe": 0.183
+      },
+      "AGAINST_MOMENTUM": {
+        "n": 49,
+        "mean_R": 0.5714,
+        "net_R": 28.0,
+        "loss_only_R": -13.46,
+        "sharpe": 0.416
+      }
+    },
+    "excluded_zero_momentum": 0,
+    "d_mean_R": -0.3013,
+    "p_value": 0.8518148185181482,
+    "p_backwards": 0.14828517148285172,
+    "low_power": false,
+    "verdict": "NOT_SIGNIFICANT",
+    "walk_forward": null,
+    "economic_rationale": "Menkhoff, Sarno, Schmeling & Schrimpf (2012), 'Currency Momentum Strategies' \u2014 momentum is behavioral spot return-continuation, orthogonal to carry's risk premium; documented cost-sensitive & OOS-decaying.",
+    "construct_caveat": "Time-series momentum-AGREEMENT overlay on single carry trades, NOT the cross-sectional winner-minus-loser factor (4 pairs can't form that). Prior anchor: COUNTER_MOMENTUM group did better here (0.747 vs 0.242 R)."
+  }
+}

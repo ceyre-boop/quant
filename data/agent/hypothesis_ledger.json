@@ -677,5 +677,14 @@
     "result": "LOW_VOL(<0.4%): n=0 meanR=None; MED_VOL(0.4-0.7%): n=21 meanR=0.3477; HIGH_VOL(>=0.7%): n=82 meanR=0.4303 | d=-0.0826 p=0.5916408359164084 [LOW POWER]",
     "p_value": 0.5916408359164084,
     "methodology_note": "Net expectancy over ALL trades (winners+losers); 10k-shuffle permutation on mean-R diff; v015 4-pair OOS n=103; features reconstructed. Pre-registered: MED_VOL (0.4% \u2264 ATR_14d < 0.7%) mean R exceeds LOW and HIGH"
+  },
+  {
+    "id": "MOMENTUM-CARRY-ORTHO",
+    "name": "Currency momentum as an orthogonal overlay on carry (WITH vs AGAINST 63d spot momentum)",
+    "status": "NOT_SIGNIFICANT",
+    "date_tested": "2026-06-05",
+    "result": "WITH n=54 meanR=0.2701 sharpe=0.183; AGAINST n=49 meanR=0.5714 sharpe=0.416; d=-0.3013 p=0.8518148185181482",
+    "p_value": 0.8518148185181482,
+    "methodology_note": "Net expectancy over ALL trades; 10k-shuffle permutation; v015 4-pair OOS n=103; fully costed; features reconstructed. Grounded in Menkhoff, Sarno, Schmeling & Schrimpf (2012), 'Currency Momentum Strategies'. Time-series momentum-AGREEMENT overlay on single carry trades, NOT the cross-sectional winner-minus-loser factor (4 pairs can't form that). Prior anchor: COUNTER_MOMENTUM group did better here (0.747 vs 0.242 R)."
   }
 ]
