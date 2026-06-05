@@ -39,7 +39,7 @@ LOG = ROOT / "logs" / "forex_scan.log"
 HEARTBEAT = ROOT / "logs" / ".heartbeat_forex_scan"
 PROX_PATH = ROOT / "data" / "agent" / "forex_proximity.json"
 
-_CONVICTION_ENTRY = 0.10   # lowered — grade_from_signal() in entry_engine now governs sizing
+_CONVICTION_ENTRY = 0.35   # ROLLBACK 2026-06-05: reverted 0.10→0.35 to match CONVICTION_NEUTRAL_THRESHOLD (e80cc8d unvalidated, NN#4)
 
 
 def _now() -> str:
@@ -177,7 +177,9 @@ def main() -> dict:
     from sovereign.risk import engine_adapter
     try:
         _equity = bridge.get_account_balance()
-    except Exception:
+    except Exception as e:
+        import logging as _log
+        _log.warning(f"FOREX_LIVE_SCAN equity fetch failed, sizing without equity context: {type(e).__name__}: {e}")
         _equity = None
 
     for c in tradeable:
