@@ -39,7 +39,7 @@ LOG = ROOT / "logs" / "forex_scan.log"
 HEARTBEAT = ROOT / "logs" / ".heartbeat_forex_scan"
 PROX_PATH = ROOT / "data" / "agent" / "forex_proximity.json"
 
-_CONVICTION_ENTRY = 0.35   # CONVICTION_NEUTRAL_THRESHOLD from entry_engine.py:324
+_CONVICTION_ENTRY = 0.10   # lowered — grade_from_signal() in entry_engine now governs sizing
 
 
 def _now() -> str:
@@ -183,10 +183,11 @@ def main() -> dict:
     for c in tradeable:
         s, p = c.entry_signal, c.position
         pair, direction = s.pair, s.direction
-        # Dynamic Risk Engine is the SOLE sizing authority. Map the forex conviction onto a grade
-        # base, then let the cascade govern. ForexSpecialist no longer sizes around the engine.
+        # Dynamic Risk Engine is the SOLE sizing authority. Grade comes from grade_from_signal()
+        # in entry_engine (combat-rules: A+ = strong diff+conviction, A = strong diff,
+        # B = baseline aligned, C = weak signal). The cascade governs from there.
         _decision = engine_adapter.size(pair, direction, s.entry_price, s.stop_price,
-                                        grade=engine_adapter.grade_from_risk(p.risk_pct),
+                                        grade=s.grade,
                                         equity=_equity)
         risk_pct = _decision.final_risk_pct
         if readiness.status == "REDUCE":

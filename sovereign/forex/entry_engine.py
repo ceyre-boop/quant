@@ -52,6 +52,7 @@ from sovereign.forex.strategy import (
     TARGET_RR_T1,
     TARGET_RR_T2,
     TARGET_RR_T3,
+    grade_from_signal,
 )
 
 CB_DECISIONS_PATH = Path(__file__).parents[2] / 'data' / 'cache' / 'cb_decisions.json'
@@ -213,7 +214,7 @@ class ForexEntrySignal:
     pair: str
     direction: str          # LONG / SHORT / NO_TRADE
     score: int              # 0–6
-    size_modifier: float    # 0.0 (no trade), 0.5, 0.75, or 1.0
+    size_modifier: float    # 0.0 (no trade), 0.25, 0.5, 0.75, or 1.0
     entry_price: float
     stop_price: float
     t1: float               # ~1.5:1 target
@@ -224,10 +225,11 @@ class ForexEntrySignal:
     macro_conviction: float
     ict_analysis: ICTAnalysis
     macro_signal: ForexSignal
+    grade: str = 'B'        # A+/A/B/C from grade_from_signal() — risk engine uses this as base
 
     @property
     def is_tradeable(self) -> bool:
-        return self.score >= 4 and self.direction != 'NO_TRADE'
+        return self.score >= 3 and self.direction != 'NO_TRADE'
 
 
 class ForexEntryEngine:
@@ -375,7 +377,7 @@ class ForexEntryEngine:
             if score >= 3 and cb_event['direction'] == target_direction:
                 score = max(score, 4)  # floor to tradeable threshold
 
-        if score < 4:
+        if score < 3:
             return ForexEntrySignal(
                 pair=pair, direction='NO_TRADE', score=score,
                 size_modifier=0.0, entry_price=ict.current_price,
@@ -385,8 +387,8 @@ class ForexEntryEngine:
                 ict_analysis=ict, macro_signal=macro_sig,
             )
 
-        # ICT score determines base size; Buffett conviction tiers cap it
-        ict_size = 1.0 if score == 6 else (0.75 if score == 5 else 0.5)
+        # ICT score determines base size; score 3 gets quarter-size (partial setup)
+        ict_size = 1.0 if score == 6 else (0.75 if score == 5 else 0.5 if score >= 4 else 0.25)
         # Buffett tiers: conviction > 0.85 → 1.5×, 0.70–0.85 → 1×, 0.35–0.70 → 0.75×
         if effective_conviction >= CONVICTION_MAX_SIZE:
             buffett_mod = 1.5
@@ -484,6 +486,8 @@ class ForexEntryEngine:
                 ict_analysis=ict, macro_signal=macro_sig,
             )
 
+        sig_grade = grade_from_signal(macro_sig.rate_differential, effective_conviction)
+        rationale.append(f'Grade: {sig_grade} (rate_diff={macro_sig.rate_differential:.2f}pp, conv={effective_conviction:.2f})')
         return ForexEntrySignal(
             pair=pair,
             direction=target_direction,
@@ -499,6 +503,7 @@ class ForexEntryEngine:
             macro_conviction=effective_conviction,
             ict_analysis=ict,
             macro_signal=macro_sig,
+            grade=sig_grade,
         )
 
     def scan_all(self) -> list[ForexEntrySignal]:
