@@ -90,7 +90,7 @@ class ForexSpecialist:
                 if sig:
                     entry_signals.append(sig)
             except Exception as e:
-                logger.debug(f"evaluate failed for {pair}: {e}")
+                logger.warning(f"ForexSpecialist eval failed for {pair}: {type(e).__name__}: {e}")
 
         for sig in entry_signals:
             if not sig.is_tradeable:
@@ -152,8 +152,8 @@ class ForexSpecialist:
                     },
                     active_lessons=[],
                 )
-            except Exception:
-                pass
+            except Exception as e:
+                logger.debug(f"decision_logger failed for {sig.pair}: {type(e).__name__}: {e}")
 
             report.tradeable.append(ForexTradeCandidate(
                 entry_signal=sig,

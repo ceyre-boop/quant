@@ -98,8 +98,8 @@ class ForexMacroEngine:
                         cycle_divergence=0.0, hurst=0.5, spot=0.0,
                         base_cycle='UNKNOWN', quote_cycle='UNKNOWN',
                     )
-            except Exception:
-                pass
+            except Exception as e:
+                logger.debug(f"SNB suppression signal build failed for {pair}: {type(e).__name__}: {e}")
 
         # ── JPY pairs: BOJ activity gate ─────────────────────────────── #
         # 2015–2021: BOJ frozen at zero. IRP/cycle signals on JPY had nothing
@@ -302,7 +302,8 @@ class ForexMacroEngine:
             z = (current_change - mu) / sigma if sigma > 0 else 0.0
             return float(np.clip(z / 2.0, -1, 1))  # normalize z to [-1, 1]
 
-        except Exception:
+        except Exception as e:
+            logger.debug(f"rate momentum Z failed, using trajectory fallback: {type(e).__name__}: {e}")
             # Fallback: trajectory decisions
             base_net = sum(base_macro.get('rate_trajectory', [0, 0, 0]))
             quote_net = sum(quote_macro.get('rate_trajectory', [0, 0, 0]))
@@ -321,7 +322,8 @@ class ForexMacroEngine:
             recent = boj_rates.iloc[-90:]
             change_90d = abs(float(recent.iloc[-1]) - float(recent.iloc[0]))
             return change_90d > 0.001   # any move at all (1/10th of a bp)
-        except Exception:
+        except Exception as e:
+            logger.debug(f"BOJ activity check failed, permissive fallback: {type(e).__name__}: {e}")
             return True   # permissive fallback
 
     def _get_price_history(self, pair: str, years: int = 10) -> Optional[pd.Series]:
@@ -375,7 +377,8 @@ class ForexMacroEngine:
             log_rs = np.log(rs_list)
             h = np.polyfit(log_tau, log_rs, 1)[0]
             return float(np.clip(h, 0.1, 0.9))
-        except Exception:
+        except Exception as e:
+            logger.debug(f"Hurst computation failed, returning 0.5: {type(e).__name__}: {e}")
             return 0.5
 
     @staticmethod
