@@ -39,7 +39,8 @@ LOG = ROOT / "logs" / "forex_scan.log"
 HEARTBEAT = ROOT / "logs" / ".heartbeat_forex_scan"
 PROX_PATH = ROOT / "data" / "agent" / "forex_proximity.json"
 
-_CONVICTION_ENTRY = 0.35   # ROLLBACK 2026-06-05: reverted 0.10→0.35 to match CONVICTION_NEUTRAL_THRESHOLD (e80cc8d unvalidated, NN#4)
+_CONVICTION_ENTRY = 0.10   # authorized 2026-06-05 — see data/agent/param_change_log.jsonl
+_BELOW_PROVEN_BAR = 0.35   # trades with conviction < this get BELOW_PROVEN_BAR tag for Oracle analysis
 
 
 def _now() -> str:
@@ -160,6 +161,16 @@ def main() -> dict:
     prox = _report_proximity(report, verbose=args.verbose)
     print(f"  Proximity: {prox['verdict']}")
 
+    # ── Kill switch: trading path frozen → proximity reported above, place NOTHING ──
+    from sovereign.utils.kill_switch import trading_frozen
+    frz = trading_frozen()
+    if frz:
+        _log({"timestamp": ts, "mode": mode, "verdict": "FROZEN",
+              "reason": f"SYSTEM FROZEN ({frz.get('mode')}): {frz.get('reason', '')}"})
+        print(f"  🧊 SYSTEM FROZEN ({frz.get('mode')}) — {frz.get('reason', '')}. "
+              f"Proximity reported; placing nothing.")
+        return {"verdict": "FROZEN", "reason": frz.get("reason")}
+
     if not tradeable:
         _log({"timestamp": ts, "mode": mode, "verdict": "NO_SIGNALS",
               "reason": "No pair meets forex macro entry criteria today.",
@@ -187,9 +198,11 @@ def main() -> dict:
         # Dynamic Risk Engine is the SOLE sizing authority. Grade comes from grade_from_signal()
         # in entry_engine (combat-rules: A+ = strong diff+conviction, A = strong diff,
         # B = baseline aligned, C = weak signal). The cascade governs from there.
+        below_proven_bar = bool(s.macro_conviction < _BELOW_PROVEN_BAR)
         _decision = engine_adapter.size(pair, direction, s.entry_price, s.stop_price,
                                         grade=s.grade,
-                                        equity=_equity)
+                                        equity=_equity,
+                                        notes={"below_proven_bar": below_proven_bar})
         risk_pct = _decision.final_risk_pct
         if readiness.status == "REDUCE":
             risk_pct = round(risk_pct * 0.5, 5)  # readiness only ever reduces further
@@ -198,7 +211,8 @@ def main() -> dict:
         base = {"timestamp": ts, "mode": mode, "pair": pair, "direction": direction,
                 "entry": s.entry_price, "stop": s.stop_price, "tp1": s.t1,
                 "risk_pct": risk_pct, "units": p.units, "score": s.score,
-                "macro_conviction": s.macro_conviction}
+                "macro_conviction": s.macro_conviction,
+                "below_proven_bar": below_proven_bar}
 
         if not risk_check.allowed:
             rec = {**base, "verdict": "DENIED", "reason": risk_check.reason}

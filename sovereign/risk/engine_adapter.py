@@ -60,7 +60,8 @@ def grade_from_risk(risk_pct: float) -> str:
 
 
 def size(pair, direction, entry, stop, *, grade="B", equity=None, point_value=1.0,
-         open_positions=None, threat_score=0.0, regime="UNKNOWN", health_ok=True, cfg=None):
+         open_positions=None, threat_score=0.0, regime="UNKNOWN", health_ok=True, cfg=None,
+         notes=None):
     cfg = cfg or load_risk_config()
     start = float(cfg["prop"]["account_size"])
     equity = float(equity) if equity else start
@@ -72,5 +73,6 @@ def size(pair, direction, entry, stop, *, grade="B", equity=None, point_value=1.
         drawdown_static=dd_s, drawdown_trailing=dd_t, regime=regime, threat_score=threat_score,
         edge_stats=_pooled_edge_stats(), mc_breach_prob=_read_mc_breach(), health_ok=health_ok)
     d = 1 if str(direction).upper() == "LONG" else -1
-    sig = Signal(pair, d, float(entry), float(stop), grade, strategy="forex_macro", point_value=point_value)
+    sig = Signal(pair, d, float(entry), float(stop), grade, strategy="forex_macro", point_value=point_value,
+                 notes=notes or {})
     return decide(sig, state, cfg)

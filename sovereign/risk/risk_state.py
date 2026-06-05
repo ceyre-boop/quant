@@ -26,6 +26,7 @@ class Signal:
     grade: str                # 'A+' | 'A' | 'B' | 'C'
     strategy: str = "forex_macro"
     point_value: float = 1.0  # account-currency value per 1 price unit per 1 size unit
+    notes: dict = field(default_factory=dict)  # caller-supplied tags (e.g. below_proven_bar)
 
     @property
     def stop_distance(self) -> float:

@@ -137,6 +137,7 @@ class ForexSpecialist:
                         "rate_differential": getattr(_macro, "rate_differential", None),
                         "ppp_z": getattr(_macro, "ppp_z", None),
                         "primary_driver": getattr(_macro, "primary_driver", None),
+                        "below_proven_bar": bool(sig.macro_conviction < 0.35),
                     },
                     # Loop 2: forex entry-time snapshot (this path has no equity
                     # PresentState object; assemble the equivalent from the macro signal).

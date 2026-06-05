@@ -9,7 +9,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 
-CONVICTION_NEUTRAL_THRESHOLD = 0.35  # ROLLBACK 2026-06-05: reverted 0.10→0.35 (e80cc8d was unvalidated, NN#4). 0.35 is the proven baseline (OOS Sharpe 1.08). See data/agent/param_change_log.jsonl.
+CONVICTION_NEUTRAL_THRESHOLD = 0.10  # authorized 2026-06-05 — see data/agent/param_change_log.jsonl
 CONVICTION_FULL_SIZE = 0.70
 CONVICTION_MAX_SIZE = 0.85
 

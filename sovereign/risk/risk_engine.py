@@ -139,6 +139,7 @@ def decide(signal, state, cfg=None) -> RiskDecision:
         "halt": decision.halt, "halt_reason": decision.halt_reason,
         "layer_budgets": decision.layer_budgets, "modulators": decision.modulators,
         "reasoning": decision.reasoning,
+        "notes": signal.notes,
     }, ROOT / cfg["audit"]["decisions_log"])
 
     return decision
