@@ -23,10 +23,13 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 QUEUE = ROOT / "data" / "oracle" / "edge_review_queue.json"
 LEDGER = ROOT / "data" / "agent" / "hypothesis_ledger.json"
 CHANGE_LOG = ROOT / "data" / "agent" / "param_change_log.jsonl"
@@ -104,6 +107,14 @@ def main():
             print(f"  {v['id']:12s} [{v.get('subsystem')}] p={v.get('p_value')}  {v.get('reason','')[:80]}")
             print(f"               delta: {json.dumps(v.get('param_delta'))}")
         return
+
+    # ── Kill switch (HARD): block live-config mutation while frozen. --list above still works. ──
+    from sovereign.utils.kill_switch import config_frozen
+    frz = config_frozen()
+    if frz:
+        raise SystemExit(
+            f"🧊 SYSTEM FROZEN (hard) — {frz.get('reason', '')}. approve_edge is blocked "
+            f"(no live-config mutation while frozen). Thaw first: python3 scripts/alta.py thaw")
 
     target = args.reject or args.hyp_id
     item = next((v for v in pending if v["id"] == target), None)

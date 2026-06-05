@@ -66,6 +66,16 @@ class DecisionChain:
         ts  = datetime.now(timezone.utc).isoformat()
         rec = DecisionRecord(pair=pair, timestamp=ts, direction=direction)
 
+        # ── Kill switch: master freeze blocks ALL trade evaluation (any caller) ──
+        from sovereign.utils.kill_switch import trading_frozen
+        frz = trading_frozen()
+        if frz:
+            rec.verdict   = "DENIED_FROZEN"
+            rec.q1_status = "FROZEN"
+            rec.q1_reason = f"SYSTEM FROZEN ({frz.get('mode')}): {frz.get('reason', '')}"
+            self._log(rec)
+            return {"status": "DENIED", "reason": f"SYSTEM_FROZEN: {frz.get('reason', '')}"}
+
         # ── Q1: Should I trade today? ─────────────────────────────────────
         from sovereign.oracle.daily_readiness import DailyReadiness
         readiness = DailyReadiness(bridge).assess()

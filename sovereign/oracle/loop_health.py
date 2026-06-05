@@ -205,8 +205,10 @@ def check_all_loops(message: bool = True) -> dict:
                 priority=tier,
             )
 
+    from sovereign.utils.kill_switch import state as _ks_state
+    frozen = _ks_state()
     result = {"checked_at": now.isoformat(), "market_hours": _is_market_hours(now),
-              "down": [d[0] for d in dead], "loops": loops}
+              "frozen": frozen, "down": [d[0] for d in dead], "loops": loops}
     STATUS.parent.mkdir(parents=True, exist_ok=True)
     STATUS.write_text(json.dumps(result, indent=2))
     return result
@@ -214,6 +216,10 @@ def check_all_loops(message: bool = True) -> dict:
 
 if __name__ == "__main__":
     r = check_all_loops()
+    if r.get("frozen"):
+        _f = r["frozen"]
+        print(f"🧊 SYSTEM FROZEN ({_f.get('mode')}) — {_f.get('reason', '')} "
+              f"(trading path blocked; monitoring + cognition alive)")
     print(f"Loop health @ {r['checked_at']} (market_hours={r['market_hours']})")
     for loop, s in r["loops"].items():
         flag = "🔴" if s["status"] == "DOWN" else ("⚪" if s["status"] in ("NO_DATA", "EVENT_DRIVEN") else "🟢")
