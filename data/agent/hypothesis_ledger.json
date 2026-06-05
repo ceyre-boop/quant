@@ -686,5 +686,14 @@
     "result": "WITH n=54 meanR=0.2701 sharpe=0.183; AGAINST n=49 meanR=0.5714 sharpe=0.416; d=-0.3013 p=0.8518148185181482",
     "p_value": 0.8518148185181482,
     "methodology_note": "Net expectancy over ALL trades; 10k-shuffle permutation; v015 4-pair OOS n=103; fully costed; features reconstructed. Grounded in Menkhoff, Sarno, Schmeling & Schrimpf (2012), 'Currency Momentum Strategies'. Time-series momentum-AGREEMENT overlay on single carry trades, NOT the cross-sectional winner-minus-loser factor (4 pairs can't form that). Prior anchor: COUNTER_MOMENTUM group did better here (0.747 vs 0.242 R)."
+  },
+  {
+    "id": "OVERNIGHT-QQQ",
+    "name": "Overnight effect on QQQ (orthogonal non-FX source)",
+    "status": "VALID_EDGE",
+    "date_tested": "2026-06-05",
+    "result": "overnight 5.494bp/day (cum 3169%, Sharpe 0.971) vs intraday 0.088bp; net-1.5x Sharpe 0.574; perm p=0.004899510048995101; recent_alive=True",
+    "p_value": 0.004899510048995101,
+    "methodology_note": "QQQ daily adj OHLC, overnight=open/prior-close, intraday=close/open; fully costed (1x/1.5x/2x); per-year walk-forward; segment-label permutation. Grounded in Cooper/Cliff/Gulen; Lou, Polk & Skouras 'A Tug of War' (2019); Branch & Ma \u2014 overnight/intraday return decomposition. CAVEAT: phenomenon on Nasdaq source, not yet a tradeable NQ strategy (needs futures feed/broker; 24h structure may weaken)."
   }
 ]

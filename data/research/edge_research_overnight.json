@@ -1,0 +1,211 @@
+{
+  "generated_at": "2026-06-05T14:43:35.883717+00:00",
+  "id": "OVERNIGHT-QQQ",
+  "instrument": "QQQ (Nasdaq-100 ETF), corporate-action adjusted (yfinance auto_adjust)",
+  "citation": "Cooper/Cliff/Gulen; Lou, Polk & Skouras 'A Tug of War' (2019); Branch & Ma \u2014 overnight/intraday return decomposition",
+  "verdict": "VALID_EDGE",
+  "gates": {
+    "survives_1.5x_cost": true,
+    "recent_walkforward_alive_2023_25": true,
+    "permutation_significant": true
+  },
+  "test1_existence": {
+    "n_days": 6852,
+    "window": "1999-03-11..2026-06-05",
+    "overnight": {
+      "mean_bp": 5.494,
+      "cum_return": 31.6857,
+      "ann_sharpe": 0.971,
+      "t_stat": 5.06
+    },
+    "intraday": {
+      "mean_bp": 0.088,
+      "cum_return": -0.4846,
+      "ann_sharpe": 0.01,
+      "t_stat": 0.05
+    },
+    "buy_hold": {
+      "mean_bp": 5.558,
+      "cum_return": 15.8469,
+      "ann_sharpe": 0.52
+    },
+    "pre_registered_overnight_gt0": true,
+    "pre_registered_intraday_le0": false
+  },
+  "test2_costs": {
+    "base_cost_bp": 1.5,
+    "note": "overnight-only = 1 round trip/day (buy MOC, sell MOO); cost applied to every day",
+    "1.0x": {
+      "ann_sharpe": 0.706,
+      "ann_return_pct": 10.07,
+      "cost_drag_pct_yr": 3.78
+    },
+    "1.5x": {
+      "ann_sharpe": 0.574,
+      "ann_return_pct": 8.18,
+      "cost_drag_pct_yr": 5.67
+    },
+    "2.0x": {
+      "ann_sharpe": 0.441,
+      "ann_return_pct": 6.29,
+      "cost_drag_pct_yr": 7.56
+    }
+  },
+  "test3_walkforward": {
+    "1999": {
+      "n": 206,
+      "overnight_net_sharpe": 5.55,
+      "mean_bp": 32.52
+    },
+    "2000": {
+      "n": 252,
+      "overnight_net_sharpe": 1.432,
+      "mean_bp": 15.96
+    },
+    "2001": {
+      "n": 248,
+      "overnight_net_sharpe": -0.215,
+      "mean_bp": -0.79
+    },
+    "2002": {
+      "n": 252,
+      "overnight_net_sharpe": -0.839,
+      "mean_bp": -5.59
+    },
+    "2003": {
+      "n": 252,
+      "overnight_net_sharpe": 1.624,
+      "mean_bp": 9.5
+    },
+    "2004": {
+      "n": 252,
+      "overnight_net_sharpe": 1.464,
+      "mean_bp": 5.98
+    },
+    "2005": {
+      "n": 252,
+      "overnight_net_sharpe": 2.214,
+      "mean_bp": 6.34
+    },
+    "2006": {
+      "n": 251,
+      "overnight_net_sharpe": 0.508,
+      "mean_bp": 2.81
+    },
+    "2007": {
+      "n": 251,
+      "overnight_net_sharpe": 1.66,
+      "mean_bp": 7.41
+    },
+    "2008": {
+      "n": 253,
+      "overnight_net_sharpe": -0.899,
+      "mean_bp": -5.75
+    },
+    "2009": {
+      "n": 252,
+      "overnight_net_sharpe": 0.711,
+      "mean_bp": 5.05
+    },
+    "2010": {
+      "n": 252,
+      "overnight_net_sharpe": 1.131,
+      "mean_bp": 6.62
+    },
+    "2011": {
+      "n": 252,
+      "overnight_net_sharpe": -0.039,
+      "mean_bp": 1.29
+    },
+    "2012": {
+      "n": 250,
+      "overnight_net_sharpe": 1.066,
+      "mean_bp": 5.21
+    },
+    "2013": {
+      "n": 252,
+      "overnight_net_sharpe": 1.957,
+      "mean_bp": 7.29
+    },
+    "2014": {
+      "n": 252,
+      "overnight_net_sharpe": 1.705,
+      "mean_bp": 6.51
+    },
+    "2015": {
+      "n": 252,
+      "overnight_net_sharpe": 0.643,
+      "mean_bp": 4.89
+    },
+    "2016": {
+      "n": 252,
+      "overnight_net_sharpe": -0.377,
+      "mean_bp": -0.02
+    },
+    "2017": {
+      "n": 251,
+      "overnight_net_sharpe": 2.735,
+      "mean_bp": 7.5
+    },
+    "2018": {
+      "n": 251,
+      "overnight_net_sharpe": 0.958,
+      "mean_bp": 5.96
+    },
+    "2019": {
+      "n": 252,
+      "overnight_net_sharpe": 1.086,
+      "mean_bp": 5.91
+    },
+    "2020": {
+      "n": 253,
+      "overnight_net_sharpe": 0.909,
+      "mean_bp": 10.34
+    },
+    "2021": {
+      "n": 252,
+      "overnight_net_sharpe": 1.159,
+      "mean_bp": 6.19
+    },
+    "2022": {
+      "n": 251,
+      "overnight_net_sharpe": -1.473,
+      "mean_bp": -8.72
+    },
+    "2023": {
+      "n": 250,
+      "overnight_net_sharpe": 0.755,
+      "mean_bp": 4.56
+    },
+    "2024": {
+      "n": 252,
+      "overnight_net_sharpe": 2.158,
+      "mean_bp": 11.33
+    },
+    "2025": {
+      "n": 250,
+      "overnight_net_sharpe": 0.84,
+      "mean_bp": 6.41
+    },
+    "2026": {
+      "n": 107,
+      "overnight_net_sharpe": 0.07,
+      "mean_bp": 1.84
+    }
+  },
+  "test4_reversal": {
+    "overnight_intraday_corr": -0.019,
+    "intraday_on_overnight_slope": -0.03,
+    "interpretation": "no strong reversal"
+  },
+  "test5_permutation": {
+    "observed_overnight_minus_intraday_bp": 5.406,
+    "p_value": 0.004899510048995101
+  },
+  "caveat": "QQQ tests the PHENOMENON on the Nasdaq source. NOT yet a tradeable NQ strategy \u2014 live capture needs a CME futures feed + broker, and futures' 24h Globex structure may weaken the RTH overnight gap. A VALID_EDGE here is a candidate second edge that must clear its own execution validation downstream.",
+  "meta": {
+    "perms": 10000,
+    "seed": 7,
+    "cost_rationale": "1.5bp round trip = half-spread + slippage/side x2 + negligible ETF commission (QQQ is among the most liquid ETFs)."
+  }
+}
