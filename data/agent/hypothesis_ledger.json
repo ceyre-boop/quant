@@ -695,5 +695,13 @@
     "result": "overnight 5.494bp/day (cum 3169%, Sharpe 0.971) vs intraday 0.088bp; net-1.5x Sharpe 0.574; perm p=0.004899510048995101; recent_alive=True",
     "p_value": 0.004899510048995101,
     "methodology_note": "QQQ daily adj OHLC, overnight=open/prior-close, intraday=close/open; fully costed (1x/1.5x/2x); per-year walk-forward; segment-label permutation. Grounded in Cooper/Cliff/Gulen; Lou, Polk & Skouras 'A Tug of War' (2019); Branch & Ma \u2014 overnight/intraday return decomposition. CAVEAT: phenomenon on Nasdaq source, not yet a tradeable NQ strategy (needs futures feed/broker; 24h structure may weaken)."
+  },
+  {
+    "id": "OVERNIGHT-CARRY-DIVERSIFICATION",
+    "name": "Does overnight-QQQ diversify the carry edge (crisis-conditional)?",
+    "status": "long_only=CORRELATED; long_short=CORRELATED_IN_CRISIS",
+    "date_tested": "2026-06-05",
+    "result": "long-only full rho=0.361 maxCrisis=0.568; long-short full rho=0.014 maxCrisis=0.416. NEITHER version diversifies carry in crisis \u2014 overnight-QQQ is correlated return-stacking, not true diversification. Do NOT treat it as a crisis-independent second edge.",
+    "methodology_note": "QQQ overnight & overnight\u2212intraday vs DBV carry proxy; full + crisis (2008/2020/2022) + VIX>30 + tail-decile + rolling-60d correlations. Lou, Polk & Skouras 'A Tug of War' (2019); overnight/intraday decomposition + carry-factor (DBV) diversification. DBV\u2260our exact strategy; crisis corr decides."
   }
 ]
