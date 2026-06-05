@@ -8,7 +8,8 @@
          runs loop_health, the briefing engine has its own news. oracle_cycle.py writes
          logs/.heartbeat_oracle_reflection at the start of every run so loop_health measures
          EXECUTION, not output. NOTE: launchd StartCalendarInterval fires in the machine's LOCAL
-         timezone (America/Los_Angeles). 02:30 PT, daily. `launchctl load` to enable. -->
+         timezone, which is America/Detroit (ET). 02:30 ET = 06:30 UTC, daily. `launchctl load`
+         to enable. -->
     <key>ProgramArguments</key>
     <array>
         <string>/bin/bash</string><string>-c</string>

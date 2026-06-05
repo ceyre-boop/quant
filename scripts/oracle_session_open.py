@@ -17,10 +17,15 @@ from __future__ import annotations
 
 import json
 import logging
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+# Make `scripts.*` and `sovereign.*` importable regardless of how launchd invokes us
+# (the plist runs `python3 scripts/oracle_session_open.py`, so sys.path[0] is scripts/, not ROOT).
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 logging.basicConfig(level=logging.ERROR)
 for lib in ("oandapyV20", "urllib3", "requests"):
     logging.getLogger(lib).setLevel(logging.ERROR)
@@ -66,6 +71,33 @@ def _loops_down() -> list[str]:
         return []
 
 
+def _refresh_analyst_briefing() -> None:
+    """Refresh the analyst-narrative briefing BEFORE composing the session summary.
+
+    morning_market_briefing.build() rewrites data/oracle/market_briefings/latest.json — the
+    store reflect_cycle._load_market_briefing() feeds to Oracle's REFLECT — and stamps
+    logs/.heartbeat_morning_briefing, which is the ONLY signal loop_health uses for the
+    morning_briefing loop. Nothing else schedules that engine, so without this call Oracle
+    reflects on a stale market read and loop_health false-alarms RED every 2h.
+
+    Fail-safe: build() is fully _safe-wrapped internally (deterministic fallback, no API key
+    required), but we still guard the call so a briefing-engine error can never crash the
+    session-open summary — and we stamp the heartbeat ourselves as a last resort so the
+    monitor never goes dark on us."""
+    try:
+        from scripts.morning_market_briefing import build as _build_briefing
+        _build_briefing()
+    except Exception as exc:
+        logging.getLogger("oracle_session_open").warning(
+            "analyst briefing refresh failed (session summary continues): %s", exc)
+        try:
+            hb = ROOT / "logs" / ".heartbeat_morning_briefing"
+            hb.parent.mkdir(parents=True, exist_ok=True)
+            hb.write_text(_now())
+        except Exception:
+            pass
+
+
 def _read_regime() -> dict:
     try:
         d = json.loads((ROOT / "data" / "research" / "nqes_regime.json").read_text())
@@ -75,6 +107,10 @@ def _read_regime() -> dict:
 
 
 def build_briefing() -> dict:
+    # Refresh Oracle's analyst briefing + morning_briefing heartbeat FIRST, so the loop_health
+    # read below reflects this run and Oracle's next REFLECT consumes a fresh market read.
+    _refresh_analyst_briefing()
+
     scan = _latest_scan()
     positions = _open_positions()
     down = _loops_down()
