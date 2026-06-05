@@ -118,6 +118,9 @@ class CBEventTrigger:
         if not self._decisions:
             return None
 
+        # d['date'] values are bare date strings → tz-naive; strip tz from as_of to match
+        if getattr(as_of, 'tzinfo', None) is not None:
+            as_of = as_of.replace(tzinfo=None)
         window_start = as_of - pd.Timedelta(days=window_days + 4)  # +4 for weekends
 
         candidates = []
@@ -298,7 +301,7 @@ class ForexEntryEngine:
         cb_event = None
         if base_country and quote_country:
             cb_event = self._cb.check(
-                base_country, quote_country, as_of=pd.Timestamp.utcnow()
+                base_country, quote_country, as_of=pd.Timestamp.now('UTC')
             )
 
         # ── Buffett conviction gate ───────────────────────────────────── #
@@ -352,7 +355,7 @@ class ForexEntryEngine:
         # ── ATR filter (77% importance in trajectory model) ───────────── #
         # Trajectory model proved: atr_pct < 2.2% → worst outcomes (-4.09R avg).
         # Low ATR = price not moving enough for the signal to express.
-        ATR_MEDIAN_PCT = 0.022   # 2.2% from attribution training
+        ATR_MEDIAN_PCT = 0.002   # 0.20% — forex bottom-10th-pct (equity 2.2% does not apply)
         atr_pct = ict.atr_daily / ict.current_price if ict.current_price > 0 else 0
         if atr_pct < ATR_MEDIAN_PCT:
             return ForexEntrySignal(

@@ -331,7 +331,7 @@ class ForexSignalEngine:
             # ── ATR filter ────────────────────────────────────────────── #
             if atr_series is not None and date in atr_series.index:
                 atr_pct_now = float(atr_series.asof(date))
-                if atr_pct_now < 0.022:   # 2.2% median from attribution training
+                if atr_pct_now < 0.002:   # 0.20% — forex bottom-10th-pct (equity 2.2% does not apply)
                     continue
 
             # ── USDCHF: require confirmed momentum alignment ──────────── #
