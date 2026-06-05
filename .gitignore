@@ -75,6 +75,9 @@ outputs/
 # Sovereign Cache
 sovereign/cache/
 
+# System runtime state — KILL_SWITCH is operational state, never commit
+data/system/KILL_SWITCH
+
 # Large data/cache directories — never commit
 data/cache/
 data/harvest.db

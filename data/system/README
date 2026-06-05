@@ -1,0 +1,7 @@
+# data/system/ — runtime system state
+
+KILL_SWITCH (gitignored): master freeze for the live trading path.
+Operate via: python3 scripts/alta.py {freeze "reason" [--hard], thaw, status}
+  soft = freeze trading/signal path (forex_live_scan placement, DecisionChain.evaluate)
+  hard = ALSO block approve_edge.py (live-config mutation)
+Monitoring (pulse_check/loop_health) + Oracle cognition keep running. Persists across reboots.
