@@ -24,7 +24,8 @@ from collections import defaultdict
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-TRADE_LOG = ROOT / "data" / "futures" / "trade_log.jsonl"
+TRADE_LOG  = ROOT / "data" / "futures" / "trade_log.jsonl"
+ORACLE_LOG = ROOT / "data" / "futures" / "oracle_mornings.jsonl"
 VALIDATION_THRESHOLD = 150
 
 
@@ -200,13 +201,142 @@ def _analyze(trades: list[dict], preview: bool) -> None:
     print(f"{'═'*60}\n")
 
 
+def _oracle_calibration(instrument: str | None = None) -> None:
+    """Score oracle morning calls and display calibration curve."""
+    if not ORACLE_LOG.exists():
+        print("No oracle calls logged yet. Run: python3.13 scripts/futures_oracle_morning.py")
+        return
+
+    calls = []
+    with open(ORACLE_LOG) as f:
+        for line in f:
+            try:
+                rec = json.loads(line)
+                if instrument is None or rec.get("instrument") == instrument:
+                    calls.append(rec)
+            except Exception:
+                pass
+
+    if not calls:
+        print("No oracle calls found.")
+        return
+
+    scored = [c for c in calls if c.get("outcome_scored") is not None]
+    n_total = len(calls)
+    n_scored = len(scored)
+
+    print(f"\n{'═'*60}")
+    print(f"  ORACLE CALIBRATION — {instrument or 'ALL'}")
+    print(f"{'═'*60}")
+    print(f"  Total calls: {n_total}  |  Scored: {n_scored}  |  Pending: {n_total - n_scored}")
+
+    if n_scored == 0:
+        print("\n  No scored calls yet.")
+        print("  After each session, run:")
+        print("    python3.13 scripts/futures_analysis.py --score-today --hit 1  (T1 reached)")
+        print("    python3.13 scripts/futures_analysis.py --score-today --hit 0  (falsifier hit)")
+        print(f"{'═'*60}\n")
+        return
+
+    # Brier score
+    brier = sum((c["stated_probability"] - c["outcome_scored"]) ** 2 for c in scored) / n_scored
+    hits  = sum(c["outcome_scored"] for c in scored)
+    overall_wr = hits / n_scored * 100
+
+    print(f"\n  Overall hit rate: {hits}/{n_scored} ({overall_wr:.1f}%)")
+    print(f"  Brier score:      {brier:.4f}  {'✓ well-calibrated' if brier < 0.15 else ('~ noisy' if brier < 0.25 else '✗ overconfident')}")
+    print(f"  (Brier: 0=perfect, 0.25=random, lower=better)")
+
+    # Bucket breakdown
+    buckets = {"40-50%": [], "50-60%": [], "60-70%": [], "70-80%": []}
+    for c in scored:
+        p = c["stated_probability"]
+        if   p < 0.50: buckets["40-50%"].append(c["outcome_scored"])
+        elif p < 0.60: buckets["50-60%"].append(c["outcome_scored"])
+        elif p < 0.70: buckets["60-70%"].append(c["outcome_scored"])
+        else:          buckets["70-80%"].append(c["outcome_scored"])
+
+    print(f"\n  Calibration by stated probability bucket:")
+    print(f"  {'Stated':10s}  {'n':>4}  {'Actual':>8}  {'Delta':>8}  Bar")
+    for label, outcomes in buckets.items():
+        if not outcomes:
+            continue
+        mid = float(label.split("-")[0].rstrip("%")) / 100 + 0.05
+        actual = sum(outcomes) / len(outcomes)
+        delta  = actual - mid
+        bar_len = int(actual * 20)
+        bar = "█" * bar_len + "░" * (20 - bar_len)
+        sign = "+" if delta >= 0 else ""
+        print(f"  {label:10s}  {len(outcomes):>4}  {actual:>7.1%}  {sign}{delta:>7.1%}  {bar}")
+
+    # Recent calls summary
+    recent = calls[-5:]
+    print(f"\n  Recent calls (last {len(recent)}):")
+    for c in recent:
+        scored_str = ""
+        if c.get("outcome_scored") is not None:
+            scored_str = " → HIT" if c["outcome_scored"] == 1 else " → MISS"
+        print(f"    {c.get('date','')}  {c.get('instrument','')}  "
+              f"{c.get('bias','?'):7s}  {c.get('stated_probability', 0):.0%}{scored_str}")
+
+    print(f"{'═'*60}\n")
+
+
+def _score_today(instrument: str | None, hit: int) -> None:
+    """Mark today's oracle call as hit (1) or miss (0)."""
+    if not ORACLE_LOG.exists():
+        print("No oracle log found.")
+        return
+    today = __import__("datetime").datetime.now(__import__("datetime").timezone.utc).strftime("%Y-%m-%d")
+    lines = []
+    found = False
+    with open(ORACLE_LOG) as f:
+        for line in f:
+            try:
+                rec = json.loads(line)
+                if (rec.get("date") == today and
+                        (instrument is None or rec.get("instrument") == instrument) and
+                        rec.get("outcome_scored") is None):
+                    p = rec.get("stated_probability", 0.5)
+                    rec["outcome_scored"]    = hit
+                    rec["outcome_hit_t1"]    = bool(hit)
+                    rec["brier_contribution"] = round((p - hit) ** 2, 6)
+                    found = True
+            except Exception:
+                pass
+            lines.append(json.dumps(rec) if isinstance(rec, dict) else line.rstrip())
+    if found:
+        with open(ORACLE_LOG, "w") as f:
+            f.write("\n".join(lines) + "\n")
+        result = "HIT ✓" if hit else "MISS ✗"
+        print(f"  Scored today's oracle call: {result}")
+    else:
+        print(f"  No unscored oracle call found for today ({today}).")
+
+
 def main() -> None:
-    ap = argparse.ArgumentParser(description="Futures sandbox 150-trade analysis")
+    ap = argparse.ArgumentParser(description="Futures sandbox analysis + oracle calibration")
     ap.add_argument("--preview",    action="store_true",
-                    help="Run analysis even before 150-trade threshold")
-    ap.add_argument("--instrument", default=None, choices=["MES", "MNQ"],
-                    help="Filter to one instrument (default: all)")
+                    help="Run trade analysis before 150-trade threshold")
+    ap.add_argument("--instrument", default=None, choices=["MES", "MNQ"])
+    ap.add_argument("--oracle",     action="store_true",
+                    help="Show oracle calibration scores")
+    ap.add_argument("--score-today", action="store_true",
+                    help="Score today's oracle call (use with --hit)")
+    ap.add_argument("--hit", type=int, choices=[0, 1], default=None,
+                    help="1 = T1 was reached, 0 = falsifier was hit")
     args = ap.parse_args()
+
+    if args.score_today:
+        if args.hit is None:
+            print("--score-today requires --hit 0 or --hit 1")
+            sys.exit(1)
+        _score_today(args.instrument, args.hit)
+        return
+
+    if args.oracle:
+        _oracle_calibration(args.instrument)
+        return
 
     trades = _load(args.instrument)
     n = len(trades)
