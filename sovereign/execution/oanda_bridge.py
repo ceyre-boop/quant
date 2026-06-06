@@ -242,6 +242,7 @@ class OandaBridge:
             logger.info("[OandaBridge] Units capped %d → %d", units, MAX_UNITS)
             units = MAX_UNITS
         if units == 0:
+            _log_veto('ZERO_UNITS', pair, {})
             return {'status': 'VETOED', 'reason': 'ZERO_UNITS'}
 
         # ── Gate 2: daily loss limit ──────────────────────────────────────
