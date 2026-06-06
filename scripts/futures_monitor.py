@@ -119,8 +119,8 @@ def _fetch_bars(instrument: str):
     return bars
 
 
-def _compute_indicators(bars) -> tuple[float, float, float]:
-    """Returns (last_price, vwap, rsi). Raises ValueError if bars empty."""
+def _compute_indicators(bars) -> tuple[float, float, float, float, float, float, float]:
+    """Returns (last_price, vwap, rsi, curr_volume, avg_volume_20, ema8, ema21). Raises ValueError if bars empty."""
     if bars.empty:
         raise ValueError("empty bars")
     last_price = float(bars["Close"].iloc[-1].item())
@@ -136,12 +136,18 @@ def _compute_indicators(bars) -> tuple[float, float, float]:
     avg_loss = loss.ewm(alpha=1/14, adjust=False).mean()
     rs       = avg_gain / avg_loss
     rsi      = float((100 - (100 / (1 + rs))).iloc[-1].item())
-    return last_price, vwap, rsi
+    curr_volume   = float(bars["Volume"].iloc[-1].item())
+    avg_volume_20 = float(bars["Volume"].tail(20).mean())
+    ema8  = float(bars["Close"].ewm(span=8,  adjust=False).mean().iloc[-1].item())
+    ema21 = float(bars["Close"].ewm(span=21, adjust=False).mean().iloc[-1].item())
+    return last_price, vwap, rsi, curr_volume, avg_volume_20, ema8, ema21
 
 
 def _check_signal(bias_dir: str, curr_price: float, curr_vwap: float, curr_rsi: float,
                   prev_price: float, prev_vwap: float, prev_rsi: float,
-                  last_proposal_time: datetime | None, proposals_count: int) -> str | None:
+                  last_proposal_time: datetime | None, proposals_count: int,
+                  curr_volume: float, avg_volume_20: float,
+                  ema8: float, ema21: float) -> str | None:
     if bias_dir not in ("LONG", "SHORT"):
         return None
     if proposals_count >= 3:
@@ -150,19 +156,26 @@ def _check_signal(bias_dir: str, curr_price: float, curr_vwap: float, curr_rsi: 
         elapsed = (datetime.now(timezone.utc) - last_proposal_time).total_seconds()
         if elapsed < 300:
             return None
+    # Volume confirmation gate — signal bar must have above-average participation
+    if avg_volume_20 > 0 and curr_volume < 1.5 * avg_volume_20:
+        return None
+    # EMA position filter — price must be on the correct structural side
+    above_both = curr_price > ema8 and curr_price > ema21
+    below_both = curr_price < ema8 and curr_price < ema21
     long_signal  = (prev_price < prev_vwap and curr_price >= curr_vwap
                     and prev_rsi < 50 and curr_rsi >= 50)
     short_signal = (prev_price > prev_vwap and curr_price <= curr_vwap
                     and prev_rsi > 50 and curr_rsi <= 50)
-    if long_signal  and bias_dir == "LONG":
+    if long_signal  and bias_dir == "LONG"  and above_both:
         return "LONG"
-    if short_signal and bias_dir == "SHORT":
+    if short_signal and bias_dir == "SHORT" and below_both:
         return "SHORT"
     return None
 
 
 def _print_header(instrument: str, price: float, vwap: float, rsi: float,
-                  bias: dict, session_r: float, verbose: bool) -> None:
+                  bias: dict, session_r: float, verbose: bool,
+                  ema8: float | None = None, ema21: float | None = None) -> None:
     bias_dir  = bias.get("bias", "NEUTRAL")
     conviction = bias.get("conviction", 0)
     stars = _stars(conviction)
@@ -180,8 +193,9 @@ def _print_header(instrument: str, price: float, vwap: float, rsi: float,
             f"  RSI {rsi:.1f}"
             f"  |  Bias: {color}{bias_dir} {stars}{RS}"
             f"  |  Session R: {r_sign}{session_r:.2f}")
-    if verbose:
-        line += f"  |  prev_vwap={vwap:.2f}"
+    if verbose and ema8 is not None and ema21 is not None:
+        ema_status = "↑ LONG" if price > ema21 else ("↓ SHORT" if price < ema8 else "≈ CHOP")
+        line += f"  |  EMA {ema8:.1f}/{ema21:.1f} {ema_status}"
     print(f"\r{line:<120}", end="", flush=True)
 
 
@@ -475,10 +489,11 @@ def main() -> None:
                     continue
 
                 curr_ts = bars.index[-1]
-                curr_price, curr_vwap, curr_rsi = _compute_indicators(bars)
+                curr_price, curr_vwap, curr_rsi, curr_volume, avg_volume_20, ema8, ema21 = _compute_indicators(bars)
 
                 _print_header(instrument, curr_price, curr_vwap, curr_rsi,
-                              bias, session_r, args.verbose)
+                              bias, session_r, args.verbose,
+                              ema8=ema8, ema21=ema21)
 
                 # Only check signal on new bar (avoid repeat-firing on same data)
                 if last_bar_ts is not None and curr_ts == last_bar_ts:
@@ -486,9 +501,12 @@ def main() -> None:
                     continue
 
                 if prev_price > 0:  # have at least one prior tick
-                    signal = _check_signal(bias_dir, curr_price, curr_vwap, curr_rsi,
-                                           prev_price, prev_vwap, prev_rsi,
-                                           last_proposal_time, proposals_count)
+                    signal = _check_signal(
+                        bias_dir, curr_price, curr_vwap, curr_rsi,
+                        prev_price, prev_vwap, prev_rsi,
+                        last_proposal_time, proposals_count,
+                        curr_volume, avg_volume_20, ema8, ema21,
+                    )
                     if signal:
                         print()  # newline after header
                         last_proposal_time, session_trades, proposals_count = _handle_proposal(
