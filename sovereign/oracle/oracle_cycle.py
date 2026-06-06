@@ -162,6 +162,8 @@ def run_daily_cycle(dry_run: bool = False) -> dict:
         "wisdom": {
             "active_lesson_count": codify_result.get("active_lessons_count"),
             "last_codified":       codify_result.get("lesson_number"),
+            "codify_status":       codify_result.get("action", "UNKNOWN"),
+            "codify_error":        codify_result.get("error"),
         },
         "cycle": {
             "cost_usd": summary["oracle_cost_usd"],
