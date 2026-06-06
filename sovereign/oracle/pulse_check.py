@@ -722,6 +722,11 @@ def run_pulse() -> dict:
     n_backfilled = _backfill_decision_outcomes()
     n_expired = _expire_stale_decisions()
 
+    # Write state BEFORE check_all_loops reads it — prevents false DOWN alarm where
+    # health reads the 2h-old timestamp because state wasn't updated yet.
+    pulse_timestamp = canonical_timestamp()
+    _save_pulse_state(last_pulse_time=pulse_timestamp)
+
     # Watch the loops: detect any improvement-machinery loop that has gone silent.
     loop_health = {}
     try:
@@ -731,7 +736,7 @@ def run_pulse() -> dict:
         log.warning("loop_health check failed: %s", exc)
 
     pulse = {
-        "timestamp": canonical_timestamp(),
+        "timestamp": pulse_timestamp,
         "new_entries_since_last": len(new_entries),
         "new_outcomes_since_last": sum(1 for e in new_entries if e.get("outcome")),
         "outcomes_backfilled": n_backfilled,
@@ -748,7 +753,6 @@ def run_pulse() -> dict:
     ts_slug = pulse["timestamp"][:16].replace(":", "").replace("-", "").replace("T", "")
     (PULSE_DIR / f"pulse_{ts_slug}.json").write_text(json.dumps(pulse, indent=2))
 
-    _save_pulse_state(last_pulse_time=pulse["timestamp"])
     _update_health_json(pulse)
     if anomalies:
         _write_messages(anomalies)

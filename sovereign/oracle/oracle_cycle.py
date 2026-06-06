@@ -138,6 +138,42 @@ def run_daily_cycle(dry_run: bool = False) -> dict:
     }
 
     _log(f"Daily cycle complete. Status: {summary['status']}")
+
+    # Write dashboard-visible summary to data/agent/ (atomic: tmp → replace)
+    import os as _os
+    _AGENT_DIR = ROOT / "data" / "agent"
+    _AGENT_DIR.mkdir(parents=True, exist_ok=True)
+    _oracle_summary = {
+        "last_updated": datetime.now(timezone.utc).isoformat(),
+        "harvest": {
+            "trades_closed":    harvest["trades_closed"],
+            "win_rate":         harvest.get("win_rate"),
+            "failure_taxonomy": harvest.get("failure_taxonomy", {}),
+        },
+        "reflection": {
+            "candidate_lesson": reflection.get("reflection", {}).get("candidate_lesson", {}).get("lesson_text", ""),
+            "mechanism":        reflection.get("reflection", {}).get("candidate_lesson", {}).get("mechanism", ""),
+            "testable_rule":    reflection.get("reflection", {}).get("candidate_lesson", {}).get("testable_rule", ""),
+        },
+        "validation": {
+            "verdict": validation["verdict"],
+            "reason":  validation.get("reason", ""),
+        },
+        "wisdom": {
+            "active_lesson_count": codify_result.get("active_lessons_count"),
+            "last_codified":       codify_result.get("lesson_number"),
+        },
+        "cycle": {
+            "cost_usd": summary["oracle_cost_usd"],
+            "status":   summary["status"],
+            "date":     summary["date"],
+        },
+    }
+    _tmp = _AGENT_DIR / ".oracle_daily_summary.tmp"
+    _tmp.write_text(json.dumps(_oracle_summary, indent=2))
+    _os.replace(str(_tmp), str(_AGENT_DIR / "oracle_daily_summary.json"))
+    _log("oracle_daily_summary.json written to data/agent/")
+
     return summary
 
 

@@ -256,6 +256,21 @@ class OandaBridge:
             _log_veto('INVALID_PRICES', pair, {'stop': stop_price, 'tp1': tp1_price})
             return {'status': 'VETOED', 'reason': 'INVALID_PRICES'}
 
+        # ── Gate 4: FIFO pre-flight ───────────────────────────────────────
+        existing = self.get_open_trades_for_pair(pair)
+        if existing:
+            existing_dir = "LONG" if float(existing[0].get("currentUnits", 0)) > 0 else "SHORT"
+            logger.info(
+                "[OandaBridge] FIFO pre-flight: %s has %d open trade(s) (dir=%s) — vetoing new %s",
+                pair, len(existing), existing_dir, direction,
+            )
+            _log_veto("FIFO_EXISTING_POSITION", pair, {
+                "existing_count":     len(existing),
+                "existing_direction": existing_dir,
+                "new_direction":      direction,
+            })
+            return {"status": "VETOED", "reason": f"FIFO_EXISTING_POSITION ({existing_dir})"}
+
         # Signed units: LONG = positive, SHORT = negative
         signed_units = units if direction == 'LONG' else -units
 
@@ -340,6 +355,17 @@ class OandaBridge:
             return resp.get('trades', [])
         except Exception as exc:
             logger.warning("[OandaBridge] get_open_trades failed: %s", exc)
+            return []
+
+    def get_open_trades_for_pair(self, pair: str) -> list[dict]:
+        """Return open OANDA trades for the given instrument. Empty list if none or on error."""
+        from oandapyV20.endpoints import trades as trades_ep
+        try:
+            req = trades_ep.OpenTrades(self._account_id)
+            resp = self._api.request(req)
+            return [t for t in resp.get("trades", []) if t.get("instrument") == pair]
+        except Exception as exc:
+            logger.warning("[OandaBridge] get_open_trades_for_pair error: %s", exc)
             return []
 
     def get_trade(self, trade_id: str) -> Optional[dict]:
