@@ -634,9 +634,17 @@
   {
     "id": "HYP-052c",
     "name": "Pair-level rate trend gate (>50% days widening per pair)",
-    "status": "CANDIDATE",
+    "status": "CONFIRMED",
     "date": "2026-06-03",
-    "note": "Pair-level version of HYP-052: only trade pair X when majority of recent days show widening rate diff for that pair. Correctly calls 2024 (all 4 pairs block), correctly identifies USDJPY as 2022 winner, correctly selects EURUSD+USDJPY for 2023. Needs run_with_signals() to backtest formally."
+    "note": "Pair-level version of HYP-052: only trade pair X when majority of recent days show widening rate diff for that pair. Correctly calls 2024 (all 4 pairs block), correctly identifies USDJPY as 2022 winner, correctly selects EURUSD+USDJPY for 2023. Needs run_with_signals() to backtest formally.",
+    "confirmed_date": "2026-06-06",
+    "result": {
+      "is_sharpe": 0.992,
+      "oos_sharpe": 1.19,
+      "n_is": 244,
+      "n_oos": 82,
+      "note": "OOS > IS \u2014 no overfit. Enter only when |real_rate_diff| widening vs previous trade for that pair."
+    }
   },
   {
     "id": "HYP-054",
@@ -699,9 +707,78 @@
   {
     "id": "OVERNIGHT-CARRY-DIVERSIFICATION",
     "name": "Does overnight-QQQ diversify the carry edge (crisis-conditional)?",
-    "status": "long_only=CORRELATED; long_short=CORRELATED_IN_CRISIS",
+    "status": "REJECTED",
     "date_tested": "2026-06-05",
+    "date_decided": "2026-06-07",
+    "decision": "REJECTED as a carry diversifier (kill accepted). overnight-QQQ remains a VALID_EDGE standalone, but is NOT a crisis-independent second edge: long-only is correlated return-stacking (rho~0.36, worse in crisis); long-short looks orthogonal in calm (rho 0.014) but robustly re-couples in the COVID liquidity crash (rho 0.416, BH p=0.0072, sig>calm). Caveat: measured vs DBV proxy (died 2023-03); real v015 overlap thin (n=39, rho=0.036).",
     "result": "long-only full rho=0.361 maxCrisis=0.568; long-short full rho=0.014 maxCrisis=0.416. NEITHER version diversifies carry in crisis \u2014 overnight-QQQ is correlated return-stacking, not true diversification. Do NOT treat it as a crisis-independent second edge.",
-    "methodology_note": "QQQ overnight & overnight\u2212intraday vs DBV carry proxy; full + crisis (2008/2020/2022) + VIX>30 + tail-decile + rolling-60d correlations. Lou, Polk & Skouras 'A Tug of War' (2019); overnight/intraday decomposition + carry-factor (DBV) diversification. DBV\u2260our exact strategy; crisis corr decides."
+    "methodology_note": "QQQ overnight & overnight\u2212intraday vs DBV carry proxy; full + crisis (2008/2020/2022) + VIX>30 + tail-decile + rolling-60d correlations. Lou, Polk & Skouras 'A Tug of War' (2019); overnight/intraday decomposition + carry-factor (DBV) diversification. DBV\u2260our exact strategy; crisis corr decides.",
+    "robustness": {
+      "tested": "2026-06-07",
+      "method": "moving-block bootstrap CIs + crisis-vs-calm diff test + BH (scripts/diversification_robustness.py)",
+      "long_short_verdict": "ROBUST_CRISIS_COUPLING",
+      "covid_rho_ci95": [
+        0.112,
+        0.631
+      ],
+      "covid_bh_p": 0.0072,
+      "finding": "Market-neutral long-short COVID coupling rho=0.416 is STATISTICALLY ROBUST (CI [0.112,0.631] excludes 0; BH p=0.0072; sig > calm). NOT a 50-day fluke. It coupled in the COVID liquidity crash (was independent/negative in 2008 & 2022), but coupling in the sharpest crash is disqualifying for a crisis-independent diversifier. Prior kill CONFIRMED & hardened. overnight-QQQ = return-stacking, one edge, not two. Caveat unchanged: DBV proxy; live carry book has no crisis history.",
+      "artifact": "data/research/diversification_robustness.json"
+    }
+  },
+  {
+    "id": "HYP-055",
+    "title": "USDJPY + USDCAD macro contrarian filter: only trade MVD=-1",
+    "status": "PARTIAL_CONFIRMATION",
+    "created_date": "2026-06-06",
+    "origin": "REST-005",
+    "description": "For USDJPY and USDCAD, only enter when macro_vs_direction=-1 (macro signal points against the trade \u2014 contrarian entry). USDJPY MVD=-1: IS=1.324, OOS=2.101. USDJPY MVD=1: IS=-1.356, OOS=0.680. USDCAD MVD=-1: IS=0.768, OOS=1.299. USDCAD MVD=1: IS=-0.157, OOS=0.044. Needs formal permutation test. GBPUSD and EURUSD do not show the same stable pattern.",
+    "test_needed": "rq_rest_010_macro_contrarian_gate.py \u2014 permutation test on MVD=-1 filter for USDJPY+USDCAD",
+    "confirmed_date": "2026-06-07",
+    "result": {
+      "usdjpy_mvd_neg1_sharpe": 0.293,
+      "usdjpy_mvd_pos1_sharpe": -0.114,
+      "usdjpy_delta": 0.406,
+      "usdjpy_p": 0.0117,
+      "usdcad_p": 0.1754,
+      "combined_full_p": 0.0117,
+      "combined_oos_p": 0.2106,
+      "n_oos_mvd_neg1": 15,
+      "gate3_is": 0.316,
+      "gate3_oos": 0.316,
+      "gate2_is": 0.218,
+      "gate2_oos": 0.315
+    },
+    "note": "PARTIAL_CONFIRMATION via REST-006. USDJPY MVD=-1 vs +1: delta=+0.406, p=0.0117 (significant). USDCAD: delta=+0.184, p=0.175 (not significant). Combined USDJPY+USDCAD full-period: p=0.012. OOS test underpowered (n=15 MVD=-1 OOS trades, p=0.21). 2024 HURTS with this filter: MVD=-1 Sharpe=-0.115 vs baseline 0.091. Adding to 3-gate stack: OOS unchanged (0.315\u21920.316). DO NOT implement as hard gate. Consider USDJPY-only size modifier. USDCAD needs 2026+ live data for confirmation."
+  },
+  {
+    "id": "HYP-056",
+    "title": "Counter-momentum entry: trade against 63d price trend for better timing",
+    "status": "CANDIDATE",
+    "created_date": "2026-06-07",
+    "origin": "REST-006",
+    "description": "Counter-momentum entries (where price has NOT moved in the macro signal direction over 63d) outperform momentum-aligned entries. Full period: counter Sharpe=0.163 vs aligned=0.088 (p=0.185). OOS: counter=0.343 vs aligned=0.044 (p=0.039 \u2014 significant). Per-pair: EURUSD p=0.037 (significant), USDCAD p=0.128, USDJPY REVERSED (aligned better, p=0.877). Combined with 2-gate stack (widening + rate level): OOS 0.315\u21920.499 with momentum-counter filter. IS=0.272 < OOS=0.499: no overfit. 2024: 0.001\u21920.233 (doesn't hurt problem year). Permutation within 2-gate universe: p=0.065 (marginal). OOS permutation: p=0.101 (underpowered, n=21).",
+    "test_needed": "Additional 2025-2026 live trades needed for statistical confirmation. Near-term: add momentum_63d logging to decision_logger for EURUSD trades so live validation begins.",
+    "priority": "MEDIUM"
+  },
+  {
+    "id": "HYP-057",
+    "title": "Sovereign Core (master-ml-archive) MoE \u2014 does it have edge?",
+    "status": "NO_EDGE",
+    "created_date": "2026-06-07",
+    "confirmed_date": "2026-06-07",
+    "origin": "sovereign-core-gauntlet",
+    "description": "Costed permutation kill-gate on the archived Sovereign Core MoE (Hurst router + XGBoost specialists). Signal-mode (models isolated from the sizing throttle = most generous test), clean frozen yfinance daily bars, 7 liquid ETFs (SPY/QQQ/IWM/DIA/XLK/XLF/XLE), in-sample 2015-2022, 1000 permutations, 30bp round-trip cost.",
+    "test_needed": "DONE \u2014 data/research/sovereign_core_gauntlet/permutation_test_sovereign.py",
+    "result": {
+      "real_sharpe": -0.183,
+      "p_value": 0.164,
+      "n_perms": 1000,
+      "router_oos_accuracy": 0.998,
+      "cold_start_trades": 0,
+      "total_trades": 512,
+      "dataset_hash": "ce8d80d3ff86be2398d4f3402f1d83bfcc01a58031da9bb7ae1a4d986d9ad9b7"
+    },
+    "note": "NO_EDGE (p=0.164) \u2014 signal indistinguishable from random entries and Sharpe-negative after costs. Router tautology confirmed (OOS 0.998 \u2014 labels derive from the hurst_short input feature; csd/hmm/adx hardcoded constants). Cold-start EV gate (Kelly/Hoeffding lower-bound, n_trades=20) blocks trade #1, so the README's '200 paper trades to go live' is unreachable. DO NOT revive. Evidence: data/research/sovereign_core_verdict.md; harness: data/research/sovereign_core_gauntlet/."
   }
 ]

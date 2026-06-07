@@ -1,0 +1,317 @@
+{
+  "generated_at": "2026-06-07T16:07:44.954727+00:00",
+  "id": "OVERNIGHT-CARRY-DIVERSIFICATION-ROBUSTNESS",
+  "method": {
+    "bootstrap": "moving-block (block=5d), 10000 resamples, seed=7",
+    "tests": "per-cut block-bootstrap 95% CI; crisis-vs-calm bootstrap-diff CI + one-sided Fisher-z; BH across crisis windows",
+    "carry_proxy": "DBV (G10 carry ETF, ends 2023-03)",
+    "couples_rule": "crisis rho must be sig>0 (BH<0.05) AND sig>calm (diff CI excl 0 + Fisher p<0.05)"
+  },
+  "data_dates": {
+    "overnight": [
+      "1999-03-11",
+      "2026-06-05"
+    ],
+    "carry_dbv": [
+      "2008-01-03",
+      "2023-03-16"
+    ]
+  },
+  "long_short": {
+    "label": "long_short_overnight_minus_intraday",
+    "full_sample": {
+      "rho": 0.014,
+      "n": 3827,
+      "ci95_block": [
+        -0.045,
+        0.074
+      ],
+      "excludes_zero": false,
+      "ci95_iid": [
+        -0.044,
+        0.074
+      ],
+      "fisher_p": 0.3826
+    },
+    "crises": {
+      "GFC_2008": {
+        "rho": -0.023,
+        "n": 210,
+        "ci95_block": [
+          -0.237,
+          0.16
+        ],
+        "excludes_zero": false,
+        "ci95_iid": [
+          -0.206,
+          0.145
+        ],
+        "fisher_p": 0.7357
+      },
+      "COVID_2020": {
+        "rho": 0.416,
+        "n": 50,
+        "ci95_block": [
+          0.112,
+          0.631
+        ],
+        "excludes_zero": true,
+        "ci95_iid": [
+          0.029,
+          0.689
+        ],
+        "fisher_p": 0.0024
+      },
+      "RATE_SHOCK_2022": {
+        "rho": -0.152,
+        "n": 251,
+        "ci95_block": [
+          -0.257,
+          -0.042
+        ],
+        "excludes_zero": true,
+        "ci95_iid": [
+          -0.264,
+          -0.036
+        ],
+        "fisher_p": 0.0158
+      }
+    },
+    "vix_gt30": {
+      "rho": 0.042,
+      "n": 431,
+      "ci95_block": [
+        -0.099,
+        0.171
+      ],
+      "excludes_zero": false,
+      "ci95_iid": [
+        -0.09,
+        0.165
+      ],
+      "fisher_p": 0.3801
+    },
+    "calm_vix_le30": {
+      "rho": -0.006,
+      "n": 3396,
+      "ci95_block": [
+        -0.045,
+        0.032
+      ],
+      "excludes_zero": false,
+      "ci95_iid": [
+        -0.045,
+        0.031
+      ],
+      "fisher_p": 0.7065
+    },
+    "crisis_vs_calm": {
+      "GFC_2008": {
+        "boot": {
+          "point": -0.028,
+          "ci95": [
+            -0.237,
+            0.168
+          ],
+          "excludes_zero": false
+        },
+        "fisher_p_crisis_gt_calm": 0.5938
+      },
+      "COVID_2020": {
+        "boot": {
+          "point": 0.411,
+          "ci95": [
+            0.112,
+            0.634
+          ],
+          "excludes_zero": true
+        },
+        "fisher_p_crisis_gt_calm": 0.0011
+      },
+      "RATE_SHOCK_2022": {
+        "boot": {
+          "point": -0.145,
+          "ci95": [
+            -0.257,
+            -0.03
+          ],
+          "excludes_zero": true
+        },
+        "fisher_p_crisis_gt_calm": 0.9871
+      },
+      "VIX_gt30": {
+        "boot": {
+          "point": 0.046,
+          "ci95": [
+            -0.101,
+            0.181
+          ],
+          "excludes_zero": false
+        },
+        "fisher_p_crisis_gt_calm": 0.1702
+      }
+    },
+    "bh_adjusted_crisis_p": {
+      "GFC_2008": 0.7357,
+      "RATE_SHOCK_2022": 0.0237,
+      "COVID_2020": 0.0072
+    },
+    "verdict": "ROBUST_CRISIS_COUPLING"
+  },
+  "long_only": {
+    "label": "long_only_overnight",
+    "full_sample": {
+      "rho": 0.361,
+      "n": 3827,
+      "ci95_block": [
+        0.307,
+        0.413
+      ],
+      "excludes_zero": true,
+      "ci95_iid": [
+        0.312,
+        0.409
+      ],
+      "fisher_p": 0.0
+    },
+    "crises": {
+      "GFC_2008": {
+        "rho": 0.568,
+        "n": 210,
+        "ci95_block": [
+          0.43,
+          0.663
+        ],
+        "excludes_zero": true,
+        "ci95_iid": [
+          0.452,
+          0.659
+        ],
+        "fisher_p": 0.0
+      },
+      "COVID_2020": {
+        "rho": 0.464,
+        "n": 50,
+        "ci95_block": [
+          0.345,
+          0.676
+        ],
+        "excludes_zero": true,
+        "ci95_iid": [
+          0.224,
+          0.661
+        ],
+        "fisher_p": 0.0006
+      },
+      "RATE_SHOCK_2022": {
+        "rho": -0.027,
+        "n": 251,
+        "ci95_block": [
+          -0.141,
+          0.105
+        ],
+        "excludes_zero": false,
+        "ci95_iid": [
+          -0.16,
+          0.102
+        ],
+        "fisher_p": 0.6704
+      }
+    },
+    "vix_gt30": {
+      "rho": 0.458,
+      "n": 431,
+      "ci95_block": [
+        0.38,
+        0.552
+      ],
+      "excludes_zero": true,
+      "ci95_iid": [
+        0.367,
+        0.548
+      ],
+      "fisher_p": 0.0
+    },
+    "calm_vix_le30": {
+      "rho": 0.277,
+      "n": 3396,
+      "ci95_block": [
+        0.234,
+        0.318
+      ],
+      "excludes_zero": true,
+      "ci95_iid": [
+        0.238,
+        0.317
+      ],
+      "fisher_p": 0.0
+    },
+    "crisis_vs_calm": {
+      "GFC_2008": {
+        "boot": {
+          "point": 0.283,
+          "ci95": [
+            0.146,
+            0.395
+          ],
+          "excludes_zero": true
+        },
+        "fisher_p_crisis_gt_calm": 0.0
+      },
+      "COVID_2020": {
+        "boot": {
+          "point": 0.205,
+          "ci95": [
+            0.061,
+            0.403
+          ],
+          "excludes_zero": true
+        },
+        "fisher_p_crisis_gt_calm": 0.0687
+      },
+      "RATE_SHOCK_2022": {
+        "boot": {
+          "point": -0.297,
+          "ci95": [
+            -0.424,
+            -0.164
+          ],
+          "excludes_zero": true
+        },
+        "fisher_p_crisis_gt_calm": 1.0
+      },
+      "VIX_gt30": {
+        "boot": {
+          "point": 0.189,
+          "ci95": [
+            0.093,
+            0.285
+          ],
+          "excludes_zero": true
+        },
+        "fisher_p_crisis_gt_calm": 0.0
+      }
+    },
+    "bh_adjusted_crisis_p": {
+      "RATE_SHOCK_2022": 0.6704,
+      "COVID_2020": 0.0009,
+      "GFC_2008": 0.0
+    },
+    "verdict": "ROBUST_CRISIS_COUPLING"
+  },
+  "sanity_shuffled_full_ci": {
+    "rho": 0.005,
+    "n": 3827,
+    "ci95_block": [
+      -0.026,
+      0.035
+    ],
+    "excludes_zero": false,
+    "ci95_iid": [
+      -0.025,
+      0.036
+    ],
+    "fisher_p": 0.7464
+  },
+  "recommendation": "CONFIRM the kill: the market-neutral long-short robustly couples with carry in crisis (crisis rho sig > 0 AND sig > calm). Not a crisis-independent second edge. Verdict hardened with bootstrap CIs."
+}
