@@ -760,8 +760,9 @@ class Handler(BaseHTTPRequestHandler):
 
 
 if __name__ == '__main__':
-    port = 8765
-    print(f'Live Signals Server → http://localhost:{port}')
-    print('Open frontend/live_signals.html in your browser.')
+    # PORT from env for cloud hosts (Render/Fly); defaults to 8765 locally.
+    port = int(os.environ.get('PORT', 8765))
+    print(f'Live Signals Server → http://0.0.0.0:{port}')
+    print('Open the dashboard at http://localhost:%d/ (serves index.html + live data).' % port)
     print('Ctrl+C to stop.\n')
-    HTTPServer(('', port), Handler).serve_forever()
+    HTTPServer(('0.0.0.0', port), Handler).serve_forever()
