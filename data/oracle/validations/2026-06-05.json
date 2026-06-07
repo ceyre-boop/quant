@@ -1,0 +1,9 @@
+{
+  "date": "2026-06-05",
+  "generated_at": "2026-06-05T06:31:41.361041+00:00",
+  "candidate_lesson": "When the 30-indicator consensus shows conv=100% LONG but green_matches=0 and hist_hr=0%, the signal is a structurally unbacked extreme \u2014 do not size up on consensus conviction without historical pattern confirmation.",
+  "testable_rule": "if consensus_conviction >= 0.90 and green_matches == 0 and hist_hr <= 0.10: size_multiplier *= 0.5  # untested extreme, halve exposure",
+  "verdict": "REJECTED",
+  "reason": "Rule filters only 0 trades \u2014 insufficient sample",
+  "trades_available": 1160
+}

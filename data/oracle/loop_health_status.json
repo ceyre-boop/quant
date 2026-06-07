@@ -1,43 +1,50 @@
 {
-  "checked_at": "2026-06-01T03:31:17.136145+00:00",
-  "market_hours": true,
+  "checked_at": "2026-06-07T16:13:32.081859+00:00",
+  "market_hours": false,
+  "frozen": null,
   "down": [
-    "pulse_check",
-    "decision_backfill"
+    "morning_briefing"
   ],
   "loops": {
     "ict_scanner": {
       "status": "ALIVE",
-      "last": "2026-06-01T03:31:17.108664+00:00",
-      "silence_hours": 0.0,
+      "last": "2026-06-07T16:08:47.435157+00:00",
+      "silence_hours": 0.1,
       "threshold": 0.5,
       "kind": "periodic"
     },
-    "forex_scanner": {
-      "status": "NO_DATA",
-      "last": null,
-      "silence_hours": null,
+    "forex_scan": {
+      "status": "ALIVE",
+      "last": "2026-06-05T12:11:13.332335+00:00",
+      "silence_hours": 52.0,
       "threshold": 30,
       "kind": "periodic"
     },
     "pulse_check": {
-      "status": "DOWN",
-      "last": "2026-05-31T05:55:56+00:00",
-      "silence_hours": 21.6,
+      "status": "ALIVE",
+      "last": "2026-06-07T16:13:32+00:00",
+      "silence_hours": 0.0,
       "threshold": 3,
       "kind": "periodic"
     },
     "decision_backfill": {
-      "status": "DOWN",
-      "last": "2026-05-31T05:55:56+00:00",
-      "silence_hours": 21.6,
+      "status": "ALIVE",
+      "last": "2026-06-07T16:13:32+00:00",
+      "silence_hours": 0.0,
       "threshold": 3,
       "kind": "periodic"
     },
     "oracle_reflection": {
       "status": "ALIVE",
-      "last": "2026-05-31T06:03:21.388322+00:00",
-      "silence_hours": 21.5,
+      "last": "2026-06-07T06:30:06.261755+00:00",
+      "silence_hours": 9.7,
+      "threshold": 26,
+      "kind": "periodic"
+    },
+    "morning_briefing": {
+      "status": "DOWN",
+      "last": "2026-06-05T12:28:00.651028+00:00",
+      "silence_hours": 51.8,
       "threshold": 26,
       "kind": "periodic"
     },

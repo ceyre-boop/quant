@@ -1,0 +1,28 @@
+{
+  "last_updated": "2026-06-07T06:30:18.498496+00:00",
+  "harvest": {
+    "trades_closed": 0,
+    "win_rate": null,
+    "failure_taxonomy": {}
+  },
+  "reflection": {
+    "candidate_lesson": "When the 30-indicator consensus shows conv=100% but green_matches=0 and hist_hr is 0%, the signal is structurally unvalidated and must be sized down or vetoed despite the conviction reading.",
+    "mechanism": "conv=100% measures live indicator agreement (how many of 30 point the same way right now), but green_matches=0 means no historical analog exists for this exact configuration \u2014 and hist_hr=0% confirms the few analogs that did exist lost. High live agreement with zero validated precedent is the signature of a crowded directional read into a catalyst (NFP morning), where institutional flow reverses on the print. EURUSD (conv 100% SHORT, hist_hr 0%) and USDJPY (conv 100% LONG, hist_hr 0%) are exactly this trap; GBPUSD (conv 100%, hist_hr 67%) and AUDUSD (conv 100%, hist_hr 72%) are validated and tradeable.",
+    "testable_rule": "if consensus_conviction >= 1.0 and green_matches == 0 and hist_hr < 0.40: size *= 0.0  # veto. elif consensus_conviction >= 1.0 and hist_hr >= 0.60: size *= 1.0  # full"
+  },
+  "validation": {
+    "verdict": "REJECTED",
+    "reason": "Rule filters only 0 trades \u2014 insufficient sample"
+  },
+  "wisdom": {
+    "active_lesson_count": null,
+    "last_codified": null,
+    "codify_status": "SKIPPED",
+    "codify_error": null
+  },
+  "cycle": {
+    "cost_usd": 0.14676,
+    "status": "COMPLETE",
+    "date": "2026-06-07"
+  }
+}

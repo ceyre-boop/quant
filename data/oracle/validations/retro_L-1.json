@@ -1,0 +1,23 @@
+{
+  "lesson_id": "L-1",
+  "lesson_num": 1,
+  "lesson_name": "The Exact Setup Exists",
+  "date": "2026-05-27",
+  "generated_at": "2026-05-27T14:18:50.449306+00:00",
+  "testability": "PARTIAL",
+  "testability_note": "commitment_score absent from forensics; tests session+grade gate only",
+  "testable_rule": "system == 'ICT' and session == 'London' and grade == 'A'",
+  "verdict": "REJECTED",
+  "status": "REJECTED",
+  "trades_tested": 812,
+  "trades_filtered": 79,
+  "baseline_sharpe": 0.1115,
+  "training_sharpe": 0.2358,
+  "test_a_delta_sharpe": 0.1243,
+  "test_a_passed": true,
+  "test_b_p_value": 0.241326,
+  "test_b_passed": false,
+  "test_c_replication_ratio": 2.6395,
+  "test_c_holdout_sharpe": 0.4844,
+  "test_c_passed": true
+}

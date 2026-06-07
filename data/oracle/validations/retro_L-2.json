@@ -1,0 +1,23 @@
+{
+  "lesson_id": "L-2",
+  "lesson_num": 2,
+  "lesson_name": "NY_PM Is Anti-Edge",
+  "date": "2026-05-27",
+  "generated_at": "2026-05-27T14:18:50.477709+00:00",
+  "testability": "FULL",
+  "testability_note": "Non-NY_PM trades should outperform the full mix (removal benefit test)",
+  "testable_rule": "session != 'NY_PM'",
+  "verdict": "REJECTED",
+  "status": "LOW_CONFIDENCE",
+  "trades_tested": 812,
+  "trades_filtered": 718,
+  "baseline_sharpe": 0.1115,
+  "training_sharpe": 0.1429,
+  "test_a_delta_sharpe": 0.0314,
+  "test_a_passed": false,
+  "test_b_p_value": 2.5e-05,
+  "test_b_passed": true,
+  "test_c_replication_ratio": 1.3539,
+  "test_c_holdout_sharpe": 0.1988,
+  "test_c_passed": true
+}

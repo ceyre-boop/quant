@@ -1,0 +1,97 @@
+{
+  "date": "2026-06-04",
+  "generated_at": "2026-06-05T03:38:27.352573+00:00",
+  "meta_regime": "BREADTH",
+  "regime_read": "ES & NQ moving together \u2014 broad agreement, more DURABLE directional signal. Trust the direction more.",
+  "narrative": "PRE-US-OPEN BRIEFING \u2014 ES/NQ (research only; no execution path on this pair). As of 2026-06-05 ~03:38 UTC.\n\n1) RECENT MOVE-BY-MOVE READ\nNQ is the laggard overnight: it's down ~1.41% on the day and trading at 30,201, well below its prior-day low (30,478) and its session VWAP (30,372). ES is far more contained, off just ~0.15% at 7,560 and also below its VWAP (7,576) but holding well inside its prior-day range. So the tape is tech-led weakness \u2014 the Nasdaq complex is doing the heavy lifting to the downside while the broad index drifts. Likely catalysts: the news set is dominated by GEOPOLITICS (US-Iran talks stalling, House votes to curb Iran action, Russia oil/gas revenue) and a cluster of AI_CAPEX / TECH hardware headlines (COMPUTEX, RTX, AI mini-PCs). None of these is a clean, market-moving macro driver; they read as noise plus a risk-off geopolitical tint. The bigger gravitational pull is the calendar: Nonfarm Payrolls is ~1 day out, so overnight de-risking and tech-led softness ahead of an 8:30 ET high-impact print is the most parsimonious explanation. RSI is neutral on both (ES 53.8, NQ 58.2) \u2014 this is consolidation/de-risking, not a trend break. Both remain structurally well above their 200-day SMAs (ES +9.9%, NQ +17.8%), so the larger uptrend is intact; this is a pullback within an uptrend, not a regime change.\n\n2) VOLUME-PROFILE READ (where volume traded \u2014 NOT order-flow delta; true buy/sell aggression needs a CME order-flow feed)\nES: 5-day POC at 7,624 with a value area of 7,572\u20137,627. Price at 7,560 is sitting just BELOW value-area-low \u2014 a slight rejection lower, but the high-volume nodes (7,624 / 7,606 / 7,602 / 7,589 / 7,584) form a thick acceptance shelf overhead. ES is leaning on the lower edge of its accepted range. Line in the sand for ES: reclaim 7,572 (VAL) to argue the dip is being bought; stay below and 7,542 (prior-day low) is the next test.\nNQ: 5-day POC at 30,569 with a value area of 30,319\u201330,712. Price at 30,201 has traded clean BELOW value-area-low (30,319) \u2014 a more decisive rejection than ES. The high-volume acceptance is stacked far overhead (30,569 / 30,676 / 30,640 / 30,587 / 30,551). NQ is the weak link, having fallen out of its 5-day value area. Line in the sand for NQ: 30,319 (VAL). Below it, sellers retain control and the 5-day balance is broken to the downside; a reclaim back above 30,319 would signal the breakdown is being rejected.\n\n3) NQ/ES LEAD-LAG REGIME \u2014 BREADTH\nContemporaneous correlation is high at 0.85\u20130.87, the cross-correlogram peaks cleanly at lag 0 (0.867) with all other lags near zero, best non-zero lag is a trivial 0.035, and leader = NONE. Divergence flag is FALSE. This is a clean BREADTH regime: ES and NQ are moving together, no instrument is reliably front-running the other, and direction is more durable / more trustworthy than in a concentration tape. Implication: when these two agree on a move, trust the DIRECTION more \u2014 but note the nuance that today NQ is leading lower on magnitude (down 1.4% vs ES 0.15%) even though the lead-lag stats say no structural leader. That's a magnitude divergence inside a correlation-agreement regime: broad direction is soft-negative, with tech doing the dirtying. Regime is an INPUT, not an edge.\n\n4) EVENT-CALENDAR AWARENESS\nNonfarm Payrolls is ~1 day out (2026-06-05, 8:30 ET, high-impact) \u2014 though this is a CADENCE ESTIMATE, not a verified release date, so treat with caution. This dominates sizing: widen stops / size down into the window, and do not chase the overnight tech weakness as if it's a clean directional signal when an 8:30 print can reprice everything. Beyond NFP: CPI ~8 days out (6/12) and FOMC ~13 days out (6/17) \u2014 both reduce-size events as they approach. The whole 21-day horizon is event-heavy; this argues for smaller size and quicker reads throughout.\n\n5) SYNTHESIS \u2014 META-REGIME + NARROWED BIAS\nMeta-regime: pullback-within-an-uptrend, BREADTH correlation, tech-led softness, into a high-impact NFP that's roughly a day out. The structural trend (well above 200-DMA) is up; the short-term tape is de-risking. These pull in opposite directions, which is exactly why confidence must stay LOW. NQ has broken below its 5-day value area (bearish short-term tell) while ES is merely leaning on its VAL \u2014 so the immediate momentum is soft-negative, but it's the kind of weakness that often resolves AT or AFTER the NFP print, not before. I will not manufacture certainty here.\nBias: NEUTRAL-to-cautiously-short-the-momentum, ~42% conviction. The cleaner actionable read: NQ is below value (30,319) and below VWAP (30,372) \u2014 as long as it stays under 30,319 the short-term lean is lower; a reclaim of 30,319 invalidates the bearish tilt and flips this back toward dip-buying given the intact larger uptrend. INVALIDATION (NQ): a sustained reclaim above 30,319 (VAL) neutralizes/reverses the short-side lean. Confidence is deliberately capped because (a) the news is geopolitical noise rather than a clean catalyst, (b) lead-lag shows NO leader so there's no asymmetric edge to exploit, and (c) NFP within ~24h makes any pre-print positioning low-quality. Size down, widen stops, let the print clear.\nHONESTY NOTE: This briefing is INTELLIGENCE, not a validated edge. Scorecard is n=1 (hit 1.0) \u2014 statistically meaningless; this engine is still CALIBRATING and needs ~30\u201360 samples before any hit-rate means anything. Calendar dates are cadence estimates, not verified. Treat accordingly.",
+  "directional_bias": "NEUTRAL",
+  "confidence": 42,
+  "regime_call": "BREADTH",
+  "key_level": 30319,
+  "synthesis_source": "claude-opus-4-8",
+  "lead_lag": {
+    "regime": "BREADTH",
+    "spread_avg": 0.00141,
+    "leader": "NONE",
+    "corr": 0.85,
+    "divergence": false
+  },
+  "volume_profile": {
+    "ES=F": {
+      "symbol": "ES=F",
+      "as_of": "2026-06-05T03:37:51.938989+00:00",
+      "days": 5,
+      "bins": 40,
+      "poc": 7624.08,
+      "value_area_low": 7571.58,
+      "value_area_high": 7626.58,
+      "high_volume_nodes": [
+        7624.08,
+        7589.08,
+        7584.08,
+        7606.58,
+        7601.58
+      ],
+      "price_range": [
+        7530.33,
+        7630.33
+      ],
+      "limitation": "Volume profile = WHERE volume traded (volume-at-price). NOT order-flow delta (buy/sell aggression). True delta needs a CME order-flow feed (Databento/CQG)."
+    },
+    "NQ=F": {
+      "symbol": "NQ=F",
+      "as_of": "2026-06-05T03:37:51.980309+00:00",
+      "days": 5,
+      "bins": 40,
+      "poc": 30569.01,
+      "value_area_low": 30319.17,
+      "value_area_high": 30711.78,
+      "high_volume_nodes": [
+        30569.01,
+        30676.09,
+        30640.39,
+        30586.86,
+        30551.16
+      ],
+      "price_range": [
+        30078.25,
+        30792.08
+      ],
+      "limitation": "Volume profile = WHERE volume traded (volume-at-price). NOT order-flow delta (buy/sell aggression). True delta needs a CME order-flow feed (Databento/CQG)."
+    }
+  },
+  "news_count": 14,
+  "event_calendar": [
+    {
+      "event": "Nonfarm Payrolls",
+      "date": "2026-06-05",
+      "source": "cadence_estimate",
+      "action": "high-impact 8:30 ET \u2014 widen stops / size down",
+      "days_until": 1,
+      "note": "in 1d \u2014 high-impact 8:30 ET \u2014 widen stops / size down"
+    },
+    {
+      "event": "CPI",
+      "date": "2026-06-12",
+      "source": "cadence_estimate",
+      "action": "inflation print 8:30 ET \u2014 reduce size into window",
+      "days_until": 8,
+      "note": "in 8d \u2014 inflation print 8:30 ET \u2014 reduce size into window"
+    },
+    {
+      "event": "FOMC meeting",
+      "date": "2026-06-17",
+      "source": "seed",
+      "action": "reduce size / widen stops into the window",
+      "days_until": 13,
+      "note": "in 13d \u2014 reduce size / widen stops into the window"
+    }
+  ],
+  "scorecard_summary": "Briefing scorecard: n=1 dir-calls, hit 1.0, regime acc 1.0 \u2014 CALIBRATING \u2014 need ~30-60 samples before the hit-rate/calibration mean anything",
+  "bias": "size to regime: trust direction more in BREADTH, less in CONCENTRATION; ROTATION_WARN = treat tech-led longs as suspect",
+  "provenance": {
+    "source": "oracle_morning_briefing",
+    "verified": false,
+    "note": "Analyst/Oracle journal \u2014 qualitative regime context + a self-scored directional call, NOT a verified data feed or validated edge. Numbers here are never ingested as trading inputs."
+  }
+}

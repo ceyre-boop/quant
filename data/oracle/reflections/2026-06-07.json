@@ -1,0 +1,26 @@
+{
+  "date": "2026-06-07",
+  "generated_at": "2026-06-07T06:30:18.485290+00:00",
+  "input_tokens": 5439,
+  "output_tokens": 869,
+  "estimated_cost_usd": 0.14676,
+  "harvest_days_read": 6,
+  "reflection": {
+    "candidate_lesson": {
+      "lesson_text": "When the 30-indicator consensus shows conv=100% but green_matches=0 and hist_hr is 0%, the signal is structurally unvalidated and must be sized down or vetoed despite the conviction reading.",
+      "mechanism": "conv=100% measures live indicator agreement (how many of 30 point the same way right now), but green_matches=0 means no historical analog exists for this exact configuration \u2014 and hist_hr=0% confirms the few analogs that did exist lost. High live agreement with zero validated precedent is the signature of a crowded directional read into a catalyst (NFP morning), where institutional flow reverses on the print. EURUSD (conv 100% SHORT, hist_hr 0%) and USDJPY (conv 100% LONG, hist_hr 0%) are exactly this trap; GBPUSD (conv 100%, hist_hr 67%) and AUDUSD (conv 100%, hist_hr 72%) are validated and tradeable.",
+      "testable_rule": "if consensus_conviction >= 1.0 and green_matches == 0 and hist_hr < 0.40: size *= 0.0  # veto. elif consensus_conviction >= 1.0 and hist_hr >= 0.60: size *= 1.0  # full",
+      "expected_impact": "Win rate +3-5% and drawdown reduction by filtering EURUSD/USDJPY-type zero-precedent signals; contributes toward Sharpe gap by removing negative-expectancy fills (target +0.02-0.03 Sharpe).",
+      "evidence_from_harvest": "Live consensus snapshot shows EURUSD SHORT and USDJPY LONG both at conv=100% but green_matches=0 and hist_hr=0%, while GBPUSD (hist_hr=67%) and AUDUSD (hist_hr=72%) at identical conviction have strong historical hit rates \u2014 conviction alone does not separate winners from losers; hist_hr does.",
+      "evidence_from_reasoning": null,
+      "reasoning_component_targeted": "consensus_conviction / hist_hr / green_matches",
+      "sample_needed": 30
+    },
+    "retirement_flag": {
+      "lesson_to_review": null,
+      "reason": null
+    },
+    "system_health_note": "Zero trades in last 7 days with Regime=UNKNOWN and an NFP print at days_until=0 \u2014 the system is correctly in a low-conviction hold; no decision logs exist yet so this lesson is harvest/consensus-grounded only."
+  },
+  "auto_validation": null
+}

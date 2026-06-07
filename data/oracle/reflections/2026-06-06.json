@@ -1,0 +1,26 @@
+{
+  "date": "2026-06-06",
+  "generated_at": "2026-06-06T06:39:57.945538+00:00",
+  "input_tokens": 5394,
+  "output_tokens": 782,
+  "estimated_cost_usd": 0.13956,
+  "harvest_days_read": 5,
+  "reflection": {
+    "candidate_lesson": {
+      "lesson_text": "When the 30-indicator consensus shows max conviction (100%) but green_matches=0 against historical memory, treat the signal as UNCONFIRMED and apply a sizing penalty \u2014 current-state extremity without historical analog is regime novelty, not edge.",
+      "mechanism": "A 100% conviction reading with zero green_matches means the live indicator configuration has no precedent in the historical memory bank. Institutional flow that produces durable moves leaves repeatable fingerprints; a configuration with no historical match is more likely a transient liquidity dislocation (e.g. NFP-morning de-risking) than a structurally-backed trend. The conviction number measures internal agreement, NOT out-of-sample reliability \u2014 these are orthogonal, and conflating them violates Tenet 3 (systems must know when unreliable).",
+      "testable_rule": "if consensus_conviction >= 1.0 and green_matches == 0: size *= 0.5  # unconfirmed extremity; require hist_hr >= 0.60 for full size",
+      "expected_impact": "Reduces drawdown from false-confidence entries; targets Sharpe +0.02-0.03 by filtering the EURUSD/USDJPY-type signals where conv=100% but hist_hr=0%.",
+      "evidence_from_harvest": "Live consensus shows GBPUSD/EURUSD/USDJPY/AUDUSD all at conv=100% with green_matches=0; EURUSD hist_hr=0% and USDJPY hist_hr=0% despite max conviction, while GBPUSD (hist_hr=67%) and AUDUSD (hist_hr=72%) carry real historical support. Conviction alone does not separate the 0% from the 72% buckets.",
+      "evidence_from_reasoning": null,
+      "reasoning_component_targeted": "consensus_conviction / green_matches / hist_hr",
+      "sample_needed": 30
+    },
+    "retirement_flag": {
+      "lesson_to_review": null,
+      "reason": null
+    },
+    "system_health_note": "Zero trades in 7 days with Regime=UNKNOWN and TradingView providing 0 signals \u2014 system is in a low-confidence calibrating state on NFP morning, correctly sizing down to 75%."
+  },
+  "auto_validation": null
+}

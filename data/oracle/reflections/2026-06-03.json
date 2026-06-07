@@ -1,0 +1,26 @@
+{
+  "date": "2026-06-03",
+  "generated_at": "2026-06-03T06:30:19.117108+00:00",
+  "input_tokens": 5256,
+  "output_tokens": 909,
+  "estimated_cost_usd": 0.147015,
+  "harvest_days_read": 2,
+  "reflection": {
+    "candidate_lesson": {
+      "lesson_text": "When the 30-indicator consensus shows conviction=100% but green_matches=0 and hist_hr=0%, the live signal has NO validated historical analog and must be sized down or vetoed despite apparent strength.",
+      "mechanism": "A 12/30 unanimous-bull reading on USDJPY (conv=100%) with zero historical green_matches means the indicator pattern has never co-occurred with a winning outcome in the memory bank \u2014 it is an out-of-distribution configuration, not a high-confidence one. Institutional flow that produces clean unanimity at safe-haven pairs near multi-year highs (USDJPY 159.9) is typically late-stage momentum chasing, exactly what L8 warns about, and the absence of any historical match means we are extrapolating, not pattern-matching.",
+      "testable_rule": "if consensus_conviction >= 0.90 and green_matches == 0 and hist_hr == 0.0: size *= 0.5  # OOD unanimity, no validated analog",
+      "expected_impact": "Win rate +2-4% by filtering OOD high-conviction traps; drawdown reduction on safe-haven late-momentum entries; modest Sharpe contribution via variance reduction on the worst tail trades.",
+      "evidence_from_harvest": "Current consensus shows USDJPY dir=LONG conv=100% but green_matches=0 hist_hr=0%; EURUSD dir=SHORT conv=58% green_matches=0 hist_hr=0% \u2014 every pair currently has green_matches=0, indicating the live regime has no historical winning analog, a clear UNRELIABLE-state signal under Tenet 3.",
+      "evidence_from_reasoning": null,
+      "reasoning_component_targeted": "consensus_conviction / green_matches / hist_hr",
+      "sample_needed": 30
+    },
+    "retirement_flag": {
+      "lesson_to_review": "L8",
+      "reason": "L8 tightens the USDJPY/AUDNZD VIX gate assuming a bull-market safe-haven dynamic; with regime=UNKNOWN/MOMENTUM and USDJPY at 159.9 unanimous-bull but zero historical match, the VIX-only gate may no longer capture the actual late-momentum risk \u2014 worth confirming the gate still fires correctly in this regime."
+    },
+    "system_health_note": "System is in a no-validated-analog state (all pairs green_matches=0, regime UNKNOWN, 0 trades in 7d, TV confirmation absent at 75% sizing) \u2014 appropriate posture is reduced size and harvest-based learning, not new directional conviction."
+  },
+  "auto_validation": null
+}

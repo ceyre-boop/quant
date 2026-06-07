@@ -1,0 +1,23 @@
+{
+  "lesson_id": "L-3",
+  "lesson_num": 3,
+  "lesson_name": "Grade Labels Invert Quality",
+  "date": "2026-05-27",
+  "generated_at": "2026-05-27T14:18:50.489221+00:00",
+  "testability": "FULL",
+  "testability_note": "Grade A ICT trades vs all ICT (A + A+ mix); A should outperform",
+  "testable_rule": "system == 'ICT' and grade == 'A'",
+  "verdict": "REJECTED",
+  "status": "LOW_CONFIDENCE",
+  "trades_tested": 812,
+  "trades_filtered": 153,
+  "baseline_sharpe": 0.1115,
+  "training_sharpe": 0.1146,
+  "test_a_delta_sharpe": 0.0031,
+  "test_a_passed": false,
+  "test_b_p_value": 0.83979,
+  "test_b_passed": false,
+  "test_c_replication_ratio": 30.5936,
+  "test_c_holdout_sharpe": 0.2512,
+  "test_c_passed": true
+}

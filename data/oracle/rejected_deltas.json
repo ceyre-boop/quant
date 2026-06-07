@@ -12,6 +12,32 @@
       "status": "REJECTED",
       "p_value": 0.5,
       "date": "2026-05-31"
+    },
+    {
+      "id": "FACT-00001",
+      "subsystem": "ict",
+      "param_delta": {
+        "weights": {
+          "sweep": 3.5
+        }
+      },
+      "status": "REJECTED",
+      "p_value": 0.2782,
+      "date": "2026-06-01"
+    },
+    {
+      "id": "SEED_SEED-FX-CARRY-001",
+      "subsystem": "forex",
+      "param_delta": {
+        "signal_weights": {
+          "irp_weight": 0.0,
+          "rate_weight": 1.0,
+          "use_momentum_filter": false
+        }
+      },
+      "status": "REJECTED",
+      "p_value": 0.539,
+      "date": "2026-06-01"
     }
   ]
 }

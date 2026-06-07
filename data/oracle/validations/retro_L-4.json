@@ -1,0 +1,23 @@
+{
+  "lesson_id": "L-4",
+  "lesson_num": 4,
+  "lesson_name": "pd_alignment Anti-Signal",
+  "date": "2026-05-27",
+  "generated_at": "2026-05-27T14:18:50.501393+00:00",
+  "testability": "FULL",
+  "testability_note": "pd_align read from features{}; pd_align=0 trades should outperform",
+  "testable_rule": "system == 'ICT' and pd_align == 0.0",
+  "verdict": "REJECTED",
+  "status": "SUSPENDED",
+  "trades_tested": 812,
+  "trades_filtered": 162,
+  "baseline_sharpe": 0.1115,
+  "training_sharpe": 0.0772,
+  "test_a_delta_sharpe": -0.0343,
+  "test_a_passed": false,
+  "test_b_p_value": 0.831798,
+  "test_b_passed": false,
+  "test_c_replication_ratio": 0.0,
+  "test_c_holdout_sharpe": 0.1858,
+  "test_c_passed": false
+}
