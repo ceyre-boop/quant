@@ -70,7 +70,16 @@ def main() -> None:
         sys.exit(1)
 
     ledger = json.loads(LEDGER_PATH.read_text())
-    hypotheses = ledger.get("hypotheses", [])
+    # Accept both the {"hypotheses": [...]} wrapper and a flat list ledger.
+    # `ledger` stays the raw container so the write-back below preserves the
+    # original on-disk format (entries are mutated in place either way).
+    if isinstance(ledger, dict):
+        hypotheses = ledger.get("hypotheses", [])
+    elif isinstance(ledger, list):
+        hypotheses = ledger
+    else:
+        print(f"ERROR: unexpected ledger format: {type(ledger).__name__}")
+        sys.exit(1)
 
     counts = {
         "HAS_OOS_PVALUE": [],
