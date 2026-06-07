@@ -202,7 +202,7 @@
     "observed_overnight_minus_intraday_bp": 5.406,
     "p_value": 0.004899510048995101
   },
-  "caveat": "QQQ tests the PHENOMENON on the Nasdaq source. NOT yet a tradeable NQ strategy \u2014 live capture needs a CME futures feed + broker, and futures' 24h Globex structure may weaken the RTH overnight gap. A VALID_EDGE here is a candidate second edge that must clear its own execution validation downstream.",
+  "caveat": "QQQ tests the PHENOMENON on the Nasdaq source. NOT yet a tradeable NQ strategy \u2014 live capture needs a CME futures feed + broker, and futures' 24h Globex structure may weaken the RTH overnight gap. A VALID_EDGE here is a candidate second edge that must clear its own execution validation downstream.\n\nDeployment-feed warning (added 2026-06-07): Alpaca's free IEX feed returns gappy/truncated history (SPY only from 2018-11 with ~28% of trading days missing; QQQ only from mid-2020). The overnight-QQQ edge executes via Alpaca equities \u2014 it will need a clean/paid SIP feed, not free IEX. Discovered during the Sovereign Core gauntlet (see HYP-057).",
   "meta": {
     "perms": 10000,
     "seed": 7,

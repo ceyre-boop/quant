@@ -1,0 +1,64 @@
+{
+  "created_utc": "2026-06-07T07:34:34.026987+00:00",
+  "stage": "1_permutation_kill_gate",
+  "mode": "signal",
+  "dataset_hash": "ce8d80d3ff86be2398d4f3402f1d83bfcc01a58031da9bb7ae1a4d986d9ad9b7",
+  "data_source": "yfinance (frozen)",
+  "in_sample": [
+    "2015-01-01",
+    "2022-12-31"
+  ],
+  "symbols": [
+    "SPY",
+    "QQQ",
+    "IWM",
+    "DIA",
+    "XLK",
+    "XLF",
+    "XLE"
+  ],
+  "n_perms": 1000,
+  "seed": 7,
+  "cost_roundtrip": 0.003,
+  "max_hold": 20,
+  "real_sharpe": -0.183,
+  "total_trades": 512,
+  "per_symbol": {
+    "SPY": {
+      "sharpe": -0.5368,
+      "trades": 72
+    },
+    "QQQ": {
+      "sharpe": 0.0143,
+      "trades": 70
+    },
+    "IWM": {
+      "sharpe": 0.0425,
+      "trades": 58
+    },
+    "DIA": {
+      "sharpe": 0.3083,
+      "trades": 77
+    },
+    "XLK": {
+      "sharpe": 0.0812,
+      "trades": 57
+    },
+    "XLF": {
+      "sharpe": -1.0324,
+      "trades": 78
+    },
+    "XLE": {
+      "sharpe": -0.1,
+      "trades": 100
+    }
+  },
+  "p_value": 0.16383616383616384,
+  "null_distribution": {
+    "mean": -0.4104,
+    "std": 0.2285,
+    "pct95": -0.0526,
+    "max": 0.2691
+  },
+  "verdict": "NO_EDGE (p>=0.10) \u2014 random entries match it; STOP. Gauntlet ends."
+}
