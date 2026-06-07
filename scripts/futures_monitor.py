@@ -108,6 +108,36 @@ def _check_macro(instrument: str) -> dict | None:
             "avg_conviction": round(avg_conv, 2), "dates": sorted_dates[:3]}
 
 
+def _kill_level(bias_dir: str, bias: dict, instrument: str) -> float | None:
+    """The price beyond which the bias is DEAD — the most conservative (soonest) of the rules
+    invalidation (overnight high/low) and today's oracle falsifier. SHORT dies ABOVE it; LONG
+    dies BELOW it. Returns None if no numeric level is available."""
+    if bias_dir not in ("LONG", "SHORT"):
+        return None
+    levels: list[float] = []
+    kl = bias.get("key_levels", {})
+    rules = kl.get("overnight_high") if bias_dir == "SHORT" else kl.get("overnight_low")
+    if isinstance(rules, (int, float)):
+        levels.append(float(rules))
+    oracle_path = ROOT / "data" / "futures" / "oracle_mornings.jsonl"
+    if oracle_path.exists():
+        today = _today()
+        try:
+            for line in oracle_path.read_text().splitlines():
+                if not line.strip():
+                    continue
+                r = json.loads(line)
+                if r.get("date") == today and _norm_inst(r.get("instrument", "")) == _norm_inst(instrument):
+                    inv = (r.get("key_levels") or {}).get("invalidation")
+                    if isinstance(inv, (int, float)):
+                        levels.append(float(inv))
+        except Exception:
+            pass
+    if not levels:
+        return None
+    return min(levels) if bias_dir == "SHORT" else max(levels)
+
+
 def _fetch_bars(instrument: str):
     import yfinance as yf
     import pandas as pd
@@ -556,6 +586,10 @@ def main() -> None:
     print(f"  Today's bias: {bias_dir} conviction {bias.get('conviction',0)}/3")
     if bias_dir == "NEUTRAL":
         print(f"  {Y}  NEUTRAL bias — signal detection disabled. Display-only mode.{RS}")
+    kill_level = _kill_level(bias_dir, bias, instrument)
+    if kill_level is not None:
+        side = "above" if bias_dir == "SHORT" else "below"
+        print(f"  Kill level: {bias_dir} bias dies {side} {kill_level:.2f} → auto-gates to NEUTRAL")
 
     # ── IB connection ─────────────────────────────────────────────────────────
     bridge = None
@@ -632,6 +666,7 @@ def main() -> None:
     orb_high: float | None = None
     orb_low:  float | None = None
     orb_taken: bool = False
+    bias_invalidated: bool = False
 
     try:
         while True:
@@ -653,15 +688,24 @@ def main() -> None:
                     time.sleep(5)
                     continue
 
+                # ── Falsifier gate: once price crosses the kill level, the bias is DEAD (latched) ──
+                if not bias_invalidated and kill_level is not None and bias_dir in ("LONG", "SHORT"):
+                    breached = (curr_price > kill_level) if bias_dir == "SHORT" else (curr_price < kill_level)
+                    if breached:
+                        bias_invalidated = True
+                        print(f"\n  {R}{BD}⚠ BIAS INVALIDATED — {instrument} {curr_price:.2f} crossed kill "
+                              f"{kill_level:.2f}. Gating to NEUTRAL for the session.{RS}")
+                bias_dir_eff = "NEUTRAL" if bias_invalidated else bias_dir
+
                 # ── ORB macro setup (once per session): capture range, watch for break ──
                 if orb_high is None:
                     rng = _orb_range(bars, orb_minutes)
                     if rng is not None and len(bars) >= orb_minutes:
                         orb_high, orb_low = rng
-                elif not orb_taken and bias_dir in ("LONG", "SHORT"):
+                elif not orb_taken and bias_dir_eff in ("LONG", "SHORT"):
                     orb_dir = ("LONG" if curr_price > orb_high else
                                "SHORT" if curr_price < orb_low else None)
-                    if orb_dir == bias_dir and avg_volume_20 > 0 and curr_volume >= 1.5 * avg_volume_20:
+                    if orb_dir == bias_dir_eff and avg_volume_20 > 0 and curr_volume >= 1.5 * avg_volume_20:
                         print()
                         session_trades, proposals_count, orb_taken = _handle_orb(
                             orb_dir, instrument, round(curr_price, 2), orb_high, orb_low,
@@ -671,7 +715,7 @@ def main() -> None:
 
                 if prev_price > 0:  # have at least one prior tick
                     signal = _check_signal(
-                        bias_dir, curr_price, curr_vwap, curr_rsi,
+                        bias_dir_eff, curr_price, curr_vwap, curr_rsi,
                         prev_price, prev_vwap, prev_rsi,
                         last_proposal_time, proposals_count,
                         curr_volume, avg_volume_20, ema8, ema21, max_trades,
