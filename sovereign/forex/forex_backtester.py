@@ -23,7 +23,7 @@ import yfinance as yf
 from sovereign.forex.pair_universe import ALL_PAIRS, PAIR_CONFIG, CB_TO_COUNTRY
 from sovereign.forex.data_fetcher import ForexDataFetcher
 from sovereign.forex.entry_engine import CBEventTrigger, CB_MIN_SURPRISE_BPS
-from sovereign.forex.fast_backtester import simulate_forex_trades
+from sovereign.forex.fast_backtester import simulate_forex_trades, simulate_forex_trades_arrays
 from sovereign.forex.signal_engine import ForexSignalEngine, SignalConfig
 from sovereign.forex.compliance import (
     ForexComplianceConfig,
@@ -329,6 +329,141 @@ class ForexBacktester:
             json.dump(serialisable, f, indent=2, default=str)
 
         return results
+
+    # ── Public entry-point variants ───────────────────────────────────────── #
+
+    def run_pair(
+        self,
+        pair: str,
+        base_country: str,
+        quote_country: str,
+    ) -> Optional["ForexBacktestResult"]:
+        """Like backtest_pair() but accepts explicit country params.
+
+        Useful when the caller has already resolved base/quote from PAIR_CONFIG
+        and wants to avoid a second lookup (e.g. rq_rest_004 gate tests).
+        Applies all per-pair overrides (hold, trailing, VIX gate).
+        """
+        df = self._download_price(pair)
+        if df is None or len(df) < 252:
+            return None
+
+        pair_hold = self.PAIR_HOLD_OVERRIDES.get(pair, self.HOLD_DAYS)
+        pair_trailing = self.PAIR_TRAILING_OVERRIDES.get(pair, self.TRAILING_ATR_MULT)
+
+        signals = self._get_pair_signals(
+            df=df,
+            base_country=base_country,
+            quote_country=quote_country,
+            pair=pair,
+            hold_days=pair_hold,
+        )
+
+        if pair in self.PAIR_VIX_GATES:
+            signals = self._apply_vix_regime_gate(
+                signals, pair=pair, start=self.start, end=self.end
+            )
+
+        trades = self._simulate_trades(df, signals, pair=pair, trailing_mult=pair_trailing)
+        if not trades:
+            return None
+        return self._compute_stats(pair, trades, len(df))
+
+    def run_pair_with_trades(
+        self,
+        pair: str,
+        base_country: str,
+        quote_country: str,
+        signal_engine_override=None,
+    ) -> "tuple[Optional[ForexBacktestResult], list]":
+        """Like run_pair() but returns (result, trades) and accepts an engine override.
+
+        signal_engine_override: a ForexSignalEngine subclass instance whose
+        build_signal_frame() is called in place of the default engine.
+        Used by rq_rest_003 to capture per-signal macro_score.
+        Applies all per-pair overrides (hold, trailing, VIX gate).
+        """
+        df = self._download_price(pair)
+        if df is None or len(df) < 252:
+            return None, []
+
+        pair_hold = self.PAIR_HOLD_OVERRIDES.get(pair, self.HOLD_DAYS)
+        pair_trailing = self.PAIR_TRAILING_OVERRIDES.get(pair, self.TRAILING_ATR_MULT)
+
+        if signal_engine_override is not None:
+            signals = signal_engine_override.build_signal_frame(
+                prices=df,
+                base_country=base_country,
+                quote_country=quote_country,
+                start=self.start,
+                end=self.end,
+                pair=pair,
+            )
+        else:
+            signals = self._get_pair_signals(
+                df=df,
+                base_country=base_country,
+                quote_country=quote_country,
+                pair=pair,
+                hold_days=pair_hold,
+            )
+
+        if pair in self.PAIR_VIX_GATES:
+            signals = self._apply_vix_regime_gate(
+                signals, pair=pair, start=self.start, end=self.end
+            )
+
+        trades = self._simulate_trades(df, signals, pair=pair, trailing_mult=pair_trailing)
+        if not trades:
+            return None, []
+
+        result = self._compute_stats(pair, trades, len(df))
+        return result, trades
+
+    def run_with_signals(
+        self,
+        pair: str,
+        opens: "np.ndarray",
+        closes: "np.ndarray",
+        signals: "np.ndarray",
+        hold_days: "np.ndarray",
+        index: "pd.Index",
+    ) -> Optional["ForexBacktestResult"]:
+        """Run a backtest with externally-provided array data (from ForexArrayDataset).
+
+        Intended for gate-testing experiments (rq_rest_004) where the caller
+        already has preloaded price/signal arrays and has applied an external
+        gate to the signals before passing them in.
+
+        Applies per-pair cost model and trailing-mult override; does NOT apply
+        the VIX gate (caller is responsible for signal filtering).
+        """
+        pair_trailing = self.PAIR_TRAILING_OVERRIDES.get(pair, self.TRAILING_ATR_MULT)
+
+        trades = simulate_forex_trades_arrays(
+            opens=opens,
+            closes=closes,
+            signals=signals,
+            hold_days=hold_days,
+            stop_pct=self.STOP_PCT,
+            index=index,
+            atr_pcts=None,
+            stop_atr_mult=self.STOP_ATR_MULT,
+            trailing_atr_mult=pair_trailing,
+            strict_mode=self.strict_mode,
+            donchian_exit_days=self.DONCHIAN_EXIT_DAYS,
+            allow_pyramiding=self.allow_pyramiding,
+            max_pyramid_units=self.max_pyramid_units,
+            risk_pct=self.MAX_RISK_PER_TRADE_PCT,
+            max_risk_pct=self.MAX_RISK_PER_TRADE_PCT,
+            enable_cb_refresh=not self.strict_mode,
+        )
+
+        if not trades:
+            return None
+
+        trades = self._apply_costs(trades, pair)
+        return self._compute_stats(pair, trades, len(index))
 
     def _get_pair_signals(
         self,

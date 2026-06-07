@@ -1,0 +1,50 @@
+{
+  "id": "HYP-046a",
+  "name": "EUR/GBP hold 5d \u2014 without AUDNZD",
+  "run_at": "2026-06-02T22:24:18.783846+00:00",
+  "config": {
+    "EXCLUDE_PAIRS": [
+      "AUDNZD=X"
+    ],
+    "HOLD_OVERRIDES": {
+      "EURUSD=X": 5,
+      "GBPUSD=X": 5
+    }
+  },
+  "baseline": {
+    "is_sharpe": 0.6722,
+    "oos_sharpe": 0.7582
+  },
+  "is_sharpe": 0.6702,
+  "is_n": 276,
+  "is_ci": [
+    0.54,
+    0.801
+  ],
+  "is_delta": -0.002,
+  "oos_sharpe": 1.0811,
+  "oos_n": 103,
+  "oos_ci": [
+    0.838,
+    1.324
+  ],
+  "oos_delta": 0.3229,
+  "decay_ratio": 1.613,
+  "perm": {
+    "real_sharpe": 0.7006,
+    "null_mean": -0.3401,
+    "null_std": 0.3686,
+    "null_p95": 0.2075,
+    "p_value": 0.002,
+    "n_perms": 500,
+    "verdict": "REAL"
+  },
+  "bh_survives": true,
+  "gates": {
+    "oos_delta_positive": true,
+    "oos_p_lt_005": true,
+    "bh_survives": true,
+    "decay_ok": true
+  },
+  "verdict": "CONFIRMED"
+}

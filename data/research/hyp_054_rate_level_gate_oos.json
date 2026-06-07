@@ -1,0 +1,548 @@
+{
+  "run_date": "2026-06-05T01:12:42.188954+00:00",
+  "run_by": "REST-004",
+  "hypothesis": "HYP-054",
+  "n_trades_total": 863,
+  "n_is": 657,
+  "n_oos": 206,
+  "baseline": {
+    "n": 863,
+    "sharpe": 0.1365,
+    "mean_r": 0.1817,
+    "win_rate": 0.489
+  },
+  "threshold_sweep": {
+    "threshold_0.25pct": {
+      "threshold": 0.25,
+      "passing": {
+        "n": 761,
+        "sharpe": 0.1457,
+        "mean_r": 0.1944,
+        "win_rate": 0.4954
+      },
+      "blocking": {
+        "n": 102,
+        "sharpe": 0.0668,
+        "mean_r": 0.0873,
+        "win_rate": 0.4412
+      },
+      "pct_passed": 88.2
+    },
+    "threshold_0.50pct": {
+      "threshold": 0.5,
+      "passing": {
+        "n": 668,
+        "sharpe": 0.1397,
+        "mean_r": 0.1853,
+        "win_rate": 0.4955
+      },
+      "blocking": {
+        "n": 195,
+        "sharpe": 0.1256,
+        "mean_r": 0.1694,
+        "win_rate": 0.4667
+      },
+      "pct_passed": 77.4
+    },
+    "threshold_0.75pct": {
+      "threshold": 0.75,
+      "passing": {
+        "n": 597,
+        "sharpe": 0.1426,
+        "mean_r": 0.1882,
+        "win_rate": 0.4941
+      },
+      "blocking": {
+        "n": 266,
+        "sharpe": 0.123,
+        "mean_r": 0.1672,
+        "win_rate": 0.4774
+      },
+      "pct_passed": 69.2
+    },
+    "threshold_1.00pct": {
+      "threshold": 1.0,
+      "passing": {
+        "n": 509,
+        "sharpe": 0.1524,
+        "mean_r": 0.2031,
+        "win_rate": 0.499
+      },
+      "blocking": {
+        "n": 354,
+        "sharpe": 0.1135,
+        "mean_r": 0.151,
+        "win_rate": 0.4746
+      },
+      "pct_passed": 59.0
+    },
+    "threshold_1.25pct": {
+      "threshold": 1.25,
+      "passing": {
+        "n": 453,
+        "sharpe": 0.1505,
+        "mean_r": 0.2062,
+        "win_rate": 0.4989
+      },
+      "blocking": {
+        "n": 410,
+        "sharpe": 0.1201,
+        "mean_r": 0.1547,
+        "win_rate": 0.478
+      },
+      "pct_passed": 52.5
+    },
+    "threshold_1.50pct": {
+      "threshold": 1.5,
+      "passing": {
+        "n": 406,
+        "sharpe": 0.1334,
+        "mean_r": 0.1862,
+        "win_rate": 0.4877
+      },
+      "blocking": {
+        "n": 457,
+        "sharpe": 0.1397,
+        "mean_r": 0.1778,
+        "win_rate": 0.4902
+      },
+      "pct_passed": 47.0
+    },
+    "threshold_2.00pct": {
+      "threshold": 2.0,
+      "passing": {
+        "n": 305,
+        "sharpe": 0.1418,
+        "mean_r": 0.2058,
+        "win_rate": 0.4885
+      },
+      "blocking": {
+        "n": 558,
+        "sharpe": 0.1336,
+        "mean_r": 0.1686,
+        "win_rate": 0.4892
+      },
+      "pct_passed": 35.3
+    }
+  },
+  "is_oos_split": {
+    "IS": {
+      "all": {
+        "n": 657,
+        "sharpe": 0.126,
+        "mean_r": 0.1737,
+        "win_rate": 0.481
+      },
+      "gated_1pct": {
+        "n": 378,
+        "sharpe": 0.1259,
+        "mean_r": 0.1699,
+        "win_rate": 0.4894
+      }
+    },
+    "OOS": {
+      "all": {
+        "n": 206,
+        "sharpe": 0.177,
+        "mean_r": 0.2075,
+        "win_rate": 0.5146
+      },
+      "gated_1pct": {
+        "n": 131,
+        "sharpe": 0.2327,
+        "mean_r": 0.2991,
+        "win_rate": 0.5267
+      }
+    }
+  },
+  "per_pair": {
+    "AUDNZD=X": {
+      "all": {
+        "n": 105,
+        "sharpe": 0.1274,
+        "mean_r": 0.1586,
+        "win_rate": 0.5333
+      },
+      "passing": {
+        "n": 43,
+        "sharpe": 0.0007,
+        "mean_r": 0.0009,
+        "win_rate": 0.5116
+      },
+      "blocking": {
+        "n": 62,
+        "sharpe": 0.2323,
+        "mean_r": 0.2679,
+        "win_rate": 0.5484
+      },
+      "pct_passed": 41.0
+    },
+    "AUDUSD=X": {
+      "all": {
+        "n": 120,
+        "sharpe": 0.1901,
+        "mean_r": 0.2957,
+        "win_rate": 0.4667
+      },
+      "passing": {
+        "n": 79,
+        "sharpe": 0.3097,
+        "mean_r": 0.4429,
+        "win_rate": 0.519
+      },
+      "blocking": {
+        "n": 41,
+        "sharpe": 0.0068,
+        "mean_r": 0.012,
+        "win_rate": 0.3659
+      },
+      "pct_passed": 65.8
+    },
+    "EURUSD=X": {
+      "all": {
+        "n": 127,
+        "sharpe": 0.1505,
+        "mean_r": 0.2045,
+        "win_rate": 0.4961
+      },
+      "passing": {
+        "n": 68,
+        "sharpe": 0.2081,
+        "mean_r": 0.3,
+        "win_rate": 0.5441
+      },
+      "blocking": {
+        "n": 59,
+        "sharpe": 0.075,
+        "mean_r": 0.0944,
+        "win_rate": 0.4407
+      },
+      "pct_passed": 53.5
+    },
+    "GBPJPY=X": {
+      "all": {
+        "n": 133,
+        "sharpe": 0.1169,
+        "mean_r": 0.1401,
+        "win_rate": 0.5338
+      },
+      "passing": {
+        "n": 117,
+        "sharpe": 0.0953,
+        "mean_r": 0.1163,
+        "win_rate": 0.5214
+      },
+      "blocking": {
+        "n": 16,
+        "sharpe": 0.3027,
+        "mean_r": 0.3141,
+        "win_rate": 0.625
+      },
+      "pct_passed": 88.0
+    },
+    "GBPUSD=X": {
+      "all": {
+        "n": 135,
+        "sharpe": 0.1692,
+        "mean_r": 0.2419,
+        "win_rate": 0.5259
+      },
+      "passing": {
+        "n": 68,
+        "sharpe": 0.2258,
+        "mean_r": 0.3213,
+        "win_rate": 0.5441
+      },
+      "blocking": {
+        "n": 67,
+        "sharpe": 0.1119,
+        "mean_r": 0.1613,
+        "win_rate": 0.5075
+      },
+      "pct_passed": 50.4
+    },
+    "USDCAD=X": {
+      "all": {
+        "n": 123,
+        "sharpe": 0.0867,
+        "mean_r": 0.1101,
+        "win_rate": 0.4146
+      },
+      "passing": {
+        "n": 23,
+        "sharpe": -0.0911,
+        "mean_r": -0.1137,
+        "win_rate": 0.2609
+      },
+      "blocking": {
+        "n": 100,
+        "sharpe": 0.1268,
+        "mean_r": 0.1616,
+        "win_rate": 0.45
+      },
+      "pct_passed": 18.7
+    },
+    "USDJPY=X": {
+      "all": {
+        "n": 120,
+        "sharpe": 0.0936,
+        "mean_r": 0.1159,
+        "win_rate": 0.45
+      },
+      "passing": {
+        "n": 111,
+        "sharpe": 0.1092,
+        "mean_r": 0.1362,
+        "win_rate": 0.4505
+      },
+      "blocking": {
+        "n": 9,
+        "sharpe": -0.1166,
+        "mean_r": -0.1351,
+        "win_rate": 0.4444
+      },
+      "pct_passed": 92.5
+    }
+  },
+  "year_by_year": {
+    "2015": {
+      "all": {
+        "n": 17,
+        "sharpe": 0.3475,
+        "mean_r": 0.6639,
+        "win_rate": 0.6471
+      },
+      "passing": {
+        "n": 10,
+        "sharpe": 0.4147,
+        "mean_r": 0.8946,
+        "win_rate": 0.7
+      },
+      "blocking": {
+        "n": 7,
+        "sharpe": 0.2098,
+        "mean_r": 0.3343,
+        "win_rate": 0.5714
+      }
+    },
+    "2016": {
+      "all": {
+        "n": 91,
+        "sharpe": 0.1,
+        "mean_r": 0.1672,
+        "win_rate": 0.4945
+      },
+      "passing": {
+        "n": 47,
+        "sharpe": 0.1272,
+        "mean_r": 0.2177,
+        "win_rate": 0.5106
+      },
+      "blocking": {
+        "n": 44,
+        "sharpe": 0.0687,
+        "mean_r": 0.1132,
+        "win_rate": 0.4773
+      }
+    },
+    "2017": {
+      "all": {
+        "n": 67,
+        "sharpe": 0.2524,
+        "mean_r": 0.2728,
+        "win_rate": 0.5224
+      },
+      "passing": {
+        "n": 36,
+        "sharpe": 0.4224,
+        "mean_r": 0.4244,
+        "win_rate": 0.6389
+      },
+      "blocking": {
+        "n": 31,
+        "sharpe": 0.0837,
+        "mean_r": 0.0966,
+        "win_rate": 0.3871
+      }
+    },
+    "2018": {
+      "all": {
+        "n": 84,
+        "sharpe": 0.2149,
+        "mean_r": 0.1883,
+        "win_rate": 0.5833
+      },
+      "passing": {
+        "n": 40,
+        "sharpe": 0.2008,
+        "mean_r": 0.1321,
+        "win_rate": 0.625
+      },
+      "blocking": {
+        "n": 44,
+        "sharpe": 0.2299,
+        "mean_r": 0.2393,
+        "win_rate": 0.5455
+      }
+    },
+    "2019": {
+      "all": {
+        "n": 93,
+        "sharpe": 0.1406,
+        "mean_r": 0.165,
+        "win_rate": 0.4624
+      },
+      "passing": {
+        "n": 54,
+        "sharpe": 0.0806,
+        "mean_r": 0.0816,
+        "win_rate": 0.463
+      },
+      "blocking": {
+        "n": 39,
+        "sharpe": 0.2046,
+        "mean_r": 0.2805,
+        "win_rate": 0.4615
+      }
+    },
+    "2020": {
+      "all": {
+        "n": 84,
+        "sharpe": 0.2379,
+        "mean_r": 0.3628,
+        "win_rate": 0.5119
+      },
+      "passing": {
+        "n": 29,
+        "sharpe": 0.0734,
+        "mean_r": 0.0869,
+        "win_rate": 0.4138
+      },
+      "blocking": {
+        "n": 55,
+        "sharpe": 0.3046,
+        "mean_r": 0.5083,
+        "win_rate": 0.5636
+      }
+    },
+    "2021": {
+      "all": {
+        "n": 85,
+        "sharpe": -0.0027,
+        "mean_r": -0.0026,
+        "win_rate": 0.4941
+      },
+      "passing": {
+        "n": 57,
+        "sharpe": 0.1472,
+        "mean_r": 0.1325,
+        "win_rate": 0.5789
+      },
+      "blocking": {
+        "n": 28,
+        "sharpe": -0.2722,
+        "mean_r": -0.2776,
+        "win_rate": 0.3214
+      }
+    },
+    "2022": {
+      "all": {
+        "n": 136,
+        "sharpe": 0.0343,
+        "mean_r": 0.0581,
+        "win_rate": 0.3529
+      },
+      "passing": {
+        "n": 105,
+        "sharpe": 0.0552,
+        "mean_r": 0.0952,
+        "win_rate": 0.3429
+      },
+      "blocking": {
+        "n": 31,
+        "sharpe": -0.0424,
+        "mean_r": -0.0675,
+        "win_rate": 0.3871
+      }
+    },
+    "2023": {
+      "all": {
+        "n": 104,
+        "sharpe": 0.3586,
+        "mean_r": 0.4617,
+        "win_rate": 0.6058
+      },
+      "passing": {
+        "n": 81,
+        "sharpe": 0.3027,
+        "mean_r": 0.412,
+        "win_rate": 0.5679
+      },
+      "blocking": {
+        "n": 23,
+        "sharpe": 0.6419,
+        "mean_r": 0.637,
+        "win_rate": 0.7391
+      }
+    },
+    "2024": {
+      "all": {
+        "n": 102,
+        "sharpe": -0.0526,
+        "mean_r": -0.0516,
+        "win_rate": 0.4216
+      },
+      "passing": {
+        "n": 50,
+        "sharpe": 0.1018,
+        "mean_r": 0.1162,
+        "win_rate": 0.46
+      },
+      "blocking": {
+        "n": 52,
+        "sharpe": -0.2734,
+        "mean_r": -0.213,
+        "win_rate": 0.3846
+      }
+    }
+  },
+  "combined_gates": {
+    "carry_aligned": {
+      "n": 391,
+      "sharpe": 0.1433,
+      "mean_r": 0.1744,
+      "win_rate": 0.4859
+    },
+    "level_gated_1pct": {
+      "n": 509,
+      "sharpe": 0.1524,
+      "mean_r": 0.2031,
+      "win_rate": 0.499
+    },
+    "combined_level_and_carry": {
+      "n": 262,
+      "sharpe": 0.0657,
+      "mean_r": 0.0765,
+      "win_rate": 0.4466
+    }
+  },
+  "nom_vs_real": {
+    "nom_gate_1pct": {
+      "n": 293,
+      "sharpe": 0.1686,
+      "mean_r": 0.2222,
+      "win_rate": 0.5051
+    },
+    "real_gate_1pct": {
+      "n": 509,
+      "sharpe": 0.1524,
+      "mean_r": 0.2031,
+      "win_rate": 0.499
+    }
+  },
+  "verdict": "OOS_CONFIRMED",
+  "optimal_threshold": 1.0,
+  "sharpe_at_1pct_full": 0.1524,
+  "sharpe_at_1pct_oos": 0.2327,
+  "sharpe_baseline_oos": 0.177
+}

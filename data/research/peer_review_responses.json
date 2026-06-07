@@ -1,0 +1,228 @@
+{
+  "generated_at": "2026-05-31T00:34:00.447296+00:00",
+  "test_1_ablation": {
+    "pool_size": 29,
+    "combinations_tested": 3654,
+    "candidates_without_fvg": 928,
+    "stored_for_validation": 121,
+    "validated_without_fvg": 43,
+    "best_non_fvg_holdout_hr": 0.6471,
+    "best_non_fvg_combo": {
+      "pair": "USDCAD",
+      "direction": "LONG",
+      "indicators": [
+        "adx",
+        "parabolic_sar",
+        "session_hl"
+      ],
+      "train_hr": 0.575,
+      "holdout_hr": 0.6471,
+      "n_holdout": 17
+    },
+    "verdict_summary": {
+      "real": 43,
+      "weak": 15,
+      "overfit": 6,
+      "insuf": 57
+    },
+    "conclusion": "WEAKENS \u2014 43 non-FVG combos validated on holdout"
+  },
+  "test_2_fvg_alone": {
+    "avg_train_hit_rate": 0.6974,
+    "avg_holdout_hit_rate": 0.7058,
+    "vs_combination_hit_rate": 0.714,
+    "filtering_effect_size": 0.0082,
+    "per_pair": {
+      "AUDNZD": {
+        "LONG": {
+          "train_hr": 0.6914,
+          "holdout_hr": 0.7407,
+          "n_train": 256,
+          "n_holdout": 27
+        },
+        "SHORT": {
+          "train_hr": 0.7628,
+          "holdout_hr": 0.7826,
+          "n_train": 253,
+          "n_holdout": 23
+        }
+      },
+      "AUDUSD": {
+        "LONG": {
+          "train_hr": 0.6831,
+          "holdout_hr": 0.697,
+          "n_train": 325,
+          "n_holdout": 33
+        },
+        "SHORT": {
+          "train_hr": 0.7304,
+          "holdout_hr": 0.7105,
+          "n_train": 345,
+          "n_holdout": 38
+        }
+      },
+      "EURUSD": {
+        "LONG": {
+          "train_hr": 0.6794,
+          "holdout_hr": 0.7037,
+          "n_train": 340,
+          "n_holdout": 27
+        },
+        "SHORT": {
+          "train_hr": 0.6593,
+          "holdout_hr": 0.7568,
+          "n_train": 364,
+          "n_holdout": 37
+        }
+      },
+      "GBPUSD": {
+        "LONG": {
+          "train_hr": 0.6667,
+          "holdout_hr": 0.7576,
+          "n_train": 327,
+          "n_holdout": 33
+        },
+        "SHORT": {
+          "train_hr": 0.6819,
+          "holdout_hr": 0.75,
+          "n_train": 349,
+          "n_holdout": 32
+        }
+      },
+      "NZDUSD": {
+        "LONG": {
+          "train_hr": 0.7105,
+          "holdout_hr": 0.4545,
+          "n_train": 342,
+          "n_holdout": 33
+        },
+        "SHORT": {
+          "train_hr": 0.7448,
+          "holdout_hr": 0.7381,
+          "n_train": 384,
+          "n_holdout": 42
+        }
+      },
+      "USDCAD": {
+        "LONG": {
+          "train_hr": 0.7054,
+          "holdout_hr": 0.8723,
+          "n_train": 336,
+          "n_holdout": 47
+        },
+        "SHORT": {
+          "train_hr": 0.6991,
+          "holdout_hr": 0.5556,
+          "n_train": 339,
+          "n_holdout": 27
+        }
+      },
+      "USDCHF": {
+        "LONG": {
+          "train_hr": 0.6814,
+          "holdout_hr": 0.7179,
+          "n_train": 317,
+          "n_holdout": 39
+        },
+        "SHORT": {
+          "train_hr": 0.7115,
+          "holdout_hr": 0.6923,
+          "n_train": 312,
+          "n_holdout": 26
+        }
+      },
+      "USDJPY": {
+        "LONG": {
+          "train_hr": 0.6722,
+          "holdout_hr": 0.8077,
+          "n_train": 421,
+          "n_holdout": 52
+        },
+        "SHORT": {
+          "train_hr": 0.6779,
+          "holdout_hr": 0.5556,
+          "n_train": 326,
+          "n_holdout": 27
+        }
+      }
+    },
+    "conclusion": "STANDALONE",
+    "detail": "FVG alone achieves >68% holdout hit rate; combo lift is marginal"
+  },
+  "test_3_rolling": {
+    "2021_green_candidates": 2654,
+    "2021_real_signal": 41,
+    "2021_fvg_rate": 1.0,
+    "2022_green_candidates": 2324,
+    "2022_real_signal": 43,
+    "2022_fvg_rate": 1.0,
+    "2023_green_candidates": 2719,
+    "2023_real_signal": 27,
+    "2023_fvg_rate": 1.0,
+    "2024_green_candidates": 2366,
+    "2024_real_signal": 37,
+    "2024_fvg_rate": 1.0,
+    "all_above_90pct": true,
+    "min_fvg_rate": 1.0,
+    "conclusion": "STRUCTURAL",
+    "per_year": {
+      "2021": {
+        "train_end": "2020-12-31",
+        "green_candidates": 2654,
+        "real_signal": 41,
+        "fvg_in_real": 41,
+        "fvg_rate": 1.0,
+        "weak": 24,
+        "overfit": 17,
+        "insuf": 78
+      },
+      "2022": {
+        "train_end": "2021-12-31",
+        "green_candidates": 2324,
+        "real_signal": 43,
+        "fvg_in_real": 43,
+        "fvg_rate": 1.0,
+        "weak": 26,
+        "overfit": 9,
+        "insuf": 82
+      },
+      "2023": {
+        "train_end": "2022-12-31",
+        "green_candidates": 2719,
+        "real_signal": 27,
+        "fvg_in_real": 27,
+        "fvg_rate": 1.0,
+        "weak": 28,
+        "overfit": 25,
+        "insuf": 80
+      },
+      "2024": {
+        "train_end": "2023-12-31",
+        "green_candidates": 2366,
+        "real_signal": 37,
+        "fvg_in_real": 37,
+        "fvg_rate": 1.0,
+        "weak": 25,
+        "overfit": 5,
+        "insuf": 93
+      }
+    }
+  },
+  "test_4_restricted": {
+    "pool": [
+      "fvg",
+      "bos",
+      "session_hl",
+      "displacement",
+      "liq_sweep",
+      "order_block",
+      "acc_dist"
+    ],
+    "combinations_tested": 35,
+    "candidates": 0,
+    "validated_count": 0,
+    "fvg_presence_rate": 0.0,
+    "validated_combos": [],
+    "conclusion": "INCONCLUSIVE \u2014 restricted-pool indicators too sparse in combination (none of C(7,3)=35 combos reached n\u226520 co-occurrences); cannot assess FVG dominance in this search space"
+  }
+}
