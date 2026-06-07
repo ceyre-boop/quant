@@ -1,0 +1,20 @@
+# Render Blueprint — hosted SOVEREIGN dashboard backend.
+# Serves live market data (yfinance), chat (anthropic/Haiku), and the repo's data snapshots over
+# HTTPS so the public dashboard (GitHub Pages) can fetch live data from anywhere.
+# Deploys from master — the same branch GitHub Pages + the data-sync flow already target, so the
+# backend's data, server, and Blueprint all live together and refresh on each push to master.
+services:
+  - type: web
+    name: sovereign-quant-dashboard
+    runtime: python
+    plan: starter            # always-on (~$7/mo) — no cold starts
+    branch: master
+    buildCommand: pip install -r requirements-dashboard.txt
+    startCommand: python3 scripts/live_signals_server.py
+    healthCheckPath: /data
+    autoDeploy: true         # redeploy on push to master (refreshes data + code)
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.0"
+      - key: ANTHROPIC_API_KEY   # set in Render dashboard (secret) — powers the CHAT tab
+        sync: false
