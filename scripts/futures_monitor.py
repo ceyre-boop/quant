@@ -54,6 +54,14 @@ def _today() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
 
+def _norm_inst(x: str) -> str:
+    """Treat the micro and its underlying as the same product: MES==ES, MNQ==NQ.
+    (futures_bias.py logs ES/NQ; the monitor/oracle use MES/MNQ — normalize so the monitor
+    finds the bias.)"""
+    x = (x or "").upper()
+    return {"MES": "ES", "MNQ": "NQ"}.get(x, x)
+
+
 def _load_bias(instrument: str) -> dict:
     today = _today()
     last = None
@@ -62,7 +70,7 @@ def _load_bias(instrument: str) -> dict:
             for line in f:
                 try:
                     rec = json.loads(line)
-                    if rec.get("date") == today and rec.get("instrument", "").upper() == instrument.upper():
+                    if rec.get("date") == today and _norm_inst(rec.get("instrument", "")) == _norm_inst(instrument):
                         last = rec
                 except Exception:
                     pass
@@ -80,7 +88,7 @@ def _check_macro(instrument: str) -> dict | None:
         for line in f:
             try:
                 rec = json.loads(line)
-                if rec.get("instrument", "").upper() == instrument.upper():
+                if _norm_inst(rec.get("instrument", "")) == _norm_inst(instrument):
                     d = rec.get("date", "")
                     if d:
                         by_date[d] = rec
