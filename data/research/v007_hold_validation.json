@@ -1,0 +1,132 @@
+{
+  "created_utc": "2026-06-07T17:41:08.904485+00:00",
+  "id": "HYP-V007-HOLD",
+  "active_pairs": [
+    "EURUSD=X",
+    "GBPUSD=X",
+    "USDJPY=X",
+    "AUDUSD=X"
+  ],
+  "live_overrides": {
+    "GBPUSD=X": 6,
+    "AUDUSD=X": 5,
+    "EURUSD=X": 5
+  },
+  "n_perms": 10000,
+  "seed": 7,
+  "oos": {
+    "treatment_sharpe": 1.3053,
+    "treatment_trades": 110,
+    "treatment_per_pair": {
+      "EURUSD=X": {
+        "sharpe": 1.275,
+        "n": 30,
+        "avg_hold": 6.6
+      },
+      "GBPUSD=X": {
+        "sharpe": 1.774,
+        "n": 29,
+        "avg_hold": 7.1
+      },
+      "USDJPY=X": {
+        "sharpe": 1.497,
+        "n": 25,
+        "avg_hold": 8.5
+      },
+      "AUDUSD=X": {
+        "sharpe": 0.655,
+        "n": 26,
+        "avg_hold": 4.6
+      }
+    },
+    "baseline_sharpe": 1.2504,
+    "baseline_trades": 110,
+    "baseline_per_pair": {
+      "EURUSD=X": {
+        "sharpe": 1.278,
+        "n": 30,
+        "avg_hold": 6.6
+      },
+      "GBPUSD=X": {
+        "sharpe": 1.437,
+        "n": 29,
+        "avg_hold": 7.2
+      },
+      "USDJPY=X": {
+        "sharpe": 1.497,
+        "n": 25,
+        "avg_hold": 8.5
+      },
+      "AUDUSD=X": {
+        "sharpe": 0.782,
+        "n": 26,
+        "avg_hold": 5.9
+      }
+    },
+    "delta_sharpe": 0.0549,
+    "treatment_ci": [
+      1.051,
+      1.56,
+      0.13
+    ],
+    "baseline_ci": [
+      1.001,
+      1.5,
+      0.127
+    ]
+  },
+  "permutation": {
+    "treatment_array_sharpe": 0.8306,
+    "null_mean": 0.7181,
+    "null_pct95": 0.8272,
+    "null_max": 0.9065,
+    "p_value": 0.0443955604439556,
+    "interpretation": "p = P(random per-pair caps >= the chosen 6/5/5 caps). Array path (no VIX gate); measures whether the SPECIFIC caps are special vs random."
+  },
+  "walk_forward": [
+    {
+      "window": "2021",
+      "treatment": 0.978,
+      "baseline": 0.833,
+      "delta": 0.145,
+      "t_n": 51,
+      "b_n": 51
+    },
+    {
+      "window": "2022",
+      "treatment": 0.506,
+      "baseline": 0.551,
+      "delta": -0.045,
+      "t_n": 80,
+      "b_n": 80
+    },
+    {
+      "window": "2023",
+      "treatment": 1.765,
+      "baseline": 1.643,
+      "delta": 0.123,
+      "t_n": 67,
+      "b_n": 67
+    },
+    {
+      "window": "2024",
+      "treatment": 0.366,
+      "baseline": 0.366,
+      "delta": 0.0,
+      "t_n": 59,
+      "b_n": 59
+    }
+  ],
+  "verdict": "NOT_SIGNIFICANT",
+  "verdict_basis": {
+    "oos_delta_positive": true,
+    "permutation_sig": true,
+    "walk_forward_stable": false,
+    "wf_deltas": [
+      0.145,
+      -0.045,
+      0.123,
+      0.0
+    ]
+  }
+}
