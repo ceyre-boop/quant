@@ -147,10 +147,10 @@ def _check_signal(bias_dir: str, curr_price: float, curr_vwap: float, curr_rsi: 
                   prev_price: float, prev_vwap: float, prev_rsi: float,
                   last_proposal_time: datetime | None, proposals_count: int,
                   curr_volume: float, avg_volume_20: float,
-                  ema8: float, ema21: float) -> str | None:
+                  ema8: float, ema21: float, max_trades: int = 3) -> str | None:
     if bias_dir not in ("LONG", "SHORT"):
         return None
-    if proposals_count >= 3:
+    if proposals_count >= max_trades:
         return None
     if last_proposal_time is not None:
         elapsed = (datetime.now(timezone.utc) - last_proposal_time).total_seconds()
@@ -373,6 +373,127 @@ def _handle_proposal(direction: str, curr_price: float, curr_vwap: float,
         return now, session_trades, proposals_count + 1
 
 
+def _trading_blocked(bridge, instrument: str, loss_limit: float) -> str | None:
+    """Return a block reason if the auto path must NOT place a trade, else None.
+    Checks the global kill switch (Track 1) AND the sandbox daily loss limit ($ hard lock)."""
+    try:
+        from sovereign.utils.kill_switch import trading_frozen
+        frz = trading_frozen()
+        if frz:
+            return f"SYSTEM FROZEN ({frz.get('mode')}): {frz.get('reason', '')}"
+    except Exception:
+        pass
+    try:
+        from sovereign.futures import loss_limit as ll
+        pnl = ll.session_pnl_usd(bridge, instrument)
+        if ll.check_and_lock(pnl, loss_limit):
+            return f"DAILY LOSS LIMIT LOCKED — {ll.lock_reason()} (press 'u' or delete data/futures/.session_lock to unlock)"
+    except Exception:
+        pass
+    return None
+
+
+def _auto_execute(direction: str, curr_price: float, curr_rsi: float, prev_rsi: float,
+                  curr_volume: float, avg_volume_20: float, ema8: float, ema21: float,
+                  bias: dict, instrument: str, dry_run: bool, ib_connected: bool, bridge,
+                  session_trades: int, session_r: float, proposals_count: int,
+                  loss_limit: float) -> tuple[datetime, int, int]:
+    """Fully-auto micro scalp: place the bracket without a prompt, log with a rule-derived reason."""
+    now = datetime.now(timezone.utc)
+    block = _trading_blocked(bridge, instrument, loss_limit)
+    if block:
+        print(f"\n  {R}⛔ AUTO BLOCKED — {block}{RS}")
+        return now, session_trades, proposals_count + 1
+
+    entry = round(curr_price, 2)
+    stop  = round(_compute_stop(bias, direction, entry), 2)
+    t1    = round(entry + (entry - stop) if direction == "LONG" else entry - (stop - entry), 2)
+    rationale = _sizing_rationale(session_trades, session_r)
+    vol_x = (curr_volume / avg_volume_20) if avg_volume_20 > 0 else 0.0
+    reason = (f"VWAP {'reclaim' if direction=='LONG' else 'reject'} + {vol_x:.1f}x vol + "
+              f"{'>' if direction=='LONG' else '<'}EMA8/21 + RSI {prev_rsi:.0f}->{curr_rsi:.0f} + bias {direction}")
+
+    if not dry_run and ib_connected and bridge:
+        try:
+            side = "BUY" if direction == "LONG" else "SELL"
+            contract = bridge.mes_contract() if instrument == "MES" else bridge.mnq_contract()
+            results = bridge.bracket_order(contract, side, 1, entry, stop, t1)
+            print(f"\n  {G}{BD}⚡ AUTO FILLED {direction} 1 {instrument} @ {entry:.2f}{RS}"
+                  f"  SL {stop:.2f}  TP {t1:.2f}  | id={results[0].order_id}")
+            notes = f"auto: {reason} | order_id={results[0].order_id}"
+        except Exception as e:
+            print(f"\n  {R}Auto order failed: {type(e).__name__}: {e}{RS}")
+            notes = f"auto: order failed: {type(e).__name__}: {e}"
+    else:
+        tag = "[DRY-RUN] " if dry_run else "[IB disconnected] "
+        print(f"\n  {G}{BD}⚡ {tag}WOULD AUTO-PLACE {direction} 1 {instrument} @ {entry:.2f}{RS}"
+              f"  SL {stop:.2f}  TP {t1:.2f}")
+        print(f"  {DM}reason: {reason}{RS}")
+        notes = f"auto ({'dry-run' if dry_run else 'IB disconnected'}): {reason}"
+
+    _log_trade(_build_record(instrument, direction, entry, stop, t1, bias,
+                             session_trades, session_r, rationale, notes))
+    return now, session_trades + 1, proposals_count + 1
+
+
+# ── ORB (opening range breakout) — the macro discretionary gate ───────────────
+
+def _orb_range(bars, orb_minutes: int) -> tuple[float, float] | None:
+    """High/low of the first `orb_minutes` 1-min bars of the RTH session. None if not enough bars."""
+    if bars is None or len(bars) < orb_minutes:
+        return None
+    window = bars.iloc[:orb_minutes]
+    return float(window["High"].max().item()), float(window["Low"].min().item())
+
+
+def _handle_orb(direction: str, instrument: str, entry: float, orb_high: float, orb_low: float,
+                bias: dict, dry_run: bool, ib_connected: bool, bridge,
+                session_trades: int, session_r: float, proposals_count: int,
+                loss_limit: float) -> tuple[int, int, bool]:
+    """ORB break → big/safe checkbox → place. Returns (session_trades, proposals_count, taken)."""
+    now_block = _trading_blocked(bridge, instrument, loss_limit)
+    if now_block:
+        print(f"\n  {R}⛔ ORB BLOCKED — {now_block}{RS}")
+        return session_trades, proposals_count, True   # taken=True so we don't re-prompt
+    big_tp   = round(entry + 25 if direction == "LONG" else entry - 25, 2)
+    safe_tp  = round(entry + 12 if direction == "LONG" else entry - 12, 2)
+    stop     = round(orb_low if direction == "LONG" else orb_high, 2)
+    print(f"\n\n{BD}╔══════════════════════════════════════════════════════╗{RS}")
+    print(f"  🌅 ORB BREAKOUT {direction} — {instrument} @ {entry:.2f}  (range {orb_low:.2f}-{orb_high:.2f})")
+    print(f"  [B]ig (3 ct, TP {big_tp:.2f} / 25pt)   [S]afe (1 ct, TP {safe_tp:.2f} / 12pt)   [n]skip")
+    print(f"{BD}╚══════════════════════════════════════════════════════╝{RS}")
+    try:
+        ans = input("  → ").strip().lower()
+    except EOFError:
+        ans = "n"
+    if ans not in ("b", "s"):
+        print("  ORB skipped.")
+        return session_trades, proposals_count, True
+    size = 3 if ans == "b" else 1
+    t1   = big_tp if ans == "b" else safe_tp
+    rationale = "press" if ans == "b" else "probe"
+    if not dry_run and ib_connected and bridge:
+        try:
+            side = "BUY" if direction == "LONG" else "SELL"
+            contract = bridge.mes_contract() if instrument == "MES" else bridge.mnq_contract()
+            results = bridge.bracket_order(contract, side, size, entry, stop, t1)
+            print(f"  {G}{BD}ORB {('BIG' if ans=='b' else 'SAFE')} FILLED {direction} {size} {instrument} @ {entry:.2f}{RS} | id={results[0].order_id}")
+            notes = f"ORB macro {rationale} | order_id={results[0].order_id}"
+        except Exception as e:
+            print(f"  {R}ORB order failed: {type(e).__name__}: {e}{RS}")
+            notes = f"ORB order failed: {type(e).__name__}: {e}"
+    else:
+        tag = "[DRY-RUN] " if dry_run else "[IB disconnected] "
+        print(f"  {G}{tag}WOULD PLACE ORB {('BIG' if ans=='b' else 'SAFE')} {direction} {size} {instrument} @ {entry:.2f} SL {stop:.2f} TP {t1:.2f}{RS}")
+        notes = f"ORB macro {rationale} ({'dry-run' if dry_run else 'IB disconnected'})"
+    rec = _build_record(instrument, direction, entry, stop, t1, bias,
+                        session_trades, session_r, rationale, notes)
+    rec["size_contracts"] = size
+    rec["setup"] = "ORB"
+    _log_trade(rec)
+    return session_trades + 1, proposals_count + 1, True
+
+
 def _show_macro_proposal(macro: dict) -> None:
     d = macro["direction"]
     dates_str = ", ".join(macro["dates"])
@@ -392,7 +513,15 @@ def _show_macro_proposal(macro: dict) -> None:
 def _parse_args() -> argparse.Namespace:
     ap = argparse.ArgumentParser(description="Live MES/MNQ paper trading terminal")
     ap.add_argument("--instrument", default="MES", choices=["MES", "MNQ"])
-    ap.add_argument("--dry-run",  action="store_true", help="No IB order placement")
+    ap.add_argument("--dry-run",  action="store_true", help="No IB order placement (prints WOULD-PLACE)")
+    ap.add_argument("--auto",     action="store_true",
+                    help="Auto-execute micro VWAP scalps (no prompt) — the felt loop")
+    ap.add_argument("--loss-limit", type=float, default=500.0,
+                    help="Hard daily loss limit in $ (locks auto path when hit; default 500)")
+    ap.add_argument("--max-trades", type=int, default=20,
+                    help="Bounded per-session trade cap (the $ loss limit is the real guard; default 20)")
+    ap.add_argument("--orb-minutes", type=int, default=5,
+                    help="Opening-range minutes for the ORB macro setup (default 5)")
     ap.add_argument("--verbose",  action="store_true", help="Extra indicator output per tick")
     return ap.parse_args()
 
@@ -467,8 +596,21 @@ def main() -> None:
             })
             print(f"  Macro hold logged.\n")
 
+    auto       = args.auto
+    loss_limit = float(args.loss_limit)
+    max_trades = int(args.max_trades)
+    orb_minutes = int(args.orb_minutes)
+
+    # Loss-limit / kill-switch startup status
+    from sovereign.futures import loss_limit as ll
+    if ll.is_locked():
+        print(f"  {R}{BD}⛔ Auto path is LOCKED from a prior session — {ll.lock_reason()}{RS}")
+        print(f"  {Y}  Unlock: delete data/futures/.session_lock{RS}")
+    print(f"  Mode: {'AUTO micros' if auto else 'MANUAL (approve/skip)'} | "
+          f"daily loss limit ${loss_limit:.0f} | max {max_trades} trades/session")
+
     print(f"\n  Watching for VWAP reclaim + RSI confirmation in bias direction...")
-    print(f"  Max 3 proposals per session | 5-minute cooldown between proposals\n")
+    print(f"  ORB macro: first {orb_minutes}-min range → big/safe checkbox | 5-min cooldown\n")
 
     # ── Main polling loop ─────────────────────────────────────────────────────
     prev_price: float = 0.0
@@ -479,6 +621,9 @@ def main() -> None:
     session_trades:  int = 0
     session_r:       float = 0.0
     last_bar_ts = None
+    orb_high: float | None = None
+    orb_low:  float | None = None
+    orb_taken: bool = False
 
     try:
         while True:
@@ -500,20 +645,44 @@ def main() -> None:
                     time.sleep(5)
                     continue
 
+                # ── ORB macro setup (once per session): capture range, watch for break ──
+                if orb_high is None:
+                    rng = _orb_range(bars, orb_minutes)
+                    if rng is not None and len(bars) >= orb_minutes:
+                        orb_high, orb_low = rng
+                elif not orb_taken and bias_dir in ("LONG", "SHORT"):
+                    orb_dir = ("LONG" if curr_price > orb_high else
+                               "SHORT" if curr_price < orb_low else None)
+                    if orb_dir == bias_dir and avg_volume_20 > 0 and curr_volume >= 1.5 * avg_volume_20:
+                        print()
+                        session_trades, proposals_count, orb_taken = _handle_orb(
+                            orb_dir, instrument, round(curr_price, 2), orb_high, orb_low,
+                            bias, dry_run, ib_connected, bridge,
+                            session_trades, session_r, proposals_count, loss_limit,
+                        )
+
                 if prev_price > 0:  # have at least one prior tick
                     signal = _check_signal(
                         bias_dir, curr_price, curr_vwap, curr_rsi,
                         prev_price, prev_vwap, prev_rsi,
                         last_proposal_time, proposals_count,
-                        curr_volume, avg_volume_20, ema8, ema21,
+                        curr_volume, avg_volume_20, ema8, ema21, max_trades,
                     )
                     if signal:
                         print()  # newline after header
-                        last_proposal_time, session_trades, proposals_count = _handle_proposal(
-                            signal, curr_price, curr_vwap, curr_rsi, prev_rsi,
-                            bias, instrument, dry_run, ib_connected, bridge,
-                            session_trades, session_r, proposals_count,
-                        )
+                        if auto:
+                            last_proposal_time, session_trades, proposals_count = _auto_execute(
+                                signal, curr_price, curr_rsi, prev_rsi,
+                                curr_volume, avg_volume_20, ema8, ema21,
+                                bias, instrument, dry_run, ib_connected, bridge,
+                                session_trades, session_r, proposals_count, loss_limit,
+                            )
+                        else:
+                            last_proposal_time, session_trades, proposals_count = _handle_proposal(
+                                signal, curr_price, curr_vwap, curr_rsi, prev_rsi,
+                                bias, instrument, dry_run, ib_connected, bridge,
+                                session_trades, session_r, proposals_count,
+                            )
 
                 prev_price, prev_vwap, prev_rsi = curr_price, curr_vwap, curr_rsi
                 last_bar_ts = curr_ts
