@@ -9,3 +9,4 @@
 {"timestamp": "2026-06-05T04:34:10.779745+00:00", "change": "SYSTEM FREEZE (soft)", "rationale": "verify soft", "approved_by": "colin"}
 {"timestamp": "2026-06-05T04:34:10.856200+00:00", "change": "SYSTEM FREEZE (hard)", "rationale": "verify hard", "approved_by": "colin"}
 {"timestamp": "2026-06-05T04:34:10.968684+00:00", "change": "SYSTEM THAW", "rationale": "unfreeze (was: verify hard)", "approved_by": "colin"}
+{"timestamp": "2026-06-07T17:55:25.548482+00:00", "change": "Forex PAIR_HOLD_OVERRIDES cleared (GBP6/AUD5/EUR5/AUDNZD7 -> {} , all 60d default)", "rationale": "v007 holds failed redesigned validation: NOT_SIGNIFICANT (OOS delta +0.055, permutation p=0.044, but FAILS walk-forward stability \u2014 benefit regime-concentrated 2021/2023). Re-measured 60d config: OOS Sharpe 1.2504, decay 2.17 ROBUST, permutation p<0.001. Ref: scripts/validate_v007_hold.py, data/research/v007_hold_validation.json, ledger V007-HOLD-VALIDATION.", "approved_by": "colin"}

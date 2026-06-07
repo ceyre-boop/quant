@@ -85,6 +85,9 @@ python3 scripts/run_replay_validation.py
 | Config | `config/parameters.yml`, `config/ict_params.yml` | Never hardcode thresholds |
 
 Current live version: Forex v015 — anchored as logs/research/v003 (tracked snapshot), HYP-045 4-pair portfolio (AUDNZD excluded).
+v007 per-pair hold overrides ROLLED BACK 2026-06-07 (NOT_SIGNIFICANT — fails walk-forward; ledger V007-HOLD-VALIDATION).
+Live config now 60d default for all pairs; re-measured OOS Sharpe **1.25** (decay 2.17 ROBUST, permutation p<0.001) on
+2026-06-07 data — differs from the 2026-06-02 recorded 1.08 due to both the rollback and yfinance data drift.
 HYP-045 CONFIRMED 2026-06-02: AUDNZD exclusion → OOS costed Sharpe **1.08** (CI [0.84, 1.32], n=103);
 decay 1.61 (ROBUST); p=0.002. v014 baseline was 0.76 (5-pair, AUDNZD OOS Sharpe -0.879 — active drag).
 Prior headline 2.097 was uncosted and annualized as if trading daily (these strategies trade 4–14×/yr).

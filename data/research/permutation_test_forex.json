@@ -1,33 +1,33 @@
 {
-  "test_date": "2026-06-02T23:17:50.095738+00:00",
+  "test_date": "2026-06-07T17:54:28.833676+00:00",
   "system": "forex_macro",
   "n_permutations": 1000,
   "seed": 7,
   "costed": true,
-  "real_portfolio_sharpe": 0.3568,
-  "real_n_trades": 521,
+  "real_portfolio_sharpe": 0.353,
+  "real_n_trades": 580,
   "real_per_pair": {
     "AUDUSD": {
-      "sharpe": 0.469,
-      "n": 122
+      "sharpe": 0.422,
+      "n": 129
     },
     "EURUSD": {
-      "sharpe": 0.34,
-      "n": 134
+      "sharpe": 0.381,
+      "n": 146
     },
     "GBPUSD": {
-      "sharpe": 0.445,
-      "n": 139
+      "sharpe": 0.542,
+      "n": 148
     },
     "USDJPY": {
-      "sharpe": 0.171,
-      "n": 126
+      "sharpe": 0.08,
+      "n": 157
     }
   },
-  "null_mean": -0.1378,
-  "null_std": 0.1631,
-  "null_pct95": 0.1189,
-  "null_max": 0.2586,
+  "null_mean": -0.1451,
+  "null_std": 0.1565,
+  "null_pct95": 0.1174,
+  "null_max": 0.3218,
   "p_value": 0.0,
   "edge_above_95th": true,
   "verdict": "REAL"

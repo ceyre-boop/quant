@@ -112,22 +112,15 @@ class ForexBacktester:
     CB_SURPRISE_THRESHOLD = 20  # 20bp in backtest (vs 25bp live) for adequate sample size
     MAX_RISK_PER_TRADE_PCT = 0.01
     MAX_SHARED_JPY_POSITIONS = 2
-    # v007 per-pair hold sweep (2026-05-19): trailing_mult swept at optimal hold per pair.
-    # AUDUSD 5d/1.0x: 1.292 (+0.028 vs 60d) | EURUSD 5d/1.25x: 1.441 (unchanged, shorter hold)
-    # AUDNZD 7d/1.25x: 1.172 (unchanged, shorter hold) | GBPJPY 5d/1.0x: 0.741 (+0.088 vs 60d)
-    # USDCAD/USDJPY: below sweep threshold, 60d hold unchanged.
-    # Portfolio: 1.0713 (+0.017 vs v006 1.0547) — below +0.05 version gate but all-pair consistency
-    # warrants apply: shorter holds reduce overnight exposure, GBPJPY gains are real.
-    # NOTE: Retro validation 2026-05-27 flagged this as harmful (delta_sharpe=-0.087, p=0.008)
-    # but live backtester CONTRADICTS that finding: removing overrides drops GBPUSD 1.89→1.70,
-    # AUDUSD 1.67→1.43. Retro test was flawed — forensics 'hold' reflects natural trade duration,
-    # not the effect of forced hold caps. Rule remains active pending redesigned validation.
-    PAIR_HOLD_OVERRIDES: dict = {
-        "GBPUSD=X": 6,
-        "AUDUSD=X": 5,
-        "EURUSD=X": 5,
-        "AUDNZD=X": 7,
-    }
+    # v007 per-pair hold overrides — ROLLED BACK 2026-06-07 to the 60d default.
+    # The redesigned validation the prior comment said was "pending" was run
+    # (scripts/validate_v007_hold.py → data/research/v007_hold_validation.json; ledger
+    # V007-HOLD-VALIDATION; commit 961330e). Verdict NOT_SIGNIFICANT: OOS delta only +0.055 and
+    # it FAILS walk-forward stability — benefit is regime-concentrated (2021 +0.145, 2023 +0.123;
+    # 2022 -0.045, 2024 flat) and GBPUSD-driven, with AUDUSD negative. The overrides were also
+    # near-inert on realized hold duration (only AUDUSD's avg shifted). An override that isn't
+    # walk-forward-robust does not stay live. Empty dict → every pair uses HOLD_DAYS (60d).
+    PAIR_HOLD_OVERRIDES: dict = {}
     PAIR_TRAILING_OVERRIDES: dict = {
         "GBPUSD=X": 2.0,
         "AUDUSD=X": 1.0,   # 1.0x beats 1.25x at 5d hold: exits faster, less giveback

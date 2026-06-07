@@ -784,7 +784,7 @@
   {
     "id": "V007-HOLD-VALIDATION",
     "title": "Per-pair hold overrides (v007, GBP6/AUD5/EUR5) vs 60d baseline \u2014 redesigned validation",
-    "status": "NOT_SIGNIFICANT",
+    "status": "NOT_SIGNIFICANT_ROLLED_BACK",
     "created_date": "2026-06-07",
     "confirmed_date": "2026-06-07",
     "origin": "v007-hold-revalidation",
@@ -813,6 +813,14 @@
       }
     },
     "note": "NOT_SIGNIFICANT \u2014 fails walk-forward stability. Benefit is regime-concentrated (2021 +0.145, 2023 +0.123; 2022 -0.045, 2024 0.000) and GBPUSD-driven (+0.34) partly offset by AUDUSD (negative). Overrides near-inert on realized hold duration (only AUDUSD avg shifts 5.9->4.6); GBPUSD gain comes from capping non-event signals, not from a clean duration limit. CAVEAT: harness OOS treatment=1.305/n=110 does NOT reconcile to the 2026-06-02 holdout 1.081/n=103 (likely yfinance data drift); the treatment-vs-baseline DELTA is the valid internal measure. Permutation p=0.044 (chosen vs random caps) marginally passed but the question that matters (robust vs 60d) fails walk-forward. Recommend roll back to 60d pending confirmation.",
-    "artifact": "data/research/v007_hold_validation.json"
+    "artifact": "data/research/v007_hold_validation.json",
+    "rollback": {
+      "applied": "2026-06-07",
+      "new_config": "all pairs 60d default",
+      "new_oos_sharpe": 1.2504,
+      "new_decay": 2.169,
+      "new_perm_p": 0.0,
+      "note": "PAIR_HOLD_OVERRIDES cleared. 60d baseline re-validated ROBUST p<0.001."
+    }
   }
 ]
