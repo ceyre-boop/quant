@@ -2271,40 +2271,61 @@ function resUsage(data){
 }
 let _hypData=null,_hypFilter='ALL';
 
+// The ledger has 10 real statuses; collapse them into the 3 visible filter buckets.
+function _hypBucket(status){
+  const s=(status||'').toUpperCase();
+  if(['CONFIRMED','VALID_EDGE','DEPLOYED','PARTIAL_CONFIRMATION'].includes(s))return'CONFIRMED';
+  if(['REJECTED','REJECTED_OOS','NO_EDGE','NOT_SIGNIFICANT'].includes(s))return'REJECTED';
+  return'TESTING'; // CANDIDATE, RETEST_BLOCKED, and anything unknown = in-progress
+}
+
+// Wire the static #hyp-filter bar once (its buttons exist in the page markup).
+function _wireHypFilter(){
+  document.querySelectorAll('#hyp-filter .sig-tb-btn').forEach(b=>{
+    b.addEventListener('click',()=>{_hypFilter=b.dataset.status||'ALL';resHypRender();});
+  });
+}
+
 function resHypRender(){
   const el=document.getElementById('rp-hyp');
   const data=_hypData;
-  const hyps=data?.hypotheses||data?.ledger||[];
+  // hypothesis_ledger.json is a bare array — accept that as well as wrapped shapes.
+  const hyps=Array.isArray(data)?data:(data?.hypotheses||data?.ledger||[]);
+  const bIcon={CONFIRMED:'✅',REJECTED:'❌',TESTING:'🔄'};
+  const bColor={CONFIRMED:'var(--green)',REJECTED:'var(--red)',TESTING:'var(--blue)'};
+  const bOrder={TESTING:0,CONFIRMED:1,REJECTED:2};
+  // Bucket counts drive the static filter bar (ALL/TESTING/CONFIRMED/REJECTED).
+  const counts={ALL:hyps.length,TESTING:0,CONFIRMED:0,REJECTED:0};
+  hyps.forEach(h=>{counts[_hypBucket(h.status)]++;});
+  document.querySelectorAll('#hyp-filter .sig-tb-btn').forEach(b=>{
+    const s=b.dataset.status||'ALL';
+    b.classList.toggle('active',_hypFilter===s);
+    b.innerHTML=s+' <span style="color:var(--dim)">'+(counts[s]??0)+'</span>';
+  });
   if(!hyps.length){el.innerHTML='<div class="rp-title">Hypothesis Ledger</div><div class="rp-empty">No data</div>';return;}
-  const icons={CONFIRMED:'✅',REJECTED:'❌',TESTING:'🔄',QUEUED:'📋'};
-  const order={TESTING:0,QUEUED:1,CONFIRMED:2,REJECTED:3};
-  const counts={ALL:hyps.length};
-  ['CONFIRMED','REJECTED','TESTING','QUEUED'].forEach(s=>counts[s]=(hyps.filter(h=>h.status===s).length));
-  const filtered=_hypFilter==='ALL'?hyps:hyps.filter(h=>h.status===_hypFilter);
-  const sorted=[...filtered].sort((a,b)=>(order[a.status]??4)-(order[b.status]??4));
-  const filters=['ALL','TESTING','QUEUED','CONFIRMED','REJECTED'].map(f=>{
-    const active=_hypFilter===f;
-    return`<button onclick="resHypFilter('${f}')" style="background:${active?'rgba(0,212,160,.12)':'var(--bg3)'};color:${active?'var(--green)':'var(--muted)'};border:1px solid ${active?'rgba(0,212,160,.4)':'var(--border)'};border-radius:4px;font-size:9px;padding:3px 9px;cursor:pointer;font-family:var(--font);letter-spacing:1px">${f} <span style="color:var(--dim)">${counts[f]||0}</span></button>`;
-  }).join('');
+  const filtered=_hypFilter==='ALL'?hyps:hyps.filter(h=>_hypBucket(h.status)===_hypFilter);
+  const sorted=[...filtered].sort((a,b)=>bOrder[_hypBucket(a.status)]-bOrder[_hypBucket(b.status)]);
   const rows=sorted.map(h=>{
-    const date=h.date_confirmed||h.date_formed||h.date||'—';
-    const result=(h.result||'—').slice(0,90)+(h.result?.length>90?'…':'');
+    const bucket=_hypBucket(h.status);
+    const date=h.date_confirmed||h.date_decided||h.date_tested||h.date_formed||h.date||'—';
+    const text=h.result||h.conclusion||'—';
+    const result=text.slice(0,90)+(text.length>90?'…':'');
     return`<tr>
       <td style="color:var(--muted);white-space:nowrap">${h.id||'—'}</td>
-      <td style="white-space:nowrap">${icons[h.status]||'?'} <span style="color:${h.status==='CONFIRMED'?'var(--green)':h.status==='REJECTED'?'var(--red)':h.status==='TESTING'?'var(--blue)':'var(--muted)'};font-size:9px;letter-spacing:.5px">${h.status}</span></td>
+      <td style="white-space:nowrap">${bIcon[bucket]} <span style="color:${bColor[bucket]};font-size:9px;letter-spacing:.5px">${h.status||'—'}</span></td>
       <td style="font-size:11px">${h.name||'—'}</td>
       <td style="font-size:10px;color:var(--muted);max-width:200px">${result}</td>
       <td style="color:var(--dim);white-space:nowrap;font-size:10px">${date}</td>
     </tr>`;
   }).join('');
   el.innerHTML=`<div class="rp-title">Hypothesis Ledger <span style="color:var(--muted);font-size:10px;margin-left:8px">${hyps.length} total</span></div>
-    <div style="display:flex;gap:4px;padding:8px 0;flex-wrap:wrap">${filters}</div>
     <div class="rp-scroll"><table class="rp-hyp-table">
       <thead><tr><th>ID</th><th>Status</th><th>Hypothesis</th><th>Result</th><th>Date</th></tr></thead>
       <tbody>${rows}</tbody></table></div>`;
 }
 function resHypFilter(f){_hypFilter=f;resHypRender();}
 function resHyp(data){_hypData=data;resHypRender();}
+_wireHypFilter();
 
 function resQueue(data){
   const el=document.getElementById('rp-queue');
