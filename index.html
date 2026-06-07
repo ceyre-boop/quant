@@ -735,9 +735,9 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
       </div>
       <div id="sig-offline" class="hidden">
         <div class="offline-icon">📡</div>
-        <div class="offline-title">Signal server offline</div>
-        <div style="color:var(--muted);font-size:11px">Live signals require the local server running on your machine</div>
-        <div class="offline-cmd">python3 scripts/live_signals_server.py</div>
+        <div class="offline-title" id="sig-offline-title">Signal server offline</div>
+        <div style="color:var(--muted);font-size:11px" id="sig-offline-desc">Live signals require the local server running on your machine</div>
+        <div class="offline-cmd" id="sig-offline-cmd">python3 scripts/live_signals_server.py</div>
         <button class="offline-retry" onclick="sigRefresh()">↻ Retry Connection</button>
       </div>
       <div id="sig-live" class="hidden">
@@ -1151,6 +1151,21 @@ setInterval(updateBridgeState,60000);
 
 // ══ TAB 2: SIGNALS ══
 const SIG_API='http://localhost:8765/data';
+
+// On the public HTTPS site the browser blocks fetches to http://localhost (mixed content) —
+// the local server may be running fine, it just can't be reached from here. Make the offline
+// message honest instead of implying the user's server is down.
+const IS_REMOTE = location.protocol === 'https:' ||
+  !['localhost','127.0.0.1',''].includes(location.hostname);
+(function adjustOfflineMsg(){
+  if(!IS_REMOTE) return;
+  const t=document.getElementById('sig-offline-title');
+  const d=document.getElementById('sig-offline-desc');
+  const c=document.getElementById('sig-offline-cmd');
+  if(t) t.textContent='Live signals are local-only';
+  if(d) d.innerHTML='This is the static public dashboard — it can’t reach a server on your machine. Run the server, then open the local dashboard:';
+  if(c) c.textContent='python3 scripts/live_signals_server.py  →  open http://localhost:8765/';
+})();
 
 // ── indicator compute helpers ───────────────────────────────────────────────
 function _ema(closes,period){

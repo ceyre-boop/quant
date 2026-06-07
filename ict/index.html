@@ -564,7 +564,10 @@ async function loadAll() {
     const b=document.createElement('div');
     b.id='ict-offline-banner';
     b.style.cssText='position:fixed;bottom:16px;right:16px;background:var(--bg2);border:1px solid var(--border);padding:8px 14px;font-size:10px;color:var(--muted);z-index:1000;letter-spacing:.5px';
-    b.textContent='Static view · live data requires local backend';
+    const _remote=location.protocol==='https:'||!['localhost','127.0.0.1',''].includes(location.hostname);
+    b.textContent=_remote
+      ? 'Static public view · for live data open http://localhost:8765/ict/ (server running)'
+      : 'Static view · live data requires local backend';
     document.body.appendChild(b);
     setTimeout(()=>b.remove(),8000);
   }

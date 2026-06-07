@@ -432,6 +432,32 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
+    # Serve dashboard HTML/assets from the repo root so http://localhost:8765/ is the full
+    # dashboard on ONE origin — avoids the HTTPS->localhost mixed-content block that makes the
+    # public GitHub Pages site show "server offline".
+    _CTYPES = {'.html': 'text/html; charset=utf-8', '.css': 'text/css',
+               '.js': 'application/javascript', '.json': 'application/json',
+               '.svg': 'image/svg+xml', '.ico': 'image/x-icon',
+               '.png': 'image/png', '.map': 'application/json'}
+
+    def _send_static(self, rel_path):
+        root = os.path.realpath('.')
+        target = os.path.realpath(os.path.join(root, rel_path))
+        # Path-traversal guard: refuse anything resolving outside the repo root.
+        if not (target == root or target.startswith(root + os.sep)) or not os.path.isfile(target):
+            self.send_response(404)
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            return
+        ext = os.path.splitext(target)[1].lower()
+        with open(target, 'rb') as f:
+            body = f.read()
+        self.send_response(200)
+        self.send_header('Content-Type', self._CTYPES.get(ext, 'application/octet-stream'))
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.end_headers()
+        self.wfile.write(body)
+
     def do_OPTIONS(self):
         self.send_response(204)
         self.send_header('Access-Control-Allow-Origin', '*')
@@ -441,7 +467,7 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         path = self.path.split('?')[0]
-        if path in ('/', '/data'):
+        if path == '/data':
             try:
                 self._send_json(200, build_payload())
             except Exception:
@@ -659,8 +685,13 @@ class Handler(BaseHTTPRequestHandler):
                 self._send_json(500, {'error': traceback.format_exc()})
 
         else:
-            self.send_response(404)
-            self.end_headers()
+            # Static dashboard files (HTML/assets) served from repo root.
+            if path == '/':
+                self._send_static('index.html')
+            elif path in ('/ict', '/ict/'):
+                self._send_static('ict/index.html')
+            else:
+                self._send_static(path.lstrip('/'))
 
     def do_POST(self):
         path = self.path.split('?')[0]
