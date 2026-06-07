@@ -822,5 +822,24 @@
       "new_perm_p": 0.0,
       "note": "PAIR_HOLD_OVERRIDES cleared. 60d baseline re-validated ROBUST p<0.001."
     }
+  },
+  {
+    "id": "GBPUSD-GRADE-EXPECTANCY",
+    "title": "GBPUSD grade-A vs grade-B expectancy (is conviction-grading real?)",
+    "status": "NOT_SIGNIFICANT",
+    "created_date": "2026-06-07",
+    "confirmed_date": "2026-06-07",
+    "origin": "v007-step3",
+    "description": "Tests whether GBPUSD grade-A (|real_rate_diff|>=1.5) trades have materially different expectancy than grade-B (0.5-1.5). Full-period 2015-24 backtest trades graded by real_rate_diff at entry; 10k label-shuffle permutation. (No grade->size multiplier exists; diagnostic only.)",
+    "result": {
+      "n_A": 42,
+      "meanpnl_A_pct": 0.5328,
+      "n_B": 37,
+      "meanpnl_B_pct": 0.4278,
+      "obs_diff_pct": 0.105,
+      "permutation_p": 0.7746225377462254
+    },
+    "note": "NOT_SIGNIFICANT (p=0.77). Grade-A and grade-B GBPUSD expectancy indistinguishable (+0.53% vs +0.43%). Do NOT build a grade-based size multiplier \u2014 unsupported by data. Artifact: data/research/gbpusd_grade_expectancy.json.",
+    "artifact": "data/research/gbpusd_grade_expectancy.json"
   }
 ]

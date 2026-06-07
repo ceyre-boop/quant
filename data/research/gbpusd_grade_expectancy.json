@@ -1,0 +1,28 @@
+{
+  "created_utc": "2026-06-07T17:57:27.811566+00:00",
+  "id": "GBPUSD-GRADE-EXPECTANCY",
+  "pair": "GBPUSD=X",
+  "period": "2015-01-01..2024-12-31",
+  "n_trades": 105,
+  "grade_counts": {
+    "A": 42,
+    "B": 37,
+    "C": 26
+  },
+  "grade_A": {
+    "n": 42,
+    "mean_pnl_pct": 0.5328,
+    "win_rate": 0.5
+  },
+  "grade_B": {
+    "n": 37,
+    "mean_pnl_pct": 0.4278,
+    "win_rate": 0.595
+  },
+  "observed_mean_diff_pct": 0.105,
+  "permutation_p": 0.7746225377462254,
+  "n_perms": 10000,
+  "seed": 7,
+  "verdict": "NOT_SIGNIFICANT",
+  "note": "Diagnostic only \u2014 no grade->size multiplier exists to gate. Grade-A and grade-B GBPUSD expectancy not distinguishable; grading carries no actionable size signal on this sample."
+}
