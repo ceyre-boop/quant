@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%230a0a0a'/><circle cx='8' cy='8' r='3.5' fill='%2300d4a0'/></svg>">
 <title>SOVEREIGN — Trader Dashboard</title>
 <style>
 :root {
@@ -465,6 +466,33 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
 .mb-tag.risk-off{background:#3d1515;color:#ff6b6b}
 .mb-tag.stress{background:#3d1515;color:#ff6b6b}
 #macro-bar .mb-updated{margin-left:auto;font-size:9px;color:var(--muted)}
+@media(max-width:768px){
+  #hdr{height:auto;padding:8px 16px;flex-wrap:wrap}
+  .hdr-tabs{overflow-x:auto;-webkit-overflow-scrolling:touch;width:100%}
+  .hdr-tab{padding:0 12px;height:44px;font-size:10px;letter-spacing:1px}
+  .ph-verdict{flex-direction:column;align-items:flex-start;gap:4px}
+  .ph-verdict code{margin-left:0}
+  /* TRADE tab — collapse the 12-column grid to a single column */
+  #trade-wrap{grid-template-columns:1fr;padding:16px}
+  .prop-hero,.sys-status,.ict-section,.edge-section,.sharpe-section{grid-column:1/-1}
+  .forex-grid{grid-template-columns:repeat(2,1fr)}
+  .ict-stats-grid{grid-template-columns:repeat(2,1fr)}
+  /* SIGNALS tab — stack chart above the side panel (give chart real height) */
+  #sig-live{grid-template-columns:1fr;overflow-y:auto}
+  #sig-chart-area{height:55vh}
+  #oracle-cols{grid-template-columns:1fr}
+  /* RESEARCH tab — single-column cards */
+  #res-grid{grid-template-columns:1fr}
+  .rp.half{grid-column:1/-1}
+  .rp-health-grid{grid-template-columns:repeat(2,1fr)}
+  .rp-gate-grid{grid-template-columns:repeat(2,1fr)}
+  #tr-session-summary{grid-template-columns:repeat(2,1fr)!important}
+}
+@media(max-width:480px){
+  .hdr-tab{padding:0 8px;font-size:9px;letter-spacing:.5px}
+  .forex-grid,.ict-stats-grid,.rp-health-grid,.rp-gate-grid,.edge-outcomes{grid-template-columns:1fr 1fr}
+  #trade-wrap{padding:12px}
+}
 </style>
 </head>
 <body>
@@ -864,13 +892,6 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
       </div>
       <div id="chat-err"></div>
       <div id="chat-input-outer">
-        <div class="chat-chip-row">
-          <button class="chat-chip" type="button">What's the best setup right now?</button>
-          <button class="chat-chip" type="button">ICT system status?</button>
-          <button class="chat-chip" type="button">Which forex pair has highest conviction?</button>
-          <button class="chat-chip" type="button">Should I take a trade today?</button>
-          <button class="chat-chip" type="button">Bridge state?</button>
-        </div>
         <div class="chat-inner-row">
           <textarea id="chat-input" placeholder="Ask about the system…" rows="1"></textarea>
           <button id="chat-send">SEND</button>
@@ -958,11 +979,16 @@ updateClock();setInterval(updateClock,1000);
 
 // ══ TAB SWITCHING ══
 const tabInited={};
-document.querySelectorAll('.hdr-tab').forEach(btn=>{
+const _allTabs=[...document.querySelectorAll('.hdr-tab')];
+_allTabs.forEach((btn,i)=>{
+  // Keyboard accessibility: focusable, semantic role, Enter/Space activation, arrow-key nav
+  btn.setAttribute('tabindex','0');
+  btn.setAttribute('role','tab');
   btn.addEventListener('click',()=>{
-    document.querySelectorAll('.hdr-tab').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.hdr-tab').forEach(b=>{b.classList.remove('active');b.setAttribute('aria-selected','false');});
     document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
     btn.classList.add('active');
+    btn.setAttribute('aria-selected','true');
     const id='tab-'+btn.dataset.tab;
     document.getElementById(id).classList.add('active');
     if(!tabInited[id]){
@@ -971,6 +997,14 @@ document.querySelectorAll('.hdr-tab').forEach(btn=>{
       if(id==='tab-signals'){sigInit();sigRefresh();oracleRefresh();macroRefresh();}
       if(id==='tab-trades'){trLoad();spLoad();}
       if(id==='tab-chat')chatInjectChips();
+    }
+  });
+  btn.addEventListener('keydown',e=>{
+    if(e.key==='Enter'||e.key===' '){e.preventDefault();btn.click();}
+    else if(e.key==='ArrowRight'||e.key==='ArrowLeft'){
+      e.preventDefault();
+      const next=_allTabs[(i+(e.key==='ArrowRight'?1:_allTabs.length-1))%_allTabs.length];
+      next.focus();next.click();
     }
   });
 });
@@ -1734,6 +1768,14 @@ async function sigRefresh(){
     loading.style.display='none';
     live.classList.add('hidden');
     offline.classList.remove('hidden');
+    if(!document.getElementById('dash-offline-banner')){
+      const b=document.createElement('div');
+      b.id='dash-offline-banner';
+      b.style.cssText='position:fixed;bottom:16px;right:16px;background:var(--bg2);border:1px solid var(--border);padding:8px 14px;font-size:10px;color:var(--muted);z-index:1000;letter-spacing:.5px';
+      b.textContent='Static view · live data requires local backend';
+      document.body.appendChild(b);
+      setTimeout(()=>b.remove(),8000);
+    }
   }
 }
 setInterval(()=>{if(document.getElementById('tab-signals').classList.contains('active'))sigRefresh();},60000);
@@ -2018,8 +2060,8 @@ const RES_VERSIONS=[
 ];
 const RES_TARGET=2.1470;
 
-async function resFetch(f){try{const r=await fetch(RES_BASE+f+'?t='+Date.now());return r.ok?await r.json():null;}catch{return null;}}
-async function fetchPath(p){try{const r=await fetch(p+'?t='+Date.now());return r.ok?await r.json():null;}catch{return null;}}
+async function resFetch(f){try{const r=await fetch(RES_BASE+f+'?t='+Date.now(),{signal:AbortSignal.timeout(6000)});return r.ok?await r.json():null;}catch{return null;}}
+async function fetchPath(p){try{const r=await fetch(p+'?t='+Date.now(),{signal:AbortSignal.timeout(6000)});return r.ok?await r.json():null;}catch{return null;}}
 
 function resGates(data){
   const el=document.getElementById('rp-gates');
@@ -2402,7 +2444,7 @@ async function chatSend(){
   chatBubble('user',msg);chatTyping();
   try{
     const r=await fetch(CHAT_API,{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({message:msg,context:'sovereign_trading'})});
+      body:JSON.stringify({message:msg,context:'sovereign_trading'}),signal:AbortSignal.timeout(15000)});
     document.getElementById('chat-typing')?.remove();
     if(!r.ok)throw new Error('HTTP '+r.status);
     const d=await r.json();
@@ -2412,7 +2454,11 @@ async function chatSend(){
     document.getElementById('chat-typing')?.remove();
     const errEl=document.getElementById('chat-err');
     errEl.style.display='block';
-    errEl.textContent='⚠ '+e.message+' — run: python3 scripts/live_signals_server.py';
+    // TypeError = network/mixed-content refused; TimeoutError = no response in 15s.
+    const offline=e.name==='TypeError'||e.name==='TimeoutError'||e.name==='AbortError';
+    errEl.textContent=offline
+      ? '⚠ Chat backend offline — start the local server: python3 scripts/live_signals_server.py'
+      : '⚠ '+e.message;
   }finally{
     document.getElementById('chat-send').disabled=false;
     document.getElementById('chat-input').focus();
@@ -2468,10 +2514,14 @@ function trRenderLiveFeed(d) {
     sumEl.innerHTML = '';
     return;
   }
-  const open = d.open_positions || [];
-  const events = d.events || [];
   const src = typeof trSource !== 'undefined' ? trSource : 'all';
-  const filtered = src === 'all' ? events : events.filter(e => e.source === src);
+  const allOpen = d.open_positions || [];
+  const allEvents = d.events || [];
+  // Apply the active source filter to BOTH the visible feed and the summary,
+  // so clicking ICT / FOREX / TRADINGVIEW actually changes what's shown.
+  const open = src === 'all' ? allOpen : allOpen.filter(p => p.source === src);
+  const events = src === 'all' ? allEvents : allEvents.filter(e => e.source === src);
+  const filtered = events;
 
   if (open.length) {
     feed.innerHTML = open.map(p => {
@@ -2497,9 +2547,10 @@ function trRenderLiveFeed(d) {
     const sessionTxt = spSession ? spSession.textContent : '—';
     const spEq = document.getElementById('sp-equity-scan');
     const eqTxt = spEq ? spEq.textContent : '—';
+    const emptyMsg = src === 'all' ? 'Waiting for first trade signal...' : `No open ${src} positions`;
     feed.innerHTML = `
       <div style="padding:16px 0">
-        <div style="font-size:14px;font-weight:600;color:var(--muted);margin-bottom:12px">Waiting for first trade signal...</div>
+        <div style="font-size:14px;font-weight:600;color:var(--muted);margin-bottom:12px">${emptyMsg}</div>
         <div style="font-size:12px;color:var(--muted);line-height:2">
           Next opportunity: <strong style="color:var(--text)">ICT London Kill Zone</strong> · 03:00 ET<br>
           Session: <strong style="color:var(--text)">${sessionTxt}</strong><br>

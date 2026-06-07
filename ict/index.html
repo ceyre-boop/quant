@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%230a0a0a'/><circle cx='8' cy='8' r='3.5' fill='%2300c896'/></svg>">
 <title>SOVEREIGN // ICT Oracle</title>
 <style>
 :root {
@@ -154,7 +155,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
 #statsbar{background:var(--bg2);border-top:1px solid var(--border);padding:7px 24px;display:flex;gap:32px;font-size:10px;color:var(--muted);flex-shrink:0}
 #statsbar span{color:var(--text)}
 
-@media(max-width:900px){#main{grid-template-columns:1fr}#sidebar{order:-1}#state-cards{grid-template-columns:repeat(2,1fr)}#ict-stats{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:900px){#main{grid-template-columns:1fr;padding:16px}#state-cards{grid-template-columns:repeat(2,1fr)}#ict-stats{grid-template-columns:repeat(2,1fr)}#health-detail{min-width:auto;width:calc(100vw - 32px);right:16px}}
+@media(max-width:600px){#bridge-banner{flex-wrap:wrap;gap:8px;padding:8px 16px}.bb-threat{margin-left:0;width:100%}#statsbar{flex-wrap:wrap;gap:8px 20px;padding:8px 16px}}
+@media(max-width:480px){#header{flex-wrap:wrap;height:auto;padding:10px 16px;gap:8px}.hdr-left{flex-wrap:wrap;gap:8px}.hdr-right{width:100%;justify-content:space-between}#state-cards{grid-template-columns:1fr 1fr}#ict-stats{grid-template-columns:1fr}#main{padding:12px}}
 </style>
 </head>
 <body>
@@ -166,7 +169,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
     <div class="hdr-nav"><a href="../">← Dashboard</a></div>
   </div>
   <div class="hdr-right">
-    <div id="health-pill" onclick="toggleHealth()">
+    <div id="health-pill" onclick="toggleHealth()" tabindex="0" role="button" aria-label="Toggle system health detail" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleHealth();}">
       <div id="health-dot"></div>
       <div id="health-summary">checking…</div>
     </div>
@@ -203,7 +206,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
       <div class="state-card alert">
         <div class="sc-label">Threat Score</div>
         <div class="sc-value" style="color:var(--red)" id="sc-threat">1.00</div>
-        <div class="sc-sub">CRITICAL · Lo 3: 0.50×</div>
+        <div class="sc-sub" id="sc-threat-sub">CRITICAL · 0.50× size</div>
       </div>
       <div class="state-card ok">
         <div class="sc-label">London + Grade A</div>
@@ -273,7 +276,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
       <div class="gate-row"><div class="gate-light">🟡</div><div class="gate-label">G3 WR Alignment<span class="gate-sub">collecting (need 10+)</span></div></div>
       <div class="gate-row"><div class="gate-light" id="g4-light">🔴</div><div class="gate-label">G4 Bridge Threat<span class="gate-sub" id="g4-sub">1.00 HALT_NEW</span></div></div>
       <div class="gate-row"><div class="gate-light">🟡</div><div class="gate-label">G5 Non-Bust Days<span class="gate-sub">collecting</span></div></div>
-      <div style="margin-top:10px;padding:8px 10px;background:rgba(224,82,82,.06);border:1px solid var(--red);font-size:11px;color:var(--red)">
+      <div id="wait-banner" style="margin-top:10px;padding:8px 10px;background:rgba(224,82,82,.06);border:1px solid var(--red);font-size:11px;color:var(--red)">
         ⏸ WAIT — buy when G2a + G2b + G4 flip GREEN
       </div>
     </div>
@@ -316,7 +319,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
 const BASE = '../data/agent/';
 
 async function fetchJSON(path) {
-  try { const r = await fetch(path+'?t='+Date.now()); return r.ok?await r.json():null; } catch { return null; }
+  try{const r=await fetch(path+'?t='+Date.now(),{signal:AbortSignal.timeout(5000)});return r.ok?await r.json():null;}catch{return null;}
 }
 
 function timeAgo(iso) {
@@ -390,6 +393,16 @@ function renderBridge(crossState) {
   document.getElementById('sc-regime').textContent = regime;
   document.getElementById('sc-threat').textContent = threat.toFixed(2);
   document.getElementById('sc-threat').style.color = threat>0.85?'var(--red)':threat>0.5?'var(--yellow)':'var(--green)';
+  const bridgeCard=document.getElementById('sc-bridge')?document.getElementById('sc-bridge').closest('.state-card'):null;
+  const threatCard=document.getElementById('sc-threat')?document.getElementById('sc-threat').closest('.state-card'):null;
+  if(bridgeCard)bridgeCard.className='state-card '+(mode==='HALT_NEW'?'alert':mode==='TIGHTEN'?'warn':'ok');
+  if(threatCard)threatCard.className='state-card '+(threat>0.85?'alert':threat>0.5?'warn':'ok');
+  const threatSub=document.getElementById('sc-threat-sub');
+  if(threatSub){
+    const lvl=threat>0.85?'CRITICAL':threat>0.5?'ELEVATED':'NORMAL';
+    const size=crossState.commitment_score_avg!=null?crossState.commitment_score_avg.toFixed(2)+'× size':'';
+    threatSub.textContent=size?lvl+' · '+size:lvl;
+  }
   document.getElementById('stat-bridge').textContent = mode;
   document.getElementById('stat-bridge').style.color = mode==='HALT_NEW'?'var(--red)':mode==='TIGHTEN'?'var(--yellow)':'var(--green)';
   // G4 gate — live threat
@@ -399,6 +412,33 @@ function renderBridge(crossState) {
     const halted = threat > 0.85 || mode === 'HALT_NEW';
     g4Light.textContent = halted ? '🔴' : threat > 0.5 ? '🟡' : '🟢';
     g4Sub.textContent = threat.toFixed(2) + ' ' + mode;
+  }
+}
+
+// ── WAIT banner — reflects which gates are actually not green ──
+function updateWaitBanner() {
+  const banner = document.getElementById('wait-banner');
+  if (!banner) return;
+  const pending = [];
+  document.querySelectorAll('#sidebar .gate-row').forEach(row => {
+    const light = row.querySelector('.gate-light');
+    const label = row.querySelector('.gate-label');
+    if (!light || !label) return;
+    if (light.textContent.trim() !== '🟢') {
+      const name = (label.childNodes[0]?.textContent || label.textContent).trim();
+      pending.push(name.split(/\s/)[0]);
+    }
+  });
+  if (!pending.length) {
+    banner.style.background = 'rgba(0,200,150,.06)';
+    banner.style.borderColor = 'var(--green)';
+    banner.style.color = 'var(--green)';
+    banner.textContent = '✅ READY — all gates green';
+  } else {
+    banner.style.background = 'rgba(224,82,82,.06)';
+    banner.style.borderColor = 'var(--red)';
+    banner.style.color = 'var(--red)';
+    banner.textContent = '⏸ WAIT — pending: ' + pending.join(' + ');
   }
 }
 
@@ -431,12 +471,13 @@ function renderFeed(msgs) {
 async function renderReflectionFeed() {
   const el = document.getElementById('feed-items');
   const today = new Date();
-  const candidates = [];
-  for (let i = 0; i < 7; i++) {
+  // latest first, then a short 3-day window — keeps the network/console quiet
+  // when no reflection files are published (e.g. the static public site)
+  const candidates = ['../data/oracle/latest_reflection.json'];
+  for (let i = 0; i < 3; i++) {
     const d = new Date(today); d.setDate(d.getDate() - i);
     candidates.push('../data/oracle/reflections/' + d.toISOString().slice(0,10) + '.json');
   }
-  candidates.push('../data/oracle/latest_reflection.json');
   const results = await Promise.all(candidates.map(p => fetchJSON(p)));
   const seen = new Set();
   const entries = results
@@ -518,12 +559,22 @@ async function loadAll() {
     fetchJSON('../data/forensics/cross_system_state.json'),
   ]);
   const msgs = messages?.messages||[];
+  const _allNull=[health,messages,hypotheses,suggestions,crossState].every(x=>x===null);
+  if(_allNull&&!document.getElementById('ict-offline-banner')){
+    const b=document.createElement('div');
+    b.id='ict-offline-banner';
+    b.style.cssText='position:fixed;bottom:16px;right:16px;background:var(--bg2);border:1px solid var(--border);padding:8px 14px;font-size:10px;color:var(--muted);z-index:1000;letter-spacing:.5px';
+    b.textContent='Static view · live data requires local backend';
+    document.body.appendChild(b);
+    setTimeout(()=>b.remove(),8000);
+  }
   renderHealth(health);
   if (crossState) renderBridge(crossState);
   renderOracle(msgs);
   renderReflectionFeed();
   renderSuggestions(suggestions);
   renderSharpe();
+  updateWaitBanner();
   document.getElementById('last-refresh').textContent = 'updated '+new Date().toLocaleTimeString();
 }
 
