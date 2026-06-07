@@ -84,7 +84,7 @@ python3 scripts/run_replay_validation.py
 | Decision logger | `sovereign/intelligence/decision_logger.py` | All decision contexts |
 | Config | `config/parameters.yml`, `config/ict_params.yml` | Never hardcode thresholds |
 
-Current live version: Forex v015 (pending save_version gate) — 4-pair portfolio (AUDNZD excluded).
+Current live version: Forex v015 — anchored as logs/research/v003 (tracked snapshot), HYP-045 4-pair portfolio (AUDNZD excluded).
 HYP-045 CONFIRMED 2026-06-02: AUDNZD exclusion → OOS costed Sharpe **1.08** (CI [0.84, 1.32], n=103);
 decay 1.61 (ROBUST); p=0.002. v014 baseline was 0.76 (5-pair, AUDNZD OOS Sharpe -0.879 — active drag).
 Prior headline 2.097 was uncosted and annualized as if trading daily (these strategies trade 4–14×/yr).
@@ -98,6 +98,5 @@ Evidence status (2026-06-02):
   carry diversifier** — long-short robustly re-couples with carry in the COVID crash (ρ=0.42, BH p=0.007,
   sig>calm); correlated return-stacking, not a crisis-independent second edge. Do not re-explore as a
   diversifier. (Measured vs DBV proxy, died 2023-03; real v015 overlap thin: n=39, ρ=0.036.)
-- Next: run `scripts/holdout_validation_v014.py` and `scripts/permutation_test_forex.py` on 4-pair config
-  to refresh validation files, then `scripts/save_version.py --label "HYP-045: AUDNZD exclusion"`.
+- Next: v007 per-pair hold implementation (GBPUSD 6d/2.0×, AUDUSD/EURUSD 5d, GBPJPY 5d) toward the 1.5 Sharpe target.
 Full system state: `~/.claude/memory/alta-investments-architecture.md`

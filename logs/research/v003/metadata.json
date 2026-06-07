@@ -1,0 +1,67 @@
+{
+  "version": "v003",
+  "label": "HYP-045: AUDNZD exclusion (4-pair, OOS Sharpe 1.08, ROBUST)",
+  "date": "2026-06-02 19:18",
+  "git_commit": "8516145",
+  "backtest_period": "2015-01-01 to 2024-12-31",
+  "metrics": {
+    "sharpe_by_pair": {
+      "EURUSD=X": 0.503,
+      "GBPUSD=X": 0.776,
+      "USDJPY=X": 0.736,
+      "AUDUSD=X": 0.67
+    },
+    "win_rate_by_pair": {
+      "EURUSD=X": 0.543,
+      "GBPUSD=X": 0.547,
+      "USDJPY=X": 0.574,
+      "AUDUSD=X": 0.481
+    },
+    "pf_by_pair": {
+      "EURUSD=X": 1.724,
+      "GBPUSD=X": 2.172,
+      "USDJPY=X": 2.219,
+      "AUDUSD=X": 1.835
+    },
+    "max_dd_by_pair": {
+      "EURUSD=X": -0.054,
+      "GBPUSD=X": -0.064,
+      "USDJPY=X": -0.049,
+      "AUDUSD=X": -0.042
+    },
+    "trades_by_pair": {
+      "EURUSD=X": 70,
+      "GBPUSD=X": 75,
+      "USDJPY=X": 54,
+      "AUDUSD=X": 77
+    },
+    "positive_sharpe_count": 4,
+    "total_pairs": 4,
+    "avg_sharpe": 0.6702,
+    "best_pair": "GBPUSD=X",
+    "best_sharpe": 0.776,
+    "worst_pair": "EURUSD=X",
+    "worst_sharpe": 0.503,
+    "total_trades_all": 276
+  },
+  "improvement_vs_prev": {
+    "prev_version": "v003",
+    "prev_avg_sharpe": null,
+    "delta_avg_sharpe": null
+  },
+  "to_beat_in_next": {
+    "target_metric": "avg_sharpe across all 11 pairs",
+    "current_value": 0.6702,
+    "minimum_improvement": 0.05,
+    "target_positive_pairs": 5,
+    "weakest_pairs": [
+      "EURUSD=X",
+      "AUDUSD=X",
+      "USDJPY=X",
+      "GBPUSD=X"
+    ],
+    "notes": "Focus on EURUSD, AUDUSD first"
+  },
+  "chart": "chart_v003.png",
+  "clarification": "metrics.avg_sharpe 0.6702 = full-period 2015-2024 backtest. The label's '1.08' is the OOS (2023-2024) costed Sharpe, validated in data/audit/holdout_validation_v014.json (decay 1.61, ROBUST). Both are real; do not read 0.67 as underperformance. v003 is the durable (git-tracked) anchor for the 4-pair v015 system / prop challenge. NOTE: metadata.git_commit 8516145 is just HEAD at save time (an unrelated [ICT] frontend commit), NOT a forex-strategy pin. (Annotation 2026-06-07; captured metrics untouched.)"
+}
