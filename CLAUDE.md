@@ -94,6 +94,10 @@ Evidence status (2026-06-02):
 - **ICT pattern edge: NOT PROVEN** — permutation p=0.52; fails BH. Treat ICT as unvalidated.
 - **AUDNZD removed**: both legs RBA-driven (RBNZ tracks RBA ≤1 quarter) — no independent rate differential.
 - HYP-044 VIX gate: rolled back (REJECTED_OOS, p=0.50, delta≈0).
+- **Overnight-QQQ (2026-06-07): real STANDALONE edge (VALID_EDGE, net Sharpe 0.574) but REJECTED as a
+  carry diversifier** — long-short robustly re-couples with carry in the COVID crash (ρ=0.42, BH p=0.007,
+  sig>calm); correlated return-stacking, not a crisis-independent second edge. Do not re-explore as a
+  diversifier. (Measured vs DBV proxy, died 2023-03; real v015 overlap thin: n=39, ρ=0.036.)
 - Next: run `scripts/holdout_validation_v014.py` and `scripts/permutation_test_forex.py` on 4-pair config
   to refresh validation files, then `scripts/save_version.py --label "HYP-045: AUDNZD exclusion"`.
 Full system state: `~/.claude/memory/alta-investments-architecture.md`
