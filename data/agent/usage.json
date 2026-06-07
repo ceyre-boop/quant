@@ -7,43 +7,46 @@
     "agent_share": 0.3
   },
   "week": {
-    "start_date": "2026-05-16",
-    "weekly_used": 21200,
-    "weekly_remaining": 191300,
+    "start_date": "2026-05-31",
+    "weekly_used": 6800,
+    "weekly_remaining": 193200,
     "last_synced": null,
-    "note": "REST MODE May 18 01:12-01:20 UTC added ~3500 tokens (4 backtests, file updates)"
+    "note": "REST MODE Jun 1 01:30-01:52 UTC \u2014 HYP-039 partial confirmed (CB blackout), HYP-053 discovered (regime velocity), health check, paper trading status"
   },
   "today": {
-    "date": "2026-05-27",
+    "date": "2026-06-01",
     "human_used": 0,
-    "agent_used": 4500,
+    "agent_used": 2600,
     "daily_human_budget": 20000,
     "daily_agent_budget": 8571,
     "agent_extra_from_rollover": 10000,
     "agent_allowed_today": 18571,
-    "note": "REST MODE May 27 01:07-01:15 UTC \u2014 RQ-REST-004 complete, HYP-046/047/048, score cap sweep + triple filter MC, HYP-036 proxy failure"
+    "note": "REST MODE Jun 1 01:30 UTC \u2014 CB blackout analysis, regime fragility study, 4 findings, 4 messages, 2 tasks added"
   },
   "session": {
-    "started": "2026-05-27T01:07:55+00:00",
-    "ended": "2026-05-27T01:15:00+00:00",
+    "started": "2026-06-01T01:30:00+00:00",
+    "ended": "2026-06-01T01:52:00+00:00",
     "mode": "REST_MODE",
     "tasks_completed": [
-      "RQ-REST-004"
+      "HYP-039-cb-blackout",
+      "HYP-053-regime-velocity",
+      "health-check",
+      "paper-trading-status"
     ],
     "findings_written": 4,
-    "hypotheses_closed": [
-      "HYP-046 (confirmed)",
-      "HYP-047 (confirmed)",
-      "HYP-048 (candidate)"
+    "hypotheses_updated": [
+      "HYP-039"
+    ],
+    "new_hypotheses": [
+      "HYP-053"
     ],
     "new_tasks_added": [
-      "RQ-REST-006"
+      "RQ-REST-010",
+      "RQ-REST-011"
     ],
-    "queue_tasks_completed": [
-      "RQ-REST-004"
-    ]
+    "key_finding": "Rate divergence velocity predicts forex regime; current 2026 signal is FULL SIZE (91st pct). CB danger zone is days 3-14 pre-meeting, not 0-2d."
   },
-  "mode": "NORMAL",
+  "mode": "REST_MODE_COMPLETE",
   "thresholds": {
     "weekly_danger": 20000,
     "weekly_light_mode": 50000,

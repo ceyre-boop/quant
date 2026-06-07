@@ -398,7 +398,58 @@
       "estimated_minutes": 15,
       "source": "REST_MODE DOW analysis",
       "hypothesis_id": "HYP-NEW-DOW-VETO"
+    },
+    {
+      "id": "RQ-REST-008",
+      "status": "QUEUED",
+      "priority": 1,
+      "created": "2026-05-31T01:30:00Z",
+      "name": "Wire DOM 8-15 size boost in sizing stage",
+      "description": "HYP-052 CANDIDATE. DOM 8-15 as 1.5x size multiplier on DOW veto base. Implementation: in execute_daily.py (or sizing module), after DOW veto applied, check entry_dt.day in [8..15] \u2192 apply size_mult=1.5. Expected: MC from 83.9% to 91% with no frequency cost. Requires Colin approval \u2014 live pipeline sizing change.",
+      "requires_human": true,
+      "needs_network": false,
+      "estimated_minutes": 20,
+      "source": "REST_MODE_HYP-052",
+      "hypothesis_id": "HYP-052"
+    },
+    {
+      "id": "RQ-REST-009",
+      "status": "QUEUED",
+      "priority": 2,
+      "created": "2026-05-31T01:30:00Z",
+      "name": "HYP-051 DOM 8-15 gate vs size boost: Colin policy decision",
+      "description": "HYP-051 confirmed: Days 8-15 replicates in all 3 windows. Policy decision needed: Option A (hard filter): DOM 8-15 only \u2192 MC=91.4%, 1.2/month, G2 in 25mo. Option B (size boost): DOW veto + DOM 1.5x \u2192 MC=91%, 2.4/month, G2 in 13mo. Option C (both hard): DOW+DOM \u2192 MC=97.8%, 0.8/month, G2 in 37mo. Recommend Option B: same MC as hard DOM filter, twice the data collection rate.",
+      "requires_human": true,
+      "needs_network": false,
+      "estimated_minutes": 5,
+      "source": "REST_MODE_HYP-051/052",
+      "hypothesis_id": "HYP-051"
+    },
+    {
+      "id": "RQ-REST-010",
+      "status": "QUEUED",
+      "priority": 2,
+      "created": "2026-06-01T01:45:00Z",
+      "name": "HYP-039: MC validation for CB blackout gate (days 3-14 before CB)",
+      "description": "REST MODE found: days 3-14 before any CB meeting show WR=18-22% (vs baseline 30.8%) for London ICT trades. Pre-7d overall delta: WR=-5.8pp, avgR=-0.198R. n=52 is borderline. Run MC simulation: apply days_3_14_before_cb veto to London trades dataset. Compute Sharpe delta and MC prop challenge pass rate. If Sharpe delta > 0.10: wire as hard veto. If smaller: wire as 0.5x size reducer. Needs CB calendar at entry time (already cached).",
+      "needs_network": false,
+      "estimated_minutes": 15,
+      "source": "REST_MODE_HYP-039",
+      "hypothesis_id": "HYP-039"
+    },
+    {
+      "id": "RQ-REST-011",
+      "status": "QUEUED",
+      "priority": 1,
+      "created": "2026-06-01T01:45:00Z",
+      "name": "HYP-053: Backtest rate divergence velocity size gate on v014 trade log",
+      "description": "REST MODE found: 90-day rolling spread velocity (GBPUSD+AUDUSD+USDJPY+AUDNZD) correctly predicts 3/4 bad years. Proposed size gate: velocity > p50 = 1.0x, p25-p50 = 0.5x, < p25 = 0.25x. Backtest: load v014 trade log (n=119 costed OOS trades), apply daily size multiplier from cached rate data, recompute Sharpe and max_DD. Focus on 2021 (expected: large improvement) and 2024 (expected: material improvement). Compare vs v014 baseline Sharpe=0.76. This is a pure size reducer — no trade entries missed. Low implementation risk. Needs rate data loading (parquet files already cached).",
+      "needs_network": false,
+      "estimated_minutes": 20,
+      "source": "REST_MODE_HYP-053",
+      "hypothesis_id": "HYP-053",
+      "is_code_change": false
     }
   ],
-  "last_updated": "2026-05-29T01:20:52.138864+00:00"
+  "last_updated": "2026-06-01T01:50:00Z"
 }

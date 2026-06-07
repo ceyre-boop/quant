@@ -1,0 +1,26 @@
+{
+  "date": "2026-06-05",
+  "generated_at": "2026-06-05T06:31:41.345726+00:00",
+  "input_tokens": 5338,
+  "output_tokens": 848,
+  "estimated_cost_usd": 0.14367,
+  "harvest_days_read": 4,
+  "reflection": {
+    "candidate_lesson": {
+      "lesson_text": "When the 30-indicator consensus shows conv=100% LONG but green_matches=0 and hist_hr=0%, the signal is a structurally unbacked extreme \u2014 do not size up on consensus conviction without historical pattern confirmation.",
+      "mechanism": "A 15/30 bull, 0/30 bear reading on USDJPY reflects current momentum agreement, but green_matches=0 means this exact indicator configuration has never resolved profitably in memory. Institutionally, a pair pinned at one-directional consensus right before a high-impact NFP print (per briefing) is overnight positioning that mean-reverts on the print \u2014 the consensus describes crowding, not edge.",
+      "testable_rule": "if consensus_conviction >= 0.90 and green_matches == 0 and hist_hr <= 0.10: size_multiplier *= 0.5  # untested extreme, halve exposure",
+      "expected_impact": "Reduces drawdown variance on false-conviction entries; expected +0.02 to +0.03 Sharpe by avoiding the largest single-trade losses on crowded pre-event positioning.",
+      "evidence_from_harvest": "USDJPY currently reads dir=LONG conv=100% with green_matches=0 and hist_hr=0% \u2014 maximal conviction with zero historical validation. AUDUSD by contrast shows conv=8% but hist_hr=72%, proving conviction and historical reliability are decoupled and that low-conviction/high-hr is the inverse-but-real edge.",
+      "evidence_from_reasoning": null,
+      "reasoning_component_targeted": "consensus_conviction / green_matches / hist_hr",
+      "sample_needed": 25
+    },
+    "retirement_flag": {
+      "lesson_to_review": "L8",
+      "reason": "L8 tightens the USDJPY/AUDNZD VIX gate to 13, but current state shows USDJPY at conv=100% LONG with no VIX context surfaced \u2014 if NFP-driven safe-haven flow is active, the gate may need re-validation against the new green_matches=0 regime; verify it still fires before this NFP cycle."
+    },
+    "system_health_note": "Regime is UNKNOWN with 0 trades in 7 days and TradingView providing no signals \u2014 system is correctly idle, sizing capped at 75%, but the USDJPY conv=100%/hist_hr=0% reading is a latent trap that should be gated before any pre-NFP entry."
+  },
+  "auto_validation": null
+}

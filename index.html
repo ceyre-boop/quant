@@ -969,6 +969,12 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
 </div><!-- #tabs -->
 
 <script>
+// ══ BACKEND BASE ══
+// Local: talk to the localhost server. Remote (public HTTPS site): use the hosted backend URL
+// once set in Phase 2; until then '' makes fetches relative → 404 on Pages → honest offline state.
+const IS_REMOTE = location.protocol === 'https:' || !['localhost','127.0.0.1',''].includes(location.hostname);
+const API_BASE = IS_REMOTE ? '' : 'http://localhost:8765';
+
 // ══ CLOCK ══
 function updateClock(){
   const now=new Date();
@@ -1034,7 +1040,7 @@ tabInited['tab-trade']=true;
 // ══ CROSS-SYSTEM STATE (local server) ══
 async function tryFetchBridge(){
   try{
-    const r=await fetch('http://localhost:8765/data?t='+Date.now(),{signal:AbortSignal.timeout(3000)});
+    const r=await fetch(API_BASE+'/data?t='+Date.now(),{signal:AbortSignal.timeout(3000)});
     if(!r.ok)return null;
     return await r.json();
   }catch{return null;}
@@ -1150,15 +1156,12 @@ updateBridgeState();
 setInterval(updateBridgeState,60000);
 
 // ══ TAB 2: SIGNALS ══
-const SIG_API='http://localhost:8765/data';
+const SIG_API=API_BASE+'/data';
 
-// On the public HTTPS site the browser blocks fetches to http://localhost (mixed content) —
-// the local server may be running fine, it just can't be reached from here. Make the offline
-// message honest instead of implying the user's server is down.
-const IS_REMOTE = location.protocol === 'https:' ||
-  !['localhost','127.0.0.1',''].includes(location.hostname);
+// On the public HTTPS site, until the hosted backend is wired (Phase 2), localhost is unreachable —
+// make the offline message honest instead of implying the user's local server is down.
 (function adjustOfflineMsg(){
-  if(!IS_REMOTE) return;
+  if(!IS_REMOTE || API_BASE) return;
   const t=document.getElementById('sig-offline-title');
   const d=document.getElementById('sig-offline-desc');
   const c=document.getElementById('sig-offline-cmd');
@@ -1663,7 +1666,7 @@ function sigRenderPairBar(signals){
         sigRenderChart(p);
         const pairCode=sigActivePair.replace('=X','');
         try{
-          const resp=await fetch('http://localhost:8765/ohlcv?pair='+pairCode+'&t='+Date.now(),{signal:AbortSignal.timeout(8000)});
+          const resp=await fetch(API_BASE+'/ohlcv?pair='+pairCode+'&t='+Date.now(),{signal:AbortSignal.timeout(8000)});
           if(resp.ok){
             const d=await resp.json();
             if(d.ohlcv?.length){
@@ -1756,7 +1759,7 @@ async function sigRefresh(){
       sigRenderChart(t);
       // Fetch fresh OHLCV for initial pair (ensures correct scale for all pairs incl USDJPY)
       const _pc=sigActivePair.replace('=X','');
-      fetch('http://localhost:8765/ohlcv?pair='+_pc+'&t='+Date.now(),{signal:AbortSignal.timeout(8000)})
+      fetch(API_BASE+'/ohlcv?pair='+_pc+'&t='+Date.now(),{signal:AbortSignal.timeout(8000)})
         .then(r=>r.ok?r.json():null)
         .then(d=>{if(d?.ohlcv?.length){t.ohlcv=d.ohlcv;if(d.current)t.price=d.current;_sigSetData(t);}})
         .catch(()=>{});
@@ -1768,14 +1771,14 @@ async function sigRefresh(){
     // Fetch session levels (once per day)
     const today = new Date().toISOString().slice(0,10);
     if (_sessionLevelsDate !== today) {
-      fetch('http://localhost:8765/session_levels?pair=' + (sigActivePair || 'GBPUSD') + '&t=' + Date.now(), { signal: AbortSignal.timeout(8000) })
+      fetch(API_BASE+'/session_levels?pair=' + (sigActivePair || 'GBPUSD') + '&t=' + Date.now(), { signal: AbortSignal.timeout(8000) })
         .then(r => r.ok ? r.json() : null)
         .then(lvl => { if (lvl && !lvl.error) { drawSessionLevels(lvl); _sessionLevelsDate = today; } })
         .catch(() => {});
     }
 
     // Scanner state for TP/SL lines
-    fetch('http://localhost:8765/scanner_state?t=' + Date.now(), { signal: AbortSignal.timeout(4000) })
+    fetch(API_BASE+'/scanner_state?t=' + Date.now(), { signal: AbortSignal.timeout(4000) })
       .then(r => r.ok ? r.json() : null)
       .then(sc => { if (sc) drawScannerLevels(sc, sigActivePair || 'GBPUSD'); })
       .catch(() => {});
@@ -1796,15 +1799,15 @@ async function sigRefresh(){
 setInterval(()=>{if(document.getElementById('tab-signals').classList.contains('active'))sigRefresh();},60000);
 
 // ══ ORACLE INTEL PANEL ══
-const ORACLE_API='http://localhost:8765/oracle';
+const ORACLE_API=API_BASE+'/oracle';
 let _oracleLinesSl=null, _oracleLinesEntry=null, _oracleLinesTP1=null, _oracleLinesTP2=null;
 
 async function oracleRefresh(){
   try{
     const [oracleR, scannerR, activityR] = await Promise.allSettled([
       fetch(ORACLE_API + '?t=' + Date.now(), { signal: AbortSignal.timeout(5000) }),
-      fetch('http://localhost:8765/scanner_state?t=' + Date.now(), { signal: AbortSignal.timeout(4000) }),
-      fetch('http://localhost:8765/activity?t=' + Date.now(), { signal: AbortSignal.timeout(4000) }),
+      fetch(API_BASE+'/scanner_state?t=' + Date.now(), { signal: AbortSignal.timeout(4000) }),
+      fetch(API_BASE+'/activity?t=' + Date.now(), { signal: AbortSignal.timeout(4000) }),
     ]);
     const oracleData = oracleR.status === 'fulfilled' && oracleR.value.ok ? await oracleR.value.json() : null;
     const scannerData = scannerR.status === 'fulfilled' && scannerR.value.ok ? await scannerR.value.json() : null;
@@ -1822,7 +1825,7 @@ async function oracleRefresh(){
 
 async function macroRefresh(){
   try{
-    const r = await fetch('http://localhost:8765/macro?t='+Date.now(), {signal: AbortSignal.timeout(6000)});
+    const r = await fetch(API_BASE+'/macro?t='+Date.now(), {signal: AbortSignal.timeout(6000)});
     if(!r.ok) return;
     const d = await r.json();
     const s = d.summary||{};
@@ -2308,7 +2311,8 @@ function resHypRender(){
   const rows=sorted.map(h=>{
     const bucket=_hypBucket(h.status);
     const date=h.date_confirmed||h.date_decided||h.date_tested||h.date_formed||h.date||'—';
-    const text=h.result||h.conclusion||'—';
+    // result/conclusion can be a string, null, or (in some entries) an object — coerce safely.
+    let text=h.result; if(typeof text!=='string')text=(typeof h.conclusion==='string'?h.conclusion:'—');
     const result=text.slice(0,90)+(text.length>90?'…':'');
     return`<tr>
       <td style="color:var(--muted);white-space:nowrap">${h.id||'—'}</td>
@@ -2402,15 +2406,24 @@ async function resLoad(){
     fetchPath('data/agent/tv_regime_signals.json'),
     fetchPath('data/indicators/live_snapshot.json'),
   ]);
-  resHealth(health);resMsgs(msgs);resUsage(usage);resHyp(hyp);resQueue(queue);
-  resGates(gates);resReflection(reflection);resFills(g2);resVersions(verHistory||null);
-  resRegime(tvSignals||[],gates);
-  resIndicators(indSnap||null);
+  // Per-card guard: one bad field can never blank the whole tab or leave a card on "Loading…".
+  const R=(id,fn,...a)=>{try{fn(...a);}catch(e){console.error('render '+id+' failed',e);const el=document.getElementById(id);if(el)el.innerHTML='<div class="rp-empty">Unavailable</div>';}};
+  R('rp-health',resHealth,health);
+  R('rp-messages',resMsgs,msgs);
+  R('rp-usage',resUsage,usage);
+  R('rp-hyp',resHyp,hyp);
+  R('rp-queue',resQueue,queue);
+  R('rp-gates',resGates,gates);
+  R('rp-reflection',resReflection,reflection);
+  R('rp-fills',resFills,g2);
+  R('rp-versions',resVersions,verHistory||null);
+  R('rp-regime',resRegime,tvSignals||[],gates);
+  R('rp-indicators',resIndicators,indSnap||null);
 }
 setInterval(()=>{if(document.getElementById('tab-research').classList.contains('active'))resLoad();},300000);
 
 // ══ TAB 4: CHAT ══
-const CHAT_API='http://localhost:8765/chat';
+const CHAT_API=API_BASE+'/chat';
 const CHAT_CHIPS=['What is the best setup right now?','ICT system status?','Which forex pair has highest conviction?','Should I take a trade today?','Bridge state and threat level?','Show me the edge math'];
 
 function chatInjectChips(){
@@ -2525,7 +2538,7 @@ async function trLoad(){
   const dot=document.getElementById('tr-dot');
   const statusText=document.getElementById('tr-status-text');
   try{
-    const r=await fetch('http://localhost:8765/trades?n=200',{signal:AbortSignal.timeout(4000)});
+    const r=await fetch(API_BASE+'/trades?n=200',{signal:AbortSignal.timeout(4000)});
     const d=await r.json();
     dot.className='tv-status-dot live';
     statusText.textContent='SERVER LIVE · '+d.count+' EVENTS';
@@ -2631,8 +2644,8 @@ function spLoad() {
   const AC = new AbortController();
   const tid = setTimeout(() => AC.abort(), 6000);
   Promise.all([
-    fetch('http://localhost:8765/scanner_state', {signal: AC.signal}).then(r => r.json()),
-    fetch('http://localhost:8765/activity',      {signal: AC.signal}).then(r => r.json()),
+    fetch(API_BASE+'/scanner_state', {signal: AC.signal}).then(r => r.json()),
+    fetch(API_BASE+'/activity',      {signal: AC.signal}).then(r => r.json()),
   ]).then(([state, activity]) => {
     clearTimeout(tid);
     const prev = _spState;

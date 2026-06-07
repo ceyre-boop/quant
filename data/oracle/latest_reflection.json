@@ -1,25 +1,90 @@
 {
-  "date": "2026-05-29",
-  "generated_at": "2026-05-29T00:03:57.296040+00:00",
-  "input_tokens": 5351,
-  "output_tokens": 858,
-  "estimated_cost_usd": 0.144615,
-  "harvest_days_read": 0,
-  "reflection": {
-    "candidate_lesson": {
-      "lesson_text": "A maxed commitment_score (1.0) with a null rate_differential_zscore is a false-confidence trap: price-action perfection without macro confirmation produces COMMITMENT_FAILURE.",
-      "mechanism": "commitment_score measures price-structure quality (sweep + FVG tap + kill zone) but is blind to macro thesis. When rate_differential_zscore is null, there is no independent macro vote \u2014 institutions are not defending the level for a fundamental reason, so the sweep is retail-driven liquidity churn that reverts. The two signals must pass independently; one cannot substitute for the other.",
-      "testable_rule": "if commitment_score >= 0.90 and rate_differential_zscore is None: return ICTVeto  # require non-null macro confirmation when price-action is maximal",
-      "expected_impact": "Removes a class of high-conviction-but-unconfirmed losers; estimated +0.02-0.03 Sharpe by eliminating -0.94R outliers that drag the tail, improving win rate on remaining London A setups.",
-      "evidence_from_harvest": "Only 1 closed trade (0W/1L, avg R=-0.940) \u2014 a London Grade A setup that matches the L6 'exact setup' on price-action criteria yet still failed, suggesting the missing macro vote is the differentiator.",
-      "evidence_from_reasoning": "The single COMMITMENT_FAILURE had commitment_score=1.0 (maximal) but rate_differential_zscore=null \u2014 perfect price action with zero macro confirmation produced -0.94R; the library_match (2022_RATE_SHOCK at 0.61) was a weak/moderate similarity that did not save it.",
-      "reasoning_component_targeted": "rate_differential_zscore",
-      "sample_needed": 25
+  "revision_2026_05_31": "⚠️ Sharpe figures in this briefing (2.097) are LEGACY uncosted/mis-annualized. Honest costed √n-weighted Sharpe is 0.72 IS / 1.07 OOS (95% CI [0.82,1.31], n=103). The HYP-044 VIX gate did not validate out-of-sample (delta=0). Prose below is preserved as the point-in-time record of what was believed on 2026-05-28.",
+  "timestamp": "2026-05-31T04:15:47.104523+00:00",
+  "type": "END_OF_DAY_BRIEFING",
+  "model": "claude-opus-4-7",
+  "context": {
+    "date": "2026-05-28",
+    "system_version": "v015",
+    "changes_today": [
+      "Weekly trend gate (Stage 5.6) added and validated: WR 39.6% \u2192 42.3%",
+      "Backtest confirmed: v015 ships, fewer counter-trend trades",
+      "G2a signal validation: PASS at 36.4% after trend gate",
+      "G2b execution validation: 1/8, OANDA connected, trades queue for Sunday open",
+      "PropRiskManager built: 6 gates live, wired into all execution paths",
+      "ExecutionTracker built: logging slippage to data/execution/fills.jsonl",
+      "DailyReadiness gate built: portfolio-level assessment before any scan",
+      "DecisionChain built: all 5 questions in series, single gateway for all trades",
+      "FVG express scanner: 3 signals ready (EURUSD SHORT, USDJPY LONG, GBPUSD LONG blocked by correlation)",
+      "NY AM session scanner added: runs every 30min 12:00-15:00 UTC",
+      "Oracle upgraded to Opus 4.7 for nightly reflections",
+      "Micro-corrections increased to 12x/day (every 2h) on Haiku",
+      "Oracle now has live prices in every call",
+      "API keys: 10/11 connected (NASDAQ deprecated)",
+      "Tiingo replaces yfinance as primary forex data source",
+      "News API feeds Oracle reflect cycle with daily headlines",
+      "Alpha Vantage FX_DAILY as secondary rate fallback"
+    ],
+    "research_findings": [
+      "FVG validated as structural backbone: present in 160/160 validated indicator combinations",
+      "FVG standalone hit rate: 71% on holdout (peer review confirmed)",
+      "Rolling holdout test: FVG dominance confirmed across 2021, 2022, 2023, 2024 independently",
+      "Peer review assessment: Novelty HIGH, Statistical credibility MODERATE, Worth pursuing ABSOLUTELY",
+      "L-4 (pd_alignment) SUSPENDED: delta=-0.034, failed all gates",
+      "L-5 stays ACTIVE: removing hurts Sharpe by -0.09"
+    ],
+    "current_state": {
+      "forex_sharpe": 2.097,
+      "forex_version": "v015",
+      "ict_wr": "42.3% (with weekly trend gate)",
+      "library_threat": 0.05,
+      "library_pattern": "LATE_CYCLE_MOMENTUM",
+      "bridge_mode": "NORMAL",
+      "oanda_nav": 110000,
+      "oanda_practice": true,
+      "prop_g1": "GREEN 99.7%",
+      "prop_g2a": "PASS 36.4%",
+      "prop_g2b": "1/8 collecting",
+      "prop_g4": "GREEN 0.05",
+      "active_lessons": 7,
+      "suspended_lessons": 1,
+      "untestable_lessons": 3,
+      "decision_chain": "LIVE",
+      "daily_readiness": "LIVE",
+      "trade_manager": "PENDING Phase 3",
+      "dynamic_sizer": "PENDING Phase 2",
+      "present_state_reader": "PENDING Phase 2"
     },
-    "retirement_flag": {
-      "lesson_to_review": "L1",
-      "reason": "L1 defines the 'exact setup' as London + Grade A + structure_score < 1.5 but does not require a non-null macro vote \u2014 the failed trade satisfied L1 fully yet lost, suggesting L1 needs a macro-confirmation sub-clause."
+    "tomorrow": {
+      "markets_open": "21:00 UTC Sunday (5 PM ET)",
+      "first_auto_trades": "EURUSD SHORT + USDJPY LONG via FVG express",
+      "london_scanner": "03:00 ET Monday",
+      "ny_scanner": "08:30 ET Monday"
+    }
+  },
+  "briefing": "# ORACLE INTELLIGENCE BRIEFING\n**2026-05-28 04:15 UTC**\n\n---\n\n**1. SYSTEM STATE**\nv015 live. Forex Sharpe **2.097**. ICT win rate **42.3%** post weekly trend gate. Library threat **0.05** (LATE_CYCLE_MOMENTUM). Bridge **NORMAL**. OANDA practice NAV **$110,000**. Prop gates: G1 GREEN 99.7% / G2a PASS 36.4% / G2b 1/8 / G4 GREEN.\n\n**2. WHAT CHANGED TODAY**\nThe weekly trend gate is the headline \u2014 it lifted ICT win rate from 39.6% to 42.3% by cutting counter-trend entries, and v015 shipped clean on backtest. Underneath that, we built the four governance pieces that were missing: DailyReadiness, PropRiskManager (6 gates), DecisionChain (single gateway for every trade), and ExecutionTracker logging slippage to disk. The system now has a spine.\n\n**3. THE FVG FINDING**\nFVG appeared in **160/160** validated indicator combinations with a **71% standalone hit rate** on holdout, confirmed independently across 2021\u20132024. Translation for tomorrow: the FVG express scanner is firing the highest-conviction edge we have ever measured \u2014 not a hypothesis, a structural feature.\n\n**4. RISK POSTURE**\nCapital is meaningfully better protected than 24 hours ago. DailyReadiness blocks scanning if portfolio state fails; DecisionChain forces all five questions in series so no trade bypasses logic; PropRiskManager enforces six hard gates at execution; weekly trend gate filters at signal level. **Four serial chokepoints between idea and fill.** L-4 suspended after failing gates \u2014 discipline is holding. Caveat: TradeManager and DynamicSizer are still Phase 2/3 pending, so position management post-entry is static.\n\n**5. TOMORROW (Sunday 21:00 UTC open)**\nFirst auto-fires queued: **EURUSD SHORT** and **USDJPY LONG** via FVG express. GBPUSD LONG blocked by correlation \u2014 gate working. London scanner 03:00 ET Monday, NY 08:30 ET. Oracle watches: G2b fill count progression to",
+  "system_state": {
+    "last_updated": "2026-05-31T04:15:47.104523+00:00",
+    "generated_by": "oracle_end_of_day_briefing",
+    "library_threat": 0.05,
+    "library_pattern": "LATE_CYCLE_MOMENTUM",
+    "bridge_mode": "NORMAL",
+    "forex_sharpe": 2.097,
+    "forex_version": "v015",
+    "ict_wr": 0.423,
+    "ict_avg_r": 0.84,
+    "system_status": "OPERATIONAL",
+    "oracle_briefing": "# ORACLE INTELLIGENCE BRIEFING\n**2026-05-28 04:15 UTC**\n\n---\n\n**1. SYSTEM STATE**\nv015 live. Forex Sharpe **2.097**. ICT win rate **42.3%** post weekly trend gate. Library threat **0.05** (LATE_CYCLE_MOMENTUM). Bridge **NORMAL**. OANDA practice NAV **$110,000**. Prop gates: G1 GREEN 99.7% / G2a PASS 36.4% / G2b 1/8 / G4 GREEN.\n\n**2. WHAT CHANGED TODAY**\nThe weekly trend gate is the headline \u2014 it lifted ICT win rate from 39.6% to 42.3% by cutting counter-trend entries, and v015 shipped clean on backtest. Underneath that, we built the four governance pieces that were missing: DailyReadiness, PropRiskManager (6 gates), DecisionChain (single gateway for every trade), and ExecutionTracker logging slippage to disk. The system now has a spine.\n\n**3. THE FVG FINDING**\nFVG appeared in **160/160** validated indicator combinations with a **71% standalone hit rate** on holdout, confirmed independently across 2021\u20132024. Translation for tomorrow: the FVG express scanner is firing the highest-conviction edge we have ever measured \u2014 not a hypothesis, a structural feature.\n\n**4. RISK POSTURE**\nCapital is meaningfully better protected than 24 hours ago. DailyReadiness blocks scanning if portfolio state fails; DecisionChain forces all five questions in series so no trade bypasses logic; PropRiskManager enforces six hard gates at execution; weekly trend gate filters at signal level. **Four serial chokepoints between idea and fill.** L-4 suspended after failing gates \u2014 discipline is holding. Caveat: TradeManager and DynamicSizer are still Phase 2/3 pending, so position management post-entry is static.\n\n**5. TOMORROW (Sunday 21:00 UTC open)**\nFirst auto-fires queued: **EURUSD SHORT** and **USDJPY LONG** via FVG express. GBPUSD LONG blocked by correlation \u2014 gate working. London scanner 03:00 ET Monday, NY 08:30 ET. Oracle watches: G2b fill count progression to",
+    "prop_status": {
+      "g1": "GREEN",
+      "g2a": "PASS",
+      "g2b": "1/8",
+      "g4": "GREEN",
+      "overall": "COLLECTING"
     },
-    "system_health_note": "Regime is UNKNOWN with only 1 closed trade \u2014 sample is far below any statistical gate, so this lesson is a hypothesis to queue, not a rule to commit; HYP-033 already showed commitment_score has no standalone IC, reinforcing that the macro field is the missing factor."
+    "api_keys_live": 10,
+    "api_keys_total": 11,
+    "decision_chain": "LIVE",
+    "next_trade_window": "2026-05-29T01:00:00+00:00"
   }
 }

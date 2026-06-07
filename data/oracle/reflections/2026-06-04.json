@@ -1,0 +1,26 @@
+{
+  "date": "2026-06-04",
+  "generated_at": "2026-06-04T06:30:16.222297+00:00",
+  "input_tokens": 5296,
+  "output_tokens": 891,
+  "estimated_cost_usd": 0.146265,
+  "harvest_days_read": 3,
+  "reflection": {
+    "candidate_lesson": {
+      "lesson_text": "When the 30-indicator consensus shows high conviction (>=90%) but green_matches=0 and hist_hr=0%, the signal is structurally unreliable and should be sized to zero regardless of conviction strength.",
+      "mechanism": "A 14/30 bull, 100% conviction LONG on USDJPY with green_matches=0 means no historical analog has ever produced a winning outcome for this exact indicator configuration \u2014 high live agreement on a configuration the library has never validated is overfitting to the present tape, not edge. Institutionally, USDJPY momentum during a CONCENTRATION/AI-led risk-on regime is a safe-haven-corrupted rate signal (per L8), so a 100% bullish read here is precisely the false-confidence trap the green_matches gate exists to catch.",
+      "testable_rule": "if consensus_conviction >= 0.90 and green_matches == 0 and hist_hr == 0.0: size_multiplier = 0.0  # freeze, log as UNRELIABLE",
+      "expected_impact": "Drawdown reduction and Sharpe +0.01\u20130.03 by vetoing the highest-conviction-but-unvalidated false signals (currently USDJPY 100% conv with 0% historical hit rate would otherwise size up).",
+      "evidence_from_harvest": "0 trades in last 7 days means current gates are already filtering correctly; live consensus shows USDJPY at 100% conviction yet hist_hr=0% and green_matches=0 \u2014 exactly the configuration where conviction and historical reliability diverge. EURUSD by contrast shows conv=67% with hist_hr=66%, a validated config.",
+      "evidence_from_reasoning": null,
+      "reasoning_component_targeted": "green_matches / hist_hr (consensus reliability fields)",
+      "sample_needed": 30
+    },
+    "retirement_flag": {
+      "lesson_to_review": "L8",
+      "reason": "L8 sets USDJPY VIX gate at 13 for bull markets, but current regime is CONCENTRATION/UNKNOWN (not clearly bull) with USDJPY at 100% momentum conviction \u2014 if regime is no longer a clean bull, the VIX threshold assumption may be miscalibrated and worth re-validating against the new regime label."
+    },
+    "system_health_note": "System is correctly frozen (0 trades/7d) under UNKNOWN regime + 75% sizing + no TV confirmation; the live USDJPY 100%-conviction/0%-hist_hr divergence is the main latent risk if any gate loosens."
+  },
+  "auto_validation": null
+}

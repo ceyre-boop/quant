@@ -1,25 +1,25 @@
 {
-  "run_at": "2026-05-31T02:34:00.597932Z",
-  "days_scanned": 30,
-  "signals_generated": 11,
-  "wins": 4,
-  "losses": 7,
-  "pending": 0,
-  "win_rate": 0.3636,
+  "run_at": "2026-05-31T05:05:58.558495Z",
+  "days_scanned": 90,
+  "signals_generated": 6,
+  "wins": 2,
+  "losses": 2,
+  "pending": 2,
+  "win_rate": 0.5,
   "backtest_expectation": 0.41,
   "status": "PASS",
-  "status_reason": "WR 36.4% \u2265 floor 30% on 11 signals (11 closed)",
+  "status_reason": "WR 50.0% \u2265 floor 30% on 6 signals (4 closed)",
   "pairs_breakdown": {
     "GBPUSD=X": {
-      "signals": 5,
-      "wins": 1,
-      "losses": 4,
+      "signals": 0,
+      "wins": 0,
+      "losses": 0,
       "pending": 0
     },
     "EURUSD=X": {
-      "signals": 3,
+      "signals": 0,
       "wins": 0,
-      "losses": 3,
+      "losses": 0,
       "pending": 0
     },
     "AUDUSD=X": {
@@ -29,138 +29,83 @@
       "pending": 0
     },
     "AUDNZD=X": {
-      "signals": 0,
-      "wins": 0,
-      "losses": 0,
-      "pending": 0
+      "signals": 4,
+      "wins": 1,
+      "losses": 2,
+      "pending": 1
     },
     "USDJPY=X": {
-      "signals": 3,
-      "wins": 3,
+      "signals": 2,
+      "wins": 1,
       "losses": 0,
-      "pending": 0
+      "pending": 1
     }
   },
   "signals": [
     {
-      "date": "2026-05-26",
-      "pair": "GBPUSD=X",
+      "date": "2026-05-20",
+      "pair": "AUDNZD=X",
       "direction": "LONG",
       "grade": "A",
-      "score": 6.81,
-      "entry": 1.34297,
-      "stop": 1.33783,
-      "tp1": 1.35325,
+      "score": 6.61,
+      "entry": 1.21807,
+      "stop": 1.21575,
+      "tp1": 1.22272,
       "outcome": "LOSS"
     },
     {
-      "date": "2026-05-26",
-      "pair": "EURUSD=X",
+      "date": "2026-04-24",
+      "pair": "AUDNZD=X",
       "direction": "LONG",
       "grade": "A",
-      "score": 6.73,
-      "entry": 1.16232,
-      "stop": 1.15964,
-      "tp1": 1.16767,
-      "outcome": "LOSS"
+      "score": 7.36,
+      "entry": 1.21339,
+      "stop": 1.20996,
+      "tp1": 1.22025,
+      "outcome": "WIN"
     },
     {
-      "date": "2026-05-25",
-      "pair": "GBPUSD=X",
+      "date": "2026-04-03",
+      "pair": "AUDNZD=X",
       "direction": "LONG",
       "grade": "A",
-      "score": 8.25,
-      "entry": 1.34618,
-      "stop": 1.33872,
-      "tp1": 1.36109,
-      "outcome": "LOSS"
+      "score": 6.86,
+      "entry": 1.20684,
+      "stop": 1.1943,
+      "tp1": 1.23192,
+      "outcome": "PENDING"
     },
     {
-      "date": "2026-05-22",
-      "pair": "EURUSD=X",
-      "direction": "LONG",
-      "grade": "A",
-      "score": 7.97,
-      "entry": 1.16056,
-      "stop": 1.15963,
-      "tp1": 1.16244,
-      "outcome": "LOSS"
-    },
-    {
-      "date": "2026-05-21",
+      "date": "2026-03-12",
       "pair": "USDJPY=X",
+      "direction": "LONG",
+      "grade": "A",
+      "score": 7.51,
+      "entry": 158.7275,
+      "stop": 157.50789,
+      "tp1": 161.16672,
+      "outcome": "PENDING"
+    },
+    {
+      "date": "2026-03-03",
+      "pair": "AUDNZD=X",
       "direction": "LONG",
       "grade": "A",
       "score": 6.68,
-      "entry": 158.938,
-      "stop": 158.69862,
-      "tp1": 159.41676,
-      "outcome": "WIN"
-    },
-    {
-      "date": "2026-05-19",
-      "pair": "GBPUSD=X",
-      "direction": "LONG",
-      "grade": "A",
-      "score": 6.83,
-      "entry": 1.33711,
-      "stop": 1.33348,
-      "tp1": 1.34438,
-      "outcome": "WIN"
-    },
-    {
-      "date": "2026-05-07",
-      "pair": "GBPUSD=X",
-      "direction": "LONG",
-      "grade": "A",
-      "score": 8.11,
-      "entry": 1.36065,
-      "stop": 1.35726,
-      "tp1": 1.36743,
+      "entry": 1.19046,
+      "stop": 1.18544,
+      "tp1": 1.2005,
       "outcome": "LOSS"
     },
     {
-      "date": "2026-05-01",
-      "pair": "EURUSD=X",
-      "direction": "LONG",
-      "grade": "A",
-      "score": 7.55,
-      "entry": 1.17343,
-      "stop": 1.16857,
-      "tp1": 1.18316,
-      "outcome": "LOSS"
-    },
-    {
-      "date": "2026-04-27",
-      "pair": "GBPUSD=X",
-      "direction": "LONG",
-      "grade": "A",
-      "score": 7.0,
-      "entry": 1.3526,
-      "stop": 1.34826,
-      "tp1": 1.36129,
-      "outcome": "LOSS"
-    },
-    {
-      "date": "2026-04-21",
+      "date": "2026-02-16",
       "pair": "USDJPY=X",
       "direction": "LONG",
       "grade": "A",
-      "score": 7.4,
-      "entry": 158.75401,
-      "stop": 158.4885,
-      "tp1": 159.28503,
-      "outcome": "WIN"
-    },
-    {
-      "date": "2026-04-20",
-      "pair": "USDJPY=X",
-      "direction": "LONG",
-      "grade": "A",
-      "score": 6.93,
-      "entry": 158.75401,
-      "stop": 158.48058,
-      "tp1": 159.30085,
+      "score": 7.74,
+      "entry": 153.1935,
+      "stop": 152.4963,
+      "tp1": 154.5879,
       "outcome": "WIN"
     }
   ]
