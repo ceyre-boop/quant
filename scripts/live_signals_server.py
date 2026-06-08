@@ -95,12 +95,14 @@ def _fetch_forex_signals():
     import pandas as pd
     from sovereign.forex.signal_engine import build_signal_frame
 
-    results = []
-    for ticker, base, quote, label in PAIRS:
+    from concurrent.futures import ThreadPoolExecutor
+
+    def _one(_pair):
+        ticker, base, quote, label = _pair
         try:
             prices = yf.Ticker(ticker).history(period='2y', interval='1d')
             if prices.empty:
-                continue
+                return None
             prices.index = prices.index.tz_convert(None)
             df = build_signal_frame(ticker, prices, base, quote)
             last = df.iloc[-1]
@@ -152,7 +154,7 @@ def _fetch_forex_signals():
                     's': sig_val,
                 })
 
-            results.append({
+            return {
                 'ticker': ticker,
                 'label': label,
                 'price': close,
@@ -164,11 +166,14 @@ def _fetch_forex_signals():
                 'conv_history': conv_history,
                 'signal_marks': signal_marks[-20:],
                 'error': None,
-            })
+            }
         except Exception as e:
-            results.append({'ticker': ticker, 'label': label, 'price': None,
-                            'signal': 0, 'conviction': 0.0, 'error': str(e)})
-    return results
+            return {'ticker': ticker, 'label': label, 'price': None,
+                    'signal': 0, 'conviction': 0.0, 'error': str(e)}
+
+    # Fetch all pairs in parallel — turns ~5 sequential yfinance calls (~22s) into ~5s.
+    with ThreadPoolExecutor(max_workers=len(PAIRS)) as _ex:
+        return [r for r in _ex.map(_one, PAIRS) if r is not None]
 
 
 def _fetch_equity_signals():
@@ -332,14 +337,22 @@ def _build_oracle_board(forex_signals, bridge_state):
     }
 
 
-def build_payload():
+_PAYLOAD_CACHE = {'ts': 0.0, 'data': None}
+
+def build_payload(ttl=120):
+    # Serve a cached payload for `ttl` seconds — the forex/equity fetches hit yfinance, so this
+    # keeps repeat dashboard loads instant instead of recomputing (~5s) every time.
+    import time as _t
+    now = _t.time()
+    if _PAYLOAD_CACHE['data'] is not None and (now - _PAYLOAD_CACHE['ts']) < ttl:
+        return _PAYLOAD_CACHE['data']
     bridge = _load_cross_system_state()
     ict_trades = _load_ict_trades()
     forex = _fetch_forex_signals()
     equity = _fetch_equity_signals()
     best = _best_trade_today(forex, bridge)
 
-    return {
+    payload = {
         'timestamp': datetime.now(timezone.utc).isoformat(),
         'bridge': bridge,
         'forex_signals': forex,
@@ -348,6 +361,9 @@ def build_payload():
         'ict_trades_count': len(ict_trades),
         'ict_recent': ict_trades[-5:] if ict_trades else [],
     }
+    _PAYLOAD_CACHE['data'] = payload
+    _PAYLOAD_CACHE['ts'] = now
+    return payload
 
 
 def _build_chat_system() -> str:

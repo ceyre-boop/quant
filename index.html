@@ -973,7 +973,9 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
 // Local: talk to the localhost server. Remote (public HTTPS site): use the hosted backend URL
 // once set in Phase 2; until then '' makes fetches relative → 404 on Pages → honest offline state.
 const IS_REMOTE = location.protocol === 'https:' || !['localhost','127.0.0.1',''].includes(location.hostname);
-const API_BASE = IS_REMOTE ? '' : 'http://localhost:8765';
+const API_BASE = IS_REMOTE ? 'https://sovereign-quant-dashboard.onrender.com' : 'http://localhost:8765';
+// Cloud (free tier) can cold-start after idle, so remote fetches get a generous timeout.
+const NET_T = IS_REMOTE ? 30000 : 5000;
 
 // ══ CLOCK ══
 function updateClock(){
@@ -1040,7 +1042,7 @@ tabInited['tab-trade']=true;
 // ══ CROSS-SYSTEM STATE (local server) ══
 async function tryFetchBridge(){
   try{
-    const r=await fetch(API_BASE+'/data?t='+Date.now(),{signal:AbortSignal.timeout(3000)});
+    const r=await fetch(API_BASE+'/data?t='+Date.now(),{signal:AbortSignal.timeout(NET_T)});
     if(!r.ok)return null;
     return await r.json();
   }catch{return null;}
@@ -1666,7 +1668,7 @@ function sigRenderPairBar(signals){
         sigRenderChart(p);
         const pairCode=sigActivePair.replace('=X','');
         try{
-          const resp=await fetch(API_BASE+'/ohlcv?pair='+pairCode+'&t='+Date.now(),{signal:AbortSignal.timeout(8000)});
+          const resp=await fetch(API_BASE+'/ohlcv?pair='+pairCode+'&t='+Date.now(),{signal:AbortSignal.timeout(NET_T)});
           if(resp.ok){
             const d=await resp.json();
             if(d.ohlcv?.length){
@@ -1741,7 +1743,7 @@ async function sigRefresh(){
   const offline=document.getElementById('sig-offline');
   const live=document.getElementById('sig-live');
   try{
-    const r=await fetch(SIG_API+'?t='+Date.now(),{signal:AbortSignal.timeout(4000)});
+    const r=await fetch(SIG_API+'?t='+Date.now(),{signal:AbortSignal.timeout(NET_T)});
     if(!r.ok)throw new Error('HTTP '+r.status);
     const data=await r.json();
     if(data.error)throw new Error(data.error);
@@ -1759,7 +1761,7 @@ async function sigRefresh(){
       sigRenderChart(t);
       // Fetch fresh OHLCV for initial pair (ensures correct scale for all pairs incl USDJPY)
       const _pc=sigActivePair.replace('=X','');
-      fetch(API_BASE+'/ohlcv?pair='+_pc+'&t='+Date.now(),{signal:AbortSignal.timeout(8000)})
+      fetch(API_BASE+'/ohlcv?pair='+_pc+'&t='+Date.now(),{signal:AbortSignal.timeout(NET_T)})
         .then(r=>r.ok?r.json():null)
         .then(d=>{if(d?.ohlcv?.length){t.ohlcv=d.ohlcv;if(d.current)t.price=d.current;_sigSetData(t);}})
         .catch(()=>{});
@@ -1771,14 +1773,14 @@ async function sigRefresh(){
     // Fetch session levels (once per day)
     const today = new Date().toISOString().slice(0,10);
     if (_sessionLevelsDate !== today) {
-      fetch(API_BASE+'/session_levels?pair=' + (sigActivePair || 'GBPUSD') + '&t=' + Date.now(), { signal: AbortSignal.timeout(8000) })
+      fetch(API_BASE+'/session_levels?pair=' + (sigActivePair || 'GBPUSD') + '&t=' + Date.now(), { signal: AbortSignal.timeout(NET_T) })
         .then(r => r.ok ? r.json() : null)
         .then(lvl => { if (lvl && !lvl.error) { drawSessionLevels(lvl); _sessionLevelsDate = today; } })
         .catch(() => {});
     }
 
     // Scanner state for TP/SL lines
-    fetch(API_BASE+'/scanner_state?t=' + Date.now(), { signal: AbortSignal.timeout(4000) })
+    fetch(API_BASE+'/scanner_state?t=' + Date.now(), { signal: AbortSignal.timeout(NET_T) })
       .then(r => r.ok ? r.json() : null)
       .then(sc => { if (sc) drawScannerLevels(sc, sigActivePair || 'GBPUSD'); })
       .catch(() => {});
@@ -1805,9 +1807,9 @@ let _oracleLinesSl=null, _oracleLinesEntry=null, _oracleLinesTP1=null, _oracleLi
 async function oracleRefresh(){
   try{
     const [oracleR, scannerR, activityR] = await Promise.allSettled([
-      fetch(ORACLE_API + '?t=' + Date.now(), { signal: AbortSignal.timeout(5000) }),
-      fetch(API_BASE+'/scanner_state?t=' + Date.now(), { signal: AbortSignal.timeout(4000) }),
-      fetch(API_BASE+'/activity?t=' + Date.now(), { signal: AbortSignal.timeout(4000) }),
+      fetch(ORACLE_API + '?t=' + Date.now(), { signal: AbortSignal.timeout(NET_T) }),
+      fetch(API_BASE+'/scanner_state?t=' + Date.now(), { signal: AbortSignal.timeout(NET_T) }),
+      fetch(API_BASE+'/activity?t=' + Date.now(), { signal: AbortSignal.timeout(NET_T) }),
     ]);
     const oracleData = oracleR.status === 'fulfilled' && oracleR.value.ok ? await oracleR.value.json() : null;
     const scannerData = scannerR.status === 'fulfilled' && scannerR.value.ok ? await scannerR.value.json() : null;
@@ -1825,7 +1827,7 @@ async function oracleRefresh(){
 
 async function macroRefresh(){
   try{
-    const r = await fetch(API_BASE+'/macro?t='+Date.now(), {signal: AbortSignal.timeout(6000)});
+    const r = await fetch(API_BASE+'/macro?t='+Date.now(), {signal: AbortSignal.timeout(NET_T)});
     if(!r.ok) return;
     const d = await r.json();
     const s = d.summary||{};
@@ -2493,7 +2495,7 @@ async function chatSend(){
   chatBubble('user',msg);chatTyping();
   try{
     const r=await fetch(CHAT_API,{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({message:msg,context:'sovereign_trading'}),signal:AbortSignal.timeout(15000)});
+      body:JSON.stringify({message:msg,context:'sovereign_trading'}),signal:AbortSignal.timeout(IS_REMOTE?45000:20000)});
     document.getElementById('chat-typing')?.remove();
     if(!r.ok)throw new Error('HTTP '+r.status);
     const d=await r.json();
@@ -2538,7 +2540,7 @@ async function trLoad(){
   const dot=document.getElementById('tr-dot');
   const statusText=document.getElementById('tr-status-text');
   try{
-    const r=await fetch(API_BASE+'/trades?n=200',{signal:AbortSignal.timeout(4000)});
+    const r=await fetch(API_BASE+'/trades?n=200',{signal:AbortSignal.timeout(NET_T)});
     const d=await r.json();
     dot.className='tv-status-dot live';
     statusText.textContent='SERVER LIVE · '+d.count+' EVENTS';
