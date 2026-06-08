@@ -197,6 +197,31 @@ class IBBridge:
             self._ib.cancelOrder(trade.order)
         self._ib.sleep(0.5)
 
+    # ── Historical bars ────────────────────────────────────────────────────────
+
+    def historical_bars(self, contract, duration: str = "1 D",
+                        bar_size: str = "1 min", what: str = "TRADES",
+                        rth: bool = True, end: str = ""):
+        """Historical OHLCV as a DataFrame indexed by UTC datetime.
+
+        Columns: Open, High, Low, Close, Volume. `end` is "" for now, or an IB
+        endDateTime string ("YYYYMMDD HH:MM:SS") to pull a specific past session.
+        Used by bar_feed.IBBarFeed for both live session bars and replay history.
+        """
+        from ib_async import util
+        bars = self._ib.reqHistoricalData(
+            contract, endDateTime=end, durationStr=duration,
+            barSizeSetting=bar_size, whatToShow=what, useRTH=rth, formatDate=2,
+        )
+        df = util.df(bars)
+        if df is None or df.empty:
+            return df
+        df = df.rename(columns={
+            "date": "Date", "open": "Open", "high": "High",
+            "low": "Low", "close": "Close", "volume": "Volume",
+        }).set_index("Date")
+        return df[["Open", "High", "Low", "Close", "Volume"]]
+
     # ── Live quote ───────────────────────────────────────────────────────────
 
     def last_price(self, contract) -> Optional[float]:

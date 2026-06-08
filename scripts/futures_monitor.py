@@ -28,6 +28,11 @@ warnings.filterwarnings("ignore")
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
+# Single source of truth for signal logic — shared with scripts/futures_replay.py
+from sovereign.futures import scalp_strategy as strat
+from sovereign.futures import telegram_gateway as tg
+from sovereign.futures.config import futures_params
+
 BIAS_LOG  = ROOT / "data" / "futures" / "bias_log.jsonl"
 TRADE_LOG = ROOT / "data" / "futures" / "trade_log.jsonl"
 
@@ -108,37 +113,44 @@ def _check_macro(instrument: str) -> dict | None:
             "avg_conviction": round(avg_conv, 2), "dates": sorted_dates[:3]}
 
 
-def _kill_level(bias_dir: str, bias: dict, instrument: str) -> float | None:
-    """The price beyond which the bias is DEAD — the most conservative (soonest) of the rules
-    invalidation (overnight high/low) and today's oracle falsifier. SHORT dies ABOVE it; LONG
-    dies BELOW it. Returns None if no numeric level is available."""
-    if bias_dir not in ("LONG", "SHORT"):
-        return None
-    levels: list[float] = []
-    kl = bias.get("key_levels", {})
-    rules = kl.get("overnight_high") if bias_dir == "SHORT" else kl.get("overnight_low")
-    if isinstance(rules, (int, float)):
-        levels.append(float(rules))
+def _oracle_invalidation(instrument: str) -> float | None:
+    """Today's oracle falsifier price for this instrument (file I/O), or None."""
     oracle_path = ROOT / "data" / "futures" / "oracle_mornings.jsonl"
-    if oracle_path.exists():
-        today = _today()
-        try:
-            for line in oracle_path.read_text().splitlines():
-                if not line.strip():
-                    continue
-                r = json.loads(line)
-                if r.get("date") == today and _norm_inst(r.get("instrument", "")) == _norm_inst(instrument):
-                    inv = (r.get("key_levels") or {}).get("invalidation")
-                    if isinstance(inv, (int, float)):
-                        levels.append(float(inv))
-        except Exception:
-            pass
-    if not levels:
+    if not oracle_path.exists():
         return None
-    return min(levels) if bias_dir == "SHORT" else max(levels)
+    today = _today()
+    try:
+        for line in oracle_path.read_text().splitlines():
+            if not line.strip():
+                continue
+            r = json.loads(line)
+            if r.get("date") == today and _norm_inst(r.get("instrument", "")) == _norm_inst(instrument):
+                inv = (r.get("key_levels") or {}).get("invalidation")
+                if isinstance(inv, (int, float)):
+                    return float(inv)
+    except Exception:
+        pass
+    return None
 
 
-def _fetch_bars(instrument: str):
+def _kill_level(bias_dir: str, bias: dict, instrument: str) -> float | None:
+    """Soonest of rules invalidation (overnight high/low) and today's oracle falsifier.
+    Pure combination lives in scalp_strategy.kill_level; file I/O stays here."""
+    return strat.kill_level(bias_dir, bias.get("key_levels", {}),
+                            _oracle_invalidation(instrument))
+
+
+def _fetch_bars(instrument: str, bridge=None, contract=None):
+    """Live 1-min RTH bars. Prefers the connected IB bridge (matches what the replay
+    uses); falls back to yfinance if no bridge or the IB call fails."""
+    if bridge is not None and contract is not None:
+        try:
+            from sovereign.futures.bar_feed import live_session_bars
+            df = live_session_bars(bridge, contract)
+            if df is not None and len(df) > 0:
+                return df
+        except Exception:
+            pass  # fall through to yfinance
     import yfinance as yf
     import pandas as pd
     ticker = TICKER_MAP[instrument]
@@ -158,27 +170,11 @@ def _fetch_bars(instrument: str):
 
 
 def _compute_indicators(bars) -> tuple[float, float, float, float, float, float, float]:
-    """Returns (last_price, vwap, rsi, curr_volume, avg_volume_20, ema8, ema21). Raises ValueError if bars empty."""
-    if bars.empty:
-        raise ValueError("empty bars")
-    last_price = float(bars["Close"].iloc[-1].item())
-    bars = bars.copy()
-    bars["typical"] = (bars["High"] + bars["Low"] + bars["Close"]) / 3
-    bars["cum_tp_vol"] = (bars["typical"] * bars["Volume"]).cumsum()
-    bars["cum_vol"]    = bars["Volume"].cumsum()
-    vwap = float((bars["cum_tp_vol"] / bars["cum_vol"]).iloc[-1].item())
-    delta    = bars["Close"].diff()
-    gain     = delta.clip(lower=0)
-    loss     = (-delta).clip(lower=0)
-    avg_gain = gain.ewm(alpha=1/14, adjust=False).mean()
-    avg_loss = loss.ewm(alpha=1/14, adjust=False).mean()
-    rs       = avg_gain / avg_loss
-    rsi      = float((100 - (100 / (1 + rs))).iloc[-1].item())
-    curr_volume   = float(bars["Volume"].iloc[-1].item())
-    avg_volume_20 = float(bars["Volume"].tail(20).mean())
-    ema8  = float(bars["Close"].ewm(span=8,  adjust=False).mean().iloc[-1].item())
-    ema21 = float(bars["Close"].ewm(span=21, adjust=False).mean().iloc[-1].item())
-    return last_price, vwap, rsi, curr_volume, avg_volume_20, ema8, ema21
+    """(last_price, vwap, rsi, curr_volume, avg_volume, ema_fast, ema_slow).
+    Delegates to scalp_strategy (single source of truth). Raises ValueError if empty."""
+    ind = strat.compute_indicators(bars)
+    return (ind.last_price, ind.vwap, ind.rsi, ind.curr_volume,
+            ind.avg_volume, ind.ema_fast, ind.ema_slow)
 
 
 def _check_signal(bias_dir: str, curr_price: float, curr_vwap: float, curr_rsi: float,
@@ -186,29 +182,17 @@ def _check_signal(bias_dir: str, curr_price: float, curr_vwap: float, curr_rsi: 
                   last_proposal_time: datetime | None, proposals_count: int,
                   curr_volume: float, avg_volume_20: float,
                   ema8: float, ema21: float, max_trades: int = 3) -> str | None:
-    if bias_dir not in ("LONG", "SHORT"):
-        return None
+    """Delegates to scalp_strategy.micro_signal. CLI --max-trades is honored as an
+    extra bound on top of the config cap."""
     if proposals_count >= max_trades:
         return None
-    if last_proposal_time is not None:
-        elapsed = (datetime.now(timezone.utc) - last_proposal_time).total_seconds()
-        if elapsed < 300:
-            return None
-    # Volume confirmation gate — signal bar must have above-average participation
-    if avg_volume_20 > 0 and curr_volume < 1.5 * avg_volume_20:
-        return None
-    # EMA position filter — price must be on the correct structural side
-    above_both = curr_price > ema8 and curr_price > ema21
-    below_both = curr_price < ema8 and curr_price < ema21
-    long_signal  = (prev_price < prev_vwap and curr_price >= curr_vwap
-                    and prev_rsi < 50 and curr_rsi >= 50)
-    short_signal = (prev_price > prev_vwap and curr_price <= curr_vwap
-                    and prev_rsi > 50 and curr_rsi <= 50)
-    if long_signal  and bias_dir == "LONG"  and above_both:
-        return "LONG"
-    if short_signal and bias_dir == "SHORT" and below_both:
-        return "SHORT"
-    return None
+    curr = strat.Indicators(curr_price, curr_vwap, curr_rsi, curr_volume,
+                            avg_volume_20, ema8, ema21)
+    prev = strat.Indicators(prev_price, prev_vwap, prev_rsi, 0.0, 0.0, 0.0, 0.0)
+    return strat.micro_signal(bias_dir, curr, prev,
+                              now=datetime.now(timezone.utc),
+                              last_entry_time=last_proposal_time,
+                              trades_taken=proposals_count)
 
 
 def _print_header(instrument: str, price: float, vwap: float, rsi: float,
@@ -239,15 +223,12 @@ def _print_header(instrument: str, price: float, vwap: float, rsi: float,
 
 def _compute_stop(bias: dict, direction: str, entry: float) -> float:
     kl = bias.get("key_levels", {})
-    if direction == "LONG":
-        return float(kl.get("overnight_low") or entry * 0.999)
-    return float(kl.get("overnight_high") or entry * 1.001)
+    return strat.compute_stop(direction, entry,
+                              kl.get("overnight_low"), kl.get("overnight_high"))
 
 
 def _sizing_rationale(session_trades: int, session_r: float) -> str:
-    if session_trades == 0:
-        return "probe"
-    return "press" if session_r > 0 else "reduce"
+    return strat.sizing_rationale(session_trades, session_r)
 
 
 def _show_proposal(direction: str, instrument: str, entry: float, stop: float, t1: float,
@@ -477,11 +458,8 @@ def _auto_execute(direction: str, curr_price: float, curr_rsi: float, prev_rsi: 
 # ── ORB (opening range breakout) — the macro discretionary gate ───────────────
 
 def _orb_range(bars, orb_minutes: int) -> tuple[float, float] | None:
-    """High/low of the first `orb_minutes` 1-min bars of the RTH session. None if not enough bars."""
-    if bars is None or len(bars) < orb_minutes:
-        return None
-    window = bars.iloc[:orb_minutes]
-    return float(window["High"].max().item()), float(window["Low"].min().item())
+    """High/low of the first `orb_minutes` 1-min RTH bars. Delegates to scalp_strategy."""
+    return strat.orb_range(bars, orb_minutes)
 
 
 def _handle_orb(direction: str, instrument: str, entry: float, orb_high: float, orb_low: float,
@@ -493,37 +471,71 @@ def _handle_orb(direction: str, instrument: str, entry: float, orb_high: float, 
     if now_block:
         print(f"\n  {R}⛔ ORB BLOCKED — {now_block}{RS}")
         return session_trades, proposals_count, True   # taken=True so we don't re-prompt
-    big_tp   = round(entry + 25 if direction == "LONG" else entry - 25, 2)
-    safe_tp  = round(entry + 12 if direction == "LONG" else entry - 12, 2)
-    stop     = round(orb_low if direction == "LONG" else orb_high, 2)
-    print(f"\n\n{BD}╔══════════════════════════════════════════════════════╗{RS}")
-    print(f"  🌅 ORB BREAKOUT {direction} — {instrument} @ {entry:.2f}  (range {orb_low:.2f}-{orb_high:.2f})")
-    print(f"  [B]ig (3 ct, TP {big_tp:.2f} / 25pt)   [S]afe (1 ct, TP {safe_tp:.2f} / 12pt)   [n]skip")
-    print(f"{BD}╚══════════════════════════════════════════════════════╝{RS}")
-    try:
-        ans = input("  → ").strip().lower()
-    except EOFError:
-        ans = "n"
-    if ans not in ("b", "s"):
-        print("  ORB skipped.")
-        return session_trades, proposals_count, True
-    size = 3 if ans == "b" else 1
-    t1   = big_tp if ans == "b" else safe_tp
-    rationale = "press" if ans == "b" else "probe"
+    o = futures_params()["orb"]
+    big_ct, small_ct = o["big_contracts"], o["safe_contracts"]
+    big_tp  = round(entry + o["big_target_points"] if direction == "LONG"
+                    else entry - o["big_target_points"], 2)
+    safe_tp = round(entry + o["safe_target_points"] if direction == "LONG"
+                    else entry - o["safe_target_points"], 2)
+    stop    = round(orb_low if direction == "LONG" else orb_high, 2)
+
+    # Decision channel: phone (headless) if wired, else terminal.
+    if tg.two_way_ready():
+        print(f"\n  📲 ORB {direction} {instrument} @ {entry:.2f} — asking phone "
+              f"(big/small/now/wait/skip)...")
+        d = tg.ask(tg.macro_prompt("ORB BREAKOUT", instrument, direction, entry, stop,
+                                   big_tp, big_ct, safe_tp, small_ct), timeout_s=300)
+        if d is None:
+            print(f"  {Y}No reply in time — ORB skipped.{RS}")
+            tg.send("⏱ No reply — ORB skipped.")
+            return session_trades, proposals_count, True
+        if d["action"] == "skip":
+            print("  Phone: skip.")
+            return session_trades, proposals_count, True
+        if d.get("timing") == "wait":
+            print("  Phone: wait for retrace — re-arming ORB.")
+            tg.send("⏳ Holding for a retrace; I'll re-ask on the next break.")
+            return session_trades, proposals_count, False   # re-arm (don't mark taken)
+        choice = d["size"]                                   # big | small
+    else:
+        print(f"\n\n{BD}╔══════════════════════════════════════════════════════╗{RS}")
+        print(f"  🌅 ORB BREAKOUT {direction} — {instrument} @ {entry:.2f}  (range {orb_low:.2f}-{orb_high:.2f})")
+        print(f"  [B]ig ({big_ct} ct, TP {big_tp:.2f})   [S]afe ({small_ct} ct, TP {safe_tp:.2f})   [W]ait   [n]skip")
+        print(f"{BD}╚══════════════════════════════════════════════════════╝{RS}")
+        try:
+            ans = input("  → ").strip().lower()
+        except EOFError:
+            ans = "n"
+        if ans == "w":
+            print("  Waiting for retrace — re-arming.")
+            return session_trades, proposals_count, False
+        if ans not in ("b", "s"):
+            print("  ORB skipped.")
+            return session_trades, proposals_count, True
+        choice = "big" if ans == "b" else "small"
+
+    size = big_ct if choice == "big" else small_ct
+    t1   = big_tp if choice == "big" else safe_tp
+    rationale = "press" if choice == "big" else "probe"
     if not dry_run and ib_connected and bridge:
         try:
             side = "BUY" if direction == "LONG" else "SELL"
             contract = bridge.mes_contract() if instrument == "MES" else bridge.mnq_contract()
             results = bridge.bracket_order(contract, side, size, entry, stop, t1)
-            print(f"  {G}{BD}ORB {('BIG' if ans=='b' else 'SAFE')} FILLED {direction} {size} {instrument} @ {entry:.2f}{RS} | id={results[0].order_id}")
+            print(f"  {G}{BD}ORB {choice.upper()} FILLED {direction} {size} {instrument} @ {entry:.2f}{RS} | id={results[0].order_id}")
             notes = f"ORB macro {rationale} | order_id={results[0].order_id}"
+            if tg.enabled():
+                tg.send(f"✅ ORB {choice} FILLED {direction} {size} {instrument} @ {entry:.2f} "
+                        f"(SL {stop:.2f} TP {t1:.2f})")
         except Exception as e:
             print(f"  {R}ORB order failed: {type(e).__name__}: {e}{RS}")
             notes = f"ORB order failed: {type(e).__name__}: {e}"
     else:
         tag = "[DRY-RUN] " if dry_run else "[IB disconnected] "
-        print(f"  {G}{tag}WOULD PLACE ORB {('BIG' if ans=='b' else 'SAFE')} {direction} {size} {instrument} @ {entry:.2f} SL {stop:.2f} TP {t1:.2f}{RS}")
+        print(f"  {G}{tag}WOULD PLACE ORB {choice.upper()} {direction} {size} {instrument} @ {entry:.2f} SL {stop:.2f} TP {t1:.2f}{RS}")
         notes = f"ORB macro {rationale} ({'dry-run' if dry_run else 'IB disconnected'})"
+        if tg.enabled():
+            tg.send(f"{tag}WOULD PLACE ORB {choice} {direction} {size} {instrument} @ {entry:.2f}")
     rec = _build_record(instrument, direction, entry, stop, t1, bias,
                         session_trades, session_r, rationale, notes)
     rec["size_contracts"] = size
@@ -594,17 +606,23 @@ def main() -> None:
     # ── IB connection ─────────────────────────────────────────────────────────
     bridge = None
     ib_connected = False
+    live_contract = None
     if not dry_run:
         try:
             from sovereign.futures.ib_bridge import IBBridge
             bridge = IBBridge()
             bridge.connect()
             ib_connected = True
+            live_contract = bridge.mes_contract() if instrument == "MES" else bridge.mnq_contract()
             print(f"  {G}IB Gateway connected.{RS}")
         except Exception as e:
             print(f"  {Y}[warn] IB connection failed ({type(e).__name__}: {e}). Display-only mode.{RS}")
     else:
         print(f"  [DRY-RUN] Skipping IB connection.")
+
+    # Which bar feed is live this session
+    _bars_src = "IB Gateway 1-min" if (ib_connected and live_contract is not None) else "yfinance fallback"
+    print(f"  Bars: {_bars_src}")
 
     # ── Macro proposal ────────────────────────────────────────────────────────
     macro = _check_macro(instrument)
@@ -671,7 +689,7 @@ def main() -> None:
     try:
         while True:
             try:
-                bars = _fetch_bars(instrument)
+                bars = _fetch_bars(instrument, bridge if ib_connected else None, live_contract)
                 if bars.empty:
                     time.sleep(5)
                     continue
