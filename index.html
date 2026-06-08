@@ -202,6 +202,12 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
 #rp-chart-wrap{position:relative;background:var(--bg);min-width:0}
 #rp-legend{position:absolute;top:8px;left:12px;z-index:10;font-size:11px;color:#8899a6;pointer-events:none;font-family:var(--font);letter-spacing:.5px}
 #rp-side{border-left:1px solid var(--border);display:flex;flex-direction:column;background:var(--bg2);overflow:hidden}
+#rp-pnl-strip{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);background:var(--bg3)}
+#rp-running-pnl{font-size:18px;font-weight:700;color:var(--muted);margin-top:2px}
+#rp-spark{opacity:.95}
+.rp-btn.muted{opacity:.45}
+#cal-table td.clickable{cursor:pointer;transition:border-color .12s}
+#cal-table td.clickable:hover{border-color:var(--accent,#00c896)}
 #rp-orders{flex:1;overflow-y:auto}
 .rp-order{display:grid;grid-template-columns:46px 1fr auto;gap:8px;align-items:center;padding:7px 14px;border-bottom:1px solid var(--border);font-size:11px;animation:fadein .3s ease}
 .rp-order.long .rpo-side{color:var(--green);font-weight:700;font-size:10px}
@@ -817,13 +823,14 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
           </div>
           <div class="rp-grp"><span class="rp-lbl">DAY</span><select id="rp-date" onchange="replayLoad()"></select></div>
           <div class="rp-grp"><span class="rp-lbl">SPEED</span>
-            <input type="range" id="rp-dur" min="3" max="15" step="1" value="3" oninput="document.getElementById('rp-dur-val').textContent=this.value+'m'">
+            <input type="range" id="rp-dur" min="3" max="15" step="1" value="3" oninput="document.getElementById('rp-dur-val').textContent=this.value+'m';_saveState({rpdur:this.value})">
             <span id="rp-dur-val" style="font-size:10px;color:var(--muted)">3m</span>
           </div>
           <div class="rp-grp">
             <button id="rp-play" class="rp-btn play" onclick="replayPlay()">▶ PLAY DAY</button>
-            <button class="rp-btn" onclick="replayPause()">⏸</button>
-            <button class="rp-btn" onclick="replayRestart()">⟲</button>
+            <button class="rp-btn" onclick="replayPause()" title="Pause (Space)">⏸</button>
+            <button class="rp-btn" onclick="replayRestart()" title="Restart (R)">⟲</button>
+            <button id="rp-mute" class="rp-btn" onclick="replayToggleMute()" title="Order-fill sound">🔊</button>
           </div>
           <div id="rp-status" style="margin-left:auto;font-size:11px;color:var(--muted)">pick a day · press play</div>
         </div>
@@ -833,6 +840,10 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
             <div id="rp-chart" style="width:100%;height:100%"></div>
           </div>
           <div id="rp-side">
+            <div id="rp-pnl-strip">
+              <div><div class="rp-lbl">RUNNING P&L</div><div id="rp-running-pnl">$0.00</div></div>
+              <canvas id="rp-spark" width="170" height="34"></canvas>
+            </div>
             <div class="sig-section-hdr">Live Orders</div>
             <div id="rp-orders"><div style="color:var(--muted);font-size:11px;padding:10px 14px">No orders yet — press Play to replay the day.</div></div>
             <div class="sig-section-hdr">End of Day</div>
@@ -1015,7 +1026,7 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
   <!-- ══ TAB 4: CHAT ══ -->
   <div class="tab-panel" id="tab-chat">
     <div id="chat-panel">
-      <div id="chat-ctx">Context: SOVEREIGN v013 · Forex Sharpe 1.8552 · ICT London+A Sharpe 2.093 · Bridge: NORMAL (threat 0.00) · Prop: ACTIVE Day 0</div>
+      <div id="chat-ctx">Context: SOVEREIGN v015 · Forex OOS Sharpe 1.08 (costed) · ICT London+A Sharpe 2.093 · Bridge: NORMAL (threat 0.00) · Prop: ACTIVE Day 0</div>
       <div id="chat-msgs">
         <div class="cb assistant">
           <div class="cb-inner">SOVEREIGN online. Ask me about signals, hypothesis status, system health, or trading decisions.</div>
@@ -1109,6 +1120,28 @@ const API_BASE = IS_REMOTE ? 'https://sovereign-quant-dashboard.onrender.com' : 
 // Cloud (free tier) can cold-start after idle, so remote fetches get a generous timeout.
 const NET_T = IS_REMOTE ? 30000 : 5000;
 
+// ══ VIEW STATE PERSISTENCE (survive reloads) ══
+const _LS='sq_dash';
+function _loadState(){try{return JSON.parse(localStorage.getItem(_LS)||'{}');}catch(e){return {};}}
+function _saveState(patch){try{const s=_loadState();Object.assign(s,patch);localStorage.setItem(_LS,JSON.stringify(s));}catch(e){}}
+
+// ══ KEYBOARD SHORTCUTS ══
+document.addEventListener('keydown',e=>{
+  const tag=(e.target&&e.target.tagName)||''; if(tag==='INPUT'||tag==='TEXTAREA'||tag==='SELECT')return;
+  if(e.metaKey||e.ctrlKey||e.altKey)return;
+  const tabs=[...document.querySelectorAll('.hdr-tab')];
+  if(e.key>='1'&&e.key<=String(Math.min(9,tabs.length))){const idx=+e.key-1;if(tabs[idx]){tabs[idx].click();e.preventDefault();}return;}
+  const active=document.querySelector('.hdr-tab.active');
+  const at=active&&active.dataset.tab;
+  if(at==='signals'&&typeof _sigMode!=='undefined'&&_sigMode==='replay'){
+    if(e.key===' '){e.preventDefault(); if(_rpTimer)replayPause(); else replayPlay();}
+    else if(e.key==='r'||e.key==='R')replayRestart();
+  } else if(at==='calendar'){
+    if(e.key==='ArrowLeft')calNav(-1);
+    else if(e.key==='ArrowRight')calNav(1);
+  }
+});
+
 // ══ CLOCK ══
 function updateClock(){
   const now=new Date();
@@ -1131,6 +1164,7 @@ _allTabs.forEach((btn,i)=>{
     btn.setAttribute('aria-selected','true');
     const id='tab-'+btn.dataset.tab;
     document.getElementById(id).classList.add('active');
+    _saveState({tab:btn.dataset.tab});
     if(!tabInited[id]){
       tabInited[id]=true;
       if(id==='tab-research')resLoad();
@@ -1150,6 +1184,9 @@ _allTabs.forEach((btn,i)=>{
   });
 });
 tabInited['tab-trade']=true;
+// Restore the last-viewed tab across reloads — deferred to next tick so every const/function
+// declared later in this script is initialized before a restored tab's init handler runs.
+setTimeout(function(){const st=_loadState(); if(st.tab && st.tab!=='trade'){const b=document.querySelector('.hdr-tab[data-tab="'+st.tab+'"]'); if(b)b.click();}},0);
 
 // ══ SHARPE ROWS ══
 (function(){
@@ -1196,6 +1233,8 @@ async function updateBridgeState(){
   const tc=document.getElementById('nav-threat-chip');
   tc.textContent='THREAT '+threat.toFixed(2);
   tc.className='status-chip '+(threat>0.85?'chip-red':threat>0.5?'chip-yellow':'chip-green');
+  // Dynamic browser-tab title so state is visible from another tab
+  document.title=(mode==='HALT_NEW'?'⛔ ':mode==='TIGHTEN'?'⚠ ':'● ')+mode+' · threat '+threat.toFixed(2)+' · SOVEREIGN';
 
   // Alert banner
   const banner=document.getElementById('alert-banner');
@@ -1283,7 +1322,7 @@ async function updateBridgeState(){
   const ctxEl=document.getElementById('chat-ctx');
   if(ctxEl){
     const topSig=_best?`${_best.label} ${_best.signal>0?'LONG':'SHORT'}`:'no active signal';
-    ctxEl.textContent=`SOVEREIGN v013 · Forex Sharpe 1.8552 · Best: ${topSig} · Bridge: ${mode} (threat ${threat.toFixed(2)}) · Prop: ACTIVE`;
+    ctxEl.textContent=`SOVEREIGN v015 · Forex OOS Sharpe 1.08 (costed) · Best: ${topSig} · Bridge: ${mode} (threat ${threat.toFixed(2)}) · Prop: ACTIVE`;
   }
 }
 
@@ -1302,7 +1341,12 @@ let _tvBtn=null;
 let _sigMode='tv';
 function sigTVInit(){
   if(typeof TradingView==='undefined'){setTimeout(sigTVInit,300);return;}
-  if(!_tvBtn)_tvBtn=document.querySelector('#sig-tv-symbols .tvsym.active');
+  if(!_tvBtn){
+    const st=_loadState();
+    if(st.tvsym)_tvBtn=[...document.querySelectorAll('#sig-tv-symbols .tvsym')].find(x=>x.textContent.trim()===st.tvsym&&x.id!=='tv-open-tv');
+    if(!_tvBtn)_tvBtn=document.querySelector('#sig-tv-symbols .tvsym.active');
+    if(_tvBtn){document.querySelectorAll('#sig-tv-symbols .tvsym').forEach(x=>{if(x.id!=='tv-open-tv')x.classList.remove('active');});_tvBtn.classList.add('active');_tvSymbol=(_tvBtn.dataset.proxy||_tvBtn.dataset.fut||_tvSymbol);}
+  }
   const c=document.getElementById('tv_chart'); if(!c)return; c.innerHTML='';
   new TradingView.widget({
     container_id:'tv_chart', autosize:true, symbol:_tvSymbol, interval:'5',
@@ -1313,7 +1357,7 @@ function sigTVInit(){
 }
 function sigTVSymbol(btn){
   document.querySelectorAll('#sig-tv-symbols .tvsym').forEach(b=>{if(b.id!=='tv-open-tv')b.classList.remove('active');});
-  btn.classList.add('active'); _tvBtn=btn; _tvSymbol=(btn.dataset.proxy||btn.dataset.fut); sigTVInit();
+  btn.classList.add('active'); _tvBtn=btn; _tvSymbol=(btn.dataset.proxy||btn.dataset.fut); _saveState({tvsym:btn.textContent.trim()}); sigTVInit();
 }
 function sigOpenOnTV(){
   if(!_tvBtn)_tvBtn=document.querySelector('#sig-tv-symbols .tvsym.active');
@@ -1333,6 +1377,48 @@ function sigSetMode(m){
 
 // ── Replay Cockpit: replay a futures session as a live trading day ──
 let _rpSym='MNQ', _rpData=null, _rpChart=null, _rpCandle=null, _rpTimer=null, _rpInited=false;
+let _rpMuted=false, _rpRun=0, _rpEquity=[], _rpAudio=null;
+function _rpDop(win){
+  if(_rpMuted)return;
+  try{
+    _rpAudio=_rpAudio||new (window.AudioContext||window.webkitAudioContext)();
+    if(_rpAudio.state==='suspended')_rpAudio.resume();
+    const o=_rpAudio.createOscillator(), g=_rpAudio.createGain();
+    o.type='sine'; o.frequency.value=win?680:430;
+    g.gain.setValueAtTime(0.07,_rpAudio.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.0001,_rpAudio.currentTime+0.11);
+    o.connect(g); g.connect(_rpAudio.destination);
+    o.start(); o.stop(_rpAudio.currentTime+0.12);
+  }catch(e){}
+}
+function replayToggleMute(){
+  _rpMuted=!_rpMuted; _saveState({rpmute:_rpMuted});
+  const b=document.getElementById('rp-mute');
+  if(b){b.textContent=_rpMuted?'🔇':'🔊'; b.classList.toggle('muted',_rpMuted);}
+}
+function _rpDrawSpark(){
+  const c=document.getElementById('rp-spark'); if(!c||!c.getContext)return;
+  const ctx=c.getContext('2d'); ctx.clearRect(0,0,c.width,c.height);
+  if(!_rpEquity.length)return;
+  const vals=[0,..._rpEquity], mn=Math.min(...vals,0), mx=Math.max(...vals,0), rng=(mx-mn)||1;
+  const zy=c.height-((0-mn)/rng)*(c.height-4)-2;
+  ctx.strokeStyle='rgba(255,255,255,.10)'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(0,zy); ctx.lineTo(c.width,zy); ctx.stroke();
+  const last=_rpEquity[_rpEquity.length-1];
+  ctx.strokeStyle=last>=0?'#00c896':'#e05252'; ctx.lineWidth=1.5; ctx.beginPath();
+  vals.forEach((v,i)=>{const x=i/(vals.length-1||1)*c.width, y=c.height-((v-mn)/rng)*(c.height-4)-2; i?ctx.lineTo(x,y):ctx.moveTo(x,y);});
+  ctx.stroke();
+}
+function _rpResetRun(){
+  _rpRun=0; _rpEquity=[];
+  const p=document.getElementById('rp-running-pnl'); if(p){p.textContent='$0.00'; p.style.color='var(--muted)';}
+  _rpDrawSpark();
+}
+function _rpBookExit(t){
+  _rpRun+=(t.net_usd||0); _rpEquity.push(_rpRun);
+  const p=document.getElementById('rp-running-pnl');
+  if(p){p.textContent=(_rpRun>=0?'+':'')+'$'+_rpRun.toFixed(2); p.style.color=_rpRun>=0?'var(--green)':'var(--red)';}
+  _rpDrawSpark(); _rpDop((t.net_usd||0)>=0);
+}
 const _toSec=ms=>Math.floor(ms/1000);
 async function replayInit(){
   if(!_rpInited){
@@ -1349,12 +1435,18 @@ async function replayInit(){
       _rpCandle=_rpChart.addCandlestickSeries({upColor:'#00c896',downColor:'#e05252',wickUpColor:'#00c896',wickDownColor:'#e05252',borderVisible:false});
       new ResizeObserver(()=>{if(_rpChart)_rpChart.applyOptions({width:el.offsetWidth,height:el.offsetHeight});}).observe(el);
     }
+    // restore saved replay prefs (symbol, speed, mute)
+    const st=_loadState();
+    if(st.rpsym){const b=document.querySelector('.rp-sym[data-sym="'+st.rpsym+'"]'); if(b){document.querySelectorAll('.rp-sym').forEach(x=>x.classList.remove('active'));b.classList.add('active');_rpSym=st.rpsym;}}
+    if(st.rpdur){const s=document.getElementById('rp-dur'); if(s){s.value=st.rpdur; document.getElementById('rp-dur-val').textContent=st.rpdur+'m';}}
+    if(st.rpmute){_rpMuted=true; const mb=document.getElementById('rp-mute'); if(mb){mb.textContent='🔇';mb.classList.add('muted');}}
+    document.getElementById('rp-sym-label').textContent=_rpSym;
   }
   await replayLoad();
 }
 async function replaySym(btn){
   document.querySelectorAll('.rp-sym').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active'); _rpSym=btn.dataset.sym;
+  btn.classList.add('active'); _rpSym=btn.dataset.sym; _saveState({rpsym:_rpSym});
   document.getElementById('rp-sym-label').textContent=_rpSym;
   document.getElementById('rp-date').innerHTML='';
   await replayLoad();
@@ -1377,7 +1469,11 @@ async function replayLoad(){
     document.getElementById('rp-status').textContent=d.day+' · '+d.bars.length+' bars · '+d.trades.length+' trades · ready';
     document.getElementById('rp-orders').innerHTML='<div style="color:var(--muted);font-size:11px;padding:10px 14px">Press ▶ PLAY DAY to watch it unfold.</div>';
     document.getElementById('rp-summary').innerHTML='<div style="color:var(--muted);font-size:11px;padding:10px 14px">—</div>';
-  }catch(e){document.getElementById('rp-status').textContent='backend offline — start the server';}
+  }catch(e){
+    const st=document.getElementById('rp-status');
+    if(IS_REMOTE && !replayLoad._retried){replayLoad._retried=true; st.textContent='⏳ waking the live server (~30s)…'; setTimeout(()=>replayLoad(),9000);}
+    else st.textContent=IS_REMOTE?'live server unavailable — try again in a moment':'backend offline — start the local server';
+  }
 }
 function _rpRenderFull(){
   if(!_rpCandle||!_rpData||!_rpData.bars)return;
@@ -1394,6 +1490,7 @@ function replayPlay(){
   const stepMs=Math.max(40,(durMin*60*1000)/bars.length);
   document.getElementById('rp-orders').innerHTML='';
   document.getElementById('rp-summary').innerHTML='<div style="color:var(--muted);font-size:11px;padding:10px 14px">trading…</div>';
+  _rpResetRun();
   _rpCandle.setData([]); _rpCandle.setMarkers([]);
   const markers=[]; let i=0;
   _rpTimer=setInterval(()=>{
@@ -1405,10 +1502,10 @@ function replayPlay(){
       const eMs=Date.parse(t.entry_ts), xMs=Date.parse(t.exit_ts);
       if(!t._entered && Math.abs(eMs-b.t)<60000){t._entered=true;
         markers.push({time:tSec,position:t.direction==='LONG'?'belowBar':'aboveBar',color:t.direction==='LONG'?'#00c896':'#e05252',shape:t.direction==='LONG'?'arrowUp':'arrowDown',text:t.direction[0]});
-        _rpCandle.setMarkers(markers.slice()); _rpAddOrder(t,'ENTRY');}
+        _rpCandle.setMarkers(markers.slice()); _rpAddOrder(t,'ENTRY'); _rpDop(true);}
       if(!t._exited && Math.abs(xMs-b.t)<60000){t._exited=true;
         markers.push({time:tSec,position:'inBar',color:t.net_usd>=0?'#00c896':'#e05252',shape:'circle',text:'×'});
-        _rpCandle.setMarkers(markers.slice()); _rpAddOrder(t,'EXIT');}
+        _rpCandle.setMarkers(markers.slice()); _rpAddOrder(t,'EXIT'); _rpBookExit(t);}
     });
     i++;
   },stepMs);
@@ -1438,14 +1535,18 @@ function _rpShowSummary(){
 let _calMonth=null;
 async function calLoad(){
   const grid=document.getElementById('cal-grid');
-  if(!_calMonth){const n=new Date();_calMonth=n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0');}
+  if(!_calMonth){const st=_loadState();const n=new Date();_calMonth=st.calmonth||(n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0'));}
+  _saveState({calmonth:_calMonth});
   grid.innerHTML='<div style="padding:40px;text-align:center;color:var(--muted)">Loading…</div>';
   try{
     const r=await fetch(API_BASE+'/calendar?month='+_calMonth,{signal:AbortSignal.timeout(NET_T)});
     const d=await r.json();
     if(d.error){grid.innerHTML='<div style="padding:40px;text-align:center;color:var(--muted)">Unavailable</div>';return;}
     calRender(d);
-  }catch(e){grid.innerHTML='<div style="padding:40px;text-align:center;color:var(--muted)">Backend offline — the calendar needs the server running.</div>';}
+  }catch(e){
+    if(IS_REMOTE && !calLoad._retried){calLoad._retried=true; grid.innerHTML='<div style="padding:40px;text-align:center;color:var(--muted)">⏳ waking the live server (~30s)…</div>'; setTimeout(()=>calLoad(),9000);}
+    else grid.innerHTML='<div style="padding:40px;text-align:center;color:var(--muted)">'+(IS_REMOTE?'Live server unavailable — try again in a moment.':'Backend offline — the calendar needs the server running.')+'</div>';
+  }
 }
 function calNav(delta){
   const [y,m]=_calMonth.split('-').map(Number);
@@ -1473,9 +1574,9 @@ function calRender(d){
           wkPnl+=info.pnl; wkN+=info.n;
           const cls=info.pnl>0?'win':info.pnl<0?'loss':'';
           const wr=info.closed?Math.round(info.wins/info.closed*100)+'%':'—';
-          html+=`<td class="${cls}"><span class="cal-src ${info.src}" title="${info.src}"></span><div class="cal-dnum">${cur.getDate()}</div><div class="cal-pnl ${info.pnl>=0?'pos':'neg'}">${info.pnl>=0?'+':''}$${Math.round(info.pnl).toLocaleString()}</div><div class="cal-meta">${info.n} tr · ${wr}</div></td>`;
+          html+=`<td class="${cls} clickable" title="Replay ${key}" onclick="calOpenReplay('${key}')"><span class="cal-src ${info.src}" title="${info.src}"></span><div class="cal-dnum">${cur.getDate()}</div><div class="cal-pnl ${info.pnl>=0?'pos':'neg'}">${info.pnl>=0?'+':''}$${Math.round(info.pnl).toLocaleString()}</div><div class="cal-meta">${info.n} tr · ${wr}</div></td>`;
         } else {
-          html+=`<td><div class="cal-dnum">${cur.getDate()}</div><div class="cal-meta" style="margin-top:10px">·</div></td>`;
+          html+=`<td class="clickable" title="Replay ${key}" onclick="calOpenReplay('${key}')"><div class="cal-dnum">${cur.getDate()}</div><div class="cal-meta" style="margin-top:10px">·</div></td>`;
         }
       }
       cur.setDate(cur.getDate()+1);
@@ -1485,6 +1586,21 @@ function calRender(d){
   }
   html+='</tbody></table>';
   document.getElementById('cal-grid').innerHTML=html;
+}
+// Click a calendar day → jump to SIGNALS → Replay Cockpit loaded on that exact day.
+function calOpenReplay(date){
+  const nav=document.querySelector('.hdr-tab[data-tab="signals"]'); if(nav)nav.click();
+  setTimeout(()=>{
+    sigSetMode('replay');
+    setTimeout(()=>{
+      const sel=document.getElementById('rp-date');
+      if(sel){
+        if(![...sel.options].some(o=>o.value===date)){const o=document.createElement('option');o.value=date;o.textContent=date;sel.appendChild(o);}
+        sel.value=date;
+      }
+      replayLoad();
+    },350);
+  },60);
 }
 
 // On the public HTTPS site, until the hosted backend is wired (Phase 2), localhost is unreachable —
