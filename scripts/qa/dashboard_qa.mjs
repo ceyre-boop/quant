@@ -88,8 +88,20 @@ async function run() {
   record('signals', collect.errs.splice(0), f);
   // click the free QQQ proxy (futures are gated in the free widget) and screenshot a real chart
   await page.click('#sig-tv-symbols .tvsym[data-sym="NASDAQ:QQQ"]').catch(()=>{}); await sleep(6000); await shot(page, 'signals-qqq');
-  // switch to Replay Cockpit and screenshot
-  await page.click('#sigmode-replay').catch(()=>{}); await sleep(3000); await shot(page, 'signals-replay');
+  // switch to Replay Cockpit, load a day, screenshot, then start playback
+  await page.click('#sigmode-replay').catch(()=>{}); await sleep(6000); await shot(page, 'signals-replay');
+  let rf = await evalAsserts(page, () => {
+    const out = [];
+    if (!document.getElementById('replay-cockpit')) out.push('replay cockpit missing');
+    if (!document.getElementById('rp-orders')) out.push('LIVE ORDERS panel missing');
+    if (document.getElementById('sig-bridge') && document.getElementById('sig-bridge').offsetParent) out.push('Bridge State still visible');
+    const st = (document.getElementById('rp-status')||{}).textContent || '';
+    if (!/ready|trades|bars/.test(st)) out.push('replay did not load: ' + st);
+    return out;
+  });
+  record('replay', collect.errs.splice(0), rf);
+  // press PLAY, let a few bars animate, screenshot a mid-play frame
+  await page.click('#rp-play').catch(()=>{}); await sleep(8000); await shot(page, 'signals-replay-playing');
 
   // RESEARCH — the card that kept breaking
   await tab('research'); await sleep(2500); await shot(page, 'research');

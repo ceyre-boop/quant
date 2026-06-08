@@ -186,6 +186,28 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
 #sig-tv{flex:1;min-height:0;position:relative;background:var(--bg)}
 #sig-tv.hidden,#sig-replay-mode.hidden{display:none}
 #sig-replay-mode{flex:1;min-height:0;display:flex;flex-direction:column;position:relative}
+/* Replay Cockpit */
+#replay-cockpit{flex:1;min-height:0;display:flex;flex-direction:column}
+#rp-bar{display:flex;align-items:center;gap:14px;padding:8px 14px;background:var(--bg3);border-bottom:1px solid var(--border);flex-wrap:wrap}
+.rp-grp{display:flex;align-items:center;gap:6px}
+.rp-lbl{font-size:9px;color:var(--muted);letter-spacing:1px}
+.rp-sym{background:#1a2230;color:#8899a6;border:1px solid #1e2a38;border-radius:4px;font-size:10px;font-weight:700;padding:4px 10px;cursor:pointer;font-family:var(--font)}
+.rp-sym.active{background:rgba(74,158,255,.15);color:#4a9eff;border-color:rgba(74,158,255,.5)}
+#rp-date{background:#1a2230;color:#c8d3de;border:1px solid #1e2a38;border-radius:4px;font-size:11px;padding:4px 8px;font-family:var(--font)}
+#rp-dur{width:90px;accent-color:var(--green)}
+.rp-btn{background:#1a2230;color:#8899a6;border:1px solid #1e2a38;border-radius:4px;font-size:11px;padding:4px 10px;cursor:pointer;font-family:var(--font)}
+.rp-btn:hover{color:#c8d3de}
+.rp-btn.play{background:rgba(0,212,160,.14);color:var(--green);border-color:rgba(0,212,160,.45);font-weight:700}
+#rp-main{flex:1;min-height:0;display:grid;grid-template-columns:1fr 340px;overflow:hidden}
+#rp-chart-wrap{position:relative;background:var(--bg);min-width:0}
+#rp-legend{position:absolute;top:8px;left:12px;z-index:10;font-size:11px;color:#8899a6;pointer-events:none;font-family:var(--font);letter-spacing:.5px}
+#rp-side{border-left:1px solid var(--border);display:flex;flex-direction:column;background:var(--bg2);overflow:hidden}
+#rp-orders{flex:1;overflow-y:auto}
+.rp-order{display:grid;grid-template-columns:46px 1fr auto;gap:8px;align-items:center;padding:7px 14px;border-bottom:1px solid var(--border);font-size:11px;animation:fadein .3s ease}
+.rp-order.long .rpo-side{color:var(--green);font-weight:700;font-size:10px}
+.rp-order.short .rpo-side{color:var(--red);font-weight:700;font-size:10px}
+.rpo-pnl.pos{color:var(--green);font-weight:700}.rpo-pnl.neg{color:var(--red);font-weight:700}
+@media(max-width:768px){#rp-main{grid-template-columns:1fr}#rp-side{max-height:42vh}}
 #sig-offline{padding:40px;text-align:center;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
 #sig-offline.hidden{display:none}
 .offline-icon{font-size:40px;opacity:.3}
@@ -758,6 +780,38 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
       </div>
       <div id="sig-tv"><div id="tv_chart" style="width:100%;height:100%"></div></div>
       <div id="sig-replay-mode" class="hidden">
+      <div id="replay-cockpit">
+        <div id="rp-bar">
+          <div class="rp-grp"><span class="rp-lbl">SYM</span>
+            <button class="rp-sym active" data-sym="MNQ" onclick="replaySym(this)">MNQ</button>
+            <button class="rp-sym" data-sym="MES" onclick="replaySym(this)">MES</button>
+          </div>
+          <div class="rp-grp"><span class="rp-lbl">DAY</span><select id="rp-date" onchange="replayLoad()"></select></div>
+          <div class="rp-grp"><span class="rp-lbl">SPEED</span>
+            <input type="range" id="rp-dur" min="3" max="15" step="1" value="3" oninput="document.getElementById('rp-dur-val').textContent=this.value+'m'">
+            <span id="rp-dur-val" style="font-size:10px;color:var(--muted)">3m</span>
+          </div>
+          <div class="rp-grp">
+            <button id="rp-play" class="rp-btn play" onclick="replayPlay()">▶ PLAY DAY</button>
+            <button class="rp-btn" onclick="replayPause()">⏸</button>
+            <button class="rp-btn" onclick="replayRestart()">⟲</button>
+          </div>
+          <div id="rp-status" style="margin-left:auto;font-size:11px;color:var(--muted)">pick a day · press play</div>
+        </div>
+        <div id="rp-main">
+          <div id="rp-chart-wrap">
+            <div id="rp-legend"><span id="rp-clock">—</span> · <span id="rp-sym-label">MNQ</span> · <span id="rp-bias">—</span></div>
+            <div id="rp-chart" style="width:100%;height:100%"></div>
+          </div>
+          <div id="rp-side">
+            <div class="sig-section-hdr">Live Orders</div>
+            <div id="rp-orders"><div style="color:var(--muted);font-size:11px;padding:10px 14px">No orders yet — press Play to replay the day.</div></div>
+            <div class="sig-section-hdr">End of Day</div>
+            <div id="rp-summary"><div style="color:var(--muted);font-size:11px;padding:10px 14px">—</div></div>
+          </div>
+        </div>
+      </div>
+      <div id="sig-legacy-forex" style="display:none">
       <div id="sig-loading">
         <div class="loader-ring"></div>
         <div class="loader-text">Connecting to local signal server…</div>
@@ -877,6 +931,7 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
           <div id="sig-ict"></div>
         </div>
       </div>
+      </div><!-- /#sig-legacy-forex -->
       </div><!-- /#sig-replay-mode -->
     </div>
   </div>
@@ -1215,7 +1270,110 @@ function sigSetMode(m){
   document.getElementById('sig-replay-mode').classList.toggle('hidden',tv);
   document.getElementById('sig-tv-symbols').style.display=tv?'flex':'none';
   if(tv){ sigTVInit(); }
-  else { sigInit(); sigRefresh(); oracleRefresh(); macroRefresh(); }
+  else { replayInit(); }
+}
+
+// ── Replay Cockpit: replay a futures session as a live trading day ──
+let _rpSym='MNQ', _rpData=null, _rpChart=null, _rpCandle=null, _rpTimer=null, _rpInited=false;
+const _toSec=ms=>Math.floor(ms/1000);
+async function replayInit(){
+  if(!_rpInited){
+    _rpInited=true;
+    if(typeof LightweightCharts!=='undefined'){
+      const el=document.getElementById('rp-chart');
+      _rpChart=LightweightCharts.createChart(el,{
+        layout:{background:{color:'#0a0a0a'},textColor:'#8899a6'},
+        grid:{vertLines:{color:'#141414'},horzLines:{color:'#141414'}},
+        rightPriceScale:{borderColor:'#1e1e1e'},
+        timeScale:{borderColor:'#1e1e1e',timeVisible:true,secondsVisible:false},
+        crosshair:{mode:LightweightCharts.CrosshairMode.Normal},
+      });
+      _rpCandle=_rpChart.addCandlestickSeries({upColor:'#00c896',downColor:'#e05252',wickUpColor:'#00c896',wickDownColor:'#e05252',borderVisible:false});
+      new ResizeObserver(()=>{if(_rpChart)_rpChart.applyOptions({width:el.offsetWidth,height:el.offsetHeight});}).observe(el);
+    }
+  }
+  await replayLoad();
+}
+async function replaySym(btn){
+  document.querySelectorAll('.rp-sym').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active'); _rpSym=btn.dataset.sym;
+  document.getElementById('rp-sym-label').textContent=_rpSym;
+  document.getElementById('rp-date').innerHTML='';
+  await replayLoad();
+}
+async function replayLoad(){
+  replayPause();
+  const dateSel=document.getElementById('rp-date');
+  const day=dateSel.value||'';
+  document.getElementById('rp-status').textContent='loading '+_rpSym+'…';
+  try{
+    const r=await fetch(API_BASE+'/replay?symbol='+_rpSym+(day?'&date='+day:''),{signal:AbortSignal.timeout(NET_T)});
+    const d=await r.json(); _rpData=d;
+    if(d.error){document.getElementById('rp-status').textContent='no data ('+d.error+')';return;}
+    if(!dateSel.options.length && d.available_days&&d.available_days.length){
+      dateSel.innerHTML=d.available_days.slice().reverse().map(x=>`<option value="${x}">${x}</option>`).join('');
+      dateSel.value=d.day;
+    }
+    document.getElementById('rp-bias').textContent='bias '+(d.bias||'—');
+    _rpRenderFull();
+    document.getElementById('rp-status').textContent=d.day+' · '+d.bars.length+' bars · '+d.trades.length+' trades · ready';
+    document.getElementById('rp-orders').innerHTML='<div style="color:var(--muted);font-size:11px;padding:10px 14px">Press ▶ PLAY DAY to watch it unfold.</div>';
+    document.getElementById('rp-summary').innerHTML='<div style="color:var(--muted);font-size:11px;padding:10px 14px">—</div>';
+  }catch(e){document.getElementById('rp-status').textContent='backend offline — start the server';}
+}
+function _rpRenderFull(){
+  if(!_rpCandle||!_rpData||!_rpData.bars)return;
+  _rpCandle.setData(_rpData.bars.map(b=>({time:_toSec(b.t),open:b.o,high:b.h,low:b.l,close:b.c})));
+  _rpCandle.setMarkers([]);
+  _rpChart.timeScale().fitContent();
+}
+function replayPlay(){
+  if(!_rpData||!_rpData.bars||!_rpData.bars.length)return;
+  replayPause();
+  const bars=_rpData.bars, trades=(_rpData.trades||[]);
+  trades.forEach(t=>{delete t._entered;delete t._exited;});
+  const durMin=Math.max(3,parseInt(document.getElementById('rp-dur').value||'3'));
+  const stepMs=Math.max(40,(durMin*60*1000)/bars.length);
+  document.getElementById('rp-orders').innerHTML='';
+  document.getElementById('rp-summary').innerHTML='<div style="color:var(--muted);font-size:11px;padding:10px 14px">trading…</div>';
+  _rpCandle.setData([]); _rpCandle.setMarkers([]);
+  const markers=[]; let i=0;
+  _rpTimer=setInterval(()=>{
+    if(i>=bars.length){replayPause();_rpShowSummary();document.getElementById('rp-status').textContent='✓ day complete';return;}
+    const b=bars[i], tSec=_toSec(b.t);
+    _rpCandle.update({time:tSec,open:b.o,high:b.h,low:b.l,close:b.c});
+    document.getElementById('rp-clock').textContent=new Date(b.t).toLocaleTimeString('en-US',{hour12:false,timeZone:'America/New_York'})+' ET';
+    trades.forEach(t=>{
+      const eMs=Date.parse(t.entry_ts), xMs=Date.parse(t.exit_ts);
+      if(!t._entered && Math.abs(eMs-b.t)<60000){t._entered=true;
+        markers.push({time:tSec,position:t.direction==='LONG'?'belowBar':'aboveBar',color:t.direction==='LONG'?'#00c896':'#e05252',shape:t.direction==='LONG'?'arrowUp':'arrowDown',text:t.direction[0]});
+        _rpCandle.setMarkers(markers.slice()); _rpAddOrder(t,'ENTRY');}
+      if(!t._exited && Math.abs(xMs-b.t)<60000){t._exited=true;
+        markers.push({time:tSec,position:'inBar',color:t.net_usd>=0?'#00c896':'#e05252',shape:'circle',text:'×'});
+        _rpCandle.setMarkers(markers.slice()); _rpAddOrder(t,'EXIT');}
+    });
+    i++;
+  },stepMs);
+  document.getElementById('rp-status').textContent='▶ replaying '+_rpData.day+' over '+durMin+'m…';
+}
+function replayPause(){if(_rpTimer){clearInterval(_rpTimer);_rpTimer=null;}}
+function replayRestart(){replayPlay();}
+function _rpAddOrder(t,kind){
+  const box=document.getElementById('rp-orders'); if(!box)return;
+  if(box.children.length===1 && box.firstChild.textContent.includes('PLAY'))box.innerHTML='';
+  const cls=t.direction==='LONG'?'long':'short';
+  const px=kind==='ENTRY'?t.entry:t.exit;
+  const pnl=kind==='EXIT'?`<span class="rpo-pnl ${t.net_usd>=0?'pos':'neg'}">${t.net_usd>=0?'+':''}$${(t.net_usd||0).toFixed(2)}</span>`:'<span style="color:var(--muted);font-size:10px">working…</span>';
+  const row=document.createElement('div'); row.className='rp-order '+cls;
+  row.innerHTML=`<span class="rpo-side">${t.direction}</span><span style="color:var(--muted)">${kind} ${t.setup||''} @ ${px}</span>${pnl}`;
+  box.appendChild(row); box.scrollTop=box.scrollHeight;
+}
+function _rpShowSummary(){
+  const s=(_rpData&&_rpData.summary)||{}; const net=s.net_usd||0;
+  document.getElementById('rp-summary').innerHTML=`<div style="padding:12px 14px">
+    <div style="font-size:24px;font-weight:700;color:${net>=0?'var(--green)':'var(--red)'}">${net>=0?'+':''}$${net.toFixed(2)}</div>
+    <div style="font-size:11px;color:var(--muted);margin-top:4px">${s.n_trades||0} trades · max DD $${(s.max_drawdown_usd||0).toFixed(2)} · ${_rpData.day}</div>
+    <div style="font-size:10px;color:var(--dim);margin-top:6px">Day complete — exactly what the live engine would have traded.</div></div>`;
 }
 
 // On the public HTTPS site, until the hosted backend is wired (Phase 2), localhost is unreachable —
@@ -1856,7 +2014,7 @@ async function sigRefresh(){
     }
   }
 }
-setInterval(()=>{if(document.getElementById('tab-signals').classList.contains('active'))sigRefresh();},60000);
+setInterval(()=>{const el=document.getElementById('sig-live');if(el&&el.offsetParent&&document.getElementById('tab-signals').classList.contains('active'))sigRefresh();},60000);
 
 // ══ ORACLE INTEL PANEL ══
 const ORACLE_API=API_BASE+'/oracle';
@@ -2121,7 +2279,7 @@ function _oracleClearLevels(){
 
 // Refresh Oracle + Macro panel every 30s when signals tab is active
 setInterval(()=>{
-  if(document.getElementById('tab-signals').classList.contains('active')){oracleRefresh();macroRefresh();}
+  {const _sl=document.getElementById('sig-live');if(_sl&&_sl.offsetParent&&document.getElementById('tab-signals').classList.contains('active')){oracleRefresh();macroRefresh();}}
 },30000);
 
 // ══ TAB 3: RESEARCH ══
