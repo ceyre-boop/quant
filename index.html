@@ -175,6 +175,17 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
    TAB 2 — SIGNALS (live)
 ══════════════════════ */
 #signals-wrap{height:100%;display:flex;flex-direction:column}
+/* SIGNALS mode toggle (TradingView embed vs Replay Cockpit) */
+#sig-modebar{display:flex;align-items:center;gap:8px;padding:6px 12px;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;flex-wrap:wrap}
+.sig-mode-btn{background:#1a2230;color:#8899a6;border:1px solid #1e2a38;border-radius:4px;font-size:11px;font-weight:600;padding:5px 14px;cursor:pointer;letter-spacing:.5px;font-family:var(--font);transition:all .15s}
+.sig-mode-btn:hover{color:#c8d3de}
+.sig-mode-btn.active{background:rgba(0,212,160,.14);color:var(--green);border-color:rgba(0,212,160,.45)}
+.tvsym{background:#1a2230;color:#8899a6;border:1px solid #1e2a38;border-radius:4px;font-size:10px;font-weight:700;padding:4px 10px;cursor:pointer;font-family:var(--font);letter-spacing:1px}
+.tvsym:hover{color:#c8d3de}
+.tvsym.active{background:rgba(74,158,255,.15);color:#4a9eff;border-color:rgba(74,158,255,.5)}
+#sig-tv{flex:1;min-height:0;position:relative;background:var(--bg)}
+#sig-tv.hidden,#sig-replay-mode.hidden{display:none}
+#sig-replay-mode{flex:1;min-height:0;display:flex;flex-direction:column;position:relative}
 #sig-offline{padding:40px;text-align:center;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
 #sig-offline.hidden{display:none}
 .offline-icon{font-size:40px;opacity:.3}
@@ -728,7 +739,25 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
   <!-- ══ TAB 2: SIGNALS ══ -->
   <div class="tab-panel" id="tab-signals">
     <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
+    <script src="https://s3.tradingview.com/tv.js"></script>
     <div id="signals-wrap">
+      <div id="sig-modebar">
+        <button id="sigmode-tv" class="sig-mode-btn active" onclick="sigSetMode('tv')">📊 Chart (TradingView)</button>
+        <button id="sigmode-replay" class="sig-mode-btn" onclick="sigSetMode('replay')">⏵ Replay Cockpit</button>
+        <div id="sig-tv-symbols" style="margin-left:auto;display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+          <span style="font-size:9px;color:var(--muted);letter-spacing:1px">FUTURES</span>
+          <button class="tvsym active" data-sym="CME_MINI:NQ1!" onclick="sigTVSymbol(this)">NQ</button>
+          <button class="tvsym" data-sym="CME_MINI:ES1!" onclick="sigTVSymbol(this)">ES</button>
+          <button class="tvsym" data-sym="CME_MINI:MNQ1!" onclick="sigTVSymbol(this)">MNQ</button>
+          <button class="tvsym" data-sym="CME_MINI:MES1!" onclick="sigTVSymbol(this)">MES</button>
+          <span style="font-size:9px;color:var(--muted);letter-spacing:1px;margin-left:4px">FREE PROXY</span>
+          <button class="tvsym" data-sym="NASDAQ:QQQ" onclick="sigTVSymbol(this)">QQQ</button>
+          <button class="tvsym" data-sym="AMEX:SPY" onclick="sigTVSymbol(this)">SPY</button>
+          <span id="tv-tip" style="font-size:9px;color:var(--dim);margin-left:6px">↳ futures need a TradingView login on the chart</span>
+        </div>
+      </div>
+      <div id="sig-tv"><div id="tv_chart" style="width:100%;height:100%"></div></div>
+      <div id="sig-replay-mode" class="hidden">
       <div id="sig-loading">
         <div class="loader-ring"></div>
         <div class="loader-text">Connecting to local signal server…</div>
@@ -848,6 +877,7 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
           <div id="sig-ict"></div>
         </div>
       </div>
+      </div><!-- /#sig-replay-mode -->
     </div>
   </div>
 
@@ -1002,7 +1032,7 @@ _allTabs.forEach((btn,i)=>{
     if(!tabInited[id]){
       tabInited[id]=true;
       if(id==='tab-research')resLoad();
-      if(id==='tab-signals'){sigInit();sigRefresh();oracleRefresh();macroRefresh();}
+      if(id==='tab-signals'){sigSetMode('tv');}  // default to TradingView chart (no backend needed)
       if(id==='tab-trades'){trLoad();spLoad();}
       if(id==='tab-chat')chatInjectChips();
     }
@@ -1159,6 +1189,34 @@ setInterval(updateBridgeState,60000);
 
 // ══ TAB 2: SIGNALS ══
 const SIG_API=API_BASE+'/data';
+
+// ── Chart mode: TradingView embed (the real chart + your Pine indicators when logged in) ──
+let _tvSymbol='CME_MINI:NQ1!';
+let _sigMode='tv';
+function sigTVInit(){
+  if(typeof TradingView==='undefined'){setTimeout(sigTVInit,300);return;}
+  const c=document.getElementById('tv_chart'); if(!c)return; c.innerHTML='';
+  new TradingView.widget({
+    container_id:'tv_chart', autosize:true, symbol:_tvSymbol, interval:'5',
+    timezone:'America/New_York', theme:'dark', style:'1', locale:'en',
+    toolbar_bg:'#0a0a0a', enable_publishing:false, allow_symbol_change:true,
+    withdateranges:true, details:true, hide_side_toolbar:false,
+  });
+}
+function sigTVSymbol(btn){
+  document.querySelectorAll('#sig-tv-symbols .tvsym').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active'); _tvSymbol=btn.dataset.sym; sigTVInit();
+}
+function sigSetMode(m){
+  _sigMode=m; const tv=(m==='tv');
+  document.getElementById('sigmode-tv').classList.toggle('active',tv);
+  document.getElementById('sigmode-replay').classList.toggle('active',!tv);
+  document.getElementById('sig-tv').classList.toggle('hidden',!tv);
+  document.getElementById('sig-replay-mode').classList.toggle('hidden',tv);
+  document.getElementById('sig-tv-symbols').style.display=tv?'flex':'none';
+  if(tv){ sigTVInit(); }
+  else { sigInit(); sigRefresh(); oracleRefresh(); macroRefresh(); }
+}
 
 // On the public HTTPS site, until the hosted backend is wired (Phase 2), localhost is unreachable —
 // make the offline message honest instead of implying the user's local server is down.

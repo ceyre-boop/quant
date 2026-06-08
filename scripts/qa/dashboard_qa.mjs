@@ -12,7 +12,7 @@ const CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 const SHOTS = new URL('./shots/', import.meta.url).pathname;
 mkdirSync(SHOTS, { recursive: true });
 
-const BENIGN = [/favicon/i]; // whitelist: harmless console noise
+const BENIGN = [/favicon/i, /tradingview/i, /tv\.js/i, /s3\.tradingview/i, /telemetry/i]; // harmless 3rd-party (TV embed) noise
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const report = { base: BASE, views: {}, ok: true };
 
@@ -75,15 +75,21 @@ async function run() {
   });
   record('trade', collect.errs.splice(0), f);
 
-  // SIGNALS
-  await tab('signals'); await shot(page, 'signals');
+  // SIGNALS — default TradingView embed mode
+  await tab('signals'); await sleep(5000); await shot(page, 'signals');
   f = await evalAsserts(page, () => {
     const out = [];
-    const cond = [...document.querySelectorAll('#tab-signals .mc-val, #tab-signals [id^="sig-"]')];
-    if (document.querySelector('#tab-signals') == null) out.push('no signals panel');
+    if (!document.querySelector('#tab-signals')) out.push('no signals panel');
+    if (!document.getElementById('sigmode-tv')) out.push('mode toggle missing');
+    if (document.getElementById('sig-tv').classList.contains('hidden')) out.push('TV mode not active by default');
+    if (!document.querySelector('#tv_chart iframe')) out.push('TradingView embed iframe did not load');
     return out;
   });
   record('signals', collect.errs.splice(0), f);
+  // click the free QQQ proxy (futures are gated in the free widget) and screenshot a real chart
+  await page.click('#sig-tv-symbols .tvsym[data-sym="NASDAQ:QQQ"]').catch(()=>{}); await sleep(6000); await shot(page, 'signals-qqq');
+  // switch to Replay Cockpit and screenshot
+  await page.click('#sigmode-replay').catch(()=>{}); await sleep(3000); await shot(page, 'signals-replay');
 
   // RESEARCH — the card that kept breaking
   await tab('research'); await sleep(2500); await shot(page, 'research');
