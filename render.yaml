@@ -7,7 +7,7 @@ services:
   - type: web
     name: sovereign-quant-dashboard
     runtime: python
-    plan: starter            # always-on (~$7/mo) — no cold starts
+    plan: free               # $0, no card required; sleeps after ~15min idle (first load ~30-60s)
     branch: master
     buildCommand: pip install -r requirements-dashboard.txt
     startCommand: python3 scripts/live_signals_server.py
