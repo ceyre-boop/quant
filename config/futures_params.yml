@@ -1,0 +1,90 @@
+# ── ES/NQ Micro Futures sandbox parameters (Track-2) ─────────────────────────
+# Single source of truth for every threshold in the futures sandbox.
+# CLAUDE.md rule #4: no hardcoded thresholds — change here, log the rationale.
+# Loaded via sovereign/futures/config.py::futures_params().
+#
+# The real objective: CLEAR COSTS and SURVIVE TRAILING DRAWDOWN, out-of-sample.
+# Trade count is an OUTPUT of the edge, never a target.
+
+meta:
+  version: 1
+  instruments: [MES, MNQ]
+  session_tz: America/New_York
+  rth_open: "09:30"
+  rth_close: "16:00"
+
+# ── Contract specs + transaction costs (mirror futures_backtester.py) ─────────
+# These are the truth-teller. A scalp must clear cost_per_round_turn_usd to exist.
+contracts:
+  MES:
+    underlying: "ES=F"
+    dollars_per_point: 5.0
+    tick: 0.25
+  MNQ:
+    underlying: "NQ=F"
+    dollars_per_point: 2.0
+    tick: 0.25
+
+costs:
+  slippage_ticks_per_side: 1.0     # conservative for index micros (entry + exit = 2 ticks)
+  commission_per_round_turn_usd: 0.74
+
+# ── Micro scalp setup: VWAP reclaim + RSI cross, structurally gated ───────────
+micro:
+  rsi_period: 14
+  rsi_cross_level: 50.0            # long: prev<50 & curr>=50 ; short: mirror
+  ema_fast: 8
+  ema_slow: 21                     # price must be on correct side of BOTH
+  volume_gate_mult: 1.5            # signal bar volume >= mult * avg(volume, vol_lookback)
+  vol_lookback: 20
+  cooldown_seconds: 300            # min spacing between micro entries
+  max_trades_per_session: 20       # bounded guard; the $ loss limit is the real floor
+  target_rr: 1.0                   # T1 at 1R (matches current monitor)
+  poll_seconds: 5
+
+# ── Macro setup: Opening Range Breakout (the "go big / go small" prompt) ───────
+orb:
+  minutes: 5                       # first N 1-min bars define the range
+  volume_gate_mult: 1.5
+  big_contracts: 3
+  big_target_points: 25
+  safe_contracts: 1
+  safe_target_points: 12
+
+# ── Stops ─────────────────────────────────────────────────────────────────────
+stops:
+  use_overnight_levels: true       # LONG stop = overnight low, SHORT = overnight high
+  fallback_pct: 0.001              # if no level: entry * (1 -/+ fallback_pct)
+
+# ── Daily loss limit (hard $ lock, mirrors loss_limit.py) ─────────────────────
+loss_limit:
+  daily_usd: 500.0
+
+# ── Prop-firm rules — MUST be set to the firm you actually fund ────────────────
+# Defaults below approximate a 50k Apex/Topstep-style eval. "Passing on paper"
+# only means something if the replay enforces THESE. Update per chosen firm + log.
+prop:
+  firm: "GENERIC_50K"              # set to APEX_50K / TOPSTEP_50K / TRADOVATE_* when chosen
+  account_size_usd: 50000.0
+  trailing_drawdown_usd: 2500.0    # trails the intraday equity HIGH; breach = blown
+  trailing_locks_at_initial_plus: null  # some firms freeze the trail once equity >= start+this; null = always trails
+  profit_target_usd: 3000.0        # to pass the eval
+  daily_loss_limit_usd: 1100.0     # firm daily loss limit (separate from sandbox loss_limit)
+  consistency_pct: 0.30            # no single day may exceed this fraction of total profit
+
+# ── Bias engine thresholds (futures_bias.py) ──────────────────────────────────
+bias:
+  overnight_pct_strong: 0.20       # |overnight %| above this = 2 points
+  vix_high: 25.0
+  vix_elevated: 20.0
+  vix_complacency: 14.0
+  yield_chg_strong: 0.05
+  dxy_pct_strong: 0.20
+
+# ── Validation gate (futures_validate.py) ─────────────────────────────────────
+validation:
+  permutation_iterations: 1000
+  permutation_seed: 7
+  p_value_threshold: 0.05          # edge must clear costs below this to trust --auto / fund
+  walk_forward_train_days: 20
+  walk_forward_test_days: 5
