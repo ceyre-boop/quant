@@ -795,15 +795,14 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
         <button id="sigmode-tv" class="sig-mode-btn active" onclick="sigSetMode('tv')">📊 Chart (TradingView)</button>
         <button id="sigmode-replay" class="sig-mode-btn" onclick="sigSetMode('replay')">⏵ Replay Cockpit</button>
         <div id="sig-tv-symbols" style="margin-left:auto;display:flex;gap:6px;align-items:center;flex-wrap:wrap">
-          <span style="font-size:9px;color:var(--muted);letter-spacing:1px">FUTURES</span>
-          <button class="tvsym active" data-sym="CME_MINI:NQ1!" onclick="sigTVSymbol(this)">NQ</button>
-          <button class="tvsym" data-sym="CME_MINI:ES1!" onclick="sigTVSymbol(this)">ES</button>
-          <button class="tvsym" data-sym="CME_MINI:MNQ1!" onclick="sigTVSymbol(this)">MNQ</button>
-          <button class="tvsym" data-sym="CME_MINI:MES1!" onclick="sigTVSymbol(this)">MES</button>
-          <span style="font-size:9px;color:var(--muted);letter-spacing:1px;margin-left:4px">FREE PROXY</span>
-          <button class="tvsym" data-sym="NASDAQ:QQQ" onclick="sigTVSymbol(this)">QQQ</button>
-          <button class="tvsym" data-sym="AMEX:SPY" onclick="sigTVSymbol(this)">SPY</button>
-          <span id="tv-tip" style="font-size:9px;color:var(--dim);margin-left:6px">↳ futures need a TradingView login on the chart</span>
+          <button class="tvsym active" data-proxy="OANDA:NAS100USD" data-fut="CME_MINI:NQ1!" onclick="sigTVSymbol(this)">NQ</button>
+          <button class="tvsym" data-proxy="OANDA:SPX500USD" data-fut="CME_MINI:ES1!" onclick="sigTVSymbol(this)">ES</button>
+          <button class="tvsym" data-proxy="OANDA:NAS100USD" data-fut="CME_MINI:MNQ1!" onclick="sigTVSymbol(this)">MNQ</button>
+          <button class="tvsym" data-proxy="OANDA:SPX500USD" data-fut="CME_MINI:MES1!" onclick="sigTVSymbol(this)">MES</button>
+          <button class="tvsym" data-proxy="NASDAQ:QQQ" data-fut="NASDAQ:QQQ" onclick="sigTVSymbol(this)">QQQ</button>
+          <button class="tvsym" data-proxy="AMEX:SPY" data-fut="AMEX:SPY" onclick="sigTVSymbol(this)">SPY</button>
+          <button id="tv-fut-toggle" class="tvsym" onclick="sigTVToggleFut()" title="Switch to the real CME futures contract — needs a TradingView login on the chart">⚡ Live futures</button>
+          <span id="tv-tip" style="font-size:9px;color:var(--dim);margin-left:4px">charts free; ⚡ = real contract (TV login)</span>
         </div>
       </div>
       <div id="sig-tv"><div id="tv_chart" style="width:100%;height:100%"></div></div>
@@ -1293,10 +1292,16 @@ setInterval(updateBridgeState,60000);
 const SIG_API=API_BASE+'/data';
 
 // ── Chart mode: TradingView embed (the real chart + your Pine indicators when logged in) ──
-let _tvSymbol='CME_MINI:NQ1!';
+// Default to a FREE index symbol that charts without a TradingView login (tracks NQ). The ⚡ toggle
+// switches to the real CME futures contract for users logged into TradingView with futures data.
+let _tvSymbol='OANDA:NAS100USD';
+let _tvUseFut=false;
+let _tvBtn=null;
 let _sigMode='tv';
+function _tvResolve(btn){ return _tvUseFut ? (btn.dataset.fut||btn.dataset.proxy) : (btn.dataset.proxy||btn.dataset.fut); }
 function sigTVInit(){
   if(typeof TradingView==='undefined'){setTimeout(sigTVInit,300);return;}
+  if(!_tvBtn)_tvBtn=document.querySelector('#sig-tv-symbols .tvsym.active');
   const c=document.getElementById('tv_chart'); if(!c)return; c.innerHTML='';
   new TradingView.widget({
     container_id:'tv_chart', autosize:true, symbol:_tvSymbol, interval:'5',
@@ -1306,8 +1311,16 @@ function sigTVInit(){
   });
 }
 function sigTVSymbol(btn){
-  document.querySelectorAll('#sig-tv-symbols .tvsym').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active'); _tvSymbol=btn.dataset.sym; sigTVInit();
+  document.querySelectorAll('#sig-tv-symbols .tvsym').forEach(b=>{if(b.id!=='tv-fut-toggle')b.classList.remove('active');});
+  btn.classList.add('active'); _tvBtn=btn; _tvSymbol=_tvResolve(btn); sigTVInit();
+}
+function sigTVToggleFut(){
+  _tvUseFut=!_tvUseFut;
+  const t=document.getElementById('tv-fut-toggle');
+  t.classList.toggle('active',_tvUseFut);
+  t.textContent=_tvUseFut?'⚡ Live futures ✓':'⚡ Live futures';
+  if(!_tvBtn)_tvBtn=document.querySelector('#sig-tv-symbols .tvsym.active');
+  if(_tvBtn){_tvSymbol=_tvResolve(_tvBtn);sigTVInit();}
 }
 function sigSetMode(m){
   _sigMode=m; const tv=(m==='tv');
