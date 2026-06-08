@@ -8,43 +8,36 @@
   },
   "week": {
     "start_date": "2026-05-31",
-    "weekly_used": 6800,
-    "weekly_remaining": 193200,
+    "weekly_used": 10000,
+    "weekly_remaining": 190000,
     "last_synced": null,
-    "note": "REST MODE Jun 1 01:30-01:52 UTC \u2014 HYP-039 partial confirmed (CB blackout), HYP-053 discovered (regime velocity), health check, paper trading status"
+    "note": "REST-007 Jun 8 01:08-01:18Z \u2014 HYP-056 robustness battery (NOT_CONFIRMED, killed 2023-artifact gate), health check (2 loops down 61h). ~3200 tokens. NOTE: weekly ledger stale since last manual sync Jun 1; reset day Saturday so a new week likely started Jun 6 \u2014 re-sync from claude.ai/settings."
   },
   "today": {
-    "date": "2026-06-01",
+    "date": "2026-06-08",
     "human_used": 0,
-    "agent_used": 2600,
-    "daily_human_budget": 20000,
+    "agent_used": 3200,
     "daily_agent_budget": 8571,
-    "agent_extra_from_rollover": 10000,
     "agent_allowed_today": 18571,
-    "note": "REST MODE Jun 1 01:30 UTC \u2014 CB blackout analysis, regime fragility study, 4 findings, 4 messages, 2 tasks added"
+    "note": "REST-007 \u2014 1 robustness battery, health check, 3 findings, 2 messages, queue evolved. Light cycle, large buffer left."
   },
   "session": {
-    "started": "2026-06-01T01:30:00+00:00",
-    "ended": "2026-06-01T01:52:00+00:00",
+    "started": "2026-06-08T01:08:00+00:00",
+    "ended": "2026-06-08T01:18:00+00:00",
     "mode": "REST_MODE",
     "tasks_completed": [
-      "HYP-039-cb-blackout",
-      "HYP-053-regime-velocity",
-      "health-check",
-      "paper-trading-status"
+      "HYP-056-robustness-battery",
+      "health-check"
     ],
-    "findings_written": 4,
+    "findings_written": 3,
     "hypotheses_updated": [
-      "HYP-039"
+      "HYP-056"
     ],
-    "new_hypotheses": [
-      "HYP-053"
-    ],
+    "new_hypotheses": [],
     "new_tasks_added": [
-      "RQ-REST-010",
-      "RQ-REST-011"
+      "RQ-REST-012"
     ],
-    "key_finding": "Rate divergence velocity predicts forex regime; current 2026 signal is FULL SIZE (91st pct). CB danger zone is days 3-14 pre-meeting, not 0-2d."
+    "key_finding": "HYP-056 counter-momentum gate NOT_CONFIRMED \u2014 OOS edge was a 2023 artifact, fails BH across pairs. Avoided a false positive before it cost anything. Salvage: EURUSD-only magnitude effect worth live-tracking, not gating."
   },
   "mode": "REST_MODE_COMPLETE",
   "thresholds": {

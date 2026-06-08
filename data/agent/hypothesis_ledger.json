@@ -754,12 +754,27 @@
   {
     "id": "HYP-056",
     "title": "Counter-momentum entry: trade against 63d price trend for better timing",
-    "status": "CANDIDATE",
+    "status": "NOT_CONFIRMED",
     "created_date": "2026-06-07",
     "origin": "REST-006",
     "description": "Counter-momentum entries (where price has NOT moved in the macro signal direction over 63d) outperform momentum-aligned entries. Full period: counter Sharpe=0.163 vs aligned=0.088 (p=0.185). OOS: counter=0.343 vs aligned=0.044 (p=0.039 \u2014 significant). Per-pair: EURUSD p=0.037 (significant), USDCAD p=0.128, USDJPY REVERSED (aligned better, p=0.877). Combined with 2-gate stack (widening + rate level): OOS 0.315\u21920.499 with momentum-counter filter. IS=0.272 < OOS=0.499: no overfit. 2024: 0.001\u21920.233 (doesn't hurt problem year). Permutation within 2-gate universe: p=0.065 (marginal). OOS permutation: p=0.101 (underpowered, n=21).",
-    "test_needed": "Additional 2025-2026 live trades needed for statistical confirmation. Near-term: add momentum_63d logging to decision_logger for EURUSD trades so live validation begins.",
-    "priority": "MEDIUM"
+    "test_needed": "Do NOT implement as portfolio gate. Live-track momentum_63d for EURUSD entries only; revisit if 2025-26 EURUSD data shows the magnitude effect independently of 2023.",
+    "priority": "LOW",
+    "confirmed_date": "2026-06-08",
+    "robustness_REST007": {
+      "verdict": "FAILS robustness battery 1/6 checks",
+      "full_perm_p": 0.3524,
+      "full_boot_ci": [
+        -0.08914244785220478,
+        0.243761978205098
+      ],
+      "oos_perm_p": 0.0839,
+      "drop2023_perm_p": 0.6732,
+      "drop2023_delta": 0.11170513800106227,
+      "bh_any_significant": false,
+      "killer": "OOS significance was a 2023 artifact: removing 2023 collapses delta to +0.112, perm_p=0.673. No pair survives Benjamini-Hochberg across the 4 live pairs. Same failure shape as E1/E2/E3.",
+      "salvage": "Only survivor: monotone threshold response (delta +0.075 at mom=0 -> +0.486 at |dir*mom|>0.05). Suggests any real effect is a MAGNITUDE/pair-specific phenomenon (EURUSD-ish, USDJPY reversed), not a portfolio-wide counter gate. Track momentum_63d live for EURUSD only; do NOT wire as a gate."
+    }
   },
   {
     "id": "HYP-057",
@@ -780,5 +795,66 @@
       "dataset_hash": "ce8d80d3ff86be2398d4f3402f1d83bfcc01a58031da9bb7ae1a4d986d9ad9b7"
     },
     "note": "NO_EDGE (p=0.164) \u2014 signal indistinguishable from random entries and Sharpe-negative after costs. Router tautology confirmed (OOS 0.998 \u2014 labels derive from the hurst_short input feature; csd/hmm/adx hardcoded constants). Cold-start EV gate (Kelly/Hoeffding lower-bound, n_trades=20) blocks trade #1, so the README's '200 paper trades to go live' is unreachable. DO NOT revive. Evidence: data/research/sovereign_core_verdict.md; harness: data/research/sovereign_core_gauntlet/."
+  },
+  {
+    "id": "V007-HOLD-VALIDATION",
+    "title": "Per-pair hold overrides (v007, GBP6/AUD5/EUR5) vs 60d baseline \u2014 redesigned validation",
+    "status": "NOT_SIGNIFICANT_ROLLED_BACK",
+    "created_date": "2026-06-07",
+    "confirmed_date": "2026-06-07",
+    "origin": "v007-hold-revalidation",
+    "description": "The 'pending redesigned validation' the code comment calls for. Backtester is the only valid test for exit rules (retro_validate's forensics test was self-acknowledged invalid). TREATMENT (live overrides) vs BASELINE (all 60d), 4-pair, costed, OOS 2023-24 + 10k random-cap permutation + per-year walk-forward.",
+    "result": {
+      "oos_delta_sharpe": 0.0549,
+      "oos_treatment": 1.3053,
+      "oos_baseline": 1.2504,
+      "permutation_p": 0.0443955604439556,
+      "walk_forward_deltas": {
+        "2021": 0.145,
+        "2022": -0.045,
+        "2023": 0.123,
+        "2024": 0.0
+      },
+      "verdict_basis": {
+        "oos_delta_positive": true,
+        "permutation_sig": true,
+        "walk_forward_stable": false,
+        "wf_deltas": [
+          0.145,
+          -0.045,
+          0.123,
+          0.0
+        ]
+      }
+    },
+    "note": "NOT_SIGNIFICANT \u2014 fails walk-forward stability. Benefit is regime-concentrated (2021 +0.145, 2023 +0.123; 2022 -0.045, 2024 0.000) and GBPUSD-driven (+0.34) partly offset by AUDUSD (negative). Overrides near-inert on realized hold duration (only AUDUSD avg shifts 5.9->4.6); GBPUSD gain comes from capping non-event signals, not from a clean duration limit. CAVEAT: harness OOS treatment=1.305/n=110 does NOT reconcile to the 2026-06-02 holdout 1.081/n=103 (likely yfinance data drift); the treatment-vs-baseline DELTA is the valid internal measure. Permutation p=0.044 (chosen vs random caps) marginally passed but the question that matters (robust vs 60d) fails walk-forward. Recommend roll back to 60d pending confirmation.",
+    "artifact": "data/research/v007_hold_validation.json",
+    "rollback": {
+      "applied": "2026-06-07",
+      "new_config": "all pairs 60d default",
+      "new_oos_sharpe": 1.2504,
+      "new_decay": 2.169,
+      "new_perm_p": 0.0,
+      "note": "PAIR_HOLD_OVERRIDES cleared. 60d baseline re-validated ROBUST p<0.001."
+    }
+  },
+  {
+    "id": "GBPUSD-GRADE-EXPECTANCY",
+    "title": "GBPUSD grade-A vs grade-B expectancy (is conviction-grading real?)",
+    "status": "NOT_SIGNIFICANT",
+    "created_date": "2026-06-07",
+    "confirmed_date": "2026-06-07",
+    "origin": "v007-step3",
+    "description": "Tests whether GBPUSD grade-A (|real_rate_diff|>=1.5) trades have materially different expectancy than grade-B (0.5-1.5). Full-period 2015-24 backtest trades graded by real_rate_diff at entry; 10k label-shuffle permutation. (No grade->size multiplier exists; diagnostic only.)",
+    "result": {
+      "n_A": 42,
+      "meanpnl_A_pct": 0.5328,
+      "n_B": 37,
+      "meanpnl_B_pct": 0.4278,
+      "obs_diff_pct": 0.105,
+      "permutation_p": 0.7746225377462254
+    },
+    "note": "NOT_SIGNIFICANT (p=0.77). Grade-A and grade-B GBPUSD expectancy indistinguishable (+0.53% vs +0.43%). Do NOT build a grade-based size multiplier \u2014 unsupported by data. Artifact: data/research/gbpusd_grade_expectancy.json.",
+    "artifact": "data/research/gbpusd_grade_expectancy.json"
   }
 ]

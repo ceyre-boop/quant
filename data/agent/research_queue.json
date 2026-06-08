@@ -443,13 +443,30 @@
       "priority": 1,
       "created": "2026-06-01T01:45:00Z",
       "name": "HYP-053: Backtest rate divergence velocity size gate on v014 trade log",
-      "description": "REST MODE found: 90-day rolling spread velocity (GBPUSD+AUDUSD+USDJPY+AUDNZD) correctly predicts 3/4 bad years. Proposed size gate: velocity > p50 = 1.0x, p25-p50 = 0.5x, < p25 = 0.25x. Backtest: load v014 trade log (n=119 costed OOS trades), apply daily size multiplier from cached rate data, recompute Sharpe and max_DD. Focus on 2021 (expected: large improvement) and 2024 (expected: material improvement). Compare vs v014 baseline Sharpe=0.76. This is a pure size reducer — no trade entries missed. Low implementation risk. Needs rate data loading (parquet files already cached).",
+      "description": "REST MODE found: 90-day rolling spread velocity (GBPUSD+AUDUSD+USDJPY+AUDNZD) correctly predicts 3/4 bad years. Proposed size gate: velocity > p50 = 1.0x, p25-p50 = 0.5x, < p25 = 0.25x. Backtest: load v014 trade log (n=119 costed OOS trades), apply daily size multiplier from cached rate data, recompute Sharpe and max_DD. Focus on 2021 (expected: large improvement) and 2024 (expected: material improvement). Compare vs v014 baseline Sharpe=0.76. This is a pure size reducer \u2014 no trade entries missed. Low implementation risk. Needs rate data loading (parquet files already cached).",
       "needs_network": false,
       "estimated_minutes": 20,
       "source": "REST_MODE_HYP-053",
       "hypothesis_id": "HYP-053",
-      "is_code_change": false
+      "is_code_change": false,
+      "notes": [
+        "REST-007: still QUEUED. NB baseline drifted \u2014 CLAUDE.md now v015, OOS Sharpe 1.25 (v014 0.76 reference is stale). Re-anchor before running."
+      ]
+    },
+    {
+      "id": "RQ-REST-012",
+      "status": "QUEUED",
+      "priority": 3,
+      "created": "2026-06-08T01:18:00+00:00",
+      "name": "Live-track momentum_63d for EURUSD entries (HYP-056 salvage)",
+      "description": "HYP-056 was NOT_CONFIRMED as a portfolio gate (REST-007: OOS was a 2023 artifact, fails BH). The only survivor is a monotone counter-momentum dose-response concentrated in EURUSD (USDJPY reverses). Action: add momentum_63d capture to decision_logger for EURUSD entries so the magnitude effect can be validated on out-of-sample live data, pair-isolated. NO gate change. requires_human to wire (touches decision_logger). Diagnostic-only logging \u2014 low risk.",
+      "source": "REST_MODE_007_HYP-056_salvage",
+      "hypothesis_id": "HYP-056",
+      "requires_human": true,
+      "needs_network": false,
+      "estimated_minutes": 15,
+      "is_code_change": true
     }
   ],
-  "last_updated": "2026-06-01T01:50:00Z"
+  "last_updated": "2026-06-08T01:18:00+00:00"
 }
