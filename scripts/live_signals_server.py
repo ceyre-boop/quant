@@ -366,6 +366,115 @@ def build_payload(ttl=120):
     return payload
 
 
+# ── Replay engine: replay a futures session as a live trading day (Replay Cockpit) ──
+# Reuses the EXACT live scalp+ORB engine (scripts/futures_replay.py: simulate_session) over
+# historical 1-min bars, so the orders shown are the real ones the strategy would have taken.
+_REPLAY_CACHE = {}
+_FR_MOD = None
+def _futures_replay_mod():
+    global _FR_MOD
+    if _FR_MOD is None:
+        import importlib.util as _ilu
+        spec = _ilu.spec_from_file_location('futures_replay',
+                                            os.path.join(os.path.dirname(os.path.abspath(__file__)), 'futures_replay.py'))
+        m = _ilu.module_from_spec(spec); spec.loader.exec_module(m); _FR_MOD = m
+    return _FR_MOD
+
+def _run_replay(symbol=None, day=None):
+    import time as _t
+    # ES/NQ map to the micro engine (same price action; the contract spec sets $/point).
+    inst = {'NQ': 'MNQ', 'ES': 'MES'}.get((symbol or 'MNQ').upper(), (symbol or 'MNQ').upper())
+    if inst not in ('MES', 'MNQ'):
+        inst = 'MNQ'
+    ck = (inst, day or 'latest')
+    c = _REPLAY_CACHE.get(ck)
+    if c and (_t.time() - c[0] < 600):
+        return c[1]
+    fr = _futures_replay_mod()
+    from sovereign.futures import bar_feed as bf
+    df = bf.load_history(inst, source='yf', day=None, lookback='7d')
+    if df is None or len(df) == 0:
+        return {'error': 'no_data', 'instrument': inst, 'available_days': []}
+    all_days = bf.session_days(df)
+    sel = day if (day and day in all_days) else (all_days[-1] if all_days else None)
+    if not sel:
+        return {'error': 'no_session', 'instrument': inst, 'available_days': all_days}
+    prior_close = None; day_df = None
+    for d in all_days:
+        ddf = df[df.index.tz_convert(bf.ET).strftime('%Y-%m-%d') == d]
+        if d == sel:
+            day_df = ddf; break
+        if len(ddf):
+            prior_close = float(ddf['Close'].iloc[-1])
+    if day_df is None or len(day_df) < 3:
+        return {'error': 'thin_session', 'instrument': inst, 'day': sel, 'available_days': all_days}
+    bias_dir, key_levels = fr._day_bias(day_df, sel, prior_close, inst, 'auto')
+    session = fr.simulate_session(day_df, sel, bias_dir, key_levels, inst, 'safe')
+    bars = [{'t': int(ts.timestamp() * 1000),
+             'o': round(float(r['Open']), 2), 'h': round(float(r['High']), 2),
+             'l': round(float(r['Low']), 2), 'c': round(float(r['Close']), 2),
+             'v': int(r.get('Volume', 0) or 0)} for ts, r in day_df.iterrows()]
+    out = {'instrument': inst, 'day': sel, 'tf': '1m', 'bias': bias_dir,
+           'available_days': all_days, 'bars': bars, 'trades': session.get('trades', []),
+           'summary': {'net_usd': session.get('net_usd', 0), 'n_trades': session.get('n_trades', 0),
+                       'max_drawdown_usd': session.get('max_drawdown_usd', 0)}}
+    _REPLAY_CACHE[ck] = (_t.time(), out)
+    return out
+
+
+# ── Calendar: Warrior-style monthly P&L from paper trades (+ engine fill-in for unlogged days) ──
+_CAL_POINT_VALUE = {'MES': 5.0, 'MNQ': 2.0}
+def _calendar_data(month=None):
+    if not month:
+        month = datetime.now(timezone.utc).strftime('%Y-%m')
+    days = {}
+    # 1) Real logged futures paper trades (the source that fills at market close).
+    log = 'data/futures/trade_log.jsonl'
+    if os.path.exists(log):
+        for line in open(log):
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                r = json.loads(line)
+            except Exception:
+                continue
+            if r.get('size_contracts', 0) == 0:
+                continue
+            day = str(r.get('ts', ''))[:10]
+            if not day.startswith(month):
+                continue
+            d = days.setdefault(day, {'pnl': 0.0, 'n': 0, 'wins': 0, 'closed': 0, 'src': 'logged'})
+            d['n'] += 1
+            entry, exit_, size = r.get('entry'), r.get('exit'), r.get('size_contracts') or 0
+            if entry is not None and exit_ is not None and size:
+                pv = _CAL_POINT_VALUE.get(r.get('instrument'), 5.0)
+                mult = 1 if r.get('direction') == 'LONG' else -1
+                pnl = (float(exit_) - float(entry)) * mult * pv * float(size)
+                d['pnl'] = round(d['pnl'] + pnl, 2); d['closed'] += 1
+                if pnl > 0:
+                    d['wins'] += 1
+    # 2) Engine fill-in: for recent available sessions this month with no logged trades, show what
+    #    the live engine actually produced (same scalp+ORB engine as the replay). Labeled 'engine'.
+    try:
+        rep = _run_replay('MNQ', None)
+        for day in rep.get('available_days', []):
+            if not day.startswith(month) or day in days:
+                continue
+            drep = _run_replay('MNQ', day)
+            s = drep.get('summary', {})
+            days[day] = {'pnl': round(s.get('net_usd', 0), 2), 'n': s.get('n_trades', 0),
+                         'wins': sum(1 for t in drep.get('trades', []) if t.get('net_usd', 0) > 0),
+                         'closed': s.get('n_trades', 0), 'src': 'engine'}
+    except Exception:
+        pass
+    total = {'pnl': round(sum(d['pnl'] for d in days.values()), 2),
+             'n': sum(d['n'] for d in days.values()),
+             'wins': sum(d['wins'] for d in days.values()),
+             'closed': sum(d['closed'] for d in days.values())}
+    return {'month': month, 'days': days, 'month_total': total}
+
+
 def _build_chat_system() -> str:
     bridge  = _load_cross_system_state()
     mode    = bridge.get('ict_mode', 'UNKNOWN')
@@ -489,6 +598,20 @@ class Handler(BaseHTTPRequestHandler):
         elif path == '/data':
             try:
                 self._send_json(200, build_payload())
+            except Exception:
+                self._send_json(500, {'error': traceback.format_exc()})
+        elif path == '/replay':
+            try:
+                import urllib.parse as _up
+                qs = dict(_up.parse_qsl(self.path.split('?')[1] if '?' in self.path else ''))
+                self._send_json(200, _run_replay(qs.get('symbol', 'MNQ'), qs.get('date')))
+            except Exception:
+                self._send_json(500, {'error': traceback.format_exc()})
+        elif path == '/calendar':
+            try:
+                import urllib.parse as _up
+                qs = dict(_up.parse_qsl(self.path.split('?')[1] if '?' in self.path else ''))
+                self._send_json(200, _calendar_data(qs.get('month')))
             except Exception:
                 self._send_json(500, {'error': traceback.format_exc()})
         elif path == '/oracle':
