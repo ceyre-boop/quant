@@ -470,15 +470,18 @@ function renderFeed(msgs) {
 
 async function renderReflectionFeed() {
   const el = document.getElementById('feed-items');
-  const today = new Date();
-  // latest first, then a short 3-day window — keeps the network/console quiet
-  // when no reflection files are published (e.g. the static public site)
-  const candidates = ['../data/oracle/latest_reflection.json'];
-  for (let i = 0; i < 3; i++) {
-    const d = new Date(today); d.setDate(d.getDate() - i);
-    candidates.push('../data/oracle/reflections/' + d.toISOString().slice(0,10) + '.json');
+  // Anchor on latest_reflection.json (always the newest), then walk back from ITS date — never
+  // request today's not-yet-generated file, which is the only thing that 404s during the day.
+  const latest = await fetchJSON('../data/oracle/latest_reflection.json');
+  const results = [latest];
+  const anchor = latest && (latest.date || latest.generated_at);
+  if (anchor) {
+    const base = new Date(anchor);
+    for (let i = 1; i <= 2; i++) {
+      const d = new Date(base); d.setDate(d.getDate() - i);
+      results.push(await fetchJSON('../data/oracle/reflections/' + d.toISOString().slice(0,10) + '.json'));
+    }
   }
-  const results = await Promise.all(candidates.map(p => fetchJSON(p)));
   const seen = new Set();
   const entries = results
     .filter(Boolean)
