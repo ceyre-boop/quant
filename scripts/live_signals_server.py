@@ -467,7 +467,10 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         path = self.path.split('?')[0]
-        if path == '/data':
+        if path == '/health':
+            # Instant liveness probe — no yfinance/forex compute, so cloud health checks never flap.
+            self._send_json(200, {'ok': True, 'service': 'sovereign-dashboard'})
+        elif path == '/data':
             try:
                 self._send_json(200, build_payload())
             except Exception:
