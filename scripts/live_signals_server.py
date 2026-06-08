@@ -424,9 +424,14 @@ def _run_replay(symbol=None, day=None):
 
 # ── Calendar: Warrior-style monthly P&L from paper trades (+ engine fill-in for unlogged days) ──
 _CAL_POINT_VALUE = {'MES': 5.0, 'MNQ': 2.0}
+_CAL_CACHE = {}
 def _calendar_data(month=None):
+    import time as _t
     if not month:
         month = datetime.now(timezone.utc).strftime('%Y-%m')
+    c = _CAL_CACHE.get(month)
+    if c and (_t.time() - c[0] < 300):   # 5-min cache — keeps the free tier responsive
+        return c[1]
     days = {}
     # 1) Real logged futures paper trades (the source that fills at market close).
     log = 'data/futures/trade_log.jsonl'
@@ -455,24 +460,33 @@ def _calendar_data(month=None):
                 if pnl > 0:
                     d['wins'] += 1
     # 2) Engine fill-in: for recent available sessions this month with no logged trades, show what
-    #    the live engine actually produced (same scalp+ORB engine as the replay). Labeled 'engine'.
+    #    the live engine actually produced. Load the 1-min history ONCE and simulate every day from it
+    #    (instead of one yfinance fetch per day) — keeps the free-tier request well under the timeout.
     try:
-        rep = _run_replay('MNQ', None)
-        for day in rep.get('available_days', []):
-            if not day.startswith(month) or day in days:
-                continue
-            drep = _run_replay('MNQ', day)
-            s = drep.get('summary', {})
-            days[day] = {'pnl': round(s.get('net_usd', 0), 2), 'n': s.get('n_trades', 0),
-                         'wins': sum(1 for t in drep.get('trades', []) if t.get('net_usd', 0) > 0),
-                         'closed': s.get('n_trades', 0), 'src': 'engine'}
+        fr = _futures_replay_mod()
+        from sovereign.futures import bar_feed as bf
+        df = bf.load_history('MNQ', source='yf', day=None, lookback='7d')
+        if df is not None and len(df):
+            prior_close = None
+            for day in bf.session_days(df):
+                day_df = df[df.index.tz_convert(bf.ET).strftime('%Y-%m-%d') == day]
+                if day.startswith(month) and day not in days and len(day_df) >= 3:
+                    bias_dir, key_levels = fr._day_bias(day_df, day, prior_close, 'MNQ', 'auto')
+                    s = fr.simulate_session(day_df, day, bias_dir, key_levels, 'MNQ', 'safe')
+                    days[day] = {'pnl': round(s.get('net_usd', 0), 2), 'n': s.get('n_trades', 0),
+                                 'wins': sum(1 for t in s.get('trades', []) if t.get('net_usd', 0) > 0),
+                                 'closed': s.get('n_trades', 0), 'src': 'engine'}
+                if len(day_df):
+                    prior_close = float(day_df['Close'].iloc[-1])
     except Exception:
         pass
     total = {'pnl': round(sum(d['pnl'] for d in days.values()), 2),
              'n': sum(d['n'] for d in days.values()),
              'wins': sum(d['wins'] for d in days.values()),
              'closed': sum(d['closed'] for d in days.values())}
-    return {'month': month, 'days': days, 'month_total': total}
+    out = {'month': month, 'days': days, 'month_total': total}
+    _CAL_CACHE[month] = (_t.time(), out)
+    return out
 
 
 def _build_chat_system() -> str:
