@@ -11,7 +11,7 @@ services:
     branch: master
     buildCommand: pip install -r requirements-dashboard.txt
     startCommand: python3 scripts/live_signals_server.py
-    healthCheckPath: /data
+    healthCheckPath: /health
     autoDeploy: true         # redeploy on push to master (refreshes data + code)
     envVars:
       - key: PYTHON_VERSION
