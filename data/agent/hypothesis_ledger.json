@@ -754,12 +754,43 @@
   {
     "id": "HYP-056",
     "title": "Counter-momentum entry: trade against 63d price trend for better timing",
-    "status": "CANDIDATE",
+    "status": "REJECTED_UNPROVEN",
     "created_date": "2026-06-07",
     "origin": "REST-006",
     "description": "Counter-momentum entries (where price has NOT moved in the macro signal direction over 63d) outperform momentum-aligned entries. Full period: counter Sharpe=0.163 vs aligned=0.088 (p=0.185). OOS: counter=0.343 vs aligned=0.044 (p=0.039 \u2014 significant). Per-pair: EURUSD p=0.037 (significant), USDCAD p=0.128, USDJPY REVERSED (aligned better, p=0.877). Combined with 2-gate stack (widening + rate level): OOS 0.315\u21920.499 with momentum-counter filter. IS=0.272 < OOS=0.499: no overfit. 2024: 0.001\u21920.233 (doesn't hurt problem year). Permutation within 2-gate universe: p=0.065 (marginal). OOS permutation: p=0.101 (underpowered, n=21).",
-    "test_needed": "Additional 2025-2026 live trades needed for statistical confirmation. Near-term: add momentum_63d logging to decision_logger for EURUSD trades so live validation begins.",
-    "priority": "MEDIUM"
+    "test_needed": "Do NOT implement as portfolio gate. Live-track momentum_63d for EURUSD entries only; revisit if 2025-26 EURUSD data shows the magnitude effect independently of 2023.",
+    "priority": "LOW",
+    "confirmed_date": "2026-06-08",
+    "robustness_REST007": {
+      "verdict": "FAILS robustness battery 1/6 checks",
+      "full_perm_p": 0.3524,
+      "full_boot_ci": [
+        -0.08914244785220478,
+        0.243761978205098
+      ],
+      "oos_perm_p": 0.0839,
+      "drop2023_perm_p": 0.6732,
+      "drop2023_delta": 0.11170513800106227,
+      "bh_any_significant": false,
+      "killer": "OOS significance was a 2023 artifact: removing 2023 collapses delta to +0.112, perm_p=0.673. No pair survives Benjamini-Hochberg across the 4 live pairs. Same failure shape as E1/E2/E3.",
+      "salvage": "Only survivor: monotone threshold response (delta +0.075 at mom=0 -> +0.486 at |dir*mom|>0.05). Suggests any real effect is a MAGNITUDE/pair-specific phenomenon (EURUSD-ish, USDJPY reversed), not a portfolio-wide counter gate. Track momentum_63d live for EURUSD only; do NOT wire as a gate."
+    },
+    "rest007_robustness": {
+      "tested": "2026-06-08",
+      "verdict": "REJECT/UNPROVEN",
+      "n_pass": "1/6",
+      "full_perm_p": 0.3524,
+      "oos_perm_p": 0.0839,
+      "checks": {
+        "full_boot_excludes_0": false,
+        "oos_boot_excludes_0": false,
+        "year_sign_stable_>=3of4_oos": false,
+        "survives_drop_2023": false,
+        "threshold_robust": true,
+        "bh_significant": false
+      },
+      "note": "REST-007 robustness: counter-momentum REJECT/UNPROVEN (1/6 gates). Full & OOS bootstrap CIs include 0; year-sign not stable; fails drop-2023; BH not significant. Per-pair noise (GBPUSD p=0.99, USDJPY reversed). Do NOT implement. NOTE: unrelated to G4 (Bridge Macro Threat prop gate, GREEN) and to overnight-QQQ."
+    }
   },
   {
     "id": "HYP-057",
