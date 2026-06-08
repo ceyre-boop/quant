@@ -422,6 +422,59 @@ def _run_replay(symbol=None, day=None):
     return out
 
 
+# ── Calendar: Warrior-style monthly P&L from paper trades (+ engine fill-in for unlogged days) ──
+_CAL_POINT_VALUE = {'MES': 5.0, 'MNQ': 2.0}
+def _calendar_data(month=None):
+    if not month:
+        month = datetime.now(timezone.utc).strftime('%Y-%m')
+    days = {}
+    # 1) Real logged futures paper trades (the source that fills at market close).
+    log = 'data/futures/trade_log.jsonl'
+    if os.path.exists(log):
+        for line in open(log):
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                r = json.loads(line)
+            except Exception:
+                continue
+            if r.get('size_contracts', 0) == 0:
+                continue
+            day = str(r.get('ts', ''))[:10]
+            if not day.startswith(month):
+                continue
+            d = days.setdefault(day, {'pnl': 0.0, 'n': 0, 'wins': 0, 'closed': 0, 'src': 'logged'})
+            d['n'] += 1
+            entry, exit_, size = r.get('entry'), r.get('exit'), r.get('size_contracts') or 0
+            if entry is not None and exit_ is not None and size:
+                pv = _CAL_POINT_VALUE.get(r.get('instrument'), 5.0)
+                mult = 1 if r.get('direction') == 'LONG' else -1
+                pnl = (float(exit_) - float(entry)) * mult * pv * float(size)
+                d['pnl'] = round(d['pnl'] + pnl, 2); d['closed'] += 1
+                if pnl > 0:
+                    d['wins'] += 1
+    # 2) Engine fill-in: for recent available sessions this month with no logged trades, show what
+    #    the live engine actually produced (same scalp+ORB engine as the replay). Labeled 'engine'.
+    try:
+        rep = _run_replay('MNQ', None)
+        for day in rep.get('available_days', []):
+            if not day.startswith(month) or day in days:
+                continue
+            drep = _run_replay('MNQ', day)
+            s = drep.get('summary', {})
+            days[day] = {'pnl': round(s.get('net_usd', 0), 2), 'n': s.get('n_trades', 0),
+                         'wins': sum(1 for t in drep.get('trades', []) if t.get('net_usd', 0) > 0),
+                         'closed': s.get('n_trades', 0), 'src': 'engine'}
+    except Exception:
+        pass
+    total = {'pnl': round(sum(d['pnl'] for d in days.values()), 2),
+             'n': sum(d['n'] for d in days.values()),
+             'wins': sum(d['wins'] for d in days.values()),
+             'closed': sum(d['closed'] for d in days.values())}
+    return {'month': month, 'days': days, 'month_total': total}
+
+
 def _build_chat_system() -> str:
     bridge  = _load_cross_system_state()
     mode    = bridge.get('ict_mode', 'UNKNOWN')
@@ -552,6 +605,13 @@ class Handler(BaseHTTPRequestHandler):
                 import urllib.parse as _up
                 qs = dict(_up.parse_qsl(self.path.split('?')[1] if '?' in self.path else ''))
                 self._send_json(200, _run_replay(qs.get('symbol', 'MNQ'), qs.get('date')))
+            except Exception:
+                self._send_json(500, {'error': traceback.format_exc()})
+        elif path == '/calendar':
+            try:
+                import urllib.parse as _up
+                qs = dict(_up.parse_qsl(self.path.split('?')[1] if '?' in self.path else ''))
+                self._send_json(200, _calendar_data(qs.get('month')))
             except Exception:
                 self._send_json(500, {'error': traceback.format_exc()})
         elif path == '/oracle':

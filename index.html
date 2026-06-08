@@ -526,6 +526,33 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
   .forex-grid,.ict-stats-grid,.rp-health-grid,.rp-gate-grid,.edge-outcomes{grid-template-columns:1fr 1fr}
   #trade-wrap{padding:12px}
 }
+/* ── CALENDAR tab (Warrior-style monthly P&L) ── */
+#cal-wrap{height:100%;display:flex;flex-direction:column;overflow:auto;padding:16px 24px}
+#cal-bar{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+#cal-title{font-size:16px;font-weight:700;letter-spacing:1px}
+.cal-nav{background:var(--bg3);color:var(--text);border:1px solid var(--border);border-radius:4px;font-size:13px;padding:3px 12px;cursor:pointer;font-family:var(--font)}
+.cal-nav:hover{border-color:var(--accent,#00c896)}
+#cal-month-total{font-size:13px;font-weight:700;color:var(--muted)}
+#cal-legend{display:flex;gap:16px;font-size:10px;color:var(--muted);margin-bottom:12px}
+.cal-leg{display:flex;align-items:center;gap:5px}
+.cal-leg .dot{width:8px;height:8px;border-radius:2px;display:inline-block}
+.cal-leg .dot.logged{background:var(--green)}
+.cal-leg .dot.engine{background:var(--blue,#4a9eff)}
+#cal-table{table-layout:fixed;width:100%;border-collapse:separate;border-spacing:6px}
+#cal-table th{font-size:10px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;padding-bottom:4px;font-weight:600}
+#cal-table td{vertical-align:top;border:1px solid var(--border);border-radius:6px;background:var(--bg2);height:80px;padding:6px 8px;overflow:hidden}
+#cal-table td.empty{background:transparent;border:none}
+#cal-table td.win{background:rgba(0,200,150,.10);border-color:rgba(0,200,150,.4)}
+#cal-table td.loss{background:rgba(224,82,82,.10);border-color:rgba(224,82,82,.4)}
+#cal-table td.wktot{background:var(--bg3)}
+.cal-dnum{font-size:11px;color:var(--muted)}
+.cal-pnl{font-size:15px;font-weight:700;margin-top:6px}
+.cal-pnl.pos{color:var(--green)}.cal-pnl.neg{color:var(--red)}
+.cal-meta{font-size:9px;color:var(--muted);margin-top:2px}
+.cal-src{float:right;width:6px;height:6px;border-radius:50%}
+.cal-src.logged{background:var(--green)}.cal-src.engine{background:var(--blue,#4a9eff)}
+.cal-wk-label{font-size:9px;color:var(--muted);letter-spacing:1px}
+.cal-wk-pnl{font-size:14px;font-weight:700;margin-top:6px}
 </style>
 </head>
 <body>
@@ -540,6 +567,7 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
     <div class="hdr-tab live-tab" data-tab="signals">Signals<div class="tab-dot"></div></div>
     <div class="hdr-tab" data-tab="research">Research</div>
     <div class="hdr-tab" data-tab="trades">Trades<div class="tab-dot" id="trades-dot" style="display:none"></div></div>
+    <div class="hdr-tab" data-tab="calendar">Calendar</div>
     <div class="hdr-tab" data-tab="chat">Chat</div>
   </div>
   <div class="hdr-right">
@@ -965,6 +993,24 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
     </div>
   </div>
 
+  <!-- ══ TAB: CALENDAR ══ -->
+  <div class="tab-panel" id="tab-calendar">
+    <div id="cal-wrap">
+      <div id="cal-bar">
+        <button class="cal-nav" onclick="calNav(-1)">‹</button>
+        <span id="cal-title">—</span>
+        <button class="cal-nav" onclick="calNav(1)">›</button>
+        <span id="cal-month-total" style="margin-left:auto">—</span>
+        <button class="cal-nav" onclick="calLoad()" title="refresh">↻</button>
+      </div>
+      <div id="cal-legend">
+        <span class="cal-leg"><span class="dot logged"></span>logged paper trade</span>
+        <span class="cal-leg"><span class="dot engine"></span>engine result (auto-fills until live logging runs)</span>
+      </div>
+      <div id="cal-grid"><div style="padding:40px;text-align:center;color:var(--muted)">Loading…</div></div>
+    </div>
+  </div>
+
   <!-- ══ TAB 4: CHAT ══ -->
   <div class="tab-panel" id="tab-chat">
     <div id="chat-panel">
@@ -1088,6 +1134,7 @@ _allTabs.forEach((btn,i)=>{
       tabInited[id]=true;
       if(id==='tab-research')resLoad();
       if(id==='tab-signals'){sigSetMode('tv');}  // default to TradingView chart (no backend needed)
+      if(id==='tab-calendar')calLoad();
       if(id==='tab-trades'){trLoad();spLoad();}
       if(id==='tab-chat')chatInjectChips();
     }
@@ -1374,6 +1421,59 @@ function _rpShowSummary(){
     <div style="font-size:24px;font-weight:700;color:${net>=0?'var(--green)':'var(--red)'}">${net>=0?'+':''}$${net.toFixed(2)}</div>
     <div style="font-size:11px;color:var(--muted);margin-top:4px">${s.n_trades||0} trades · max DD $${(s.max_drawdown_usd||0).toFixed(2)} · ${_rpData.day}</div>
     <div style="font-size:10px;color:var(--dim);margin-top:6px">Day complete — exactly what the live engine would have traded.</div></div>`;
+}
+
+// ══ CALENDAR ══
+let _calMonth=null;
+async function calLoad(){
+  const grid=document.getElementById('cal-grid');
+  if(!_calMonth){const n=new Date();_calMonth=n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0');}
+  grid.innerHTML='<div style="padding:40px;text-align:center;color:var(--muted)">Loading…</div>';
+  try{
+    const r=await fetch(API_BASE+'/calendar?month='+_calMonth,{signal:AbortSignal.timeout(NET_T)});
+    const d=await r.json();
+    if(d.error){grid.innerHTML='<div style="padding:40px;text-align:center;color:var(--muted)">Unavailable</div>';return;}
+    calRender(d);
+  }catch(e){grid.innerHTML='<div style="padding:40px;text-align:center;color:var(--muted)">Backend offline — the calendar needs the server running.</div>';}
+}
+function calNav(delta){
+  const [y,m]=_calMonth.split('-').map(Number);
+  const dt=new Date(y,m-1+delta,1);
+  _calMonth=dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0');
+  calLoad();
+}
+function calRender(d){
+  const [y,m]=d.month.split('-').map(Number);
+  const days=d.days||{}, mt=d.month_total||{pnl:0,n:0};
+  document.getElementById('cal-title').textContent=new Date(y,m-1,1).toLocaleDateString('en-US',{month:'long',year:'numeric'});
+  document.getElementById('cal-month-total').innerHTML=`Month: <span style="color:${mt.pnl>=0?'var(--green)':'var(--red)'}">${mt.pnl>=0?'+':''}$${Math.round(mt.pnl||0).toLocaleString()}</span> · ${mt.n||0} trades`;
+  const last=new Date(y,m,0);
+  const cur=new Date(y,m-1,1); cur.setDate(cur.getDate()-cur.getDay()); // back to Sunday
+  let html='<table id="cal-table"><thead><tr>'+['Sun','Mon','Tue','Wed','Thu','Fri','Sat','Total'].map(x=>`<th>${x}</th>`).join('')+'</tr></thead><tbody>';
+  for(let wk=1;wk<=6;wk++){
+    if(cur>last) break;
+    html+='<tr>'; let wkPnl=0, wkN=0;
+    for(let i=0;i<7;i++){
+      if(cur.getMonth()!==m-1){html+='<td class="empty"></td>';}
+      else{
+        const key=cur.getFullYear()+'-'+String(cur.getMonth()+1).padStart(2,'0')+'-'+String(cur.getDate()).padStart(2,'0');
+        const info=days[key];
+        if(info && info.closed>0){
+          wkPnl+=info.pnl; wkN+=info.n;
+          const cls=info.pnl>0?'win':info.pnl<0?'loss':'';
+          const wr=info.closed?Math.round(info.wins/info.closed*100)+'%':'—';
+          html+=`<td class="${cls}"><span class="cal-src ${info.src}" title="${info.src}"></span><div class="cal-dnum">${cur.getDate()}</div><div class="cal-pnl ${info.pnl>=0?'pos':'neg'}">${info.pnl>=0?'+':''}$${Math.round(info.pnl).toLocaleString()}</div><div class="cal-meta">${info.n} tr · ${wr}</div></td>`;
+        } else {
+          html+=`<td><div class="cal-dnum">${cur.getDate()}</div><div class="cal-meta" style="margin-top:10px">·</div></td>`;
+        }
+      }
+      cur.setDate(cur.getDate()+1);
+    }
+    html+=`<td class="wktot"><div class="cal-wk-label">Week ${wk}</div><div class="cal-wk-pnl" style="color:${wkPnl>=0?'var(--green)':'var(--red)'}">${wkN?(wkPnl>=0?'+':'')+'$'+Math.round(wkPnl).toLocaleString():'—'}</div><div class="cal-meta">${wkN} tr</div></td>`;
+    html+='</tr>';
+  }
+  html+='</tbody></table>';
+  document.getElementById('cal-grid').innerHTML=html;
 }
 
 // On the public HTTPS site, until the hosted backend is wired (Phase 2), localhost is unreachable —

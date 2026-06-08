@@ -146,6 +146,18 @@ async function run() {
   });
   record('trades', collect.errs.splice(0), f);
 
+  // CALENDAR
+  await tab('calendar'); await sleep(6000); await shot(page, 'calendar');
+  f = await evalAsserts(page, () => {
+    const out = [];
+    if (!document.getElementById('tab-calendar')) out.push('calendar tab missing');
+    if (!document.querySelector('#cal-grid table')) out.push('calendar grid did not render');
+    const title = (document.getElementById('cal-title')||{}).textContent || '';
+    if (!/\d{4}/.test(title)) out.push('calendar title missing: ' + title);
+    return out;
+  });
+  record('calendar', collect.errs.splice(0), f);
+
   // CHAT
   await tab('chat'); await shot(page, 'chat');
   f = await evalAsserts(page, () => {
