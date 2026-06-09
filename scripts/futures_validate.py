@@ -33,7 +33,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 
 from sovereign.futures import scalp_strategy as strat                      # noqa: E402
 from sovereign.futures import bar_feed as bf                               # noqa: E402
-from sovereign.futures.config import futures_params, contract_spec, round_turn_cost_usd  # noqa: E402
+from sovereign.futures.config import futures_params, contract_spec, round_turn_cost_usd, tick_value_usd  # noqa: E402
 import futures_replay as fr                                                # noqa: E402
 
 OUT = ROOT / "data" / "research" / "futures_validation.json"
@@ -62,85 +62,122 @@ def _sim_trade(day_df, i: int, direction: str, instrument: str) -> float:
     return pts * dpp - round_turn_cost_usd(instrument)
 
 
+SETUP_LABEL = {"orb": "ORB", "micro": "MICRO", "vwap_mr": "VWAP_MR"}
+
+
 def main() -> None:
-    ap = argparse.ArgumentParser(description="Permutation validation gate for the ES/NQ scalp")
+    ap = argparse.ArgumentParser(description="Per-setup expectancy + permutation gate for the ES/NQ scalp")
     ap.add_argument("--instrument", default="MES", choices=["MES", "MNQ"])
+    ap.add_argument("--setup", default="orb", choices=["orb", "micro", "vwap_mr"],
+                    help="which strategy to validate IN ISOLATION (never blended)")
     ap.add_argument("--source", default="yf", choices=["yf", "ib"])
     ap.add_argument("--lookback", default="5d")
     ap.add_argument("--bias", default="auto", choices=["auto", "long", "short", "neutral"])
+    ap.add_argument("--cvd-gate", action="store_true", help="validate only CVD-confirmed entries")
+    ap.add_argument("--min-confluence", type=int, default=0,
+                    help="validate only entries with confluence >= this (0–3)")
     args = ap.parse_args()
 
     v = futures_params()["validation"]
+    min_trades = v["min_trades"]
+    margin = v["expectancy_margin_ticks"] * tick_value_usd(args.instrument)
+    rt_cost = round_turn_cost_usd(args.instrument)
     rng = np.random.default_rng(v["permutation_seed"])
 
-    print(f"Loading {args.instrument} history ({args.source})...", end=" ", flush=True)
-    df = bf.load_history(args.instrument, source=args.source, lookback=args.lookback)
+    print(f"Loading {args.instrument} history ({args.source}) for setup '{args.setup}'...", end=" ", flush=True)
+    df = bf.load_history(args.instrument, source=args.source, day=None, lookback=args.lookback)
     if df is None or len(df) == 0:
         print("\n  No data. Try --source ib for deeper history.")
         sys.exit(1)
     print(f"done. {len(df)} bars.")
 
-    days = bf.session_days(df)
+    setups = {args.setup}
     real_nets: list[float] = []
-    eligible: list[tuple] = []      # (day_df, i, bias_dir)
+    eligible: list[tuple] = []      # (day_df, i, dir) for the permutation null
     prior_close = None
-
-    for day in days:
+    prior_day_df = None
+    for day in bf.session_days(df):
         day_df = df[df.index.tz_convert(bf.ET).strftime("%Y-%m-%d") == day]
         if len(day_df) < 5:
             prior_close = float(day_df["Close"].iloc[-1]) if len(day_df) else prior_close
             continue
         bias_dir, key_levels = fr._day_bias(day_df, day, prior_close, args.instrument, args.bias)
         prior_close = float(day_df["Close"].iloc[-1])
-        if bias_dir not in ("LONG", "SHORT"):
-            continue
-        # real scalp trades for this session (net $)
-        sess = fr.simulate_session(day_df, day, bias_dir, key_levels, args.instrument, "safe")
-        real_nets.extend(t["net_usd"] for t in sess["trades"] if t["setup"] == "MICRO")
-        # eligible entry pool: any bar that leaves room to resolve
+        from sovereign.futures import volume_profile as _vp
+        prior_profile = _vp.compute_profile(prior_day_df) if prior_day_df is not None else None
+        sess = fr.simulate_session(day_df, day, bias_dir, key_levels, args.instrument,
+                                   "safe", setups=setups, cvd_gate=args.cvd_gate,
+                                   prior_profile=prior_profile)
+        for t in sess["trades"]:
+            if t.get("confluence", 0) >= args.min_confluence:
+                real_nets.append(t["net_usd"])
+        d = bias_dir if bias_dir in ("LONG", "SHORT") else "LONG"
         for i in range(2, len(day_df) - 2):
-            eligible.append((day_df, i, bias_dir))
+            eligible.append((day_df, i, d))
+        prior_day_df = day_df
 
     n_real = len(real_nets)
-    if n_real == 0 or len(eligible) < n_real:
-        print(f"\n  Not enough data: {n_real} real trades, {len(eligible)} eligible bars.")
-        print("  Run again after accumulating IB/Databento history or paper sessions.")
-        sys.exit(1)
+    arr = np.array(real_nets) if n_real else np.array([0.0])
+    wins = arr[arr > 0]; losses = arr[arr <= 0]
+    win_rate = float(len(wins) / n_real) if n_real else 0.0
+    avg_win = float(wins.mean()) if len(wins) else 0.0
+    avg_loss = float(losses.mean()) if len(losses) else 0.0   # <= 0
+    real_mean = float(arr.mean()) if n_real else 0.0
 
-    real_mean = float(np.mean(real_nets))
-    iters = v["permutation_iterations"]
-    null_means = np.empty(iters)
-    idx = np.arange(len(eligible))
-    for k in range(iters):
-        pick = rng.choice(idx, size=n_real, replace=False)
-        null_means[k] = np.mean([_sim_trade(*eligible[j]) for j in pick])
-    p_value = float(np.mean(null_means >= real_mean))
+    # permutation p-value (generic random-entry baseline)
+    p_value = 1.0
+    null_mean = 0.0
+    if n_real and len(eligible) >= n_real:
+        iters = v["permutation_iterations"]
+        null_means = np.empty(iters)
+        idx = np.arange(len(eligible))
+        for k in range(iters):
+            pick = rng.choice(idx, size=n_real, replace=False)
+            null_means[k] = np.mean([_sim_trade(eligible[j][0], eligible[j][1], eligible[j][2],
+                                                args.instrument) for j in pick])
+        p_value = float(np.mean(null_means >= real_mean))
+        null_mean = float(null_means.mean())
 
-    passed = (p_value < v["p_value_threshold"]) and (real_mean > 0)
-    adequate = n_real >= 30
+    # ── the gate: ALL must hold ──
+    adequate = n_real >= min_trades
+    expectancy_ok = real_mean > margin
+    winrate_ok = win_rate * avg_win > (1 - win_rate) * abs(avg_loss)
+    perm_ok = p_value < v["p_value_threshold"]
+    passed = adequate and expectancy_ok and winrate_ok and perm_ok
 
     G, R, Y, BD, RS = "\033[92m", "\033[91m", "\033[93m", "\033[1m", "\033[0m"
-    print(f"\n{BD}{'═'*60}{RS}")
-    print(f"  {BD}SCALP VALIDATION — {args.instrument}{RS}")
-    print(f"{BD}{'═'*60}{RS}")
-    print(f"  Real trades:        {n_real}" + ("" if adequate else f"  {Y}(< 30 — underpowered){RS}"))
-    print(f"  Real mean net/trade: ${real_mean:+.2f}  (cost ${round_turn_cost_usd(args.instrument):.2f}/RT)")
-    print(f"  Random mean net:     ${float(np.mean(null_means)):+.2f}")
-    print(f"  p-value:             {p_value:.4f}  (threshold {v['p_value_threshold']})")
-    g = (G if passed else R)
-    print(f"\n  {BD}Gate: {g}{'PASS — edge beats random & clears costs' if passed else 'FAIL — do not fund / trust --auto'}{RS}")
+    ok = lambda b: f"{G}✓{RS}" if b else f"{R}✗{RS}"
+    print(f"\n{BD}{'═'*62}{RS}")
+    print(f"  {BD}VALIDATION — {args.instrument} · setup '{args.setup}'{RS}")
+    print(f"{BD}{'═'*62}{RS}")
+    print(f"  Trades: {n_real}    Win rate: {win_rate:.0%}    "
+          f"avg win ${avg_win:+.2f}  avg loss ${avg_loss:+.2f}")
+    print(f"  Mean net/trade: ${real_mean:+.2f}   (RT cost ${rt_cost:.2f}; margin bar ${margin:.2f})")
+    print(f"  Random-entry mean: ${null_mean:+.2f}    permutation p: {p_value:.4f}")
+    print(f"\n  Gate:")
+    print(f"    {ok(adequate)} n ≥ {min_trades} (have {n_real})")
+    print(f"    {ok(expectancy_ok)} mean net > {v['expectancy_margin_ticks']} tick (${margin:.2f})")
+    print(f"    {ok(winrate_ok)} win%·avg_win > (1−win%)·avg_loss")
+    print(f"    {ok(perm_ok)} beats random at p < {v['p_value_threshold']}")
+    g = G if passed else R
+    msg = ("PASS — edge clears costs; safe to trust" if passed
+           else "FAIL — do NOT fund / do NOT trust --auto")
+    print(f"\n  {BD}{g}{msg}{RS}")
     if not adequate:
-        print(f"  {Y}Note: result is provisional until n_real >= 30.{RS}")
-    print(f"{BD}{'═'*60}{RS}\n")
+        print(f"  {Y}Underpowered: a {n_real}-trade result is noise. Accumulate IB/paper history "
+              f"to n≥{min_trades} before believing any verdict.{RS}")
+    print(f"{BD}{'═'*62}{RS}\n")
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps({
         "generated_at": datetime.now(timezone.utc).isoformat(),
-        "instrument": args.instrument, "source": args.source,
-        "n_real": n_real, "real_mean_net_usd": round(real_mean, 4),
-        "random_mean_net_usd": round(float(np.mean(null_means)), 4),
-        "p_value": round(p_value, 4), "threshold": v["p_value_threshold"],
-        "sample_adequate": adequate, "passed": passed,
+        "instrument": args.instrument, "setup": args.setup, "source": args.source,
+        "n_real": n_real, "win_rate": round(win_rate, 3),
+        "avg_win_usd": round(avg_win, 2), "avg_loss_usd": round(avg_loss, 2),
+        "real_mean_net_usd": round(real_mean, 4), "margin_usd": round(margin, 2),
+        "random_mean_net_usd": round(null_mean, 4), "p_value": round(p_value, 4),
+        "adequate": adequate, "expectancy_ok": expectancy_ok, "winrate_ok": winrate_ok,
+        "perm_ok": perm_ok, "passed": passed,
     }, indent=2))
     print(f"  → {OUT.relative_to(ROOT)}")
     sys.exit(0 if passed else 1)

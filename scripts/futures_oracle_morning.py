@@ -339,6 +339,48 @@ def _print_oracle(result: dict, instrument: str, overnight: dict) -> None:
     print(f"{'═'*62}\n")
 
 
+# ── structural context (Increment 4): prior-day volume profile + CVD trend ────
+
+def _prior_structure(instrument: str, overnight: dict) -> dict:
+    """Prior-day POC/VAH/VAL + CVD trend — the structure a 1% scalper reads pre-open.
+    Best-effort off yfinance 5m; marked untrusted because futures volume there is weak.
+    (Today's ORB level can't be known pre-open — that alignment is logged live in the replay.)"""
+    try:
+        from sovereign.futures import volume_profile as vp
+        from sovereign.futures import cvd as cvd_mod
+        from sovereign.futures.config import contract_spec
+        import yfinance as yf
+        ticker = TICKER_MAP[instrument]
+        h = yf.download(ticker, period="3d", interval="5m", progress=False, auto_adjust=True)
+        if h is None or h.empty:
+            return {"available": False}
+        import pandas as pd
+        if isinstance(h.columns, pd.MultiIndex):
+            h.columns = h.columns.get_level_values(0)
+        days = sorted({d.strftime("%Y-%m-%d") for d in h.index})
+        if len(days) < 2:
+            return {"available": False}
+        prior = h[h.index.strftime("%Y-%m-%d") == days[-2]]
+        prof = vp.compute_profile(prior)
+        cstate = cvd_mod.cvd_state(prior)
+        tick = contract_spec(instrument)["tick"]
+        last = overnight.get("last_price")
+        dist = None
+        if prof and last:
+            dist = {k: round((last - prof[k]) / tick, 1) for k in ("poc", "vah", "val")}
+        return {
+            "available": prof is not None,
+            "prior_poc": prof["poc"] if prof else None,
+            "prior_vah": prof["vah"] if prof else None,
+            "prior_val": prof["val"] if prof else None,
+            "dist_to_levels_ticks": dist,
+            "prior_cvd_trend": (None if cstate is None else ("up" if cstate["slope"] > 0 else "down")),
+            "untrusted": True,   # yfinance volume — confirm on IB
+        }
+    except Exception as e:
+        return {"available": False, "error": f"{type(e).__name__}: {e}"}
+
+
 # ── main ─────────────────────────────────────────────────────────────────────
 
 def main() -> dict:
@@ -394,6 +436,7 @@ def main() -> dict:
                 "yield_10yr":    macro.get("yield_10yr"),
                 "events_count":  len(events),
             },
+            "structure": _prior_structure(args.instrument, overnight),
         }
         ORACLE_LOG.parent.mkdir(parents=True, exist_ok=True)
         with open(ORACLE_LOG, "a") as f:

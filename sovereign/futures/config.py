@@ -28,6 +28,12 @@ def contract_spec(instrument: str) -> dict:
     return p["contracts"][inst]
 
 
+def tick_value_usd(instrument: str) -> float:
+    """Dollar value of one tick (MES $1.25, MNQ $0.50)."""
+    spec = contract_spec(instrument)
+    return round(spec["tick"] * spec["dollars_per_point"], 4)
+
+
 def round_turn_cost_usd(instrument: str, n_contracts: int = 1) -> float:
     """Dollar cost of one round trip: slippage (both sides) + commission, per spec.
 

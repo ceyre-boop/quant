@@ -11,7 +11,8 @@ from pathlib import Path
 import pandas as pd
 
 from sovereign.futures import scalp_strategy as strat
-from sovereign.futures import bar_feed, config, telegram_gateway
+from sovereign.futures import bar_feed, config, telegram_gateway, regime
+from sovereign.futures import volume_profile as vpmod, cvd as cvdmod
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "scripts"))
 import futures_replay as fr  # noqa: E402
@@ -46,6 +47,69 @@ def test_config_isolated():
 
 def test_telegram_gateway_isolated():
     _assert_clean(telegram_gateway)
+
+
+def test_regime_isolated():
+    _assert_clean(regime)
+
+
+def test_volume_profile_isolated():
+    _assert_clean(vpmod)
+
+
+def test_cvd_isolated():
+    _assert_clean(cvdmod)
+
+
+# ── Increment 4 unit tests ────────────────────────────────────────────────────
+
+def _vol_df(closes, vols):
+    return pd.DataFrame({
+        "Open": closes, "High": [c + 0.25 for c in closes], "Low": [c - 0.25 for c in closes],
+        "Close": closes, "Volume": vols,
+    })
+
+
+def test_compute_profile_and_confluence():
+    # heavy volume parked at 100 → POC ~100; entry at 100 should score on POC
+    closes = [100.0] * 25 + [101.0, 99.0, 100.0, 102.0, 98.0]
+    vols = [500] * 25 + [50, 50, 50, 50, 50]
+    prof = vpmod.compute_profile(_vol_df(closes, vols))
+    assert prof is not None and abs(prof["poc"] - 100.0) <= 1.0
+    assert vpmod.confluence_score(prof["poc"], prof, tol_price=0.5) >= 1
+    assert vpmod.confluence_score(99999, prof, tol_price=0.5) == 0
+
+
+def test_cvd_fail_loud_then_signal():
+    # <20 bars with volume>0 → None (fail loud)
+    thin = _vol_df([100.0] * 10, [0] * 10)
+    assert cvdmod.cvd_state(thin) is None
+    # each bar closes ABOVE its open on real volume → positive delta → positive slope
+    cl = [100.0 + i * 0.25 for i in range(30)]
+    rising = pd.DataFrame({
+        "Open": [c - 0.20 for c in cl], "High": [c + 0.05 for c in cl],
+        "Low": [c - 0.25 for c in cl], "Close": cl, "Volume": [200] * 30,
+    })
+    st = cvdmod.cvd_state(rising)
+    assert st is not None and st["slope"] > 0
+    assert cvdmod.cvd_confirms("ORB", "LONG", st) is True
+    assert cvdmod.cvd_confirms("ORB", "SHORT", st) is False
+    assert cvdmod.cvd_confirms("ORB", "LONG", None) is None      # unknown when no state
+
+
+def test_scale_in_never_grows_loser_and_runs():
+    import sys as _sys
+    from pathlib import Path as _P
+    _sys.path.insert(0, str(_P(__file__).resolve().parents[2] / "scripts"))
+    import futures_replay as fr
+    df = _synthetic_session(20)
+    out = fr.simulate_session(df, "2026-06-05", "LONG", {}, "MES", "safe",
+                              setups={"orb"}, scale_in=True)
+    for t in out["trades"]:
+        assert t["contracts"] >= 1
+        assert "net_1lot_usd" in t                  # static counterfactual logged
+        if t["net_usd"] < 0:
+            assert t["contracts"] == 1              # losers never scaled
 
 
 def test_telegram_parse_reply():
@@ -127,6 +191,58 @@ def test_on_event_does_not_change_results():
     assert animated["trades"] == silent["trades"]      # identical engine output
     assert animated["net_usd"] == silent["net_usd"]
     assert events.count("bar") >= 1                      # renderer actually got bar events
+
+
+def test_vwap_bands_bracket_price():
+    bands = strat.vwap_bands(_bars([100, 100, 100, 101, 99, 100, 100], vols=[100] * 7))
+    assert bands is not None
+    lower, upper, vwap, sigma = bands
+    assert lower < vwap < upper and sigma >= 0
+
+
+def test_vwap_mr_levels_stop_always_correct_side():
+    # degenerate case from the live-IB proof: entry pierced below the lower band past the buffer.
+    # bands = (lower, upper, vwap, sigma)
+    bands = (7413.38, 7497.15, 7455.26, 41.89)
+    s_long, t_long = strat.vwap_mr_levels("LONG", 7412.0, bands, "MES")
+    assert s_long < 7412.0, "LONG stop must be strictly below entry"
+    assert t_long == 7455.26
+    s_short, t_short = strat.vwap_mr_levels("SHORT", 7498.0, bands, "MES")
+    assert s_short > 7498.0, "SHORT stop must be strictly above entry"
+    # normal case still sane
+    s2, _ = strat.vwap_mr_levels("LONG", 7413.38, bands, "MES")
+    assert s2 < 7413.38
+
+
+def test_vwap_mr_signal_fades_extremes():
+    from datetime import datetime, timezone
+    now = datetime(2026, 6, 5, 14, 0, tzinfo=timezone.utc)
+    bars = _bars([100] * 10 + [90], vols=[100] * 11)   # last bar stretched far below VWAP
+    curr = strat.Indicators(90, 100, 30, 100, 100, 99, 99)
+    assert strat.vwap_mr_signal(bars, curr, now=now, last_entry_time=None, trades_taken=0) == "LONG"
+    bars_up = _bars([100] * 10 + [110], vols=[100] * 11)
+    curr_up = strat.Indicators(110, 100, 70, 100, 100, 101, 101)
+    assert strat.vwap_mr_signal(bars_up, curr_up, now=now, last_entry_time=None, trades_taken=0) == "SHORT"
+
+
+def test_in_trade_window():
+    from datetime import datetime, timezone
+    # 13:45 UTC = 09:45 ET (EDT) → open window; 16:00 UTC = 12:00 ET → midday (blocked)
+    assert strat.in_trade_window(datetime(2026, 6, 5, 13, 45, tzinfo=timezone.utc)) is True
+    assert strat.in_trade_window(datetime(2026, 6, 5, 16, 0, tzinfo=timezone.utc)) is False
+
+
+def test_regime_classify_and_router():
+    import pandas as pd
+    idx = pd.date_range("2026-06-05 13:30", periods=30, freq="1min", tz="UTC")
+    # trending: price marches up, persistently above VWAP
+    up = pd.DataFrame({"Open": range(100, 130), "High": [p + 0.5 for p in range(100, 130)],
+                       "Low": [p - 0.5 for p in range(100, 130)], "Close": list(range(100, 130)),
+                       "Volume": [100] * 30}, index=idx)
+    reg = regime.classify_session(up, vix=15, adr_used_pct=0.9)
+    assert reg["trend_state"] == "TRENDING"
+    assert regime.setup_allowed("orb", reg)[0] is True
+    assert regime.setup_allowed("vwap_mr", reg)[0] is False   # trending blocks MR
 
 
 def test_micro_signal_respects_bias_direction():

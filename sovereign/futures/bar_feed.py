@@ -62,6 +62,15 @@ def _filter_rth(df, day: Optional[str] = None):
     return out[mask]
 
 
+def _ib_duration(lookback: str) -> str:
+    """Convert a '20d'/'2w'/'1m' lookback into an IB durationStr ('20 D'/'2 W'/'1 M').
+    IB serves 1-min bars up to ~1 month per request; falls back to '20 D' if unparseable."""
+    s = (lookback or "").strip().lower()
+    num = "".join(ch for ch in s if ch.isdigit()) or "20"
+    unit = {"d": "D", "w": "W", "m": "M", "y": "Y"}.get(s[-1:], "D")
+    return f"{num} {unit}"
+
+
 def load_history(instrument: str, source: str = "yf",
                  day: Optional[str] = None, lookback: str = "5d"):
     """1-min RTH OHLCV for `instrument` (MES/MNQ). source 'ib' | 'yf'.
@@ -79,7 +88,8 @@ def load_history(instrument: str, source: str = "yf",
         try:
             contract = bridge.mes_contract() if inst in ("MES", "ES") else bridge.mnq_contract()
             end = "" if day is None else f"{day.replace('-', '')} 16:00:00 US/Eastern"
-            df = bridge.historical_bars(contract, duration="1 D" if day else "5 D",
+            duration = "1 D" if day else _ib_duration(lookback)  # honor --lookback for IB
+            df = bridge.historical_bars(contract, duration=duration,
                                         bar_size="1 min", rth=True, end=end)
         finally:
             bridge.disconnect()

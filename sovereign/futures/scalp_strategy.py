@@ -104,6 +104,84 @@ def micro_signal(
     return None
 
 
+# ── VWAP mean-reversion setup (Increment 3) ───────────────────────────────────
+
+def vwap_bands(bars, n_sigma: Optional[float] = None) -> Optional[tuple[float, float, float, float]]:
+    """Session VWAP ± n_sigma · (volume-weighted σ of typical price around VWAP).
+    Returns (lower, upper, vwap, sigma) or None if not enough volume."""
+    if bars is None or len(bars) == 0:
+        return None
+    if n_sigma is None:
+        n_sigma = futures_params()["vwap_mr"]["n_sigma"]
+    typical = (bars["High"] + bars["Low"] + bars["Close"]) / 3.0
+    vol = bars["Volume"]
+    vsum = float(vol.sum())
+    if vsum <= 0:
+        return None
+    vwap = float((typical * vol).cumsum().iloc[-1] / vol.cumsum().iloc[-1])
+    var = float((vol * (typical - vwap) ** 2).sum() / vsum)
+    sigma = var ** 0.5
+    return (vwap - n_sigma * sigma, vwap + n_sigma * sigma, vwap, sigma)
+
+
+def vwap_mr_signal(bars, curr: Indicators, *, now: datetime,
+                   last_entry_time: Optional[datetime], trades_taken: int) -> Optional[str]:
+    """Fade a stretch from VWAP: LONG at/below −nσ, SHORT at/above +nσ. Returns dir|None.
+
+    A mean-reversion setup — does NOT take a directional bias (the regime router decides
+    WHEN it may fire). Cooldown / cap from config/futures_params.yml::vwap_mr."""
+    m = futures_params()["vwap_mr"]
+    if trades_taken >= m["max_trades_per_session"]:
+        return None
+    if last_entry_time is not None and (now - last_entry_time).total_seconds() < m["cooldown_seconds"]:
+        return None
+    bands = vwap_bands(bars, m["n_sigma"])
+    if bands is None:
+        return None
+    lower, upper, _vwap, sigma = bands
+    if sigma <= 0:
+        return None
+    if curr.last_price <= lower:
+        return "LONG"
+    if curr.last_price >= upper:
+        return "SHORT"
+    return None
+
+
+def vwap_mr_levels(direction: str, entry: float, bands: tuple[float, float, float, float],
+                   instrument: str) -> tuple[float, float]:
+    """(stop, target) for a VWAP-MR entry: target = VWAP (the mean); stop = a buffer
+    beyond BOTH the entry and the band, so a LONG's stop is always < entry and a SHORT's
+    stop is always > entry (guards the degenerate case where price has already pierced the
+    band past the buffer — which otherwise produced a stop on the wrong side / absurd R)."""
+    lower, upper, vwap, _sigma = bands
+    p = futures_params()["vwap_mr"]
+    spec = futures_params()["contracts"][{"ES": "MES", "NQ": "MNQ"}.get(instrument.upper(), instrument.upper())]
+    buf = p["stop_buffer_ticks"] * spec["tick"]
+    if direction == "LONG":
+        return min(entry, lower) - buf, vwap     # always strictly below entry
+    return max(entry, upper) + buf, vwap         # always strictly above entry
+
+
+# ── Time-of-day gate (Increment 3) ────────────────────────────────────────────
+
+def in_trade_window(ts: datetime) -> bool:
+    """True if `ts` (tz-aware) falls in an allowed ET trading window. Midday is blocked.
+    Returns True (no gating) if session_windows.enabled is false."""
+    from zoneinfo import ZoneInfo
+    sw = futures_params()["session_windows"]
+    if not sw.get("enabled", True):
+        return True
+    et = ts.astimezone(ZoneInfo("America/New_York"))
+    hm = et.hour * 60 + et.minute
+
+    def _win(pair):
+        (a, b) = pair
+        ah, am = map(int, a.split(":")); bh, bm = map(int, b.split(":"))
+        return ah * 60 + am <= hm < bh * 60 + bm
+    return _win(sw["open"]) or _win(sw["close"])
+
+
 def orb_range(bars, minutes: Optional[int] = None) -> Optional[tuple[float, float]]:
     """High/low of the first `minutes` 1-min RTH bars. None if not enough bars yet."""
     if minutes is None:
