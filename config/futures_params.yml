@@ -42,6 +42,17 @@ micro:
   target_rr: 1.0                   # T1 at 1R (matches current monitor)
   poll_seconds: 5
 
+# ── VWAP mean-reversion setup (Increment 3) — the chop-regime scalp ───────────
+# NOT yet a shipping default. Validated separately before it can replace `micro`.
+# Opposite regime to ORB: wants oscillation, dies on trend / event days.
+vwap_mr:
+  n_sigma: 1.0                     # enter LONG at -nσ, SHORT at +nσ band
+  band_lookback: 20               # bars for the rolling VWAP-deviation σ
+  stop_buffer_ticks: 4.0          # stop = entry band ± this many ticks beyond
+  exit_on_vwap_touch: true        # target = VWAP (the mean); also exit if close crosses back
+  cooldown_seconds: 300
+  max_trades_per_session: 20
+
 # ── Macro setup: Opening Range Breakout (the "go big / go small" prompt) ───────
 orb:
   minutes: 5                       # first N 1-min bars define the range
@@ -51,10 +62,57 @@ orb:
   safe_contracts: 1
   safe_target_points: 12
 
+# ── Volume profile (Increment 4) — POC / Value Area as confluence context ─────
+# Trustworthy ONLY on real IB volume; yfinance volume = telemetry, not truth.
+volume_profile:
+  bins: 40
+  value_area_pct: 0.70             # top bins covering this % of volume = value area
+  confluence_tol_ticks: 2.0        # entry level within this many ticks of POC/VAH/VAL = a point
+
+# ── Cumulative volume delta (Increment 4) — order-flow proxy (no tick data) ────
+cvd:
+  slope_lookback: 5                # bars for the rolling CVD slope
+  min_vol_bars: 20                 # fail loud / return None below this many bars with volume>0
+  strong_slope_mult: 1.5           # |slope| >= mult * recent avg |slope| = "strong" (tier-3 gate)
+
+# ── Dynamic scale-in (Increment 4) — asymmetric sizing into confirmed winners ─
+# Loser ALWAYS stays 1 lot. Opt-in via --scale-in. Adds intraday heat under Apex — measured.
+sizing:
+  tier2_trigger_ticks: 2.0         # add +1 once trade is this far in favor (and CVD confirms, DD room)
+  tier3_min_confluence: 3          # add +1 more (to max) only at full confluence + strong CVD
+  max_contracts: 3
+  dd_buffer_ticks: 4.0             # never add if within this many ticks of the daily loss limit
+
 # ── Stops ─────────────────────────────────────────────────────────────────────
 stops:
   use_overnight_levels: true       # LONG stop = overnight low, SHORT = overnight high
   fallback_pct: 0.001              # if no level: entry * (1 -/+ fallback_pct)
+
+# ── Regime router (Increment 3) — each setup fires only in its favorable regime ─
+# ORB wants a directional-open burst; VWAP-MR wants chop. Blending them bleeds.
+regime:
+  oscillating_band: 0.20           # |frac_bars_above_vwap - 0.5| <= this => OSCILLATING (range)
+                                   # ... else TRENDING (price persistently one side of VWAP)
+  adr_used_low: 0.60               # VWAP-MR only when session range <= this fraction of ADR(14)
+  vix_high: 25.0                   # VWAP-MR blocked when VIX above this (event/blowout risk)
+  # routing: which setup may fire in which regime
+  vwap_mr_regimes: [OSCILLATING]   # mean-reversion needs chop
+  orb_regimes: [TRENDING]          # breakout needs a directional open
+
+# ── Time-of-day gate (Increment 3) — edge concentrates at the open ────────────
+# Entries allowed ONLY inside these ET windows; midday blocked until data proves an edge.
+session_windows:
+  open:  ["09:30", "10:30"]
+  close: ["15:00", "16:00"]
+  enabled: true                    # set false to disable the gate (research only)
+
+# ── Learning mode (paper-month default) — reps > purity ───────────────────────
+# Used by sovereign/futures/decision_engine.py when --learning-mode is set. Bypasses the
+# session-window + regime gates and loosens the volume gate so the agent gets reps; every
+# bypassed STRICT gate is recorded in the trade's `would_have_blocked` for later validation.
+# Strict mode ignores this block entirely.
+learning_mode:
+  volume_gate_mult: 0.0            # 0 = no volume requirement (logs would_have_blocked:["volume"] if strict failed)
 
 # ── Daily loss limit (hard $ lock, mirrors loss_limit.py) ─────────────────────
 loss_limit:
@@ -64,7 +122,10 @@ loss_limit:
 # Defaults below approximate a 50k Apex/Topstep-style eval. "Passing on paper"
 # only means something if the replay enforces THESE. Update per chosen firm + log.
 prop:
-  firm: "GENERIC_50K"              # set to APEX_50K / TOPSTEP_50K / TRADOVATE_* when chosen
+  firm: "APEX_50K"                 # targeting Apex (trailing-intraday drawdown)
+  drawdown_model: trailing_intraday  # trailing_intraday | eod_trailing | static
+                                   # trailing_intraday trails the intraday equity HIGH incl.
+                                   # UNREALIZED — punishes the heat VWAP-MR carries.
   account_size_usd: 50000.0
   trailing_drawdown_usd: 2500.0    # trails the intraday equity HIGH; breach = blown
   trailing_locks_at_initial_plus: null  # some firms freeze the trail once equity >= start+this; null = always trails
@@ -86,5 +147,7 @@ validation:
   permutation_iterations: 1000
   permutation_seed: 7
   p_value_threshold: 0.05          # edge must clear costs below this to trust --auto / fund
+  min_trades: 100                  # HARD FAIL below this — a hot streak is not an edge
+  expectancy_margin_ticks: 1.0     # mean net/trade must exceed this many ticks after cost
   walk_forward_train_days: 20
   walk_forward_test_days: 5

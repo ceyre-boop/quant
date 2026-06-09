@@ -31,6 +31,10 @@ sys.path.insert(0, str(ROOT))
 # Single source of truth for signal logic — shared with scripts/futures_replay.py
 from sovereign.futures import scalp_strategy as strat
 from sovereign.futures import telegram_gateway as tg
+from sovereign.futures import decision_engine as de
+from sovereign.futures import reasoning as rsn
+from sovereign.futures import regime as regime_mod
+from sovereign.futures import volume_profile as vp
 from sovereign.futures.config import futures_params
 
 BIAS_LOG  = ROOT / "data" / "futures" / "bias_log.jsonl"
@@ -264,11 +268,13 @@ def _log_trade(record: dict) -> None:
 def _build_record(instrument: str, direction: str, entry: float, stop: float, t1: float,
                   bias: dict, session_trades: int, session_r: float,
                   rationale: str, notes: str, exit_reason: str | None = None,
-                  r_realized: float | None = None) -> dict:
+                  r_realized: float | None = None, setup_type: str = "MICRO",
+                  contracts: int = 1, reasoning: dict | None = None) -> dict:
     return {
         "ts":                       datetime.now(timezone.utc).isoformat(),
         "instrument":               instrument,
         "trade_num_in_session":     session_trades + 1,
+        "setup_type":               setup_type,
         "bias_direction":           bias.get("bias", "NEUTRAL"),
         "bias_conviction":          bias.get("conviction", 0),
         "direction":                direction,
@@ -279,13 +285,57 @@ def _build_record(instrument: str, direction: str, entry: float, stop: float, t1
         "exit":                     None,
         "exit_reason":              exit_reason,
         "r_realized":               r_realized,
-        "size_contracts":           1,
+        "size_contracts":           contracts,
         "sizing_rationale":         rationale,
-        "bias_aligned":             True,
+        "bias_aligned":             bias.get("bias") == direction,
         "below_proven_bar":         bias.get("conviction", 0) < 2,
         "session_result_so_far_r":  round(session_r, 3),
+        "reasoning":                reasoning,          # entry-time belief block (learning agent)
+        "exit_reasoning":           None,               # filled at close by reasoning.exit_attribution
         "notes":                    notes,
     }
+
+
+def _execute_decision(d, instrument: str, bias: dict, dry_run: bool, ib_connected: bool,
+                      bridge, session_trades: int, session_r: float, proposals_count: int,
+                      loss_limit: float) -> tuple[datetime, int, int]:
+    """Execute + log a decision_engine EntryDecision (full setup ladder + reasoning block).
+    Auto-places the bracket (paper); logs the annotated trade. The single execution path."""
+    now = datetime.now(timezone.utc)
+    block = _trading_blocked(bridge, instrument, loss_limit)
+    if block:
+        print(f"\n  {R}⛔ BLOCKED — {block}{RS}")
+        return now, session_trades, proposals_count + 1
+
+    entry, stop, t1 = d.entry, d.stop, d.target
+    rationale = _sizing_rationale(session_trades, session_r)
+    tag = f"{d.setup_type} {d.direction} {d.contracts}x"
+    wb = f" | would_have_blocked={d.would_have_blocked}" if d.would_have_blocked else ""
+    if not dry_run and ib_connected and bridge:
+        try:
+            side = "BUY" if d.direction == "LONG" else "SELL"
+            contract = bridge.mes_contract() if instrument == "MES" else bridge.mnq_contract()
+            results = bridge.bracket_order(contract, side, d.contracts, entry, stop, t1)
+            print(f"\n  {G}{BD}⚡ FILLED {tag} {instrument} @ {entry:.2f}{RS}  SL {stop:.2f}  TP {t1:.2f}"
+                  f"  conf={d.confidence} R={d.expected_r}  id={results[0].order_id}")
+            notes = f"{tag}: {d.confidence} R={d.expected_r} | order_id={results[0].order_id}{wb}"
+        except Exception as e:
+            print(f"\n  {R}Order failed: {type(e).__name__}: {e}{RS}")
+            notes = f"{tag}: order failed: {type(e).__name__}: {e}{wb}"
+    else:
+        why = "dry-run" if dry_run else "IB disconnected"
+        print(f"\n  {G}{BD}⚡ [{why}] {tag} {instrument} @ {entry:.2f}{RS}  SL {stop:.2f}  TP {t1:.2f}"
+              f"  conf={d.confidence} R={d.expected_r}")
+        if d.would_have_blocked:
+            print(f"  {DM}learning rep — strict would_have_blocked: {d.would_have_blocked}{RS}")
+        notes = f"{tag} ({why}): {d.confidence} R={d.expected_r}{wb}"
+
+    record = _build_record(instrument, d.direction, entry, stop, t1, bias,
+                           session_trades, session_r, rationale, notes,
+                           setup_type=d.setup_type, contracts=d.contracts,
+                           reasoning=rsn.entry_reasoning(d, bias))
+    _log_trade(record)
+    return now, session_trades + 1, proposals_count + 1
 
 
 def _handle_proposal(direction: str, curr_price: float, curr_vwap: float,
@@ -573,6 +623,11 @@ def _parse_args() -> argparse.Namespace:
     ap.add_argument("--orb-minutes", type=int, default=5,
                     help="Opening-range minutes for the ORB macro setup (default 5)")
     ap.add_argument("--verbose",  action="store_true", help="Extra indicator output per tick")
+    ap.add_argument("--learning-mode", action="store_true",
+                    help="Paper-month default: bypass session-window + regime gates, loosen volume, "
+                         "log would_have_blocked. Reps > purity (decision_engine).")
+    ap.add_argument("--trace", action="store_true",
+                    help="Print every bar's gate outcome (why no trade) — Priority-Zero diagnosis.")
     return ap.parse_args()
 
 
@@ -660,17 +715,23 @@ def main() -> None:
     loss_limit = float(args.loss_limit)
     max_trades = int(args.max_trades)
     orb_minutes = int(args.orb_minutes)
+    learning_mode = args.learning_mode
+    trace      = args.trace
 
     # Loss-limit / kill-switch startup status
     from sovereign.futures import loss_limit as ll
     if ll.is_locked():
         print(f"  {R}{BD}⛔ Auto path is LOCKED from a prior session — {ll.lock_reason()}{RS}")
         print(f"  {Y}  Unlock: delete data/futures/.session_lock{RS}")
-    print(f"  Mode: {'AUTO micros' if auto else 'MANUAL (approve/skip)'} | "
-          f"daily loss limit ${loss_limit:.0f} | max {max_trades} trades/session")
+    print(f"  Mode: {'AUTO' if auto else 'MANUAL'}{' | LEARNING (reps>purity)' if learning_mode else ' | STRICT'}"
+          f"{' | TRACE' if trace else ''} | daily loss limit ${loss_limit:.0f} | max {max_trades} trades/session")
 
-    print(f"\n  Watching for VWAP reclaim + RSI confirmation in bias direction...")
-    print(f"  ORB macro: first {orb_minutes}-min range → big/safe checkbox | 5-min cooldown\n")
+    print(f"\n  Setup ladder: ORB / VWAP-MR / micro (decision_engine, one engine == replay)")
+    if learning_mode:
+        print(f"  {Y}LEARNING MODE: session-window + regime bypassed, volume loosened; "
+              f"would_have_blocked logged on every rep.{RS}\n")
+    else:
+        print(f"  STRICT MODE: full gates (validation-only).\n")
 
     # ── Main polling loop ─────────────────────────────────────────────────────
     prev_price: float = 0.0
@@ -715,44 +776,51 @@ def main() -> None:
                               f"{kill_level:.2f}. Gating to NEUTRAL for the session.{RS}")
                 bias_dir_eff = "NEUTRAL" if bias_invalidated else bias_dir
 
-                # ── ORB macro setup (once per session): capture range, watch for break ──
+                # ── ORB range capture (once per session) ──
                 if orb_high is None:
                     rng = _orb_range(bars, orb_minutes)
                     if rng is not None and len(bars) >= orb_minutes:
                         orb_high, orb_low = rng
-                elif not orb_taken and bias_dir_eff in ("LONG", "SHORT"):
-                    orb_dir = ("LONG" if curr_price > orb_high else
-                               "SHORT" if curr_price < orb_low else None)
-                    if orb_dir == bias_dir_eff and avg_volume_20 > 0 and curr_volume >= 1.5 * avg_volume_20:
-                        print()
-                        session_trades, proposals_count, orb_taken = _handle_orb(
-                            orb_dir, instrument, round(curr_price, 2), orb_high, orb_low,
-                            bias, dry_run, ib_connected, bridge,
+
+                # ── ONE decision engine: ORB / VWAP-MR / micro + full telemetry (== replay) ──
+                if proposals_count < max_trades and (bias_dir_eff in ("LONG", "SHORT") or learning_mode):
+                    prev_ind = None
+                    if len(bars) > 1:
+                        try:
+                            prev_ind = strat.compute_indicators(bars.iloc[:-1])
+                        except Exception:
+                            prev_ind = None
+                    try:
+                        regime_ctx = regime_mod.classify_session(bars)
+                    except Exception:
+                        regime_ctx = None
+                    try:
+                        profile_ctx = vp.compute_profile(bars)
+                    except Exception:
+                        profile_ctx = None
+                    eff_bias = dict(bias); eff_bias["bias"] = bias_dir_eff
+                    decision = de.evaluate_entry(
+                        bars, bias=eff_bias, ts=datetime.now(timezone.utc), instrument=instrument,
+                        prev_ind=prev_ind,
+                        orb_levels=((orb_high, orb_low) if orb_high is not None else None),
+                        orb_taken=orb_taken, regime=regime_ctx, prior_profile=profile_ctx,
+                        last_entry_time=last_proposal_time, trades_taken=proposals_count,
+                        learning_mode=learning_mode,
+                        oracle_invalidation=_oracle_invalidation(instrument),
+                    )
+                    if decision is not None:
+                        print()  # newline after header
+                        if decision.setup_type == "ORB":
+                            orb_taken = True
+                        last_proposal_time, session_trades, proposals_count = _execute_decision(
+                            decision, instrument, bias, dry_run, ib_connected, bridge,
                             session_trades, session_r, proposals_count, loss_limit,
                         )
-
-                if prev_price > 0:  # have at least one prior tick
-                    signal = _check_signal(
-                        bias_dir_eff, curr_price, curr_vwap, curr_rsi,
-                        prev_price, prev_vwap, prev_rsi,
-                        last_proposal_time, proposals_count,
-                        curr_volume, avg_volume_20, ema8, ema21, max_trades,
-                    )
-                    if signal:
-                        print()  # newline after header
-                        if auto:
-                            last_proposal_time, session_trades, proposals_count = _auto_execute(
-                                signal, curr_price, curr_rsi, prev_rsi,
-                                curr_volume, avg_volume_20, ema8, ema21,
-                                bias, instrument, dry_run, ib_connected, bridge,
-                                session_trades, session_r, proposals_count, loss_limit,
-                            )
-                        else:
-                            last_proposal_time, session_trades, proposals_count = _handle_proposal(
-                                signal, curr_price, curr_vwap, curr_rsi, prev_rsi,
-                                bias, instrument, dry_run, ib_connected, bridge,
-                                session_trades, session_r, proposals_count,
-                            )
+                    elif trace:
+                        print(f"\n  {DM}[trace] {instrument} no entry @ {curr_price:.2f} | "
+                              f"bias={bias_dir_eff} window_ok={strat.in_trade_window(datetime.now(timezone.utc))} "
+                              f"orb={'set' if orb_high is not None else 'pending'} vol={curr_volume:.0f}/"
+                              f"{avg_volume_20:.0f} learning={learning_mode}{RS}")
 
                 prev_price, prev_vwap, prev_rsi = curr_price, curr_vwap, curr_rsi
                 last_bar_ts = curr_ts
