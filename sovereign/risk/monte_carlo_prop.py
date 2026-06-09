@@ -13,8 +13,9 @@ to demonstrate where the normality assumption misleads — on our OWN data, in w
 the data says (this edge has POSITIVE skew, so GBM may actually OVERstate ruin; we report the
 honest direction, never force it).
 
-Reads logs/forex_backtest_trades.json (the OOS 2023-2024 pool the stamped Sharpe compounds).
-Writes only data/risk/prop_monte_carlo.json. Fails loud if the real pool is missing/empty.
+Reads data/risk/oos_trades_2023_2024.json (the FROZEN, held-out OOS pool; regenerate with
+scripts/generate_oos_pool.py). The OOS window is ENFORCED at load — any in-sample trade fails loud.
+Writes only data/risk/prop_monte_carlo.json. Fails loud if the pool is missing/empty/off-window.
 
 Usage:  python3 -m sovereign.risk.monte_carlo_prop [--sims 10000] [--account 100000]
 """
@@ -32,9 +33,18 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
-TRADES = ROOT / "logs" / "forex_backtest_trades.json"
+# FROZEN, tracked OOS-only pool — regenerate with scripts/generate_oos_pool.py.
+# Deliberately NOT logs/forex_backtest_trades.json: that file is gitignored and gets
+# overwritten with the FULL 2015-2024 (in-sample) backtest, which would silently turn this
+# held-out probability into an in-sample one. We point at an immutable OOS snapshot and
+# ENFORCE the window in load_pool() so "OOS" can never be a label-only claim again.
+TRADES = ROOT / "data" / "risk" / "oos_trades_2023_2024.json"
 RESULTS = ROOT / "logs" / "forex_backtest_results.json"
 OUT = ROOT / "data" / "risk" / "prop_monte_carlo.json"
+
+# The held-out out-of-sample window. Every trade in the pool MUST fall inside it.
+OOS_START = "2023-01-01"
+OOS_END = "2025-01-01"  # exclusive
 
 LOW_CONFIDENCE_N = 50
 
@@ -48,16 +58,32 @@ def load_pool():
     """Flatten the real per-trade %-equity returns. FAIL LOUD if missing/empty.
     Cached — the trades file is static within a run (the risk engine calls this per decision)."""
     if not TRADES.exists():
-        raise SystemExit(f"FATAL: real trade pool not found: {TRADES}. "
-                         f"Run the v015 backtest first — this tool refuses to assume returns.")
+        raise SystemExit(f"FATAL: frozen OOS trade pool not found: {TRADES}. "
+                         f"Regenerate it with: python3 scripts/generate_oos_pool.py")
     data = json.loads(TRADES.read_text())
-    pnls, per_pair = [], {}
+    pnls, per_pair, off_window = [], {}, []
     for pair, trades in data.items():
-        vals = [float(t["pnl_pct"]) for t in trades if "pnl_pct" in t]
+        vals = []
+        for t in trades:
+            if "pnl_pct" not in t:
+                continue
+            # ENFORCE the OOS window — refuse to bootstrap any in-sample trade. A trade with no
+            # entry_date is treated as off-window (fail-safe: we never silently include it).
+            ed = str(t.get("entry_date", ""))[:10]
+            if not (OOS_START <= ed < OOS_END):
+                off_window.append((pair, ed or "<no-date>"))
+                continue
+            vals.append(float(t["pnl_pct"]))
         per_pair[pair] = len(vals)
         pnls.extend(vals)
+    if off_window:
+        sample = ", ".join(f"{p}@{d}" for p, d in off_window[:5])
+        raise SystemExit(
+            f"FATAL: {len(off_window)} trade(s) fall outside the OOS window [{OOS_START}, {OOS_END}) "
+            f"(e.g. {sample}). This pool is NOT held-out — refusing to pass off in-sample data as OOS. "
+            f"Regenerate with: python3 scripts/generate_oos_pool.py")
     if not pnls:
-        raise SystemExit("FATAL: trade pool is empty — no real returns to bootstrap. Refusing to fabricate.")
+        raise SystemExit("FATAL: trade pool is empty — no real OOS returns to bootstrap. Refusing to fabricate.")
     # Portfolio trades/year (for the time clock).
     tpy = 49.8
     try:
@@ -186,7 +212,7 @@ def run(account=100_000.0, floor_pct=0.08, target_pct=0.08,
         "question": "P(reach +8% before breaching -8%) for the real v015 4-pair forex edge",
         "pool_size": n_pool,
         "pool_per_pair": per_pair,
-        "pool_window": "OOS 2023-2024 (the validated out-of-sample trades)",
+        "pool_window": f"OOS {OOS_START[:4]}-{str(int(OOS_END[:4])-1)} (held-out; window enforced at load)",
         "low_confidence": low_conf,
         "calibration_note": (
             f"Bootstrap of n={n_pool} real trades. n>={LOW_CONFIDENCE_N} so the resample is "
@@ -196,8 +222,8 @@ def run(account=100_000.0, floor_pct=0.08, target_pct=0.08,
             f"⚠️ LOW CONFIDENCE: only n={n_pool} real trades (<{LOW_CONFIDENCE_N}). The bootstrap "
             f"itself is uncertain — wide confidence on every probability. Do not over-trust."),
         "regime_caveat": (
-            "CRITICAL: this bootstraps the 2023-2024 OOS window only — a FAVORABLE, rate-trending "
-            "regime (mean +0.36%/trade, positive skew). The forex edge is REGIME-FRAGILE: rolling "
+            f"CRITICAL: this bootstraps the 2023-2024 OOS window only — a FAVORABLE, rate-trending "
+            f"regime (mean {mom['mean']*100:+.2f}%/trade, positive skew). The forex edge is REGIME-FRAGILE: rolling "
             "walk-forward was 2021 -0.13 / 2022 +0.51 / 2023 +1.26 / 2024 -0.09. In a flat/adverse "
             "regime, P(fail) would be materially higher and P(pass) lower than shown here. These "
             "numbers assume the future resembles 2023-2024; it may not."),
@@ -209,8 +235,9 @@ def run(account=100_000.0, floor_pct=0.08, target_pct=0.08,
         "method": "bootstrap resample of real per-trade pnl_pct (sizing already embedded; forex is "
                   "not graded). GBM shown only as a normality-assumption comparison.",
         "horizons": out_horizons,
-        "provenance": {"source": "logs/forex_backtest_trades.json", "verified": True,
-                       "note": "Real backtested OOS trade returns — NOT assumed/round numbers."},
+        "provenance": {"source": "data/risk/oos_trades_2023_2024.json", "verified": True,
+                       "note": "Real held-out OOS (2023-2024) trade returns — window enforced at load, "
+                               "frozen pool (regen: scripts/generate_oos_pool.py). NOT in-sample, NOT assumed."},
     }
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps(payload, indent=2))

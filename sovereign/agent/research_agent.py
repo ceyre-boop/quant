@@ -17,6 +17,7 @@ data/agent/findings.jsonl and hypothesis_ledger.json.
 
 import argparse
 import json
+import shlex
 import subprocess
 import sys
 import logging
@@ -147,11 +148,24 @@ def _add_queue_task(task: dict) -> str:
 # ── Task dispatchers ──────────────────────────────────────────────────────────
 
 def _run_script(script_path: str, timeout: int = 3600) -> tuple[bool, str]:
-    """Run a shell command/script. Returns (ok, output)."""
+    """Run a shell command/script. Returns (ok, output).
+
+    A bare Python script (e.g. "scripts/foo.py [args]") is run through the active
+    interpreter, NOT the shell: `sh -c "scripts/foo.py"` fails with "Permission denied"
+    because the .py file isn't an executable. Real shell commands (e.g. "echo no-op")
+    and explicit argv lists are passed through unchanged.
+    """
     try:
+        if isinstance(script_path, list):
+            cmd, use_shell = script_path, False
+        else:
+            parts = shlex.split(script_path)
+            if parts and parts[0].endswith('.py'):
+                cmd, use_shell = [sys.executable, *parts], False
+            else:
+                cmd, use_shell = script_path, True
         result = subprocess.run(
-            script_path if isinstance(script_path, list) else script_path,
-            shell=isinstance(script_path, str),
+            cmd, shell=use_shell,
             capture_output=True, text=True,
             timeout=timeout, cwd=str(ROOT),
         )
