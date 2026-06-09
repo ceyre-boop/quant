@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key><string>com.alta.oracle.killzone</string>
+    <!-- Per-killzone Sonnet 4.6 intraday synthesis (Option 2). Fires AT the three institutional
+         order-flow windows so the Oracle thinks when the market is moving, not on a daily clock.
+         StartCalendarInterval fires in the machine's LOCAL timezone = America/New_York (ET), so the
+         hours below ARE killzone-ET: London 03:00, NY-AM 09:30, NY-PM 14:00. run_killzone_synthesis.py
+         resolves which window and runs MES + MNQ. `launchctl load` to enable. -->
+    <key>ProgramArguments</key>
+    <array>
+        <string>/opt/homebrew/bin/python3</string>
+        <string>/Users/taboost/quant/scripts/run_killzone_synthesis.py</string>
+    </array>
+    <key>WorkingDirectory</key><string>/Users/taboost/quant</string>
+    <key>StartCalendarInterval</key>
+    <array>
+        <dict><key>Hour</key><integer>3</integer><key>Minute</key><integer>0</integer></dict>
+        <dict><key>Hour</key><integer>9</integer><key>Minute</key><integer>30</integer></dict>
+        <dict><key>Hour</key><integer>14</integer><key>Minute</key><integer>0</integer></dict>
+    </array>
+    <key>StandardOutPath</key><string>/Users/taboost/quant/logs/killzone_synthesis.log</string>
+    <key>StandardErrorPath</key><string>/Users/taboost/quant/logs/killzone_synthesis.err</string>
+    <key>EnvironmentVariables</key><dict><key>PATH</key><string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string></dict>
+</dict>
+</plist>

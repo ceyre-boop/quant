@@ -72,6 +72,38 @@ def _correlation_note(closed: list[dict]) -> dict | None:
             "mnq_avg_r": mnq_r, "correlation_note": note}
 
 
+_DIRECTIONAL = {"LONG", "SHORT"}
+
+
+def _killzone_agreement(day: str) -> dict | None:
+    """Did each killzone Sonnet read agree with that day's daily Opus call (per instrument)?
+
+    Reads oracle_mornings.jsonl for `day`. agree=True/False only when BOTH biases are directional
+    (LONG/SHORT); NEUTRAL/NO_PREDICTION -> agree=None (no directional read to compare). Over ~2
+    weeks this `agreements`/`disagreements` tally is the signal-vs-noise dataset for Option 2.
+    """
+    rows = [json.loads(l) for l in (ORACLE_LOG.read_text().splitlines() if ORACLE_LOG.exists() else [])
+            if l.strip() and json.loads(l).get("date") == day]
+    daily = {r["instrument"]: r.get("bias") for r in rows if r.get("synthesis_type") == "daily_opus"}
+    kz = [r for r in rows if r.get("synthesis_type") == "killzone_sonnet"]
+    if not kz:
+        return None
+    comparisons, agree_n, disagree_n = [], 0, 0
+    for r in kz:
+        inst, d_bias = r.get("instrument"), daily.get(r.get("instrument"))
+        k_bias = r.get("bias")
+        if d_bias in _DIRECTIONAL and k_bias in _DIRECTIONAL:
+            ok = (d_bias == k_bias)
+            agree_n += ok
+            disagree_n += (not ok)
+        else:
+            ok = None
+        comparisons.append({"killzone": r.get("killzone"), "instrument": inst,
+                            "killzone_bias": k_bias, "daily_bias": d_bias, "agree": ok})
+    return {"comparisons": comparisons, "agreements": agree_n, "disagreements": disagree_n,
+            "daily_call_present": bool(daily)}
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--date", default=datetime.now(rc.ET).strftime("%Y-%m-%d"))
@@ -105,6 +137,14 @@ def main() -> int:
     if corr:
         print(f"\n  CORRELATION: {corr['correlation_note']}")
 
+    kz_agree = _killzone_agreement(day)
+    if kz_agree:
+        print(f"\n  KILLZONE vs DAILY: {kz_agree['agreements']} agree / {kz_agree['disagreements']} disagree"
+              + ("" if kz_agree["daily_call_present"] else "  (no daily Opus call logged today)"))
+        for c in kz_agree["comparisons"]:
+            mark = "=" if c["agree"] else ("x" if c["agree"] is False else "·")
+            print(f"    {mark} {c['killzone']} {c['instrument']}: sonnet={c['killzone_bias']} daily={c['daily_bias']}")
+
     # ── compound into tomorrow's oracle morning note ──
     learnings = patterns or ([f"{len(closed)} closed trades, {overall_wr:.0%} win rate"] if overall_wr is not None
                              else ["No closed trades to learn from yet."])
@@ -116,6 +156,7 @@ def main() -> int:
         "net_pnl_usd": gross, "avg_r": avg_r,
         "session_learnings": learnings,
         "correlation": corr,
+        "killzone_agreement": kz_agree,
         "recommended_posture_tomorrow": posture,
         "generated_at": datetime.now(rc.ET).isoformat(),
     }

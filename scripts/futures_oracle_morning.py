@@ -34,6 +34,9 @@ TRADE_LOG  = ROOT / "data" / "futures" / "trade_log.jsonl"
 TICKER_MAP = {"MES": "ES=F", "MNQ": "NQ=F"}
 
 MODEL = "claude-opus-4-7"
+SONNET_MODEL = "claude-sonnet-4-6"          # intraday killzone synthesis (Option 2)
+# Killzone open times in ET — the institutional order-flow windows.
+KILLZONES = {"LONDON": "03:00", "NY_AM": "09:30", "NY_PM": "14:00"}
 
 SYSTEM_PROMPT = """\
 You are a futures session analyst for a paper-trading learning project on ES/NQ micro contracts.
@@ -268,6 +271,11 @@ def _build_user_prompt(instrument: str, overnight: dict, macro: dict,
 # ── Opus call ────────────────────────────────────────────────────────────────
 
 def _call_opus(user_prompt: str) -> dict:
+    """Daily Opus synthesis (back-compat wrapper)."""
+    return _call_model(user_prompt, MODEL)
+
+
+def _call_model(user_prompt: str, model: str) -> dict:
     from dotenv import load_dotenv
     import os
     load_dotenv(ROOT / ".env")
@@ -278,7 +286,7 @@ def _call_opus(user_prompt: str) -> dict:
     import anthropic
     client = anthropic.Anthropic(api_key=api_key)
     msg = client.messages.create(
-        model=MODEL,
+        model=model,
         max_tokens=1024,
         system=SYSTEM_PROMPT,
         messages=[{"role": "user", "content": user_prompt}],
@@ -384,12 +392,20 @@ def _prior_structure(instrument: str, overnight: dict) -> dict:
 # ── main ─────────────────────────────────────────────────────────────────────
 
 def main() -> dict:
-    ap = argparse.ArgumentParser(description="Futures oracle morning call (Opus-4)")
+    ap = argparse.ArgumentParser(description="Futures oracle synthesis (daily Opus / killzone Sonnet)")
     ap.add_argument("--instrument", default="MES", choices=["MES", "MNQ"])
     ap.add_argument("--no-log", action="store_true", help="Display only, don't write to jsonl")
+    ap.add_argument("--killzone", choices=list(KILLZONES), default=None,
+                    help="Intraday killzone synthesis (Sonnet) instead of the daily Opus call")
+    ap.add_argument("--model", default=None, help="Override the model id")
     args = ap.parse_args()
 
-    print(f"Gathering context for {args.instrument} oracle call...", end=" ", flush=True)
+    is_kz = args.killzone is not None
+    synthesis_type = "killzone_sonnet" if is_kz else "daily_opus"
+    model = args.model or (SONNET_MODEL if is_kz else MODEL)
+    label = f"{args.killzone} killzone (Sonnet)" if is_kz else "daily (Opus)"
+
+    print(f"Gathering context for {args.instrument} {label} call...", end=" ", flush=True)
 
     overnight   = _fetch_overnight(args.instrument)
     macro       = _fetch_macro()
@@ -397,14 +413,19 @@ def main() -> dict:
     trades      = _load_recent_sessions(args.instrument)
     prior_calls = _load_prior_oracle_sessions(args.instrument)
 
-    print("done. Calling Opus-4...", end=" ", flush=True)
+    print(f"done. Calling {model}...", end=" ", flush=True)
 
     user_prompt = _build_user_prompt(args.instrument, overnight, macro, events, trades, prior_calls)
+    if is_kz:
+        user_prompt = (f"INTRADAY KILLZONE UPDATE ({args.killzone}, {KILLZONES[args.killzone]} ET). "
+                       f"This is a fast big-move read at a live order-flow window, not the full daily "
+                       f"plan — focus on what has changed and the immediate directional read.\n\n"
+                       + user_prompt)
 
     try:
-        result = _call_opus(user_prompt)
+        result = _call_model(user_prompt, model)
     except Exception as e:
-        print(f"\n  [error] Opus call failed: {type(e).__name__}: {e}")
+        print(f"\n  [error] {model} call failed: {type(e).__name__}: {e}")
         sys.exit(1)
 
     print("done.\n")
@@ -415,6 +436,8 @@ def main() -> dict:
         record = {
             "date":              datetime.now(timezone.utc).strftime("%Y-%m-%d"),
             "timestamp":         datetime.now(timezone.utc).isoformat(),
+            "synthesis_type":    synthesis_type,    # daily_opus | killzone_sonnet
+            "killzone":          args.killzone,     # LONDON | NY_AM | NY_PM | None
             "instrument":        args.instrument,
             "bias":              result.get("bias"),
             "conviction":        result.get("conviction"),
@@ -428,7 +451,7 @@ def main() -> dict:
             "outcome_scored":    None,   # filled by futures_calibration.py --score-today
             "outcome_hit_t1":    None,
             "brier_contribution": None,
-            "model":             MODEL,
+            "model":             model,
             "context_snapshot": {
                 "last_price":    overnight.get("last_price"),
                 "overnight_pct": overnight.get("overnight_pct"),

@@ -71,6 +71,25 @@ def test_weekly_proposes_hypothesis(tmp_path, monkeypatch):
     assert any(h["predictor"] == "POSITIVE" and h["bucket"] == "HIGH" for h in cvd)
 
 
+def test_killzone_agreement(tmp_path, monkeypatch):
+    import json as _json
+    oracle = tmp_path / "oracle_mornings.jsonl"
+    rows = [
+        {"date": "2026-06-09", "synthesis_type": "daily_opus", "instrument": "MES", "bias": "LONG"},
+        {"date": "2026-06-09", "synthesis_type": "killzone_sonnet", "killzone": "NY_AM", "instrument": "MES", "bias": "LONG"},   # agree
+        {"date": "2026-06-09", "synthesis_type": "killzone_sonnet", "killzone": "NY_PM", "instrument": "MES", "bias": "SHORT"},  # disagree
+        {"date": "2026-06-09", "synthesis_type": "killzone_sonnet", "killzone": "LONDON", "instrument": "MES", "bias": "NO_PREDICTION"},  # n/a
+    ]
+    oracle.write_text("\n".join(_json.dumps(r) for r in rows) + "\n")
+    nightly = _load(Path("scripts/futures_nightly_review.py"))
+    monkeypatch.setattr(nightly, "ORACLE_LOG", oracle)
+    out = nightly._killzone_agreement("2026-06-09")
+    assert out["agreements"] == 1 and out["disagreements"] == 1
+    assert out["daily_call_present"] is True
+    assert any(c["agree"] is None for c in out["comparisons"])   # NO_PREDICTION -> n/a
+    assert nightly._killzone_agreement("2026-01-01") is None       # no killzone rows that day
+
+
 def test_review_empty_safe(tmp_path, monkeypatch):
     log = tmp_path / "empty.jsonl"
     nightly = _load(Path("scripts/futures_nightly_review.py"))
