@@ -146,9 +146,10 @@ def _kill_level(bias_dir: str, bias: dict, instrument: str) -> float | None:
                             _oracle_invalidation(instrument))
 
 
-def _fetch_bars(instrument: str, bridge=None, contract=None):
+def _fetch_bars(instrument: str, bridge=None, contract=None, require_ib: bool = False):
     """Live 1-min RTH bars. Prefers the connected IB bridge (matches what the replay
-    uses); falls back to yfinance if no bridge or the IB call fails."""
+    uses); falls back to yfinance if no bridge or the IB call fails — UNLESS require_ib is
+    set, in which case it returns empty rather than trade on fallback data (Guard 1)."""
     if bridge is not None and contract is not None:
         try:
             from sovereign.futures.bar_feed import live_session_bars
@@ -156,7 +157,10 @@ def _fetch_bars(instrument: str, bridge=None, contract=None):
             if df is not None and len(df) > 0:
                 return df
         except Exception:
-            pass  # fall through to yfinance
+            pass  # fall through to yfinance (unless IB is required)
+    if require_ib:
+        import pandas as pd
+        return pd.DataFrame()   # no yfinance shadow data when IB is the required source
     import yfinance as yf
     import pandas as pd
     ticker = TICKER_MAP[instrument]
@@ -267,11 +271,26 @@ def _log_trade(record: dict) -> None:
         f.write(json.dumps(record) + "\n")
 
 
+def _log_session_halted(instrument: str, reason: str) -> None:
+    """Write ONE integrity record marking the session stopped (e.g. IB disconnected). Never an entry."""
+    _log_trade({
+        "ts":           datetime.now(timezone.utc).isoformat(),
+        "instrument":   instrument,
+        "event":        "SESSION_HALTED",
+        "exit_reason":  reason,
+        "entry":        None, "stop": None, "target_1": None, "exit": None,
+        "size_contracts": 0,
+        "data_quality": "SIMULATED",
+        "notes":        f"SESSION_HALTED: {reason} — entry generation stopped; no shadow trades logged.",
+    })
+
+
 def _build_record(instrument: str, direction: str, entry: float, stop: float, t1: float,
                   bias: dict, session_trades: int, session_r: float,
                   rationale: str, notes: str, exit_reason: str | None = None,
                   r_realized: float | None = None, setup_type: str = "MICRO",
-                  contracts: int = 1, reasoning: dict | None = None) -> dict:
+                  contracts: int = 1, reasoning: dict | None = None,
+                  data_quality: str = "SIMULATED") -> dict:
     return {
         "ts":                       datetime.now(timezone.utc).isoformat(),
         "instrument":               instrument,
@@ -292,6 +311,10 @@ def _build_record(instrument: str, direction: str, entry: float, stop: float, t1
         "bias_aligned":             bias.get("bias") == direction,
         "below_proven_bar":         bias.get("conviction", 0) < 2,
         "session_result_so_far_r":  round(session_r, 3),
+        # Integrity tag: LIVE_PAPER only when a real IB bracket order was placed; otherwise SIMULATED
+        # (dry-run, IB disconnected, learning rep with no fill, REJECTED). The learning loop ignores
+        # SIMULATED records by default so fabricated entries never train Oracle.
+        "data_quality":             data_quality,
         "reasoning":                reasoning,          # entry-time belief block (learning agent)
         "exit_reasoning":           None,               # filled at close by reasoning.exit_attribution
         "notes":                    notes,
@@ -313,6 +336,7 @@ def _execute_decision(d, instrument: str, bias: dict, dry_run: bool, ib_connecte
     rationale = _sizing_rationale(session_trades, session_r)
     tag = f"{d.setup_type} {d.direction} {d.contracts}x"
     wb = f" | would_have_blocked={d.would_have_blocked}" if d.would_have_blocked else ""
+    data_quality = "SIMULATED"
     if not dry_run and ib_connected and bridge:
         try:
             side = "BUY" if d.direction == "LONG" else "SELL"
@@ -321,6 +345,7 @@ def _execute_decision(d, instrument: str, bias: dict, dry_run: bool, ib_connecte
             print(f"\n  {G}{BD}⚡ FILLED {tag} {instrument} @ {entry:.2f}{RS}  SL {stop:.2f}  TP {t1:.2f}"
                   f"  conf={d.confidence} R={d.expected_r}  id={results[0].order_id}")
             notes = f"{tag}: {d.confidence} R={d.expected_r} | order_id={results[0].order_id}{wb}"
+            data_quality = "LIVE_PAPER"   # a real bracket order hit the paper account
         except Exception as e:
             print(f"\n  {R}Order failed: {type(e).__name__}: {e}{RS}")
             notes = f"{tag}: order failed: {type(e).__name__}: {e}{wb}"
@@ -335,7 +360,8 @@ def _execute_decision(d, instrument: str, bias: dict, dry_run: bool, ib_connecte
     record = _build_record(instrument, d.direction, entry, stop, t1, bias,
                            session_trades, session_r, rationale, notes,
                            setup_type=d.setup_type, contracts=d.contracts,
-                           reasoning=rsn.entry_reasoning(d, bias))
+                           reasoning=rsn.entry_reasoning(d, bias),
+                           data_quality=data_quality)
     _log_trade(record)
     return now, session_trades + 1, proposals_count + 1
 
@@ -484,6 +510,7 @@ def _auto_execute(direction: str, curr_price: float, curr_rsi: float, prev_rsi: 
     reason = (f"VWAP {'reclaim' if direction=='LONG' else 'reject'} + {vol_x:.1f}x vol + "
               f"{'>' if direction=='LONG' else '<'}EMA8/21 + RSI {prev_rsi:.0f}->{curr_rsi:.0f} + bias {direction}")
 
+    data_quality = "SIMULATED"
     if not dry_run and ib_connected and bridge:
         try:
             side = "BUY" if direction == "LONG" else "SELL"
@@ -492,6 +519,7 @@ def _auto_execute(direction: str, curr_price: float, curr_rsi: float, prev_rsi: 
             print(f"\n  {G}{BD}⚡ AUTO FILLED {direction} 1 {instrument} @ {entry:.2f}{RS}"
                   f"  SL {stop:.2f}  TP {t1:.2f}  | id={results[0].order_id}")
             notes = f"auto: {reason} | order_id={results[0].order_id}"
+            data_quality = "LIVE_PAPER"
         except Exception as e:
             print(f"\n  {R}Auto order failed: {type(e).__name__}: {e}{RS}")
             notes = f"auto: order failed: {type(e).__name__}: {e}"
@@ -503,7 +531,8 @@ def _auto_execute(direction: str, curr_price: float, curr_rsi: float, prev_rsi: 
         notes = f"auto ({'dry-run' if dry_run else 'IB disconnected'}): {reason}"
 
     _log_trade(_build_record(instrument, direction, entry, stop, t1, bias,
-                             session_trades, session_r, rationale, notes))
+                             session_trades, session_r, rationale, notes,
+                             data_quality=data_quality))
     return now, session_trades + 1, proposals_count + 1
 
 
@@ -569,6 +598,7 @@ def _handle_orb(direction: str, instrument: str, entry: float, orb_high: float, 
     size = big_ct if choice == "big" else small_ct
     t1   = big_tp if choice == "big" else safe_tp
     rationale = "press" if choice == "big" else "probe"
+    data_quality = "SIMULATED"
     if not dry_run and ib_connected and bridge:
         try:
             side = "BUY" if direction == "LONG" else "SELL"
@@ -576,6 +606,7 @@ def _handle_orb(direction: str, instrument: str, entry: float, orb_high: float, 
             results = bridge.bracket_order(contract, side, size, entry, stop, t1)
             print(f"  {G}{BD}ORB {choice.upper()} FILLED {direction} {size} {instrument} @ {entry:.2f}{RS} | id={results[0].order_id}")
             notes = f"ORB macro {rationale} | order_id={results[0].order_id}"
+            data_quality = "LIVE_PAPER"
             if tg.enabled():
                 tg.send(f"✅ ORB {choice} FILLED {direction} {size} {instrument} @ {entry:.2f} "
                         f"(SL {stop:.2f} TP {t1:.2f})")
@@ -589,7 +620,8 @@ def _handle_orb(direction: str, instrument: str, entry: float, orb_high: float, 
         if tg.enabled():
             tg.send(f"{tag}WOULD PLACE ORB {choice} {direction} {size} {instrument} @ {entry:.2f}")
     rec = _build_record(instrument, direction, entry, stop, t1, bias,
-                        session_trades, session_r, rationale, notes)
+                        session_trades, session_r, rationale, notes,
+                        data_quality=data_quality)
     rec["size_contracts"] = size
     rec["setup"] = "ORB"
     _log_trade(rec)
@@ -628,6 +660,9 @@ def _parse_args() -> argparse.Namespace:
     ap.add_argument("--learning-mode", action="store_true",
                     help="Paper-month default: bypass session-window + regime gates, loosen volume, "
                          "log would_have_blocked. Reps > purity (decision_engine).")
+    ap.add_argument("--require-ib", action="store_true",
+                    help="Integrity guard: refuse to start (and halt the session) if IB Gateway is not "
+                         "connected. No shadow trades on yfinance fallback while disconnected.")
     ap.add_argument("--trace", action="store_true",
                     help="Print every bar's gate outcome (why no trade) — Priority-Zero diagnosis.")
     return ap.parse_args()
@@ -677,6 +712,14 @@ def main() -> None:
     else:
         print(f"  [DRY-RUN] Skipping IB connection.")
 
+    # ── Guard 1: integrity halt — refuse to start without IB when --require-ib is set ──
+    if not dry_run and args.require_ib and not ib_connected:
+        print(f"\n  {R}{BD}⛔ SESSION HALTED — IB Gateway not connected and --require-ib is set.{RS}")
+        print(f"  {Y}  Refusing to run: shadow trades on fallback data corrupt the learning loop.{RS}")
+        print(f"  {Y}  Start IB Gateway (paper port {ib_port}) and re-run.{RS}")
+        _log_session_halted(instrument, "IB_DISCONNECTED")
+        sys.exit(1)
+
     # Which bar feed is live this session
     _bars_src = "IB Gateway 1-min" if (ib_connected and live_contract is not None) else "yfinance fallback"
     print(f"  Bars: {_bars_src}")
@@ -709,6 +752,7 @@ def main() -> None:
                 "bias_aligned":             True,
                 "below_proven_bar":         macro["avg_conviction"] < 2,
                 "session_result_so_far_r":  0.0,
+                "data_quality":             "SIMULATED",  # a noted hold, not an executed fill
                 "notes":                    f"macro hold noted: {macro['streak']}-session streak",
             })
             print(f"  Macro hold logged.\n")
@@ -752,7 +796,8 @@ def main() -> None:
     try:
         while True:
             try:
-                bars = _fetch_bars(instrument, bridge if ib_connected else None, live_contract)
+                bars = _fetch_bars(instrument, bridge if ib_connected else None, live_contract,
+                                   require_ib=args.require_ib)
                 if bars.empty:
                     time.sleep(5)
                     continue
@@ -784,6 +829,14 @@ def main() -> None:
                     if rng is not None and len(bars) >= orb_minutes:
                         orb_high, orb_low = rng
 
+                # ── Guard 1: mid-session IB-disconnect halt — stop, don't shadow-log ──
+                if (not dry_run and (args.require_ib or learning_mode) and ib_connected
+                        and bridge is not None and not bridge.is_connected()):
+                    print(f"\n  {R}{BD}⛔ SESSION HALTED — IB Gateway disconnected mid-session.{RS}")
+                    print(f"  {Y}  Entry generation stopped. No shadow trades. Reconnect + restart to resume.{RS}")
+                    _log_session_halted(instrument, "IB_DISCONNECTED")
+                    break
+
                 # ── ONE decision engine: ORB / VWAP-MR / micro + full telemetry (== replay) ──
                 if proposals_count < max_trades and (bias_dir_eff in ("LONG", "SHORT") or learning_mode):
                     prev_ind = None
@@ -810,7 +863,19 @@ def main() -> None:
                         learning_mode=learning_mode,
                         oracle_invalidation=_oracle_invalidation(instrument),
                     )
-                    if decision is not None:
+                    if decision is not None and decision.rejected_reason:
+                        # Integrity guard (Guard 2): a structurally-impossible entry
+                        # (stop==entry / fabricated R / wrong-side stop). Log it as REJECTED with the
+                        # bad values preserved, but NEVER execute or count it as a trade.
+                        print(f"\n  {R}⛔ REJECTED entry — {decision.rejected_reason}{RS}")
+                        _log_trade(_build_record(
+                            instrument, decision.direction, decision.entry, decision.stop,
+                            decision.target, bias, session_trades, session_r,
+                            _sizing_rationale(session_trades, session_r),
+                            f"REJECTED: {decision.rejected_reason} (expected_r={decision.expected_r})",
+                            exit_reason="REJECTED:INVALID_STOP", setup_type=decision.setup_type,
+                            contracts=decision.contracts, data_quality="SIMULATED"))
+                    elif decision is not None:
                         print()  # newline after header
                         if decision.setup_type == "ORB":
                             orb_taken = True

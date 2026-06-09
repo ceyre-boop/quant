@@ -11,7 +11,9 @@ import pandas as pd
 
 from sovereign.futures import scalp_strategy as strat
 from sovereign.futures import reasoning as rsn
-from sovereign.futures.decision_engine import evaluate_entry, EntryDecision
+from sovereign.futures.decision_engine import (
+    evaluate_entry, EntryDecision, validate_decision, MAX_EXPECTED_R,
+)
 
 
 def _bars(closes, vol=1000.0):
@@ -90,3 +92,33 @@ def test_exit_attribution_null_safe():
     # missing reasoning entirely → no crash, still produces a hypothesis
     out = rsn.exit_attribution({}, {"exit_type": "TIME", "r_realized": 0.0})
     assert "post_trade_hypothesis" in out
+
+
+def _decision(entry, stop, direction="LONG", expected_r=2.0):
+    return EntryDecision(setup_type="MICRO", direction=direction, entry=entry, stop=stop,
+                         target=entry + 5, expected_r=expected_r, contracts=1)
+
+
+def test_validate_decision_rejects_zero_risk_and_fabricated_r():
+    # Guard 2: the exact corruption seen in trade_log (stop == entry → R explodes)
+    assert validate_decision(_decision(7419.5, 7419.5)) is not None
+    assert "stop == entry" in validate_decision(_decision(7419.5, 7419.5))
+    # fabricated R
+    assert validate_decision(_decision(100.0, 99.0, expected_r=MAX_EXPECTED_R)) is not None
+    assert validate_decision(_decision(100.0, 99.0, expected_r=5031.2)) is not None
+    # wrong-side stops
+    assert validate_decision(_decision(100.0, 101.0, "LONG")) is not None      # LONG stop above entry
+    assert validate_decision(_decision(100.0, 99.0, "SHORT")) is not None      # SHORT stop below entry
+
+
+def test_validate_decision_passes_valid():
+    assert validate_decision(_decision(100.0, 99.0, "LONG", 2.0)) is None
+    assert validate_decision(_decision(100.0, 101.0, "SHORT", 2.0)) is None
+
+
+def test_evaluate_entry_flags_rejected_reason_not_executed():
+    # A real ORB fire is valid → rejected_reason is None (engine emits a tradeable decision)
+    bars = _bars([100.0] * 40 + [110.0])
+    d = evaluate_entry(bars, bias={"bias": "LONG", "conviction": 2, "key_levels": {"overnight_low": 95.0}},
+                       ts=OPEN_ET, instrument="MES", orb_levels=(105.0, 99.0), learning_mode=True)
+    assert isinstance(d, EntryDecision) and d.rejected_reason is None

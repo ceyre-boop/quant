@@ -107,11 +107,13 @@ def _killzone_agreement(day: str) -> dict | None:
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--date", default=datetime.now(rc.ET).strftime("%Y-%m-%d"))
+    ap.add_argument("--include-simulated", action="store_true",
+                    help="Include data_quality=SIMULATED entries (off by default — they never train Oracle).")
     args = ap.parse_args()
     day = args.date
 
-    trades = [t for t in rc.load_trades(TRADE_LOG) if rc.session_date(t) == day
-              and t.get("size_contracts")]
+    trades = [t for t in rc.load_trades(TRADE_LOG, include_simulated=args.include_simulated)
+              if rc.session_date(t) == day and t.get("size_contracts")]
     closed = [t for t in trades if t.get("exit") is not None]
     learning = sum(1 for t in trades if rc.reasoning_field(t, "learning_mode"))
     wins = sum(1 for t in closed if rc.is_win(t))

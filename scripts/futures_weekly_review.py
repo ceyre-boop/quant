@@ -43,10 +43,12 @@ CUTS = {
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--days", type=int, default=7)
+    ap.add_argument("--include-simulated", action="store_true",
+                    help="Include data_quality=SIMULATED entries (off by default — they never train Oracle).")
     args = ap.parse_args()
     cutoff = (datetime.now(rc.ET) - timedelta(days=args.days)).strftime("%Y-%m-%d")
 
-    trades = [t for t in rc.load_trades(TRADE_LOG)
+    trades = [t for t in rc.load_trades(TRADE_LOG, include_simulated=args.include_simulated)
               if t.get("exit") is not None and (rc.session_date(t) or "") >= cutoff]
     overall = rc.winrate(trades)
     week = datetime.now(rc.ET).strftime("%Y-W%U")

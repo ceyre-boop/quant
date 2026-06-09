@@ -80,6 +80,14 @@ class IBBridge:
             self._ib.disconnect()
             self._connected = False
 
+    def is_connected(self) -> bool:
+        """Live socket state — True only if we connected AND ib-async still holds the socket.
+        Used by the monitor to halt the session on a mid-session disconnect (never raises)."""
+        try:
+            return bool(self._connected and self._ib.isConnected())
+        except Exception:
+            return False
+
     def __enter__(self):
         self.connect()
         return self

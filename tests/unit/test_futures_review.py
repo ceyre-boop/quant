@@ -98,3 +98,21 @@ def test_review_empty_safe(tmp_path, monkeypatch):
     monkeypatch.setattr(nightly, "OUT", tmp_path / "n.jsonl")
     monkeypatch.setattr("sys.argv", ["x"])
     assert nightly.main() == 0          # no trades -> no crash
+
+
+def test_load_trades_filters_simulated(tmp_path):
+    # Guard 3: SIMULATED records are excluded by default, visible with include_simulated=True
+    log = tmp_path / "trade_log.jsonl"
+    rows = [
+        {"ts": "2026-06-09T14:00:00+00:00", "instrument": "MNQ", "entry": 100, "exit": 105,
+         "size_contracts": 1, "data_quality": "LIVE_PAPER"},
+        {"ts": "2026-06-09T14:05:00+00:00", "instrument": "MNQ", "entry": 100, "exit": 100,
+         "size_contracts": 1, "data_quality": "SIMULATED"},
+        {"ts": "2026-06-09T14:10:00+00:00", "instrument": "MNQ", "entry": 100, "exit": 102,
+         "size_contracts": 1},  # untagged legacy → kept (backward-compatible)
+    ]
+    log.write_text("".join(json.dumps(r) + "\n" for r in rows))
+    default = rc.load_trades(log)
+    assert len(default) == 2 and all(r.get("data_quality") != "SIMULATED" for r in default)
+    full = rc.load_trades(log, include_simulated=True)
+    assert len(full) == 3

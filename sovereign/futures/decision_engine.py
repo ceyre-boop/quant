@@ -55,9 +55,37 @@ class EntryDecision:
     confidence: str = "MEDIUM"             # HIGH | MEDIUM | LOW
     would_have_blocked: list = field(default_factory=list)
     learning_mode: bool = False
+    # Integrity guard: set to a reason string when the decision is structurally invalid
+    # (stop==entry, wrong-side stop, fabricated R). A rejected decision must NEVER be
+    # executed or counted as a trade — callers log it as REJECTED and move on. None == valid.
+    rejected_reason: Optional[str] = None
 
     def to_dict(self) -> dict:
         return asdict(self)
+
+
+# Any expected_R at or above this is fabricated — a real micro/ORB/VWAP target is single-digit R,
+# and 1e-9-risk division (stop==entry) produced the 5031R garbage in the trade log.
+MAX_EXPECTED_R = 100.0
+
+
+def validate_decision(d: "EntryDecision") -> Optional[str]:
+    """Return a rejection reason if the decision is structurally impossible, else None.
+
+    Catches the exact corruption seen in trade_log.jsonl: stop == entry (zero risk distance →
+    expected_r blows up to thousands), a stop on the wrong side of entry, or a fabricated R.
+    Pure; the single source of truth for entry validity, enforced at every call site."""
+    if d.entry is None or d.stop is None:
+        return "INVALID_STOP: entry/stop missing"
+    if d.stop == d.entry:
+        return "INVALID_STOP: stop == entry (zero risk distance)"
+    if d.direction == "LONG" and d.stop >= d.entry:
+        return f"INVALID_STOP: LONG stop {d.stop} not below entry {d.entry}"
+    if d.direction == "SHORT" and d.stop <= d.entry:
+        return f"INVALID_STOP: SHORT stop {d.stop} not above entry {d.entry}"
+    if d.expected_r is None or d.expected_r >= MAX_EXPECTED_R:
+        return f"INVALID_STOP: expected_r {d.expected_r} >= {MAX_EXPECTED_R} (fabricated)"
+    return None
 
 
 # ── helpers ──────────────────────────────────────────────────────────────────
@@ -228,7 +256,7 @@ def evaluate_entry(
             if prior_profile.get(k) is not None:
                 kl[k] = prior_profile[k]
 
-    return EntryDecision(
+    decision = EntryDecision(
         setup_type=setup, direction=direction, entry=round(price, 2), stop=round(stop, 2),
         target=round(target, 2), expected_r=expected_r, contracts=contracts,
         confluence=confluence,
@@ -246,3 +274,6 @@ def evaluate_entry(
         would_have_blocked=blocked,
         learning_mode=learning_mode,
     )
+    # Integrity guard: flag structurally-impossible decisions so no caller executes/logs them as real.
+    decision.rejected_reason = validate_decision(decision)
+    return decision

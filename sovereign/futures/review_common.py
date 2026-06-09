@@ -14,16 +14,22 @@ from sovereign.futures.config import contract_spec, round_turn_cost_usd
 ET = ZoneInfo("America/New_York")
 
 
-def load_trades(path: Path) -> list[dict]:
+def load_trades(path: Path, include_simulated: bool = False) -> list[dict]:
+    """Load trade-log records. By DEFAULT excludes data_quality=="SIMULATED" entries (dry-run,
+    IB-disconnected, learning reps with no fill, REJECTED) so fabricated trades never reach the
+    learning loop (Guard 3). Pass include_simulated=True to inspect them explicitly."""
     if not path.exists():
         return []
     out = []
     for line in path.read_text().splitlines():
         if line.strip():
             try:
-                out.append(json.loads(line))
+                rec = json.loads(line)
             except Exception:
-                pass
+                continue
+            if not include_simulated and rec.get("data_quality") == "SIMULATED":
+                continue
+            out.append(rec)
     return out
 
 
