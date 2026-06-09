@@ -60,7 +60,9 @@ def _stars(conviction: int) -> str:
 
 
 def _today() -> str:
-    return datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    # The futures trading day is ET (matches session_windows + futures_bias.py); using UTC here
+    # rolled the day over at 20:00 ET and dropped the day's bias -> NEUTRAL. Anchor to ET.
+    return datetime.now(ZoneInfo("America/New_York")).strftime("%Y-%m-%d")
 
 
 def _norm_inst(x: str) -> str:
