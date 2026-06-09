@@ -17,6 +17,7 @@ data/agent/findings.jsonl and hypothesis_ledger.json.
 
 import argparse
 import json
+import shlex
 import subprocess
 import sys
 import logging
@@ -147,11 +148,24 @@ def _add_queue_task(task: dict) -> str:
 # ── Task dispatchers ──────────────────────────────────────────────────────────
 
 def _run_script(script_path: str, timeout: int = 3600) -> tuple[bool, str]:
-    """Run a shell command/script. Returns (ok, output)."""
+    """Run a shell command/script. Returns (ok, output).
+
+    A bare Python script (e.g. "scripts/foo.py [args]") is run through the active
+    interpreter, NOT the shell: `sh -c "scripts/foo.py"` fails with "Permission denied"
+    because the .py file isn't an executable. Real shell commands (e.g. "echo no-op")
+    and explicit argv lists are passed through unchanged.
+    """
     try:
+        if isinstance(script_path, list):
+            cmd, use_shell = script_path, False
+        else:
+            parts = shlex.split(script_path)
+            if parts and parts[0].endswith('.py'):
+                cmd, use_shell = [sys.executable, *parts], False
+            else:
+                cmd, use_shell = script_path, True
         result = subprocess.run(
-            script_path if isinstance(script_path, list) else script_path,
-            shell=isinstance(script_path, str),
+            cmd, shell=use_shell,
             capture_output=True, text=True,
             timeout=timeout, cwd=str(ROOT),
         )
@@ -245,24 +259,27 @@ def check_decision_log_health() -> list[str]:
     import time
     now = time.time()
 
-    # 1. Log file freshness — warn if no update in 48 hours during trading week
+    # 1. Log file freshness — check ONLY the CURRENT-month file (the one the logger writes to;
+    #    see decision_logger._log_path()). Previous-month files are stale BY DESIGN once the month
+    #    ends — globbing the last 2 files flagged decisions_<prev-month>.jsonl forever (false alarm).
     if DECISION_LOG_DIR.exists():
-        recent_files = sorted(DECISION_LOG_DIR.glob("decisions_*.jsonl"))[-2:]
-        for f in recent_files:
-            age_h = (now - f.stat().st_mtime) / 3600
+        month = datetime.now(timezone.utc).strftime("%Y_%m")
+        current = DECISION_LOG_DIR / f"decisions_{month}.jsonl"
+        if not current.exists():
+            issues.append(f"WARNING: {current.name} missing — no decisions logged this month yet")
+        else:
+            age_h = (now - current.stat().st_mtime) / 3600
             if age_h > 96:
-                import time as _t
-                scanner_state = ROOT / "data" / "scanner_state.json" if hasattr(ROOT, "__truediv__") else None
                 scanner_note = ""
                 try:
                     from pathlib import Path as _P
                     ss = _P(__file__).resolve().parents[2] / "data" / "scanner_state.json"
                     if ss.exists():
-                        scan_age_h = (_t.time() - ss.stat().st_mtime) / 3600
+                        scan_age_h = (now - ss.stat().st_mtime) / 3600
                         scanner_note = f" (scanner last run {scan_age_h:.1f}h ago)"
                 except Exception:
                     pass
-                issues.append(f"WARNING: {f.name} not updated in {age_h:.0f}h — no Grade A signals{scanner_note}")
+                issues.append(f"WARNING: {current.name} not updated in {age_h:.0f}h — no Grade A signals{scanner_note}")
     else:
         issues.append("WARNING: data/decision_logs/ directory missing — no trades logged yet")
         return issues
