@@ -245,24 +245,27 @@ def check_decision_log_health() -> list[str]:
     import time
     now = time.time()
 
-    # 1. Log file freshness — warn if no update in 48 hours during trading week
+    # 1. Log file freshness — check ONLY the CURRENT-month file (the one the logger writes to;
+    #    see decision_logger._log_path()). Previous-month files are stale BY DESIGN once the month
+    #    ends — globbing the last 2 files flagged decisions_<prev-month>.jsonl forever (false alarm).
     if DECISION_LOG_DIR.exists():
-        recent_files = sorted(DECISION_LOG_DIR.glob("decisions_*.jsonl"))[-2:]
-        for f in recent_files:
-            age_h = (now - f.stat().st_mtime) / 3600
+        month = datetime.now(timezone.utc).strftime("%Y_%m")
+        current = DECISION_LOG_DIR / f"decisions_{month}.jsonl"
+        if not current.exists():
+            issues.append(f"WARNING: {current.name} missing — no decisions logged this month yet")
+        else:
+            age_h = (now - current.stat().st_mtime) / 3600
             if age_h > 96:
-                import time as _t
-                scanner_state = ROOT / "data" / "scanner_state.json" if hasattr(ROOT, "__truediv__") else None
                 scanner_note = ""
                 try:
                     from pathlib import Path as _P
                     ss = _P(__file__).resolve().parents[2] / "data" / "scanner_state.json"
                     if ss.exists():
-                        scan_age_h = (_t.time() - ss.stat().st_mtime) / 3600
+                        scan_age_h = (now - ss.stat().st_mtime) / 3600
                         scanner_note = f" (scanner last run {scan_age_h:.1f}h ago)"
                 except Exception:
                     pass
-                issues.append(f"WARNING: {f.name} not updated in {age_h:.0f}h — no Grade A signals{scanner_note}")
+                issues.append(f"WARNING: {current.name} not updated in {age_h:.0f}h — no Grade A signals{scanner_note}")
     else:
         issues.append("WARNING: data/decision_logs/ directory missing — no trades logged yet")
         return issues
