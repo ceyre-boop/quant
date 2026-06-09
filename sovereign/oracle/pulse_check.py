@@ -688,7 +688,13 @@ def _expire_stale_decisions(max_age_hours: int = 48) -> int:
                 continue
             if rec.get("outcome") in (None, "OPEN"):
                 ts = _entry_ts(rec)
-                if ts is not None and ts < cutoff and not _has_fill(_norm_pair(rec.get("pair", "")), ts.date()):
+                # OANDA fills belong to the FOREX system only — they must NOT "claim" an ICT (or
+                # other-system) signal of the same pair within the ±2d window, which left those
+                # signals OPEN forever (the missing-outcome health alarm). Only forex decisions
+                # are fill-protected; everything else expires on age.
+                sys_ = str(rec.get("system", "")).upper()
+                fill_protected = sys_ == "FOREX" and _has_fill(_norm_pair(rec.get("pair", "")), ts.date()) if ts else False
+                if ts is not None and ts < cutoff and not fill_protected:
                     rec["outcome"] = "EXPIRED"
                     rec["r_realized"] = 0.0
                     rec["exit_timestamp"] = exit_ts

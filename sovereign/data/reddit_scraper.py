@@ -113,6 +113,13 @@ def _fetch_subreddit(subreddit: str, limit: int, sort: str = "hot") -> List[dict
     url = f"https://www.reddit.com/r/{subreddit}/{sort}.json?limit={limit}"
     try:
         r = requests.get(url, headers={"User-Agent": UA}, timeout=12)
+        if r.status_code in (403, 429):
+            # Reddit blocks unauthenticated/datacenter access to the public .json endpoint.
+            # The cache still refreshes (empty) so freshness stays GREEN, but real sentiment data
+            # needs a Reddit OAuth app (set REDDIT_CLIENT_ID / REDDIT_CLIENT_SECRET) — not just a UA.
+            log.warning(f"r/{subreddit}: HTTP {r.status_code} — Reddit blocks unauthenticated access "
+                        f"(needs a Reddit OAuth app: REDDIT_CLIENT_ID/SECRET).")
+            return []
         r.raise_for_status()
         children = r.json()["data"]["children"]
         return [c["data"] for c in children]

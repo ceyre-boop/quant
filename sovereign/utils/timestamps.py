@@ -20,6 +20,9 @@ _PARSE_FMTS = [
     "%Y-%m-%dT%H:%M:%S%z",
     "%Y-%m-%dT%H:%M:%S.%f%z",
     "%Y-%m-%dT%H:%M:%S+00:00",
+    "%Y-%m-%dT%H:%M:%S.%f",   # ISO-T, naive (no tz) — assumed UTC
+    "%Y-%m-%dT%H:%M:%S",      # ISO-T, naive (no tz) — assumed UTC; was the false-"0 new entries" bug
+    "%Y-%m-%d %H:%M:%S.%f",
     "%Y-%m-%d %H:%M:%S",
     "%Y-%m-%d %H:%M",
     "%Y-%m-%d",
