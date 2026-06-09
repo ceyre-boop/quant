@@ -101,6 +101,23 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
 .ph-gate-icon{font-size:11px}
 .ph-verdict{margin-top:14px;padding:8px 14px;background:rgba(255,77,106,.07);border:1px solid rgba(255,77,106,.2);font-size:11px;color:var(--red);display:flex;align-items:center;gap:8px}
 .ph-verdict.go{background:rgba(0,212,160,.07);border-color:rgba(0,212,160,.2);color:var(--green)}
+.ph-refresh{background:var(--bg);border:1px solid var(--border);color:var(--muted);font-size:9px;letter-spacing:1px;padding:3px 8px;cursor:pointer;border-radius:3px}
+.ph-refresh:hover{border-color:var(--green);color:var(--green)}
+.ph-refresh:disabled{opacity:.5;cursor:default}
+.ph-asof{font-size:9px;letter-spacing:1px;color:var(--dim);text-transform:none}
+.ph-prob-wrap{display:flex;gap:24px;align-items:center;margin-bottom:16px;flex-wrap:wrap}
+.ph-prob-stats{display:flex;gap:24px}
+.ph-prob{display:flex;flex-direction:column;gap:3px}
+.ph-prob-val{font-size:30px;font-weight:700;line-height:1}
+.ph-prob-label{font-size:9px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase}
+.ph-prob-pass .ph-prob-val{color:var(--green)}
+.ph-prob-bust .ph-prob-val{color:var(--red)}
+.ph-prob-inc .ph-prob-val{color:var(--muted)}
+.ph-fan{flex:1;min-width:280px}
+.ph-fan canvas{width:100%;max-width:460px;height:auto;display:block}
+.ph-fan-cap{font-size:9px;color:var(--dim);margin-top:4px}
+.ph-caveat{margin-top:14px;padding:8px 14px;background:rgba(255,193,7,.06);border:1px solid rgba(255,193,7,.2);font-size:10px;line-height:1.5;color:var(--muted)}
+.ph-caveat b{color:var(--yellow)}
 
 /* System status card */
 .sys-status{grid-column:span 4;background:var(--bg2);border:1px solid var(--border);padding:20px;display:flex;flex-direction:column;gap:14px}
@@ -128,7 +145,40 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
 .fc-price{font-size:11px;color:var(--muted);margin-top:6px}
 .fc-signal{font-size:10px;font-weight:700;margin-top:4px}
 .fc-signal.long{color:var(--green)}.fc-signal.short{color:var(--red)}.fc-signal.flat{color:var(--muted)}
+.forex-grid-4{grid-template-columns:repeat(4,1fr)}
+.fc-live{font-size:8px;letter-spacing:1px;color:var(--green);opacity:.7}
+.fc-signal-big{font-size:26px;font-weight:700;line-height:1;margin-bottom:4px}
+.fc-signal-big.long{color:var(--green)}.fc-signal-big.short{color:var(--red)}.fc-signal-big.flat{color:var(--muted)}
+.fc-conv{font-size:9px;color:var(--muted);letter-spacing:.5px}
 .best-setup-card{margin-top:12px;background:var(--bg2);border:1px solid var(--border);padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+/* ── Trader Control Panel ── */
+.ctl-section{grid-column:span 12;margin-top:4px}
+.ctl-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:12px}
+.ctl-card{background:var(--bg2);border:1px solid var(--border);padding:14px 16px}
+.ctl-card-head{font-size:10px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.ctl-pending{font-size:9px;color:var(--blue);letter-spacing:.5px}
+.ctl-nbm-meta{font-size:10px;color:var(--dim);margin-bottom:6px}
+.ctl-nbm-body{font-size:12px;line-height:1.55;color:var(--fg);background:var(--bg);border:1px solid var(--border);padding:10px 12px;max-height:140px;overflow:auto;white-space:pre-wrap;margin-bottom:10px;border-radius:3px}
+.ctl-actions{display:flex;gap:8px;flex-wrap:wrap}
+.ctl-btn{background:var(--bg);border:1px solid var(--border);color:var(--fg);font-size:11px;padding:6px 12px;cursor:pointer;border-radius:3px;transition:border-color .15s,color .15s}
+.ctl-btn:hover:not(:disabled){border-color:var(--green);color:var(--green)}
+.ctl-btn:disabled{opacity:.45;cursor:default}
+.ctl-btn-accent{border-color:rgba(123,97,255,.4);color:#a78bfa}
+.ctl-btn-accent:hover:not(:disabled){border-color:#a78bfa;color:#c4b5fd}
+.ctl-btn-warn{border-color:rgba(255,77,106,.4);color:var(--red)}
+.ctl-btn-warn:hover:not(:disabled){border-color:var(--red);color:#ff7a90}
+.ctl-btn-go{border-color:rgba(0,212,160,.4);color:var(--green)}
+.ctl-btn-sm{padding:4px 9px;font-size:10px}
+.ctl-job{margin-top:10px;font-size:10px;line-height:1.45;color:var(--muted);background:var(--bg);border:1px solid var(--border);padding:8px 10px;max-height:120px;overflow:auto;white-space:pre-wrap;display:none;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.ctl-job.show{display:block}
+.ctl-foot{display:flex;align-items:center;gap:8px;margin-top:12px;flex-wrap:wrap}
+.ctl-lock{font-size:12px}
+.ctl-token{background:var(--bg);border:1px solid var(--border);color:var(--fg);font-size:11px;padding:5px 9px;border-radius:3px;width:160px}
+.ctl-status{font-size:10px;color:var(--muted)}
+.ctl-status.ok{color:var(--green)}
+.ctl-status.err{color:var(--red)}
+.ctl-remote{font-size:9px;color:var(--yellow);letter-spacing:.5px;text-transform:none}
+@media(max-width:880px){.ctl-grid{grid-template-columns:1fr}}
 .best-setup-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .best-setup-tag{font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase}
 .best-setup-dir.long{color:var(--green)}.best-setup-dir.short{color:var(--red)}
@@ -600,32 +650,38 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
   <div class="tab-panel active" id="tab-trade">
     <div id="trade-wrap">
 
-      <!-- Prop Challenge Hero -->
-      <div class="prop-hero">
-        <div class="ph-label"><div class="ph-pulse"></div>PROP CHALLENGE — ACTIVE</div>
+      <!-- Prop Challenge Hero — Pass-Probability cockpit -->
+      <div class="prop-hero" id="prop-hero">
+        <div class="ph-label"><div class="ph-pulse"></div>PROP CHALLENGE — ACTIVE
+          <span style="flex:1"></span>
+          <button class="ph-refresh" id="ph-refresh" title="Re-run the Monte-Carlo pass-probability">🎲 refresh</button>
+          <span class="ph-asof" id="ph-prob-asof"></span>
+        </div>
         <div class="ph-title">FunderPro Challenge #1</div>
-        <div class="ph-sub">Lucid · $100,000 account · 0.75% risk per trade · London + Grade A</div>
-        <div class="ph-balances">
-          <div class="ph-bal">
-            <div class="ph-bal-val" style="color:var(--green)">$100,000</div>
-            <div class="ph-bal-label">Current Balance</div>
+        <div class="ph-sub" id="ph-sub">$100,000 account · pass at +8% ($108k) · bust at −8% ($92k)</div>
+
+        <!-- Probability of passing, from the real v015 Monte-Carlo (GET /prop-challenge) -->
+        <div class="ph-prob-wrap">
+          <div class="ph-prob-stats">
+            <div class="ph-prob ph-prob-pass">
+              <div class="ph-prob-val" id="ph-prob-pass">—</div>
+              <div class="ph-prob-label">P(PASS) <span id="ph-prob-horizon">90d</span></div>
+            </div>
+            <div class="ph-prob ph-prob-bust">
+              <div class="ph-prob-val" id="ph-prob-bust">—</div>
+              <div class="ph-prob-label">P(BUST)</div>
+            </div>
+            <div class="ph-prob ph-prob-inc">
+              <div class="ph-prob-val" id="ph-prob-inc">—</div>
+              <div class="ph-prob-label">NEED MORE TIME</div>
+            </div>
           </div>
-          <div class="ph-bal">
-            <div class="ph-bal-val" style="color:var(--red)">$92,000</div>
-            <div class="ph-bal-label">Drawdown Floor</div>
-          </div>
-          <div class="ph-bal">
-            <div class="ph-bal-val" style="color:#4299e1">$108,000</div>
-            <div class="ph-bal-label">Profit Target</div>
+          <div class="ph-fan">
+            <canvas id="prop-fan" width="460" height="128"></canvas>
+            <div class="ph-fan-cap">10k simulated equity paths → $108k target · band p25–p95, median bold</div>
           </div>
         </div>
-        <div class="ph-progress-outer">
-          <div class="ph-progress-fill" style="width:50%"></div>
-          <div class="ph-progress-marker" style="left:50%"></div>
-        </div>
-        <div class="ph-progress-labels">
-          <span>$92k floor</span><span>$100k · current (Day 0)</span><span>$108k target</span>
-        </div>
+
         <div class="ph-gates">
           <div class="ph-gate green"><span class="ph-gate-icon">🟢</span>G1 MC: 99.7%</div>
           <div class="ph-gate red"><span class="ph-gate-icon">🔴</span>G2 Trades: 0/30</div>
@@ -633,7 +689,7 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
           <div class="ph-gate red" id="ph-gate-bridge"><span class="ph-gate-icon">🔴</span>G4 Bridge: 1.00</div>
           <div class="ph-gate yellow"><span class="ph-gate-icon">🟡</span>G5 Days: collecting</div>
         </div>
-        <div class="ph-verdict">⏸ WAIT — G2 + G4 must flip GREEN before funding attempt · Run: <code style="margin-left:4px;color:inherit">python3 scripts/agent_scheduler.py --checklist</code></div>
+        <div class="ph-caveat" id="ph-caveat">Loading pass-probability…</div>
       </div>
 
       <!-- System Status -->
@@ -644,8 +700,8 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
         <div class="ss-row"><span class="ss-key">Threat Score</span><span class="ss-val val-green" id="ss-threat">0.00</span></div>
         <div class="ss-row"><span class="ss-key">ICT Session</span><span class="ss-val val-green">London UTC 03:xx</span></div>
         <div class="ss-row"><span class="ss-key">Equity System</span><span class="ss-val val-green">LIVE paper</span></div>
-        <div class="ss-row"><span class="ss-key">Forex Version</span><span class="ss-val val-green">v013</span></div>
-        <div class="ss-row"><span class="ss-key">Forex Sharpe</span><span class="ss-val val-green">1.8552 ★</span></div>
+        <div class="ss-row"><span class="ss-key">Forex Version</span><span class="ss-val val-green">v015</span></div>
+        <div class="ss-row"><span class="ss-key">Forex Sharpe</span><span class="ss-val val-green">1.08 OOS ★</span></div>
         <div class="ss-row"><span class="ss-key">Backtest Speed</span><span class="ss-val">148k/sec</span></div>
         <div style="margin-top:auto;padding-top:12px;border-top:1px solid var(--border)">
           <a href="ict/" class="link-btn">→ ICT Oracle</a>
@@ -654,53 +710,36 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
 
       <!-- Forex Pairs -->
       <div class="forex-section">
-        <div class="section-label">Forex Pairs — v013 Institutional Grade</div>
-        <div class="forex-grid" id="forex-grid">
-          <!-- static fallback — overwritten when server online -->
+        <div class="section-label">Forex Portfolio — v015 · 4 pairs · OOS Sharpe 1.08 (costed)</div>
+        <div class="forex-grid forex-grid-4" id="forex-grid">
+          <!-- Live-signal cards. AUDNZD excluded (HYP-045 — both legs RBA-driven, no independent edge). -->
           <div class="forex-card inst">
-            <div class="fc-pair">AUD/NZD <span class="fc-vix">VIX&gt;13</span></div>
-            <div class="fc-sharpe">2.246</div>
-            <div class="fc-label">SHARPE</div>
-            <div class="fc-badge">★ INST GRADE</div>
-            <div class="fc-price" id="fp-audnzd">—</div>
-            <div class="fc-signal flat" id="fs-audnzd">FLAT</div>
-            <canvas id="fsp-audnzd" width="80" height="24" style="display:block;margin-top:4px"></canvas>
-          </div>
-          <div class="forex-card inst">
-            <div class="fc-pair">GBP/USD <span class="fc-vix">VIX&gt;18</span></div>
-            <div class="fc-sharpe">1.885</div>
-            <div class="fc-label">SHARPE</div>
-            <div class="fc-badge">★ INST GRADE</div>
+            <div class="fc-pair">GBP/USD <span class="fc-live">● LIVE</span></div>
+            <div class="fc-signal-big flat" id="fsb-gbpusd">FLAT</div>
+            <div class="fc-conv" id="fcv-gbpusd">conviction —</div>
             <div class="fc-price" id="fp-gbpusd">—</div>
-            <div class="fc-signal flat" id="fs-gbpusd">FLAT</div>
-            <canvas id="fsp-gbpusd" width="80" height="24" style="display:block;margin-top:4px"></canvas>
+            <canvas id="fsp-gbpusd" width="80" height="24" style="display:block;margin-top:6px"></canvas>
           </div>
           <div class="forex-card inst">
-            <div class="fc-pair">USD/JPY <span class="fc-vix">VIX&gt;15</span></div>
-            <div class="fc-sharpe">1.770</div>
-            <div class="fc-label">SHARPE</div>
-            <div class="fc-badge">★ INST GRADE</div>
-            <div class="fc-price" id="fp-usdjpy">—</div>
-            <div class="fc-signal flat" id="fs-usdjpy">FLAT</div>
-            <canvas id="fsp-usdjpy" width="80" height="24" style="display:block;margin-top:4px"></canvas>
-          </div>
-          <div class="forex-card inst">
-            <div class="fc-pair">EUR/USD <span class="fc-vix">VIX&gt;18</span></div>
-            <div class="fc-sharpe">1.710</div>
-            <div class="fc-label">SHARPE</div>
-            <div class="fc-badge">★ INST GRADE</div>
+            <div class="fc-pair">EUR/USD <span class="fc-live">● LIVE</span></div>
+            <div class="fc-signal-big flat" id="fsb-eurusd">FLAT</div>
+            <div class="fc-conv" id="fcv-eurusd">conviction —</div>
             <div class="fc-price" id="fp-eurusd">—</div>
-            <div class="fc-signal flat" id="fs-eurusd">FLAT</div>
-            <canvas id="fsp-eurusd" width="80" height="24" style="display:block;margin-top:4px"></canvas>
+            <canvas id="fsp-eurusd" width="80" height="24" style="display:block;margin-top:6px"></canvas>
           </div>
           <div class="forex-card inst">
-            <div class="fc-pair">AUD/USD <span class="fc-vix">VIX&gt;20</span></div>
-            <div class="fc-sharpe">1.665</div>
-            <div class="fc-label">SHARPE</div>
-            <div class="fc-badge">★ INST GRADE</div>
+            <div class="fc-pair">USD/JPY <span class="fc-live">● LIVE</span></div>
+            <div class="fc-signal-big flat" id="fsb-usdjpy">FLAT</div>
+            <div class="fc-conv" id="fcv-usdjpy">conviction —</div>
+            <div class="fc-price" id="fp-usdjpy">—</div>
+            <canvas id="fsp-usdjpy" width="80" height="24" style="display:block;margin-top:6px"></canvas>
+          </div>
+          <div class="forex-card inst">
+            <div class="fc-pair">AUD/USD <span class="fc-live">● LIVE</span></div>
+            <div class="fc-signal-big flat" id="fsb-audusd">FLAT</div>
+            <div class="fc-conv" id="fcv-audusd">conviction —</div>
             <div class="fc-price" id="fp-audusd">—</div>
-            <div class="fc-signal flat" id="fs-audusd">FLAT</div>
-            <canvas id="fsp-audusd" width="80" height="24" style="display:block;margin-top:4px"></canvas>
+            <canvas id="fsp-audusd" width="80" height="24" style="display:block;margin-top:6px"></canvas>
           </div>
         </div>
         <div id="best-setup-card" class="best-setup-card">
@@ -708,6 +747,39 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
             <span class="best-setup-tag">Best Setup</span>
             <span style="font-size:11px;color:var(--muted)">Waiting for live signal data…</span>
           </div>
+        </div>
+      </div>
+
+      <!-- ══ Trader Control Panel — run & steer the system ══ -->
+      <div class="ctl-section">
+        <div class="section-label">Control — run &amp; steer the system <span class="ctl-remote" id="ctl-remote"></span></div>
+        <div class="ctl-grid">
+          <div class="ctl-card ctl-nbm">
+            <div class="ctl-card-head">🔮 Next Best Move <span class="ctl-pending" id="nbm-pending"></span></div>
+            <div class="ctl-nbm-meta" id="nbm-meta"></div>
+            <div class="ctl-nbm-body" id="nbm-body">Loading the Oracle's recommendation…</div>
+            <div class="ctl-actions">
+              <button class="ctl-btn" id="nbm-copy" disabled>📋 Copy to Claude Code</button>
+              <button class="ctl-btn ctl-btn-accent" id="nbm-fresh">🔮 Ask Oracle for a fresh take</button>
+            </div>
+          </div>
+          <div class="ctl-card">
+            <div class="ctl-card-head">⚙ Actions</div>
+            <div class="ctl-actions">
+              <button class="ctl-btn" data-ctl="run-queue">▶ Run Research Queue</button>
+              <button class="ctl-btn" data-ctl="checklist">✅ Run Prop Checklist</button>
+              <button class="ctl-btn" data-ctl="refresh-prop">🎲 Refresh Pass-Probability</button>
+              <button class="ctl-btn ctl-btn-warn" id="ctl-freeze">⏸ Freeze Trading</button>
+              <button class="ctl-btn ctl-btn-go" id="ctl-thaw" style="display:none">▶ Thaw Trading</button>
+            </div>
+            <pre class="ctl-job" id="ctl-job"></pre>
+          </div>
+        </div>
+        <div class="ctl-foot">
+          <span class="ctl-lock">🔒</span>
+          <input id="ctl-token" class="ctl-token" type="password" placeholder="control token" autocomplete="off">
+          <button class="ctl-btn ctl-btn-sm" id="ctl-token-save">save</button>
+          <span class="ctl-status" id="ctl-status">controls locked — enter your token</span>
         </div>
       </div>
 
@@ -778,12 +850,12 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
       <div class="sharpe-section">
         <div class="sharpe-header">
           <div>
-            <div class="section-label" style="margin-bottom:4px">Forex System — Sharpe Progress</div>
-            <div style="font-size:11px;color:var(--muted)">v013 current · target v014 &gt; 1.9052</div>
+            <div class="section-label" style="margin-bottom:4px">Forex System — Sharpe (costed, OOS)</div>
+            <div style="font-size:11px;color:var(--muted)">v015 current · OOS costed 1.08 (CI 0.84–1.32) · 1.5 target</div>
           </div>
           <div class="sharpe-achieved">
-            <span class="sharpe-badge">★ INSTITUTIONAL GRADE ACHIEVED</span>
-            <span style="font-size:11px;color:var(--muted)">Threshold 1.5 · Margin +0.355</span>
+            <span class="sharpe-badge">✓ EDGE PROVEN · permutation p&lt;0.001</span>
+            <span style="font-size:11px;color:var(--muted)">regime-fragile · below the 1.5 target</span>
           </div>
         </div>
         <div id="sharpe-rows"></div>
@@ -1188,23 +1260,27 @@ tabInited['tab-trade']=true;
 // declared later in this script is initialized before a restored tab's init handler runs.
 setTimeout(function(){const st=_loadState(); if(st.tab && st.tab!=='trade'){const b=document.querySelector('.hdr-tab[data-tab="'+st.tab+'"]'); if(b)b.click();}},0);
 
-// ══ SHARPE ROWS ══
+// ══ SHARPE ROWS — costed/OOS reality (v001–v013 were uncosted & annualized-as-daily) ══
 (function(){
   const vers=[
-    {l:'v001',s:.1785},{l:'v004',s:.6260},{l:'v006',s:1.0547},
-    {l:'v008',s:1.1955},{l:'v010',s:1.4396},{l:'v011',s:1.6476},
-    {l:'v012',s:1.7176},{l:'v013',s:1.8552,cur:true},
+    {l:'v010',s:1.4396,leg:true},{l:'v013',s:1.8552,leg:true},
+    {l:'v014',s:0.76},{l:'v015',s:1.08,cur:true},
   ];
-  const target=1.9052,inst=1.5,maxS=target*1.03;
-  document.getElementById('sharpe-rows').innerHTML=vers.map(v=>{
+  const inst=1.5,maxS=1.9052*1.03;
+  const note='<div style="font-size:10px;color:var(--dim);margin-bottom:8px">'
+    +'Legacy bars (v010/v013) are <b style="color:var(--yellow)">uncosted &amp; annualized-as-daily</b> — '
+    +'not comparable. v014/v015 are the real costed OOS Sharpe.</div>';
+  document.getElementById('sharpe-rows').innerHTML=note+vers.map(v=>{
     const pct=Math.min(100,(v.s/maxS)*100).toFixed(0);
     const instPct=Math.min(100,(inst/maxS)*100).toFixed(0);
-    const col=v.s>=inst?'var(--green)':v.s>=0.8?'var(--teal)':v.s>=0.5?'var(--yellow)':'var(--muted)';
-    return`<div class="rp-ver-row" style="margin-bottom:6px">
-      <div class="rp-vl" style="${v.cur?'color:var(--green);font-weight:700':''}">${v.l}</div>
+    const col=v.leg?'var(--dim)':v.s>=inst?'var(--green)':v.s>=0.8?'var(--teal)':'var(--yellow)';
+    const lab=v.leg?'color:var(--dim)':(v.cur?'color:var(--green);font-weight:700':'');
+    const tag=v.leg?' <span style="color:var(--dim);font-size:9px">uncosted</span>':(v.cur?' <span style="color:var(--green)">live</span>':'');
+    return`<div class="rp-ver-row" style="margin-bottom:6px;${v.leg?'opacity:.55':''}">
+      <div class="rp-vl" style="${lab}">${v.l}</div>
       <div class="rp-vbg"><div class="rp-vfill" style="width:${pct}%;background:${col}"></div>
         <div class="rp-vtarget" style="left:${instPct}%"></div></div>
-      <div class="rp-vs" style="${v.cur?'color:var(--green);font-weight:700':''}">${v.s.toFixed(4)}${v.s>=inst?' <span style="color:var(--green)">★</span>':''}</div>
+      <div class="rp-vs" style="${lab}">${v.s.toFixed(2)}${tag}</div>
     </div>`;
   }).join('');
 })();
@@ -1257,18 +1333,20 @@ async function updateBridgeState(){
   document.getElementById('ss-threat').textContent=threat.toFixed(2);
   document.getElementById('ss-threat').style.color=threat>0.85?'var(--red)':threat>0.5?'var(--yellow)':'var(--green)';
 
-  // Update forex cards — prices + sparklines
-  const pairMap={EURUSD:'eurusd',GBPUSD:'gbpusd',AUDUSD:'audusd','AUDNZD':'audnzd',USDJPY:'usdjpy'};
+  // Update forex cards — live signal + price + sparkline. AUDNZD excluded (HYP-045).
+  const pairMap={EURUSD:'eurusd',GBPUSD:'gbpusd',AUDUSD:'audusd',USDJPY:'usdjpy'};
   (data.forex_signals||[]).forEach(s=>{
-    const k=pairMap[s.ticker];if(!k)return;
+    const k=pairMap[(s.ticker||'').replace('=X','')];if(!k)return;
     const priceEl=document.getElementById('fp-'+k);
-    const sigEl=document.getElementById('fs-'+k);
+    const sigEl=document.getElementById('fsb-'+k);
+    const convEl=document.getElementById('fcv-'+k);
     if(priceEl&&s.price!=null)priceEl.textContent=s.price.toFixed(5);
     if(sigEl){
       const sig=s.signal>0?'LONG':s.signal<0?'SHORT':'FLAT';
       sigEl.textContent=sig;
-      sigEl.className='fc-signal '+(s.signal>0?'long':s.signal<0?'short':'flat');
+      sigEl.className='fc-signal-big '+(s.signal>0?'long':s.signal<0?'short':'flat');
     }
+    if(convEl)convEl.textContent='conviction '+(s.conviction!=null?s.conviction.toFixed(2):'—');
     const canvas=document.getElementById('fsp-'+k);
     if(canvas&&s.price_history?.length){
       const ctx=canvas.getContext('2d');
@@ -1328,6 +1406,144 @@ async function updateBridgeState(){
 
 updateBridgeState();
 setInterval(updateBridgeState,60000);
+
+// ── Pass-Probability cockpit (real v015 Monte-Carlo via GET /prop-challenge) ──
+const PROP_HORIZON='90';
+async function loadPropHero(){
+  try{
+    const r=await fetch(API_BASE+'/prop-challenge?t='+Date.now(),{signal:AbortSignal.timeout(NET_T)});
+    const d=await r.json();
+    const cav=document.getElementById('ph-caveat');
+    if(d.error){cav.textContent='Pass-probability not generated yet — hit 🎲 refresh to run it.';return;}
+    const hz=(d.horizons&&d.horizons[PROP_HORIZON])||{};
+    const pct=x=>x==null?'—':(x*100).toFixed(1)+'%';
+    document.getElementById('ph-prob-pass').textContent=pct(hz.p_pass);
+    document.getElementById('ph-prob-bust').textContent=pct(hz.p_fail);
+    document.getElementById('ph-prob-inc').textContent=pct(hz.p_incomplete);
+    document.getElementById('ph-prob-horizon').textContent=PROP_HORIZON+'d';
+    if(d.account){
+      const m=x=>'$'+Math.round(x).toLocaleString();
+      document.getElementById('ph-sub').textContent=m(d.account)+' account · pass at +8% ('+m(d.target)+') · bust at −8% ('+m(d.floor)+')';
+    }
+    if(d.generated_at)document.getElementById('ph-prob-asof').textContent='as of '+d.generated_at.slice(0,10);
+    drawPropFan(hz.equity_curve_bands||{}, d.target||108000, d.floor||92000, d.account||100000);
+    const note=d.regime_caveat||d.calibration_note||'directional estimate — see methodology';
+    cav.innerHTML='<b>Reality check:</b> ';
+    cav.appendChild(document.createTextNode(note+' · bootstrap of n='+(d.pool_size||'?')+' real OOS trades.'));
+  }catch(e){
+    document.getElementById('ph-caveat').textContent=IS_REMOTE?'Pass-probability unavailable — waking the live server, try refresh.':'Pass-probability unavailable — start the local server.';
+  }
+}
+function drawPropFan(bands,target,floor,base){
+  const cv=document.getElementById('prop-fan');if(!cv)return;
+  const ctx=cv.getContext('2d'),W=cv.width,H=cv.height;ctx.clearRect(0,0,W,H);
+  const p25=bands.p25,p50=bands.p50,p75=bands.p75,p95=bands.p95;
+  if(!p50||!p50.length)return;
+  const all=[].concat(p25||[],p95||[],[target,floor,base]).filter(x=>x!=null);
+  let mn=Math.min(...all),mx=Math.max(...all);const pad=(mx-mn)*0.06||1;mn-=pad;mx+=pad;
+  const n=p50.length,X=i=>i/(n-1)*(W-2)+1,Y=v=>H-2-(v-mn)/(mx-mn)*(H-4);
+  ctx.setLineDash([4,4]);ctx.lineWidth=1;
+  ctx.strokeStyle='rgba(66,153,225,.6)';ctx.beginPath();ctx.moveTo(0,Y(target));ctx.lineTo(W,Y(target));ctx.stroke();
+  ctx.strokeStyle='rgba(255,77,106,.45)';ctx.beginPath();ctx.moveTo(0,Y(floor));ctx.lineTo(W,Y(floor));ctx.stroke();
+  ctx.setLineDash([]);
+  if(p25&&p95){
+    ctx.beginPath();
+    p95.forEach((v,i)=>{const x=X(i),y=Y(v);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
+    for(let i=p25.length-1;i>=0;i--)ctx.lineTo(X(i),Y(p25[i]));
+    ctx.closePath();ctx.fillStyle='rgba(0,212,160,.10)';ctx.fill();
+  }
+  const line=(arr,style,w)=>{if(!arr)return;ctx.beginPath();arr.forEach((v,i)=>{const x=X(i),y=Y(v);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});ctx.strokeStyle=style;ctx.lineWidth=w;ctx.stroke();};
+  line(p75,'rgba(0,212,160,.35)',1);line(p25,'rgba(0,212,160,.35)',1);line(p50,'#00d4a0',2);
+}
+loadPropHero();
+setInterval(loadPropHero,300000);
+{const _pr=document.getElementById('ph-refresh');if(_pr)_pr.addEventListener('click',()=>refreshProp());}
+
+// ── Trader Control Layer (token-gated actions + Next Best Move) ──
+const _CTL_LS='sq_ctl_token';
+function ctlToken(){return localStorage.getItem(_CTL_LS)||'';}
+function ctlHeaders(){return {'Content-Type':'application/json','X-Control-Token':ctlToken()};}
+function ctlSetStatus(msg,cls){const e=document.getElementById('ctl-status');if(!e)return;e.textContent=msg;e.className='ctl-status'+(cls?' '+cls:'');}
+async function ctlStatus(){
+  try{
+    const r=await fetch(API_BASE+'/control/status?t='+Date.now(),{signal:AbortSignal.timeout(NET_T)});
+    const d=await r.json();
+    const frozen=!!d.frozen, fz=document.getElementById('ctl-freeze'), th=document.getElementById('ctl-thaw');
+    if(fz&&th){fz.style.display=frozen?'none':'';th.style.display=frozen?'':'none';}
+    if(frozen)ctlSetStatus('⏸ TRADING FROZEN — '+((d.frozen||{}).reason||''),'err');
+    else if(!ctlToken())ctlSetStatus('controls locked — enter your token');
+    else if(!d.enabled)ctlSetStatus('server has no control token set (controls disabled)','err');
+    else ctlSetStatus('controls unlocked','ok');
+    return d;
+  }catch(e){ctlSetStatus(IS_REMOTE?'waking the live server…':'backend offline','err');return null;}
+}
+function ctlPollJob(jid,onDone){
+  const job=document.getElementById('ctl-job');let tries=0;
+  const tick=async()=>{
+    tries++;
+    try{
+      const r=await fetch(API_BASE+'/control/job?id='+encodeURIComponent(jid)+'&t='+Date.now(),{signal:AbortSignal.timeout(NET_T)});
+      const d=await r.json();
+      job.textContent='['+d.status+'] '+(d.label||jid)+'\n'+(d.tail||'');job.scrollTop=job.scrollHeight;
+      if(d.status==='running'&&tries<150){setTimeout(tick,2000);return;}
+    }catch(e){job.textContent+='\n(poll error: '+e.message+')';}
+    if(onDone)onDone();
+  };
+  tick();
+}
+async function ctlAction(action,btn){
+  if(!ctlToken()){ctlSetStatus('enter your control token first','err');return;}
+  if(btn)btn.disabled=true;
+  const job=document.getElementById('ctl-job');job.classList.add('show');job.textContent='starting '+action+'…';
+  try{
+    const r=await fetch(API_BASE+'/control/'+action,{method:'POST',headers:ctlHeaders()});
+    const d=await r.json();
+    if(!r.ok||d.error){job.textContent='✗ '+(d.hint||d.error||('HTTP '+r.status));if(btn)btn.disabled=false;return;}
+    if(d.job)ctlPollJob(d.job,()=>{if(btn)btn.disabled=false;if(action==='refresh-prop')loadPropHero();});
+    else {job.textContent='✓ done';if(btn)btn.disabled=false;}
+  }catch(e){job.textContent='✗ '+e.message;if(btn)btn.disabled=false;}
+}
+function refreshProp(){ctlAction('refresh-prop',document.getElementById('ph-refresh'));}
+async function loadNextMove(){
+  const body=document.getElementById('nbm-body'),meta=document.getElementById('nbm-meta'),
+        pend=document.getElementById('nbm-pending'),copy=document.getElementById('nbm-copy');
+  if(!body)return;
+  try{
+    const r=await fetch(API_BASE+'/next-move?t='+Date.now(),{signal:AbortSignal.timeout(NET_T)});
+    const d=await r.json();
+    pend.textContent=d.pending?d.pending+' queued':'';
+    if(!d.next){body.textContent='No move queued — hit “Ask Oracle for a fresh take” to generate one now.';copy.disabled=true;meta.textContent='';return;}
+    const p=d.next;
+    meta.textContent=p.id+' · '+(p.priority||'MEDIUM')+(p.reason?' · '+p.reason:'');
+    body.textContent=p.prompt||'';copy.disabled=false;
+    copy.onclick=()=>{navigator.clipboard.writeText(p.prompt||'').then(()=>{copy.textContent='✓ Copied';setTimeout(()=>copy.textContent='📋 Copy to Claude Code',1500);});};
+  }catch(e){body.textContent=IS_REMOTE?'Waking the live server… try again in a moment.':'Backend offline — start the local server.';copy.disabled=true;}
+}
+(function(){
+  const tok=document.getElementById('ctl-token');if(tok)tok.value=ctlToken();
+  const save=document.getElementById('ctl-token-save');
+  if(save)save.addEventListener('click',()=>{localStorage.setItem(_CTL_LS,(tok.value||'').trim());ctlStatus();});
+  document.querySelectorAll('[data-ctl]').forEach(b=>b.addEventListener('click',()=>ctlAction(b.dataset.ctl,b)));
+  const fz=document.getElementById('ctl-freeze');
+  if(fz)fz.addEventListener('click',async()=>{
+    if(!ctlToken()){ctlSetStatus('enter your control token first','err');return;}
+    const reason=prompt('Reason for freezing trading?','manual freeze from dashboard');if(reason===null)return;
+    await fetch(API_BASE+'/control/freeze',{method:'POST',headers:ctlHeaders(),body:JSON.stringify({reason})}).catch(()=>{});
+    ctlStatus();
+  });
+  const th=document.getElementById('ctl-thaw');
+  if(th)th.addEventListener('click',async()=>{await fetch(API_BASE+'/control/thaw',{method:'POST',headers:ctlHeaders()}).catch(()=>{});ctlStatus();});
+  const fresh=document.getElementById('nbm-fresh');
+  if(fresh)fresh.addEventListener('click',()=>{
+    if(!ctlToken()){ctlSetStatus('enter your control token first','err');return;}
+    const job=document.getElementById('ctl-job');job.classList.add('show');job.textContent='asking Oracle for a fresh take…';
+    fetch(API_BASE+'/control/nudge-oracle',{method:'POST',headers:ctlHeaders()}).then(r=>r.json()).then(d=>{
+      if(d.job)ctlPollJob(d.job,loadNextMove);else job.textContent='✗ '+(d.hint||d.error||'failed');
+    }).catch(e=>job.textContent='✗ '+e.message);
+  });
+  if(IS_REMOTE){const rm=document.getElementById('ctl-remote');if(rm)rm.textContent='— controls act on the cloud snapshot; your live brain runs on localhost:8765';}
+  loadNextMove();ctlStatus();
+})();
 
 // ══ TAB 2: SIGNALS ══
 const SIG_API=API_BASE+'/data';
@@ -2790,7 +3006,11 @@ function resQueue(data){
       </div>
       <span style="font-size:9px;letter-spacing:.5px;color:${stCol[t.status]||'var(--muted)'};white-space:nowrap">${t.status||'—'}</span>
     </div>`).join('');
-  el.innerHTML='<div class="rp-title">Research Queue <span style="color:var(--muted);font-size:10px;margin-left:8px">'+q.length+' tasks</span></div><div class="rp-scroll">'+items+'</div>';
+  const queued=q.filter(t=>t.status==='QUEUED').length;
+  const runBtn=queued?'<button class="ctl-btn ctl-btn-sm" id="rp-queue-run" style="margin-left:auto">▶ Run '+queued+' queued</button>':'';
+  el.innerHTML='<div class="rp-title" style="display:flex;align-items:center">Research Queue <span style="color:var(--muted);font-size:10px;margin-left:8px">'+q.length+' tasks</span>'+runBtn+'</div><div class="rp-scroll">'+items+'</div>';
+  const rb=document.getElementById('rp-queue-run');
+  if(rb)rb.addEventListener('click',()=>{rb.textContent='▶ running…';ctlAction('run-queue',rb);});
 }
 
 let _verChart=null,_verLine=null,_verInstLine=null;
