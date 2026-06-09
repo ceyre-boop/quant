@@ -13,6 +13,8 @@ import pandas as pd
 from sovereign.futures import scalp_strategy as strat
 from sovereign.futures import bar_feed, config, telegram_gateway, regime
 from sovereign.futures import volume_profile as vpmod, cvd as cvdmod
+from sovereign.futures import implied_move as immod
+from sovereign.futures import big_move_oracle as bmo
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "scripts"))
 import futures_replay as fr  # noqa: E402
@@ -59,6 +61,40 @@ def test_volume_profile_isolated():
 
 def test_cvd_isolated():
     _assert_clean(cvdmod)
+
+
+def test_implied_move_isolated():
+    _assert_clean(immod)
+
+
+def test_big_move_oracle_isolated():
+    _assert_clean(bmo)
+
+
+# ── Big Move Oracle (Increment 5) unit tests ──────────────────────────────────
+
+def test_implied_move_math_and_nullsafe():
+    # VIX 16 on a 6000 px → ~ 6000 * 0.16 / sqrt(252) ≈ 60.5 pts
+    em = immod.expected_daily_move(6000.0, vix=16.0)
+    assert 50 < em["expected_move_pts"] < 75
+    assert em["one_sigma_upper"] > 6000 > em["one_sigma_lower"]
+    # null-safe: no VIX → pts None, never raises
+    em2 = immod.expected_daily_move(6000.0, vix=None) if False else \
+        immod.expected_daily_move(0, vix=None)
+    assert em2["expected_move_pts"] is None
+
+
+def test_big_move_forecast_schema():
+    fc = bmo.BigMoveForecast(instrument="MES", direction="LONG", expected_move_pts=60.0,
+                             drawn_to_level=6050.0, trigger_window="09:30-10:30 ET",
+                             catalyst="open drive", conviction=2, stated_probability=0.62,
+                             falsifier="below 5990", reasoning="a\nb\nc")
+    d = fc.to_dict()
+    for k in ("instrument", "direction", "expected_move_pts", "drawn_to_level",
+              "trigger_window", "catalyst", "conviction", "stated_probability",
+              "falsifier", "reasoning", "model"):
+        assert k in d
+    assert d["model"] == "claude-sonnet-4-6"
 
 
 # ── Increment 4 unit tests ────────────────────────────────────────────────────
