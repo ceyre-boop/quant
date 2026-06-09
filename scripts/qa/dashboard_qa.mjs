@@ -64,16 +64,49 @@ async function run() {
   // helper to click a tab and settle
   const tab = async name => { await page.click(`.hdr-tab[data-tab="${name}"]`).catch(()=>{}); await sleep(2500); };
 
-  // TRADE (default active)
+  // TRADE (default active) — pass-probability cockpit + de-stale checks
+  await sleep(2500); // let /prop-challenge + /next-move land
   await shot(page, 'trade');
   let f = await evalAsserts(page, () => {
     const out = [];
     if (!document.querySelector('#tab-trade.active')) out.push('TRADE tab not active by default');
-    const pairs = document.querySelectorAll('.forex-grid .pair-row, .forex-grid > *').length;
-    if (pairs < 3) out.push('forex pairs missing (' + pairs + ')');
+    const cards = document.querySelectorAll('#forex-grid .forex-card').length;
+    if (cards !== 4) out.push('forex grid should have 4 cards (AUDNZD excluded), found ' + cards);
+    const bodyTxt = document.getElementById('tab-trade').textContent;
+    if (/AUD\/NZD/.test(bodyTxt)) out.push('AUDNZD card still present (HYP-045 excluded it)');
+    // stale FRAMING (not honest legacy labels): v013-as-current / the uncosted achievement banner
+    if (/v013 current/.test(bodyTxt)) out.push('"v013 current" still shown');
+    if (/INSTITUTIONAL GRADE ACHIEVED/.test(bodyTxt)) out.push('false "INSTITUTIONAL GRADE ACHIEVED" banner still shown');
+    if (/1\.8552/.test(bodyTxt)) out.push('uncosted 1.8552 headline still shown');
+    if (!/v015/.test(bodyTxt)) out.push('v015 not shown');
+    // pass probability must be a real number, not the "—" placeholder or "Loading"
+    const pass = (document.getElementById('ph-prob-pass') || {}).textContent || '';
+    if (!/\d+\.\d%|\d+%/.test(pass)) out.push('P(pass) not populated: "' + pass + '"');
+    if (/Loading/.test((document.getElementById('ph-caveat') || {}).textContent || '')) out.push('pass-prob caveat stuck on Loading');
+    // control panel present
+    if (!document.querySelector('.ctl-section')) out.push('control panel missing');
+    if (!document.getElementById('nbm-body')) out.push('Next Best Move card missing');
+    if (!document.querySelector('[data-ctl="run-queue"]')) out.push('Run Queue button missing');
     return out;
   });
   record('trade', collect.errs.splice(0), f);
+
+  // CONTROL: token gating — without a token the status should read "locked"; the Next Best Move
+  // card should render the queued Oracle prompt (read-only, no token needed).
+  const ctlCheck = await evalAsserts(page, async () => {
+    const out = [];
+    localStorage.removeItem('sq_ctl_token');
+    const nbm = (document.getElementById('nbm-body') || {}).textContent || '';
+    if (/Loading/.test(nbm)) out.push('Next Best Move stuck on Loading');
+    // try an action without a token → must NOT spawn a job; status flips to an error/lock hint
+    const runBtn = document.querySelector('[data-ctl="checklist"]');
+    if (runBtn) runBtn.click();
+    await new Promise(r => setTimeout(r, 400));
+    const st = (document.getElementById('ctl-status') || {}).textContent || '';
+    if (!/token/i.test(st)) out.push('no-token action did not warn about token: "' + st + '"');
+    return out;
+  });
+  if (ctlCheck.length) { report.views['trade'].assertionFailures.push(...ctlCheck); report.ok = false; }
 
   // SIGNALS — default TradingView embed mode
   await tab('signals'); await sleep(5000); await shot(page, 'signals');

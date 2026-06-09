@@ -33,6 +33,77 @@ TV_REGIME_PATH = 'data/agent/tv_regime_signals.json'
 _TV_RETAIN_HOURS = 48
 
 
+# ── Trader control layer: token-gated mutating actions + async background jobs ──── #
+import threading
+import subprocess
+
+_JOBS_DIR = 'data/agent/_jobs'
+_JOBS: dict = {}  # id -> status dict (in-memory mirror of the on-disk status file)
+
+
+def _control_token() -> str:
+    """Shared secret for mutating control endpoints. Unset → controls disabled (safe default)."""
+    return os.environ.get('SOVEREIGN_CONTROL_TOKEN', '').strip()
+
+
+def _job_path(job_id: str) -> str:
+    return os.path.join(_JOBS_DIR, job_id + '.json')
+
+
+def _write_job(job: dict) -> None:
+    _JOBS[job['id']] = job
+    try:
+        os.makedirs(_JOBS_DIR, exist_ok=True)
+        with open(_job_path(job['id']), 'w') as f:
+            json.dump(job, f, default=str)
+    except Exception:
+        pass
+
+
+def _read_job(job_id: str):
+    if job_id in _JOBS:
+        return _JOBS[job_id]
+    try:
+        with open(_job_path(job_id)) as f:
+            return json.load(f)
+    except Exception:
+        return None
+
+
+def _spawn_job(kind: str, argv: list, label: str = None) -> str:
+    """Run argv in a background daemon thread, streaming combined stdout/stderr into a capped
+    tail. Returns the job id immediately; poll /control/job?id=<id> for status. Status persists
+    to data/agent/_jobs/<id>.json so it survives across requests."""
+    job_id = kind + '-' + datetime.now().strftime('%Y%m%d-%H%M%S')
+    job = {'id': job_id, 'kind': kind, 'label': label or kind, 'cmd': ' '.join(argv),
+           'status': 'running', 'started': datetime.now(timezone.utc).isoformat(),
+           'finished': None, 'returncode': None, 'tail': ''}
+    _write_job(job)
+
+    def _run():
+        tail: list = []
+        try:
+            proc = subprocess.Popen(argv, cwd='.', stdout=subprocess.PIPE,
+                                    stderr=subprocess.STDOUT, text=True, bufsize=1,
+                                    env={**os.environ})
+            for line in proc.stdout:
+                tail.append(line.rstrip('\n'))
+                del tail[:-80]  # keep last 80 lines
+                job['tail'] = '\n'.join(tail)
+                _write_job(job)
+            proc.wait()
+            job['returncode'] = proc.returncode
+            job['status'] = 'done' if proc.returncode == 0 else 'failed'
+        except Exception:
+            job['status'] = 'failed'
+            job['tail'] = (job.get('tail', '') + '\n' + traceback.format_exc())[-4000:]
+        job['finished'] = datetime.now(timezone.utc).isoformat()
+        _write_job(job)
+
+    threading.Thread(target=_run, daemon=True).start()
+    return job_id
+
+
 def _ingest_tv_regime(payload: dict) -> None:
     """Append a regime_update alert to tv_regime_signals.json, pruning entries >48h old."""
     from pathlib import Path
@@ -601,8 +672,22 @@ class Handler(BaseHTTPRequestHandler):
         self.send_response(204)
         self.send_header('Access-Control-Allow-Origin', '*')
         self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type, X-Control-Token')
         self.end_headers()
+
+    def _control_ok(self) -> bool:
+        """True only if a control token is configured AND the request carries the matching
+        X-Control-Token header. Sends a 403 + hint and returns False otherwise."""
+        token = _control_token()
+        if not token:
+            self._send_json(403, {'error': 'controls_disabled',
+                                  'hint': 'set SOVEREIGN_CONTROL_TOKEN in the server env to enable controls'})
+            return False
+        if self.headers.get('X-Control-Token', '') != token:
+            self._send_json(403, {'error': 'bad_token',
+                                  'hint': 'set your control token (🔒) in the dashboard — it must match the server'})
+            return False
+        return True
 
     def do_GET(self):
         path = self.path.split('?')[0]
@@ -830,6 +915,60 @@ class Handler(BaseHTTPRequestHandler):
             except Exception:
                 self._send_json(500, {'error': traceback.format_exc()})
 
+        elif path == '/next-move':
+            # The Oracle's top queued "what to tell Claude Code next" prompt (read-only, safe everywhere).
+            try:
+                order = {'HIGH': 0, 'MEDIUM': 1, 'LOW': 2}
+                data = {}
+                try:
+                    with open('data/agent/prompt_queue.json') as f:
+                        data = json.load(f)
+                except FileNotFoundError:
+                    pass
+                prompts = [p for p in data.get('prompts', []) if p.get('status') == 'QUEUED']
+                prompts.sort(key=lambda p: (order.get(p.get('priority', 'MEDIUM'), 1),
+                                            p.get('queued_at', '')))
+                self._send_json(200, {'next': prompts[0] if prompts else None,
+                                      'pending': len(prompts), 'stats': data.get('stats', {})})
+            except Exception:
+                self._send_json(500, {'error': traceback.format_exc()})
+
+        elif path == '/control/status':
+            # Is the control layer enabled? Is trading frozen? Recent background jobs. (read-only)
+            try:
+                frozen = None
+                try:
+                    from sovereign.utils import kill_switch as _ks
+                    frozen = _ks.state()
+                except Exception:
+                    frozen = None
+                jobs = {}
+                try:
+                    for fn in sorted(os.listdir(_JOBS_DIR))[-12:]:
+                        if fn.endswith('.json'):
+                            j = _read_job(fn[:-5])
+                            if j:
+                                jobs[j['id']] = {k: j.get(k) for k in
+                                                 ('id', 'kind', 'label', 'status', 'started',
+                                                  'finished', 'returncode')}
+                except FileNotFoundError:
+                    pass
+                self._send_json(200, {'enabled': bool(_control_token()), 'frozen': frozen, 'jobs': jobs})
+            except Exception:
+                self._send_json(500, {'error': traceback.format_exc()})
+
+        elif path == '/control/job':
+            try:
+                import urllib.parse as _up
+                qs = dict(_up.parse_qsl(self.path.split('?')[1] if '?' in self.path else ''))
+                j = _read_job(qs.get('id', ''))
+                if j is None:
+                    self._send_json(404, {'error': 'no_such_job'})
+                else:
+                    self._send_json(200, j)
+            except Exception:
+                self._send_json(500, {'error': traceback.format_exc()})
+
         elif path.startswith('/data/'):
             try:
                 file_path = path.lstrip('/')
@@ -910,6 +1049,65 @@ class Handler(BaseHTTPRequestHandler):
                     self._send_json(503, {'ok': False, 'error': 'live_trade_log unavailable'})
             except Exception:
                 self._send_json(500, {'error': traceback.format_exc()})
+
+        # ── Trader control layer (token-gated) ──────────────────────────────────
+        elif path == '/control/run-queue':
+            if not self._control_ok():
+                return
+            jid = _spawn_job('run-queue',
+                             [sys.executable, 'scripts/run_research_queue.py'],
+                             'Run research queue')
+            self._send_json(200, {'ok': True, 'job': jid})
+
+        elif path == '/control/nudge-oracle':
+            if not self._control_ok():
+                return
+            # Fresh Oracle reflect cycle → a new "next best move" prompt lands in the queue.
+            # Heavy: needs ANTHROPIC_API_KEY + sovereign.* deps (realistically a LOCAL action).
+            jid = _spawn_job('nudge-oracle',
+                             [sys.executable, '-m', 'sovereign.oracle.reflect_cycle'],
+                             'Ask Oracle for a fresh take')
+            self._send_json(200, {'ok': True, 'job': jid})
+
+        elif path == '/control/checklist':
+            if not self._control_ok():
+                return
+            jid = _spawn_job('checklist',
+                             [sys.executable, 'scripts/agent_scheduler.py', '--checklist'],
+                             'Run prop-firm checklist')
+            self._send_json(200, {'ok': True, 'job': jid})
+
+        elif path == '/control/refresh-prop':
+            if not self._control_ok():
+                return
+            jid = _spawn_job('refresh-prop',
+                             [sys.executable, '-m', 'sovereign.risk.monte_carlo_prop'],
+                             'Refresh pass-probability')
+            self._send_json(200, {'ok': True, 'job': jid})
+
+        elif path == '/control/freeze':
+            if not self._control_ok():
+                return
+            try:
+                length = int(self.headers.get('Content-Length', 0))
+                body = json.loads(self.rfile.read(length)) if length else {}
+                from sovereign.utils import kill_switch as _ks
+                st = _ks.freeze(body.get('reason', 'manual freeze from dashboard'),
+                                hard=bool(body.get('hard')), by='dashboard')
+                self._send_json(200, {'ok': True, 'frozen': st})
+            except Exception:
+                self._send_json(500, {'error': traceback.format_exc()})
+
+        elif path == '/control/thaw':
+            if not self._control_ok():
+                return
+            try:
+                from sovereign.utils import kill_switch as _ks
+                prior = _ks.thaw(by='dashboard')
+                self._send_json(200, {'ok': True, 'was': prior})
+            except Exception:
+                self._send_json(500, {'error': traceback.format_exc()})
+
         else:
             self.send_response(404)
             self.end_headers()
