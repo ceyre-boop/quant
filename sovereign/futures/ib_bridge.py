@@ -80,6 +80,14 @@ class IBBridge:
             self._ib.disconnect()
             self._connected = False
 
+    def is_connected(self) -> bool:
+        """Live socket state — True only if we connected AND ib-async still holds the socket.
+        Used by the monitor to halt the session on a mid-session disconnect (never raises)."""
+        try:
+            return bool(self._connected and self._ib.isConnected())
+        except Exception:
+            return False
+
     def __enter__(self):
         self.connect()
         return self
@@ -134,6 +142,26 @@ class IBBridge:
             }
             for p in self._ib.positions()
         ]
+
+    def fills(self) -> list[dict]:
+        """Today's executions — the authoritative paper-fill record (use to close the loop
+        honestly instead of replaying yfinance). Each: symbol, side, shares, price, time,
+        order_id, perm_id, commission."""
+        out = []
+        for f in self._ib.fills():
+            e, c = f.execution, f.contract
+            cr = getattr(f, "commissionReport", None)
+            out.append({
+                "symbol":     c.symbol,
+                "side":       e.side,                       # BOT / SLD
+                "shares":     float(e.shares),
+                "price":      float(e.price),
+                "time":       str(e.time),
+                "order_id":   int(e.orderId),
+                "perm_id":    int(e.permId),
+                "commission": (float(cr.commission) if cr and cr.commission is not None else None),
+            })
+        return out
 
     # ── Orders ───────────────────────────────────────────────────────────────
 
