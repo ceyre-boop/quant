@@ -290,6 +290,67 @@ def _log_session_halted(instrument: str, reason: str) -> None:
     })
 
 
+# ── Guard 4: log on FILL confirmation, not on submission ──────────────────────
+# A submitted bracket-order is NOT a trade until IB executes it. Submissions go to a PENDING
+# queue + a separate pending-orders log; only a confirmed fill writes a rep to trade_log.jsonl.
+# An order that never fills within the window is cancelled and quarantined (never a rep).
+PENDING_LOG = ROOT / "data" / "futures" / "pending_orders.jsonl"
+MAX_PENDING_SECONDS = 180          # ~3 one-min bars; unfilled past this → CANCELLED_NO_FILL
+_PENDING: dict = {}                # entry_order_id -> pending entry (in-memory, this session)
+
+
+def _log_pending(rec: dict) -> None:
+    PENDING_LOG.parent.mkdir(parents=True, exist_ok=True)
+    with open(PENDING_LOG, "a") as f:
+        f.write(json.dumps(rec, default=str) + "\n")
+
+
+def _confirm_fills(bridge, bias: dict) -> int:
+    """Promote PENDING orders to confirmed trade_log reps when IB reports a fill; cancel +
+    quarantine ones that never fill (MAX_PENDING_SECONDS). Returns count of newly confirmed
+    fills (to add to session_trades). Never raises — a fills hiccup must not kill the session."""
+    if not _PENDING or bridge is None:
+        return 0
+    try:
+        fills_by_id = {int(f["order_id"]): f for f in bridge.fills()
+                       if f.get("order_id") is not None and (f.get("shares") or 0) > 0}
+    except Exception:
+        return 0
+    now = datetime.now(timezone.utc)
+    confirmed = 0
+    for oid in list(_PENDING.keys()):
+        p = _PENDING[oid]
+        fill = fills_by_id.get(int(oid))
+        if fill:
+            actual = float(fill["price"])
+            rec = _build_record(p["instrument"], p["direction"], actual, p["stop"], p["target"],
+                                bias, p["session_trades"], p["session_r"], p["rationale"],
+                                p["notes"] + f" | filled@{actual}", setup_type=p["setup_type"],
+                                contracts=p["contracts"], reasoning=p["reasoning"],
+                                data_quality=p["data_quality"])
+            rec["status"] = "FILLED"
+            rec["fill_confirmed"] = True
+            rec["entry_price_requested"] = p["entry_requested"]
+            rec["filled_at"] = fill.get("time")
+            _log_trade(rec)
+            _log_pending({"ts": now.isoformat(), "status": "FILLED", "order_id": oid,
+                          "entry_price_requested": p["entry_requested"], "entry_price_actual": actual,
+                          "instrument": p["instrument"], "filled_at": fill.get("time")})
+            print(f"\n  {G}{BD}✓ FILL CONFIRMED {p['setup_type']} {p['direction']} {p['instrument']} "
+                  f"@ {actual:.2f}{RS}  (requested {p['entry_requested']:.2f}) — rep logged")
+            del _PENDING[oid]
+            confirmed += 1
+        elif (now - p["submitted_ts"]).total_seconds() > MAX_PENDING_SECONDS:
+            bridge.cancel_order(oid)
+            _log_pending({"ts": now.isoformat(), "status": "CANCELLED_NO_FILL", "order_id": oid,
+                          "entry_price_requested": p["entry_requested"], "instrument": p["instrument"],
+                          "reason": f"no fill within {MAX_PENDING_SECONDS}s"})
+            print(f"\n  {Y}⊘ NO FILL ({MAX_PENDING_SECONDS // 60}min) — cancelled {p['setup_type']} "
+                  f"{p['direction']} {p['instrument']} @ {p['entry_requested']:.2f} (never executed, no rep){RS}")
+            del _PENDING[oid]
+    return confirmed
+
+
 def _build_record(instrument: str, direction: str, entry: float, stop: float, t1: float,
                   bias: dict, session_trades: int, session_r: float,
                   rationale: str, notes: str, exit_reason: str | None = None,
@@ -341,34 +402,49 @@ def _execute_decision(d, instrument: str, bias: dict, dry_run: bool, ib_connecte
     rationale = _sizing_rationale(session_trades, session_r)
     tag = f"{d.setup_type} {d.direction} {d.contracts}x"
     wb = f" | would_have_blocked={d.would_have_blocked}" if d.would_have_blocked else ""
-    data_quality = "SIMULATED"
+    data_quality = "LIVE_PAPER_DELAYED" if feed_delayed else "LIVE_PAPER"
+
     if not dry_run and ib_connected and bridge:
+        # Guard 4: a submitted bracket is NOT a trade. Place it, then PEND it — the rep is logged
+        # to trade_log only when _confirm_fills sees an actual IB execution.
         try:
             side = "BUY" if d.direction == "LONG" else "SELL"
             contract = bridge.mes_contract() if instrument == "MES" else bridge.mnq_contract()
             results = bridge.bracket_order(contract, side, d.contracts, entry, stop, t1)
-            print(f"\n  {G}{BD}⚡ FILLED {tag} {instrument} @ {entry:.2f}{RS}  SL {stop:.2f}  TP {t1:.2f}"
-                  f"  conf={d.confidence} R={d.expected_r}  id={results[0].order_id}")
-            notes = f"{tag}: {d.confidence} R={d.expected_r} | order_id={results[0].order_id}{wb}"
-            # a real bracket order hit the paper account; flag if the feed was delayed
-            data_quality = "LIVE_PAPER_DELAYED" if feed_delayed else "LIVE_PAPER"
+            entry_oid = int(results[0].order_id)
+            _PENDING[entry_oid] = {
+                "instrument": instrument, "direction": d.direction, "setup_type": d.setup_type,
+                "contracts": d.contracts, "stop": stop, "target": t1, "entry_requested": entry,
+                "data_quality": data_quality, "rationale": rationale,
+                "notes": f"{tag}: {d.confidence} R={d.expected_r} | order_id={entry_oid}{wb}",
+                "reasoning": rsn.entry_reasoning(d, bias),
+                "session_trades": session_trades, "session_r": session_r,
+                "submitted_ts": now, "order_ids": [r.order_id for r in results],
+            }
+            _log_pending({"ts": now.isoformat(), "status": "PENDING", "instrument": instrument,
+                          "setup_type": d.setup_type, "direction": d.direction,
+                          "entry_price_requested": entry, "stop": stop, "target_1": t1,
+                          "order_ids": [r.order_id for r in results], "data_quality": data_quality})
+            print(f"\n  {Y}{BD}⏳ SUBMITTED (PENDING fill) {tag} {instrument} @ {entry:.2f}{RS}"
+                  f"  SL {stop:.2f} TP {t1:.2f}  conf={d.confidence} — rep logs on fill, not submit")
         except Exception as e:
             print(f"\n  {R}Order failed: {type(e).__name__}: {e}{RS}")
-            notes = f"{tag}: order failed: {type(e).__name__}: {e}{wb}"
-    else:
-        why = "dry-run" if dry_run else "IB disconnected"
-        print(f"\n  {G}{BD}⚡ [{why}] {tag} {instrument} @ {entry:.2f}{RS}  SL {stop:.2f}  TP {t1:.2f}"
-              f"  conf={d.confidence} R={d.expected_r}")
-        if d.would_have_blocked:
-            print(f"  {DM}learning rep — strict would_have_blocked: {d.would_have_blocked}{RS}")
-        notes = f"{tag} ({why}): {d.confidence} R={d.expected_r}{wb}"
+            _log_trade(_build_record(instrument, d.direction, entry, stop, t1, bias, session_trades,
+                       session_r, rationale, f"{tag}: order failed: {type(e).__name__}: {e}{wb}",
+                       setup_type=d.setup_type, contracts=d.contracts,
+                       reasoning=rsn.entry_reasoning(d, bias), data_quality="SIMULATED"))
+        return now, session_trades, proposals_count + 1   # no rep yet; fill confirmation will add it
 
-    record = _build_record(instrument, d.direction, entry, stop, t1, bias,
-                           session_trades, session_r, rationale, notes,
-                           setup_type=d.setup_type, contracts=d.contracts,
-                           reasoning=rsn.entry_reasoning(d, bias),
-                           data_quality=data_quality)
-    _log_trade(record)
+    # dry-run / IB-disconnected — no real order ever fills; log an immediate SIMULATED record.
+    why = "dry-run" if dry_run else "IB disconnected"
+    print(f"\n  {G}{BD}⚡ [{why}] {tag} {instrument} @ {entry:.2f}{RS}  SL {stop:.2f}  TP {t1:.2f}"
+          f"  conf={d.confidence} R={d.expected_r}")
+    if d.would_have_blocked:
+        print(f"  {DM}learning rep — strict would_have_blocked: {d.would_have_blocked}{RS}")
+    _log_trade(_build_record(instrument, d.direction, entry, stop, t1, bias, session_trades,
+               session_r, rationale, f"{tag} ({why}): {d.confidence} R={d.expected_r}{wb}",
+               setup_type=d.setup_type, contracts=d.contracts,
+               reasoning=rsn.entry_reasoning(d, bias), data_quality="SIMULATED"))
     return now, session_trades + 1, proposals_count + 1
 
 
@@ -844,6 +920,10 @@ def main() -> None:
                     _log_session_halted(instrument, "IB_DISCONNECTED")
                     break
 
+                # ── Guard 4: confirm fills from prior submissions → reps; cancel stale no-fills ──
+                if not dry_run and ib_connected and bridge is not None:
+                    session_trades += _confirm_fills(bridge, bias)
+
                 # ── Feed freshness: tag reps from a delayed feed (IBKR delayed data, no real-time sub) ──
                 try:
                     bar_age = (datetime.now(timezone.utc) - curr_ts.to_pydatetime()).total_seconds()
@@ -922,8 +1002,18 @@ def main() -> None:
     except KeyboardInterrupt:
         r_sign = "+" if session_r >= 0 else ""
         print(f"\n\n  {BD}Session complete.{RS}")
-        print(f"  Proposals: {proposals_count} | Trades logged: {session_trades} | Session R: {r_sign}{session_r:.2f}")
+        print(f"  Proposals: {proposals_count} | Confirmed-fill reps: {session_trades} | "
+              f"Pending(unfilled): {len(_PENDING)} | Session R: {r_sign}{session_r:.2f}")
+        # Cancel any still-pending (unfilled) brackets so they can't fill orphaned after we exit.
         if ib_connected and bridge:
+            for _oid, _p in list(_PENDING.items()):
+                try:
+                    bridge.cancel_order(_oid)
+                    _log_pending({"ts": datetime.now(timezone.utc).isoformat(),
+                                  "status": "CANCELLED_NO_FILL", "order_id": _oid,
+                                  "instrument": _p.get("instrument"), "reason": "session exit"})
+                except Exception:
+                    pass
             try:
                 bridge.disconnect()
             except Exception:

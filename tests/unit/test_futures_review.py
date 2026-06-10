@@ -120,3 +120,57 @@ def test_load_trades_filters_simulated(tmp_path):
     assert any(r.get("data_quality") == "LIVE_PAPER_DELAYED" for r in default)  # delayed stays in
     full = rc.load_trades(log, include_simulated=True)
     assert len(full) == 4
+
+
+def _load_monitor(tmp_path, monkeypatch):
+    mon = _load(Path("scripts/futures_monitor.py"))
+    monkeypatch.setattr(mon, "TRADE_LOG", tmp_path / "trade_log.jsonl")
+    monkeypatch.setattr(mon, "PENDING_LOG", tmp_path / "pending.jsonl")
+    mon._PENDING.clear()
+    return mon
+
+
+class _FakeBridge:
+    def __init__(self, fills): self._fills = fills; self.cancelled = []
+    def fills(self): return self._fills
+    def cancel_order(self, oid): self.cancelled.append(int(oid)); return True
+
+
+def _pending_entry(mon, oid, submitted_ts):
+    mon._PENDING[oid] = {
+        "instrument": "MES", "direction": "LONG", "setup_type": "VWAP_MR", "contracts": 1,
+        "stop": 7395.0, "target": 7420.0, "entry_requested": 7400.0,
+        "data_quality": "LIVE_PAPER_DELAYED", "rationale": "probe",
+        "notes": "VWAP_MR LONG 1x", "reasoning": {"setup_type": "VWAP_MR"},
+        "session_trades": 0, "session_r": 0.0, "submitted_ts": submitted_ts,
+        "order_ids": [oid, oid + 1, oid + 2],
+    }
+
+
+def test_confirm_fills_logs_only_on_fill(tmp_path, monkeypatch):
+    from datetime import datetime, timezone
+    mon = _load_monitor(tmp_path, monkeypatch)
+    _pending_entry(mon, 111, datetime.now(timezone.utc))
+    bridge = _FakeBridge([{"order_id": 111, "shares": 1, "price": 7401.25, "time": "2026-06-10T14:40:00"}])
+    n = mon._confirm_fills(bridge, {"bias": "LONG", "conviction": 2})
+    assert n == 1 and not mon._PENDING                      # confirmed + dequeued
+    rows = [json.loads(l) for l in (tmp_path / "trade_log.jsonl").read_text().splitlines() if l.strip()]
+    assert len(rows) == 1
+    r = rows[0]
+    assert r["status"] == "FILLED" and r["fill_confirmed"] is True
+    assert r["entry"] == 7401.25 and r["entry_price_requested"] == 7400.0   # ACTUAL fill price recorded
+    assert r["data_quality"] == "LIVE_PAPER_DELAYED"
+
+
+def test_confirm_fills_cancels_stale_nofill(tmp_path, monkeypatch):
+    from datetime import datetime, timezone, timedelta
+    mon = _load_monitor(tmp_path, monkeypatch)
+    old = datetime.now(timezone.utc) - timedelta(seconds=mon.MAX_PENDING_SECONDS + 30)
+    _pending_entry(mon, 222, old)
+    bridge = _FakeBridge([])                                # IB reports no fills
+    n = mon._confirm_fills(bridge, {"bias": "LONG", "conviction": 2})
+    assert n == 0 and not mon._PENDING                      # nothing confirmed, dequeued
+    assert 222 in bridge.cancelled                          # working order cancelled
+    assert not (tmp_path / "trade_log.jsonl").exists()      # NO rep written to the learning log
+    pend = [json.loads(l) for l in (tmp_path / "pending.jsonl").read_text().splitlines() if l.strip()]
+    assert any(p["status"] == "CANCELLED_NO_FILL" for p in pend)
