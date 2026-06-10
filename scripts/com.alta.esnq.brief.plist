@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key><string>com.alta.esnq.brief</string>
+    <!-- ES/NQ morning session brief — bias, levels, plan. Cognition-only (runs under
+         soft freeze; it proposes, never trades). NOTE: launchd StartCalendarInterval
+         fires in the machine's LOCAL timezone (America/Detroit = ET). 08:45 ET,
+         Mon-Fri (Weekday 1-5 not supported as a range; runs daily, the script is a
+         no-op cost on weekends since Globex pull simply reflects no new session).
+         Enable with: launchctl load ~/Library/LaunchAgents/com.alta.esnq.brief.plist
+         (copy this file there first). -->
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string><string>-c</string>
+        <string>cd /Users/taboost/quant &amp;&amp; /opt/homebrew/bin/python3 scripts/es_nq_daily_brief.py</string>
+    </array>
+    <key>WorkingDirectory</key><string>/Users/taboost/quant</string>
+    <key>StartCalendarInterval</key>
+    <dict><key>Hour</key><integer>8</integer><key>Minute</key><integer>45</integer></dict>
+    <key>StandardOutPath</key><string>/Users/taboost/quant/logs/esnq_brief.log</string>
+    <key>StandardErrorPath</key><string>/Users/taboost/quant/logs/esnq_brief.err</string>
+    <key>EnvironmentVariables</key><dict><key>PATH</key><string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string></dict>
+</dict>
+</plist>
