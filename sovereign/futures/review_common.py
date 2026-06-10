@@ -14,10 +14,14 @@ from sovereign.futures.config import contract_spec, round_turn_cost_usd
 ET = ZoneInfo("America/New_York")
 
 
+_NON_FILL_STATUS = {"PENDING", "CANCELLED_NO_FILL"}
+
+
 def load_trades(path: Path, include_simulated: bool = False) -> list[dict]:
-    """Load trade-log records. By DEFAULT excludes data_quality=="SIMULATED" entries (dry-run,
-    IB-disconnected, learning reps with no fill, REJECTED) so fabricated trades never reach the
-    learning loop (Guard 3). Pass include_simulated=True to inspect them explicitly."""
+    """Load trade-log records. By DEFAULT excludes:
+      - data_quality=="SIMULATED" (dry-run, IB-disconnected, REJECTED) — Guard 3, and
+      - status in {PENDING, CANCELLED_NO_FILL} — orders that never actually filled (Guard 4),
+    so only confirmed real fills reach the learning loop. Pass include_simulated=True to inspect all."""
     if not path.exists():
         return []
     out = []
@@ -28,6 +32,8 @@ def load_trades(path: Path, include_simulated: bool = False) -> list[dict]:
             except Exception:
                 continue
             if not include_simulated and rec.get("data_quality") == "SIMULATED":
+                continue
+            if not include_simulated and rec.get("status") in _NON_FILL_STATUS:
                 continue
             out.append(rec)
     return out

@@ -225,6 +225,19 @@ class IBBridge:
             self._ib.cancelOrder(trade.order)
         self._ib.sleep(0.5)
 
+    def cancel_order(self, order_id: int) -> bool:
+        """Cancel one working order by id (the bracket children cancel with the parent).
+        Targeted so a single no-fill timeout never nukes other live brackets. Never raises."""
+        try:
+            for trade in self._ib.openTrades():
+                if int(trade.order.orderId) == int(order_id):
+                    self._ib.cancelOrder(trade.order)
+                    self._ib.sleep(0.3)
+                    return True
+        except Exception:
+            pass
+        return False
+
     # ── Historical bars ────────────────────────────────────────────────────────
 
     def historical_bars(self, contract, duration: str = "1 D",
