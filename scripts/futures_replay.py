@@ -450,8 +450,8 @@ def _print_report(agg: dict, sessions: list[dict]) -> None:
     print(f"  {BD}REPLAY REPORT — {agg['instrument']}  |  {agg['sessions']} session(s){RS}")
     print(f"{BD}{'═'*64}{RS}")
     if agg.get("untrusted"):
-        print(f"  {Y}{BD}⚠ UNTRUSTED — volume profile / CVD need real IB volume; yfinance is "
-              f"telemetry only. Use --source ib and n≥30/condition before believing this.{RS}")
+        print(f"  {Y}{BD}⚠ UNTRUSTED — volume profile / CVD need real volume; yfinance is "
+              f"telemetry only. Use --source databento (or ib) and n≥30/condition before believing this.{RS}")
     pf = "∞" if agg["profit_factor"] is None else f"{agg['profit_factor']:.2f}"
     print(f"  Trades: {agg['n_trades']}   Win rate: {agg['win_rate']:.0%}   PF: {pf}")
     print(f"  Net P&L (after costs): {G if agg['net_total_usd']>=0 else R}${agg['net_total_usd']:.2f}{RS}"
@@ -500,8 +500,9 @@ def _print_report(agg: dict, sessions: list[dict]) -> None:
 def main() -> None:
     ap = argparse.ArgumentParser(description="Nightly ES/NQ replay (backtest like live)")
     ap.add_argument("--instrument", default="MES", choices=["MES", "MNQ"])
-    ap.add_argument("--source", default="yf", choices=["yf", "ib"],
-                    help="yf=yfinance fallback (runs tonight w/o IB), ib=IB Gateway bars")
+    ap.add_argument("--source", default="yf", choices=["yf", "ib", "databento"],
+                    help="yf=yfinance (synthetic vol), ib=IB Gateway bars, databento=real CME 1-min "
+                         "(GLBX.MDP3, trustworthy volume; needs DATABENTO_API_KEY)")
     ap.add_argument("--day", default=None, help="Single ET day YYYY-MM-DD (else all available)")
     ap.add_argument("--lookback", default="5d", help="yfinance lookback window (1m caps ~7d)")
     ap.add_argument("--bias", default="auto", choices=["auto", "long", "short", "neutral"])
@@ -565,7 +566,7 @@ def main() -> None:
         sys.exit(1)
 
     agg = _aggregate(sessions, args.instrument)
-    agg["untrusted"] = (args.source != "ib")     # VP/CVD need real IB volume
+    agg["untrusted"] = (args.source not in ("ib", "databento"))   # VP/CVD need real volume (IB or Databento)
     _print_report(agg, sessions)
 
     if not args.no_log:

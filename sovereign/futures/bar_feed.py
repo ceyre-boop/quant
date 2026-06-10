@@ -5,13 +5,15 @@ Sandbox-local: no forex/ICT/intelligence imports.
   - ReplayBarFeed: drives a stored 1-min DataFrame bar-by-bar, yielding the
     session-to-date slice at each step (so VWAP/RSI replay exactly as they would
     accumulate live). This is what makes "backtest like it's live tonight" honest.
-  - load_history(): fetch 1-min RTH bars for a day/lookback from IB (preferred) or
-    yfinance (fallback so the replay runs tonight even if IB Gateway is down).
-
-Decision (per plan): IB bars now, Databento later. yfinance is the tonight-fallback.
+  - load_history(): fetch 1-min RTH bars for a day/lookback from one of three sources:
+      'ib'        — the IB bridge (Gateway running); real-time only when subscribed.
+      'databento' — Databento GLBX.MDP3 historical 1-min bars: real, clean CME volume
+                    (the trustworthy source for replay VP/CVD). Needs DATABENTO_API_KEY.
+      'yf'        — yfinance fallback (free, but synthetic volume; 1m caps ~7 days).
 """
 from __future__ import annotations
 
+import os
 from datetime import datetime
 from typing import Iterator, Optional
 from zoneinfo import ZoneInfo
@@ -71,16 +73,62 @@ def _ib_duration(lookback: str) -> str:
     return f"{num} {unit}"
 
 
+def _lookback_days(lookback: str) -> int:
+    """Approx calendar days from a '5d'/'2w'/'1m' lookback (for Databento start/end)."""
+    s = (lookback or "5d").strip().lower()
+    num = int("".join(ch for ch in s if ch.isdigit()) or "5")
+    return num * {"d": 1, "w": 7, "m": 31, "y": 366}.get(s[-1:], 1)
+
+
+def _load_databento(inst: str, day: Optional[str], lookback: str):
+    """Real 1-min CME bars from Databento GLBX.MDP3 (continuous front month). Fails loud if
+    the key/package is missing — never silently degrades, so replay provenance stays honest."""
+    try:
+        import databento as db
+    except ImportError:
+        raise SystemExit("FATAL: databento not installed. Run: pip install databento")
+    key = os.environ.get("DATABENTO_API_KEY", "").strip()
+    if not key:
+        raise SystemExit("FATAL: DATABENTO_API_KEY not set. Sign up (free $125 credit) and add it to .env")
+    import pandas as pd
+    from datetime import timedelta
+    if day is not None:
+        start = f"{day}T00:00:00"
+        end = (datetime.fromisoformat(day) + timedelta(days=1)).strftime("%Y-%m-%dT00:00:00")
+    else:
+        end_dt = datetime.now(UTC)
+        start = (end_dt - timedelta(days=_lookback_days(lookback))).strftime("%Y-%m-%dT%H:%M:%S")
+        end = end_dt.strftime("%Y-%m-%dT%H:%M:%S")
+    symbol = f"{'MES' if inst in ('MES', 'ES') else 'MNQ'}.c.0"   # continuous front month
+    client = db.Historical(key)
+    store = client.timeseries.get_range(
+        dataset="GLBX.MDP3", schema="ohlcv-1m", stype_in="continuous",
+        symbols=[symbol], start=start, end=end,
+    )
+    df = store.to_df()
+    if df is None or len(df) == 0:
+        return df
+    # Databento df: ts_event index (UTC) + open/high/low/close/volume. Standardize to our contract.
+    df = df.rename(columns={"open": "Open", "high": "High", "low": "Low",
+                            "close": "Close", "volume": "Volume"})
+    if df.index.tz is None:
+        df.index = df.index.tz_localize("UTC")
+    return _filter_rth(df[["Open", "High", "Low", "Close", "Volume"]], day)
+
+
 def load_history(instrument: str, source: str = "yf",
                  day: Optional[str] = None, lookback: str = "5d"):
-    """1-min RTH OHLCV for `instrument` (MES/MNQ). source 'ib' | 'yf'.
+    """1-min RTH OHLCV for `instrument` (MES/MNQ). source 'ib' | 'databento' | 'yf'.
 
     'yf': last `lookback` of 1-min bars (yfinance caps 1m at ~7 days), RTH-filtered,
-          optionally narrowed to a single ET `day`.
+          optionally narrowed to a single ET `day`. Synthetic volume.
+    'databento': real, clean CME 1-min bars (GLBX.MDP3 continuous) — trustworthy volume.
     'ib': pulls via the IB bridge (Gateway must be running).
     Returns a DataFrame with Open/High/Low/Close/Volume indexed by tz-aware datetime.
     """
     inst = instrument.upper()
+    if source == "databento":
+        return _load_databento(inst, day, lookback)
     if source == "ib":
         from sovereign.futures.ib_bridge import IBBridge
         bridge = IBBridge()
