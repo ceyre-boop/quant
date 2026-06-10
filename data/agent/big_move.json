@@ -1,0 +1,18 @@
+{
+  "updated_at": "2026-06-09T23:06:17.897660+00:00",
+  "instrument": "MES",
+  "direction": "SHORT",
+  "expected_move_pts": 92.52,
+  "drawn_to_level": 7299.23,
+  "trigger_window": "09:30-10:30 ET",
+  "catalyst": "overnight rejection below prior day low, price trading well below POC/VAH",
+  "conviction": 2,
+  "probability": 0.58,
+  "falsifier": "MES reclaims and holds above POC 7415 on RTH open",
+  "reasoning": "Last price 7391.75 is below prior day close 7415.75 and POC 7415.3, with only 25% of volume above VWAP \u2014 bearish structural lean.\nADR already used 231% suggests extended range day with downside continuation toward lower implied-move bound 7299.\nCVD slope is positive but quality is LOW, reducing reliability; price action below value area (VAL 7413) is the dominant signal.",
+  "vix": 19.87,
+  "implied_move_pts": 92.52,
+  "regime": "TRENDING",
+  "cvd_slope": 24940.2,
+  "model": "claude-sonnet-4-6"
+}
