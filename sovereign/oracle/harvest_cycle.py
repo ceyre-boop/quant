@@ -122,6 +122,57 @@ def _detect_anomalies(records: list[dict], trades: list[dict]) -> list[str]:
     return anomalies
 
 
+ES_NQ_SESSION_LOG = ROOT / "data" / "es_nq" / "session_log.jsonl"
+
+
+def _load_recent_es_nq_sessions(hours: int = 24) -> list[dict]:
+    """PAPER-mode ES/NQ session records from the last N hours.
+
+    Oracle reads the es_nq FILES; es_nq never imports oracle (isolation, brief
+    rule #8). BACKTEST/BRIEF records are excluded — Oracle learns from real
+    (paper) sessions only.
+    """
+    if not ES_NQ_SESSION_LOG.exists():
+        return []
+    cutoff = datetime.now(timezone.utc) - timedelta(hours=hours)
+    out = []
+    for line in ES_NQ_SESSION_LOG.read_text().splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        rec = json.loads(line)
+        if rec.get("mode") != "PAPER":
+            continue
+        try:
+            ts = datetime.fromisoformat(rec["ts"])
+        except (KeyError, ValueError):
+            continue
+        if ts >= cutoff:
+            out.append(rec)
+    return out
+
+
+def _es_nq_block(sessions: list[dict]) -> Optional[dict]:
+    """Compact ES/NQ summary for the harvest — bias call vs outcome, trades, P&L."""
+    if not sessions:
+        return None
+    trades = [t for s in sessions for t in s.get("trades", [])]
+    correct = [s.get("bias_was_correct") for s in sessions
+               if s.get("bias_was_correct") is not None]
+    return {
+        "sessions": len(sessions),
+        "bias_calls": [{"date": s.get("session_date"),
+                        "direction": (s.get("bias") or {}).get("direction"),
+                        "confidence": (s.get("bias") or {}).get("confidence"),
+                        "correct": s.get("bias_was_correct")} for s in sessions],
+        "bias_accuracy": (round(sum(1 for c in correct if c) / len(correct), 4)
+                          if correct else None),
+        "trades": len(trades),
+        "session_r_total": round(sum(s.get("session_r_total", 0.0) for s in sessions), 4),
+        "session_usd_total": round(sum(s.get("session_usd_total", 0.0) for s in sessions), 2),
+    }
+
+
 def run_harvest(date: Optional[str] = None, hours: int = 24) -> dict:
     """
     Run the full harvest cycle. Returns daily summary dict.
@@ -158,6 +209,7 @@ def run_harvest(date: Optional[str] = None, hours: int = 24) -> dict:
         "anomalies":        _detect_anomalies(forensics, trades),
         "forensic_records_processed": len(forensics),
         "data_window_hours": hours,
+        "es_nq":            _es_nq_block(_load_recent_es_nq_sessions(hours)),
     }
 
     out_path = HARVEST_DIR / f"daily_harvest_{date}.json"
