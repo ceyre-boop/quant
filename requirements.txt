@@ -39,3 +39,7 @@ responses>=0.23.0
 pytz>=2023.3
 python-dateutil>=2.8.0
 tenacity>=8.2.0
+
+# Futures replay — real CME 1-min bars (GLBX.MDP3). Local/dev only; NOT in requirements-dashboard.txt
+# (Render doesn't run the replay-from-Databento path). Needs DATABENTO_API_KEY in .env.
+databento>=0.34.0

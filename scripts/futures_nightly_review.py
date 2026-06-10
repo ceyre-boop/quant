@@ -116,6 +116,7 @@ def main() -> int:
               if rc.session_date(t) == day and t.get("size_contracts")]
     closed = [t for t in trades if t.get("exit") is not None]
     learning = sum(1 for t in trades if rc.reasoning_field(t, "learning_mode"))
+    delayed = sum(1 for t in trades if t.get("data_quality") == "LIVE_PAPER_DELAYED")
     wins = sum(1 for t in closed if rc.is_win(t))
     losses = sum(1 for t in closed if rc.is_win(t) is False)
     pnls = [rc.trade_pnl_usd(t) for t in closed]
@@ -127,6 +128,9 @@ def main() -> int:
 
     print(f"\n{'='*60}\n  FUTURES NIGHTLY REVIEW — {day}\n{'='*60}")
     print(f"  TRADES: {len(trades)} placed / {learning} learning-mode / {len(closed)} closed")
+    if delayed:
+        print(f"  {('⚠ ')}DELAYED FEED: {delayed}/{len(trades)} reps on stale data "
+              f"(LIVE_PAPER_DELAYED) — re-examine once real-time data is live")
     print(f"  WIN/LOSS: {wins}W {losses}L  (win rate {overall_wr if overall_wr is not None else 'n/a'})")
     print(f"  NET P&L (costed): ${gross:+.2f}   AVG R: {avg_r if avg_r is not None else 'n/a'}")
 

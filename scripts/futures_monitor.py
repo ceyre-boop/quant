@@ -40,6 +40,11 @@ from sovereign.futures.config import futures_params
 BIAS_LOG  = ROOT / "data" / "futures" / "bias_log.jsonl"
 TRADE_LOG = ROOT / "data" / "futures" / "trade_log.jsonl"
 
+# A just-closed 1-min bar is ~60-120s old; the un-subscribed CME feed runs ~11 min behind. Above this
+# threshold the feed is DELAYED → real fills are tagged LIVE_PAPER_DELAYED (kept for learning, but
+# flagged for re-examination once a real-time data subscription exists).
+STALE_BAR_SECONDS = 300
+
 TICKER_MAP = {"MES": "ES=F", "MNQ": "NQ=F"}
 
 # ANSI
@@ -323,7 +328,7 @@ def _build_record(instrument: str, direction: str, entry: float, stop: float, t1
 
 def _execute_decision(d, instrument: str, bias: dict, dry_run: bool, ib_connected: bool,
                       bridge, session_trades: int, session_r: float, proposals_count: int,
-                      loss_limit: float) -> tuple[datetime, int, int]:
+                      loss_limit: float, feed_delayed: bool = False) -> tuple[datetime, int, int]:
     """Execute + log a decision_engine EntryDecision (full setup ladder + reasoning block).
     Auto-places the bracket (paper); logs the annotated trade. The single execution path."""
     now = datetime.now(timezone.utc)
@@ -345,7 +350,8 @@ def _execute_decision(d, instrument: str, bias: dict, dry_run: bool, ib_connecte
             print(f"\n  {G}{BD}⚡ FILLED {tag} {instrument} @ {entry:.2f}{RS}  SL {stop:.2f}  TP {t1:.2f}"
                   f"  conf={d.confidence} R={d.expected_r}  id={results[0].order_id}")
             notes = f"{tag}: {d.confidence} R={d.expected_r} | order_id={results[0].order_id}{wb}"
-            data_quality = "LIVE_PAPER"   # a real bracket order hit the paper account
+            # a real bracket order hit the paper account; flag if the feed was delayed
+            data_quality = "LIVE_PAPER_DELAYED" if feed_delayed else "LIVE_PAPER"
         except Exception as e:
             print(f"\n  {R}Order failed: {type(e).__name__}: {e}{RS}")
             notes = f"{tag}: order failed: {type(e).__name__}: {e}{wb}"
@@ -792,6 +798,7 @@ def main() -> None:
     orb_low:  float | None = None
     orb_taken: bool = False
     bias_invalidated: bool = False
+    delayed_warned: bool = False
 
     try:
         while True:
@@ -836,6 +843,17 @@ def main() -> None:
                     print(f"  {Y}  Entry generation stopped. No shadow trades. Reconnect + restart to resume.{RS}")
                     _log_session_halted(instrument, "IB_DISCONNECTED")
                     break
+
+                # ── Feed freshness: tag reps from a delayed feed (IBKR delayed data, no real-time sub) ──
+                try:
+                    bar_age = (datetime.now(timezone.utc) - curr_ts.to_pydatetime()).total_seconds()
+                except Exception:
+                    bar_age = 0.0
+                feed_delayed = bar_age > STALE_BAR_SECONDS
+                if feed_delayed and not delayed_warned:
+                    delayed_warned = True
+                    print(f"\n  {Y}{BD}⚠ DELAYED FEED — bars ~{bar_age/60:.0f} min old. Real fills tagged "
+                          f"LIVE_PAPER_DELAYED (kept for learning, flagged for re-exam).{RS}")
 
                 # ── ONE decision engine: ORB / VWAP-MR / micro + full telemetry (== replay) ──
                 if proposals_count < max_trades and (bias_dir_eff in ("LONG", "SHORT") or learning_mode):
@@ -882,6 +900,7 @@ def main() -> None:
                         last_proposal_time, session_trades, proposals_count = _execute_decision(
                             decision, instrument, bias, dry_run, ib_connected, bridge,
                             session_trades, session_r, proposals_count, loss_limit,
+                            feed_delayed=feed_delayed,
                         )
                     elif trace:
                         print(f"\n  {DM}[trace] {instrument} no entry @ {curr_price:.2f} | "

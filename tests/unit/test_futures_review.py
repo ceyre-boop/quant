@@ -101,18 +101,22 @@ def test_review_empty_safe(tmp_path, monkeypatch):
 
 
 def test_load_trades_filters_simulated(tmp_path):
-    # Guard 3: SIMULATED records are excluded by default, visible with include_simulated=True
+    # Guard 3 + delayed tag: SIMULATED excluded by default; LIVE_PAPER and LIVE_PAPER_DELAYED both
+    # KEPT (delayed reps stay in the learning loop, just flagged); untagged legacy kept.
     log = tmp_path / "trade_log.jsonl"
     rows = [
         {"ts": "2026-06-09T14:00:00+00:00", "instrument": "MNQ", "entry": 100, "exit": 105,
          "size_contracts": 1, "data_quality": "LIVE_PAPER"},
         {"ts": "2026-06-09T14:05:00+00:00", "instrument": "MNQ", "entry": 100, "exit": 100,
          "size_contracts": 1, "data_quality": "SIMULATED"},
+        {"ts": "2026-06-09T14:08:00+00:00", "instrument": "MNQ", "entry": 100, "exit": 103,
+         "size_contracts": 1, "data_quality": "LIVE_PAPER_DELAYED"},
         {"ts": "2026-06-09T14:10:00+00:00", "instrument": "MNQ", "entry": 100, "exit": 102,
          "size_contracts": 1},  # untagged legacy → kept (backward-compatible)
     ]
     log.write_text("".join(json.dumps(r) + "\n" for r in rows))
     default = rc.load_trades(log)
-    assert len(default) == 2 and all(r.get("data_quality") != "SIMULATED" for r in default)
+    assert len(default) == 3 and all(r.get("data_quality") != "SIMULATED" for r in default)
+    assert any(r.get("data_quality") == "LIVE_PAPER_DELAYED" for r in default)  # delayed stays in
     full = rc.load_trades(log, include_simulated=True)
-    assert len(full) == 3
+    assert len(full) == 4
