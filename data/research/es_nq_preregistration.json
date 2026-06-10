@@ -1,0 +1,81 @@
+{
+  "registered_at": "2026-06-10T21:30:00Z",
+  "registered_by": "colin + claude (ES/NQ build session)",
+  "system": "ES_NQ_DAILY_INTELLIGENCE_ENGINE",
+  "status": "LOCKED_BEFORE_ANY_BACKTEST",
+  "instrument": {
+    "research_symbol": "NQ.v.0 (Databento GLBX.MDP3, volume-rolled continuous front month)",
+    "trade_instruments": ["MNQ", "MES"]
+  },
+  "splits": {
+    "is": ["2018-01-01", "2020-12-31"],
+    "oos": ["2021-01-01", "2023-12-31"],
+    "holdout": ["2024-01-01", "2025-12-31"],
+    "holdout_policy": "RUN ONCE on the configuration frozen by Stages 1-3. Sentinel data/research/.es_nq_holdout_done prevents re-runs. Result reported regardless of outcome.",
+    "paper": ["2026-01-01", null]
+  },
+  "bias_weights_preregistered": {
+    "overnight": 0.30,
+    "calendar": 0.25,
+    "vix": 0.20,
+    "hurst": 0.15,
+    "international": 0.10,
+    "policy": "NEVER fit. Alternative weights may be tested only AFTER primary validation completes, as separately-ledgered hypotheses."
+  },
+  "outcome_definition": {
+    "primary": "direction_real = sign(rth_close - rth_open), where rth_open is the Open of the 09:30 ET five-minute bar and rth_close is the last RTH bar Close. Exact-zero sessions excluded from the accuracy denominator.",
+    "secondary_reported_only": "Sessions with |rth_close/rth_open - 1| < 0.15% marked FLAT and excluded; FLAT fraction reported. Never gates."
+  },
+  "input_definitions": {
+    "overnight": "ret = (last 1-min Close at/before 09:25 ET) / (prior session 16:00 RTH close) - 1. Score = clip(ret / 0.003, -1, +1). Score forced to 0 on contract-roll days (continuous series is spliced, not back-adjusted; cross-contract returns are artifacts).",
+    "calendar": "See amendment A1.",
+    "vix": "Data through prior session close only. dir5 = sign(VIX[t-1] - VIX[t-6]); rel = sign(VIX[t-1] - SMA20(VIX)[t-1]). Score = 0.5*(-dir5) + 0.5*(-rel). Falling / below-MA VIX is bullish NQ.",
+    "hurst": "Variance-ratio Hurst (same math as universe_sweep._rolling_hurst) on the trailing 20 daily RTH-close log returns ending at t-1. ctx = sign(sum of last 5 daily log returns through t-1). Score = +ctx if H > 0.55; -ctx if H < 0.45; else 0.",
+    "international": "Nikkei: same-calendar-date close (Tokyo session completes ~01:00-02:00 ET, strictly pre-09:30) close-to-close sign; 0 on Tokyo holidays. DAX: prior COMPLETED session close-to-close sign (DAX is still open at 09:30 ET; stale by design, documented). Score = 0.5*nikkei + 0.5*dax."
+  },
+  "lookahead_cutoffs": {
+    "overnight": "09:25 ET session day",
+    "calendar": "event dates known in advance; live tone uses only pre-09:30 releases",
+    "vix": "prior session close",
+    "hurst": "prior session close",
+    "international": "Nikkei same-day close (pre-02:00 ET); DAX prior session close"
+  },
+  "amendments": [
+    {
+      "id": "A1",
+      "title": "Economic calendar input degraded for backtests (2018-2025)",
+      "registered_before_validation": true,
+      "reason": "No source exists in the system for historical consensus-vs-actual economic surprise tone (Forex Factory scraper is today-only; Alpha Vantage and FRED carry no historical consensus).",
+      "backtest_treatment": "Input 2 contributes 0 to direction. High-impact event days (FOMC decision, CPI release, Employment Situation release; dates from data/es_nq/econ_calendar_2018_2026.json - FOMC hand-tabulated from Fed public schedules, CPI and NFP from FRED release-dates API) apply a 0.75 multiplier to bias confidence. Effective directional weights are the remaining four renormalized.",
+      "live_treatment": "2026+ live path uses data/calendar_fetcher.py for real event tone with the full pre-registered weight.",
+      "disclosure": "This live-vs-backtest asymmetry is disclosed in every validation stage report."
+    }
+  ],
+  "structure_gate": {
+    "levels": "PDH/PDL (prior session RTH high/low), ONH/ONL (overnight 18:00->09:30 ET high/low)",
+    "sweep": "bar exceeds level by >= 0.1% then a Close back inside the level within 3 five-minute bars; extreme = min/max across sweep..reclaim bars",
+    "confirmation": "after reclaim: price touches session VWAP (typical-price cumulative, identical to sovereign/futures/scalp_strategy.compute_indicators), then one bar closing in bias direction with Volume > 1.2x rolling-20-bar average; must complete before 12:00 ET",
+    "execution": "entry next bar Open + 0.25 tick slippage; stop = sweep extreme -/+ 2 ticks (0.5 tick slippage on stop fills); T1 = 1.5x stop distance (half off, stop to breakeven effective from the NEXT bar after the T1 fill), T2 = 2.5x; if stop and target are both touched within one bar, STOP fills first (conservative); flat by 15:55 ET",
+    "roll_days": "excluded from structure-gate trading (backtest and live)"
+  },
+  "bias_only_baseline": "If bias != NEUTRAL: enter at the 09:35 ET bar Open in bias direction, stop = entry -/+ 1.0 x daily ATR(14), same T1/T2 ratios and cost model, flat 15:55. This is the Stage-2 comparison arm.",
+  "sizing_ladder": {
+    "probe": 0.005, "press": 0.010, "pullback": 0.0025, "runner": 0.005,
+    "rules": "trade1 probe; trade2 press if probe won else pullback; trade3 runner only if trades 1 AND 2 both won; max 3 trades; hard daily stop at -1.5% of account",
+    "stage3_comparison": "adaptive ladder vs flat 0.5% per trade, identical trades"
+  },
+  "cost_model": {
+    "commission_per_side_usd": 0.35,
+    "slippage_ticks_entry": 0.25,
+    "slippage_ticks_stop": 0.5,
+    "robustness_reporting": "Stages 2/3 also reported under 1.0 tick/side + $0.74 RT (informational, never gates)"
+  },
+  "validation_stages": {
+    "stage1": "ESNQ-BIAS-01: OOS 2021-2023 directional accuracy on non-NEUTRAL calls. Primary null: permute realized direction labels across OOS sessions, 10000 draws, seed 7. Secondary (reported): circular-shift null. Gate: accuracy > 50% AND p < 0.05, else KILL (paper runner permanently blocked).",
+    "stage2": "ESNQ-GATE-02: structure-gate trades vs bias_only baseline, net R/trade. Null: random same-direction entries drawn from the eligible 09:35-12:00 bar pool per bias-fired session, identical exit machinery, stop distances resampled from real trades. Gate improves with p < 0.05 else gate dropped.",
+    "stage3": "ESNQ-SIZE-03: adaptive vs flat sizing on identical trades, session-level Sharpe. Null: within-session trade-order permutation re-laddered, 10000 draws, plus bootstrap CI. Adaptive ships only if diff > 0 with p < 0.05, else flat.",
+    "stage4": "ESNQ-HOLDOUT-04: frozen configuration on 2024-2025, run once, report whatever it says.",
+    "both_sides_rule": "Every stage reports condition-met AND condition-not-met cohorts (the combat-rules rule)."
+  },
+  "ledger": "Entries appended to data/agent/hypothesis_ledger.json (canonical path; the brief's data/research/ path is a known discrepancy, resolved here). Full machine results to data/research/es_nq_validation.json."
+}

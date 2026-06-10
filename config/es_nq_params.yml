@@ -1,0 +1,89 @@
+# ES/NQ Daily Intelligence Engine — single source of truth for ALL thresholds.
+# PRE-REGISTERED 2026-06-10 (data/research/es_nq_preregistration.json) BEFORE any
+# backtest ran. Bias weights are the brief's pre-registered values — NEVER fit them.
+# Changes require a logged rationale in data/agent/param_change_log.jsonl (rule #4).
+
+meta:
+  version: 1
+  research_symbol: "NQ.v.0"        # Databento GLBX.MDP3 volume-rolled continuous front month
+  trade_instrument: "MNQ"
+  session_tz: "America/New_York"
+  rth_open: "09:30"
+  rth_close: "16:00"
+  globex_open: "18:00"             # prior calendar day ET
+
+splits:                            # holdout is touched ONCE (sentinel-enforced)
+  is_period:  ["2018-01-01", "2020-12-31"]
+  oos:        ["2021-01-01", "2023-12-31"]
+  holdout:    ["2024-01-01", "2025-12-31"]
+  paper:      ["2026-01-01", null]
+
+bias:
+  weights:                         # PRE-REGISTERED — tripwire test asserts these exact values
+    overnight: 0.30
+    calendar: 0.25
+    vix: 0.20
+    hurst: 0.15
+    international: 0.10
+  neutral_below_confidence: 0.40   # NEUTRAL = no trade; the skip is a trade
+  overnight_cutoff_et: "09:25"     # Globex price at 09:25 vs prior 16:00 RTH close
+  overnight_strong_pct: 0.003      # |ret| at which overnight score saturates to +/-1
+  hurst:
+    window_days: 20                # trailing daily RTH-close log returns through t-1
+    momentum_above: 0.55
+    reversion_below: 0.45
+    context_return_days: 5
+  vix:
+    direction_days: 5
+    ma_days: 20
+  calendar_event_confidence_mult: 0.75   # Amendment A1: event-day confidence haircut (backtest)
+
+structure:
+  bar_minutes: 5
+  sweep_min_pct: 0.001             # exceed PDH/PDL/ONH/ONL by >= 0.1%
+  sweep_reclaim_bars: 3            # close back inside within 3 five-min bars
+  confirm_volume_mult: 1.2
+  confirm_volume_lookback: 20      # rolling 20 five-min bars
+  stop_buffer_ticks: 2
+  t1_r: 1.5
+  t2_r: 2.5
+  t1_fraction: 0.5                 # half off at T1, stop to breakeven, rest to T2
+  entry_deadline_et: "12:00"       # no new entries after
+  flat_by_et: "15:55"
+
+sizing:
+  account_base_usd: 50000.0
+  ladder:                          # 3-trade session model (brief Component 3)
+    probe: 0.005
+    press: 0.010
+    pullback: 0.0025
+    runner: 0.005
+  daily_loss_cap_pct: 0.015        # hard stop, all trading ends
+  max_trades_per_session: 3
+
+bias_only_baseline:                # Stage-2 comparison arm (pre-registered)
+  entry_bar_et: "09:35"            # enter at this bar's Open in bias direction
+  stop_atr_mult: 1.0               # daily ATR(14)
+  atr_period_days: 14
+
+costs:                             # brief's cost model (micro contracts)
+  commission_per_side_usd: 0.35
+  slippage_ticks_entry: 0.25
+  slippage_ticks_stop: 0.5
+  # Robustness reporting only (harsher sandbox model): 1.0 tick/side + $0.74 RT
+  legacy_slippage_ticks_per_side: 1.0
+  legacy_commission_per_round_turn_usd: 0.74
+
+contracts:
+  MNQ: {underlying: "NQ=F", dollars_per_point: 2.0, tick: 0.25}
+  MES: {underlying: "ES=F", dollars_per_point: 5.0, tick: 0.25}
+
+outcome:                           # bias accuracy target (pre-registered, G)
+  primary: "sign(rth_close - rth_open); rth_open = 09:30 five-min bar Open; zeros excluded"
+  secondary_noise_threshold_pct: 0.0015   # FLAT band, reported only — never gates
+
+validation:
+  permutations: 10000
+  seed: 7
+  p_threshold: 0.05
+  min_oos_accuracy: 0.50
