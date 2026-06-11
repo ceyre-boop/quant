@@ -85,9 +85,13 @@ def pull_globex_history(start: str, end: str, symbol: Optional[str] = None,
     df = pd.concat(frames)
     df = df.rename(columns={"open": "Open", "high": "High", "low": "Low",
                             "close": "Close", "volume": "Volume"})
-    if "symbol" not in df.columns:
-        raise SystemExit("FATAL: Databento to_df() lacks 'symbol' column — roll detection "
-                         "impossible. Check databento version / map_symbols behavior.")
+    # Continuous-symbol requests map the 'symbol' column to the alias (NQ.v.0),
+    # so the roll detector keys on instrument_id — it changes when the front
+    # contract rolls (verified databento 0.79.0, 2026-06-10).
+    if "instrument_id" not in df.columns:
+        raise SystemExit("FATAL: Databento to_df() lacks 'instrument_id' column — roll "
+                         "detection impossible. Check databento version.")
+    df["symbol"] = df["instrument_id"].astype(str)
     if df.index.tz is None:
         df.index = df.index.tz_localize("UTC")
     df = df[~df.index.duplicated(keep="first")].sort_index()

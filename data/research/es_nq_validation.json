@@ -1,0 +1,100 @@
+{
+ "stage1": {
+  "verdict": "NOT_SIGNIFICANT",
+  "report": {
+   "real_accuracy_oos": 0.5142857142857142,
+   "n_calls_oos": 315,
+   "n_sessions_oos": 773,
+   "p_primary_label_permutation": 0.5667,
+   "p_secondary_circular_shift": 0.5745,
+   "null_acc_mean": 0.5159161904761904,
+   "null_acc_p95": 0.5587301587301587,
+   "is_reference": {
+    "accuracy": 0.5239520958083832,
+    "n_calls": 334,
+    "label": "IN-SAMPLE 2018-2020 \u2014 reference only"
+   },
+   "both_sides": {
+    "up_calls": {
+     "n": 194,
+     "n_called": 194,
+     "accuracy": 0.5670103092783505,
+     "mean_move_pct": 0.0009784119325758423
+    },
+    "down_calls": {
+     "n": 121,
+     "n_called": 121,
+     "accuracy": 0.4297520661157025,
+     "mean_move_pct": 0.0014235383595370779
+    },
+    "neutral_abstained": {
+     "n": 458,
+     "n_called": 0,
+     "accuracy": null,
+     "mean_move_pct": -7.175757416471242e-05
+    },
+    "event_days": {
+     "n": 97,
+     "n_called": 33,
+     "accuracy": 0.42424242424242425,
+     "mean_move_pct": 0.000641247332475191
+    },
+    "non_event_days": {
+     "n": 676,
+     "n_called": 282,
+     "accuracy": 0.524822695035461,
+     "mean_move_pct": 0.000394961680778355
+    }
+   },
+   "secondary_outcome_flat_excluded": {
+    "accuracy": 0.5234657039711191,
+    "n": 277,
+    "flat_fraction": 0.12677878395860284,
+    "label": "secondary outcome (|move|>=0.15%) \u2014 reported only, never gates"
+   },
+   "amendment_a1_disclosure": "Backtest calendar input contributes 0 direction (no historical surprise tone exists); event days apply x0.75 confidence. Live uses real tone \u2014 live confidence will differ on event days."
+  },
+  "perms": 10000,
+  "seed": 7,
+  "run_at": "2026-06-11T01:30:58.360725+00:00",
+  "post_mortem_exploratory": {
+   "label": "EXPLORATORY \u2014 run after the Stage-1 verdict; never a validation claim. OOS is now contaminated for any future formal claim on these inputs.",
+   "per_input_standalone_oos": {
+    "overnight": {
+     "n_active": 761,
+     "acc": 0.511,
+     "edge_vs_base": -0.029
+    },
+    "vix": {
+     "n_active": 595,
+     "acc": 0.509,
+     "edge_vs_base": -0.025
+    },
+    "hurst": {
+     "n_active": 548,
+     "acc": 0.496,
+     "edge_vs_base": -0.055
+    },
+    "international": {
+     "n_active": 496,
+     "acc": 0.522,
+     "edge_vs_base": -0.032
+    }
+   },
+   "strong_overnight": {
+    "abs_score_ge_0.5 (>=0.15% move)": {
+     "n": 595,
+     "acc": 0.521,
+     "base": 0.541
+    },
+    "abs_score_ge_1.0 (>=0.30% move)": {
+     "n": 486,
+     "acc": 0.506,
+     "base": 0.516
+    }
+   },
+   "conclusion": "Every input standalone underperforms the UP base rate (0.543). No reformulation candidate exists among these five inputs \u2014 reweighting zero-signal inputs cannot produce signal. FULL BURIAL. Holdout 2024-2025 remains untouched."
+  }
+ },
+ "stages_2_3_4": "NOT RUN \u2014 blocked by design (Stage 1 NOT_SIGNIFICANT kills the chain)."
+}
