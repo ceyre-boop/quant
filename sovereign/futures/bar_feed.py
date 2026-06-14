@@ -143,7 +143,9 @@ def load_history(instrument: str, source: str = "yf",
             bridge.disconnect()
         return _filter_rth(df, day)
 
-    # yfinance fallback
+    # yfinance fallback — MNQ/NQ excluded: NQ=F is not a valid yfinance ticker
+    if inst in ("MNQ", "NQ"):
+        raise RuntimeError(f"IB required for {inst} — no yfinance fallback configured (NQ=F is delisted).")
     import yfinance as yf
     import pandas as pd
     ticker = TICKER_MAP.get(inst, "ES=F")

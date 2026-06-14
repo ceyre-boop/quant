@@ -65,6 +65,15 @@ class IBBridge:
 
     def connect(self) -> None:
         """Connect to IB Gateway. Raises if Gateway isn't running."""
+        if self._connected:
+            # Tear down before reconnecting — prevents reqAccountSummary accumulation
+            # (ib_async sends a new reqAccountSummary on each connect; if the prior
+            # subscription wasn't cancelled, TWS returns Error 322 on the next one).
+            try:
+                self._ib.disconnect()
+            except Exception:
+                pass
+            self._connected = False
         host, port, cid = IB_HOST(), IB_PORT(), IB_CLIENT_ID()
         logger.info(f"[IBBridge] Connecting to {host}:{port} (clientId={cid})")
         self._ib.connect(host, port, clientId=cid, readonly=False)

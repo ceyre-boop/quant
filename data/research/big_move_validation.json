@@ -1,0 +1,120 @@
+{
+  "generated_at": "2026-06-14T19:47:52.533155+00:00",
+  "mode": "live",
+  "params": {
+    "threshold": 0.5,
+    "cost_pct": 0.0002,
+    "nperm": 2000,
+    "alpha": 0.05,
+    "min_oos_sharpe": 0.3
+  },
+  "verdict": "FAIL",
+  "gates": {
+    "oos_sharpe>=min": false,
+    "permutation<alpha": false,
+    "walkforward_robust": false
+  },
+  "portfolio": {
+    "is_sharpe": -3.119,
+    "oos_sharpe": -7.847,
+    "pooled_permutation_p": 1.0,
+    "walkforward": {
+      "2021": -4.673,
+      "2022": -9.705,
+      "2023": -4382407220762443.0,
+      "2024": -1.0810476177073352e+16
+    },
+    "walkforward_verdict": "FRAGILE"
+  },
+  "per_pair": [
+    {
+      "pair": "GBPUSD",
+      "is_sharpe": -2.925,
+      "oos_sharpe": -2.166,
+      "oos_ci": [
+        -2.82,
+        -1.511
+      ],
+      "oos_trades": 30,
+      "decay": "INCONCLUSIVE",
+      "decay_note": "In-sample Sharpe is zero or negative \u2014 cannot compute ratio.",
+      "p_value": 1.0,
+      "walkforward": {
+        "2021": -6.546,
+        "2022": -0.694,
+        "2023": -1.872,
+        "2024": 0.0
+      },
+      "bh_rank": 1,
+      "bh_threshold": 0.0125,
+      "bh_status": "FAILS_BH"
+    },
+    {
+      "pair": "EURUSD",
+      "is_sharpe": -3.976,
+      "oos_sharpe": -13.731,
+      "oos_ci": [
+        -17.347,
+        -10.116
+      ],
+      "oos_trades": 28,
+      "decay": "INCONCLUSIVE",
+      "decay_note": "In-sample Sharpe is zero or negative \u2014 cannot compute ratio.",
+      "p_value": 1.0,
+      "walkforward": {
+        "2021": -6.284,
+        "2022": 0.0,
+        "2023": 0.0,
+        "2024": 0.0
+      },
+      "bh_rank": 2,
+      "bh_threshold": 0.025,
+      "bh_status": "FAILS_BH"
+    },
+    {
+      "pair": "USDJPY",
+      "is_sharpe": -3.105,
+      "oos_sharpe": -11.173,
+      "oos_ci": [
+        -13.259,
+        -9.087
+      ],
+      "oos_trades": 56,
+      "decay": "INCONCLUSIVE",
+      "decay_note": "In-sample Sharpe is zero or negative \u2014 cannot compute ratio.",
+      "p_value": 1.0,
+      "walkforward": {
+        "2021": -4.14,
+        "2022": -27.152,
+        "2023": -54.208,
+        "2024": -3.427955392445894e+16
+      },
+      "bh_rank": 3,
+      "bh_threshold": 0.0375,
+      "bh_status": "FAILS_BH"
+    },
+    {
+      "pair": "AUDUSD",
+      "is_sharpe": -2.503,
+      "oos_sharpe": -3.3,
+      "oos_ci": [
+        -4.209,
+        -2.392
+      ],
+      "oos_trades": 30,
+      "decay": "INCONCLUSIVE",
+      "decay_note": "In-sample Sharpe is zero or negative \u2014 cannot compute ratio.",
+      "p_value": 1.0,
+      "walkforward": {
+        "2021": -1.973,
+        "2022": -4.256,
+        "2023": -1.8986130184615924e+16,
+        "2024": 0.0
+      },
+      "bh_rank": 4,
+      "bh_threshold": 0.05,
+      "bh_status": "FAILS_BH"
+    }
+  ],
+  "discipline_note": "Weights in big_move.py are hand-set priors. A FAIL keeps the meter display-only \u2014 that is a valid, expected outcome, not a bug. Record the verdict in a logged rationale before any live wiring (CLAUDE.md #4)."
+}

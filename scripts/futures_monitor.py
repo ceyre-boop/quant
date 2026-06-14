@@ -163,9 +163,11 @@ def _fetch_bars(instrument: str, bridge=None, contract=None, require_ib: bool = 
                 return df
         except Exception:
             pass  # fall through to yfinance (unless IB is required)
-    if require_ib:
+    if require_ib or instrument == "MNQ":
         import pandas as pd
-        return pd.DataFrame()   # no yfinance shadow data when IB is the required source
+        if instrument == "MNQ":
+            print(f"[warn] IB unavailable for MNQ — no yfinance fallback. Skipping bar fetch.")
+        return pd.DataFrame()
     import yfinance as yf
     import pandas as pd
     ticker = TICKER_MAP[instrument]
@@ -772,6 +774,13 @@ def main() -> None:
     print(f"  Today's bias: {bias_dir} conviction {bias.get('conviction',0)}/3")
     if bias_dir == "NEUTRAL":
         print(f"  {Y}  NEUTRAL bias — signal detection disabled. Display-only mode.{RS}")
+        if not args.learning_mode:
+            # [DEFENSIVE-FALLBACK] No bias entry found for today — auto-enable learning mode
+            # so trades still fire instead of silently doing nothing all session.
+            # This fires when futures_bias.py wasn't run pre-market (the June 11-12 root cause).
+            print(f"  {Y}  [DEFENSIVE-FALLBACK] Enabling --learning-mode automatically.{RS}")
+            print(f"  {Y}  Run 'python3 scripts/futures_bias.py' before open to set a directional lean.{RS}")
+            args.learning_mode = True
     kill_level = _kill_level(bias_dir, bias, instrument)
     if kill_level is not None:
         side = "above" if bias_dir == "SHORT" else "below"
