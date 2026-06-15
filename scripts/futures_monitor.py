@@ -39,6 +39,7 @@ from sovereign.futures.config import futures_params
 
 BIAS_LOG  = ROOT / "data" / "futures" / "bias_log.jsonl"
 TRADE_LOG = ROOT / "data" / "futures" / "trade_log.jsonl"
+SIGNALS_LOG = ROOT / "data" / "futures" / "scalp_signals.jsonl"  # --signals-only emit feed (no orders)
 
 # A just-closed 1-min bar is ~60-120s old; the un-subscribed CME feed runs ~11 min behind. Above this
 # threshold the feed is DELAYED → real fills are tagged LIVE_PAPER_DELAYED (kept for learning, but
@@ -387,6 +388,34 @@ def _build_record(instrument: str, direction: str, entry: float, stop: float, t1
         "exit_reasoning":           None,               # filled at close by reasoning.exit_attribution
         "notes":                    notes,
     }
+
+
+def _emit_signal(d, instrument: str, bias: dict, feed_delayed: bool) -> None:
+    """SIGNALS-ONLY: record a generated signal to data/futures/scalp_signals.jsonl and print it.
+    NEVER places an order — this is pure broker-fed signal generation. The record is explicitly
+    NOT a trade (no fill, no P&L) so it can't be mistaken for one or train the Oracle."""
+    rec = {
+        "ts":          datetime.now(timezone.utc).isoformat(),
+        "kind":        "SIGNAL",                 # not a trade — emit-only
+        "instrument":  instrument,
+        "direction":   d.direction,
+        "setup_type":  d.setup_type,
+        "entry":       round(float(d.entry), 2),
+        "stop":        round(float(d.stop), 2),
+        "target":      (round(float(d.target), 2) if d.target is not None else None),
+        "expected_r":  getattr(d, "expected_r", None),
+        "contracts":   d.contracts,
+        "bias":        bias.get("bias"),
+        "conviction":  bias.get("conviction"),
+        "feed":        "LIVE_PAPER_DELAYED" if feed_delayed else "IB_REALTIME",
+        "placed":      False,                    # signals-only never places
+    }
+    SIGNALS_LOG.parent.mkdir(parents=True, exist_ok=True)
+    with open(SIGNALS_LOG, "a") as f:
+        f.write(json.dumps(rec) + "\n")
+    tgt = f" → T {rec['target']}" if rec["target"] is not None else ""
+    print(f"\n  {G}{BD}📡 SIGNAL {d.setup_type} {d.direction} {instrument} @ {rec['entry']:.2f}"
+          f"  SL {rec['stop']:.2f}{tgt}{RS}  {DM}(emitted, no order · {rec['feed']}){RS}")
 
 
 def _execute_decision(d, instrument: str, bias: dict, dry_run: bool, ib_connected: bool,
@@ -749,13 +778,21 @@ def _parse_args() -> argparse.Namespace:
                          "connected. No shadow trades on yfinance fallback while disconnected.")
     ap.add_argument("--trace", action="store_true",
                     help="Print every bar's gate outcome (why no trade) — Priority-Zero diagnosis.")
+    ap.add_argument("--signals-only", action="store_true",
+                    help="Connect to IB paper for REAL-TIME data but place NO orders: every signal is "
+                         "emitted to data/futures/scalp_signals.jsonl + printed. Unattended, no prompts. "
+                         "Pure broker-fed signal generation (the unproven micro edge never auto-trades).")
     return ap.parse_args()
 
 
 def main() -> None:
     args = _parse_args()
     instrument = args.instrument
-    dry_run    = args.dry_run
+    signals_only = args.signals_only
+    # Signals-only needs live IB data, so it is NOT dry-run for the data path. Placement is
+    # bypassed entirely (the signal handler emits instead of calling _execute_decision), so
+    # no order is ever sent regardless of dry_run.
+    dry_run    = args.dry_run and not signals_only
 
     # ── Paper-only guard ──────────────────────────────────────────────────────
     from dotenv import load_dotenv
@@ -765,8 +802,12 @@ def main() -> None:
         print(f"{R}ERROR: IB_PORT=4001 is the LIVE port. This terminal is paper-only. Exiting.{RS}")
         sys.exit(1)
 
-    print(f"\n{BD}  FUTURES MONITOR — {instrument} {'[DRY-RUN]' if dry_run else ''}{RS}")
-    print(f"  Paper port {ib_port} | python3.13 | Ctrl+C to exit\n")
+    _mode_tag = "[SIGNALS-ONLY]" if signals_only else ("[DRY-RUN]" if dry_run else "")
+    print(f"\n{BD}  FUTURES MONITOR — {instrument} {_mode_tag}{RS}")
+    print(f"  Paper port {ib_port} | python3.13 | Ctrl+C to exit")
+    if signals_only:
+        print(f"  {BD}SIGNALS-ONLY: IB real-time data, NO orders. Signals → data/futures/scalp_signals.jsonl{RS}")
+    print()
 
     # ── Load bias ─────────────────────────────────────────────────────────────
     bias = _load_bias(instrument)
@@ -986,11 +1027,18 @@ def main() -> None:
                         print()  # newline after header
                         if decision.setup_type == "ORB":
                             orb_taken = True
-                        last_proposal_time, session_trades, proposals_count = _execute_decision(
-                            decision, instrument, bias, dry_run, ib_connected, bridge,
-                            session_trades, session_r, proposals_count, loss_limit,
-                            feed_delayed=feed_delayed,
-                        )
+                        if signals_only:
+                            # Emit the signal, place NOTHING. Counts as a proposal + spaces the
+                            # cooldown, but never touches the broker's order path.
+                            _emit_signal(decision, instrument, bias, feed_delayed)
+                            proposals_count += 1
+                            last_proposal_time = datetime.now(timezone.utc)
+                        else:
+                            last_proposal_time, session_trades, proposals_count = _execute_decision(
+                                decision, instrument, bias, dry_run, ib_connected, bridge,
+                                session_trades, session_r, proposals_count, loss_limit,
+                                feed_delayed=feed_delayed,
+                            )
                     elif trace:
                         print(f"\n  {DM}[trace] {instrument} no entry @ {curr_price:.2f} | "
                               f"bias={bias_dir_eff} window_ok={strat.in_trade_window(datetime.now(timezone.utc))} "
