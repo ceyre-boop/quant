@@ -180,10 +180,14 @@ def _ledger_entry(candidate: dict, validator: str, verdict: str, parsed: dict) -
 
 # ── Processing ────────────────────────────────────────────────────────────────
 
-def _process_one(candidate: dict, cfg: dict, live: bool) -> dict:
-    """Process a single queued candidate end-to-end. Returns a result record."""
+def _process_one(candidate: dict, cfg: dict, live: bool, forced_validator: str | None = None) -> dict:
+    """Process a single candidate end-to-end. Returns a result record.
+
+    `forced_validator` overrides keyword routing — used by direct mode so an explicit
+    validate_name actually selects the validator instead of falling through to _route()'s
+    text match. Queue mode passes None and routes by candidate text as before."""
     hyp_id = candidate.get("id", "unknown")
-    validator = _route(candidate)
+    validator = forced_validator or _route(candidate)
     base = {"hypothesis_id": hyp_id, "detector": candidate.get("detector"),
             "timestamp": C.now_iso(), "live": live}
 
@@ -244,12 +248,13 @@ def run(dry_run: bool = True, validate_name: str | None = None) -> dict:
         spec = VALIDATOR_REGISTRY[validate_name]
         synthetic = {
             "id": f"REG-{validate_name}-{datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S')}",
-            "hypothesis": f"Registered validator '{validate_name}' edge check (big move classifier).",
+            "hypothesis": f"Registered validator '{validate_name}' edge check.",
             "test_spec": {"validator": validate_name},
             "mechanism": "Standing system-validation hypothesis run directly via the factory.",
             "detector": "registered_validator",
         }
-        results.append(_process_one(synthetic, cfg, live))
+        # Direct mode: the named validator drives selection — not keyword routing.
+        results.append(_process_one(synthetic, cfg, live, forced_validator=validate_name))
     else:
         # Queue mode: process QUEUED candidates.
         if not QUEUE_PATH.exists():
