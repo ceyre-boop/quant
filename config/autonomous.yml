@@ -1,0 +1,31 @@
+# Autonomous layer configuration — single source of truth for the gate.
+#
+# `live: false` (default) keeps Components 3 (Research Factory) and 4 (Escalation
+# Router) in DRY-RUN: they compute verdicts/escalations and write to shadow files
+# and logs, but DO NOT mutate the curated hypothesis ledger and DO NOT send
+# outbound notifications. Flip to `true` to activate those auto-actions.
+#
+# Components 1 (Health Responder) and 2 (Hypothesis Generator) ignore this flag —
+# they are dispatch/queue-only and safe to run live by design.
+#
+# CLAUDE.md rule #4: changing this is a live behavior change — log a rationale
+# in data/agent/param_change_log.jsonl before flipping `live` to true.
+
+live: false
+
+budget:
+  # Hard daily ceiling across ALL autonomous components (constraint #6).
+  daily_usd_cap: 10.0
+  # Per-run sub-cap for the research factory specifically (constraint #6).
+  factory_daily_usd_cap: 5.0
+
+methodology:
+  # Constraint #2 — every hypothesis test must clear these or verdict = INVALID.
+  min_permutations: 10000
+  p_threshold: 0.05
+  require_walk_forward: true
+  require_both_sides: true
+
+health_responder:
+  # Don't re-dispatch the same component more than once per this many hours.
+  dedup_hours: 6
