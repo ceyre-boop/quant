@@ -969,6 +969,26 @@ class Handler(BaseHTTPRequestHandler):
             except Exception:
                 self._send_json(500, {'error': traceback.format_exc()})
 
+        elif path == '/escalations':
+            # Intelligence feed for the dashboard — recent triaged events from the
+            # autonomous layer's Escalation Router (Component 4). JSONL → JSON array,
+            # newest first, capped. Empty list if the feed doesn't exist yet.
+            try:
+                import pathlib
+                feed = pathlib.Path('data/agent/escalation_log.jsonl')
+                rows = []
+                if feed.exists():
+                    for line in feed.read_text().splitlines():
+                        line = line.strip()
+                        if line:
+                            try:
+                                rows.append(json.loads(line))
+                            except json.JSONDecodeError:
+                                continue
+                rows.reverse()  # newest first
+                self._send_json(200, {'escalations': rows[:100]})
+            except Exception:
+                self._send_json(500, {'error': traceback.format_exc()})
         elif path.startswith('/data/'):
             try:
                 file_path = path.lstrip('/')
