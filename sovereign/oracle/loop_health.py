@@ -17,7 +17,7 @@ from __future__ import annotations
 import glob
 import json
 import logging
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -36,13 +36,17 @@ log = logging.getLogger("oracle.loop_health")
 # fired). A scanner that runs every 5 min but finds no signal is HEALTHY — using the
 # decision log as its heartbeat is a false-alarm bug (fixed: scanners write a heartbeat
 # file every invocation, before any session/signal gate).
+# weekday_only: the loop is scheduled Mon–Fri only (launchd Weekday 1–5). For these,
+# silence is measured EXCLUDING weekend hours — otherwise a Friday→Monday gap (~72h)
+# always blows past the threshold over the weekend and raises a false DOWN alarm.
 HEARTBEAT_EXPECTATIONS = {
     "ict_scanner":       {"max_silence_hours": 0.5, "during": "market_hours", "kind": "periodic"},
-    "forex_scan":        {"max_silence_hours": 30,  "during": "market_hours", "kind": "periodic"},
+    "forex_scan":        {"max_silence_hours": 30,  "during": "market_hours", "kind": "periodic", "weekday_only": True},
     "pulse_check":       {"max_silence_hours": 3,   "during": "always",       "kind": "periodic"},
     "decision_backfill": {"max_silence_hours": 3,   "during": "always",       "kind": "periodic"},
+    "big_move":          {"max_silence_hours": 3,   "during": "always",       "kind": "periodic"},
     "oracle_reflection": {"max_silence_hours": 26,  "during": "always",       "kind": "periodic"},
-    "morning_briefing":  {"max_silence_hours": 26,  "during": "always",       "kind": "periodic"},
+    "morning_briefing":  {"max_silence_hours": 26,  "during": "always",       "kind": "periodic", "weekday_only": True},
     "edge_pipeline":     {"max_silence_hours": 999, "during": "always",       "kind": "event"},
 }
 
@@ -57,6 +61,22 @@ def _parse(ts) -> datetime | None:
         return d.replace(tzinfo=timezone.utc) if d.tzinfo is None else d
     except Exception:
         return None
+
+
+def _weekend_hours(start: datetime, end: datetime) -> float:
+    """Hours within [start, end) that fall on Saturday or Sunday (UTC). Steps by day
+    boundary so a long-dead loop still terminates quickly."""
+    if start >= end:
+        return 0.0
+    total = 0.0
+    cur = start
+    while cur < end:
+        day_end = (cur.replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1))
+        nxt = min(end, day_end)
+        if cur.weekday() in (5, 6):  # Sat, Sun
+            total += (nxt - cur).total_seconds() / 3600
+        cur = nxt
+    return total
 
 
 def _is_market_hours(now: datetime | None = None) -> bool:
@@ -135,7 +155,7 @@ def _last_heartbeat(loop: str) -> datetime | None:
     if hb is not None:
         return hb
     # Fallbacks per loop (execution-based, NOT decision/output-based):
-    if loop in ("pulse_check", "decision_backfill"):
+    if loop in ("pulse_check", "decision_backfill", "big_move"):
         return _pulse_last()
     if loop == "oracle_reflection":
         return _reflection_last()
@@ -167,19 +187,26 @@ def check_all_loops(message: bool = True) -> dict:
         last = _last_heartbeat(loop)
         silence = round((now - last).total_seconds() / 3600, 1) if last else None
         applicable = expect["during"] == "always" or _is_market_hours(now)
+        # Weekday-only loops: discount weekend hours so a Fri→Mon gap doesn't false-alarm.
+        eff_silence = silence
+        if silence is not None and expect.get("weekday_only"):
+            eff_silence = round(silence - _weekend_hours(last, now), 1)
         status = "UNKNOWN"
         if expect["kind"] == "event":
             status = "EVENT_DRIVEN"
         elif last is None:
             status = "NO_DATA"
-        elif silence > expect["max_silence_hours"] and applicable:
+        elif eff_silence > expect["max_silence_hours"] and applicable:
             status = "DOWN"
-            dead.append((loop, silence))
+            dead.append((loop, eff_silence))
         else:
             status = "ALIVE"
-        loops[loop] = {"status": status, "last": last.isoformat() if last else None,
-                       "silence_hours": silence, "threshold": expect["max_silence_hours"],
-                       "kind": expect["kind"]}
+        entry = {"status": status, "last": last.isoformat() if last else None,
+                 "silence_hours": silence, "threshold": expect["max_silence_hours"],
+                 "kind": expect["kind"]}
+        if expect.get("weekday_only"):
+            entry["effective_silence_hours"] = eff_silence  # weekend-adjusted (drives status)
+        loops[loop] = entry
 
     if dead and message:
         for loop, silence in dead:

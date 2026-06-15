@@ -307,7 +307,16 @@ def main() -> dict:
 
     print(f"Fetching data for {args.instrument} bias...", end=" ", flush=True)
 
-    prices = _fetch_prices(args.instrument)
+    try:
+        prices = _fetch_prices(args.instrument)
+    except RuntimeError as e:
+        # No market data (markets closed, or pre-open data not yet posted). Skip
+        # cleanly — write no bias, exit 0. The monitor runs NEUTRAL until a later
+        # run produces data; a missing bias is not a hard failure and must not
+        # surface as a traceback / non-zero exit (which would trip loop_health).
+        print(f"\n  ⚠️  {e} — markets likely closed; no bias written this run.")
+        return {"instrument": args.instrument.upper(), "bias": "NEUTRAL",
+                "skipped": True, "reason": str(e)}
     macro  = _fetch_macro()
     events = _fetch_calendar()
     scored = _score_bias(prices, macro, events)
