@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key><string>com.alta.research.factory</string>
+    <!-- Component 3 of the autonomous layer. Every 4h: processes QUEUED hypotheses,
+         runs the mapped validator, applies the methodology gate, emits a verdict.
+         GATED — runs in DRY-RUN (shadow file only, ledger untouched, no notify) until
+         config/autonomous.yml::live is flipped to true. Never deploys to live trading. -->
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string><string>-c</string>
+        <string>cd /Users/taboost/quant &amp;&amp; /opt/homebrew/bin/python3 sovereign/autonomous/research_factory.py</string>
+    </array>
+    <key>WorkingDirectory</key><string>/Users/taboost/quant</string>
+    <key>StartInterval</key><integer>14400</integer>
+    <key>StandardOutPath</key><string>/Users/taboost/quant/logs/research_factory.log</string>
+    <key>StandardErrorPath</key><string>/Users/taboost/quant/logs/research_factory.err</string>
+    <key>EnvironmentVariables</key><dict><key>PATH</key><string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string></dict>
+</dict>
+</plist>

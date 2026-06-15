@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key><string>com.alta.hypothesis.generator</string>
+    <!-- Component 2 of the autonomous layer. Nightly at 03:00 PT — runs AFTER the
+         Oracle reflect cycle (02:30 PT) so it sees the freshest observations. Pure
+         rule-based candidate generation into auto_hypothesis_queue.jsonl. No LLM. -->
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string><string>-c</string>
+        <string>cd /Users/taboost/quant &amp;&amp; /opt/homebrew/bin/python3 sovereign/autonomous/hypothesis_generator.py</string>
+    </array>
+    <key>WorkingDirectory</key><string>/Users/taboost/quant</string>
+    <key>StartCalendarInterval</key>
+    <dict><key>Hour</key><integer>3</integer><key>Minute</key><integer>0</integer></dict>
+    <key>StandardOutPath</key><string>/Users/taboost/quant/logs/hypothesis_generator.log</string>
+    <key>StandardErrorPath</key><string>/Users/taboost/quant/logs/hypothesis_generator.err</string>
+    <key>EnvironmentVariables</key><dict><key>PATH</key><string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string></dict>
+</dict>
+</plist>
