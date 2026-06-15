@@ -630,6 +630,85 @@ def _handle_chat(message: str, context: str) -> str:
         return f'Chat unavailable: {e}. Ensure ANTHROPIC_API_KEY is set.'
 
 
+def _scalp_journal_payload() -> dict:
+    """Aggregate data/futures/scalp_log.jsonl for the discretionary scalping panel +
+    calendar. Empty-safe (zeros / empty lists before any trade is logged). This file is
+    isolated from the systematic decision logs and is never read by the Oracle."""
+    import pathlib
+    from datetime import datetime, timezone, timedelta
+
+    log = pathlib.Path('data/futures/scalp_log.jsonl')
+    rows = []
+    if log.exists():
+        for line in log.read_text().splitlines():
+            line = line.strip()
+            if line:
+                try:
+                    rows.append(json.loads(line))
+                except json.JSONDecodeError:
+                    continue
+
+    def _dt(r):
+        try:
+            return datetime.fromisoformat(str(r.get('timestamp_entry')).replace('Z', '+00:00'))
+        except (ValueError, TypeError):
+            return None
+
+    now = datetime.now(timezone.utc)
+    day0 = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    week0 = now - timedelta(days=7)
+    month0 = now - timedelta(days=30)
+
+    def _agg(sel):
+        closed = [r for r in sel if r.get('outcome') != 'OPEN']
+        net_r = round(sum(r.get('R_realized') or 0 for r in closed), 2)
+        pnl = round(sum(r.get('pnl_dollars') or 0 for r in closed), 2)
+        wins = sum(1 for r in closed if (r.get('R_realized') or 0) > 0)
+        wr = round(100 * wins / len(closed)) if closed else 0
+        return {'trades': len(sel), 'closed': len(closed), 'net_R': net_r,
+                'pnl': pnl, 'win_rate': wr}
+
+    dated = [(r, _dt(r)) for r in rows]
+    today = _agg([r for r, d in dated if d and d >= day0])
+    week = _agg([r for r, d in dated if d and d >= week0])
+    month_rows = [r for r, d in dated if d and d >= month0]
+    month = _agg(month_rows)
+
+    open_positions = [{
+        'trade_id': r.get('trade_id'), 'instrument': r.get('instrument'),
+        'direction': r.get('direction'), 'entry_price': r.get('entry_price'),
+        'stop_price': r.get('stop_price'), 'target_price': r.get('target_price'),
+        'size_contracts': r.get('size_contracts'), 'thesis': r.get('thesis'),
+        'setup_type': r.get('setup_type'), 'session': r.get('session'),
+    } for r in rows if r.get('outcome') == 'OPEN']
+
+    recent = sorted([r for r in rows if r.get('outcome') != 'OPEN'],
+                    key=lambda x: x.get('timestamp_exit') or x.get('timestamp_entry') or '',
+                    reverse=True)[:12]
+
+    # Setup breakdown over the trailing month (closed trades only).
+    setup_breakdown = {}
+    for r in month_rows:
+        if r.get('outcome') == 'OPEN':
+            continue
+        s = r.get('setup_type') or 'other'
+        b = setup_breakdown.setdefault(s, {'trades': 0, 'wins': 0, 'net_R': 0.0})
+        b['trades'] += 1
+        b['net_R'] = round(b['net_R'] + (r.get('R_realized') or 0), 2)
+        if (r.get('R_realized') or 0) > 0:
+            b['wins'] += 1
+    for s, b in setup_breakdown.items():
+        b['win_rate'] = round(100 * b['wins'] / b['trades']) if b['trades'] else 0
+
+    return {
+        'today': today, 'week': week, 'month': month,
+        'open_positions': open_positions, 'recent': recent,
+        'setup_breakdown': setup_breakdown, 'raw': rows,
+        'discretionary': True,
+        'note': 'Discretionary paper scalping — not a systematic edge.',
+    }
+
+
 class Handler(BaseHTTPRequestHandler):
     def log_message(self, fmt, *args):
         pass  # silence request logs
@@ -989,6 +1068,13 @@ class Handler(BaseHTTPRequestHandler):
                 self._send_json(200, {'escalations': rows[:100]})
             except Exception:
                 self._send_json(500, {'error': traceback.format_exc()})
+        elif path == '/scalp_journal':
+            # Discretionary ES/NQ scalping journal (Colin's manual paper trades).
+            # NOT a systematic signal — separate file, never read by the Oracle.
+            try:
+                self._send_json(200, _scalp_journal_payload())
+            except Exception:
+                self._send_json(500, {'error': traceback.format_exc()})
         elif path.startswith('/data/'):
             try:
                 file_path = path.lstrip('/')
@@ -1005,6 +1091,8 @@ class Handler(BaseHTTPRequestHandler):
                 self._send_static('index.html')
             elif path in ('/ict', '/ict/'):
                 self._send_static('ict/index.html')
+            elif path in ('/scalp_calendar', '/scalp_calendar/'):
+                self._send_static('templates/scalp_calendar.html')
             else:
                 self._send_static(path.lstrip('/'))
 
