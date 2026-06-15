@@ -3510,5 +3510,84 @@ setInterval(()=>{
   if(document.getElementById('tab-trades').classList.contains('active')){trLoad();spLoad();}
 },30000);
 </script>
+
+<!-- ══ SCALPING JOURNAL (discretionary · paper) — self-contained, blue accent ══ -->
+<script>
+(function(){
+  const SCALP_API = (typeof API_BASE !== 'undefined' ? API_BASE : location.origin);
+  // Scoped styles (blue accent — deliberately distinct from the systematic green/gold).
+  const css = `
+  .scalp-section{grid-column:span 12;background:var(--bg2);border:1px solid var(--border);
+    border-left:3px solid var(--blue);padding:20px;margin-top:4px}
+  .scalp-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
+  .scalp-tag{font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--blue);
+    border:1px solid var(--blue);border-radius:3px;padding:2px 6px}
+  .scalp-sub{font-size:10px;color:var(--muted);margin-top:3px}
+  .scalp-rows{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+  .scalp-row{display:flex;justify-content:space-between;font-size:12px;border-bottom:1px solid var(--border);padding-bottom:5px}
+  .scalp-row .k{color:var(--muted)}
+  .scalp-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .scalp-blk-label{font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+  .scalp-li{font-size:11px;color:var(--text);padding:3px 0;border-bottom:1px solid var(--dim)}
+  .scalp-pos{color:var(--green)} .scalp-neg{color:var(--red)}
+  .scalp-setup{display:flex;justify-content:space-between;font-size:11px;padding:3px 0}
+  .scalp-cal-link{display:inline-block;margin-top:12px;font-size:11px;color:var(--blue);text-decoration:none}
+  .scalp-empty{color:var(--muted);font-size:11px;font-style:italic}`;
+  const st=document.createElement('style'); st.textContent=css; document.head.appendChild(st);
+
+  // Build the panel and append into the main dashboard grid (#trade-wrap).
+  const wrap=document.getElementById('trade-wrap');
+  if(!wrap) return;
+  const panel=document.createElement('div');
+  panel.className='scalp-section';
+  panel.id='scalp-journal';
+  panel.innerHTML='<div class="scalp-empty">Loading scalping journal…</div>';
+  wrap.appendChild(panel);
+
+  const money=n=>(n>=0?'+$':'-$')+Math.abs(n).toFixed(2);
+  const rr=n=>(n>=0?'+':'')+Number(n).toFixed(1)+'R';
+  const cls=n=>n>=0?'scalp-pos':'scalp-neg';
+
+  function render(d){
+    if(!d){panel.innerHTML='<div class="scalp-empty">Journal unavailable.</div>';return;}
+    const T=d.today||{},W=d.week||{},M=d.month||{};
+    const total=(T.trades||0)+(W.trades||0)+(M.trades||0);
+    const statRow=(lbl,a)=>`<div class="scalp-row"><span class="k">${lbl}</span>
+      <span>${a.trades||0} trades · <b class="${cls(a.net_R||0)}">${rr(a.net_R||0)}</b> ·
+      <b class="${cls(a.pnl||0)}">${money(a.pnl||0)}</b>${a.closed?` · WR ${a.win_rate}%`:''}</span></div>`;
+    const open=(d.open_positions||[]).map(p=>`<div class="scalp-li">• ${p.instrument} ${p.direction}
+      @${p.entry_price} stop ${p.stop_price} <span style="color:var(--muted)">(${p.setup_type})</span></div>`).join('')
+      || '<div class="scalp-empty">none</div>';
+    const recent=(d.recent||[]).slice(0,6).map(t=>{const r=t.R_realized||0;
+      return `<div class="scalp-li">${r>=0?'✓':'✗'} ${t.instrument} ${t.direction}
+      <b class="${cls(r)}">${rr(r)}</b> <span style="color:var(--muted)">${t.setup_type}</span></div>`;}).join('')
+      || '<div class="scalp-empty">no closed trades</div>';
+    const setups=Object.entries(d.setup_breakdown||{}).sort((a,b)=>(b[1].net_R)-(a[1].net_R))
+      .map(([s,b])=>`<div class="scalp-setup"><span>${s}</span>
+      <span>${b.trades} · WR ${b.win_rate}% · <b class="${cls(b.net_R)}">${rr(b.net_R)}</b></span></div>`).join('')
+      || '<div class="scalp-empty">no data this month</div>';
+    panel.innerHTML=`
+      <div class="scalp-head">
+        <div><div class="section-label">Scalping Journal</div>
+          <div class="scalp-sub">Discretionary · paper · not a systematic edge</div></div>
+        <div class="scalp-tag">Discretionary</div>
+      </div>
+      <div class="scalp-rows">${statRow('Today',T)}${statRow('Week',W)}${statRow('Month',M)}</div>
+      <div class="scalp-grid">
+        <div><div class="scalp-blk-label">Open Positions</div>${open}
+          <div class="scalp-blk-label" style="margin-top:12px">Recent Trades</div>${recent}</div>
+        <div><div class="scalp-blk-label">Setup Breakdown (month)</div>${setups}</div>
+      </div>
+      <a class="scalp-cal-link" href="/scalp_calendar">Full Calendar View →</a>`;
+  }
+
+  function load(){
+    fetch(SCALP_API+'/scalp_journal?t='+Date.now(),{signal:AbortSignal.timeout(6000)})
+      .then(r=>r.ok?r.json():null).then(render).catch(()=>render(null));
+  }
+  load();
+  setInterval(()=>{if(document.getElementById('tab-trade').classList.contains('active'))load();},60000);
+})();
+</script>
 </body>
 </html>
