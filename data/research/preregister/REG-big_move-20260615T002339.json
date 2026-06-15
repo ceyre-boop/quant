@@ -1,0 +1,17 @@
+{
+  "hypothesis_id": "REG-big_move-20260615T002339",
+  "validator": "big_move",
+  "frozen_at": "2026-06-15T00:23:39+00:00",
+  "script": "scripts/validate_big_move.py",
+  "args": [
+    "--nperm",
+    "10000",
+    "--seed",
+    "42"
+  ],
+  "methodology": {
+    "permutation": true,
+    "walk_forward": true,
+    "both_sides": true
+  }
+}
