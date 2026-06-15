@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scalping Journal — Calendar</title>
+<style>
+  :root{
+    --bg:#080b0f; --bg2:#0d1117; --bg3:#131920; --border:#1e2a38; --text:#e2e8f0;
+    --muted:#4a5568; --dim:#2d3748; --green:#00d4a0; --red:#ff4d6a; --blue:#4299e1;
+    --font:'SF Mono','Fira Code','Courier New',monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:var(--font);padding:24px;font-size:13px}
+  a{color:var(--blue);text-decoration:none}
+  .head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;
+    border-left:3px solid var(--blue);padding-left:14px}
+  h1{font-size:18px;font-weight:700}
+  .sub{font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:3px}
+  .month-ctl{display:flex;gap:8px;align-items:center}
+  button{background:var(--bg3);color:var(--text);border:1px solid var(--border);
+    font-family:var(--font);font-size:12px;padding:6px 12px;cursor:pointer;border-radius:3px}
+  button:hover{border-color:var(--blue)}
+  .aggs{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:20px}
+  .agg{background:var(--bg2);border:1px solid var(--border);padding:12px}
+  .agg .v{font-size:18px;font-weight:700;color:var(--blue)}
+  .agg .l{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+  .dow{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:6px}
+  .dow div{font-size:9px;color:var(--muted);text-transform:uppercase;text-align:center}
+  .cal{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+  .cell{background:var(--bg2);border:1px solid var(--border);min-height:78px;padding:6px;
+    border-radius:3px;cursor:default}
+  .cell.has{cursor:pointer}
+  .cell.has:hover{border-color:var(--blue)}
+  .cell.pos{border-left:3px solid var(--green)}
+  .cell.neg{border-left:3px solid var(--red)}
+  .cell.flat{border-left:3px solid var(--dim)}
+  .cell .dnum{font-size:11px;color:var(--muted)}
+  .cell .ct{font-size:9px;color:var(--muted);margin-top:3px}
+  .cell .r{font-size:14px;font-weight:700;margin-top:4px}
+  .cell .pnl{font-size:10px}
+  .pos-c{color:var(--green)} .neg-c{color:var(--red)}
+  .empty-cell{background:transparent;border:none}
+  #drill{margin-top:20px;background:var(--bg2);border:1px solid var(--border);padding:16px;display:none}
+  #drill.show{display:block}
+  .trade{border-bottom:1px solid var(--dim);padding:8px 0;font-size:12px}
+  .trade .meta{color:var(--muted);font-size:10px;margin-top:2px}
+  .loading{color:var(--muted);font-style:italic;padding:40px;text-align:center}
+</style>
+</head>
+<body>
+  <div class="head">
+    <div>
+      <h1>Scalping Journal — Calendar</h1>
+      <div class="sub">Discretionary · paper · not a systematic edge</div>
+    </div>
+    <div class="month-ctl">
+      <button id="prev">◀</button>
+      <div id="month-label" style="min-width:120px;text-align:center"></div>
+      <button id="next">▶</button>
+      <a href="/" style="margin-left:12px;font-size:11px">← Dashboard</a>
+    </div>
+  </div>
+
+  <div class="aggs" id="aggs"></div>
+  <div class="dow"><div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div></div>
+  <div class="cal" id="cal"><div class="loading">Loading…</div></div>
+  <div id="drill"></div>
+
+<script>
+const API = location.origin;
+let TRADES = [];
+let view = new Date(); view.setDate(1);
+
+const money=n=>(n>=0?'+$':'-$')+Math.abs(n).toFixed(2);
+const rr=n=>(n>=0?'+':'')+Number(n).toFixed(1)+'R';
+
+function dayKey(iso){ return (iso||'').slice(0,10); }
+
+function tradesByDay(){
+  const map={};
+  for(const t of TRADES){
+    if(t.outcome==='OPEN') continue;
+    const k=dayKey(t.timestamp_exit||t.timestamp_entry);
+    if(!k) continue;
+    (map[k]=map[k]||[]).push(t);
+  }
+  return map;
+}
+
+function renderAggs(map){
+  const all=Object.values(map).flat();
+  const closed=all.filter(t=>t.outcome!=='OPEN');
+  const netR=closed.reduce((s,t)=>s+(t.R_realized||0),0);
+  const pnl=closed.reduce((s,t)=>s+(t.pnl_dollars||0),0);
+  const wins=closed.filter(t=>(t.R_realized||0)>0).length;
+  const wr=closed.length?Math.round(100*wins/closed.length):0;
+  const dayNet={}; for(const[k,ts]of Object.entries(map)) dayNet[k]=ts.reduce((s,t)=>s+(t.pnl_dollars||0),0);
+  const days=Object.entries(dayNet);
+  const best=days.length?days.reduce((a,b)=>b[1]>a[1]?b:a):null;
+  const worst=days.length?days.reduce((a,b)=>b[1]<a[1]?b:a):null;
+  // current streak: consecutive most-recent days with same P&L sign
+  const sortedDays=days.sort((a,b)=>a[0]<b[0]?1:-1);
+  let streak=0,sign=null;
+  for(const[,v]of sortedDays){const s=v>0?1:(v<0?-1:0); if(s===0)break; if(sign===null)sign=s; if(s===sign)streak++;else break;}
+  const A=(v,l)=>`<div class="agg"><div class="v">${v}</div><div class="l">${l}</div></div>`;
+  document.getElementById('aggs').innerHTML=
+    A(closed.length,'Total Trades')+A(rr(netR),'Total R')+A(money(pnl),'Total $')+
+    A(wr+'%','Win Rate')+A(best?money(best[1]):'—','Best Day')+
+    A((streak?(sign>0?'+':'-'):'')+streak+'d','Streak');
+}
+
+function renderCal(){
+  const map=tradesByDay();
+  renderAggs(map);
+  const y=view.getFullYear(), m=view.getMonth();
+  document.getElementById('month-label').textContent=
+    view.toLocaleString('en',{month:'long',year:'numeric'});
+  const first=new Date(y,m,1).getDay();
+  const days=new Date(y,m+1,0).getDate();
+  let html='';
+  for(let i=0;i<first;i++) html+='<div class="empty-cell"></div>';
+  for(let d=1;d<=days;d++){
+    const key=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const ts=map[key]||[];
+    const netR=ts.reduce((s,t)=>s+(t.R_realized||0),0);
+    const pnl=ts.reduce((s,t)=>s+(t.pnl_dollars||0),0);
+    const klass=ts.length?(pnl>0?'pos':(pnl<0?'neg':'flat')):'flat';
+    const has=ts.length?'has':'';
+    html+=`<div class="cell ${klass} ${has}" data-key="${key}">
+      <div class="dnum">${d}</div>
+      ${ts.length?`<div class="ct">${ts.length} trade${ts.length>1?'s':''}</div>
+        <div class="r ${pnl>=0?'pos-c':'neg-c'}">${rr(netR)}</div>
+        <div class="pnl ${pnl>=0?'pos-c':'neg-c'}">${money(pnl)}</div>`:''}
+    </div>`;
+  }
+  const cal=document.getElementById('cal'); cal.innerHTML=html;
+  cal.querySelectorAll('.cell.has').forEach(c=>c.addEventListener('click',()=>drill(c.dataset.key,map[c.dataset.key])));
+}
+
+function drill(key,ts){
+  const d=document.getElementById('drill');
+  d.className='show';
+  d.innerHTML=`<div style="font-size:13px;font-weight:700;margin-bottom:10px">${key} — ${ts.length} trade(s)</div>`+
+    ts.map(t=>{const r=t.R_realized||0;
+      return `<div class="trade">
+        <div>${r>=0?'✓':'✗'} <b>${t.instrument} ${t.direction}</b>
+          <span class="${r>=0?'pos-c':'neg-c'}">${rr(r)} · ${money(t.pnl_dollars||0)}</span>
+          <span style="color:var(--muted)">[${t.setup_type}/${t.session}]</span></div>
+        <div class="meta">entry ${t.entry_price} → exit ${t.exit_price} · stop ${t.stop_price} · ${t.outcome}</div>
+        <div class="meta">thesis: ${t.thesis||'—'}</div>
+        ${t.notes_post?`<div class="meta">notes: ${t.notes_post}</div>`:''}
+      </div>`;}).join('');
+}
+
+document.getElementById('prev').onclick=()=>{view.setMonth(view.getMonth()-1);renderCal();document.getElementById('drill').className='';};
+document.getElementById('next').onclick=()=>{view.setMonth(view.getMonth()+1);renderCal();document.getElementById('drill').className='';};
+
+fetch(API+'/scalp_journal?t='+Date.now()).then(r=>r.json()).then(d=>{
+  TRADES=d.raw||[];
+  renderCal();
+}).catch(()=>{document.getElementById('cal').innerHTML='<div class="loading">Journal unavailable.</div>';});
+</script>
+</body>
+</html>
