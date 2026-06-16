@@ -19,6 +19,7 @@ Usage:  python3 scripts/validate_vrp.py [--perms 10000] [--seed 7]
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import sys
 from datetime import datetime, timezone
@@ -36,7 +37,82 @@ OUT = ROOT / "data" / "research" / "vrp_validation.json"
 FINDINGS = ROOT / "data" / "research" / "vrp_findings.md"
 PREREG = ROOT / "data" / "research" / "vrp_preregistration.json"
 LEDGER = ROOT / "data" / "agent" / "hypothesis_ledger.json"
+OPTIONS_OUT = ROOT / "data" / "research" / "vrp_options_validation.json"
+HOLDOUT_MARKER = ROOT / "data" / "research" / ".vrp_holdout_touched"
 CITATION = "Coval & Shumway (2001); Bakshi & Kapadia (2003); Bollerslev, Tauchen & Zhou (2009)"
+
+
+def _read_env() -> dict:
+    env: dict = {}
+    p = ROOT / ".env"
+    if p.exists():
+        for line in p.read_text().splitlines():
+            line = line.strip()
+            if line and not line.startswith("#") and "=" in line:
+                k, _, v = line.partition("=")
+                env[k.strip()] = v.strip()
+    return env
+
+
+def _options_prereg() -> dict:
+    """Load the signed options_backtest block; refuse to run a retuned spec (signature tripwire)."""
+    ob = json.loads(PREREG.read_text())["options_backtest"]
+    canon = json.dumps({"split": ob["split"], "params": ob["params"]},
+                       sort_keys=True, separators=(",", ":"))
+    if ob.get("content_sha256") != hashlib.sha256(canon.encode()).hexdigest():
+        raise SystemExit("FATAL: options pre-registration signature mismatch — refusing a retuned spec.")
+    return ob
+
+
+def _run_options_stage(args) -> None:
+    """Stages 2/3/4 — real SPY iron-condor backtest on ThetaData chains (requires subscription)."""
+    ob = _options_prereg()
+    params = ob["params"]
+    name, split = {2: ("IS", ob["split"]["IS"]), 3: ("OOS", ob["split"]["OOS"]),
+                   4: ("holdout", ob["split"]["holdout"])}[args.stage]
+    split = tuple(split)
+    if args.stage == 4:
+        if not args.confirm_once:
+            raise SystemExit("Stage 4 (holdout) requires --confirm-once — it runs exactly once.")
+        if HOLDOUT_MARKER.exists():
+            raise SystemExit(f"Holdout already touched ({HOLDOUT_MARKER.read_text().strip()}). Refusing to re-run.")
+
+    env = _read_env()
+    from sovereign.research.vrp.data_loader import ThetaDataLoader
+    loader = ThetaDataLoader(api_key=env.get("THETADATA_API_KEY") or None,
+                             base_url=env.get("THETADATA_BASE_URL", "http://127.0.0.1:25510"))
+    spy = dl.load_underlying("SPY")["Close"]
+    vix = dl.load_vol_index("^VIX")
+    result = iron_condor_simulate(loader, spy_daily=spy, params=params, split=split, vix_daily=vix)
+
+    doc = json.loads(OPTIONS_OUT.read_text()) if OPTIONS_OUT.exists() else {"id": "VRP-001-OPTIONS", "stages": {}}
+    doc["generated_at"] = datetime.now(timezone.utc).isoformat()
+    doc["stages"][name] = result
+    OPTIONS_OUT.write_text(json.dumps(doc, indent=2, default=str))
+
+    led = json.loads(LEDGER.read_text()) if LEDGER.exists() else []
+    led = [e for e in led if e.get("id") != "VRP-001-OPTIONS"]
+    summary = "; ".join(f"{k}:{v.get('status')}/{v.get('n_trades', '-')}t/Sh{v.get('sharpe_weekly_ann', '-')}"
+                        for k, v in doc["stages"].items())
+    led.append({
+        "id": "VRP-001-OPTIONS",
+        "name": "VRP iron-condor backtest on ThetaData SPY chains (Stages 2-4)",
+        "status": result.get("status"),
+        "date_tested": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+        "result": f"[{name} {split[0]}..{split[1]}] {summary}",
+        "methodology_note": ("Short 1SD iron condor, 25pt wings, 30-45 DTE, manage 21DTE/50% take/2x stop, 1% "
+                             "risk, Monday weekly. Real SPY chains via ThetaData; strikes from prior-20d realized "
+                             "vol (yfinance). Pre-registered + signed (vrp_preregistration.json#options_backtest)."),
+    })
+    LEDGER.write_text(json.dumps(led, indent=2))
+    if args.stage == 4:
+        HOLDOUT_MARKER.write_text(datetime.now(timezone.utc).isoformat())
+
+    print(f"\n[VRP-OPTIONS] stage {args.stage} ({name}) {split[0]}..{split[1]} -> {result.get('status')}")
+    if result.get("status") == "OK":
+        print(f"  trades={result['n_trades']} net={result['net_total']} Sharpe(wk-ann)={result['sharpe_weekly_ann']} "
+              f"win={result['win_rate']} maxDD%={result['max_drawdown_pct']} exits={result['exit_reason_counts']}")
+    print("  saved: data/research/vrp_options_validation.json ; ledger VRP-001-OPTIONS\n")
 
 
 def _check_prereg():
@@ -115,8 +191,14 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--perms", type=int, default=10000)
     ap.add_argument("--seed", type=int, default=7)
+    ap.add_argument("--stage", type=int, choices=(2, 3, 4), default=None,
+                    help="options iron-condor backtest phase: 2=IS, 3=OOS, 4=holdout (requires ThetaData)")
+    ap.add_argument("--confirm-once", action="store_true", help="required for --stage 4 (holdout runs once)")
     args = ap.parse_args()
     _check_prereg()
+    if args.stage:
+        _run_options_stage(args)
+        return
 
     # ── Load (free yfinance + log reads; thin-data guards inside loader) ──
     spy = dl.load_underlying("SPY")

@@ -9,6 +9,7 @@ Tripwire: the frozen gates in data/research/vrp_preregistration.json are the pre
 values. If a tripwire test fails, someone retuned a gate — that invalidates the verdict. Do
 not "fix" the test; revert the constant in validator.py.
 """
+import hashlib
 import inspect
 import json
 from pathlib import Path
@@ -56,7 +57,25 @@ def test_crisis_windows_match_prereg():
 
 
 def test_strategy_sim_is_inert():
-    """The iron-condor sim must never fabricate a backtest — it returns DATA_INSUFFICIENT."""
+    """The iron-condor sim must never fabricate a backtest WITHOUT a loader — DATA_INSUFFICIENT."""
     out = strategy_simulator.iron_condor_simulate()
     assert out["status"] == "DATA_INSUFFICIENT"
     assert "required_data" in out and "cost_model_spec" in out
+
+
+def test_options_prereg_signature_intact():
+    """Tripwire: recomputed SHA-256 of options_backtest split+params must match the stored
+    signature. A mismatch means a frozen parameter was changed after signing — revert it or
+    log a param_change; do NOT re-sign to make this pass."""
+    ob = json.loads(PREREG.read_text())["options_backtest"]
+    payload = {"split": ob["split"], "params": ob["params"]}
+    canon = json.dumps(payload, sort_keys=True, separators=(",", ":"))
+    digest = hashlib.sha256(canon.encode()).hexdigest()
+    assert ob["content_sha256"] == digest, (
+        "OPTIONS PRE-REGISTRATION ALTERED AFTER SIGNING — invalidates the backtest verdict.")
+
+
+def test_options_backtest_constants_frozen():
+    """Structural constants the backtest depends on must not silently drift."""
+    assert strategy_simulator.CONTRACT_MULTIPLIER == 100
+    assert strategy_simulator.STRIKE_INCREMENT == 1.0
