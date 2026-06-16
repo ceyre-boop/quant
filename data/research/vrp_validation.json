@@ -1,0 +1,282 @@
+{
+  "generated_at": "2026-06-16T17:18:47.724050+00:00",
+  "id": "VRP-001",
+  "approach": "inverted_gauntlet",
+  "citation": "Coval & Shumway (2001); Bakshi & Kapadia (2003); Bollerslev, Tauchen & Zhou (2009)",
+  "verdict": "DATA_INSUFFICIENT",
+  "gates": {
+    "vrp_exists": true,
+    "carry_relationship": "TRUE_DIVERSIFIER",
+    "recouples_with_carry": false,
+    "orthogonal_to_carry": true
+  },
+  "stage1_existence": {
+    "SPY": {
+      "label": "SPY/^VIX",
+      "n": 8380,
+      "window": "1993-02-01..2026-05-15",
+      "mean_gap_annvar": 0.00985,
+      "median_gap_annvar": 0.01151,
+      "pct_positive": 0.84,
+      "t_stat": 16.674,
+      "permutation_p": 9.999000099990002e-05,
+      "both_sides": {
+        "calm_VIX_le30": {
+          "n": 7677,
+          "mean_gap": 0.00854
+        },
+        "stressed_VIX_gt30": {
+          "n": 703,
+          "mean_gap": 0.02408
+        }
+      },
+      "by_split": {
+        "IS_2006_2020": {
+          "n": 3776,
+          "mean_gap": 0.00677,
+          "pct_positive": 0.827
+        },
+        "OOS_2021_2023": {
+          "n": 753,
+          "mean_gap": 0.01476,
+          "pct_positive": 0.865
+        },
+        "HOLDOUT_2024_2025": {
+          "n": 502,
+          "mean_gap": 0.00552,
+          "pct_positive": 0.837
+        }
+      },
+      "vrp_exists": true
+    },
+    "QQQ": {
+      "label": "QQQ/^VXN",
+      "n": 6366,
+      "window": "2001-01-23..2026-05-15",
+      "mean_gap_annvar": 0.01853,
+      "median_gap_annvar": 0.01523,
+      "pct_positive": 0.814,
+      "t_stat": 22.005,
+      "permutation_p": 9.999000099990002e-05,
+      "both_sides": {
+        "calm_VIX_le30": {
+          "n": 5004,
+          "mean_gap": 0.00772
+        },
+        "stressed_VIX_gt30": {
+          "n": 1362,
+          "mean_gap": 0.05823
+        }
+      },
+      "by_split": {
+        "IS_2006_2020": {
+          "n": 3776,
+          "mean_gap": 0.00864,
+          "pct_positive": 0.791
+        },
+        "OOS_2021_2023": {
+          "n": 753,
+          "mean_gap": 0.01351,
+          "pct_positive": 0.801
+        },
+        "HOLDOUT_2024_2025": {
+          "n": 502,
+          "mean_gap": 0.00138,
+          "pct_positive": 0.743
+        }
+      },
+      "vrp_exists": true
+    }
+  },
+  "stage2_orthogonality": {
+    "harvest_profile": {
+      "n": 8401,
+      "mean_daily_var_units": 3.90577e-05,
+      "sharpe_rf0": 1.412,
+      "pct_positive_days": 0.807,
+      "note": "harvest is a short-variance P&L in variance units; Sharpe/correlation are scale-invariant."
+    },
+    "vs_carry": {
+      "label": "vrp_harvest_vs_DBV_carry",
+      "full_sample": {
+        "rho": 0.057,
+        "n": 3827,
+        "band": "LOW"
+      },
+      "crises": {
+        "GFC_2008": {
+          "rho": -0.018,
+          "n": 210
+        },
+        "COVID_2020": {
+          "rho": 0.216,
+          "n": 50
+        },
+        "RATE_SHOCK_2022": {
+          "rho": 0.106,
+          "n": 251
+        }
+      },
+      "vix_gt30": {
+        "rho": 0.065,
+        "n": 431
+      },
+      "max_crisis_abs_corr": 0.216,
+      "tail": {
+        "A_mean_on_B_worst_decile": -0.00020943,
+        "B_mean_on_A_worst_decile": -0.00230979
+      },
+      "rolling": {
+        "overall_mean": 0.096,
+        "mean_when_VIX_gt30": 0.178,
+        "mean_when_VIX_le30": 0.086
+      },
+      "verdict": "TRUE_DIVERSIFIER"
+    },
+    "vs_v015_secondary": {
+      "label": "vrp_harvest_vs_v015_carry",
+      "full_sample": {
+        "rho": -0.068,
+        "n": 137,
+        "band": "LOW"
+      },
+      "crises": {
+        "GFC_2008": {
+          "rho": null,
+          "n": 0
+        },
+        "COVID_2020": {
+          "rho": null,
+          "n": 4
+        },
+        "RATE_SHOCK_2022": {
+          "rho": -0.052,
+          "n": 30
+        }
+      },
+      "vix_gt30": {
+        "rho": null,
+        "n": 12
+      },
+      "max_crisis_abs_corr": 0.052,
+      "tail": {
+        "A_mean_on_B_worst_decile": 0.00010188,
+        "B_mean_on_A_worst_decile": 0.01251506
+      },
+      "rolling": {
+        "overall_mean": -0.112,
+        "mean_when_VIX_gt30": -0.156,
+        "mean_when_VIX_le30": -0.105
+      },
+      "verdict": "TRUE_DIVERSIFIER"
+    },
+    "vs_overnight_qqq": {
+      "label": "vrp_harvest_vs_overnight_qqq",
+      "full_sample": {
+        "rho": 0.05,
+        "n": 6859,
+        "band": "LOW"
+      },
+      "crises": {
+        "GFC_2008": {
+          "rho": -0.162,
+          "n": 210
+        },
+        "COVID_2020": {
+          "rho": 0.381,
+          "n": 50
+        },
+        "RATE_SHOCK_2022": {
+          "rho": 0.009,
+          "n": 251
+        }
+      },
+      "vix_gt30": {
+        "rho": 0.115,
+        "n": 622
+      },
+      "max_crisis_abs_corr": 0.381,
+      "tail": {
+        "A_mean_on_B_worst_decile": -0.0001267,
+        "B_mean_on_A_worst_decile": -0.00089681
+      },
+      "rolling": {
+        "overall_mean": 0.02,
+        "mean_when_VIX_gt30": 0.088,
+        "mean_when_VIX_le30": 0.013
+      },
+      "verdict": "CORRELATED_IN_CRISIS"
+    }
+  },
+  "stage3_strategy_sim": {
+    "status": "DATA_INSUFFICIENT",
+    "reason": "No historical SPY/QQQ option chains available; brief forbids synthesizing option prices.",
+    "strategy_spec": {
+      "structure": "short iron condor",
+      "short_legs": "~1 standard deviation (prior 20d realized vol), symmetric around spot",
+      "duration": "30-45 DTE entry, manage at 21 DTE",
+      "entry": "open weekly on Monday",
+      "exit": "close at 50% max profit OR 21 DTE, whichever first",
+      "stop": "close at 2x credit received (defined risk anyway)",
+      "sizing": "1% account risk per position on defined max loss (instrument-agnostic risk engine)"
+    },
+    "cost_model_spec": {
+      "commission_per_contract_open": 0.65,
+      "commission_per_contract_close": 0.65,
+      "entry_slippage_pct_of_credit": 0.05,
+      "exit_slippage_pct_of_credit": 0.1,
+      "fill_basis": "mid-price for backtest; model 50% of bid-ask spread as slippage"
+    },
+    "required_data": {
+      "instruments": [
+        "SPY option chains",
+        "QQQ option chains"
+      ],
+      "fields": [
+        "strike",
+        "expiry",
+        "right",
+        "bid",
+        "ask",
+        "mid",
+        "underlying_spot"
+      ],
+      "history": "2018-2025 daily chains (IS 2018-2020 / OOS 2021-2023 / holdout 2024-2025)",
+      "candidate_providers": [
+        {
+          "name": "Polygon.io Options",
+          "approx_cost": "$29-199/mo",
+          "note": "API-key infra already present; options tier not subscribed"
+        },
+        {
+          "name": "ORATS",
+          "approx_cost": "subscription",
+          "note": "clean historical IV surface + greeks"
+        },
+        {
+          "name": "CBOE DataShop",
+          "approx_cost": "one-time historical purchase",
+          "note": "authoritative SPX/SPY"
+        },
+        {
+          "name": "IVolatility",
+          "approx_cost": "subscription",
+          "note": "academic-friendly historical IV"
+        }
+      ]
+    }
+  },
+  "caveats": [
+    "No historical SPY/QQQ option chains in this system \u2014 the iron-condor backtest is BLOCKED, not faked.",
+    "Stage-1 BTZ gap uses forward realized variance (look-ahead) and is quarantined to the existence stat.",
+    "Stage-2 harvest return is strictly causal: (IV_{t-1}/100)^2/252 - r_t^2.",
+    "Carry crisis coverage comes from DBV (2006->2023-03); the v015 forex-log carry is recent/noisy secondary.",
+    "Crisis/stress correlation decides orthogonality, NOT the benign full-sample average.",
+    "The Stage-2 harvest proxy is a daily LINEAR variance P&L; a real short iron condor's crisis loss is CONVEX and clusters in vol spikes, so this proxy likely UNDERSTATES true crisis coupling. A TRUE_DIVERSIFIER read vs carry is encouraging but must be confirmed on real chains, not banked.",
+    "Harvest standalone Sharpe is UNCOSTED and on a proxy series, not the tradeable strategy \u2014 do not treat it as a deployable number (the operation's prior over-annualized-Sharpe trap)."
+  ],
+  "meta": {
+    "perms": 10000,
+    "seed": 7
+  }
+}
