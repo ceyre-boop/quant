@@ -80,7 +80,7 @@ def _run_options_stage(args) -> None:
     env = _read_env()
     from sovereign.research.vrp.data_loader import ThetaDataLoader
     loader = ThetaDataLoader(api_key=env.get("THETADATA_API_KEY") or None,
-                             base_url=env.get("THETADATA_BASE_URL", "http://127.0.0.1:25510"))
+                             base_url=env.get("THETADATA_BASE_URL", "http://127.0.0.1:25503"))
     spy = dl.load_underlying("SPY")["Close"]
     vix = dl.load_vol_index("^VIX")
     result = iron_condor_simulate(loader, spy_daily=spy, params=params, split=split, vix_daily=vix)

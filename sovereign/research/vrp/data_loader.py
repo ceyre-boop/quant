@@ -87,15 +87,17 @@ def load_overnight_qqq(qqq: pd.DataFrame | None = None) -> pd.Series:
 
 
 # ════════════════════════════════════════════════════════════════════════════════
-# ThetaDataLoader — historical option chains (Phase II, awaiting subscription).
+# ThetaDataLoader — historical SPY option chains via ThetaData V3 (local ThetaTerminal).
 #
-# DESIGN-ONLY: the RETURN CONTRACT (normalized columns) is committed; the API request
-# bodies are TODO stubs. The schema is UNVERIFIED until the ThetaData Options Value
-# account is active — run scripts/vrp_schema_verify.py once on activation, then fill the
-# bodies marked `# VERIFY SCHEMA AGAINST LIVE RESPONSE BEFORE IMPLEMENTING`.
+# LIVE (schema verified 2026-06-16 against ThetaTerminal v3 on 127.0.0.1:25503, Options
+# VALUE tier). V3 renamed `root`->`symbol`, responses are CSV, dates YYYY-MM-DD, strikes
+# in decimal dollars. The EOD chain endpoint returns one row per (strike,right) with
+# bid/ask/close/volume — greeks/iv/open_interest are NOT included (-> NaN; optional, the
+# backtest needs only strike + bid/ask/mid). Stock history is FREE-tier-gated (403), so the
+# underlying close is NOT sourced here — the backtest uses the free yfinance spy_daily series.
 #
-# The simulator depends only on this contract, never on the source — so MockThetaDataLoader
-# (tests) and the real loader are interchangeable.
+# The simulator depends only on the normalized contract (OPTION_CHAIN_COLUMNS), never the
+# source — so MockThetaDataLoader (tests) and this loader are interchangeable.
 # ════════════════════════════════════════════════════════════════════════════════
 
 # Normalized chain columns the simulator relies on. Any source must map to exactly these.
@@ -110,37 +112,52 @@ VRP_DATA_CACHE = ROOT / "data" / "research" / "vrp_data_cache"
 
 
 class ThetaDataLoader:
-    """Historical SPY/QQQ option chains via ThetaData (local ThetaTerminal REST gateway).
+    """Historical SPY option chains via ThetaData V3 (local ThetaTerminal on 25503).
 
     Contract (source-agnostic): every chain frame has columns == OPTION_CHAIN_COLUMNS.
-    `get_chain_for_dte_range` additionally carries `expiration` (date) and `dte` (int).
+    `get_chain_for_dte_range` additionally carries `expiration` (Timestamp) and `dte` (int).
 
-    Assumed API surface (DOCUMENTED, NOT CALLED — verify on activation):
-        base_url        http://127.0.0.1:25510   (ThetaTerminal local gateway)
-        eod chain       GET /v2/hist/option/eod      ?root=&exp=YYYYMMDD&start_date=&end_date=
-        quote           GET /v2/hist/option/quote    ?root=&exp=&right=C|P&strike=<1/10 cent>&...
-        expirations     GET /v2/list/expirations     ?root=
-        strikes         GET /v2/list/strikes         ?root=&exp=
-    Strikes are expressed in 1/10-cent integers in the raw API; the loader normalizes to
-    dollars. None of the above is exercised until the schema is verified live.
+    Live V3 surface (verified 2026-06-16; CSV responses, dates YYYY-MM-DD, strikes in $):
+        expirations  GET /v3/option/list/expirations ?symbol=SPY
+        eod chain    GET /v3/option/history/eod      ?symbol=SPY&expiration=YYYY-MM-DD
+                                                       &start_date=YYYY-MM-DD&end_date=YYYY-MM-DD
+                     -> one row per (strike,right): symbol,expiration,strike,right,...,close,
+                        volume,count,bid_size,bid_exchange,bid,bid_condition,ask_size,...,ask,...
+    Localhost needs no auth (the terminal authenticates itself); a non-local base adds a
+    Bearer header. greeks/iv/open_interest are absent from EOD -> NaN.
     """
 
     def __init__(self, api_key: str | None = None,
-                 base_url: str = "http://127.0.0.1:25510",
+                 base_url: str = "http://127.0.0.1:25503",
                  cache_dir: Path = VRP_DATA_CACHE) -> None:
         self.api_key = api_key
-        self.base_url = base_url
+        self.base_url = base_url.rstrip("/")
         self.cache_dir = Path(cache_dir)
+        self._exp_cache: dict[str, list[str]] = {}
 
-    # ── cache layer (REAL — source-agnostic; works the moment the fetchers are filled) ──
+    # ── transport ──
+    def _is_local(self) -> bool:
+        return "127.0.0.1" in self.base_url or "localhost" in self.base_url
+
+    def _get(self, path: str, timeout: int = 60) -> str:
+        import urllib.request
+        headers = {} if self._is_local() else {"Authorization": f"Bearer {self.api_key}"}
+        req = urllib.request.Request(self.base_url + path, headers=headers)
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            return resp.read().decode()
+
+    @staticmethod
+    def _csv(text: str) -> pd.DataFrame:
+        from io import StringIO
+        if not text or not text.strip():
+            return pd.DataFrame()
+        return pd.read_csv(StringIO(text))
+
+    # ── cache layer (per symbol/date/expiration parquet) ──
     def _cache_path(self, symbol: str, date, expiration) -> Path:
-        d = str(date)[:10]
-        e = str(expiration)[:10]
-        return self.cache_dir / str(symbol) / f"{d}_{e}.parquet"
+        return self.cache_dir / str(symbol) / f"{str(date)[:10]}_{str(expiration)[:10]}.parquet"
 
     def _cached_or_fetch(self, path: Path, fetch_fn):
-        """Read the parquet cache if present, else fetch once and persist. Each historical
-        (symbol, date, expiration) costs one API call, ever."""
         if path.exists():
             return pd.read_parquet(path)
         df = fetch_fn()
@@ -148,33 +165,79 @@ class ThetaDataLoader:
         df.to_parquet(path)
         return df
 
-    # ── data accessors (TODO bodies — contract is fixed, parsing is not) ──
+    # ── normalization: v3 EOD rows (strike x right) -> one row per strike ──
+    @staticmethod
+    def _pivot_chain(raw: pd.DataFrame) -> pd.DataFrame:
+        if raw.empty or "strike" not in raw.columns:
+            return pd.DataFrame(columns=OPTION_CHAIN_COLUMNS)
+        raw = raw.copy()
+        raw["side"] = raw["right"].astype(str).str.upper().str[0]   # 'C' / 'P'
+        rows = []
+        for strike, g in raw.groupby("strike"):
+            row = dict.fromkeys(OPTION_CHAIN_COLUMNS, float("nan"))
+            row["strike"] = float(strike)
+            row["volume"] = 0.0
+            for _, r in g.iterrows():
+                side = "call" if r["side"] == "C" else "put"
+                bid = float(r.get("bid", float("nan")))
+                ask = float(r.get("ask", float("nan")))
+                row[f"{side}_bid"] = bid
+                row[f"{side}_ask"] = ask
+                row[f"{side}_mid"] = (bid + ask) / 2.0
+                row["volume"] += float(r.get("volume", 0) or 0)
+            rows.append(row)
+        return (pd.DataFrame(rows)[OPTION_CHAIN_COLUMNS]
+                .sort_values("strike").reset_index(drop=True))
+
+    # ── data accessors (V3) ──
+    def list_expirations(self, symbol: str = "SPY") -> list[str]:
+        if symbol not in self._exp_cache:
+            df = self._csv(self._get(f"/v3/option/list/expirations?symbol={symbol}"))
+            exps = sorted(df["expiration"].astype(str).str[:10].unique().tolist()) if not df.empty else []
+            self._exp_cache[symbol] = exps
+        return self._exp_cache[symbol]
+
+    def earliest_available_date(self, symbol: str = "SPY") -> str:
+        exps = self.list_expirations(symbol)
+        return exps[0] if exps else ""
+
     def get_underlying_close(self, symbol: str, date) -> float:
-        """Adjusted close for the underlying on `date`.
-        # VERIFY SCHEMA AGAINST LIVE RESPONSE BEFORE IMPLEMENTING
-        # endpoint: /v2/hist/stock/eod ?root=symbol&start_date=date&end_date=date -> parse close."""
-        raise NotImplementedError("ThetaData get_underlying_close — fill after schema_verify")
+        raise NotImplementedError(
+            "ThetaData stock history requires a Stock VALUE subscription (current: FREE -> HTTP 403). "
+            "The VRP backtest sources SPY spot + realized vol from the free yfinance series "
+            "(spy_daily), so this method is not on the backtest path.")
 
     def get_option_chain(self, symbol: str, date, expiration) -> pd.DataFrame:
-        """Full chain (all strikes) for one (date, expiration), normalized to OPTION_CHAIN_COLUMNS.
-        # VERIFY SCHEMA AGAINST LIVE RESPONSE BEFORE IMPLEMENTING
-        # endpoint: /v2/hist/option/eod ?root=symbol&exp=YYYYMMDD&start_date=date&end_date=date
-        # map raw call/put bid/ask/iv/delta + volume/open_interest onto OPTION_CHAIN_COLUMNS;
-        # mid = (bid+ask)/2; strike = raw_strike / 1000.0 (1/10-cent -> dollars)."""
+        """Full chain for one (date, expiration), normalized to OPTION_CHAIN_COLUMNS. Cached.
+        ThetaData HTTP 472 = no data for the request (e.g. no EOD for that expiry on that day)
+        -> return (and cache) an empty chain rather than abort the backtest."""
+        import urllib.error
+        d, e = str(date)[:10], str(expiration)[:10]
+
         def _fetch() -> pd.DataFrame:
-            raise NotImplementedError("ThetaData get_option_chain — fill after schema_verify")
-        return self._cached_or_fetch(self._cache_path(symbol, date, expiration), _fetch)
+            try:
+                raw = self._csv(self._get(
+                    f"/v3/option/history/eod?symbol={symbol}&expiration={e}&start_date={d}&end_date={d}"))
+            except urllib.error.HTTPError as ex:
+                if ex.code == 472:                      # NO_DATA
+                    return pd.DataFrame(columns=OPTION_CHAIN_COLUMNS)
+                raise
+            return self._pivot_chain(raw)
+        return self._cached_or_fetch(self._cache_path(symbol, d, e), _fetch)
 
     def get_chain_for_dte_range(self, symbol: str, date, dte_min: int, dte_max: int) -> pd.DataFrame:
-        """All chains whose expiration is `dte_min..dte_max` calendar days out from `date`,
-        concatenated with `expiration` and `dte` columns added.
-        # VERIFY SCHEMA AGAINST LIVE RESPONSE BEFORE IMPLEMENTING
-        # 1) /v2/list/expirations ?root=symbol -> expirations; keep those with dte in [min,max]
-        # 2) for each, self.get_option_chain(...); assign expiration + dte; concat."""
-        raise NotImplementedError("ThetaData get_chain_for_dte_range — fill after schema_verify")
-
-    def earliest_available_date(self, symbol: str) -> str:
-        """Earliest date ThetaData serves for `symbol` (the IS-boundary check).
-        # VERIFY SCHEMA AGAINST LIVE RESPONSE BEFORE IMPLEMENTING
-        # derive from /v2/list/expirations or a probe request; return 'YYYY-MM-DD'."""
-        raise NotImplementedError("ThetaData earliest_available_date — fill after schema_verify")
+        """Chains for every expiration `dte_min..dte_max` calendar days out, with expiration + dte."""
+        d = pd.Timestamp(str(date)[:10])
+        frames = []
+        for exp in self.list_expirations(symbol):
+            dte = (pd.Timestamp(exp) - d).days
+            if dte_min <= dte <= dte_max:
+                ch = self.get_option_chain(symbol, str(d.date()), exp)
+                if not ch.empty:
+                    ch = ch.copy()
+                    ch["expiration"] = pd.Timestamp(exp)
+                    ch["dte"] = int(dte)
+                    frames.append(ch)
+        if not frames:
+            return pd.DataFrame(columns=OPTION_CHAIN_COLUMNS + ["expiration", "dte"])
+        return pd.concat(frames, ignore_index=True)

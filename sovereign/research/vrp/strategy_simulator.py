@@ -99,6 +99,11 @@ def _nearest_strike(x: float, inc: float = STRIKE_INCREMENT) -> float:
     return round(round(x / inc) * inc, 2)
 
 
+def _snap(avail: list[float], target: float) -> float:
+    """Nearest strike that actually trades — real chains aren't a $1 grid far OTM."""
+    return min(avail, key=lambda s: abs(s - target))
+
+
 def _realized_vol_daily(spy_daily: pd.Series, asof, window: int = 20) -> float | None:
     """σ_daily = stdev of the last `window` daily log returns strictly BEFORE `asof`."""
     r = vc.log_returns(spy_daily)
@@ -185,15 +190,25 @@ def run_iron_condor_backtest(loader, spy_daily: pd.Series, params: dict, split,
             continue
         dte_trading = max(1, round(dte * TRADING_DAYS / 365.0))
         move = spot * sigma * math.sqrt(dte_trading)
-        sc, sp = _nearest_strike(spot + sd_mult * move), _nearest_strike(spot - sd_mult * move)
-        lc, lp = _nearest_strike(sc + wing), _nearest_strike(sp - wing)
-
         chain0 = entry_chain[entry_chain["expiration"] == exp]
+        avail = sorted(float(s) for s in chain0["strike"].dropna().unique())
+        if len(avail) < 4:
+            skips.append({"date": str(monday.date()), "reason": "too few strikes in chain"})
+            continue
+        # snap target strikes to strikes that actually trade
+        sc = _snap(avail, spot + sd_mult * move)
+        sp = _snap(avail, spot - sd_mult * move)
+        lc = _snap(avail, sc + wing)
+        lp = _snap(avail, sp - wing)
+        if not (lp < sp < sc < lc):
+            skips.append({"date": str(monday.date()), "reason": "degenerate strikes after snap"})
+            continue
         credit = _condor_value(chain0, sc, sp, lc, lp)
         if credit is None or credit <= 0:
             skips.append({"date": str(monday.date()), "reason": "no credit / missing strikes"})
             continue
-        max_loss = wing - credit
+        wing_width = max(lc - sc, sp - lp)         # actual defined-risk width from snapped strikes
+        max_loss = wing_width - credit
         if max_loss <= 0:
             skips.append({"date": str(monday.date()), "reason": "non-positive max loss"})
             continue
