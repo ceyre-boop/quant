@@ -36,7 +36,9 @@ sys.path.insert(0, str(ROOT))
 from sovereign.briefing import market_data, lead_lag, volume_profile, news_feed, event_calendar, scorecard, synthesize
 
 BRIEF_DIR = ROOT / "data" / "oracle" / "market_briefings"
+MACRO_LATEST = ROOT / "data" / "macro" / "fred_economic_latest.json"
 FOREX_PROX = ROOT / "data" / "agent" / "forex_proximity.json"
+BIG_MOVE_PATH = ROOT / "data" / "agent" / "big_move.json"
 HEARTBEAT = ROOT / "logs" / ".heartbeat_morning_briefing"
 
 
@@ -76,6 +78,43 @@ def _deterministic_narrative(ll: dict, vp: dict, cal: dict, prox: dict, score: s
     )
 
 
+def _big_move_headline() -> dict:
+    """
+    The 'answer of the day': the highest-conviction Big-Move-of-the-Day call from
+    the pulse-written estimate. Deterministic — reads data/agent/big_move.json, no
+    LLM call. DISPLAY-ONLY: this is a hypothesis the validation gate hasn't cleared,
+    so it is flagged unverified and never ingested as a trading input.
+    """
+    bm = _read(BIG_MOVE_PATH)
+    ests = bm.get("estimates") if isinstance(bm, dict) else None
+    if not ests:
+        return {}
+    # Rank non-NEUTRAL calls by p_big * confidence.
+    ranked = sorted(
+        [(p, e) for p, e in ests.items() if e.get("direction") in ("LONG", "SHORT")],
+        key=lambda x: (x[1].get("p_big", 0) * x[1].get("confidence", 0)),
+        reverse=True,
+    )
+    if not ranked:
+        return {"headline": "No directional big-move call today — drivers are mixed/neutral.",
+                "validation_status": bm.get("validation_status", "UNVALIDATED — display only")}
+    pair, e = ranked[0]
+    pct = round(e.get("p_big", 0) * 100)
+    return {
+        "headline": (f"Today's likeliest institutional move: {e['direction']} {pair} "
+                     f"(P {pct}%, ~{e.get('expected_magnitude_pct', 0):.2f}% range, "
+                     f"conf {round(e.get('confidence', 0) * 100)}%)."),
+        "pair": pair,
+        "direction": e["direction"],
+        "p_big": e.get("p_big"),
+        "confidence": e.get("confidence"),
+        "expected_magnitude_pct": e.get("expected_magnitude_pct"),
+        "session": e.get("session"),
+        "drivers": e.get("drivers", [])[:3],
+        "validation_status": bm.get("validation_status", "UNVALIDATED — display only"),
+    }
+
+
 def build(narrative_file: str | None = None) -> dict:
     today = date.today().isoformat()
 
@@ -90,6 +129,11 @@ def build(narrative_file: str | None = None) -> dict:
     nw = _safe(lambda: news_feed.fetch(), {})
     cal = _safe(lambda: event_calendar.build(), {})
     prox = _read(FOREX_PROX)
+
+    # C7 — daily FRED macro backdrop (same formatter Oracle uses; context only, never a trading input).
+    from sovereign.oracle.reflect_cycle import _load_daily_macro
+    macro_text = _safe(_load_daily_macro, "No macro snapshot (run scripts/fetch_fred_economic.py).")
+    macro_summary = _read(MACRO_LATEST).get("summary", {})
 
     # C6 — Opus synthesis, with deterministic fallback.
     synth = _safe(lambda: synthesize.synthesize(ms, ll, vp, nw, cal, score_summary), None)
@@ -112,6 +156,9 @@ def build(narrative_file: str | None = None) -> dict:
         narrative = (Path(narrative_file).read_text().strip()
                      + "\n\n---\n[auto-appended signal read]\n" + narrative)
 
+    # Surface the macro backdrop at the top of the readable narrative.
+    narrative = f"Macro backdrop —\n{macro_text}\n\n---\n{narrative}"
+
     briefing = {
         "date": today,
         "generated_at": _now(),
@@ -119,6 +166,8 @@ def build(narrative_file: str | None = None) -> dict:
         "meta_regime": ll.get("regime"),
         "regime_read": ll.get("read", ""),
         "narrative": narrative,
+        # --- answer of the day: Big-Move-of-the-Day headline (display-only) ---
+        "big_move_headline": _big_move_headline(),
         # --- structured call (scored by scorecard.py) ---
         "directional_bias": directional_bias,
         "confidence": confidence,
@@ -132,6 +181,8 @@ def build(narrative_file: str | None = None) -> dict:
             "divergence": ll.get("divergence"),
         },
         "volume_profile": vp.get("instruments", {}),
+        # --- daily FRED macro backdrop (context only) ---
+        "macro_economic": {"text": macro_text, "summary": macro_summary},
         "news_count": nw.get("count", 0),
         "event_calendar": cal.get("events", []),
         "scorecard_summary": score_summary,
