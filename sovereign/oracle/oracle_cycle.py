@@ -71,6 +71,19 @@ def run_daily_cycle(dry_run: bool = False) -> dict:
     except Exception as e:  # noqa: BLE001
         _log(f"  ⚠ Macro pull failed ({type(e).__name__}); reflect will use last-good snapshot.")
 
+    # Phase 0.5: Research panel — record every market-relevant data source as a unified daily
+    # panel (data/research/panel/). Raw recorded variables only; relationship discovery routes
+    # through research_factory (pre-registered + permutation + BH), never a daily correlation
+    # scan. Non-blocking — a dead source records null and never stalls the cycle.
+    _log("Phase 0.5: RESEARCH PANEL (multi-source harvest)")
+    try:
+        from scripts.harvest_daily_panel import harvest
+        ph = harvest()
+        _log(f"  Panel: {len(ph['sources_ok'])}/{len(ph['sources'])} sources OK"
+             + (f" (null: {ph['sources_null']})" if ph['sources_null'] else ""))
+    except Exception as e:  # noqa: BLE001
+        _log(f"  ⚠ Panel harvest failed ({type(e).__name__}); non-fatal, cycle continues.")
+
     # Phase 1: Harvest
     _log("Phase 1: HARVEST")
     try:
