@@ -59,6 +59,33 @@ def _load_market_briefing() -> str:
         return "No morning market briefing yet (run morning_market_briefing.py). Treat as no context."
 
 
+def _load_daily_macro() -> str:
+    """Daily US economic-state snapshot (FRED). Qualitative regime context for reflection —
+    NOT a trading input (never wired to sizing/signals/gates). Mirrors the market-briefing
+    pattern. Returns a short note if the snapshot is missing/unverified."""
+    p = ROOT / "data" / "macro" / "fred_economic_latest.json"
+    try:
+        d = json.loads(p.read_text())
+        if not d.get("provenance", {}).get("verified"):
+            return "No verified macro snapshot (FRED key/fetch failed). Treat as no context."
+        s = d.get("summary", {})
+
+        def f(x, suf=""):
+            return f"{x}{suf}" if x is not None else "n/a"
+        return (
+            f"[{d.get('date')}] US economic state (FRED):\n"
+            f"  Growth: real GDP {f(s.get('gdp_growth_pct'),'%')} (q/q ann)\n"
+            f"  Inflation: CPI {f(s.get('cpi_yoy_pct'),'%')} YoY | core CPI {f(s.get('core_cpi_yoy_pct'),'%')} | "
+            f"core PCE {f(s.get('core_pce_yoy_pct'),'%')} (Fed target 2%)\n"
+            f"  Labor: unemployment {f(s.get('unemployment_pct'),'%')}\n"
+            f"  Rates: fed funds {f(s.get('fed_funds_pct'),'%')} | 10Y {f(s.get('ten_year_pct'),'%')} | "
+            f"10Y-2Y {f(s.get('yield_curve_10y2y'),'%')} ({s.get('yield_curve_state','n/a')})\n"
+            f"  Consumer: UMich sentiment {f(s.get('consumer_sentiment'))} | VIX {f(s.get('vix'))}"
+        )
+    except Exception:
+        return "No macro snapshot yet (run scripts/fetch_fred_economic.py). Treat as no context."
+
+
 def _load_recent_prices() -> str:
     """Load live_prices from the most recent pulse file."""
     if not PULSE_DIR.exists():
@@ -124,6 +151,9 @@ Every suggestion you make must move one needle: Sharpe, win rate, drawdown, or p
 
 ## Morning market briefing (analyst narrative — UNVERIFIED qualitative context, NOT a data feed)
 {market_briefing}
+
+## US macro snapshot (FRED economic state — qualitative context, NOT a trading signal)
+{macro_economic}
 
 ## External regime confirmation (TradingView vs internal)
 {regime_alignment}
@@ -404,6 +434,7 @@ def run_reflect(harvests: list[dict], date: Optional[str] = None) -> dict:
         bridge_state=ctx["bridge_state"],
         prices_json=_load_recent_prices(),
         market_briefing=_load_market_briefing(),
+        macro_economic=_load_daily_macro(),
         regime_alignment=_load_regime_alignment(),
         indicator_consensus=_load_indicator_consensus(),
         next_milestones=ctx["next_milestones"],
@@ -497,6 +528,7 @@ if __name__ == "__main__":
             bridge_state=ctx["bridge_state"],
             prices_json=_load_recent_prices(),
         market_briefing=_load_market_briefing(),
+            macro_economic=_load_daily_macro(),
             regime_alignment=_load_regime_alignment(),
             indicator_consensus=_load_indicator_consensus(),
             next_milestones=ctx["next_milestones"],

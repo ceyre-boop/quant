@@ -59,6 +59,18 @@ def run_daily_cycle(dry_run: bool = False) -> dict:
         pass
     _log(f"Oracle daily cycle starting — {date}")
 
+    # Phase 0: Macro pull — refresh the daily FRED economic snapshot BEFORE reflect so the
+    # brain reflects with live macro context. Non-blocking: a FRED outage degrades to the
+    # last-good fred_economic_latest.json and never stalls the cognition cycle. Context only.
+    _log("Phase 0: MACRO (FRED economic snapshot)")
+    try:
+        from scripts.fetch_fred_economic import fetch_economic_snapshot
+        ms = fetch_economic_snapshot()
+        _log(f"  Macro {'OK' if ms['provenance']['verified'] else 'UNVERIFIED'} — "
+             f"{len(ms.get('metrics', {}))} series.")
+    except Exception as e:  # noqa: BLE001
+        _log(f"  ⚠ Macro pull failed ({type(e).__name__}); reflect will use last-good snapshot.")
+
     # Phase 1: Harvest
     _log("Phase 1: HARVEST")
     try:
