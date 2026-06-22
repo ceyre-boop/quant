@@ -1,0 +1,26 @@
+{
+  "name": "alta-status-mcp",
+  "version": "0.1.0",
+  "description": "Read-only MCP server exposing the Alta Investments operation's live state (account, morning brief, signals, oracle, loop health, research panel).",
+  "type": "module",
+  "bin": {
+    "alta-status-mcp": "dist/index.js"
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "start": "node dist/index.js",
+    "dev": "bun run src/index.ts",
+    "smoke": "bun run src/smoke.ts",
+    "inspect": "bunx @modelcontextprotocol/inspector node dist/index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "@types/node": "^22.0.0"
+  }
+}
