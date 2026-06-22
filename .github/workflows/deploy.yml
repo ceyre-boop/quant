@@ -31,6 +31,7 @@ jobs:
           mkdir -p _site/data/oracle/reflections
           cp data/oracle/latest_reflection.json _site/data/oracle/ 2>/dev/null || true
           cp data/oracle/version_history.json _site/data/oracle/ 2>/dev/null || true
+          cp data/oracle/lesson_velocity.json _site/data/oracle/ 2>/dev/null || true
           cp data/oracle/reflections/[0-9]*.json _site/data/oracle/reflections/ 2>/dev/null || true
       - uses: actions/upload-pages-artifact@v3
         with:

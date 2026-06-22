@@ -1061,6 +1061,7 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
         <div class="rp" id="rp-usage"><div class="rp-title">Session Usage</div><div class="rp-empty">Loading…</div></div>
         <div class="rp full" id="rp-gates"><div class="rp-title">Prop Challenge Gates</div><div class="rp-empty">Loading…</div></div>
         <div class="rp half" id="rp-reflection"><div class="rp-title">Oracle Reflection</div><div class="rp-empty">Loading…</div></div>
+        <div class="rp" id="rp-velocity"><div class="rp-title">Learning Velocity</div><div class="rp-empty">Loading…</div></div>
         <div class="rp" id="rp-fills"><div class="rp-title">G2 Progress — Paper Fills</div><div class="rp-empty">Loading…</div></div>
         <div class="rp full" id="rp-regime"><div class="rp-title">TV Regime Alignment</div><div class="rp-empty">Loading…</div></div>
         <div class="rp full" id="rp-indicators"><div class="rp-title">Indicator Consensus (30-panel)</div><div class="rp-empty">Loading…</div></div>
@@ -2775,6 +2776,43 @@ function resReflection(data){
     ${cl.sample_needed?`<div style="font-size:9px;color:var(--dim);margin-top:4px">Needs ${cl.sample_needed} trades to confirm</div>`:''}
     ${retire}`;
 }
+function resVelocity(data){
+  const el=document.getElementById('rp-velocity');
+  if(!el)return;
+  if(!data){el.innerHTML='<div class="rp-title">Learning Velocity</div><div class="rp-empty">No velocity data — run lesson_lifecycle.py</div>';return;}
+  const v=data.velocity||{};
+  const cur=data.current_lesson||null;
+  const badge=(s)=>{const c=s==='converged'?'var(--green)':s==='dormant'?'var(--dim)':'var(--yellow)';return `<span style="font-size:9px;padding:1px 6px;border-radius:8px;border:1px solid ${c};color:${c}">${(s||'?').toUpperCase()}</span>`;};
+  // Current lesson — prominent: what Oracle is learning right now, and how long it's been at it.
+  let curHtml='';
+  if(cur){
+    const hist=(cur.history||[]).slice(-6).map(h=>`<div style="display:flex;gap:8px;font-family:monospace;font-size:9px;color:var(--muted)"><span style="color:var(--dim);min-width:62px">${h.date}</span><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${(h.rule||'—').slice(0,70)}</span></div>`).join('');
+    curHtml=`<div style="background:var(--bg3);border-left:2px solid var(--yellow);padding:8px 10px;margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+        <span style="font-size:10px;font-family:monospace;color:var(--blue)">${cur.component_label||'lesson'}</span> ${badge(cur.status)}
+      </div>
+      <div style="font-size:11px;font-style:italic;line-height:1.5;margin-bottom:6px">"${cur.latest_lesson_text||'—'}"</div>
+      <div style="font-size:10px;color:var(--fg);margin-bottom:6px">⏱ forming <b>${cur.days_forming}d</b> · <b>${cur.n_revisions}</b> revisions · stable ${cur.stable_days}d${cur.time_to_converge_days!=null?` · learned in ${cur.time_to_converge_days}d`:''}</div>
+      <div style="font-size:9px;color:var(--dim);margin-bottom:3px">rule evolution:</div>${hist}
+    </div>`;
+  }
+  const stat=(label,val)=>`<div style="text-align:center"><div style="font-size:15px;color:var(--fg)">${val==null?'—':val}</div><div style="font-size:8px;color:var(--dim);text-transform:uppercase">${label}</div></div>`;
+  const statsHtml=`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:8px">
+    ${stat('median converge',v.median_days_to_converge!=null?v.median_days_to_converge+'d':null)}
+    ${stat('median codify',v.median_days_to_codify!=null?v.median_days_to_codify+'d':null)}
+    ${stat('themes/wk',v.themes_formed_per_week)}
+    ${stat('codified',v.n_codified)}
+  </div>`;
+  // codified lessons — days-to-codify as inline bars
+  const cod=(data.codified_lessons||[]);
+  const maxD=Math.max(1,...cod.map(c=>c.days_to_codify||0));
+  const bars=cod.map(c=>{const d=c.days_to_codify;const w=d==null?0:Math.round((d/maxD)*100);return `<div style="display:flex;align-items:center;gap:6px;font-size:9px"><span style="color:var(--dim);min-width:38px;font-family:monospace">${c.id||''}</span><div style="flex:1;background:var(--bg2);height:8px;border-radius:4px;overflow:hidden"><div style="width:${Math.max(w,2)}%;height:100%;background:${c.health==='ACTIVE'?'var(--green)':'var(--dim)'}"></div></div><span style="color:var(--muted);min-width:26px;text-align:right">${d==null?'—':d+'d'}</span></div>`;}).join('');
+  el.innerHTML=`<div class="rp-title">Learning Velocity <span style="color:var(--muted);font-size:9px;margin-left:8px">${data.as_of_date||''} · ${v.n_themes_forming||0} forming / ${v.n_themes_converged||0} converged</span></div>
+    ${curHtml}
+    ${statsHtml}
+    <div style="font-size:9px;color:var(--dim);margin-bottom:4px">codified lessons — time to learn (discovered → codified):</div>
+    <div style="display:flex;flex-direction:column;gap:3px">${bars||'<div class="rp-empty">none yet</div>'}</div>`;
+}
 function resRegime(signals, gates){
   const el=document.getElementById('rp-regime');
   if(!el)return;
@@ -3058,7 +3096,7 @@ function resVersions(externalVers){
 }
 
 async function resLoad(){
-  const[health,msgs,usage,hyp,queue,gates,reflection,g2,verHistory,tvSignals,indSnap]=await Promise.all([
+  const[health,msgs,usage,hyp,queue,gates,reflection,g2,verHistory,tvSignals,indSnap,velocity]=await Promise.all([
     resFetch('health.json'),
     resFetch('messages_to_colin.json'),
     resFetch('usage.json'),
@@ -3070,6 +3108,7 @@ async function resLoad(){
     fetchPath('data/oracle/version_history.json'),
     fetchPath('data/agent/tv_regime_signals.json'),
     fetchPath('data/indicators/live_snapshot.json'),
+    fetchPath('data/oracle/lesson_velocity.json'),
   ]);
   // Per-card guard: one bad field can never blank the whole tab or leave a card on "Loading…".
   const R=(id,fn,...a)=>{try{fn(...a);}catch(e){console.error('render '+id+' failed',e);const el=document.getElementById(id);if(el)el.innerHTML='<div class="rp-empty">Unavailable</div>';}};
@@ -3080,6 +3119,7 @@ async function resLoad(){
   R('rp-queue',resQueue,queue);
   R('rp-gates',resGates,gates);
   R('rp-reflection',resReflection,reflection);
+  R('rp-velocity',resVelocity,velocity);
   R('rp-fills',resFills,g2);
   R('rp-versions',resVersions,verHistory||null);
   R('rp-regime',resRegime,tvSignals||[],gates);
