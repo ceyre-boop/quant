@@ -150,6 +150,20 @@ def run_daily_cycle(dry_run: bool = False) -> dict:
         _log(f"  Codify failed (non-fatal): {e}")
         codify_result = {"action": "ERROR", "error": str(e)}
 
+    # Phase 4.5: Lesson lifecycle — recompute the learning-velocity tracker (time-to-converge /
+    # time-to-codify, frequency, current in-progress lesson) now that today's reflection + any
+    # codification have landed. Instrumentation over Oracle's own outputs; non-blocking.
+    _log("Phase 4.5: LESSON LIFECYCLE")
+    try:
+        from scripts.lesson_lifecycle import build as build_lesson_velocity
+        lv = build_lesson_velocity()
+        cur = lv.get("current_lesson") or {}
+        _log(f"  Velocity: {lv['velocity']['n_themes_tracked']} themes, "
+             f"current [{cur.get('component_label', '?')}] {cur.get('status', '?')} "
+             f"forming {cur.get('days_forming', '?')}d / {cur.get('n_revisions', '?')} revisions.")
+    except Exception as e:  # noqa: BLE001
+        _log(f"  Lesson lifecycle failed (non-fatal): {type(e).__name__}")
+
     summary = {
         "date": date,
         "status": "COMPLETE",
