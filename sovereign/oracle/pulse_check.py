@@ -28,6 +28,17 @@ INDICATORS_DIR = ROOT / "data" / "indicators"
 G2_PROGRESS_PATH = ROOT / "data" / "agent" / "g2_progress.json"
 G2_TARGET = 8
 
+# Big-Move-of-the-Day classifier outputs (display-only until validate_big_move.py PASSes).
+BIG_MOVE_PATH      = ROOT / "data" / "agent" / "big_move.json"
+BIG_MOVE_PRED_LOG  = DECISION_LOG_DIR / "big_move_predictions.jsonl"
+# Proven 4-pair portfolio (AUDNZD excluded — HYP-045, both legs RBA-driven).
+_BIG_MOVE_PAIRS = {
+    'GBPUSD': 'GBPUSD=X',
+    'EURUSD': 'EURUSD=X',
+    'USDJPY': 'USDJPY=X',
+    'AUDUSD': 'AUDUSD=X',
+}
+
 log = logging.getLogger("oracle.pulse")
 
 _PRICE_PAIRS = {
@@ -709,6 +720,180 @@ def _expire_stale_decisions(max_age_hours: int = 48) -> int:
 
 # ─── Main ─────────────────────────────────────────────────────────────────────
 
+# ─── Big-Move-of-the-Day classifier ──────────────────────────────────────────
+
+def _current_killzone(now: Optional[datetime] = None) -> str:
+    """Approximate ICT killzone from the current UTC hour (display label only)."""
+    h = (now or datetime.now(timezone.utc)).hour
+    if 7 <= h < 12:
+        return "LONDON"
+    if 12 <= h < 16:
+        return "NY_AM"
+    if 16 <= h < 21:
+        return "NY_PM"
+    return "OFF_HOURS"
+
+
+def _big_move_context() -> dict:
+    """
+    Assemble the cheap, safe macro context shared across pairs: current VIX and
+    whether a high-impact event lands today. Each piece degrades to absent (the
+    classifier handles missing context) so this never blocks the pulse.
+    rate_diff_z / cot_percentile are intentionally left out until a lookahead-safe
+    accessor exists — better absent than wrong.
+    """
+    ctx: dict = {}
+    try:
+        import yfinance as yf
+        vix = yf.download("^VIX", period="5d", progress=False, auto_adjust=True)
+        if vix is not None and len(vix):
+            ctx["vix"] = float(vix["Close"].iloc[-1])
+    except Exception as exc:
+        log.debug("big_move VIX fetch failed: %s", exc)
+    try:
+        import sys as _sys
+        _sys.path.insert(0, str(ROOT / "data"))
+        from calendar_fetcher import CalendarFetcher  # type: ignore
+        cf = CalendarFetcher()
+        events = cf.fetch_events(days_ahead=0)
+        high = cf.get_high_impact_events(events) if events else []
+        ctx["high_impact_event_today"] = bool(high)
+    except Exception as exc:
+        log.debug("big_move calendar fetch failed: %s", exc)
+    return ctx
+
+
+def _compute_big_move_estimates() -> dict:
+    """
+    Compute the Big-Move-of-the-Day estimate per pair, publish data/agent/big_move.json,
+    and append predictions to the prediction log for later outcome backfill.
+
+    Zero LLM cost. Returns {} on any error (never blocks the pulse).
+    DISPLAY-ONLY: does not gate any decision until validate_big_move.py PASSes.
+    """
+    try:
+        import yfinance as yf
+        import pandas as pd
+        from sovereign.intelligence.big_move import estimate_big_move
+
+        now = datetime.now(timezone.utc)
+        session = _current_killzone(now)
+        context = _big_move_context()
+        estimates: dict = {}
+
+        for pair, ticker in _BIG_MOVE_PAIRS.items():
+            try:
+                df = yf.Ticker(ticker).history(period="120d", interval="1d", auto_adjust=True)
+                if df is None or len(df) < 60:
+                    continue
+                df = df[["Open", "High", "Low", "Close"]].dropna()
+                df.index = pd.to_datetime(df.index, utc=True)
+                est = estimate_big_move(pair, df, context=context, session=session, now=now)
+                estimates[pair] = est.to_dict()
+            except Exception as pair_exc:
+                log.debug("big_move(%s) failed: %s", pair, pair_exc)
+                continue
+
+        if not estimates:
+            return {}
+
+        BIG_MOVE_PATH.parent.mkdir(parents=True, exist_ok=True)
+        BIG_MOVE_PATH.write_text(json.dumps({
+            "timestamp": canonical_timestamp(),
+            "session": session,
+            "context_keys": sorted(context.keys()),
+            "validation_status": "UNVALIDATED — display only (run scripts/validate_big_move.py)",
+            "estimates": estimates,
+        }, indent=2))
+
+        # Append one prediction row per pair for later outcome backfill.
+        DECISION_LOG_DIR.mkdir(parents=True, exist_ok=True)
+        pred_date = now.date().isoformat()
+        with BIG_MOVE_PRED_LOG.open("a") as fh:
+            for pair, e in estimates.items():
+                fh.write(json.dumps({
+                    "prediction_date": pred_date,
+                    "timestamp": e["timestamp"],
+                    "pair": pair,
+                    "p_big": e["p_big"],
+                    "direction": e["direction"],
+                    "expected_vs_adr": e["expected_vs_adr"],
+                    "session": session,
+                    "outcome": None,            # backfilled when the day completes
+                    "realized_direction": None,
+                    "was_big_day": None,
+                    "direction_hit": None,
+                }) + "\n")
+
+        return estimates
+    except Exception as exc:
+        log.warning("_compute_big_move_estimates failed: %s", exc)
+        return {}
+
+
+def _backfill_big_move_outcomes() -> int:
+    """
+    Close the big-move loop: for predictions whose day is complete and outcome is
+    still null, fill realized direction + whether it was a big day + direction hit.
+    Rewrites the JSONL in place (small file). Returns count backfilled.
+    """
+    if not BIG_MOVE_PRED_LOG.exists():
+        return 0
+    try:
+        import yfinance as yf
+        import pandas as pd
+        from sovereign.intelligence.big_move import big_move_label
+
+        lines = [json.loads(ln) for ln in BIG_MOVE_PRED_LOG.read_text().splitlines() if ln.strip()]
+        pending = [r for r in lines if r.get("outcome") is None
+                   and r.get("prediction_date") < datetime.now(timezone.utc).date().isoformat()]
+        if not pending:
+            return 0
+
+        # Fetch daily once per pair, reuse across that pair's pending rows.
+        frames: dict = {}
+        for pair in {r["pair"] for r in pending}:
+            ticker = _BIG_MOVE_PAIRS.get(pair, pair + "=X")
+            try:
+                df = yf.Ticker(ticker).history(period="200d", interval="1d", auto_adjust=True)
+                df = df[["Open", "High", "Low", "Close"]].dropna()
+                df.index = pd.to_datetime(df.index, utc=True)
+                frames[pair] = df
+            except Exception:
+                frames[pair] = None
+
+        n = 0
+        for r in pending:
+            df = frames.get(r["pair"])
+            if df is None or df.empty:
+                continue
+            # Locate the prediction date's bar.
+            target = pd.Timestamp(r["prediction_date"], tz="UTC")
+            locs = df.index.normalize().get_indexer([target])
+            idx = int(locs[0]) if locs[0] != -1 else -1
+            if idx < 0:
+                continue
+            label = big_move_label(df, idx)
+            if label is None:
+                continue
+            was_big, sign = label
+            pred_sign = 1 if r["direction"] == "LONG" else (-1 if r["direction"] == "SHORT" else 0)
+            r["realized_direction"] = int(sign)
+            r["was_big_day"] = bool(was_big)
+            r["direction_hit"] = bool(pred_sign != 0 and pred_sign == sign)
+            r["outcome"] = "CLOSED"
+            n += 1
+
+        if n:
+            with BIG_MOVE_PRED_LOG.open("w") as fh:
+                for r in lines:
+                    fh.write(json.dumps(r) + "\n")
+        return n
+    except Exception as exc:
+        log.warning("_backfill_big_move_outcomes failed: %s", exc)
+        return 0
+
+
 def run_pulse() -> dict:
     """Run pulse check. No LLM call. Writes pulse report, updates health.json."""
     last = _get_last_pulse_time()
@@ -727,6 +912,10 @@ def run_pulse() -> dict:
     # Close the learning loop: back-fill closed trades, expire never-filled signals.
     n_backfilled = _backfill_decision_outcomes()
     n_expired = _expire_stale_decisions()
+
+    # Big-Move-of-the-Day: compute fresh estimates, close the prior-day loop.
+    big_move = _compute_big_move_estimates()
+    n_big_move_backfilled = _backfill_big_move_outcomes()
 
     # Write state BEFORE check_all_loops reads it — prevents false DOWN alarm where
     # health reads the 2h-old timestamp because state wasn't updated yet.
@@ -753,6 +942,8 @@ def run_pulse() -> dict:
         "live_prices": live_prices,
         "indicator_consensus": indicator_consensus,
         "g2_progress": g2_progress,
+        "big_move": big_move,
+        "big_move_outcomes_backfilled": n_big_move_backfilled,
     }
 
     PULSE_DIR.mkdir(parents=True, exist_ok=True)
@@ -762,6 +953,14 @@ def run_pulse() -> dict:
     _update_health_json(pulse)
     if anomalies:
         _write_messages(anomalies)
+
+    # Proof-of-life: refresh the "system is alive & producing signal" summary each pulse (~2h) so
+    # the dashboard/MCP show fresh would-be signals + today's fills intraday. Read-only, non-fatal.
+    try:
+        from scripts.proof_of_life import main as _refresh_proof_of_life
+        _refresh_proof_of_life()
+    except Exception as exc:  # noqa: BLE001
+        log.warning("proof_of_life refresh failed (non-fatal): %s", type(exc).__name__)
 
     return pulse
 

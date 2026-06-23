@@ -1060,6 +1060,7 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
         <div class="rp half" id="rp-messages"><div class="rp-title">Messages to Colin</div><div class="rp-empty">Loading…</div></div>
         <div class="rp" id="rp-usage"><div class="rp-title">Session Usage</div><div class="rp-empty">Loading…</div></div>
         <div class="rp full" id="rp-gates"><div class="rp-title">Prop Challenge Gates</div><div class="rp-empty">Loading…</div></div>
+        <div class="rp" id="rp-proof"><div class="rp-title">Proof of Life</div><div class="rp-empty">Loading…</div></div>
         <div class="rp half" id="rp-reflection"><div class="rp-title">Oracle Reflection</div><div class="rp-empty">Loading…</div></div>
         <div class="rp" id="rp-velocity"><div class="rp-title">Learning Velocity</div><div class="rp-empty">Loading…</div></div>
         <div class="rp" id="rp-fills"><div class="rp-title">G2 Progress — Paper Fills</div><div class="rp-empty">Loading…</div></div>
@@ -2776,6 +2777,24 @@ function resReflection(data){
     ${cl.sample_needed?`<div style="font-size:9px;color:var(--dim);margin-top:4px">Needs ${cl.sample_needed} trades to confirm</div>`:''}
     ${retire}`;
 }
+function resProof(data){
+  const el=document.getElementById('rp-proof');
+  if(!el)return;
+  if(!data){el.innerHTML='<div class="rp-title">Proof of Life</div><div class="rp-empty">No proof-of-life snapshot — run proof_of_life.py</div>';return;}
+  const fired=data.fired_today;
+  const wf=(data.pairs||[]).filter(p=>p.direction&&p.direction!=='NO_TRADE');
+  const dot=data.alive?'var(--green)':'var(--red)';
+  const lf=data.last_fill||{};
+  const banner=fired
+    ?`<div style="background:var(--bg3);border-left:3px solid var(--green);padding:8px 10px;margin-bottom:8px;font-size:12px"><b style="color:var(--green)">🟢 TRADE FIRED TODAY</b> — ${lf.pair||''} ${lf.direction||''} @ ${lf.fill_price||''}</div>`
+    :`<div style="background:var(--bg3);border-left:3px solid ${wf.length?'var(--yellow)':'var(--dim)'};padding:8px 10px;margin-bottom:8px;font-size:11px;color:var(--muted)">${wf.length?`${wf.length} pair(s) signalling — `:'All NO_TRADE — '}edge ${wf.length?'firing':'not firing (correct, not broken)'}. Last fill: ${lf.pair||'—'} ${lf.direction||''}${lf.days_ago!=null?` ${lf.days_ago}d ago`:''}</div>`;
+  const rows=(data.pairs||[]).map(p=>{const sig=p.direction&&p.direction!=='NO_TRADE';const c=sig?'var(--green)':'var(--dim)';return `<div style="display:flex;justify-content:space-between;align-items:center;font-size:10px;padding:2px 0"><span style="font-family:monospace;color:var(--muted)">${p.pair}</span><span style="display:flex;gap:8px;align-items:center"><span style="color:${c}">${p.direction||'—'}</span><span style="color:var(--dim);min-width:42px;text-align:right">conv ${p.conviction!=null?p.conviction:'—'}</span></span></div>`;}).join('');
+  const loops=`<div style="font-size:9px;color:var(--dim);margin-top:6px">loops alive: ${data.loops_alive||0}${(data.loops_down&&data.loops_down.length)?` · <span style="color:var(--yellow)">DOWN: ${data.loops_down.join(', ')}</span>`:''} · scan ${data.scan_age_hours!=null?data.scan_age_hours+'h ago':'—'}</div>`;
+  el.innerHTML=`<div class="rp-title">Proof of Life <span style="color:${dot};font-size:9px;margin-left:8px">● ${data.alive?'ALIVE':'CHECK'}</span></div>
+    ${banner}
+    <div style="display:flex;flex-direction:column;gap:1px">${rows||'<div class="rp-empty">no scan</div>'}</div>
+    ${loops}`;
+}
 function resVelocity(data){
   const el=document.getElementById('rp-velocity');
   if(!el)return;
@@ -3096,7 +3115,7 @@ function resVersions(externalVers){
 }
 
 async function resLoad(){
-  const[health,msgs,usage,hyp,queue,gates,reflection,g2,verHistory,tvSignals,indSnap,velocity]=await Promise.all([
+  const[health,msgs,usage,hyp,queue,gates,reflection,g2,verHistory,tvSignals,indSnap,velocity,proof]=await Promise.all([
     resFetch('health.json'),
     resFetch('messages_to_colin.json'),
     resFetch('usage.json'),
@@ -3109,6 +3128,7 @@ async function resLoad(){
     fetchPath('data/agent/tv_regime_signals.json'),
     fetchPath('data/indicators/live_snapshot.json'),
     fetchPath('data/oracle/lesson_velocity.json'),
+    fetchPath('data/agent/proof_of_life.json'),
   ]);
   // Per-card guard: one bad field can never blank the whole tab or leave a card on "Loading…".
   const R=(id,fn,...a)=>{try{fn(...a);}catch(e){console.error('render '+id+' failed',e);const el=document.getElementById(id);if(el)el.innerHTML='<div class="rp-empty">Unavailable</div>';}};
@@ -3118,6 +3138,7 @@ async function resLoad(){
   R('rp-hyp',resHyp,hyp);
   R('rp-queue',resQueue,queue);
   R('rp-gates',resGates,gates);
+  R('rp-proof',resProof,proof);
   R('rp-reflection',resReflection,reflection);
   R('rp-velocity',resVelocity,velocity);
   R('rp-fills',resFills,g2);

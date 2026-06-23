@@ -20,6 +20,7 @@ import {
   oracleReflection,
   loopHealth,
   researchPanel,
+  proofOfLife,
 } from "./alta.js";
 
 const READONLY = {
@@ -141,6 +142,21 @@ server.registerTool(
     annotations: READONLY,
   },
   async ({ date, source }) => ok(researchPanel({ date, source })),
+);
+
+server.registerTool(
+  "alta_proof_of_life",
+  {
+    title: "Alta proof of life",
+    description:
+      "The honest 'is the system alive and producing signal?' read: whether a trade fired today, " +
+      "would-be signals (pairs currently signalling vs NO_TRADE), how close each pair is to firing, " +
+      "the last actual fill + its age, and loop health. The answer to 'is it working?' WITHOUT " +
+      "real-money risk — no forced trades, read-only.",
+    inputSchema: {},
+    annotations: READONLY,
+  },
+  async () => ok(proofOfLife()),
 );
 
 const transport = new StdioServerTransport();

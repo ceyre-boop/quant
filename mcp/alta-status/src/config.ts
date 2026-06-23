@@ -21,6 +21,7 @@ export const PATHS = {
   loopHealth: join(ALTA_ROOT, "data", "oracle", "loop_health_status.json"),
   reflectionsDir: join(ALTA_ROOT, "data", "oracle", "reflections"),
   panelDir: join(ALTA_ROOT, "data", "research", "panel"),
+  proofOfLife: join(ALTA_ROOT, "data", "agent", "proof_of_life.json"),
   fredEconomic: join(ALTA_ROOT, "data", "macro", "fred_economic_latest.json"),
   env: join(ALTA_ROOT, ".env"),
 };

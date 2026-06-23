@@ -153,6 +153,26 @@ export function loopHealth(): any {
   };
 }
 
+// ── proof of life (is the system alive & producing signal) ──────────────────────
+export function proofOfLife(): any {
+  const d = readJson(PATHS.proofOfLife);
+  if (!d) return { available: false, note: "No proof-of-life snapshot yet (run scripts/proof_of_life.py)." };
+  return {
+    available: true,
+    generated_at: d.generated_at,
+    alive: d.alive,
+    fired_today: d.fired_today,
+    summary: d.summary_line,
+    n_would_fire_today: d.n_would_fire_today,
+    strongest_signal: d.strongest_signal,
+    pairs: d.pairs,
+    last_fill: d.last_fill,
+    loops_alive: d.loops_alive,
+    loops_down: d.loops_down,
+    scan_age_hours: d.scan_age_hours,
+  };
+}
+
 // ── research panel (a given day, default latest) ────────────────────────────────
 export function researchPanel(opts: { date?: string; source?: string } = {}): any {
   let file: string;
