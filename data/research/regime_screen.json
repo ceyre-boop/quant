@@ -1,0 +1,126 @@
+{
+  "id": "REGIME-ROUTER-SCREEN",
+  "generated_at": "2026-06-23T23:40:20.776956+00:00",
+  "regime": "Bull (SPY>200SMA) AND VIX>15.0",
+  "splits": {
+    "IS": [
+      "2015-01-01",
+      "2022-12-31"
+    ],
+    "OOS": [
+      "2023-01-01",
+      "2024-12-31"
+    ]
+  },
+  "rows": [
+    {
+      "pair": "GBPUSD=X",
+      "IS": {
+        "sharpe_ungated": 0.786,
+        "n_ungated": 82,
+        "sharpe_gated_out_regime": 0.687,
+        "n_out_regime": 67,
+        "sharpe_in_regime": 0.415,
+        "n_in_regime": 15,
+        "delta_gated_minus_ungated": -0.099
+      },
+      "OOS": {
+        "sharpe_ungated": 1.437,
+        "n_ungated": 29,
+        "sharpe_gated_out_regime": 1.357,
+        "n_out_regime": 28,
+        "sharpe_in_regime": 0.0,
+        "n_in_regime": 1,
+        "delta_gated_minus_ungated": -0.08
+      }
+    },
+    {
+      "pair": "EURUSD=X",
+      "IS": {
+        "sharpe_ungated": 0.449,
+        "n_ungated": 77,
+        "sharpe_gated_out_regime": 0.433,
+        "n_out_regime": 60,
+        "sharpe_in_regime": 0.234,
+        "n_in_regime": 17,
+        "delta_gated_minus_ungated": -0.016
+      },
+      "OOS": {
+        "sharpe_ungated": 1.278,
+        "n_ungated": 30,
+        "sharpe_gated_out_regime": 0.974,
+        "n_out_regime": 28,
+        "sharpe_in_regime": 2.502,
+        "n_in_regime": 2,
+        "delta_gated_minus_ungated": -0.304
+      }
+    },
+    {
+      "pair": "USDJPY=X",
+      "IS": {
+        "sharpe_ungated": 0.547,
+        "n_ungated": 77,
+        "sharpe_gated_out_regime": 0.547,
+        "n_out_regime": 77,
+        "sharpe_in_regime": null,
+        "n_in_regime": 0,
+        "delta_gated_minus_ungated": 0.0
+      },
+      "OOS": {
+        "sharpe_ungated": 1.497,
+        "n_ungated": 25,
+        "sharpe_gated_out_regime": 1.497,
+        "n_out_regime": 25,
+        "sharpe_in_regime": null,
+        "n_in_regime": 0,
+        "delta_gated_minus_ungated": 0.0
+      }
+    },
+    {
+      "pair": "AUDUSD=X",
+      "IS": {
+        "sharpe_ungated": 0.519,
+        "n_ungated": 82,
+        "sharpe_gated_out_regime": 0.363,
+        "n_out_regime": 56,
+        "sharpe_in_regime": 0.396,
+        "n_in_regime": 28,
+        "delta_gated_minus_ungated": -0.156
+      },
+      "OOS": {
+        "sharpe_ungated": 0.782,
+        "n_ungated": 26,
+        "sharpe_gated_out_regime": 1.18,
+        "n_out_regime": 22,
+        "sharpe_in_regime": -11.187,
+        "n_in_regime": 4,
+        "delta_gated_minus_ungated": 0.398
+      }
+    },
+    {
+      "pair": "AUDNZD=X",
+      "IS": {
+        "sharpe_ungated": 0.553,
+        "n_ungated": 55,
+        "sharpe_gated_out_regime": 0.553,
+        "n_out_regime": 55,
+        "sharpe_in_regime": null,
+        "n_in_regime": 0,
+        "delta_gated_minus_ungated": 0.0
+      },
+      "OOS": {
+        "sharpe_ungated": -0.754,
+        "n_ungated": 18,
+        "sharpe_gated_out_regime": -0.754,
+        "n_out_regime": 18,
+        "sharpe_in_regime": null,
+        "n_in_regime": 0,
+        "delta_gated_minus_ungated": 0.0
+      }
+    }
+  ],
+  "provenance": {
+    "kind": "regime_screen_table",
+    "note": "Research table only. No gating decision. A cross-pair gate becomes a hypothesis ONLY via scripts/run_hypothesis.py (permutation>=1000 + IS/OOS + BH + decay>=0.50). Not labelled v016 pre-gauntlet. No live config touched."
+  }
+}

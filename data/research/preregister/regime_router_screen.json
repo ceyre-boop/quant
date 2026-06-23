@@ -1,0 +1,15 @@
+{
+  "id": "REGIME-ROUTER-SCREEN",
+  "frozen_at": "2026-06-23",
+  "purpose": "Cross-pair regime screen: does the proven USDJPY Bull+VIX>15 gate (HYP-027) generalize? For each pair, measure Sharpe in vs out of the Bull+VIX regime. Find pairs that THRIVE in the regime that kills USDJPY -> cross-pair router candidate. RESEARCH ONLY: produces a table, no gating decision, no live change.",
+  "regime_definition": "Bull AND elevated VIX: SPY > 200-day SMA AND VIX > vix_threshold (the same lens HYP-027 proves for USDJPY).",
+  "vix_threshold": 15.0,
+  "vix_threshold_rationale": "SINGLE frozen value = the pre-proven HYP-027/v013 threshold. Deliberately NOT a swept grid — sweeping thresholds is the multiple-comparisons surface that produced the HYP-044 in-sample artifact (15->13 gave +0.242 IS, 0.000 OOS). One principled threshold, no post-hoc tuning.",
+  "pairs": ["GBPUSD=X", "EURUSD=X", "USDJPY=X", "AUDUSD=X", "AUDNZD=X"],
+  "splits": { "IS": ["2015-01-01", "2022-12-31"], "OOS": ["2023-01-01", "2024-12-31"] },
+  "both_sides_rule": "For EVERY pair report Sharpe in BOTH regime states: in_regime (Bull+VIX>15 trades only) AND out_regime (gated = everything else). Never condition on outcome.",
+  "metrics_per_cell": ["sharpe_ungated", "sharpe_gated_out_regime", "sharpe_in_regime", "delta_gated_minus_ungated", "n_trades"],
+  "no_mid_run_tuning": "Frozen. regime_screen.py asserts vix_threshold + pairs + splits match this file (tripwire) and refuses to run a tuned spec.",
+  "verdict_discipline": "The screen outputs a TABLE only. A cross-pair gate becomes a hypothesis ONLY via scripts/run_hypothesis.py (permutation>=1000 + IS/OOS + BH + decay>=0.50). Nothing is labelled v016 pre-gauntlet. Existing EURUSD=18/GBPUSD=18/AUDUSD=20 gates are re-examined here for OOS-reality.",
+  "isolation": "Reads/runs the forex backtester in-memory with patched PAIR_VIX_GATES; touches NO live config. position_sizer and the sizing/leverage formula are untouched."
+}
