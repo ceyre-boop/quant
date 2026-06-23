@@ -1,0 +1,54 @@
+{
+  "generated_at": "2026-06-23T15:11:17.928682+00:00",
+  "alive": true,
+  "fired_today": true,
+  "frozen": null,
+  "scan_age_hours": 2.5,
+  "n_pairs_scanned": 3,
+  "n_would_fire_today": 1,
+  "strongest_signal": {
+    "pair": "GBPUSD=X",
+    "conviction": 0.256,
+    "direction": "NO_TRADE",
+    "pct_to_trigger": 100.0,
+    "regime": "TRENDING",
+    "rate_differential": 0.17
+  },
+  "pairs": [
+    {
+      "pair": "GBPUSD=X",
+      "conviction": 0.256,
+      "direction": "NO_TRADE",
+      "pct_to_trigger": 100.0,
+      "regime": "TRENDING",
+      "rate_differential": 0.17
+    },
+    {
+      "pair": "EURUSD=X",
+      "conviction": 0.133,
+      "direction": "SHORT",
+      "pct_to_trigger": 100.0,
+      "regime": "TRENDING",
+      "rate_differential": -1.83
+    },
+    {
+      "pair": "AUDUSD=X",
+      "conviction": 0.102,
+      "direction": "NO_TRADE",
+      "pct_to_trigger": 100.0,
+      "regime": "TRENDING",
+      "rate_differential": 0.1
+    }
+  ],
+  "last_fill": {
+    "pair": "EUR_USD",
+    "direction": "SHORT",
+    "fill_price": 1.1395,
+    "date": "2026-06-23",
+    "days_ago": 0.1
+  },
+  "loops_alive": 7,
+  "loops_down": [],
+  "summary_line": "\ud83d\udfe2 TRADE FIRED today: EUR_USD SHORT @ 1.1395. 3 pairs scanned 2.5h ago \u2014 1 signalling (EURUSD=X SHORT). Highest conviction: GBPUSD=X 0.256. ",
+  "note": "Honest proof-of-life: would-be signals + proximity, never a forced trade. Read-only."
+}
