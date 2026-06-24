@@ -151,7 +151,8 @@ class Verdict:
 class Gate:
     def __init__(self, adapter, *, train_window: tuple[str, str],
                  holdout_window: tuple[str, str], n_perms: int = 500, seed: int = 7,
-                 perm_p_max: float = 0.05, dsr_prob_min: float = 0.95):
+                 perm_p_max: float = 0.05, dsr_prob_min: float = 0.95,
+                 directional_perm: bool = False):
         self.adapter = adapter
         self.train_window = train_window
         self.holdout_window = holdout_window
@@ -159,6 +160,10 @@ class Gate:
         self.rng = np.random.default_rng(seed)
         self.perm_p_max = perm_p_max
         self.dsr_prob_min = dsr_prob_min
+        # directional_perm: shuffle the candidate's OWN long/short values (preserve the
+        # directional ratio) instead of random ±1. Required for trending/directional assets
+        # (equity indices) so a long-biased rule must beat random TIMING, not just capture beta.
+        self.directional_perm = directional_perm
         self.pairs = adapter.pairs
 
     # -- per-candidate signal arrays (computed once, reused across windows) --
@@ -197,7 +202,10 @@ class Gate:
                 perm = np.zeros(n_bars, dtype=np.int8)
                 if n_sig > 0:
                     pos = self.rng.choice(n_bars, size=n_sig, replace=False)
-                    perm[pos] = self.rng.choice(np.array([-1, 1], dtype=np.int8), size=n_sig)
+                    if self.directional_perm:
+                        perm[pos] = self.rng.permutation(sig[sig != 0])  # preserve long/short ratio
+                    else:
+                        perm[pos] = self.rng.choice(np.array([-1, 1], dtype=np.int8), size=n_sig)
                 res = self.adapter.eval_signals(pair, perm)
                 per_pair[pair] = (res.sharpe, res.n_trades)
             null_sharpe = weighted_portfolio_sharpe(list(per_pair.values()))

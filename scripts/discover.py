@@ -276,12 +276,114 @@ def run_validate(args) -> int:
     return 0
 
 
+def run_equity(args, source: str, quiet: bool = False):
+    """Discovery on clean equity-index data (NQ). Beta-controlled: directional permutation
+    + delta-vs-buy-and-hold + per-year walk-forward (2022's NQ bear is the real test)."""
+    import numpy as np
+    from sovereign.discovery.equity_adapter import EquityIndexAdapter
+    from sovereign.discovery.features import compute_features
+    from sovereign.discovery import candidates as C
+    from sovereign.discovery.gate import Gate
+    from sovereign.discovery import visuals
+    from datetime import datetime, timezone
+
+    start, end = "2018-01-01", "2026-06-09"
+    tw, hw = (start, "2023-12-31"), ("2024-01-01", end)
+    wf_years = list(range(2019, 2026))
+    p = lambda m: None if quiet else print(f"   {m}")
+
+    if not quiet:
+        print(f"[discover] equity track | source={source} | NQ | directional null + delta-vs-buy&hold + walk-forward")
+    adapter = EquityIndexAdapter(source=source, symbol=args.symbol, start=start, end=end).preload()
+    df = adapter.price_df()
+    if not quiet:
+        print(f"[discover] {len(df)} daily bars {df.index[0].date()}→{df.index[-1].date()}")
+    feats = {pr: compute_features(adapter.price_df(pr)) for pr in adapter.pairs}
+    cands = C.generate(adapter, feats, tw, include_clusters=True)
+
+    base = {pr: np.ones(len(adapter.price_df(pr)), dtype=np.int8) for pr in adapter.pairs}
+    bh = adapter.eval_signals(adapter.pairs[0], base[adapter.pairs[0]])
+
+    out_dir = Path(args.out) / f"equity-{source}"
+    _preregister(cands, out_dir, tw, hw, datetime.now(timezone.utc).isoformat())
+    g = Gate(adapter, train_window=tw, holdout_window=hw, n_perms=args.perms, seed=args.seed,
+             directional_perm=True)
+    verds = g.evaluate(cands, feats, max_finalists=args.max_finalists, progress=p,
+                       base_signals_by_pair=base, wf_years=wf_years)
+    n_valid = sum(1 for v in verds if v.verdict == "VALID_EDGE")
+    summary = {"window": f"{start}..{end}", "n_candidates": len(cands),
+               "n_finalists": sum(1 for v in verds if v.verdict != "SCREENED_OUT"), "n_valid": n_valid}
+    visuals.render(f"equity-{source}", verds, adapter, feats, tw, out_dir, summary)
+    if not quiet:
+        print(f"\n  NQ buy-and-hold benchmark (beta): Sharpe={bh.sharpe}")
+        _print_regime_table(verds)
+        print(f"\n[discover] VALID_EDGE (beats beta + null + every OOS year): "
+              f"{[v.name for v in verds if v.verdict=='VALID_EDGE'] or 'none'}")
+        print(f"[discover] artifacts → {out_dir}/")
+    return verds, bh.sharpe
+
+
+def run_compare_sources(args) -> int:
+    """The centerpiece: same machinery + same asset (NQ), two sources -> the delta IS the data."""
+    print("[discover] SOURCE COMPARISON — NQ: clean parquet vs yfinance (NQ=F)")
+    vp, bhp = run_equity(args, "parquet", quiet=True)
+    vy, bhy = run_equity(args, "yfinance", quiet=True)
+    byname = {}
+    for v in vp:
+        byname.setdefault(v.name, {})["parquet"] = v
+    for v in vy:
+        byname.setdefault(v.name, {})["yfinance"] = v
+    rows = ["candidate,parquet_sharpe,parquet_perm_p,parquet_verdict,yf_sharpe,yf_perm_p,yf_verdict"]
+    print(f"\n  NQ buy&hold: parquet Sharpe={bhp}  yfinance Sharpe={bhy}")
+    print(f"  {'candidate':20s} {'parq_S':>7s} {'parq_p':>7s} {'yf_S':>7s} {'yf_p':>7s}  agree?")
+    for name in sorted(byname):
+        pq, yf = byname[name].get("parquet"), byname[name].get("yfinance")
+        if not pq or not yf:
+            continue
+        agree = (pq.verdict == yf.verdict)
+        rows.append(f"{name},{pq.full_sharpe},{pq.perm_p},{pq.verdict},{yf.full_sharpe},{yf.perm_p},{yf.verdict}")
+        if pq.verdict != "SCREENED_OUT" or yf.verdict != "SCREENED_OUT":
+            print(f"  {name:20s} {pq.full_sharpe:+7.2f} {str(pq.perm_p):>7s} {yf.full_sharpe:+7.2f} {str(yf.perm_p):>7s}  {'✓' if agree else '✗ DIVERGES'}")
+    out = Path(args.out) / "equity-parquet" / "source_comparison.csv"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text("\n".join(rows) + "\n")
+    n_div = sum(1 for n in byname if byname[n].get("parquet") and byname[n].get("yfinance")
+                and byname[n]["parquet"].verdict != byname[n]["yfinance"].verdict)
+    print(f"\n[discover] {n_div} candidate(s) get a DIFFERENT verdict between sources.")
+    print("[discover] If ~0 diverge -> drift isn't changing conclusions at the daily scale (the data was honest).")
+    print(f"[discover] → {out}")
+    return 0
+
+
+def run_equity_selfcheck(args) -> int:
+    """Gate sanity on the equity adapter: a future-peek leak must crush; momentum base must not."""
+    import numpy as np
+    from sovereign.discovery.equity_adapter import EquityIndexAdapter
+    from sovereign.discovery.gate import Gate, Candidate
+    ad = EquityIndexAdapter(source=args.source, symbol=args.symbol, start="2018-01-01", end="2026-06-09").preload()
+    feats = {p: ad.price_df(p) for p in ad.pairs}
+    def leak(pair, pdf, fdf):
+        c = pdf["Close"]; return np.sign((c.shift(-20) / c - 1).fillna(0)).astype(np.int8).to_numpy()
+    g = Gate(ad, train_window=("2018-01-01", "2023-12-31"), holdout_window=("2024-01-01", "2026-06-09"),
+             n_perms=max(80, args.perms), seed=7, directional_perm=True)
+    res = {r.name: r for r in g.evaluate([Candidate("leak", "canary", "future peek", leak)], feats, progress=lambda m: None)}
+    c = res["canary"]
+    ok = c.perm_p is not None and c.perm_p < 0.05 and c.full_sharpe > 0.8
+    print(f"[selfcheck:equity] canary Sharpe={c.full_sharpe} perm_p={c.perm_p} → {'PASS ✓' if ok else 'FAIL ✗'}")
+    return 0 if ok else 1
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description="Alta edge-discovery pipeline (discovery feeds the gate).")
     ap.add_argument("--track", default="forex-daily",
-                    choices=["forex-daily", "regime", "nq-intraday", "intraday-fx"])
+                    choices=["forex-daily", "regime", "equity", "nq-intraday", "intraday-fx"])
     ap.add_argument("--validate", default=None, metavar="CANDIDATE",
                     help="resolve a single named candidate (e.g. cluster4_short) at full perm depth")
+    ap.add_argument("--source", default="parquet", choices=["parquet", "yfinance"],
+                    help="equity track data source (clean parquet vs yfinance)")
+    ap.add_argument("--compare-sources", action="store_true",
+                    help="equity: run NQ on BOTH sources and diff (the data-source effect)")
+    ap.add_argument("--symbol", default="NQ", help="equity symbol (default NQ)")
     ap.add_argument("--start", default="2015-01-01")
     ap.add_argument("--end", default="2024-12-31")
     ap.add_argument("--train-end", default="2022-12-31")
@@ -297,13 +399,18 @@ def main() -> int:
     args = ap.parse_args()
 
     if args.selfcheck:
-        return run_selfcheck(args)
+        return run_equity_selfcheck(args) if args.track == "equity" else run_selfcheck(args)
+    if args.compare_sources:
+        return run_compare_sources(args)
     if args.validate:
         return run_validate(args)
     if args.track == "forex-daily":
         return run_forex_daily(args)
     if args.track == "regime":
         return run_regime(args)
+    if args.track == "equity":
+        run_equity(args, args.source)
+        return 0
     if args.track == "nq-intraday":
         return run_nq_intraday(args)
     return run_intraday_fx(args)
