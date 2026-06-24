@@ -172,6 +172,57 @@ class TestForexFullLoop(unittest.TestCase):
                 self.assertEqual(records[0]["outcome"], "WIN")
 
 
+class TestCrossVenuePairMatch(unittest.TestCase):
+    """Regression for the silent win/loss-loop break (NON-NEGOTIABLE #2).
+
+    forex_live_scan logs the yfinance ticker ('GBPUSD=X'); the pulse backfill
+    derives 'GBPUSD' from the OANDA instrument 'GBP_USD'. Before the fix those
+    strings never compared equal AND the backfill passed system='ICT', so every
+    FOREX fill was skipped and no trade ever closed. Both must hold now.
+    """
+
+    def test_oanda_fill_closes_yfinance_ticker_decision(self):
+        from sovereign.intelligence.decision_logger import log_forex_decision, update_outcome
+
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            with _patch_log_dir(tmp_path):
+                rec = log_forex_decision(
+                    pair="GBPUSD=X",            # what forex_live_scan actually logs
+                    direction="LONG", entry_level=1.3469,
+                    stop_loss=1.3400, hold_days=10, risk_pct=0.0075,
+                    signal_layers=["carry"], rate_diff_z=2.0,
+                )
+                self.assertEqual(_read_records(tmp_path)[0]["pair"], "GBPUSD=X")
+
+                # what _backfill_decision_outcomes passes: 'GBP_USD'.replace('_','') + system FOREX
+                found = update_outcome(
+                    pair="GBPUSD",
+                    entry_timestamp=rec.entry_timestamp,
+                    outcome="WIN", r_realized=1.4, system="FOREX",
+                )
+                self.assertTrue(found, "OANDA fill must close the yfinance-ticker FOREX decision")
+                rec2 = _read_records(tmp_path)[0]
+                self.assertEqual(rec2["outcome"], "WIN")
+                self.assertAlmostEqual(rec2["r_realized"], 1.4)
+
+    def test_forex_fill_does_not_touch_ict_record(self):
+        """The system filter must still hold: a FOREX backfill must not close an ICT record."""
+        from sovereign.intelligence.decision_logger import log_ict_decision, update_outcome
+
+        signal = _SignalStub(symbol="GBPUSD")
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            with _patch_log_dir(tmp_path):
+                rec = log_ict_decision(signal=signal, commitment_score=0.8, bars_since_signal=1)
+                found = update_outcome(
+                    pair="GBPUSD", entry_timestamp=rec.entry_timestamp,
+                    outcome="WIN", r_realized=1.0, system="FOREX",
+                )
+                self.assertFalse(found, "FOREX backfill must not close an ICT decision")
+                self.assertIsNone(_read_records(tmp_path)[0]["outcome"])
+
+
 class TestTimestampRobustness(unittest.TestCase):
 
     def test_all_formats_normalize(self):

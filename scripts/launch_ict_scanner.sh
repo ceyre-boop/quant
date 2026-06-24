@@ -17,10 +17,12 @@ mkdir -p logs
 # no qualifying signals" (healthy, just quiet). The decision log is NOT a heartbeat.
 date -u +"%Y-%m-%dT%H:%M:%SZ" > logs/.heartbeat_ict_scanner
 
-# ET time — strip leading zeros so bash doesn't treat 08/09 as octal
-ET_HOUR=$(TZ="America/New_York" date +"%H" | sed 's/^0//')
-ET_MIN=$(TZ="America/New_York" date +"%M" | sed 's/^0//')
-ET_TIME=$(( ET_HOUR * 60 + ET_MIN ))
+# ET time — use the 10# radix prefix so leading-zero hours/mins (08, 09) are read as
+# base-10, never octal. Bulletproof vs the old `sed 's/^0//'` (which crashed the time
+# gate and recurringly took the scanner DOWN — see NEXT.md).
+ET_HOUR=$(TZ="America/New_York" date +"%H")
+ET_MIN=$(TZ="America/New_York" date +"%M")
+ET_TIME=$(( 10#$ET_HOUR * 60 + 10#$ET_MIN ))
 
 # NY PM: 13:30–16:00 ET = 810–960 min
 # London: 02:00–05:00 ET = 120–300 min

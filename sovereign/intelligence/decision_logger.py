@@ -11,6 +11,7 @@ Schema: see DecisionRecord dataclass below.
 from __future__ import annotations
 
 import json
+import logging
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -19,6 +20,18 @@ from typing import Any, Optional
 from sovereign.utils.timestamps import canonical_timestamp, timestamps_match
 
 LOG_DIR = Path("data/decision_logs")
+
+log = logging.getLogger(__name__)
+
+
+def _norm_pair(p: str) -> str:
+    """Normalize a pair to a venue-agnostic key for outcome matching.
+
+    Forex decisions log the yfinance ticker ('GBPUSD=X'); OANDA fills use
+    'GBP_USD'; ICT logs plain 'GBPUSD'. All three must compare equal or the
+    win/loss loop silently never closes (CLAUDE.md NON-NEGOTIABLE #2).
+    """
+    return (p or "").upper().replace("=X", "").replace("_", "").replace("/", "").replace("-", "")
 
 
 def _now_iso() -> str:
@@ -321,13 +334,16 @@ def update_outcome(
 
     records = []
     found = False
+    skipped: list[str] = []  # same-pair OPEN records we could not match (for fail-loud logging)
+    target_pair = _norm_pair(pair)
     for line in log_path.read_text().splitlines():
         if not line.strip():
             continue
         try:
             obj = json.loads(line)
-            if not found and obj.get("pair") == pair and obj.get("outcome") is None:
+            if not found and _norm_pair(obj.get("pair")) == target_pair and obj.get("outcome") is None:
                 if system and obj.get("system") != system:
+                    skipped.append(f"system={obj.get('system')}!={system}")
                     records.append(obj)
                     continue
                 stored_ts = obj.get("entry_timestamp", "")
@@ -336,11 +352,20 @@ def update_outcome(
                     obj["r_realized"] = r_realized
                     obj["exit_timestamp"] = exit_timestamp or _now_iso()
                     found = True
+                else:
+                    skipped.append(f"ts={stored_ts}!~{entry_timestamp}")
             records.append(obj)
         except Exception:
             records.append({"_raw": line})
 
     if found:
         log_path.write_text("\n".join(json.dumps(r, default=str) for r in records) + "\n")
+    else:
+        # Fail loud: a closed trade that matches nothing means the loop is not closing.
+        log.warning(
+            "update_outcome: NO match for %s @ %s (system=%s) — %s",
+            pair, entry_timestamp, system,
+            ("; ".join(skipped) if skipped else "no OPEN same-pair record in this month's log"),
+        )
 
     return found

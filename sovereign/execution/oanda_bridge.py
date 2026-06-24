@@ -197,6 +197,24 @@ class OandaBridge:
         resp = self._api.request(req)
         return float(resp['account']['NAV'])
 
+    def get_account_summary(self) -> dict:
+        """Full practice-account snapshot: NAV, balance, unrealized/lifetime PL, open counts.
+
+        NAV is the equity that drives the live equity curve. One API call; used by
+        pulse_check's live-NAV snapshot and any 'am I making money' view.
+        """
+        req = accounts.AccountSummary(self._account_id)
+        a = self._api.request(req)['account']
+        return {
+            "nav": float(a.get('NAV', 0.0) or 0.0),
+            "balance": float(a.get('balance', 0.0) or 0.0),
+            "unrealized_pl": float(a.get('unrealizedPL', 0.0) or 0.0),
+            "realized_pl_lifetime": float(a.get('pl', 0.0) or 0.0),
+            "margin_used": float(a.get('marginUsed', 0.0) or 0.0),
+            "open_trade_count": int(a.get('openTradeCount', 0) or 0),
+            "currency": a.get('currency', 'USD'),
+        }
+
     def _check_daily_loss(self) -> Optional[str]:
         """Returns a veto reason string if daily loss limit is hit, else None."""
         try:

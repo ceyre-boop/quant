@@ -53,6 +53,14 @@ VALIDATOR_REGISTRY = {
         "parser": "big_move",
         "timeout": 600,
     },
+    "ohlc_quartile": {
+        "script": "scripts/validate_ohlc_quartile.py",
+        "args": ["--nperm", "10000", "--seed", "42"],
+        "result": "data/research/ohlc_quartile_validation.json",
+        "methodology": {"permutation": True, "walk_forward": True, "both_sides": True},
+        "parser": "ohlc_quartile",
+        "timeout": 900,
+    },
 }
 
 
@@ -64,6 +72,8 @@ def _route(candidate: dict) -> str | None:
             json.dumps(candidate.get("test_spec", {}))).lower()
     if any(k in text for k in ("big-move", "big move", "directional day", "institutional move")):
         return "big_move"
+    if any(k in text for k in ("ohlc", "quartile", "candle structure", "candle quartile")):
+        return "ohlc_quartile"
     return None
 
 
@@ -81,7 +91,19 @@ def _parse_big_move(result_path: Path) -> dict:
     }
 
 
-_PARSERS = {"big_move": _parse_big_move}
+def _parse_ohlc_quartile(result_path: Path) -> dict:
+    data = json.loads(result_path.read_text())
+    gates = data.get("gates", {})
+    return {
+        "gates_all_pass": bool(gates) and all(gates.values()),
+        "nperm": int(data.get("params", {}).get("nperm", 0)),
+        "perm_p": data.get("portfolio", {}).get("pooled_permutation_p"),
+        "oos_sharpe": data.get("portfolio", {}).get("oos_sharpe"),
+        "walkforward": data.get("portfolio", {}).get("walkforward_verdict"),
+    }
+
+
+_PARSERS = {"big_move": _parse_big_move, "ohlc_quartile": _parse_ohlc_quartile}
 
 
 # ── Methodology gate (constraint #2) ──────────────────────────────────────────
@@ -265,6 +287,23 @@ def run(dry_run: bool = True, validate_name: str | None = None) -> dict:
         _log(f"{len(pending)} QUEUED candidate(s)")
         for c in pending:
             results.append(_process_one(c, cfg, live))
+
+        # Terminally retire candidates with no registered validator so the 4h cycle stops
+        # re-emitting the same BLOCKED_NO_VALIDATOR verdicts every run (was ~45/cycle of pure
+        # log noise). The verdict is structural — it can't change until a validator is built —
+        # so this is housekeeping, not a live action, and applies even in dry-run. Real
+        # verdicts on QUEUED candidates are still only consumed when live.
+        blocked_ids = {r.get("hypothesis_id") for r in results
+                       if r.get("verdict") == "BLOCKED_NO_VALIDATOR"}
+        if blocked_ids:
+            retired = 0
+            for c in queued:
+                if c.get("status") == "QUEUED" and c.get("id") in blocked_ids:
+                    c["status"] = "BLOCKED_NO_VALIDATOR"
+                    retired += 1
+            if retired:
+                QUEUE_PATH.write_text("\n".join(json.dumps(c) for c in queued) + "\n")
+                _log(f"retired {retired} no-validator candidate(s) — won't re-emit next cycle")
 
     # Persist verdicts: shadow file always; queue consumption only when live.
     for r in results:

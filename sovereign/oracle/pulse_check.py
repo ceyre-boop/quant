@@ -22,6 +22,7 @@ PULSE_DIR      = ROOT / "data" / "oracle" / "pulses"
 PULSE_STATE    = ROOT / "data" / "oracle" / ".pulse_state.json"
 DECISION_LOG_DIR = ROOT / "data" / "decision_logs"
 MESSAGES_PATH  = ROOT / "data" / "agent" / "messages_to_colin.json"
+LIVE_EQUITY_PATH = ROOT / "data" / "agent" / "equity_curve_live.jsonl"
 HEALTH_PATH    = ROOT / "data" / "agent" / "health.json"
 LEDGER_PATH    = ROOT / "data" / "agent" / "hypothesis_ledger.json"
 INDICATORS_DIR = ROOT / "data" / "indicators"
@@ -546,6 +547,37 @@ def _classify_realized(realized_pl: float) -> str:
     return "BREAKEVEN"
 
 
+def _snapshot_live_nav() -> bool:
+    """Append the live OANDA-practice NAV to the equity-curve ledger.
+
+    Folded into the 2h pulse (OANDA is already hit here for the backfill) — no new
+    launchd job. Rows are equity_curve.v1-compatible via reporting.build_from_nav,
+    so the live forward curve and the backtest proof curve render in one panel.
+    Non-fatal: a snapshot failure must never break the pulse.
+    """
+    try:
+        from sovereign.execution.oanda_bridge import OandaBridge
+        summ = OandaBridge().get_account_summary()
+    except Exception as exc:  # noqa: BLE001
+        log.warning("live NAV snapshot skipped (non-fatal): %s", exc)
+        return False
+    try:
+        row = {
+            "t": canonical_timestamp(),
+            "nav": round(summ["nav"], 2),
+            "balance": round(summ["balance"], 2),
+            "unrealized_pl": round(summ["unrealized_pl"], 2),
+            "open_trade_count": summ["open_trade_count"],
+        }
+        LIVE_EQUITY_PATH.parent.mkdir(parents=True, exist_ok=True)
+        with LIVE_EQUITY_PATH.open("a") as fh:
+            fh.write(json.dumps(row) + "\n")
+        return True
+    except Exception as exc:  # noqa: BLE001
+        log.warning("live NAV write failed (non-fatal): %s", exc)
+        return False
+
+
 def _backfill_decision_outcomes() -> int:
     """Match closed OANDA trades to OPEN decision records and back-fill outcomes.
 
@@ -563,6 +595,7 @@ def _backfill_decision_outcomes() -> int:
 
     fills_by_id = {str(f.get("trade_id", "")): f for f in _load_fills()}
     n_backfilled = 0
+    n_attempted = 0  # closed OANDA trades with a sane stop we tried to match to a decision
 
     for trade in closed:
         try:
@@ -587,13 +620,30 @@ def _backfill_decision_outcomes() -> int:
             outcome = _classify_realized(float(trade.get("realizedPL") or 0.0))
             open_time = str(trade.get("openTime", ""))[:19]
 
+            # OANDA is the FOREX book — these fills close FOREX decisions, never ICT
+            # (ICT trades on Alpaca paper). Hard-coding "ICT" here was why the loop
+            # silently never closed: every FOREX record got skipped. (NON-NEGOTIABLE #2.)
+            n_attempted += 1
             if update_outcome(pair=pair, entry_timestamp=open_time, outcome=outcome,
                               r_realized=r_realized,
-                              exit_timestamp=trade.get("closeTime"), system="ICT"):
+                              exit_timestamp=trade.get("closeTime"), system="FOREX"):
                 n_backfilled += 1
                 log.info("backfill: %s %s r=%+.2f", pair, outcome, r_realized)
         except Exception as exc:
             log.warning("backfill: trade %s failed: %s", trade.get("id"), exc)
+
+    # Stall alarm: closed trades exist but none matched → the win/loss loop is broken again.
+    if n_attempted > 0 and n_backfilled == 0:
+        log.error("OUTCOME_LOOP_STALL: %d closed OANDA trades, 0 matched to decisions", n_attempted)
+        _write_messages([{
+            "type": "OUTCOME_LOOP_STALL",
+            "priority": "URGENT",
+            "message": (
+                f"{n_attempted} closed OANDA trades but 0 matched to open decisions — the win/loss "
+                "loop is not closing (CLAUDE.md NON-NEGOTIABLE #2). Oracle is learning from nothing. "
+                "Check pair/timestamp/system matching in decision_logger.update_outcome."
+            ),
+        }])
 
     # Venue-aware: also backfill Tradovate (CME futures) outcomes. Fully guarded — a no-op
     # without TRADOVATE creds, and can never break the OANDA backfill above.
@@ -912,6 +962,11 @@ def run_pulse() -> dict:
     # Close the learning loop: back-fill closed trades, expire never-filled signals.
     n_backfilled = _backfill_decision_outcomes()
     n_expired = _expire_stale_decisions()
+
+    # Snapshot the live practice-account NAV onto the forward equity curve (reuses the
+    # OANDA hit above; non-fatal). This is the live proof line that runs alongside the
+    # fast backtest proof curve.
+    _snapshot_live_nav()
 
     # Big-Move-of-the-Day: compute fresh estimates, close the prior-day loop.
     big_move = _compute_big_move_estimates()
