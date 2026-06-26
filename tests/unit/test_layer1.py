@@ -163,7 +163,47 @@ class TestBiasEngine:
             event_risk=EventRisk.CLEAR,
             composite_score=0.75
         )
-    
+
+    def test_train_uses_forward_label_not_rsi_tautology(self):
+        """Regression: train() must label on FORWARD direction (record.forward_dir_5d),
+        never the old tautology y = rsi_14 > 50 (a feature predicting itself).
+
+        Construction proves it: rsi_14 is held CONSTANT at 60 for every record, so the old
+        rsi>50 label would be single-class (all 1s) and could not represent forward direction.
+        With forward_dir_5d alternating, a forward-labelled model fits (two classes); with
+        forward_dir_5d=None it must DECLINE to fit (no fabricated label).
+        """
+        pytest.importorskip("xgboost")
+        from contracts.types import (
+            SovereignFeatureRecord, RegimeFeatures, MomentumFeatures, MacroFeatures,
+        )
+
+        def mk(i, rsi, fwd):
+            return SovereignFeatureRecord(
+                symbol="TEST",
+                timestamp=f"2020-{(i // 28) + 1:02d}-{(i % 28) + 1:02d}T00:00:00",
+                regime=RegimeFeatures(0.5, 0.5, 'NEUTRAL', 0.5, 'NEUTRAL', 1, 'NORMAL', 0.6, 0.2, 25.0, 'ESTABLISHED'),
+                momentum=MomentumFeatures(0.0, 0.0, 1.0, rsi, 'NEUTRAL'),
+                macro=MacroFeatures(0.01, 0.0, 0.04, 1.0, 0.0, 1.5, 200.0, 'RISK_ON'),
+                petroulas=None,
+                bar_ohlcv={'open': 1.0, 'high': 1.0, 'low': 1.0, 'close': 1.0, 'volume': 0.0},
+                is_valid=True, validation_errors=[], forward_dir_5d=fwd,
+            )
+
+        # rsi constant > 50, forward label alternates → fits ONLY because it labels on forward dir.
+        labelled = [mk(i, 60.0, i % 2) for i in range(120)]
+        eng = BiasEngine()
+        eng.train(labelled)
+        assert getattr(eng, "_sovereign_fitted", False), \
+            "model should fit on forward-direction labels (proves it is not using constant rsi)"
+
+        # No forward labels → must NOT fit (the old tautology would have fit on rsi>50).
+        unlabelled = [mk(i, 60.0, None) for i in range(120)]
+        eng2 = BiasEngine()
+        eng2.train(unlabelled)
+        assert not getattr(eng2, "_sovereign_fitted", False), \
+            "with no forward labels the engine must decline to fit — never fabricate a label"
+
     def test_get_daily_bias(self, sample_features, sample_regime):
         """Test bias generation."""
         engine = BiasEngine()

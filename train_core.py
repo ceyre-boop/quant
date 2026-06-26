@@ -171,6 +171,8 @@ def _build_records_from_df(symbol, df):
     # Compute RSI-14 on the full close series
     closes = df['close'].to_numpy(dtype=float)
     rsi_arr = _compute_rsi(closes)
+    n_bars = len(closes)
+    LABEL_H = 5  # forward-direction horizon (HYP-064: docs/layer1/feature_windows.json)
 
     for i, (idx, row) in enumerate(df.iterrows()):
         if i < 90:          # need lookback for hurst_long
@@ -225,6 +227,13 @@ def _build_records_from_df(symbol, df):
             macro_features=macro,
         )
 
+        # Forward-direction label (the fix for the rsi>50 tautology). Computed here, on the
+        # full contiguous series, so it stays correct after downstream regime-filtering. None
+        # for the final LABEL_H bars, which have no complete forward window.
+        fwd_dir = None
+        if i + LABEL_H < n_bars:
+            fwd_dir = 1 if closes[i + LABEL_H] > closes[i] else 0
+
         record = SovereignFeatureRecord(
             symbol=symbol,
             timestamp=idx.isoformat() if hasattr(idx, 'isoformat') else str(idx),
@@ -241,6 +250,7 @@ def _build_records_from_df(symbol, df):
             },
             is_valid=True,
             validation_errors=[],
+            forward_dir_5d=fwd_dir,
         )
 
         records.append(record)

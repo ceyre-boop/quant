@@ -44,12 +44,33 @@ class BiasEngine:
         # Feature group mapping for rationale
         self.feature_to_group = self._build_feature_group_mapping()
     
+    LABEL_HORIZON_DAYS = 5  # forward-direction label horizon (HYP-064 pre-registration)
+
     def train(self, records: list) -> None:
-        """Train a direction predictor on SovereignFeatureRecord list."""
+        """Train a direction predictor on a SovereignFeatureRecord list.
+
+        The label is the FORWARD price direction (`record.forward_dir_5d`) — 1 if the close
+        five bars ahead is higher, else 0 — computed upstream where the full price series is
+        available (train_core._build_records_from_df). It is NOT a function of any same-bar
+        feature.
+
+        This replaced a tautology: the prior label `y = rsi_14 > 50` was derived from the
+        `rsi_14` feature, so the model predicted a feature from itself — the identical failure
+        class that invalidated Sovereign Core ML (label derived from `hurst_short`, also a
+        feature). See data/research/sovereign_core_verdict.md and
+        tests/test_feature_label_isolation.py.
+
+        Records without a forward label (series tail, or live current-bar records that have no
+        future) are skipped — we never fabricate a label. If too few labelled records remain
+        the engine declines to fit and the caller falls back to the heuristic path.
+        """
         import xgboost as xgb
 
         X, y = [], []
         for r in records:
+            label = getattr(r, "forward_dir_5d", None)
+            if label is None:
+                continue  # no honest forward label available — skip, never fabricate
             X.append([
                 r.regime.hurst_short,
                 r.regime.hurst_long,
@@ -58,9 +79,14 @@ class BiasEngine:
                 r.regime.hmm_confidence,
                 r.regime.hmm_transition_prob,
             ])
-            y.append(1 if r.momentum.rsi_14 > 50 else 0)
+            y.append(int(label))
 
-        if not X:
+        if len(X) < 50 or len(set(y)) < 2:
+            logger.warning(
+                "BiasEngine.train: insufficient forward-labelled records "
+                "(n=%d, classes=%d) — not fitting (heuristic fallback stays active)",
+                len(X), len(set(y)),
+            )
             return
 
         X_arr = np.array(X)
@@ -75,7 +101,8 @@ class BiasEngine:
         )
         self._sovereign_model.fit(X_arr, y_arr)
         self._sovereign_fitted = True
-        logger.info(f"BiasEngine trained on {len(X)} sovereign records")
+        logger.info("BiasEngine trained on %d forward-labelled records (H=%d)",
+                    len(X), self.LABEL_HORIZON_DAYS)
 
     def save(self, path: str) -> None:
         import joblib

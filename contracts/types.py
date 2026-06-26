@@ -747,6 +747,12 @@ class SovereignFeatureRecord:
     is_valid:            bool
     validation_errors:   List[str]
     event_risk:          Optional[str] = 'CLEAR'  # 'CLEAR' | 'ELEVATED' | 'HIGH' | 'EXTREME'
+    # Forward-direction training label: 1 if close[t+5] > close[t] else 0. None when there is
+    # no forward window (series tail) or no future at all (live current-bar records). This is
+    # the ONLY training label — it replaces the rsi_14>50 tautology in layer1/bias_engine.py.
+    # Computed upstream where the full price series exists (train_core._build_records_from_df),
+    # so it stays valid even when records are later regime-filtered into a non-contiguous subset.
+    forward_dir_5d:      Optional[int] = None
 
 
 @dataclass
