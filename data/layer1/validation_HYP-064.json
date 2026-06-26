@@ -1,0 +1,170 @@
+{
+  "hypothesis": "HYP-064",
+  "prereg_hash": "d22ae88f",
+  "verdict": "NOT_SIGNIFICANT",
+  "n_train": 287,
+  "n_val": 121,
+  "statistical_bar": {
+    "pass": false,
+    "best_val_auc": 0.5325,
+    "bar_auc": 0.55,
+    "best_perm_p": 0.2907,
+    "any_bh_survives": false,
+    "deflated_sharpe": 3.9085
+  },
+  "economic_bar": {
+    "pass": false,
+    "mean_R_delta": -0.0105,
+    "bar_R_delta": 0.1,
+    "retention": 0.653,
+    "bar_retention": 0.5,
+    "bootstrap_sharpe_diff_p": 0.5227,
+    "gate_threshold": 0.3605
+  },
+  "ablation": {
+    "sharpe_drop_pct": -11.7,
+    "band": "REDUNDANT with carry (<5% drop) \u2014 carry-overlap features add ~nothing independent",
+    "dropped_features": [
+      "day_of_week",
+      "pair_real_rate_diff",
+      "pair_rate_diff_mom_1m",
+      "pair_rate_diff_mom_3m",
+      "pair_rate_diff_mom_6m"
+    ]
+  },
+  "calibration": {
+    "brier": 0.248,
+    "ece": 0.0301
+  },
+  "shap_top5": [
+    {
+      "feature": "pair_real_rate_diff",
+      "mean_abs_contrib": 0.50168,
+      "is_carry_overlap": true
+    },
+    {
+      "feature": "pair_price_mom_60d",
+      "mean_abs_contrib": 0.22647,
+      "is_carry_overlap": false
+    },
+    {
+      "feature": "nqes_regime_flag",
+      "mean_abs_contrib": 0.18886,
+      "is_carry_overlap": false
+    },
+    {
+      "feature": "bond_equity_corr_63d",
+      "mean_abs_contrib": 0.16127,
+      "is_carry_overlap": false
+    },
+    {
+      "feature": "pair_rate_diff_mom_1m",
+      "mean_abs_contrib": 0.15376,
+      "is_carry_overlap": true
+    }
+  ],
+  "config_table": [
+    {
+      "max_depth": 2,
+      "n_estimators": 200,
+      "learning_rate": 0.03,
+      "val_auc": 0.5055,
+      "perm_p": 0.4595,
+      "bh_survives": false
+    },
+    {
+      "max_depth": 2,
+      "n_estimators": 200,
+      "learning_rate": 0.1,
+      "val_auc": 0.5235,
+      "perm_p": 0.3506,
+      "bh_survives": false
+    },
+    {
+      "max_depth": 2,
+      "n_estimators": 400,
+      "learning_rate": 0.03,
+      "val_auc": 0.5172,
+      "perm_p": 0.3766,
+      "bh_survives": false
+    },
+    {
+      "max_depth": 2,
+      "n_estimators": 400,
+      "learning_rate": 0.1,
+      "val_auc": 0.5096,
+      "perm_p": 0.4346,
+      "bh_survives": false
+    },
+    {
+      "max_depth": 3,
+      "n_estimators": 200,
+      "learning_rate": 0.03,
+      "val_auc": 0.5153,
+      "perm_p": 0.4016,
+      "bh_survives": false
+    },
+    {
+      "max_depth": 3,
+      "n_estimators": 200,
+      "learning_rate": 0.1,
+      "val_auc": 0.5235,
+      "perm_p": 0.3546,
+      "bh_survives": false
+    },
+    {
+      "max_depth": 3,
+      "n_estimators": 400,
+      "learning_rate": 0.03,
+      "val_auc": 0.5096,
+      "perm_p": 0.4436,
+      "bh_survives": false
+    },
+    {
+      "max_depth": 3,
+      "n_estimators": 400,
+      "learning_rate": 0.1,
+      "val_auc": 0.5265,
+      "perm_p": 0.3247,
+      "bh_survives": false
+    },
+    {
+      "max_depth": 4,
+      "n_estimators": 200,
+      "learning_rate": 0.03,
+      "val_auc": 0.5325,
+      "perm_p": 0.2907,
+      "bh_survives": false
+    },
+    {
+      "max_depth": 4,
+      "n_estimators": 200,
+      "learning_rate": 0.1,
+      "val_auc": 0.5123,
+      "perm_p": 0.3936,
+      "bh_survives": false
+    },
+    {
+      "max_depth": 4,
+      "n_estimators": 400,
+      "learning_rate": 0.03,
+      "val_auc": 0.5271,
+      "perm_p": 0.3287,
+      "bh_survives": false
+    },
+    {
+      "max_depth": 4,
+      "n_estimators": 400,
+      "learning_rate": 0.1,
+      "val_auc": 0.5213,
+      "perm_p": 0.3417,
+      "bh_survives": false
+    }
+  ],
+  "best_config": {
+    "max_depth": 4,
+    "n_estimators": 200,
+    "learning_rate": 0.03
+  },
+  "caveat": "Labels from SIMULATED exits (strict_mode=False); retrain when L2 live. Holdout 2024+ untouched."
+}

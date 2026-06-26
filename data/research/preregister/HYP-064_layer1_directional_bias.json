@@ -1,0 +1,118 @@
+{
+  "id": "HYP-064",
+  "name": "Layer-1 meta-labeling secondary model (XGBoost win-filter on the carry edge)",
+  "status": "PREREGISTERED_REVISED",
+  "frozen_at": "2026-06-26",
+  "revision": "Revised from fixed-horizon binary direction to META-LABELING (Lopez de Prado). The original label (fwd_direction_5d = sign(close[t+5]-close[t])) trained the model to predict drift, not whether a carry signal produces a winning trade under the exit rules. Supersedes the prior hash 8cea71c9d3c29f8eda88a299f02a61a502237161f44bc16537a2be0fc623367c. [intra-revision re-hash: ablation clarified UNCONDITIONAL; prior meta-label hash 1cb3b918... superseded.] [barriers corrected to strict_mode=False reality: Donchian INACTIVE in the canonical run; stop is ATR-based; pnl is net-of-costs. prior hash f82d22af... superseded.]",
+  "family": "ml-meta-label",
+  "phase": "Phase-2 (data) revised. NO model trained; holdout 2024+ untouched.",
+  "purpose": "Build a META-LABELING SECONDARY MODEL: the carry edge (primary) fixes direction; XGBoost (secondary) predicts P(win) for each carry signal. The model never sets direction or size by itself \u2014 it gates/weights carry signals. Formal framing: Lopez de Prado meta-labeling (primary decides side, secondary decides whether to act); it is the academic name for the two-layer propose/dispose split.",
+  "mechanism": "Primary = sovereign/forex/signal_engine.build_signal_frame (carry/IRP/RRD events). Secondary = XGBoost over the 41-feature panel (docs/layer1/feature_windows.json) evaluated at each signal's ENTRY bar -> P(this trade wins). A setup fires only when P(win) >= a tuned threshold.",
+  "prior_expectation": "NOT_SIGNIFICANT. Daily forex features were flat in discovery (28->0); Sovereign Core ML died p=0.164. Meta-labeling can still help by IMPROVING PRECISION (filtering carry's losers) even where direction is unpredictable \u2014 that is the one genuinely-open question this tests. Still a falsification test: a clean kill is the expected, valuable outcome.",
+  "model_design": "Meta-labeling secondary model. Trained on SIGNAL EVENTS ONLY (one row per carry trade), NOT the full daily panel. Pooled across the 5 pairs. Direction is fixed by the primary; the secondary never predicts direction (that is what makes meta-labeling overfit-resistant).",
+  "pairs": [
+    "EURUSD",
+    "GBPUSD",
+    "USDJPY",
+    "AUDUSD",
+    "USDCAD"
+  ],
+  "label": {
+    "name": "meta_win",
+    "definition": "1 if the carry trade's realized NET pnl_pct > 0 (after per-pair spread+swap costs) else 0, under the canonical exit machine.",
+    "exit_machine": "sovereign/forex/fast_backtester._simulate_forex_core (via simulate_forex_trades)",
+    "barriers": {
+      "strict_mode": "False \u2014 CANONICAL/PROVEN config (prove.py:50 instantiates ForexBacktester(start,end) at the default strict_mode=False; this is the Sharpe-1.25 exit machine L2 will port).",
+      "stop_atr_mult": 2.0,
+      "stop_status": "ACTIVE \u2014 ATR stop (stop_atr_mult>0 so STOP_PCT fallback is NOT used)",
+      "trailing_atr_mult_base": 1.25,
+      "trailing_overrides": {
+        "GBPUSD": 2.0,
+        "AUDUSD": 1.0,
+        "EURUSD": 1.25
+      },
+      "trailing_status": "ACTIVE",
+      "time_barrier_days": 60,
+      "time_status": "ACTIVE (fires only when not strict_mode \u2014 fast_backtester.py:107)",
+      "reversal_status": "ACTIVE (signal flip)",
+      "cb_refresh_status": "ACTIVE (enable_cb_refresh = not strict_mode)",
+      "donchian_exit_days": 10,
+      "donchian_status": "CONFIGURED BUT INACTIVE in strict_mode=False \u2014 fires only in strict_mode AND for longs (fast_backtester.py:100). CORRECTED 2026-06-26 after reading the code (operator confirmation #1); the earlier pre-reg listed it as active.",
+      "stop_pct_cap": 0.04,
+      "stop_pct_status": "fallback only (unused: stop_atr_mult=2.0>0)",
+      "take_profit": "NONE \u2014 'win' = realized NET pnl>0, the disposer's actual verdict (NNUE), not an idealized +2ATR TP.",
+      "costs": "net of per-pair spread + swap via forex_backtester._apply_costs"
+    },
+    "exit_reasons_recorded": [
+      "stop",
+      "trailing_stop",
+      "reversal",
+      "cb_refresh",
+      "time"
+    ]
+  },
+  "sampling": "One row per carry trade (signal != 0) with a realized exit. Open-at-boundary trades dropped.",
+  "feature_spec": "docs/layer1/feature_windows.json (41 features built; 10 deferred per data/layer1/load_report.json)",
+  "feature_source": "data/layer1/features_v1.parquet, joined at each trade's entry_date+pair",
+  "splits": {
+    "train": [
+      "2015-01-01",
+      "2021-12-31"
+    ],
+    "validation": [
+      "2022-01-01",
+      "2023-12-31"
+    ],
+    "holdout": [
+      "2024-01-01",
+      null
+    ]
+  },
+  "holdout_discipline": "TOUCH ONCE, after both bars are evaluated on validation. Not read in Phase 2.",
+  "model_class": "XGBoost binary classifier \u2014 reuse sovereign/ml_trainer.py (purged walk-forward, uniqueness weights, isotonic calibration).",
+  "hyperparameter_grid": {
+    "max_depth": [
+      2,
+      3,
+      4
+    ],
+    "n_estimators": [
+      200,
+      400
+    ],
+    "learning_rate": [
+      0.03,
+      0.1
+    ]
+  },
+  "config_cap": 12,
+  "config_cap_rationale": "3 x 2 x 2 = 12 configs (label is now exit-defined, no horizon sweep). BH across all 12.",
+  "validation_protocol": {
+    "purged_cv": "walk_forward_validation.py:88-138 (purge = max feature lookback + max hold; embargo after test).",
+    "permutation_null": "gate.py _permutation_p (directional; preserve win/loss base rate).",
+    "multiple_comparisons": "gate.py benjamini_hochberg across all 12 configs; deflated metrics.",
+    "calibration": "isotonic (ml_trainer.py:308); report reliability curve + Brier/ECE.",
+    "meta_gate_test": "gate.py bootstrap_sharpe_diff_pvalue: meta-gated carry vs carry-alone OOS."
+  },
+  "success_criteria": {
+    "both_must_clear": true,
+    "statistical": "validation ROC-AUC >= 0.55 AND beats the directional permutation null at p<0.05 AFTER Benjamini-Hochberg across all 12 configs AND deflated metric > 0.",
+    "economic": "the meta-gate (take a carry trade only when P(win) >= tuned threshold) beats carry-alone on OOS mean-R by >= +0.10R per trade WHILE retaining >= 50% of carry trades (HYP-044 selectivity trap), bootstrap Sharpe-diff p<0.05, positive in walk-forward."
+  },
+  "feature_independence_ablation": "ALWAYS-RUN (unconditional): the ablation is a standard step of the Phase-3 analysis pipeline, executed regardless of the main model's outcome \u2014 NOT a post-hoc check run only if results look surprising. Retrain WITHOUT {day_of_week, pair_real_rate_diff, pair_rate_diff_mom_1m, pair_rate_diff_mom_3m, pair_rate_diff_mom_6m} (these overlap live hypotheses HYP-050 DOW veto, HYP-052c & HYP-054 real-rate-diff gates). If OOS Sharpe drops <5% when ablated, those features are REDUNDANT with the carry edge (not independent alpha) and their importance is not credited.",
+  "metrics": [
+    "roc_auc",
+    "calibration_error_brier_ece",
+    "deflated_oos_accuracy",
+    "meta_gate_oos_mean_r_delta",
+    "trade_retention_pct"
+  ],
+  "failure_criteria": "Fails EITHER bar -> NOT_SIGNIFICANT. Isolation test ever fails -> INVALID_METHODOLOGY.",
+  "label_caveat_option_B": "Labels are from the SIMULATED exit machine (_simulate_forex_core), not a live L2. This is the exact exit logic L2 will port, so the gap is sim-vs-live execution fidelity only. MANDATORY retrain + re-validation once L2 is live and has accumulated real exit outcomes (the NNUE point).",
+  "tautology_guard": "tests/test_feature_label_isolation.py must pass on the real meta_dataset_v1 before any training.",
+  "no_mid_run_tuning": "Grid + config_cap + splits + label + barriers frozen here; the trainer asserts a match before training.",
+  "isolation": "Phase 2 writes docs/layer1/*, sovereign/layer1/*, tests/*, data/layer1/*, this pre-reg. No live config, no Layer 2 touch, no holdout read, no commit without approval.",
+  "supersedes_hash": "8cea71c9d3c29f8eda88a299f02a61a502237161f44bc16537a2be0fc623367c",
+  "hash_method": "sha256 of json.dumps(body, sort_keys=True, separators=(',',':')) where body = this object MINUS the hash_lock field",
+  "hash_lock": "d22ae88fb3c38ab3ea8678f09c657908c9f7284733c8bf9a57fa0159c319fdab"
+}

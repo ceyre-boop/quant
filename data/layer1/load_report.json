@@ -1,0 +1,345 @@
+{
+  "generated_for": "layer1 features_v1",
+  "train_window": [
+    "2015-01-01",
+    "2023-12-31"
+  ],
+  "holdout_fetched": false,
+  "n_sources": 35,
+  "n_ok": 30,
+  "n_failed": 5,
+  "sources": [
+    {
+      "source": "yfinance:dxy(DX-Y.NYB)",
+      "ok": true,
+      "rows": 2263,
+      "start": "2015-01-02",
+      "end": "2023-12-29",
+      "nan_pct": 0.0,
+      "reason": null
+    },
+    {
+      "source": "yfinance:vix(^VIX)",
+      "ok": true,
+      "rows": 2264,
+      "start": "2015-01-02",
+      "end": "2023-12-29",
+      "nan_pct": 0.0,
+      "reason": null
+    },
+    {
+      "source": "yfinance:vix9d(^VIX9D)",
+      "ok": true,
+      "rows": 2264,
+      "start": "2015-01-02",
+      "end": "2023-12-29",
+      "nan_pct": 0.0,
+      "reason": null
+    },
+    {
+      "source": "yfinance:vix3m(^VIX3M)",
+      "ok": true,
+      "rows": 2264,
+      "start": "2015-01-02",
+      "end": "2023-12-29",
+      "nan_pct": 0.0,
+      "reason": null
+    },
+    {
+      "source": "yfinance:spy(SPY)",
+      "ok": true,
+      "rows": 2264,
+      "start": "2015-01-02",
+      "end": "2023-12-29",
+      "nan_pct": 0.0,
+      "reason": null
+    },
+    {
+      "source": "yfinance:oil(CL=F)",
+      "ok": true,
+      "rows": 2262,
+      "start": "2015-01-02",
+      "end": "2023-12-29",
+      "nan_pct": 0.0,
+      "reason": null
+    },
+    {
+      "source": "yfinance:gold(GC=F)",
+      "ok": true,
+      "rows": 2261,
+      "start": "2015-01-02",
+      "end": "2023-12-29",
+      "nan_pct": 0.0,
+      "reason": null
+    },
+    {
+      "source": "yfinance:crb(^TRCCRB)",
+      "ok": true,
+      "rows": 2223,
+      "start": "2015-01-02",
+      "end": "2023-12-29",
+      "nan_pct": 0.0,
+      "reason": null
+    },
+    {
+      "source": "yfinance:hyg(HYG)",
+      "ok": true,
+      "rows": 2264,
+      "start": "2015-01-02",
+      "end": "2023-12-29",
+      "nan_pct": 0.0,
+      "reason": null
+    },
+    {
+      "source": "yfinance:ief(IEF)",
+      "ok": true,
+      "rows": 2264,
+      "start": "2015-01-02",
+      "end": "2023-12-29",
+      "nan_pct": 0.0,
+      "reason": null
+    },
+    {
+      "source": "yfinance:tlt(TLT)",
+      "ok": true,
+      "rows": 2264,
+      "start": "2015-01-02",
+      "end": "2023-12-29",
+      "nan_pct": 0.0,
+      "reason": null
+    },
+    {
+      "source": "yfinance:nq(NQ=F)",
+      "ok": true,
+      "rows": 2263,
+      "start": "2015-01-02",
+      "end": "2023-12-29",
+      "nan_pct": 0.0,
+      "reason": null
+    },
+    {
+      "source": "yfinance:es(ES=F)",
+      "ok": true,
+      "rows": 2263,
+      "start": "2015-01-02",
+      "end": "2023-12-29",
+      "nan_pct": 0.0,
+      "reason": null
+    },
+    {
+      "source": "fred:us_2y(DGS2)",
+      "ok": true,
+      "rows": 2347,
+      "start": "2015-01-01",
+      "end": "2023-12-29",
+      "nan_pct": 4.09,
+      "reason": null
+    },
+    {
+      "source": "fred:us_5y(DGS5)",
+      "ok": true,
+      "rows": 2347,
+      "start": "2015-01-01",
+      "end": "2023-12-29",
+      "nan_pct": 4.09,
+      "reason": null
+    },
+    {
+      "source": "fred:us_10y(DGS10)",
+      "ok": true,
+      "rows": 2347,
+      "start": "2015-01-01",
+      "end": "2023-12-29",
+      "nan_pct": 4.09,
+      "reason": null
+    },
+    {
+      "source": "fred:us_2s10s(T10Y2Y)",
+      "ok": true,
+      "rows": 2347,
+      "start": "2015-01-01",
+      "end": "2023-12-29",
+      "nan_pct": 4.09,
+      "reason": null
+    },
+    {
+      "source": "fred:breakeven_10y(T10YIE)",
+      "ok": true,
+      "rows": 2347,
+      "start": "2015-01-01",
+      "end": "2023-12-29",
+      "nan_pct": 4.09,
+      "reason": null
+    },
+    {
+      "source": "fred:fed_funds(DFF)",
+      "ok": true,
+      "rows": 3287,
+      "start": "2015-01-01",
+      "end": "2023-12-31",
+      "nan_pct": 0.0,
+      "reason": null
+    },
+    {
+      "source": "fred:BAMLH0A0HYM2(BAMLH0A0HYM2)",
+      "ok": true,
+      "rows": 136,
+      "start": "2023-06-27",
+      "end": "2023-12-31",
+      "nan_pct": 0.74,
+      "reason": null
+    },
+    {
+      "source": "yfinance:px:EURUSD(EURUSD=X)",
+      "ok": true,
+      "rows": 2344,
+      "start": "2015-01-01",
+      "end": "2023-12-29",
+      "nan_pct": 0.0,
+      "reason": null
+    },
+    {
+      "source": "data_fetcher:diffs(EURUSD)",
+      "ok": true,
+      "rows": 2347,
+      "start": "2015-01-01",
+      "end": "2023-12-29",
+      "nan_pct": 0.09,
+      "reason": null
+    },
+    {
+      "source": "cot_engine:net(EURUSD/EUR)",
+      "ok": false,
+      "rows": 0,
+      "start": null,
+      "end": null,
+      "nan_pct": null,
+      "reason": "no COT history: cot_engine._fetch_cftc downloads only the single hardcoded 2024 file (which is HOLDOUT) and FX positioning is not in the disaggregated (commodity) report \u2014 it lives in the legacy/TFF report. Needs a dedicated historical COT fetcher (per-year 2015-2023 legacy zips, survivorship-aware). DEFERRED, not zero-filled."
+    },
+    {
+      "source": "yfinance:px:GBPUSD(GBPUSD=X)",
+      "ok": true,
+      "rows": 2344,
+      "start": "2015-01-01",
+      "end": "2023-12-29",
+      "nan_pct": 0.0,
+      "reason": null
+    },
+    {
+      "source": "data_fetcher:diffs(GBPUSD)",
+      "ok": true,
+      "rows": 2347,
+      "start": "2015-01-01",
+      "end": "2023-12-29",
+      "nan_pct": 0.09,
+      "reason": null
+    },
+    {
+      "source": "cot_engine:net(GBPUSD/GBP)",
+      "ok": false,
+      "rows": 0,
+      "start": null,
+      "end": null,
+      "nan_pct": null,
+      "reason": "no COT history: cot_engine._fetch_cftc downloads only the single hardcoded 2024 file (which is HOLDOUT) and FX positioning is not in the disaggregated (commodity) report \u2014 it lives in the legacy/TFF report. Needs a dedicated historical COT fetcher (per-year 2015-2023 legacy zips, survivorship-aware). DEFERRED, not zero-filled."
+    },
+    {
+      "source": "yfinance:px:USDJPY(USDJPY=X)",
+      "ok": true,
+      "rows": 2344,
+      "start": "2015-01-01",
+      "end": "2023-12-29",
+      "nan_pct": 0.0,
+      "reason": null
+    },
+    {
+      "source": "data_fetcher:diffs(USDJPY)",
+      "ok": true,
+      "rows": 2347,
+      "start": "2015-01-01",
+      "end": "2023-12-29",
+      "nan_pct": 0.09,
+      "reason": null
+    },
+    {
+      "source": "cot_engine:net(USDJPY/JPY)",
+      "ok": false,
+      "rows": 0,
+      "start": null,
+      "end": null,
+      "nan_pct": null,
+      "reason": "no COT history: cot_engine._fetch_cftc downloads only the single hardcoded 2024 file (which is HOLDOUT) and FX positioning is not in the disaggregated (commodity) report \u2014 it lives in the legacy/TFF report. Needs a dedicated historical COT fetcher (per-year 2015-2023 legacy zips, survivorship-aware). DEFERRED, not zero-filled."
+    },
+    {
+      "source": "yfinance:px:AUDUSD(AUDUSD=X)",
+      "ok": true,
+      "rows": 2344,
+      "start": "2015-01-01",
+      "end": "2023-12-29",
+      "nan_pct": 0.0,
+      "reason": null
+    },
+    {
+      "source": "data_fetcher:diffs(AUDUSD)",
+      "ok": true,
+      "rows": 2347,
+      "start": "2015-01-01",
+      "end": "2023-12-29",
+      "nan_pct": 0.09,
+      "reason": null
+    },
+    {
+      "source": "cot_engine:net(AUDUSD/AUD)",
+      "ok": false,
+      "rows": 0,
+      "start": null,
+      "end": null,
+      "nan_pct": null,
+      "reason": "no COT history: cot_engine._fetch_cftc downloads only the single hardcoded 2024 file (which is HOLDOUT) and FX positioning is not in the disaggregated (commodity) report \u2014 it lives in the legacy/TFF report. Needs a dedicated historical COT fetcher (per-year 2015-2023 legacy zips, survivorship-aware). DEFERRED, not zero-filled."
+    },
+    {
+      "source": "yfinance:px:USDCAD(USDCAD=X)",
+      "ok": true,
+      "rows": 2344,
+      "start": "2015-01-01",
+      "end": "2023-12-29",
+      "nan_pct": 0.0,
+      "reason": null
+    },
+    {
+      "source": "data_fetcher:diffs(USDCAD)",
+      "ok": true,
+      "rows": 2347,
+      "start": "2015-01-01",
+      "end": "2023-12-29",
+      "nan_pct": 0.09,
+      "reason": null
+    },
+    {
+      "source": "cot_engine:net(USDCAD/CAD)",
+      "ok": false,
+      "rows": 0,
+      "start": null,
+      "end": null,
+      "nan_pct": null,
+      "reason": "no COT history: cot_engine._fetch_cftc downloads only the single hardcoded 2024 file (which is HOLDOUT) and FX positioning is not in the disaggregated (commodity) report \u2014 it lives in the legacy/TFF report. Needs a dedicated historical COT fetcher (per-year 2015-2023 legacy zips, survivorship-aware). DEFERRED, not zero-filled."
+    }
+  ],
+  "coverage": {
+    "declared": 51,
+    "built": 41,
+    "missing": [
+      "pair_10y_rate_diff",
+      "pair_carry_differential",
+      "pair_irp_z",
+      "pair_ppp_z",
+      "pair_cycle_divergence",
+      "pair_atr_pct_14",
+      "pair_cot_net_spec",
+      "pair_cot_z_156w",
+      "pair_cot_percentile_1y",
+      "pair_cot_extreme_flag"
+    ],
+    "extra_undeclared": []
+  }
+}

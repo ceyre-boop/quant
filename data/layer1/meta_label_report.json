@@ -1,0 +1,34 @@
+{
+  "n_events": 408,
+  "win_rate": 0.473,
+  "per_pair_trade_count": {
+    "EURUSD=X": 91,
+    "GBPUSD=X": 95,
+    "USDJPY=X": 86,
+    "AUDUSD=X": 96,
+    "USDCAD=X": 40
+  },
+  "exit_reason_mix": {
+    "time": 203,
+    "trailing_stop": 120,
+    "reversal": 76,
+    "stop": 9
+  },
+  "mean_realized_r": 0.00271,
+  "n_unmatched_entries_dropped_loud": 0,
+  "ablation_target_features_present": [
+    "day_of_week",
+    "pair_real_rate_diff",
+    "pair_rate_diff_mom_1m",
+    "pair_rate_diff_mom_3m",
+    "pair_rate_diff_mom_6m"
+  ],
+  "n_features": 41,
+  "date_range": [
+    "2015-01-02",
+    "2023-12-05"
+  ],
+  "holdout_fetched": false,
+  "strict_mode": false,
+  "label": "meta_win = net pnl_pct > 0 under ForexBacktester (canonical, strict_mode=False)"
+}

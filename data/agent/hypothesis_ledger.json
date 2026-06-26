@@ -1362,9 +1362,11 @@
   {
     "id": "HYP-064",
     "name": "Layer-1 daily directional bias model (XGBoost agreement gate on carry)",
-    "status": "PREREGISTERED_PHASE1",
+    "status": "NOT_SIGNIFICANT",
     "date_tested": "2026-06-26",
-    "result": "Phase 1 pre-registration built (data/research/preregister/HYP-064_layer1_directional_bias.json, SHA256 hash-locked; both-bars success criteria; expected verdict NOT_SIGNIFICANT). The feature/label isolation test (tests/test_feature_label_isolation.py) CAUGHT A LIVE TAUTOLOGY in layer1/bias_engine.py on day 1: label y=rsi_14>50 trained on rsi_14 (a feature predicting itself) \u2014 same failure class as the killed Sovereign Core ML. Fixed: forward-direction label now carried on SovereignFeatureRecord.forward_dir_5d, computed in train_core where the full series exists. Evidence the methodology infrastructure works.",
-    "methodology_note": "Phase 1 of 6; Phase 2 (data pipeline) in progress, no model trained. Phase-3 gate reuses discovery/gate.py (directional permutation null + Benjamini-Hochberg + Deflated Sharpe) + agreement-gate bootstrap Sharpe-diff. Holdout 2024+ untouched."
+    "result": "Phase 1 pre-registration built (data/research/preregister/HYP-064_layer1_directional_bias.json, SHA256 hash-locked; both-bars success criteria; expected verdict NOT_SIGNIFICANT). The feature/label isolation test (tests/test_feature_label_isolation.py) CAUGHT A LIVE TAUTOLOGY in layer1/bias_engine.py on day 1: label y=rsi_14>50 trained on rsi_14 (a feature predicting itself) \u2014 same failure class as the killed Sovereign Core ML. Fixed: forward-direction label now carried on SovereignFeatureRecord.forward_dir_5d, computed in train_core where the full series exists. Evidence the methodology infrastructure works. | REVISED 2026-06-26: fixed-horizon -> META-LABELING (LdP). Old pre-reg hash 8cea71c9d3c29f8eda88a299f02a61a502237161f44bc16537a2be0fc623367c SUPERSEDED by 1cb3b9182a18acfd5911f7af6fb103746fa541f9406e4c9039367a6eee1d81f9. Label = carry-trade win/loss under _simulate_forex_core (simulated exits; retrain when L2 live). Concrete success bars (ROC-AUC>=0.55 + meta-gate >=+0.10R retaining >=50% trades). Feature-independence ablation pre-registered vs HYP-050/052c/054 overlap. | PHASE 3 VERDICT: NOT_SIGNIFICANT. val AUC 0.5325 (bar 0.55, stat FAIL); mean-R delta -0.0105 retention 0.653 (econ FAIL); ablation drop -11.7%. SIMULATED-exit labels; holdout untouched.",
+    "methodology_note": "Phase 1 of 6; Phase 2 (data pipeline) in progress, no model trained. Phase-3 gate reuses discovery/gate.py (directional permutation null + Benjamini-Hochberg + Deflated Sharpe) + agreement-gate bootstrap Sharpe-diff. Holdout 2024+ untouched.",
+    "superseded_hash": "8cea71c9d3c29f8eda88a299f02a61a502237161f44bc16537a2be0fc623367c",
+    "hash_lock": "d22ae88fb3c38ab3ea8678f09c657908c9f7284733c8bf9a57fa0159c319fdab"
   }
 ]
