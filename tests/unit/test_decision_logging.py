@@ -206,6 +206,70 @@ class TestCrossVenuePairMatch(unittest.TestCase):
                 self.assertEqual(rec2["outcome"], "WIN")
                 self.assertAlmostEqual(rec2["r_realized"], 1.4)
 
+    def test_oanda_fill_in_later_hour_still_closes_decision(self):
+        """Regression for the SECOND silent loop break (NON-NEGOTIABLE #2, found 2026-06-26).
+
+        A FOREX decision is logged at SIGNAL time; the backfill keys on the OANDA FILL
+        time, which routinely lands in a later clock-hour (signal 12:43 → fill 13:34).
+        Strict date+hour matching dropped these silently. Every prior forex test reused an
+        identical or date-only timestamp, so none exercised this. This one must close the
+        loop across an hour boundary.
+        """
+        from sovereign.intelligence.decision_logger import (
+            log_forex_decision, update_outcome, _outcome_entry_match,
+        )
+
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            with _patch_log_dir(tmp_path):
+                rec = log_forex_decision(
+                    pair="EURUSD", direction="SHORT", entry_level=1.1395,
+                    stop_loss=1.1467, hold_days=10, risk_pct=0.0075,
+                    signal_layers=["carry"], rate_diff_z=-2.0,
+                )
+                # Forge a fill timestamp one+ hour after the signal, same UTC day.
+                sig = rec.entry_timestamp                         # e.g. ...T12:43:xx+00:00
+                fill_ts = sig[:11] + "13:34:54" + sig[19:]        # ...T13:34:54+00:00
+                # Sanity: this is exactly the case the old matcher dropped.
+                from sovereign.utils.timestamps import timestamps_match
+                self.assertFalse(timestamps_match(sig, fill_ts),
+                                 "test precondition: signal and fill must be in different hours")
+                self.assertTrue(_outcome_entry_match(sig, fill_ts),
+                                "same-day fill must match the signal decision")
+
+                found = update_outcome(
+                    pair="EURUSD", entry_timestamp=fill_ts,
+                    outcome="WIN", r_realized=1.6, system="FOREX",
+                )
+                self.assertTrue(found, "OANDA fill in a later hour must close the FOREX decision")
+                rec2 = _read_records(tmp_path)[0]
+                self.assertEqual(rec2["outcome"], "WIN")
+                self.assertAlmostEqual(rec2["r_realized"], 1.6)
+
+    def test_fill_on_different_day_does_not_match(self):
+        """The same-date fallback must NOT match a fill from a different calendar day."""
+        from sovereign.intelligence.decision_logger import log_forex_decision, update_outcome
+
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            with _patch_log_dir(tmp_path):
+                rec = log_forex_decision(
+                    pair="EURUSD", direction="SHORT", entry_level=1.1395,
+                    stop_loss=1.1467, hold_days=10, risk_pct=0.0075,
+                    signal_layers=["carry"], rate_diff_z=-2.0,
+                )
+                sig = rec.entry_timestamp
+                # Same year-month (so the same monthly log file is opened) but a different,
+                # always-valid day — isolates the date guard from run-date / month-boundary.
+                other_day = "15" if sig[8:10] != "15" else "16"
+                other_day_ts = sig[:8] + other_day + sig[10:]     # same time, different day
+                found = update_outcome(
+                    pair="EURUSD", entry_timestamp=other_day_ts,
+                    outcome="WIN", r_realized=1.6, system="FOREX",
+                )
+                self.assertFalse(found, "a different-day fill must not close the decision")
+                self.assertIsNone(_read_records(tmp_path)[0]["outcome"])
+
     def test_forex_fill_does_not_touch_ict_record(self):
         """The system filter must still hold: a FOREX backfill must not close an ICT record."""
         from sovereign.intelligence.decision_logger import log_ict_decision, update_outcome

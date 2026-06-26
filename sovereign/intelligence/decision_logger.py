@@ -17,7 +17,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Optional
 
-from sovereign.utils.timestamps import canonical_timestamp, timestamps_match
+from sovereign.utils.timestamps import canonical_timestamp, normalize_timestamp, timestamps_match
 
 LOG_DIR = Path("data/decision_logs")
 
@@ -303,6 +303,29 @@ def log_forex_decision(
 
 # ─── Outcome updater (called by forensic engine on trade close) ───────────────
 
+def _outcome_entry_match(stored_ts: str, incoming_ts: str) -> bool:
+    """Match a closing trade's entry timestamp to a stored decision's entry timestamp.
+
+    Tiered, because a FOREX decision is logged at SIGNAL time (`_now_iso()`), but the
+    outcome backfill keys on the OANDA FILL time (the trade's `openTime`), which
+    routinely lands in a LATER clock-hour than the signal (e.g. signal 12:43 → fill
+    13:34). Strict date+hour matching (`timestamps_match`, `[:13]`) silently dropped
+    those — the closed loop never closed for forex, breaking NON-NEGOTIABLE #2 while
+    the unit tests (which reuse identical/same-hour timestamps) stayed green.
+
+    Tier 1: existing strict behaviour (exact / date+hour / forensic date-only) — unchanged.
+    Tier 2: same-UTC-date fallback. Safe because forex fires ≤~1 trade per pair per day
+    and the caller already constrains the match to a same-pair record that is still OPEN
+    (outcome is None); the scan picks the oldest open record, so concurrent same-day
+    signals close FIFO. Does not loosen the ICT/forensic paths (they resolve in Tier 1).
+    """
+    if timestamps_match(stored_ts, incoming_ts):
+        return True
+    s = normalize_timestamp(str(stored_ts).strip())
+    i = normalize_timestamp(str(incoming_ts).strip())
+    return bool(s and i and s[:10] == i[:10])
+
+
 def update_outcome(
     pair: str,
     entry_timestamp: str,
@@ -347,7 +370,7 @@ def update_outcome(
                     records.append(obj)
                     continue
                 stored_ts = obj.get("entry_timestamp", "")
-                if timestamps_match(stored_ts, entry_timestamp):
+                if _outcome_entry_match(stored_ts, entry_timestamp):
                     obj["outcome"] = outcome
                     obj["r_realized"] = r_realized
                     obj["exit_timestamp"] = exit_timestamp or _now_iso()
