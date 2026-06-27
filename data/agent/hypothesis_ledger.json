@@ -1349,7 +1349,8 @@
     "caveats": "N=26 is a floor (true trials larger -> stricter); HYP-046a/b/c are 3 correlated holds of one edge; 4 CONFIRMED/DEPLOYED gates (HYP-050/052c/054/047) carry no perm p and are outside the family (FIND-REST-021-c).",
     "action": "No live change. Integrity recommendations: (1) relabel HYP-056 -> MARGINAL; (2) run+record permutation tests for HYP-050/052c/054/047 (RQ-REST-022). Reinforces RQ-REST-013 (exit re-sim) as top lever -- HYP-059 is the single FWER-robust result.",
     "methodology_note": "Offline meta-audit (no network). p per hyp = primary significance test, OOS-preferred. BH and Bonferroni at alpha=0.05.",
-    "rest_mode": true
+    "rest_mode": true,
+    "rest_mode_set": "2026-06-22"
   },
   {
     "id": "REGIME-ROUTER-SCREEN",
@@ -1368,5 +1369,13 @@
     "methodology_note": "Phase 1 of 6; Phase 2 (data pipeline) in progress, no model trained. Phase-3 gate reuses discovery/gate.py (directional permutation null + Benjamini-Hochberg + Deflated Sharpe) + agreement-gate bootstrap Sharpe-diff. Holdout 2024+ untouched.",
     "superseded_hash": "8cea71c9d3c29f8eda88a299f02a61a502237161f44bc16537a2be0fc623367c",
     "hash_lock": "d22ae88fb3c38ab3ea8678f09c657908c9f7284733c8bf9a57fa0159c319fdab"
+  },
+  {
+    "id": "HYP-065",
+    "name": "Carry edge is conditional on Fed-cycle position (hiking/peak ON, cutting/bottom OFF)",
+    "status": "PAUSED",
+    "hash_lock": "111854c0b912b5ef7e83aec1672fdcc23685a4ec8357a782ae0b242ebd91b955",
+    "result": "PAUSED 2026-06-27 \u2014 motivating evidence RETRACTED. The dossier's fresh -0.085 'collapse' was an UNGATED short-window artifact (VIX gates un-warmed). Re-measured gated full-history (OOS reconciles 1.17): fresh 2025-26 = +0.038 [CI -0.26,+0.34] on 45 trades \u2014 FLAT, UNDETERMINED (not dead, not confirmed). Pre-reg 111854c0 untouched & valid. Re-evaluate regime conditionality ONLY when fresh sample reaches ~100 trades. EURUSD -0.61 on 13 is too thin to research. See docs/research/v015_remeasurement.md + docs/MEASUREMENT_METHODOLOGY.md Rule 1.",
+    "methodology_note": "scripts/test_regime_conditionality.py; continuous 2015-2026 ledger; FEDFUNDS regime; 2024-26 = forward test."
   }
 ]

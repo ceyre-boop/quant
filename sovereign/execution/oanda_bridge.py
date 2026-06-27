@@ -34,6 +34,7 @@ from typing import Optional
 
 import oandapyV20
 import oandapyV20.endpoints.accounts as accounts
+import oandapyV20.endpoints.instruments as instruments
 import oandapyV20.endpoints.orders as orders
 import oandapyV20.endpoints.trades as trades
 from dotenv import load_dotenv
@@ -214,6 +215,33 @@ class OandaBridge:
             "open_trade_count": int(a.get('openTradeCount', 0) or 0),
             "currency": a.get('currency', 'USD'),
         }
+
+    def get_historical_candles(self, pair: str, start: str, end: str, granularity: str = "D"):
+        """Clean broker OHLC candles (OANDA mid) for [start,end]. yfinance-like DataFrame.
+
+        Used as the clean cross-source check vs yfinance (which drifts). A closed OANDA
+        candle never revises. pair accepts 'EURUSD=X' / 'EURUSD' / 'EUR_USD'.
+        """
+        import pandas as pd
+        inst = PAIR_MAP.get(pair)
+        if not inst:
+            base = pair.replace("=X", "")
+            inst = base[:3] + "_" + base[3:] if "_" not in base else base
+        params = {"granularity": granularity, "price": "M",
+                  "from": f"{start}T00:00:00Z", "to": f"{end}T00:00:00Z"}
+        req = instruments.InstrumentsCandles(instrument=inst, params=params)
+        resp = self._api.request(req)
+        rows = []
+        for c in resp.get("candles", []):
+            if not c.get("complete"):
+                continue
+            m = c["mid"]
+            rows.append((c["time"][:10], float(m["o"]), float(m["h"]), float(m["l"]), float(m["c"])))
+        df = pd.DataFrame(rows, columns=["date", "Open", "High", "Low", "Close"])
+        if not df.empty:
+            df["date"] = pd.to_datetime(df["date"])
+            df = df.set_index("date")
+        return df
 
     def _check_daily_loss(self) -> Optional[str]:
         """Returns a veto reason string if daily loss limit is hit, else None."""

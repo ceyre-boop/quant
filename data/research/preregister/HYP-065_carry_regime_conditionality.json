@@ -1,0 +1,73 @@
+{
+  "id": "HYP-065",
+  "name": "Carry edge is conditional on Fed-cycle position (hiking/peak ON, cutting/bottom OFF)",
+  "status": "PREREGISTERED",
+  "frozen_at": "2026-06-27",
+  "hypothesis": "The v015 carry edge concentrates in Fed HIKING and PEAK_HOLD periods and fails in CUTTING and BOTTOM periods, and this pattern holds across >=2 of 3 historical Fed cycles. If it appears only in Cycle 3 (2022-23), it is curve-fit and carry is dead.",
+  "motivation": "v015_dossier.html confirms 2025-26 Sharpe ~0 (-0.015 yfinance / -0.085 OANDA) vs 2023-24 OOS +1.25. Trajectory 2021 -0.13 / 2022 +0.51 / 2023 +1.26 / 2024 -0.09 / 2025-26 -0.085 coincides with Fed hiking(2022-23)->cutting(2024-26). Test whether that is a Fed-cycle effect or a one-cycle artifact.",
+  "pairs": [
+    "EURUSD",
+    "GBPUSD",
+    "USDJPY",
+    "AUDUSD"
+  ],
+  "cycle_dates": {
+    "C1": [
+      "2015-12-16",
+      "2019-07-30"
+    ],
+    "C2": [
+      "2019-07-31",
+      "2022-03-15"
+    ],
+    "C3": [
+      "2022-03-16",
+      "2026-06-30"
+    ]
+  },
+  "regime_rule": {
+    "source": "FRED FEDFUNDS (monthly, ffilled to daily)",
+    "HIKING": "rate >= +0.25 vs 3 months prior",
+    "CUTTING": "rate <= -0.25 vs 3 months prior",
+    "PEAK_HOLD": "not hiking/cutting AND within 0.25 of trailing-12mo high",
+    "BOTTOM": "not hiking/cutting AND within 0.25 of trailing-12mo low",
+    "NEUTRAL": "flat and mid-range (in neither edge-ON nor edge-OFF group)",
+    "locked_params": {
+      "delta_threshold_pct": 0.25,
+      "lookback_months": 3,
+      "high_low_window_months": 12
+    }
+  },
+  "robustness": {
+    "delta_threshold_pct": [
+      0.1,
+      0.5
+    ],
+    "lookback_months": [
+      2,
+      6
+    ],
+    "rule": "A result that passes only at the locked params but fails at nearby values is FRAGILE, not confirmed."
+  },
+  "confirmation_bar_all_must_hold": {
+    "edge_on": "Sharpe(HIKING + PEAK_HOLD) > 0.50 in >= 2 of 3 cycles",
+    "edge_off": "Sharpe(CUTTING + BOTTOM) < 0.20 in >= 2 of 3 cycles",
+    "significance": "permutation p < 0.05 (1000 shuffles of regime labels WITHIN each cycle) for Sharpe(on)-Sharpe(off)",
+    "robust": "consistent verdict across the robustness sweep"
+  },
+  "rejection_criteria": {
+    "curve_fit": "pattern present only in C3 -> carry is curve-fit/dead",
+    "not_fed_effect": "C1 and C2 show opposite patterns",
+    "permanent_collapse": "2024-26 fresh (Fed cutting) does NOT show edge-OFF -> the collapse is permanent, not regime-explained"
+  },
+  "verdicts": {
+    "CONFIRMED": "bar met + robust -> regime gate justified (separate design)",
+    "PARTIAL": "C3-only or fragile -> curve-fit, carry dead",
+    "REJECTED": "no regime pattern -> carry dead unconditionally"
+  },
+  "data_plan": "Generate ONE continuous 2015-01-01..2026-06-30 trade ledger for the 4 pairs via the canonical ForexBacktester.run_pair_with_trades (costed, VIX-gated = live v015 config). This fills the 2024 gap (absent from both meta_dataset_v1 [2015-2023] and forex_backtest_trades.json [2025-2026]) and fixes one config across all cycles. The 2024-26 fresh slice is the load-bearing forward test.",
+  "method": "Annualized Sharpe per bucket via sovereign/reporting/equity_curve (canonical sqrt-n by trades/yr). Permutation via sovereign/discovery/gate. READ-ONLY; no live config; no commits.",
+  "isolation": "Hash-lock BEFORE generating trades. No config/execution edits. Report-only.",
+  "hash_method": "sha256 of json.dumps(body, sort_keys=True, separators=(',',':')) minus hash_lock",
+  "hash_lock": "111854c0b912b5ef7e83aec1672fdcc23685a4ec8357a782ae0b242ebd91b955"
+}
