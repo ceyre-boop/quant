@@ -1290,14 +1290,6 @@
     "methodology_note": "Inverted gauntlet on free yfinance proxies (no option chains). Stage1 BTZ forward IV-RV gap, both-sides calm/stressed, sign-flip permutation. Stage2 strictly-causal harvest return (IV_{t-1}^2/252 - r_t^2) vs DBV carry/v015/overnight-QQQ; crisis (2008/2020/2022)+VIX>30+rolling-60d corr. Coval & Shumway (2001); Bakshi & Kapadia (2003); Bollerslev, Tauchen & Zhou (2009). Iron-condor sim blocked: brief forbids synthesizing option prices."
   },
   {
-    "id": "VRP-001-OPTIONS",
-    "name": "VRP iron-condor backtest on ThetaData SPY chains (Stages 2-4)",
-    "status": "NO_TRADES",
-    "date_tested": "2026-06-16",
-    "result": "[IS 2022-01-01..2022-12-31] IS:NO_TRADES/0t/Sh-",
-    "methodology_note": "Short 1SD iron condor, 25pt wings, 30-45 DTE, manage 21DTE/50% take/2x stop, 1% risk, Monday weekly. Real SPY chains via ThetaData; strikes from prior-20d realized vol (yfinance). Pre-registered + signed (vrp_preregistration.json#options_backtest)."
-  },
-  {
     "id": "HYP-062",
     "created_date": "2026-06-20",
     "confirmed_date": "2026-06-20",
@@ -1373,9 +1365,77 @@
   {
     "id": "HYP-065",
     "name": "Carry edge is conditional on Fed-cycle position (hiking/peak ON, cutting/bottom OFF)",
-    "status": "PAUSED",
+    "status": "REJECTED",
     "hash_lock": "111854c0b912b5ef7e83aec1672fdcc23685a4ec8357a782ae0b242ebd91b955",
-    "result": "PAUSED 2026-06-27 \u2014 motivating evidence RETRACTED. The dossier's fresh -0.085 'collapse' was an UNGATED short-window artifact (VIX gates un-warmed). Re-measured gated full-history (OOS reconciles 1.17): fresh 2025-26 = +0.038 [CI -0.26,+0.34] on 45 trades \u2014 FLAT, UNDETERMINED (not dead, not confirmed). Pre-reg 111854c0 untouched & valid. Re-evaluate regime conditionality ONLY when fresh sample reaches ~100 trades. EURUSD -0.61 on 13 is too thin to research. See docs/research/v015_remeasurement.md + docs/MEASUREMENT_METHODOLOGY.md Rule 1.",
-    "methodology_note": "scripts/test_regime_conditionality.py; continuous 2015-2026 ledger; FEDFUNDS regime; 2024-26 = forward test."
+    "result": "REJECTED: edge-ON>0.5 in 2/3 cycles, edge-OFF<0.2 in 1/3, perm p 0.0919, robust False. Per-cycle ON Sharpe: C1 0.517 / C2 0.204 / C3 1.163. 2024-26 fresh Sharpe 0.448 (matches-OFF False).",
+    "methodology_note": "scripts/test_regime_conditionality.py; continuous 2015-2026 ledger; FEDFUNDS regime; 2024-26 = forward test.",
+    "date_tested": "2026-06-27"
+  },
+  {
+    "id": "VRP-001-OPTIONS",
+    "name": "VRP iron-condor backtest on ThetaData SPY chains (Stages 2-4)",
+    "status": "OK",
+    "date_tested": "2026-06-29",
+    "result": "[IS 2022-01-01..2022-12-31] IS:OK/50t/Sh1.248",
+    "methodology_note": "Short 1SD iron condor, 25pt wings, 30-45 DTE, manage 21DTE/50% take/2x stop, 1% risk, Monday weekly. Real SPY chains via ThetaData; strikes from prior-20d realized vol (yfinance). Pre-registered + signed (vrp_preregistration.json#options_backtest)."
+  },
+  {
+    "id": "BENCH-THROUGHPUT",
+    "name": "Backtest throughput benchmark (measured, replaces the 148k claim)",
+    "status": "MEASURED",
+    "date_tested": "2026-06-29",
+    "result": "single-core(90bar)=25,223/s \u00b7 12-core ceiling=123,168/s \u00b7 best bar-evals=11,085,141/s \u00b7 legacy claim 148,193 (NOT beaten; numba INACTIVE on py3.14.4 \u2192 pure-Python fallback)",
+    "methodology_note": "Apple M4 Pro, 12 physical cores, numba INACTIVE on py3.14.4 \u2192 pure-Python fallback. Time-boxed. FastBacktestEngine vs pure-Python forex kernel across 90bar/daily/5min/1min, single vs all-cores. See backtest_benchmark JSON."
+  },
+  {
+    "id": "HYP-067",
+    "name": "exit_policy_evolution (GA over 3x3x3 regime/age-keyed exit policy)",
+    "status": "NOT_ROBUST",
+    "date_tested": "2026-06-29",
+    "source": "manual",
+    "validator": "exit_policy_evolution",
+    "mechanism": "GA-evolved per-bar regime+age-conditioned exit policy vs static; CPCV fitness, holdout permutation, deflated-Sharpe at search size, prove band.",
+    "result": {
+      "perm_p": 0.26036981509245377,
+      "oos_sharpe": -0.4007,
+      "walkforward": "DEGRADED",
+      "nperm": 2000
+    },
+    "oos_sharpe": -0.4007,
+    "is_sharpe": 1.1023,
+    "p_value": 0.26036981509245377,
+    "bh_survives": false,
+    "standalone": true,
+    "auto_generated": false
+  },
+  {
+    "id": "HYP-071",
+    "name": "Tabular exit value function (Stockfish/NNUE-style L2 exit evaluator)",
+    "status": "METRIC_ARTIFACT",
+    "date_tested": "2026-06-30",
+    "source": "manual",
+    "validator": "hyp_071_exit_value_function",
+    "mechanism": "Per-cell V(cell,action)=E[R]-0.5*DownsideDeviation(R) over the 108-cell board (ATR% tercile x excursion-R x hold-fraction x RSI-extreme x carry), EXIT_NOW vs HOLD_AND_TRAIL, scored by a regime-conditional stationary block bootstrap (L=5) carrying each member state forward through resampled continuations via the shared decide_exit.",
+    "result": {
+      "finding": "EXIT_NOW dominance is tautological - a locked current value has no forecast variance, HOLD does. Not an edge; a confounded metric. Self-refuted by contradiction with the 0.6886 reconciliation: an EXIT_NOW-everywhere policy = never-trail, which would degrade the trailing machine that produces 0.6886. Static exit config vindicated; no deployable signal.",
+      "reconcile_weighted_sharpe": 0.6886,
+      "retrace_parity_match_rate": 1.0,
+      "n_members_decade": 458,
+      "exit_now_cells": "45 of 54 evaluated",
+      "E_hold_vs_mean_excursion": "E_hold ~ mean current excursion (holding preserves mean return); EXIT_NOW chosen only via the lambda*DD penalty on HOLD's irreducible forecast variance",
+      "cpcv_stable_sensible_divergences": 10,
+      "forward_consistent": 9,
+      "prereg_hash": "3d500bda3249c4615698ce311a7cbad41a35600a23abd2a4ea4526416eac06a4",
+      "addendum_hash": "c1fab80730f1ebf3af7c35e4bbd8fc80e2bafd86419fc0125acc140b414d806f",
+      "results_artifact": "data/research/HYP-071_tabular_exit_value_results.json"
+    },
+    "action": "KEEP_STATIC_CONFIG - no live config change; no deployable signal.",
+    "reopen_condition": "New prereg with symmetric forecast variance on the EXIT_NOW side, OR a pure E[R] comparison without the lambda*downside penalty.",
+    "oos_sharpe": null,
+    "is_sharpe": null,
+    "p_value": null,
+    "bh_survives": false,
+    "standalone": true,
+    "auto_generated": false
   }
 ]
