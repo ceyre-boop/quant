@@ -102,6 +102,10 @@ data/agent/_jobs/
 
 # L2 exit manager runtime state (shadow JSONL + state json) — never commit runtime state
 data/exec/
+
+# Sentiment board-state pipeline DuckDB (runtime data, rebuilt from sources) — never commit
+data/sentiment.db
+data/sentiment/
 .env
 .env
 .env

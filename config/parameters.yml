@@ -154,3 +154,28 @@ regime_params:
     stop_atr_mult: 1.0
     tp_rr: 1.5
     fitted_on: '2026-06-01'
+
+# ── Sentiment board-state pipeline (sovereign/sentiment/) — Step 0 data layer ──────────────────────
+# Thresholds live here (never hardcoded). VIX regime cutoffs and the news rolling window are config.
+sentiment:
+  news:
+    rolling_window_hours: 24       # rolling sentiment lookback per pair
+    max_articles: 100              # NewsAPI pageSize per pair query
+    # Per-pair topic queries for NewsAPI /v2/everything (OR-joined). Tunable here, not in code.
+    pairs:
+      EURUSD: ['euro', 'ECB', 'eurozone', 'EUR/USD', 'European Central Bank']
+      GBPUSD: ['pound sterling', 'Bank of England', 'GBP/USD', 'UK economy', 'gilt']
+      USDJPY: ['Japanese yen', 'Bank of Japan', 'USD/JPY', 'Japan economy', 'BOJ']
+      AUDUSD: ['Australian dollar', 'RBA', 'AUD/USD', 'Australia economy', 'Reserve Bank of Australia']
+  vix_regime:                      # LOW <low_max, NORMAL [low_max,normal_max], HIGH (normal_max,spike_min], SPIKE >spike_min
+    low_max: 15
+    normal_max: 25
+    spike_min: 30
+  vix:
+    ticker: '^VIX'                  # yfinance symbol (already used across the repo)
+    momentum_lookback_days: 5       # VIX - VIX_5d_ago
+  fred:
+    series: ['DFF', 'T10Y2Y', 'VIXCLS', 'BAMLH0A0HYM2', 'T10YIE']
+    delta_windows: [1, 5]          # business-day deltas computed per series
+  macro_start: '2015-01-01'        # FRED/VIX backfill start (full carry history)
+  db_path: data/sentiment.db       # DuckDB store, relative to repo root

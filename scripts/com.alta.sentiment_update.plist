@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>EnvironmentVariables</key>
+	<dict>
+		<key>PATH</key>
+		<string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+	</dict>
+	<key>Label</key>
+	<string>com.alta.sentiment_update</string>
+	<key>Nice</key>
+	<integer>5</integer>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/opt/homebrew/bin/python3</string>
+		<string>/Users/taboost/quant/scripts/update_sentiment.py</string>
+	</array>
+	<key>StandardErrorPath</key>
+	<string>/Users/taboost/quant/logs/sentiment_update.err</string>
+	<key>StandardOutPath</key>
+	<string>/Users/taboost/quant/logs/sentiment_update.log</string>
+	<!-- 07:45 local, ~15 min before com.alta.forex.scan (08:00) so the board is fresh for the scan. -->
+	<key>StartCalendarInterval</key>
+	<array>
+		<dict><key>Hour</key><integer>7</integer><key>Minute</key><integer>45</integer><key>Weekday</key><integer>1</integer></dict>
+		<dict><key>Hour</key><integer>7</integer><key>Minute</key><integer>45</integer><key>Weekday</key><integer>2</integer></dict>
+		<dict><key>Hour</key><integer>7</integer><key>Minute</key><integer>45</integer><key>Weekday</key><integer>3</integer></dict>
+		<dict><key>Hour</key><integer>7</integer><key>Minute</key><integer>45</integer><key>Weekday</key><integer>4</integer></dict>
+		<dict><key>Hour</key><integer>7</integer><key>Minute</key><integer>45</integer><key>Weekday</key><integer>5</integer></dict>
+	</array>
+	<key>WorkingDirectory</key>
+	<string>/Users/taboost/quant</string>
+</dict>
+</plist>
