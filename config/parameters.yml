@@ -208,3 +208,16 @@ sentiment:
       PAYEMS:    1    # nonfarm payrolls — hot jobs ⇒ USD+
       RSAFS:     1    # retail sales — hot consumer ⇒ USD+
       UNRATE:   -1    # unemployment rate — higher ⇒ weak labor ⇒ dovish ⇒ USD-
+  # ── COT positioning (CFTC Commitment of Traders — free, keyless, weekly, 1986+) ──
+  # LOOK-AHEAD GUARD: COT is measured Tuesday but PUBLISHED ~Friday. Every row is dated to the FRIDAY
+  # publish_date (Tuesday + publish_lag); the board only sees it on/after publish. NEVER date to Tuesday.
+  cot:
+    start: '1986-01-01'
+    socrata_dataset: '6dca-aqww'      # CFTC legacy futures-only COT
+    publish_lag_days: 3               # Tue measurement → Fri publish (forward-look test asserts publish>measurement)
+    percentile_window_weeks: 156      # trailing 3 years — the "extreme" (contrarian) percentile feature
+    pairs:                            # FX pair → CFTC contract_market_code (the FOREIGN-currency future vs USD)
+      EURUSD: '099741'   # EURO FX
+      GBPUSD: '096742'   # BRITISH POUND
+      USDJPY: '097741'   # JAPANESE YEN — NB: JPY-long = USDJPY DOWN (inverse; sign handled in the diagnostic)
+      AUDUSD: '232741'   # AUSTRALIAN DOLLAR

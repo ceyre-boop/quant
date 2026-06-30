@@ -75,6 +75,21 @@ CREATE TABLE IF NOT EXISTS sentiment_surprise_daily (
     fetched_at      TIMESTAMP,
     PRIMARY KEY (date)
 );
+-- CFTC Commitment of Traders — large-spec (non-commercial) net positioning. publish_date = Tuesday
+-- measurement + lag (Friday); the board may ONLY see a row on/after publish_date (no look-ahead).
+CREATE TABLE IF NOT EXISTS sentiment_cot_weekly (
+    measurement_date DATE,        -- CFTC "as of" Tuesday
+    publish_date     DATE,        -- Tuesday + publish_lag (~Friday) — first date the board may use it
+    pair             VARCHAR,
+    noncomm_long     BIGINT,
+    noncomm_short    BIGINT,
+    net_spec         BIGINT,       -- long - short (large speculators)
+    net_oi           DOUBLE,       -- net_spec / open_interest (scale-invariant level)
+    net_pct          DOUBLE,       -- trailing-3yr percentile of net_spec [0,1] — the contrarian-extreme feature
+    open_interest    BIGINT,
+    fetched_at       TIMESTAMP,
+    PRIMARY KEY (measurement_date, pair)
+);
 CREATE TABLE IF NOT EXISTS sentiment_board_state (
     date            DATE,
     pair            VARCHAR,
@@ -83,6 +98,8 @@ CREATE TABLE IF NOT EXISTS sentiment_board_state (
     gdelt_tone_5d   DOUBLE,
     gdelt_volume    DOUBLE,
     econ_surprise_z DOUBLE,
+    cot_net_pct     DOUBLE,
+    cot_net_oi      DOUBLE,
     macro_curve     DOUBLE,
     macro_spread    DOUBLE,
     macro_inflation DOUBLE,
@@ -98,6 +115,8 @@ ALTER TABLE sentiment_board_state ADD COLUMN IF NOT EXISTS gdelt_tone_5d DOUBLE;
 ALTER TABLE sentiment_board_state ADD COLUMN IF NOT EXISTS gdelt_volume DOUBLE;
 ALTER TABLE sentiment_board_state ADD COLUMN IF NOT EXISTS econ_surprise_z DOUBLE;
 ALTER TABLE sentiment_surprise_release ADD COLUMN IF NOT EXISTS usd_sign DOUBLE;
+ALTER TABLE sentiment_board_state ADD COLUMN IF NOT EXISTS cot_net_pct DOUBLE;
+ALTER TABLE sentiment_board_state ADD COLUMN IF NOT EXISTS cot_net_oi DOUBLE;
 """
 
 

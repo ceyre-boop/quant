@@ -25,7 +25,9 @@ for lib in ("yfinance", "peewee", "urllib3", "requests", "fredapi"):
     logging.getLogger(lib).setLevel(logging.ERROR)
 
 from config.loader import params
-from sovereign.sentiment import store, news_feed, macro_feed, vix_feed, gdelt_feed, surprise_feed, board_state
+from sovereign.sentiment import (
+    store, news_feed, macro_feed, vix_feed, gdelt_feed, surprise_feed, cot_feed, board_state,
+)
 
 HEARTBEAT = ROOT / "logs" / ".heartbeat_sentiment"
 
@@ -48,6 +50,7 @@ def main() -> dict:
         macro_cov = macro_feed.update(con=con, start=start)
         vix_cov = vix_feed.update(con=con, start=start)
         surprise_cov = surprise_feed.update(con=con, start=start)  # release-innovation spine
+        cot_cov = cot_feed.update(con=con)                         # CFTC COT positioning (Friday-published)
         board_rows = board_state.rebuild(con=con)
 
         # ── coverage report (required deliverable) ──
@@ -73,10 +76,14 @@ def main() -> dict:
                 print(f"   daily econ_surprise_z rows={c.get('rows'):>5}  {c.get('start')}→{c.get('end')}")
             else:
                 print(f"   {sid:14} releases={c.get('releases'):>4}  {c.get('start')}→{c.get('end')}")
+        print("COT positioning (CFTC, Friday-published, 1986+):")
+        for pair, c in cot_cov.items():
+            span = f"{c.get('start')}→{c.get('end')}" if c.get("rows") else "NO DATA"
+            print(f"   {pair:14} weeks={c.get('rows'):>5}  {span}")
         print(f"BOARD: {board_rows} rows (sentiment_board_state)")
         print(f"DB: {store.DB_PATH}")
         return {"board_rows": board_rows, "news": news_cov, "gdelt": gdelt_cov, "macro": macro_cov,
-                "vix": vix_cov, "surprise": surprise_cov, "news_probe": news_probe}
+                "vix": vix_cov, "surprise": surprise_cov, "cot": cot_cov, "news_probe": news_probe}
     finally:
         con.close()
 

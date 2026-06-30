@@ -15,7 +15,9 @@ import pandas as pd
 import pytest
 
 from config.loader import params
-from sovereign.sentiment import store, board_state, vix_feed, news_feed, macro_feed, gdelt_feed, surprise_feed
+from sovereign.sentiment import (
+    store, board_state, vix_feed, news_feed, macro_feed, gdelt_feed, surprise_feed, cot_feed,
+)
 
 NOW = datetime(2026, 6, 30, tzinfo=timezone.utc)
 PAIRS = board_state.PAIRS
@@ -69,6 +71,16 @@ def con():
     # daily econ_surprise_z on the seeded trading days (broadcast across pairs)
     surprise = pd.DataFrame({"date": dates, "econ_surprise_z": [0.0, 1.2, 0.6, -0.8, 2.1, 0.1], "fetched_at": NOW})
     store.upsert(c, "sentiment_surprise_daily", surprise, ["date"])
+
+    # COT weekly (EURUSD) — Friday-published; a later row (Nov-29) must NOT be visible to earlier board dates
+    cot = pd.DataFrame(
+        [(pd.Timestamp("2023-01-03").date(), pd.Timestamp("2023-01-06").date(), "EURUSD", 200000, 150000, 50000, 0.06, 0.70, 800000, NOW),
+         (pd.Timestamp("2023-07-04").date(), pd.Timestamp("2023-07-07").date(), "EURUSD", 180000, 200000, -20000, -0.02, 0.20, 850000, NOW),
+         (pd.Timestamp("2024-11-26").date(), pd.Timestamp("2024-11-29").date(), "EURUSD", 250000, 100000, 150000, 0.18, 0.95, 820000, NOW)],
+        columns=["measurement_date", "publish_date", "pair", "noncomm_long", "noncomm_short",
+                 "net_spec", "net_oi", "net_pct", "open_interest", "fetched_at"],
+    )
+    store.upsert(c, "sentiment_cot_weekly", cot, ["measurement_date", "pair"])
 
     board_state.rebuild(con=c)
     yield c
@@ -125,7 +137,7 @@ def test_no_forward_look(con):
 # 6 — isolation: no sentiment module imports ict / ict-engine / layer1 / layer2 (AST-checked)
 def test_sentiment_does_not_import_ict():
     forbidden_roots = {"ict", "ict_engine", "layer1", "layer2"}
-    for mod in (store, news_feed, macro_feed, vix_feed, board_state):
+    for mod in (store, news_feed, macro_feed, vix_feed, gdelt_feed, surprise_feed, cot_feed, board_state):
         tree = ast.parse(inspect.getsource(mod))
         names = set()
         for node in ast.walk(tree):
@@ -240,3 +252,33 @@ class TestSurprise:
         day = rel[rel["publish_date"] == "2023-02-03"]
         assert day["usd_z"].sum() == pytest.approx(3.0)   # +2 (payrolls) + +1 (unemployment fell) — constructive
         assert day["surprise_z"].sum() == pytest.approx(1.0)  # raw sum cancels to +1 — the bug we fixed
+
+
+# ── ITEM 3: COT positioning (CFTC, Friday-published, no look-ahead) ───────────
+class TestCOT:
+    def test_forward_look_publish_after_measurement(self, con):
+        bad = con.execute(
+            "SELECT COUNT(*) FROM sentiment_cot_weekly WHERE publish_date <= measurement_date").fetchone()[0]
+        assert bad == 0                                   # every row dated to its Friday publish, AFTER the Tuesday
+
+    def test_net_pct_bounded(self, con):
+        df = con.execute("SELECT net_pct FROM sentiment_cot_weekly WHERE net_pct IS NOT NULL").df()
+        assert len(df) >= 1 and df["net_pct"].between(0.0, 1.0).all()
+
+    def test_board_has_cot_columns(self, con):
+        h = board_state.get_history("2023-01-01", "2024-12-31", "EURUSD", con=con)
+        assert "cot_net_pct" in h.columns and "cot_net_oi" in h.columns
+
+    def test_board_asof_no_lookahead(self, con):
+        # board sees only COT published on/before its date; a future-published row stays invisible
+        assert board_state.get_state(pd.Timestamp("2023-03-01").date(), "EURUSD", con=con)["cot_net_pct"] == pytest.approx(0.70)
+        assert board_state.get_state(pd.Timestamp("2023-09-01").date(), "EURUSD", con=con)["cot_net_pct"] == pytest.approx(0.20)
+        # 2024-11-01 must still see the 2023-07-07 row (0.20) — the 2024-11-29-published 0.95 is NOT yet public
+        assert board_state.get_state(pd.Timestamp("2024-11-01").date(), "EURUSD", con=con)["cot_net_pct"] == pytest.approx(0.20)
+
+    def test_trailing_percentile_no_lookahead(self):
+        # the percentile uses TRAILING data only — current value's rank within its own trailing window
+        s = pd.Series([10, 20, 30, 40, 5], dtype=float)
+        pct = s.rolling(5, min_periods=2).apply(lambda x: float((x <= x[-1]).mean()), raw=True)
+        assert pct.iloc[3] == pytest.approx(1.0)          # 40 is the max SO FAR → 100th pct (ignores the future 5)
+        assert pct.iloc[4] == pytest.approx(0.2)          # 5 is the min of the 5 → 20th pct

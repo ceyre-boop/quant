@@ -12,6 +12,9 @@ Coverage note: NewsAPI (free/developer tier) serves only ~30 days of history, so
 populatable only for recent dates; FRED + VIX backfill to 2015. The board carries NULL news_score for
 uncovered (historical) dates.
 """
-from sovereign.sentiment import store, news_feed, macro_feed, vix_feed, gdelt_feed, surprise_feed, board_state
+from sovereign.sentiment import (
+    store, news_feed, macro_feed, vix_feed, gdelt_feed, surprise_feed, cot_feed, board_state,
+)
 
-__all__ = ["store", "news_feed", "macro_feed", "vix_feed", "gdelt_feed", "surprise_feed", "board_state"]
+__all__ = ["store", "news_feed", "macro_feed", "vix_feed", "gdelt_feed", "surprise_feed",
+           "cot_feed", "board_state"]
