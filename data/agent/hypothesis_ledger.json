@@ -1437,5 +1437,29 @@
     "bh_survives": false,
     "standalone": true,
     "auto_generated": false
+  },
+  {
+    "id": "SENTIMENT-ECON-SURPRISE",
+    "name": "Economic release-innovation surprise -> forward FX directional move (daily/swing horizon)",
+    "status": "NOT_SIGNIFICANT",
+    "date_tested": "2026-06-30",
+    "source": "diagnostic",
+    "validator": "manual diagnostic read (NOT pre-registered) on sentiment board econ_surprise_z",
+    "mechanism": "USD-signed release innovation (first-print actual - naive prior, z-scored; UNRATE inverted, fixed commit a1dc0cb). Tested directional forward move per G10 pair at 1/3/5d on DE-OVERLAPPED distinct release events, sign-corrected (USD-positive shock -> USD up). FINDING: scheduled macro surprises are priced FASTER than the daily-bar/swing horizon measured here -- the move is largely intraday/same-bar, so a daily feature sees a null.",
+    "result": {
+      "finding": "No significant directional signal on de-overlapped events. Raw |z|>1.5 = 517 days collapse to 164 DISTINCT release events (lag-1 autocorr 0.74). Best cell EURUSD 5d ex-2020: hit 58%, median +0.23%, binomial p=0.076 (N=140) -- suggestive, NOT significant; every other cell p>0.10. NOT COVID-driven (ex-2020 >= full). Effect sizes tiny (0.04-0.23% over 1-5d). The UNRATE sign fix did NOT sharpen the jobs-report read (jobs-day 3d hit 56-59% USD-signed vs 60-62% as-built, within noise, differing N) -> cancellation wasn't muffling a real signal.",
+      "distinct_events_N": 164,
+      "best_cell": "EURUSD 5d ex-2020: hit 58%, median +0.23%, p=0.076, N=140",
+      "interpretation": "Scheduled surprises priced faster than daily bars -> null at the swing horizon.",
+      "de_overlap_standard": "Future surprise/event diagnostics MUST use ONE observation per distinct release/publish date (the EWMA peak), NOT per high-z day; binomial null at the REAL de-overlapped N; median primary (mean is outlier-dragged); report full AND ex-COVID.",
+      "infrastructure": "KEPT -- econ_surprise_z spine is correct + committed (USD-signed a1dc0cb); available as one input in a future multi-feature board."
+    },
+    "action": "KEEP_INFRASTRUCTURE -- no standalone directional signal; do NOT build a model on it alone. Re-test only intraday (where the surprise is actually priced) or as one input in a multi-feature board.",
+    "oos_sharpe": null,
+    "is_sharpe": null,
+    "p_value": 0.076,
+    "bh_survives": false,
+    "standalone": true,
+    "auto_generated": false
   }
 ]
