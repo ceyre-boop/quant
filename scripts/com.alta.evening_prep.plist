@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.alta.evening_prep</string>
+
+    <key>Program</key>
+    <string>/bin/bash</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>/Users/taboost/quant/scripts/evening_prep.sh</string>
+    </array>
+
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Hour</key>
+        <integer>22</integer>
+        <key>Minute</key>
+        <integer>0</integer>
+    </dict>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/taboost/quant</string>
+
+    <key>StandardOutPath</key>
+    <string>/tmp/evening_prep.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/tmp/evening_prep.err</string>
+
+    <key>RunAtLoad</key>
+    <false/>
+</dict>
+</plist>
