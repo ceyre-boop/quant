@@ -175,13 +175,21 @@ class ICTMemoryEngine:
     def assess_match(self, match: MemoryMatch) -> dict:
         """
         Returns hard/soft veto decision based on cluster quality thresholds.
+
+        The 7.5 ``score_floor`` is only meaningful when the memory cluster is
+        ACTIVE (>= MIN_PATTERNS closed trades) AND is generating a real
+        cluster-based veto. When the cluster is inactive (insufficient data)
+        or healthy (no veto), ``score_floor`` is ``None`` so the orchestrator
+        skips the floor check entirely. Returning 7.5 unconditionally would
+        kill grade-A signals (median score ~6.87) before the memory engine has
+        even activated — see ICT-Veto-Analysis-2026-06.
         """
         if not match.available:
             return {
                 "hard_veto": False,
                 "soft_veto": False,
                 "penalty": 0.0,
-                "score_floor": self._soft_veto_score_floor,
+                "score_floor": None,          # cluster inactive — no floor
                 "reason": "insufficient_data",
             }
 
@@ -194,7 +202,7 @@ class ICTMemoryEngine:
                 "hard_veto": True,
                 "soft_veto": False,
                 "penalty": 0.0,
-                "score_floor": self._soft_veto_score_floor,
+                "score_floor": self._soft_veto_score_floor,  # active + real veto
                 "reason": "hard_threshold",
             }
 
@@ -203,7 +211,9 @@ class ICTMemoryEngine:
             "hard_veto": False,
             "soft_veto": soft_veto,
             "penalty": self._soft_veto_penalty if soft_veto else 0.0,
-            "score_floor": self._soft_veto_score_floor,
+            # Floor applies only when a real soft veto fires; a healthy active
+            # cluster (no veto) imposes no floor.
+            "score_floor": self._soft_veto_score_floor if soft_veto else None,
             "reason": "soft_cluster_wr" if soft_veto else "ok",
         }
 

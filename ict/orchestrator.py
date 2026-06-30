@@ -333,13 +333,17 @@ class ICTOrchestrator:
 
                     # A-grade (+ Grade B in NY AM) + session + no blackout + bias + memory + heatmap
                     _accepted_grades = (ICTGrade.A_PLUS, ICTGrade.A, ICTGrade.B) if self.ny_am_mode else (ICTGrade.A_PLUS, ICTGrade.A)
+                    # score_floor is None when the memory cluster is inactive or
+                    # healthy (no real veto) — skip the floor check in that case.
+                    _score_floor = mem_assessment["score_floor"]
+                    _floor_ok = _score_floor is None or decision_score >= _score_floor
                     is_actionable = (
                         best.grade in _accepted_grades
                         and session_ok
                         and not blackout
                         and bias_agrees
                         and not mem_veto
-                        and decision_score >= mem_assessment["score_floor"]
+                        and _floor_ok
                         and not heatmap_conflict
                     )
                     if not bias_agrees:
