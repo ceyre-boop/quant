@@ -25,7 +25,7 @@ for lib in ("yfinance", "peewee", "urllib3", "requests", "fredapi"):
     logging.getLogger(lib).setLevel(logging.ERROR)
 
 from config.loader import params
-from sovereign.sentiment import store, news_feed, macro_feed, vix_feed, board_state
+from sovereign.sentiment import store, news_feed, macro_feed, vix_feed, gdelt_feed, surprise_feed, board_state
 
 HEARTBEAT = ROOT / "logs" / ".heartbeat_sentiment"
 
@@ -44,8 +44,10 @@ def main() -> dict:
     try:
         print(f"[sentiment] updating  (backfill={args.backfill}, macro_start={start})")
         news_cov = news_feed.update(con=con)
+        gdelt_cov = gdelt_feed.update(con=con)            # GDELT texture (5s-rate-limited; ~2017+)
         macro_cov = macro_feed.update(con=con, start=start)
         vix_cov = vix_feed.update(con=con, start=start)
+        surprise_cov = surprise_feed.update(con=con, start=start)  # release-innovation spine
         board_rows = board_state.rebuild(con=con)
 
         # ── coverage report (required deliverable) ──
@@ -61,9 +63,20 @@ def main() -> dict:
         print("VIX:")
         vspan = f"{vix_cov.get('start')}→{vix_cov.get('end')}" if vix_cov.get("rows") else "NO DATA"
         print(f"   ^VIX           rows={vix_cov.get('rows'):>5}  {vspan}")
+        print("GDELT texture (tone, ~2017+):")
+        for pair, c in gdelt_cov.items():
+            span = f"{c.get('start')}→{c.get('end')}" if c.get("rows") else "NO DATA"
+            print(f"   {pair:14} rows={c.get('rows'):>5}  {span}")
+        print("ECON SURPRISE (release_innovation — NOT consensus):")
+        for sid, c in surprise_cov.items():
+            if sid == "_daily":
+                print(f"   daily econ_surprise_z rows={c.get('rows'):>5}  {c.get('start')}→{c.get('end')}")
+            else:
+                print(f"   {sid:14} releases={c.get('releases'):>4}  {c.get('start')}→{c.get('end')}")
         print(f"BOARD: {board_rows} rows (sentiment_board_state)")
         print(f"DB: {store.DB_PATH}")
-        return {"board_rows": board_rows, "news": news_cov, "macro": macro_cov, "vix": vix_cov, "news_probe": news_probe}
+        return {"board_rows": board_rows, "news": news_cov, "gdelt": gdelt_cov, "macro": macro_cov,
+                "vix": vix_cov, "surprise": surprise_cov, "news_probe": news_probe}
     finally:
         con.close()
 

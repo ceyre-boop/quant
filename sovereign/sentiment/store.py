@@ -46,10 +46,42 @@ CREATE TABLE IF NOT EXISTS sentiment_vix_daily (
     fetched_at   TIMESTAMP,
     PRIMARY KEY (date)
 );
+CREATE TABLE IF NOT EXISTS sentiment_gdelt_daily (
+    date        DATE,
+    pair        VARCHAR,
+    tone_raw    DOUBLE,           -- GDELT avg article tone, [-100, 100]
+    tone_score  DOUBLE,           -- tone_raw / 100, [-1, 1]
+    tone_5d     DOUBLE,           -- tone_score - tone_score 5 trading days ago
+    volume      DOUBLE,           -- log1p(article count) — attention/intensity
+    fetched_at  TIMESTAMP,
+    PRIMARY KEY (date, pair)
+);
+-- Economic "release innovation" — first-print actual vs naive baseline, z-scored. NOT a consensus surprise.
+CREATE TABLE IF NOT EXISTS sentiment_surprise_release (
+    publish_date DATE,            -- ALFRED realtime_start of the FIRST print (when the market saw it)
+    series       VARCHAR,
+    ref_date     DATE,            -- reference period of the data point
+    first_print  DOUBLE,
+    baseline     DOUBLE,
+    surprise     DOUBLE,          -- first_print - baseline (release innovation)
+    surprise_z   DOUBLE,          -- standardized over trailing releases
+    fetched_at   TIMESTAMP,
+    PRIMARY KEY (publish_date, series)
+);
+CREATE TABLE IF NOT EXISTS sentiment_surprise_daily (
+    date            DATE,
+    econ_surprise_z DOUBLE,       -- EWMA-decayed sum of standardized release innovations (US, broadcast)
+    fetched_at      TIMESTAMP,
+    PRIMARY KEY (date)
+);
 CREATE TABLE IF NOT EXISTS sentiment_board_state (
     date            DATE,
     pair            VARCHAR,
     news_score      DOUBLE,
+    gdelt_tone      DOUBLE,
+    gdelt_tone_5d   DOUBLE,
+    gdelt_volume    DOUBLE,
+    econ_surprise_z DOUBLE,
     macro_curve     DOUBLE,
     macro_spread    DOUBLE,
     macro_inflation DOUBLE,
@@ -59,6 +91,11 @@ CREATE TABLE IF NOT EXISTS sentiment_board_state (
     built_at        TIMESTAMP,
     PRIMARY KEY (date, pair)
 );
+-- migrate pre-Step-1 board tables (gitignored runtime DBs) without a rebuild-from-scratch
+ALTER TABLE sentiment_board_state ADD COLUMN IF NOT EXISTS gdelt_tone DOUBLE;
+ALTER TABLE sentiment_board_state ADD COLUMN IF NOT EXISTS gdelt_tone_5d DOUBLE;
+ALTER TABLE sentiment_board_state ADD COLUMN IF NOT EXISTS gdelt_volume DOUBLE;
+ALTER TABLE sentiment_board_state ADD COLUMN IF NOT EXISTS econ_surprise_z DOUBLE;
 """
 
 

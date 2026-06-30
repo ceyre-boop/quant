@@ -14,7 +14,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from sovereign.sentiment import store, board_state, vix_feed, news_feed, macro_feed
+from sovereign.sentiment import store, board_state, vix_feed, news_feed, macro_feed, gdelt_feed, surprise_feed
 
 NOW = datetime(2026, 6, 30, tzinfo=timezone.utc)
 PAIRS = board_state.PAIRS
@@ -57,6 +57,17 @@ def con():
         columns=["date", "pair", "n_articles", "n_pos", "n_neg", "news_score", "fetched_at"],
     )
     store.upsert(c, "sentiment_news_daily", news, ["date", "pair"])
+
+    # GDELT texture (tone in [-1,1]) on a couple of (date, pair); rest NULL (gdelt starts ~2017)
+    gdelt = pd.DataFrame(
+        [(dates[0], "EURUSD", 22.0, 0.22, 0.05, 6.1, NOW), (dates[1], "EURUSD", -15.0, -0.15, -0.10, 5.4, NOW)],
+        columns=["date", "pair", "tone_raw", "tone_score", "tone_5d", "volume", "fetched_at"],
+    )
+    store.upsert(c, "sentiment_gdelt_daily", gdelt, ["date", "pair"])
+
+    # daily econ_surprise_z on the seeded trading days (broadcast across pairs)
+    surprise = pd.DataFrame({"date": dates, "econ_surprise_z": [0.0, 1.2, 0.6, -0.8, 2.1, 0.1], "fetched_at": NOW})
+    store.upsert(c, "sentiment_surprise_daily", surprise, ["date"])
 
     board_state.rebuild(con=c)
     yield c
@@ -135,3 +146,77 @@ def test_news_scorer():
     for n_pos, n_neg, n_tot in [(7, 2, 10), (0, 5, 5), (3, 3, 6), (10, 0, 10)]:
         score = (n_pos - n_neg) / n_tot
         assert -1.0 <= score <= 1.0
+
+
+# ── Step 1: GDELT texture ─────────────────────────────────────────────────────
+class TestGdelt:
+    def test_normalize_tone_bounded(self):
+        for raw in (-100.0, -42.0, 0.0, 37.0, 100.0):
+            assert -1.0 <= gdelt_feed.normalize_tone(raw) <= 1.0
+        assert gdelt_feed.normalize_tone(50.0) == 0.5
+
+    def test_parse_timeline(self):
+        payload = {"timeline": [{"data": [{"date": "20230301T000000Z", "value": 2.5},
+                                          {"date": "20230302T000000Z", "value": -1.0}]}]}
+        pts = gdelt_feed.parse_timeline(payload)
+        assert len(pts) == 2 and pts[0]["value"] == 2.5
+
+    def test_parse_timeline_garbage(self):
+        # the plain-text throttle body / malformed payloads must degrade to [] (not crash)
+        assert gdelt_feed.parse_timeline({}) == []
+        assert gdelt_feed.parse_timeline("Please limit requests to one every 5 seconds") == []
+        assert gdelt_feed.parse_timeline({"timeline": []}) == []
+
+    def test_board_gdelt_tone(self, con):
+        h = board_state.get_history("2023-01-01", "2024-12-31", "EURUSD", con=con)
+        nn = h["gdelt_tone"].dropna()
+        assert len(nn) >= 1 and nn.between(-1.0, 1.0).all()
+        assert h["gdelt_tone"].isna().any()      # NULL where uncovered, not fabricated
+
+
+# ── Step 1: economic surprise (release innovation) ────────────────────────────
+class TestSurprise:
+    def test_innovation_and_zscore(self):
+        # VARYING month-over-month innovation → defined z-score (a constant innovation has 0 variance → NaN, correctly)
+        steps = ([1, 2, 1, 3, 2, 1, 2, 3, 1, 2] * 4)[:40]
+        vals = (100 + np.cumsum(steps)).astype(float)
+        fp = pd.DataFrame({
+            "ref_date": pd.date_range("2018-01-01", periods=40, freq="MS"),
+            "publish_date": pd.date_range("2018-02-05", periods=40, freq="MS"),
+            "first_print": vals,
+        })
+        out = surprise_feed.compute_surprise(fp, "prior", zscore_window=12)
+        assert out["surprise"].dropna().iloc[-1] == pytest.approx(vals[-1] - vals[-2])  # first_print − prior
+        assert out["surprise_z"].notna().any()
+
+    def test_constant_innovation_is_nan_not_garbage(self):
+        fp = pd.DataFrame({
+            "ref_date": pd.date_range("2018-01-01", periods=30, freq="MS"),
+            "publish_date": pd.date_range("2018-02-05", periods=30, freq="MS"),
+            "first_print": [100 + i for i in range(30)],   # constant +1 innovation → zero variance
+        })
+        out = surprise_feed.compute_surprise(fp, "prior", 12)
+        assert out["surprise_z"].isna().all()              # no fabricated z on a zero-variance series
+
+    def test_no_forward_look_publish_after_ref(self):
+        # the innovation must be dated on the PUBLISH date, which is AFTER the reference period
+        fp = pd.DataFrame({
+            "ref_date": pd.to_datetime(["2026-05-01"]),
+            "publish_date": pd.to_datetime(["2026-06-05"]),   # BLS publishes May data in June
+            "first_print": [4.3],
+        })
+        out = surprise_feed.compute_surprise(fp, "prior", 12)
+        assert (pd.to_datetime(out["publish_date"]) > pd.to_datetime(out["ref_date"])).all()
+
+    def test_decay_accumulate(self):
+        cal = [f"d{i}" for i in range(11)]
+        pulse = {"d0": 2.0}                                   # single pulse at t=0
+        z = surprise_feed._decay_accumulate(cal, pulse, halflife_days=5)
+        assert z[0] == pytest.approx(2.0)
+        assert z[5] == pytest.approx(1.0, abs=0.05)           # halved after one half-life
+        assert z[-1] < z[5]                                   # keeps decaying, never re-spikes
+
+    def test_board_econ_surprise(self, con):
+        h = board_state.get_history("2023-01-01", "2024-12-31", "EURUSD", con=con)
+        assert "econ_surprise_z" in h.columns
+        assert h["econ_surprise_z"].notna().sum() >= 1
