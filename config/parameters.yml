@@ -159,7 +159,7 @@ regime_params:
 # Thresholds live here (never hardcoded). VIX regime cutoffs and the news rolling window are config.
 sentiment:
   news:
-    rolling_window_hours: 24       # rolling sentiment lookback per pair
+    rolling_window_hours: 48       # rolling sentiment lookback per pair (48h: NewsAPI Developer tier delays ~24h, so 24h window returned 0 articles)
     max_articles: 100              # NewsAPI pageSize per pair query
     # Per-pair topic queries for NewsAPI /v2/everything (OR-joined). Tunable here, not in code.
     pairs:
