@@ -92,6 +92,7 @@ def update(con=None, start: str | None = None) -> dict:
             "baseline": s["baseline"].astype(float),
             "surprise": s["surprise"].astype(float),
             "surprise_z": s["surprise_z"].astype(float),
+            "usd_sign": float(cfg.get("usd_sign", {}).get(sid, 1.0)),  # +1 default; UNRATE=-1 (inverted)
             "fetched_at": now,
         }).dropna(subset=["surprise_z"])
         rel = rel.drop_duplicates(subset=["publish_date", "series"], keep="last")
@@ -108,7 +109,10 @@ def update(con=None, start: str | None = None) -> dict:
             "SELECT DISTINCT date FROM sentiment_vix_daily WHERE date >= ? ORDER BY date", [str(start)]).fetchall()]
         if not cal:                                       # tests / no VIX yet → business days
             cal = [d.date() for d in pd.bdate_range(start, now.date())]
-        pulse = rel_all.groupby("publish_date")["surprise_z"].sum().to_dict()
+        # USD-SIGNED aggregation: a +surprise on UNRATE is USD-negative, so flip it BEFORE summing
+        # (raw-summing let PAYEMS+UNRATE cancel on jobs reports). econ_surprise_z = EWMA(Σ surprise_z·usd_sign).
+        signed = rel_all["surprise_z"] * rel_all["usd_sign"]
+        pulse = signed.groupby(rel_all["publish_date"]).sum().to_dict()
         z = _decay_accumulate(cal, pulse, float(cfg.get("ewma_halflife_days", 5)))
         daily = pd.DataFrame({"date": cal, "econ_surprise_z": z, "fetched_at": now})
         upsert(con, "sentiment_surprise_daily", daily, ["date"])

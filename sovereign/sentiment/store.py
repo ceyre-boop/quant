@@ -64,7 +64,8 @@ CREATE TABLE IF NOT EXISTS sentiment_surprise_release (
     first_print  DOUBLE,
     baseline     DOUBLE,
     surprise     DOUBLE,          -- first_print - baseline (release innovation)
-    surprise_z   DOUBLE,          -- standardized over trailing releases
+    surprise_z   DOUBLE,          -- standardized over trailing releases (RAW per-series innovation)
+    usd_sign     DOUBLE,          -- economic USD direction of a +surprise (config; UNRATE=-1, rest +1)
     fetched_at   TIMESTAMP,
     PRIMARY KEY (publish_date, series)
 );
@@ -96,6 +97,7 @@ ALTER TABLE sentiment_board_state ADD COLUMN IF NOT EXISTS gdelt_tone DOUBLE;
 ALTER TABLE sentiment_board_state ADD COLUMN IF NOT EXISTS gdelt_tone_5d DOUBLE;
 ALTER TABLE sentiment_board_state ADD COLUMN IF NOT EXISTS gdelt_volume DOUBLE;
 ALTER TABLE sentiment_board_state ADD COLUMN IF NOT EXISTS econ_surprise_z DOUBLE;
+ALTER TABLE sentiment_surprise_release ADD COLUMN IF NOT EXISTS usd_sign DOUBLE;
 """
 
 

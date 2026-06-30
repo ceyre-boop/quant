@@ -14,6 +14,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
+from config.loader import params
 from sovereign.sentiment import store, board_state, vix_feed, news_feed, macro_feed, gdelt_feed, surprise_feed
 
 NOW = datetime(2026, 6, 30, tzinfo=timezone.utc)
@@ -220,3 +221,22 @@ class TestSurprise:
         h = board_state.get_history("2023-01-01", "2024-12-31", "EURUSD", con=con)
         assert "econ_surprise_z" in h.columns
         assert h["econ_surprise_z"].notna().sum() >= 1
+
+    def test_usd_sign_map_and_no_cancellation(self):
+        # the documented sign map: UNRATE inverted, the other 5 USD-positive on a beat
+        sign = params["sentiment"]["surprise"]["usd_sign"]
+        assert sign["UNRATE"] == -1
+        assert all(sign[s] == 1 for s in ["CPIAUCSL", "CPILFESL", "PCEPILFE", "PAYEMS", "RSAFS"])
+        # the feeder aggregates surprise_z × usd_sign — verify signs + that a hot jobs report ADDS (no cancel)
+        rel = pd.DataFrame({
+            "publish_date": ["2023-02-03", "2023-02-03", "2023-01-12"],
+            "series": ["PAYEMS", "UNRATE", "UNRATE"],
+            "surprise_z": [2.0, -1.0, 2.0],   # hot jobs: payrolls +2, unemployment fell -1 | separate: unemployment rose +2
+            "usd_sign": [sign["PAYEMS"], sign["UNRATE"], sign["UNRATE"]],
+        })
+        rel["usd_z"] = rel["surprise_z"] * rel["usd_sign"]
+        assert rel.loc[0, "usd_z"] > 0                    # hot payrolls → USD-positive
+        assert rel.loc[2, "usd_z"] < 0                    # rising unemployment → USD-negative (was +ve before fix)
+        day = rel[rel["publish_date"] == "2023-02-03"]
+        assert day["usd_z"].sum() == pytest.approx(3.0)   # +2 (payrolls) + +1 (unemployment fell) — constructive
+        assert day["surprise_z"].sum() == pytest.approx(1.0)  # raw sum cancels to +1 — the bug we fixed

@@ -198,3 +198,13 @@ sentiment:
     zscore_window: 36             # trailing releases for standardization
     ewma_halflife_days: 5         # daily decay of the surprise pulse into econ_surprise_z
     start: '2015-01-01'
+    # USD economic sign of a POSITIVE surprise per series — applied BEFORE the daily sum so a positive
+    # econ_surprise_z is a clean USD-positive shock. UNRATE is INVERTED (higher unemployment ⇒ dovish Fed
+    # ⇒ USD down). Documented here so it can't silently flip; a series absent from this map defaults +1.
+    usd_sign:
+      CPIAUCSL:  1    # headline CPI — hot inflation ⇒ hawkish ⇒ USD+
+      CPILFESL:  1    # core CPI
+      PCEPILFE:  1    # core PCE
+      PAYEMS:    1    # nonfarm payrolls — hot jobs ⇒ USD+
+      RSAFS:     1    # retail sales — hot consumer ⇒ USD+
+      UNRATE:   -1    # unemployment rate — higher ⇒ weak labor ⇒ dovish ⇒ USD-
