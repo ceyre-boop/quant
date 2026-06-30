@@ -22,7 +22,13 @@ sys.path.insert(0, str(ROOT))
 from dotenv import load_dotenv
 load_dotenv(ROOT / ".env")  # MUST be before agent_scheduler import so os.environ is populated
 
-from scripts.agent_scheduler import run_health_check  # noqa: E402  (after dotenv)
+# agent_scheduler.py was moved to archive/ (the live 2h pulse now only patches the
+# oracle_pulse component). Its full 18-component run_health_check is still the canonical
+# component-health builder the dashboard needs, so import it from archive/ until it is
+# relocated to a live module. TODO(NEXT.md): restore run_health_check to a live home so
+# health.json's API components stop going stale between manual syncs.
+sys.path.insert(0, str(ROOT / "archive"))
+from agent_scheduler import run_health_check  # noqa: E402  (after dotenv, from archive/)
 
 
 def _sync_health() -> dict:

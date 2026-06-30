@@ -168,9 +168,9 @@ negative); the ICT pattern edge is NOT proven (permutation p=0.52).
 **Impact:** v014 → portfolio avg Sharpe 2.097 (uncosted/mis-annualized; honest fully-costed OOS is 0.76).
 ⚠️ This lesson did NOT validate out-of-sample — candidate for retirement, not active reliance.
 **Code location:** `sovereign/forex/forex_backtester.py` `PAIR_VIX_GATES`; `sovereign/forex/signal_engine.py` `_VIX_GATES`
-**Health:** 🟢 ACTIVE — UNTESTABLE_EXIT (exit rule + n=46/39 too small)
-**Last validated:** 2026-05-27 (retest when n >= 100 per pair via backtester sweep)
-**Linked hypothesis:** HYP-044
+**Health:** ⚪ RETIRED 2026-06-30 — failed out-of-sample. HYP-044 REJECTED_OOS (bootstrap p=0.50, delta 0.000 on the 2023-24 holdout); the "+0.242" was in-sample noise. Code already rolled back to VIX 15.0 (commit 6cebecef) — the 15→13 gate is NOT live and must not be relied on. Retest only if n≥100/pair on a clean, non-yfinance-drift data source.
+**Last validated:** 2026-05-27 (retest when n >= 100 per pair via backtester sweep) — superseded by 2026-05-31 OOS rejection
+**Linked hypothesis:** HYP-044 (REJECTED_OOS)
 
 *The lesson:* USDJPY is the world's most liquid safe-haven trade. When global equities are rising and VIX is above 13, two signals compete: the macro rate differential says one thing, and the safe-haven flow says another. Between VIX 13 and 15, the safe-haven bid corrupts the rate signal but is not obvious enough to detect from price alone. Lowering the veto threshold removes the confused regime — leaving only trades where the rate differential speaks clearly. AUDNZD: both AUD and NZD are risk currencies, and the cross rate loses its macro signal in any moderately elevated risk environment.
 
