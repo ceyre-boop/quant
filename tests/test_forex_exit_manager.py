@@ -221,3 +221,38 @@ def test_live_toggle_executes_same_decision(tmp_path):
 
 def test_module_default_is_shadow():
     assert mgr.SHADOW_MODE is True, "the committed default MUST be shadow"
+
+
+# ─── idempotency: a same-day double-fire must NOT double-step state or re-write the broker ─────────
+
+def _long_trade_amending(date, close):
+    """A long EUR_USD trade + a favorable bar whose ATR-trail ratchets → AMEND_STOP (a live write)."""
+    open_trades = [{"id": "77", "instrument": "EUR_USD", "currentUnits": "10000",
+                    "price": "1.10000", "openTime": "2026-06-01T00:00:00Z"}]
+    bar = MarketBar(pair="EUR_USD", date=date, close=close, atr_pct=0.01, signal=1, hold_today=60)
+    return open_trades, _StubProvider(atr=0.01, bar=bar)
+
+
+def test_idempotency_guard_blocks_same_day_double_step(tmp_path):
+    state_p, log_p = tmp_path / "state.json", tmp_path / "shadow.jsonl"
+    init_state_file(state_p)
+    open_trades, provider = _long_trade_amending("2026-06-26", 1.12000)
+    spy = _SpyBridge(open_trades)
+
+    # First run: steps once, the trail ratchets → exactly one live set_stop.
+    e1 = run_daily(spy, provider, shadow=False, state_path=state_p, shadow_log_path=log_p)
+    assert e1[0]["action"] == "AMEND_STOP"
+    assert len(spy.set_stop_calls) == 1
+    hc1 = load_state(state_p)["trades"]["77"]["hold_count"]
+
+    # Second run, SAME bar_date: the guard must skip — no state advance, no extra broker write.
+    e2 = run_daily(spy, provider, shadow=False, state_path=state_p, shadow_log_path=log_p)
+    assert e2[0]["action"] == "SKIP_DUPLICATE"
+    assert len(spy.set_stop_calls) == 1, "duplicate same-day run must NOT re-amend the live stop"
+    assert load_state(state_p)["trades"]["77"]["hold_count"] == hc1, "hold_count advanced on a duplicate run"
+
+    # A genuinely new bar_date steps again — the guard is per-bar, not a permanent freeze.
+    _, provider2 = _long_trade_amending("2026-06-29", 1.14000)
+    e3 = run_daily(spy, provider2, shadow=False, state_path=state_p, shadow_log_path=log_p)
+    assert e3[0]["action"] != "SKIP_DUPLICATE"
+    assert load_state(state_p)["trades"]["77"]["hold_count"] == hc1 + 1

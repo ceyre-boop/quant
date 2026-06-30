@@ -344,6 +344,14 @@ def run_daily(
     open_trades = bridge.get_open_trades()
     state = reconcile(state, open_trades, provider)
 
+    # ── Idempotency guard: remember the last bar_date stepped per trade, so a manual run colliding
+    #    with the scheduled run can't double-step state (double-trail / double-amend a live stop).
+    #    Lives in the top-level state dict only — TradeState and the parity core stay untouched. ──
+    processed = state.setdefault("processed", {})
+    open_ids = {str(t.get("id") or t.get("tradeID")) for t in open_trades}
+    for stale in [t for t in processed if t not in open_ids]:
+        processed.pop(stale)
+
     run_ts = datetime.now(timezone.utc).isoformat()
     log_entries: list[dict] = []
 
@@ -364,8 +372,23 @@ def run_daily(
             logger.warning("[exit_manager] %s: market data unavailable — skipped (%s)", tid, exc)
             continue
 
+        if processed.get(tid) == bar.date:
+            # Already stepped this trade for this bar on an earlier run today — do NOT re-step
+            # (no state advance, no broker write). Guards shadow AND live alike.
+            entry = {
+                "run_ts": run_ts, "mode": "SHADOW" if shadow else "LIVE", "trade_id": tid,
+                "pair": ts.pair, "bar_date": bar.date, "action": "SKIP_DUPLICATE",
+                "reason": f"bar {bar.date} already processed for this trade — idempotency guard",
+            }
+            log_entries.append(entry)
+            _write_shadow_log(entry, shadow_log_path)
+            logger.info("[exit_manager] %s: bar %s already processed — skipped (idempotency guard)",
+                        tid, bar.date)
+            continue
+
         res = step_trade(ts, bar, cfg)
         state["trades"][tid] = res.new_state.to_dict()
+        processed[tid] = bar.date
 
         entry = {
             "run_ts": run_ts,
