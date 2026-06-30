@@ -30,6 +30,7 @@ from __future__ import annotations
 
 import json
 import logging
+import time
 from dataclasses import dataclass
 from datetime import timedelta
 from pathlib import Path
@@ -692,15 +693,28 @@ class ForexEntryEngine:
     # ── Data ──────────────────────────────────────────────────────────── #
 
     @staticmethod
-    def _download(pair: str, interval: str, period: str) -> Optional[pd.DataFrame]:
-        try:
-            df = yf.download(pair, period=period, interval=interval,
-                             progress=False, auto_adjust=True)
-            if df.empty:
-                return None
-            if isinstance(df.columns, pd.MultiIndex):
-                df.columns = df.columns.get_level_values(0)
-            return df.dropna()
-        except Exception as e:
-            logger.warning(f"Download failed {pair} {interval}: {e}")
-            return None
+    def _download(pair: str, interval: str, period: str,
+                  retries: int = 3) -> Optional[pd.DataFrame]:
+        # Yahoo intermittently returns an empty frame ("possibly delisted;
+        # no price data") under transient rate-limiting — this is not a real
+        # delisting (e.g. AUDUSD=X). Retry briefly before treating it as a drop
+        # so a valid pair isn't silently lost from the scan universe.
+        for attempt in range(retries):
+            try:
+                df = yf.download(pair, period=period, interval=interval,
+                                 progress=False, auto_adjust=True)
+                if not df.empty:
+                    if isinstance(df.columns, pd.MultiIndex):
+                        df.columns = df.columns.get_level_values(0)
+                    return df.dropna()
+            except Exception as e:
+                logger.warning(f"Download failed {pair} {interval} "
+                               f"(attempt {attempt + 1}/{retries}): {e}")
+            if attempt < retries - 1:
+                time.sleep(1.5 * (attempt + 1))
+        # Graceful degradation: explicit warning so the drop is never silent.
+        logger.warning(
+            f"Download dropped {pair} {interval}: empty after {retries} "
+            f"attempts (Yahoo transient empty / rate-limit). Excluded this scan."
+        )
+        return None
