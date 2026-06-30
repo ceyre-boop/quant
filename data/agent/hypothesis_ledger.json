@@ -1461,5 +1461,30 @@
     "bh_survives": false,
     "standalone": true,
     "auto_generated": false
+  },
+  {
+    "id": "SENTIMENT-COT-POSITIONING",
+    "name": "COT large-spec extreme positioning -> contrarian forward FX move (weekly/swing horizon)",
+    "status": "NOT_SIGNIFICANT",
+    "date_tested": "2026-06-30",
+    "source": "diagnostic",
+    "validator": "manual de-overlapped read (NOT pre-registered) on sentiment board cot_net_pct",
+    "mechanism": "CFTC COT large-spec (non-comm) NET positioning, trailing-3yr percentile (cot_net_pct), Friday-publish-dated (no look-ahead, commit 85eb56b). Tested CONTRARIAN fade of extreme positioning (>0.8 / <0.2 crossings) -> forward move per pair at 5/10/20 trading days, USD-signed (USDJPY inverse verified), on DE-OVERLAPPED distinct crossing events. STRATEGIC QUESTION: is this an edge UNCORRELATED with carry that could raise blended Calmar (carry's ~1.07 too thin for a 10/10 prop cap)? ANSWER: no on both clauses.",
+    "result": {
+      "finding": "No significant contrarian edge AND positively correlated with carry. Distinct extreme-crossing events: EURUSD 24 (12hi/12lo), GBPUSD 27, AUDUSD 36, USDJPY 40 (real N per pair, not the ~23-32% of weeks at extreme). Forward tables: EVERY cell p>0.13. 40-60th baseline a clean ~50% (51/46/50/48). Only whisper EURUSD 10d 67% +0.27% / 20d 67% +0.64% (p=0.15, N=24); ex-2020 10d 68% p=0.13; 5d 42% wrong-way. GBPUSD 10d 37% (fades wrong way); AUDUSD/USDJPY ~50%.",
+      "distinct_events_N": {"EURUSD": 24, "GBPUSD": 27, "AUDUSD": 36, "USDJPY": 40},
+      "best_cell": "EURUSD 20d: hit 67%, median +0.64%, p=0.15, N=24 (NOT significant)",
+      "correlation_to_carry": "daily-return corr +0.09 all days / +0.18 both-active (n=686); position agreement EUR 58% GBP 54% AUD 41% JPY 46% (whisper pairs AGREE with carry); carry drawdown when COT-active -2.90% vs -3.17% all days (COT fires when carry is HEALTHY, not in pain); COT contrarian standalone daily Sharpe -0.14 vs carry +0.92.",
+      "interpretation": "COT large-spec extremes COINCIDE with the carry trade (large specs ARE the carry crowd), they don't oppose it -> no uncorrelated second edge. Fails BOTH clauses of the pre-register gate (directional edge AND uncorrelated-with-carry). Does NOT provide the diversifying leg the prop-firm Calmar math needed.",
+      "de_overlap_standard": "One observation per distinct >0.8/<0.2 crossing (NOT per extreme week); binomial null at the REAL N; median primary; full AND ex-2020.",
+      "infrastructure": "KEPT -- cot_net_pct/cot_net_oi board features are correct + committed (85eb56b, Friday-publish no-look-ahead); available as one input in a future multi-feature board."
+    },
+    "action": "KEEP_INFRASTRUCTURE -- no standalone or diversifying signal; do NOT build a model on it alone and do NOT treat as a carry diversifier. Re-test only as one input in a multi-feature board.",
+    "oos_sharpe": null,
+    "is_sharpe": null,
+    "p_value": 0.15,
+    "bh_survives": false,
+    "standalone": true,
+    "auto_generated": false
   }
 ]
