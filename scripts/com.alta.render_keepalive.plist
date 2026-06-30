@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key><string>com.alta.render_keepalive</string>
+    <!-- Pings the Render free-tier backend (sovereign-quant-dashboard) /health
+         every 10 min so it never idles into a ~15min spin-down. Kills the
+         30-60s cold-start "Loading…" on the public dashboard. Long-lived
+         daemon: the script loops internally; RunAtLoad starts it and
+         StartInterval relaunches it if it ever exits. -->
+    <key>ProgramArguments</key>
+    <array>
+        <string>/opt/homebrew/bin/python3</string>
+        <string>/Users/taboost/quant/scripts/keep_alive_render.py</string>
+    </array>
+    <key>WorkingDirectory</key><string>/Users/taboost/quant</string>
+    <key>StartInterval</key><integer>600</integer>
+    <key>RunAtLoad</key><true/>
+    <key>Disabled</key><false/>
+    <key>StandardOutPath</key><string>/tmp/render_keepalive.log</string>
+    <key>StandardErrorPath</key><string>/tmp/render_keepalive.err</string>
+    <key>EnvironmentVariables</key><dict><key>PATH</key><string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string></dict>
+</dict>
+</plist>
