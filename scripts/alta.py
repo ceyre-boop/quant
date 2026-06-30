@@ -75,6 +75,30 @@ def cmd_prove(args) -> None:
     raise SystemExit(subprocess.run(cmd, check=False).returncode)
 
 
+def cmd_exit_policy_evolution(args) -> None:
+    """Run the HYP-067 evolutionary exit-policy search (scripts/research/exit_policy_evolution.py)."""
+    cmd = [sys.executable, str(ROOT / "scripts" / "research" / "exit_policy_evolution.py")]
+    if args.sign:
+        cmd += ["--sign"]
+    if args.standalone:
+        cmd += ["--standalone"]
+    if args.pop is not None:
+        cmd += ["--pop", str(args.pop)]
+    if args.generations is not None:
+        cmd += ["--generations", str(args.generations)]
+    if args.perms is not None:
+        cmd += ["--perms", str(args.perms)]
+    raise SystemExit(subprocess.run(cmd, check=False).returncode)
+
+
+def cmd_hyp_071_exit_value(args) -> None:
+    """Run the HYP-071 tabular exit value function (scripts/research/hyp_071_exit_value_function.py)."""
+    cmd = [sys.executable, str(ROOT / "scripts" / "research" / "hyp_071_exit_value_function.py")]
+    if getattr(args, "standalone", False):
+        cmd += ["--standalone"]
+    raise SystemExit(subprocess.run(cmd, check=False).returncode)
+
+
 def _read_jsonl(p: Path) -> list:
     if not p.exists():
         return []
@@ -190,9 +214,17 @@ def cmd_validate(args) -> None:
     raise SystemExit(subprocess.run(cmd, check=False).returncode)
 
 
+def cmd_bench(args) -> None:
+    cmd = [sys.executable, str(ROOT / "scripts" / "bench_throughput.py"),
+           "--seconds", str(args.seconds), "--tiers", args.tiers]
+    if args.cores:
+        cmd += ["--cores", str(args.cores)]
+    raise SystemExit(subprocess.run(cmd, check=False).returncode)
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(
-        prog="alta", description="Alta operator CLI — proof, money, health, discover, validate, kill switch.")
+        prog="alta", description="Alta operator CLI — proof, money, health, discover, validate, bench, kill switch.")
     sub = ap.add_subparsers(dest="cmd", required=True)
 
     pv = sub.add_parser("prove", help="run the backtest proof engine (equity curve + verdict)")
@@ -219,6 +251,20 @@ def main() -> None:
     vd.add_argument("--drift-compare", action="store_true", help="24h drift test vs last snapshot")
     vd.set_defaults(fn=cmd_validate)
 
+    ev = sub.add_parser("exit-policy-evolution",
+                        help="HYP-067 GA exit-policy search (gated on HYP-066; --standalone to override)")
+    ev.add_argument("--sign", action="store_true", help="freeze the prereg hash (run once)")
+    ev.add_argument("--standalone", action="store_true", help="run as independent HYP-067")
+    ev.add_argument("--pop", type=int, default=None, help="GA population size")
+    ev.add_argument("--generations", type=int, default=None, help="GA generations")
+    ev.add_argument("--perms", type=int, default=None, help="holdout permutations")
+    ev.set_defaults(fn=cmd_exit_policy_evolution)
+
+    hv = sub.add_parser("hyp-071",
+                        help="HYP-071 tabular exit value function (reconcile-gated; independent study)")
+    hv.add_argument("--standalone", action="store_true", help="(HYP-071 is independent; kept for symmetry)")
+    hv.set_defaults(fn=cmd_hyp_071_exit_value)
+
     f = sub.add_parser("freeze", help="freeze the trading path")
     f.add_argument("reason", help="why (logged to data/agent/param_change_log.jsonl)")
     f.add_argument("--hard", action="store_true",
@@ -232,6 +278,12 @@ def main() -> None:
 
     s = sub.add_parser("status", help="show freeze state")
     s.set_defaults(fn=cmd_status)
+
+    bn = sub.add_parser("bench", help="measure backtest throughput (backtests/sec) — documented + history-tracked")
+    bn.add_argument("--seconds", type=float, default=1.5, help="time budget per measurement cell")
+    bn.add_argument("--tiers", default="90bar,daily,5min,1min")
+    bn.add_argument("--cores", type=int, default=None)
+    bn.set_defaults(fn=cmd_bench)
 
     args = ap.parse_args()
     args.fn(args)

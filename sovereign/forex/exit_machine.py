@@ -14,6 +14,8 @@ import math
 from dataclasses import dataclass
 from enum import IntEnum
 
+import numpy as np
+
 
 class ExitDecision(IntEnum):
     """Member values EQUAL fast_backtester.EXIT_REASON_* so `int(decision)` feeds the reasons array
@@ -115,3 +117,65 @@ def decide_exit(state: PositionState, bar: BarContext, cfg: ExitConfig) -> ExitR
     reentry_signal = bar.signal if (reversal or cb_refresh) and bar.signal != 0 else 0
     new_state = PositionState(direction, state.stop_price, best_price, worst_price, hold_count, state.hold_limit)
     return ExitResult(decision, new_state, reentry_signal)
+
+
+def decide_exit_vec(
+    direction, stop_price, best_price, worst_price, hold_count, hold_limit,
+    close, atr_pct, signal, hold_today, donchian_exit_low, cfg: ExitConfig,
+):
+    """Vectorized BYTE-IDENTICAL port of `decide_exit` over N independent positions stepping one bar.
+
+    Every input is a length-N array (`direction`/`hold_count`/`hold_limit`/`signal`/`hold_today` integer,
+    the rest float); `cfg` is a single ExitConfig shared across the batch. Returns
+    `(decision, best_price, worst_price, hold_count, reentry_signal)` as length-N arrays — the same
+    quantities the scalar returns, computed with identical arithmetic and the identical priority order.
+
+    This exists ONLY for speed (stepping 10k rollouts in lockstep). It is gated by
+    tests/test_exit_machine.py::test_decide_exit_vec_parity, which fuzzes it against the scalar; the
+    scalar `decide_exit` remains the single source of truth for the re-trace / parity path. If parity
+    ever breaks, callers must fall back to the scalar.
+    """
+    direction = np.asarray(direction, dtype=np.int64)
+    stop_price = np.asarray(stop_price, dtype=np.float64)
+    best_price = np.maximum(np.asarray(best_price, dtype=np.float64), close)
+    worst_price = np.minimum(np.asarray(worst_price, dtype=np.float64), close)
+    hold_count = np.asarray(hold_count, dtype=np.int64) + 1
+    hold_limit = np.asarray(hold_limit, dtype=np.int64)
+    price = np.asarray(close, dtype=np.float64)
+    atr_pct_now = np.maximum(np.asarray(atr_pct, dtype=np.float64), 1e-6)
+    signal = np.asarray(signal, dtype=np.int64)
+    hold_today = np.asarray(hold_today, dtype=np.int64)
+    donchian_exit_low = np.asarray(donchian_exit_low, dtype=np.float64)
+    n = price.shape[0]
+    is_long = direction == 1
+
+    trail_hit = np.zeros(n, dtype=bool)
+    if cfg.trailing_atr_mult > 0:
+        trail_stop_long = best_price - (cfg.trailing_atr_mult * atr_pct_now * best_price)
+        trail_stop_short = worst_price + (cfg.trailing_atr_mult * atr_pct_now * worst_price)
+        trail_hit = np.where(is_long, price <= trail_stop_long, price >= trail_stop_short)
+
+    donchian_hit = np.zeros(n, dtype=bool)
+    if cfg.strict_mode:
+        donchian_hit = is_long & ~np.isnan(donchian_exit_low) & (price < donchian_exit_low)
+
+    stop_hit = np.where(is_long, price <= stop_price, price >= stop_price)
+    reversal = (signal != 0) & (signal != direction)
+    time_exit = (hold_count >= hold_limit) if not cfg.strict_mode else np.zeros(n, dtype=bool)
+    if cfg.enable_cb_refresh:
+        cb_refresh = (signal == direction) & (hold_today < 30) & (hold_count >= 20)
+    else:
+        cb_refresh = np.zeros(n, dtype=bool)
+
+    # Priority: stop > trail > donchian > reversal > cb_refresh > time > HOLD.
+    # Assign lowest-priority first so higher priority overwrites (mirrors the scalar elif chain).
+    decision = np.full(n, int(ExitDecision.HOLD), dtype=np.int64)
+    decision = np.where(time_exit, int(ExitDecision.TIME), decision)
+    decision = np.where(cb_refresh, int(ExitDecision.CB_REFRESH), decision)
+    decision = np.where(reversal, int(ExitDecision.REVERSAL), decision)
+    decision = np.where(donchian_hit, int(ExitDecision.DONCHIAN), decision)
+    decision = np.where(trail_hit, int(ExitDecision.TRAILING_ATR), decision)
+    decision = np.where(stop_hit, int(ExitDecision.INITIAL_STOP), decision)
+
+    reentry_signal = np.where((reversal | cb_refresh) & (signal != 0), signal, 0)
+    return decision, best_price, worst_price, hold_count, reentry_signal

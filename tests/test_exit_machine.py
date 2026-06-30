@@ -13,7 +13,7 @@ import numpy as np
 import pytest
 
 from sovereign.forex.exit_machine import (
-    BarContext, ExitConfig, ExitDecision, PositionState, decide_exit,
+    BarContext, ExitConfig, ExitDecision, PositionState, decide_exit, decide_exit_vec,
 )
 from sovereign.forex.fast_backtester import _simulate_forex_core
 
@@ -123,3 +123,56 @@ def test_enum_values_match_reason_constants():
     assert int(ExitDecision.TIME) == fb.EXIT_REASON_TIME
     assert int(ExitDecision.TRAILING_ATR) == fb.EXIT_REASON_TRAILING
     assert int(ExitDecision.DONCHIAN) == fb.EXIT_REASON_DONCHIAN
+
+
+# ─── parity-gate for the vectorized kernel (HYP-071 Step 2) ─────────────────────
+
+def test_decide_exit_vec_parity():
+    """decide_exit_vec must be byte-identical to scalar decide_exit across a large random battery,
+    on decision AND advanced (best, worst, hold_count) AND reentry_signal, for both directions and all
+    four cfg toggles. If this fails, the vec kernel is disabled and rollouts fall back to scalar."""
+    rng = np.random.default_rng(20260630)
+    n = 200_000
+    direction = rng.choice([-1, 1], size=n)
+    # prices around 1.0 so stop/trail crossings actually happen across the battery
+    close = rng.uniform(0.80, 1.20, size=n)
+    stop = rng.uniform(0.80, 1.20, size=n)
+    best = rng.uniform(0.90, 1.20, size=n)
+    worst = rng.uniform(0.80, 1.10, size=n)
+    atr = rng.uniform(0.0, 0.03, size=n)            # includes 0 → exercises the 1e-6 floor
+    signal = rng.choice([-1, 0, 1], size=n)
+    hold_today = rng.integers(0, 70, size=n)
+    hold_count = rng.integers(0, 65, size=n)
+    hold_limit = rng.integers(1, 61, size=n)
+    donch = np.where(rng.random(n) < 0.5, rng.uniform(0.80, 1.20, size=n), np.nan)
+
+    for cfg in (
+        ExitConfig(2.0, 1.25, False, True),   # canonical v015
+        ExitConfig(2.0, 1.25, True, True),    # strict → donchian + no time exit
+        ExitConfig(2.0, 0.0, False, False),   # no trail, no cb_refresh
+        ExitConfig(2.0, 2.0, False, True),    # GBP-style trail
+    ):
+        dec_v, best_v, worst_v, hc_v, re_v = decide_exit_vec(
+            direction, stop, best, worst, hold_count, hold_limit,
+            close, atr, signal, hold_today, donch, cfg,
+        )
+        # scalar reference, element by element
+        dec_s = np.empty(n, dtype=np.int64)
+        best_s = np.empty(n); worst_s = np.empty(n); hc_s = np.empty(n, dtype=np.int64); re_s = np.empty(n, dtype=np.int64)
+        for i in range(n):
+            r = decide_exit(
+                PositionState(int(direction[i]), float(stop[i]), float(best[i]), float(worst[i]),
+                              int(hold_count[i]), int(hold_limit[i])),
+                BarContext(float(close[i]), float(atr[i]), int(signal[i]), int(hold_today[i]), float(donch[i])),
+                cfg,
+            )
+            dec_s[i] = int(r.decision)
+            best_s[i] = r.state.best_price
+            worst_s[i] = r.state.worst_price
+            hc_s[i] = r.state.hold_count
+            re_s[i] = r.reentry_signal
+        np.testing.assert_array_equal(dec_v, dec_s)
+        np.testing.assert_array_equal(best_v, best_s)
+        np.testing.assert_array_equal(worst_v, worst_s)
+        np.testing.assert_array_equal(hc_v, hc_s)
+        np.testing.assert_array_equal(re_v, re_s)

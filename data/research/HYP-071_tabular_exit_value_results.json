@@ -1,0 +1,2414 @@
+{
+  "id": "HYP-071",
+  "prereg_hash": "3d500bda3249c4615698ce311a7cbad41a35600a23abd2a4ea4526416eac06a4",
+  "addendum_hash": "c1fab80730f1ebf3af7c35e4bbd8fc80e2bafd86419fc0125acc140b414d806f",
+  "verdict": "PASS",
+  "verdict_status": "PROVISIONAL \u2014 read with Colin against the locked \u00a77 gate",
+  "reconcile_weighted_sharpe": 0.6886,
+  "block_length_L": 5,
+  "n_continuations": 10000,
+  "pct_window": 60,
+  "lambda": 0.5,
+  "parity": {
+    "n": 458,
+    "matched": 458,
+    "dropped": 0,
+    "match_rate": 1.0
+  },
+  "n_members": {
+    "decade": 2111,
+    "forward": 242
+  },
+  "cells": {
+    "0": {
+      "evaluated": true,
+      "coords": {
+        "atr_tercile": "low",
+        "excursion": "underwater",
+        "hold_frac": "early",
+        "rsi_extreme": false,
+        "carry": "aligned"
+      },
+      "n_members": 132,
+      "V_hold": -0.50847,
+      "V_exit": -0.30939,
+      "E_hold": -0.18821,
+      "DD_hold": 0.64051,
+      "margin": -0.19908,
+      "optimal_action": "EXIT_NOW",
+      "static_action": "HOLD_AND_TRAIL",
+      "agree_with_static": false,
+      "cpcv": {
+        "sign_stable": true,
+        "stability_fraction": 1.0,
+        "signs": [
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1
+        ],
+        "status": "OK"
+      },
+      "economically_sensible": false,
+      "forward": {
+        "oos_2023_24": "EXIT_NOW",
+        "forward_2025_26": "EXIT_NOW",
+        "agree": true
+      },
+      "per_regime": {
+        "hiking": "EXIT_NOW",
+        "cutting": "EXIT_NOW"
+      },
+      "regime_window_252": "EXIT_NOW",
+      "signal_frozen_action": "EXIT_NOW"
+    },
+    "1": {
+      "evaluated": false,
+      "reason": "carry not-aligned \u2192 REVERSAL / N/A"
+    },
+    "2": {
+      "evaluated": true,
+      "coords": {
+        "atr_tercile": "low",
+        "excursion": "underwater",
+        "hold_frac": "early",
+        "rsi_extreme": true,
+        "carry": "aligned"
+      },
+      "n_members": 2,
+      "V_hold": -0.22902,
+      "V_exit": -0.02057,
+      "E_hold": 0.05025,
+      "DD_hold": 0.55855,
+      "margin": -0.20845,
+      "optimal_action": "EXIT_NOW",
+      "static_action": "HOLD_AND_TRAIL",
+      "agree_with_static": false,
+      "cpcv": {
+        "sign_stable": false,
+        "stability_fraction": null,
+        "signs": [],
+        "status": "CPCV_INSUFFICIENT"
+      },
+      "economically_sensible": false,
+      "forward": {
+        "oos_2023_24": null,
+        "forward_2025_26": null,
+        "agree": false
+      },
+      "per_regime": {
+        "hiking": null,
+        "cutting": null
+      },
+      "regime_window_252": "EXIT_NOW",
+      "signal_frozen_action": "EXIT_NOW"
+    },
+    "3": {
+      "evaluated": false,
+      "reason": "carry not-aligned \u2192 REVERSAL / N/A"
+    },
+    "4": {
+      "evaluated": true,
+      "coords": {
+        "atr_tercile": "low",
+        "excursion": "underwater",
+        "hold_frac": "mid",
+        "rsi_extreme": false,
+        "carry": "aligned"
+      },
+      "n_members": 109,
+      "V_hold": -0.474,
+      "V_exit": -0.34996,
+      "E_hold": -0.21436,
+      "DD_hold": 0.51928,
+      "margin": -0.12404,
+      "optimal_action": "EXIT_NOW",
+      "static_action": "HOLD_AND_TRAIL",
+      "agree_with_static": false,
+      "cpcv": {
+        "sign_stable": true,
+        "stability_fraction": 1.0,
+        "signs": [
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1
+        ],
+        "status": "OK"
+      },
+      "economically_sensible": false,
+      "forward": {
+        "oos_2023_24": "EXIT_NOW",
+        "forward_2025_26": "EXIT_NOW",
+        "agree": true
+      },
+      "per_regime": {
+        "hiking": "EXIT_NOW",
+        "cutting": "EXIT_NOW"
+      },
+      "regime_window_252": "EXIT_NOW",
+      "signal_frozen_action": "EXIT_NOW"
+    },
+    "5": {
+      "evaluated": false,
+      "reason": "carry not-aligned \u2192 REVERSAL / N/A"
+    },
+    "6": {
+      "evaluated": true,
+      "n_members": 0,
+      "note": "no members"
+    },
+    "7": {
+      "evaluated": false,
+      "reason": "carry not-aligned \u2192 REVERSAL / N/A"
+    },
+    "8": {
+      "evaluated": true,
+      "coords": {
+        "atr_tercile": "low",
+        "excursion": "underwater",
+        "hold_frac": "late",
+        "rsi_extreme": false,
+        "carry": "aligned"
+      },
+      "n_members": 39,
+      "V_hold": -0.41269,
+      "V_exit": -0.35821,
+      "E_hold": -0.22225,
+      "DD_hold": 0.38088,
+      "margin": -0.05448,
+      "optimal_action": "EXIT_NOW",
+      "static_action": "HOLD_AND_TRAIL",
+      "agree_with_static": false,
+      "cpcv": {
+        "sign_stable": true,
+        "stability_fraction": 1.0,
+        "signs": [
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1
+        ],
+        "status": "OK"
+      },
+      "economically_sensible": true,
+      "forward": {
+        "oos_2023_24": "EXIT_NOW",
+        "forward_2025_26": "EXIT_NOW",
+        "agree": true
+      },
+      "per_regime": {
+        "hiking": "EXIT_NOW",
+        "cutting": "EXIT_NOW"
+      },
+      "regime_window_252": "EXIT_NOW",
+      "signal_frozen_action": "EXIT_NOW"
+    },
+    "9": {
+      "evaluated": false,
+      "reason": "carry not-aligned \u2192 REVERSAL / N/A"
+    },
+    "10": {
+      "evaluated": true,
+      "n_members": 0,
+      "note": "no members"
+    },
+    "11": {
+      "evaluated": false,
+      "reason": "carry not-aligned \u2192 REVERSAL / N/A"
+    },
+    "12": {
+      "evaluated": true,
+      "coords": {
+        "atr_tercile": "low",
+        "excursion": "modest",
+        "hold_frac": "early",
+        "rsi_extreme": false,
+        "carry": "aligned"
+      },
+      "n_members": 221,
+      "V_hold": 0.06414,
+      "V_exit": 0.23079,
+      "E_hold": 0.26776,
+      "DD_hold": 0.40725,
+      "margin": -0.16664,
+      "optimal_action": "EXIT_NOW",
+      "static_action": "HOLD_AND_TRAIL",
+      "agree_with_static": false,
+      "cpcv": {
+        "sign_stable": true,
+        "stability_fraction": 1.0,
+        "signs": [
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1
+        ],
+        "status": "OK"
+      },
+      "economically_sensible": false,
+      "forward": {
+        "oos_2023_24": "EXIT_NOW",
+        "forward_2025_26": "EXIT_NOW",
+        "agree": true
+      },
+      "per_regime": {
+        "hiking": "EXIT_NOW",
+        "cutting": "EXIT_NOW"
+      },
+      "regime_window_252": "EXIT_NOW",
+      "signal_frozen_action": "EXIT_NOW"
+    },
+    "13": {
+      "evaluated": false,
+      "reason": "carry not-aligned \u2192 REVERSAL / N/A"
+    },
+    "14": {
+      "evaluated": true,
+      "coords": {
+        "atr_tercile": "low",
+        "excursion": "modest",
+        "hold_frac": "early",
+        "rsi_extreme": true,
+        "carry": "aligned"
+      },
+      "n_members": 2,
+      "V_hold": 0.07723,
+      "V_exit": 0.22537,
+      "E_hold": 0.30111,
+      "DD_hold": 0.44776,
+      "margin": -0.14814,
+      "optimal_action": "EXIT_NOW",
+      "static_action": "HOLD_AND_TRAIL",
+      "agree_with_static": false,
+      "cpcv": {
+        "sign_stable": false,
+        "stability_fraction": null,
+        "signs": [],
+        "status": "CPCV_INSUFFICIENT"
+      },
+      "economically_sensible": false,
+      "forward": {
+        "oos_2023_24": null,
+        "forward_2025_26": null,
+        "agree": false
+      },
+      "per_regime": {
+        "hiking": null,
+        "cutting": null
+      },
+      "regime_window_252": "EXIT_NOW",
+      "signal_frozen_action": "EXIT_NOW"
+    },
+    "15": {
+      "evaluated": false,
+      "reason": "carry not-aligned \u2192 REVERSAL / N/A"
+    },
+    "16": {
+      "evaluated": true,
+      "coords": {
+        "atr_tercile": "low",
+        "excursion": "modest",
+        "hold_frac": "mid",
+        "rsi_extreme": false,
+        "carry": "aligned"
+      },
+      "n_members": 144,
+      "V_hold": 0.26197,
+      "V_exit": 0.38402,
+      "E_hold": 0.38939,
+      "DD_hold": 0.25485,
+      "margin": -0.12205,
+      "optimal_action": "EXIT_NOW",
+      "static_action": "HOLD_AND_TRAIL",
+      "agree_with_static": false,
+      "cpcv": {
+        "sign_stable": true,
+        "stability_fraction": 1.0,
+        "signs": [
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1
+        ],
+        "status": "OK"
+      },
+      "economically_sensible": false,
+      "forward": {
+        "oos_2023_24": "EXIT_NOW",
+        "forward_2025_26": "EXIT_NOW",
+        "agree": true
+      },
+      "per_regime": {
+        "hiking": "EXIT_NOW",
+        "cutting": "EXIT_NOW"
+      },
+      "regime_window_252": "EXIT_NOW",
+      "signal_frozen_action": "EXIT_NOW"
+    },
+    "17": {
+      "evaluated": false,
+      "reason": "carry not-aligned \u2192 REVERSAL / N/A"
+    },
+    "18": {
+      "evaluated": true,
+      "coords": {
+        "atr_tercile": "low",
+        "excursion": "modest",
+        "hold_frac": "mid",
+        "rsi_extreme": true,
+        "carry": "aligned"
+      },
+      "n_members": 6,
+      "V_hold": 0.22927,
+      "V_exit": 0.38512,
+      "E_hold": 0.36206,
+      "DD_hold": 0.26558,
+      "margin": -0.15585,
+      "optimal_action": "EXIT_NOW",
+      "static_action": "HOLD_AND_TRAIL",
+      "agree_with_static": false,
+      "cpcv": {
+        "sign_stable": false,
+        "stability_fraction": null,
+        "signs": [],
+        "status": "CPCV_INSUFFICIENT"
+      },
+      "economically_sensible": false,
+      "forward": {
+        "oos_2023_24": "EXIT_NOW",
+        "forward_2025_26": null,
+        "agree": false
+      },
+      "per_regime": {
+        "hiking": "EXIT_NOW",
+        "cutting": "EXIT_NOW"
+      },
+      "regime_window_252": "EXIT_NOW",
+      "signal_frozen_action": "EXIT_NOW"
+    },
+    "19": {
+      "evaluated": false,
+      "reason": "carry not-aligned \u2192 REVERSAL / N/A"
+    },
+    "20": {
+      "evaluated": true,
+      "coords": {
+        "atr_tercile": "low",
+        "excursion": "modest",
+        "hold_frac": "late",
+        "rsi_extreme": false,
+        "carry": "aligned"
+      },
+      "n_members": 75,
+      "V_hold": 0.33491,
+      "V_exit": 0.40401,
+      "E_hold": 0.40743,
+      "DD_hold": 0.14504,
+      "margin": -0.06909,
+      "optimal_action": "EXIT_NOW",
+      "static_action": "HOLD_AND_TRAIL",
+      "agree_with_static": false,
+      "cpcv": {
+        "sign_stable": true,
+        "stability_fraction": 1.0,
+        "signs": [
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1
+        ],
+        "status": "OK"
+      },
+      "economically_sensible": true,
+      "forward": {
+        "oos_2023_24": "EXIT_NOW",
+        "forward_2025_26": "EXIT_NOW",
+        "agree": true
+      },
+      "per_regime": {
+        "hiking": "EXIT_NOW",
+        "cutting": "EXIT_NOW"
+      },
+      "regime_window_252": "EXIT_NOW",
+      "signal_frozen_action": "EXIT_NOW"
+    },
+    "21": {
+      "evaluated": false,
+      "reason": "carry not-aligned \u2192 REVERSAL / N/A"
+    },
+    "22": {
+      "evaluated": true,
+      "coords": {
+        "atr_tercile": "low",
+        "excursion": "modest",
+        "hold_frac": "late",
+        "rsi_extreme": true,
+        "carry": "aligned"
+      },
+      "n_members": 5,
+      "V_hold": 0.68285,
+      "V_exit": 0.73804,
+      "E_hold": 0.72706,
+      "DD_hold": 0.08842,
+      "margin": -0.05518,
+      "optimal_action": "EXIT_NOW",
+      "static_action": "HOLD_AND_TRAIL",
+      "agree_with_static": false,
+      "cpcv": {
+        "sign_stable": false,
+        "stability_fraction": null,
+        "signs": [],
+        "status": "CPCV_INSUFFICIENT"
+      },
+      "economically_sensible": false,
+      "forward": {
+        "oos_2023_24": "EXIT_NOW",
+        "forward_2025_26": null,
+        "agree": false
+      },
+      "per_regime": {
+        "hiking": "EXIT_NOW",
+        "cutting": "EXIT_NOW"
+      },
+      "regime_window_252": "EXIT_NOW",
+      "signal_frozen_action": "EXIT_NOW"
+    },
+    "23": {
+      "evaluated": false,
+      "reason": "carry not-aligned \u2192 REVERSAL / N/A"
+    },
+    "24": {
+      "evaluated": true,
+      "coords": {
+        "atr_tercile": "low",
+        "excursion": "extended",
+        "hold_frac": "early",
+        "rsi_extreme": false,
+        "carry": "aligned"
+      },
+      "n_members": 15,
+      "V_hold": 1.24907,
+      "V_exit": 1.19689,
+      "E_hold": 1.26178,
+      "DD_hold": 0.02544,
+      "margin": 0.05218,
+      "optimal_action": "HOLD_AND_TRAIL",
+      "static_action": "HOLD_AND_TRAIL",
+      "agree_with_static": true,
+      "cpcv": {
+        "sign_stable": false,
+        "stability_fraction": null,
+        "signs": [],
+        "status": "CPCV_INSUFFICIENT"
+      },
+      "economically_sensible": false,
+      "forward": {
+        "oos_2023_24": "HOLD_AND_TRAIL",
+        "forward_2025_26": "HOLD_AND_TRAIL",
+        "agree": true
+      },
+      "per_regime": {
+        "hiking": "HOLD_AND_TRAIL",
+        "cutting": null
+      },
+      "regime_window_252": "HOLD_AND_TRAIL",
+      "signal_frozen_action": "HOLD_AND_TRAIL"
+    },
+    "25": {
+      "evaluated": false,
+      "reason": "carry not-aligned \u2192 REVERSAL / N/A"
+    },
+    "26": {
+      "evaluated": true,
+      "coords": {
+        "atr_tercile": "low",
+        "excursion": "extended",
+        "hold_frac": "early",
+        "rsi_extreme": true,
+        "carry": "aligned"
+      },
+      "n_members": 4,
+      "V_hold": 1.65717,
+      "V_exit": 1.64,
+      "E_hold": 1.65948,
+      "DD_hold": 0.00461,
+      "margin": 0.01717,
+      "optimal_action": "HOLD_AND_TRAIL",
+      "static_action": "HOLD_AND_TRAIL",
+      "agree_with_static": true,
+      "cpcv": {
+        "sign_stable": false,
+        "stability_fraction": null,
+        "signs": [],
+        "status": "CPCV_INSUFFICIENT"
+      },
+      "economically_sensible": false,
+      "forward": {
+        "oos_2023_24": "EXIT_NOW",
+        "forward_2025_26": null,
+        "agree": false
+      },
+      "per_regime": {
+        "hiking": "EXIT_NOW",
+        "cutting": "HOLD_AND_TRAIL"
+      },
+      "regime_window_252": "EXIT_NOW",
+      "signal_frozen_action": "EXIT_NOW"
+    },
+    "27": {
+      "evaluated": false,
+      "reason": "carry not-aligned \u2192 REVERSAL / N/A"
+    },
+    "28": {
+      "evaluated": true,
+      "coords": {
+        "atr_tercile": "low",
+        "excursion": "extended",
+        "hold_frac": "mid",
+        "rsi_extreme": false,
+        "carry": "aligned"
+      },
+      "n_members": 17,
+      "V_hold": 1.32787,
+      "V_exit": 1.32493,
+      "E_hold": 1.34404,
+      "DD_hold": 0.03235,
+      "margin": 0.00293,
+      "optimal_action": "HOLD_AND_TRAIL",
+      "static_action": "HOLD_AND_TRAIL",
+      "agree_with_static": true,
+      "cpcv": {
+        "sign_stable": false,
+        "stability_fraction": null,
+        "signs": [],
+        "status": "CPCV_INSUFFICIENT"
+      },
+      "economically_sensible": false,
+      "forward": {
+        "oos_2023_24": "HOLD_AND_TRAIL",
+        "forward_2025_26": "HOLD_AND_TRAIL",
+        "agree": true
+      },
+      "per_regime": {
+        "hiking": "HOLD_AND_TRAIL",
+        "cutting": null
+      },
+      "regime_window_252": "EXIT_NOW",
+      "signal_frozen_action": "HOLD_AND_TRAIL"
+    },
+    "29": {
+      "evaluated": false,
+      "reason": "carry not-aligned \u2192 REVERSAL / N/A"
+    },
+    "30": {
+      "evaluated": true,
+      "coords": {
+        "atr_tercile": "low",
+        "excursion": "extended",
+        "hold_frac": "mid",
+        "rsi_extreme": true,
+        "carry": "aligned"
+      },
+      "n_members": 2,
+      "V_hold": 2.01106,
+      "V_exit": 1.93899,
+      "E_hold": 2.01614,
+      "DD_hold": 0.01016,
+      "margin": 0.07207,
+      "optimal_action": "HOLD_AND_TRAIL",
+      "static_action": "HOLD_AND_TRAIL",
+      "agree_with_static": true,
+      "cpcv": {
+        "sign_stable": false,
+        "stability_fraction": null,
+        "signs": [],
+        "status": "CPCV_INSUFFICIENT"
+      },
+      "economically_sensible": false,
+      "forward": {
+        "oos_2023_24": "HOLD_AND_TRAIL",
+        "forward_2025_26": null,
+        "agree": false
+      },
+      "per_regime": {
+        "hiking": "HOLD_AND_TRAIL",
+        "cutting": "HOLD_AND_TRAIL"
+      },
+      "regime_window_252": "EXIT_NOW",
+      "signal_frozen_action": "HOLD_AND_TRAIL"
+    },
+    "31": {
+      "evaluated": false,
+      "reason": "carry not-aligned \u2192 REVERSAL / N/A"
+    },
+    "32": {
+      "evaluated": true,
+      "coords": {
+        "atr_tercile": "low",
+        "excursion": "extended",
+        "hold_frac": "late",
+        "rsi_extreme": false,
+        "carry": "aligned"
+      },
+      "n_members": 34,
+      "V_hold": 1.46946,
+      "V_exit": 1.48511,
+      "E_hold": 1.48045,
+      "DD_hold": 0.02199,
+      "margin": -0.01565,
+      "optimal_action": "EXIT_NOW",
+      "static_action": "HOLD_AND_TRAIL",
+      "agree_with_static": false,
+      "cpcv": {
+        "sign_stable": false,
+        "stability_fraction": 0.8,
+        "signs": [
+          -1,
+          -1,
+          1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          1,
+          -1,
+          -1,
+          1,
+          -1,
+          -1
+        ],
+        "status": "OK"
+      },
+      "economically_sensible": false,
+      "forward": {
+        "oos_2023_24": "HOLD_AND_TRAIL",
+        "forward_2025_26": null,
+        "agree": false
+      },
+      "per_regime": {
+        "hiking": "EXIT_NOW",
+        "cutting": "HOLD_AND_TRAIL"
+      },
+      "regime_window_252": "EXIT_NOW",
+      "signal_frozen_action": "EXIT_NOW"
+    },
+    "33": {
+      "evaluated": false,
+      "reason": "carry not-aligned \u2192 REVERSAL / N/A"
+    },
+    "34": {
+      "evaluated": true,
+      "coords": {
+        "atr_tercile": "low",
+        "excursion": "extended",
+        "hold_frac": "late",
+        "rsi_extreme": true,
+        "carry": "aligned"
+      },
+      "n_members": 4,
+      "V_hold": 1.36409,
+      "V_exit": 1.38543,
+      "E_hold": 1.37756,
+      "DD_hold": 0.02694,
+      "margin": -0.02134,
+      "optimal_action": "EXIT_NOW",
+      "static_action": "HOLD_AND_TRAIL",
+      "agree_with_static": false,
+      "cpcv": {
+        "sign_stable": false,
+        "stability_fraction": null,
+        "signs": [],
+        "status": "CPCV_INSUFFICIENT"
+      },
+      "economically_sensible": false,
+      "forward": {
+        "oos_2023_24": "EXIT_NOW",
+        "forward_2025_26": null,
+        "agree": false
+      },
+      "per_regime": {
+        "hiking": "EXIT_NOW",
+        "cutting": null
+      },
+      "regime_window_252": "EXIT_NOW",
+      "signal_frozen_action": "EXIT_NOW"
+    },
+    "35": {
+      "evaluated": false,
+      "reason": "carry not-aligned \u2192 REVERSAL / N/A"
+    },
+    "36": {
+      "evaluated": true,
+      "coords": {
+        "atr_tercile": "mid",
+        "excursion": "underwater",
+        "hold_frac": "early",
+        "rsi_extreme": false,
+        "carry": "aligned"
+      },
+      "n_members": 95,
+      "V_hold": -0.44525,
+      "V_exit": -0.25358,
+      "E_hold": -0.16023,
+      "DD_hold": 0.57004,
+      "margin": -0.19167,
+      "optimal_action": "EXIT_NOW",
+      "static_action": "HOLD_AND_TRAIL",
+      "agree_with_static": false,
+      "cpcv": {
+        "sign_stable": true,
+        "stability_fraction": 1.0,
+        "signs": [
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1
+        ],
+        "status": "OK"
+      },
+      "economically_sensible": false,
+      "forward": {
+        "oos_2023_24": "EXIT_NOW",
+        "forward_2025_26": "EXIT_NOW",
+        "agree": true
+      },
+      "per_regime": {
+        "hiking": "EXIT_NOW",
+        "cutting": "EXIT_NOW"
+      },
+      "regime_window_252": "EXIT_NOW",
+      "signal_frozen_action": "EXIT_NOW"
+    },
+    "37": {
+      "evaluated": false,
+      "reason": "carry not-aligned \u2192 REVERSAL / N/A"
+    },
+    "38": {
+      "evaluated": true,
+      "coords": {
+        "atr_tercile": "mid",
+        "excursion": "underwater",
+        "hold_frac": "early",
+        "rsi_extreme": true,
+        "carry": "aligned"
+      },
+      "n_members": 3,
+      "V_hold": -0.29703,
+      "V_exit": -0.06148,
+      "E_hold": -0.06009,
+      "DD_hold": 0.47386,
+      "margin": -0.23555,
+      "optimal_action": "EXIT_NOW",
+      "static_action": "HOLD_AND_TRAIL",
+      "agree_with_static": false,
+      "cpcv": {
+        "sign_stable": false,
+        "stability_fraction": null,
+        "signs": [],
+        "status": "CPCV_INSUFFICIENT"
+      },
+      "economically_sensible": false,
+      "forward": {
+        "oos_2023_24": "EXIT_NOW",
+        "forward_2025_26": null,
+        "agree": false
+      },
+      "per_regime": {
+        "hiking": "EXIT_NOW",
+        "cutting": null
+      },
+      "regime_window_252": "EXIT_NOW",
+      "signal_frozen_action": "EXIT_NOW"
+    },
+    "39": {
+      "evaluated": false,
+      "reason": "carry not-aligned \u2192 REVERSAL / N/A"
+    },
+    "40": {
+      "evaluated": true,
+      "coords": {
+        "atr_tercile": "mid",
+        "excursion": "underwater",
+        "hold_frac": "mid",
+        "rsi_extreme": false,
+        "carry": "aligned"
+      },
+      "n_members": 78,
+      "V_hold": -0.46806,
+      "V_exit": -0.33338,
+      "E_hold": -0.21014,
+      "DD_hold": 0.51584,
+      "margin": -0.13468,
+      "optimal_action": "EXIT_NOW",
+      "static_action": "HOLD_AND_TRAIL",
+      "agree_with_static": false,
+      "cpcv": {
+        "sign_stable": true,
+        "stability_fraction": 1.0,
+        "signs": [
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1
+        ],
+        "status": "OK"
+      },
+      "economically_sensible": false,
+      "forward": {
+        "oos_2023_24": "EXIT_NOW",
+        "forward_2025_26": "EXIT_NOW",
+        "agree": true
+      },
+      "per_regime": {
+        "hiking": "EXIT_NOW",
+        "cutting": "EXIT_NOW"
+      },
+      "regime_window_252": "EXIT_NOW",
+      "signal_frozen_action": "EXIT_NOW"
+    },
+    "41": {
+      "evaluated": false,
+      "reason": "carry not-aligned \u2192 REVERSAL / N/A"
+    },
+    "42": {
+      "evaluated": true,
+      "n_members": 0,
+      "note": "no members"
+    },
+    "43": {
+      "evaluated": false,
+      "reason": "carry not-aligned \u2192 REVERSAL / N/A"
+    },
+    "44": {
+      "evaluated": true,
+      "coords": {
+        "atr_tercile": "mid",
+        "excursion": "underwater",
+        "hold_frac": "late",
+        "rsi_extreme": false,
+        "carry": "aligned"
+      },
+      "n_members": 32,
+      "V_hold": -0.46797,
+      "V_exit": -0.38971,
+      "E_hold": -0.2425,
+      "DD_hold": 0.45093,
+      "margin": -0.07826,
+      "optimal_action": "EXIT_NOW",
+      "static_action": "HOLD_AND_TRAIL",
+      "agree_with_static": false,
+      "cpcv": {
+        "sign_stable": true,
+        "stability_fraction": 1.0,
+        "signs": [
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1
+        ],
+        "status": "OK"
+      },
+      "economically_sensible": true,
+      "forward": {
+        "oos_2023_24": "EXIT_NOW",
+        "forward_2025_26": "EXIT_NOW",
+        "agree": true
+      },
+      "per_regime": {
+        "hiking": "EXIT_NOW",
+        "cutting": "EXIT_NOW"
+      },
+      "regime_window_252": "EXIT_NOW",
+      "signal_frozen_action": "EXIT_NOW"
+    },
+    "45": {
+      "evaluated": false,
+      "reason": "carry not-aligned \u2192 REVERSAL / N/A"
+    },
+    "46": {
+      "evaluated": true,
+      "n_members": 0,
+      "note": "no members"
+    },
+    "47": {
+      "evaluated": false,
+      "reason": "carry not-aligned \u2192 REVERSAL / N/A"
+    },
+    "48": {
+      "evaluated": true,
+      "coords": {
+        "atr_tercile": "mid",
+        "excursion": "modest",
+        "hold_frac": "early",
+        "rsi_extreme": false,
+        "carry": "aligned"
+      },
+      "n_members": 178,
+      "V_hold": -0.00183,
+      "V_exit": 0.20952,
+      "E_hold": 0.21031,
+      "DD_hold": 0.42429,
+      "margin": -0.21136,
+      "optimal_action": "EXIT_NOW",
+      "static_action": "HOLD_AND_TRAIL",
+      "agree_with_static": false,
+      "cpcv": {
+        "sign_stable": true,
+        "stability_fraction": 1.0,
+        "signs": [
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1
+        ],
+        "status": "OK"
+      },
+      "economically_sensible": false,
+      "forward": {
+        "oos_2023_24": "EXIT_NOW",
+        "forward_2025_26": "EXIT_NOW",
+        "agree": true
+      },
+      "per_regime": {
+        "hiking": "EXIT_NOW",
+        "cutting": "EXIT_NOW"
+      },
+      "regime_window_252": "EXIT_NOW",
+      "signal_frozen_action": "EXIT_NOW"
+    },
+    "49": {
+      "evaluated": false,
+      "reason": "carry not-aligned \u2192 REVERSAL / N/A"
+    },
+    "50": {
+      "evaluated": true,
+      "coords": {
+        "atr_tercile": "mid",
+        "excursion": "modest",
+        "hold_frac": "early",
+        "rsi_extreme": true,
+        "carry": "aligned"
+      },
+      "n_members": 4,
+      "V_hold": 0.19807,
+      "V_exit": 0.3489,
+      "E_hold": 0.35048,
+      "DD_hold": 0.30482,
+      "margin": -0.15084,
+      "optimal_action": "EXIT_NOW",
+      "static_action": "HOLD_AND_TRAIL",
+      "agree_with_static": false,
+      "cpcv": {
+        "sign_stable": false,
+        "stability_fraction": null,
+        "signs": [],
+        "status": "CPCV_INSUFFICIENT"
+      },
+      "economically_sensible": false,
+      "forward": {
+        "oos_2023_24": null,
+        "forward_2025_26": null,
+        "agree": false
+      },
+      "per_regime": {
+        "hiking": "EXIT_NOW",
+        "cutting": null
+      },
+      "regime_window_252": "EXIT_NOW",
+      "signal_frozen_action": "EXIT_NOW"
+    },
+    "51": {
+      "evaluated": false,
+      "reason": "carry not-aligned \u2192 REVERSAL / N/A"
+    },
+    "52": {
+      "evaluated": true,
+      "coords": {
+        "atr_tercile": "mid",
+        "excursion": "modest",
+        "hold_frac": "mid",
+        "rsi_extreme": false,
+        "carry": "aligned"
+      },
+      "n_members": 163,
+      "V_hold": 0.17787,
+      "V_exit": 0.30595,
+      "E_hold": 0.29977,
+      "DD_hold": 0.2438,
+      "margin": -0.12808,
+      "optimal_action": "EXIT_NOW",
+      "static_action": "HOLD_AND_TRAIL",
+      "agree_with_static": false,
+      "cpcv": {
+        "sign_stable": true,
+        "stability_fraction": 1.0,
+        "signs": [
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1
+        ],
+        "status": "OK"
+      },
+      "economically_sensible": false,
+      "forward": {
+        "oos_2023_24": "EXIT_NOW",
+        "forward_2025_26": "EXIT_NOW",
+        "agree": true
+      },
+      "per_regime": {
+        "hiking": "EXIT_NOW",
+        "cutting": "EXIT_NOW"
+      },
+      "regime_window_252": "EXIT_NOW",
+      "signal_frozen_action": "EXIT_NOW"
+    },
+    "53": {
+      "evaluated": false,
+      "reason": "carry not-aligned \u2192 REVERSAL / N/A"
+    },
+    "54": {
+      "evaluated": true,
+      "coords": {
+        "atr_tercile": "mid",
+        "excursion": "modest",
+        "hold_frac": "mid",
+        "rsi_extreme": true,
+        "carry": "aligned"
+      },
+      "n_members": 5,
+      "V_hold": 0.2701,
+      "V_exit": 0.41049,
+      "E_hold": 0.4032,
+      "DD_hold": 0.2662,
+      "margin": -0.14039,
+      "optimal_action": "EXIT_NOW",
+      "static_action": "HOLD_AND_TRAIL",
+      "agree_with_static": false,
+      "cpcv": {
+        "sign_stable": false,
+        "stability_fraction": null,
+        "signs": [],
+        "status": "CPCV_INSUFFICIENT"
+      },
+      "economically_sensible": false,
+      "forward": {
+        "oos_2023_24": "EXIT_NOW",
+        "forward_2025_26": null,
+        "agree": false
+      },
+      "per_regime": {
+        "hiking": "EXIT_NOW",
+        "cutting": null
+      },
+      "regime_window_252": "EXIT_NOW",
+      "signal_frozen_action": "EXIT_NOW"
+    },
+    "55": {
+      "evaluated": false,
+      "reason": "carry not-aligned \u2192 REVERSAL / N/A"
+    },
+    "56": {
+      "evaluated": true,
+      "coords": {
+        "atr_tercile": "mid",
+        "excursion": "modest",
+        "hold_frac": "late",
+        "rsi_extreme": false,
+        "carry": "aligned"
+      },
+      "n_members": 60,
+      "V_hold": 0.35374,
+      "V_exit": 0.43729,
+      "E_hold": 0.43914,
+      "DD_hold": 0.1708,
+      "margin": -0.08355,
+      "optimal_action": "EXIT_NOW",
+      "static_action": "HOLD_AND_TRAIL",
+      "agree_with_static": false,
+      "cpcv": {
+        "sign_stable": true,
+        "stability_fraction": 1.0,
+        "signs": [
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1
+        ],
+        "status": "OK"
+      },
+      "economically_sensible": true,
+      "forward": {
+        "oos_2023_24": "EXIT_NOW",
+        "forward_2025_26": "EXIT_NOW",
+        "agree": true
+      },
+      "per_regime": {
+        "hiking": "EXIT_NOW",
+        "cutting": "EXIT_NOW"
+      },
+      "regime_window_252": "EXIT_NOW",
+      "signal_frozen_action": "EXIT_NOW"
+    },
+    "57": {
+      "evaluated": false,
+      "reason": "carry not-aligned \u2192 REVERSAL / N/A"
+    },
+    "58": {
+      "evaluated": true,
+      "coords": {
+        "atr_tercile": "mid",
+        "excursion": "modest",
+        "hold_frac": "late",
+        "rsi_extreme": true,
+        "carry": "aligned"
+      },
+      "n_members": 1,
+      "V_hold": 0.9568,
+      "V_exit": 0.96059,
+      "E_hold": 0.95691,
+      "DD_hold": 0.00021,
+      "margin": -0.00379,
+      "optimal_action": "EXIT_NOW",
+      "static_action": "HOLD_AND_TRAIL",
+      "agree_with_static": false,
+      "cpcv": {
+        "sign_stable": false,
+        "stability_fraction": null,
+        "signs": [],
+        "status": "CPCV_INSUFFICIENT"
+      },
+      "economically_sensible": false,
+      "forward": {
+        "oos_2023_24": null,
+        "forward_2025_26": null,
+        "agree": false
+      },
+      "per_regime": {
+        "hiking": null,
+        "cutting": null
+      },
+      "regime_window_252": "HOLD_AND_TRAIL",
+      "signal_frozen_action": "HOLD_AND_TRAIL"
+    },
+    "59": {
+      "evaluated": false,
+      "reason": "carry not-aligned \u2192 REVERSAL / N/A"
+    },
+    "60": {
+      "evaluated": true,
+      "coords": {
+        "atr_tercile": "mid",
+        "excursion": "extended",
+        "hold_frac": "early",
+        "rsi_extreme": false,
+        "carry": "aligned"
+      },
+      "n_members": 5,
+      "V_hold": 1.37066,
+      "V_exit": 1.41394,
+      "E_hold": 1.40824,
+      "DD_hold": 0.07517,
+      "margin": -0.04328,
+      "optimal_action": "EXIT_NOW",
+      "static_action": "HOLD_AND_TRAIL",
+      "agree_with_static": false,
+      "cpcv": {
+        "sign_stable": false,
+        "stability_fraction": null,
+        "signs": [],
+        "status": "CPCV_INSUFFICIENT"
+      },
+      "economically_sensible": false,
+      "forward": {
+        "oos_2023_24": "EXIT_NOW",
+        "forward_2025_26": null,
+        "agree": false
+      },
+      "per_regime": {
+        "hiking": "HOLD_AND_TRAIL",
+        "cutting": "EXIT_NOW"
+      },
+      "regime_window_252": "HOLD_AND_TRAIL",
+      "signal_frozen_action": "EXIT_NOW"
+    },
+    "61": {
+      "evaluated": false,
+      "reason": "carry not-aligned \u2192 REVERSAL / N/A"
+    },
+    "62": {
+      "evaluated": true,
+      "coords": {
+        "atr_tercile": "mid",
+        "excursion": "extended",
+        "hold_frac": "early",
+        "rsi_extreme": true,
+        "carry": "aligned"
+      },
+      "n_members": 5,
+      "V_hold": 1.37637,
+      "V_exit": 1.3865,
+      "E_hold": 1.39041,
+      "DD_hold": 0.02809,
+      "margin": -0.01013,
+      "optimal_action": "EXIT_NOW",
+      "static_action": "HOLD_AND_TRAIL",
+      "agree_with_static": false,
+      "cpcv": {
+        "sign_stable": false,
+        "stability_fraction": null,
+        "signs": [],
+        "status": "CPCV_INSUFFICIENT"
+      },
+      "economically_sensible": false,
+      "forward": {
+        "oos_2023_24": "EXIT_NOW",
+        "forward_2025_26": null,
+        "agree": false
+      },
+      "per_regime": {
+        "hiking": "HOLD_AND_TRAIL",
+        "cutting": "HOLD_AND_TRAIL"
+      },
+      "regime_window_252": "HOLD_AND_TRAIL",
+      "signal_frozen_action": "EXIT_NOW"
+    },
+    "63": {
+      "evaluated": false,
+      "reason": "carry not-aligned \u2192 REVERSAL / N/A"
+    },
+    "64": {
+      "evaluated": true,
+      "coords": {
+        "atr_tercile": "mid",
+        "excursion": "extended",
+        "hold_frac": "mid",
+        "rsi_extreme": false,
+        "carry": "aligned"
+      },
+      "n_members": 18,
+      "V_hold": 1.29533,
+      "V_exit": 1.29732,
+      "E_hold": 1.30701,
+      "DD_hold": 0.02336,
+      "margin": -0.00198,
+      "optimal_action": "EXIT_NOW",
+      "static_action": "HOLD_AND_TRAIL",
+      "agree_with_static": false,
+      "cpcv": {
+        "sign_stable": false,
+        "stability_fraction": null,
+        "signs": [],
+        "status": "CPCV_INSUFFICIENT"
+      },
+      "economically_sensible": false,
+      "forward": {
+        "oos_2023_24": "EXIT_NOW",
+        "forward_2025_26": null,
+        "agree": false
+      },
+      "per_regime": {
+        "hiking": "EXIT_NOW",
+        "cutting": null
+      },
+      "regime_window_252": "EXIT_NOW",
+      "signal_frozen_action": "EXIT_NOW"
+    },
+    "65": {
+      "evaluated": false,
+      "reason": "carry not-aligned \u2192 REVERSAL / N/A"
+    },
+    "66": {
+      "evaluated": true,
+      "coords": {
+        "atr_tercile": "mid",
+        "excursion": "extended",
+        "hold_frac": "mid",
+        "rsi_extreme": true,
+        "carry": "aligned"
+      },
+      "n_members": 4,
+      "V_hold": 1.4743,
+      "V_exit": 1.48878,
+      "E_hold": 1.50789,
+      "DD_hold": 0.06718,
+      "margin": -0.01448,
+      "optimal_action": "EXIT_NOW",
+      "static_action": "HOLD_AND_TRAIL",
+      "agree_with_static": false,
+      "cpcv": {
+        "sign_stable": false,
+        "stability_fraction": null,
+        "signs": [],
+        "status": "CPCV_INSUFFICIENT"
+      },
+      "economically_sensible": false,
+      "forward": {
+        "oos_2023_24": null,
+        "forward_2025_26": null,
+        "agree": false
+      },
+      "per_regime": {
+        "hiking": "HOLD_AND_TRAIL",
+        "cutting": null
+      },
+      "regime_window_252": "HOLD_AND_TRAIL",
+      "signal_frozen_action": "EXIT_NOW"
+    },
+    "67": {
+      "evaluated": false,
+      "reason": "carry not-aligned \u2192 REVERSAL / N/A"
+    },
+    "68": {
+      "evaluated": true,
+      "coords": {
+        "atr_tercile": "mid",
+        "excursion": "extended",
+        "hold_frac": "late",
+        "rsi_extreme": false,
+        "carry": "aligned"
+      },
+      "n_members": 17,
+      "V_hold": 1.52279,
+      "V_exit": 1.5553,
+      "E_hold": 1.55834,
+      "DD_hold": 0.0711,
+      "margin": -0.03251,
+      "optimal_action": "EXIT_NOW",
+      "static_action": "HOLD_AND_TRAIL",
+      "agree_with_static": false,
+      "cpcv": {
+        "sign_stable": false,
+        "stability_fraction": null,
+        "signs": [],
+        "status": "CPCV_INSUFFICIENT"
+      },
+      "economically_sensible": false,
+      "forward": {
+        "oos_2023_24": "EXIT_NOW",
+        "forward_2025_26": null,
+        "agree": false
+      },
+      "per_regime": {
+        "hiking": "EXIT_NOW",
+        "cutting": null
+      },
+      "regime_window_252": "EXIT_NOW",
+      "signal_frozen_action": "EXIT_NOW"
+    },
+    "69": {
+      "evaluated": false,
+      "reason": "carry not-aligned \u2192 REVERSAL / N/A"
+    },
+    "70": {
+      "evaluated": true,
+      "coords": {
+        "atr_tercile": "mid",
+        "excursion": "extended",
+        "hold_frac": "late",
+        "rsi_extreme": true,
+        "carry": "aligned"
+      },
+      "n_members": 2,
+      "V_hold": 1.1375,
+      "V_exit": 1.14989,
+      "E_hold": 1.14686,
+      "DD_hold": 0.01872,
+      "margin": -0.01239,
+      "optimal_action": "EXIT_NOW",
+      "static_action": "HOLD_AND_TRAIL",
+      "agree_with_static": false,
+      "cpcv": {
+        "sign_stable": false,
+        "stability_fraction": null,
+        "signs": [],
+        "status": "CPCV_INSUFFICIENT"
+      },
+      "economically_sensible": false,
+      "forward": {
+        "oos_2023_24": "EXIT_NOW",
+        "forward_2025_26": null,
+        "agree": false
+      },
+      "per_regime": {
+        "hiking": "EXIT_NOW",
+        "cutting": null
+      },
+      "regime_window_252": "EXIT_NOW",
+      "signal_frozen_action": "EXIT_NOW"
+    },
+    "71": {
+      "evaluated": false,
+      "reason": "carry not-aligned \u2192 REVERSAL / N/A"
+    },
+    "72": {
+      "evaluated": true,
+      "coords": {
+        "atr_tercile": "high",
+        "excursion": "underwater",
+        "hold_frac": "early",
+        "rsi_extreme": false,
+        "carry": "aligned"
+      },
+      "n_members": 70,
+      "V_hold": -0.40744,
+      "V_exit": -0.19327,
+      "E_hold": -0.11061,
+      "DD_hold": 0.59366,
+      "margin": -0.21417,
+      "optimal_action": "EXIT_NOW",
+      "static_action": "HOLD_AND_TRAIL",
+      "agree_with_static": false,
+      "cpcv": {
+        "sign_stable": true,
+        "stability_fraction": 1.0,
+        "signs": [
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1
+        ],
+        "status": "OK"
+      },
+      "economically_sensible": true,
+      "forward": {
+        "oos_2023_24": "EXIT_NOW",
+        "forward_2025_26": "EXIT_NOW",
+        "agree": true
+      },
+      "per_regime": {
+        "hiking": "EXIT_NOW",
+        "cutting": "EXIT_NOW"
+      },
+      "regime_window_252": "EXIT_NOW",
+      "signal_frozen_action": "EXIT_NOW"
+    },
+    "73": {
+      "evaluated": false,
+      "reason": "carry not-aligned \u2192 REVERSAL / N/A"
+    },
+    "74": {
+      "evaluated": true,
+      "coords": {
+        "atr_tercile": "high",
+        "excursion": "underwater",
+        "hold_frac": "early",
+        "rsi_extreme": true,
+        "carry": "aligned"
+      },
+      "n_members": 2,
+      "V_hold": -0.25758,
+      "V_exit": -0.02265,
+      "E_hold": 0.0194,
+      "DD_hold": 0.55396,
+      "margin": -0.23493,
+      "optimal_action": "EXIT_NOW",
+      "static_action": "HOLD_AND_TRAIL",
+      "agree_with_static": false,
+      "cpcv": {
+        "sign_stable": false,
+        "stability_fraction": null,
+        "signs": [],
+        "status": "CPCV_INSUFFICIENT"
+      },
+      "economically_sensible": false,
+      "forward": {
+        "oos_2023_24": null,
+        "forward_2025_26": null,
+        "agree": false
+      },
+      "per_regime": {
+        "hiking": null,
+        "cutting": null
+      },
+      "regime_window_252": "EXIT_NOW",
+      "signal_frozen_action": "EXIT_NOW"
+    },
+    "75": {
+      "evaluated": false,
+      "reason": "carry not-aligned \u2192 REVERSAL / N/A"
+    },
+    "76": {
+      "evaluated": true,
+      "coords": {
+        "atr_tercile": "high",
+        "excursion": "underwater",
+        "hold_frac": "mid",
+        "rsi_extreme": false,
+        "carry": "aligned"
+      },
+      "n_members": 80,
+      "V_hold": -0.55984,
+      "V_exit": -0.42566,
+      "E_hold": -0.26437,
+      "DD_hold": 0.59095,
+      "margin": -0.13418,
+      "optimal_action": "EXIT_NOW",
+      "static_action": "HOLD_AND_TRAIL",
+      "agree_with_static": false,
+      "cpcv": {
+        "sign_stable": true,
+        "stability_fraction": 1.0,
+        "signs": [
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1
+        ],
+        "status": "OK"
+      },
+      "economically_sensible": true,
+      "forward": {
+        "oos_2023_24": "EXIT_NOW",
+        "forward_2025_26": "EXIT_NOW",
+        "agree": true
+      },
+      "per_regime": {
+        "hiking": "EXIT_NOW",
+        "cutting": "EXIT_NOW"
+      },
+      "regime_window_252": "EXIT_NOW",
+      "signal_frozen_action": "EXIT_NOW"
+    },
+    "77": {
+      "evaluated": false,
+      "reason": "carry not-aligned \u2192 REVERSAL / N/A"
+    },
+    "78": {
+      "evaluated": true,
+      "coords": {
+        "atr_tercile": "high",
+        "excursion": "underwater",
+        "hold_frac": "mid",
+        "rsi_extreme": true,
+        "carry": "aligned"
+      },
+      "n_members": 1,
+      "V_hold": -0.19568,
+      "V_exit": -0.02573,
+      "E_hold": 0.00913,
+      "DD_hold": 0.40961,
+      "margin": -0.16995,
+      "optimal_action": "EXIT_NOW",
+      "static_action": "HOLD_AND_TRAIL",
+      "agree_with_static": false,
+      "cpcv": {
+        "sign_stable": false,
+        "stability_fraction": null,
+        "signs": [],
+        "status": "CPCV_INSUFFICIENT"
+      },
+      "economically_sensible": false,
+      "forward": {
+        "oos_2023_24": null,
+        "forward_2025_26": null,
+        "agree": false
+      },
+      "per_regime": {
+        "hiking": null,
+        "cutting": null
+      },
+      "regime_window_252": null,
+      "signal_frozen_action": "EXIT_NOW"
+    },
+    "79": {
+      "evaluated": false,
+      "reason": "carry not-aligned \u2192 REVERSAL / N/A"
+    },
+    "80": {
+      "evaluated": true,
+      "coords": {
+        "atr_tercile": "high",
+        "excursion": "underwater",
+        "hold_frac": "late",
+        "rsi_extreme": false,
+        "carry": "aligned"
+      },
+      "n_members": 25,
+      "V_hold": -0.63163,
+      "V_exit": -0.56902,
+      "E_hold": -0.35703,
+      "DD_hold": 0.54921,
+      "margin": -0.06261,
+      "optimal_action": "EXIT_NOW",
+      "static_action": "HOLD_AND_TRAIL",
+      "agree_with_static": false,
+      "cpcv": {
+        "sign_stable": false,
+        "stability_fraction": null,
+        "signs": [],
+        "status": "CPCV_INSUFFICIENT"
+      },
+      "economically_sensible": false,
+      "forward": {
+        "oos_2023_24": "EXIT_NOW",
+        "forward_2025_26": "EXIT_NOW",
+        "agree": true
+      },
+      "per_regime": {
+        "hiking": "EXIT_NOW",
+        "cutting": null
+      },
+      "regime_window_252": "EXIT_NOW",
+      "signal_frozen_action": "EXIT_NOW"
+    },
+    "81": {
+      "evaluated": false,
+      "reason": "carry not-aligned \u2192 REVERSAL / N/A"
+    },
+    "82": {
+      "evaluated": true,
+      "n_members": 0,
+      "note": "no members"
+    },
+    "83": {
+      "evaluated": false,
+      "reason": "carry not-aligned \u2192 REVERSAL / N/A"
+    },
+    "84": {
+      "evaluated": true,
+      "coords": {
+        "atr_tercile": "high",
+        "excursion": "modest",
+        "hold_frac": "early",
+        "rsi_extreme": false,
+        "carry": "aligned"
+      },
+      "n_members": 154,
+      "V_hold": -0.0454,
+      "V_exit": 0.19389,
+      "E_hold": 0.19028,
+      "DD_hold": 0.47137,
+      "margin": -0.2393,
+      "optimal_action": "EXIT_NOW",
+      "static_action": "HOLD_AND_TRAIL",
+      "agree_with_static": false,
+      "cpcv": {
+        "sign_stable": true,
+        "stability_fraction": 1.0,
+        "signs": [
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1
+        ],
+        "status": "OK"
+      },
+      "economically_sensible": true,
+      "forward": {
+        "oos_2023_24": "EXIT_NOW",
+        "forward_2025_26": "EXIT_NOW",
+        "agree": true
+      },
+      "per_regime": {
+        "hiking": "EXIT_NOW",
+        "cutting": "EXIT_NOW"
+      },
+      "regime_window_252": "EXIT_NOW",
+      "signal_frozen_action": "EXIT_NOW"
+    },
+    "85": {
+      "evaluated": false,
+      "reason": "carry not-aligned \u2192 REVERSAL / N/A"
+    },
+    "86": {
+      "evaluated": true,
+      "coords": {
+        "atr_tercile": "high",
+        "excursion": "modest",
+        "hold_frac": "early",
+        "rsi_extreme": true,
+        "carry": "aligned"
+      },
+      "n_members": 13,
+      "V_hold": 0.05927,
+      "V_exit": 0.27095,
+      "E_hold": 0.29102,
+      "DD_hold": 0.4635,
+      "margin": -0.21168,
+      "optimal_action": "EXIT_NOW",
+      "static_action": "HOLD_AND_TRAIL",
+      "agree_with_static": false,
+      "cpcv": {
+        "sign_stable": false,
+        "stability_fraction": null,
+        "signs": [],
+        "status": "CPCV_INSUFFICIENT"
+      },
+      "economically_sensible": false,
+      "forward": {
+        "oos_2023_24": "EXIT_NOW",
+        "forward_2025_26": null,
+        "agree": false
+      },
+      "per_regime": {
+        "hiking": "EXIT_NOW",
+        "cutting": null
+      },
+      "regime_window_252": "EXIT_NOW",
+      "signal_frozen_action": "EXIT_NOW"
+    },
+    "87": {
+      "evaluated": false,
+      "reason": "carry not-aligned \u2192 REVERSAL / N/A"
+    },
+    "88": {
+      "evaluated": true,
+      "coords": {
+        "atr_tercile": "high",
+        "excursion": "modest",
+        "hold_frac": "mid",
+        "rsi_extreme": false,
+        "carry": "aligned"
+      },
+      "n_members": 103,
+      "V_hold": 0.21658,
+      "V_exit": 0.39374,
+      "E_hold": 0.38766,
+      "DD_hold": 0.34214,
+      "margin": -0.17716,
+      "optimal_action": "EXIT_NOW",
+      "static_action": "HOLD_AND_TRAIL",
+      "agree_with_static": false,
+      "cpcv": {
+        "sign_stable": true,
+        "stability_fraction": 1.0,
+        "signs": [
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1
+        ],
+        "status": "OK"
+      },
+      "economically_sensible": true,
+      "forward": {
+        "oos_2023_24": "EXIT_NOW",
+        "forward_2025_26": "EXIT_NOW",
+        "agree": true
+      },
+      "per_regime": {
+        "hiking": "EXIT_NOW",
+        "cutting": "EXIT_NOW"
+      },
+      "regime_window_252": "EXIT_NOW",
+      "signal_frozen_action": "EXIT_NOW"
+    },
+    "89": {
+      "evaluated": false,
+      "reason": "carry not-aligned \u2192 REVERSAL / N/A"
+    },
+    "90": {
+      "evaluated": true,
+      "coords": {
+        "atr_tercile": "high",
+        "excursion": "modest",
+        "hold_frac": "mid",
+        "rsi_extreme": true,
+        "carry": "aligned"
+      },
+      "n_members": 4,
+      "V_hold": 0.20302,
+      "V_exit": 0.33029,
+      "E_hold": 0.36455,
+      "DD_hold": 0.32307,
+      "margin": -0.12727,
+      "optimal_action": "EXIT_NOW",
+      "static_action": "HOLD_AND_TRAIL",
+      "agree_with_static": false,
+      "cpcv": {
+        "sign_stable": false,
+        "stability_fraction": null,
+        "signs": [],
+        "status": "CPCV_INSUFFICIENT"
+      },
+      "economically_sensible": false,
+      "forward": {
+        "oos_2023_24": null,
+        "forward_2025_26": null,
+        "agree": false
+      },
+      "per_regime": {
+        "hiking": "EXIT_NOW",
+        "cutting": null
+      },
+      "regime_window_252": "EXIT_NOW",
+      "signal_frozen_action": "EXIT_NOW"
+    },
+    "91": {
+      "evaluated": false,
+      "reason": "carry not-aligned \u2192 REVERSAL / N/A"
+    },
+    "92": {
+      "evaluated": true,
+      "coords": {
+        "atr_tercile": "high",
+        "excursion": "modest",
+        "hold_frac": "late",
+        "rsi_extreme": false,
+        "carry": "aligned"
+      },
+      "n_members": 58,
+      "V_hold": 0.39193,
+      "V_exit": 0.49622,
+      "E_hold": 0.50663,
+      "DD_hold": 0.2294,
+      "margin": -0.10429,
+      "optimal_action": "EXIT_NOW",
+      "static_action": "HOLD_AND_TRAIL",
+      "agree_with_static": false,
+      "cpcv": {
+        "sign_stable": true,
+        "stability_fraction": 1.0,
+        "signs": [
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1
+        ],
+        "status": "OK"
+      },
+      "economically_sensible": true,
+      "forward": {
+        "oos_2023_24": "EXIT_NOW",
+        "forward_2025_26": "EXIT_NOW",
+        "agree": true
+      },
+      "per_regime": {
+        "hiking": "EXIT_NOW",
+        "cutting": "EXIT_NOW"
+      },
+      "regime_window_252": "EXIT_NOW",
+      "signal_frozen_action": "EXIT_NOW"
+    },
+    "93": {
+      "evaluated": false,
+      "reason": "carry not-aligned \u2192 REVERSAL / N/A"
+    },
+    "94": {
+      "evaluated": true,
+      "coords": {
+        "atr_tercile": "high",
+        "excursion": "modest",
+        "hold_frac": "late",
+        "rsi_extreme": true,
+        "carry": "aligned"
+      },
+      "n_members": 1,
+      "V_hold": -0.01088,
+      "V_exit": 0.09378,
+      "E_hold": 0.11194,
+      "DD_hold": 0.24563,
+      "margin": -0.10465,
+      "optimal_action": "EXIT_NOW",
+      "static_action": "HOLD_AND_TRAIL",
+      "agree_with_static": false,
+      "cpcv": {
+        "sign_stable": false,
+        "stability_fraction": null,
+        "signs": [],
+        "status": "CPCV_INSUFFICIENT"
+      },
+      "economically_sensible": false,
+      "forward": {
+        "oos_2023_24": null,
+        "forward_2025_26": null,
+        "agree": false
+      },
+      "per_regime": {
+        "hiking": null,
+        "cutting": null
+      },
+      "regime_window_252": "EXIT_NOW",
+      "signal_frozen_action": "EXIT_NOW"
+    },
+    "95": {
+      "evaluated": false,
+      "reason": "carry not-aligned \u2192 REVERSAL / N/A"
+    },
+    "96": {
+      "evaluated": true,
+      "coords": {
+        "atr_tercile": "high",
+        "excursion": "extended",
+        "hold_frac": "early",
+        "rsi_extreme": false,
+        "carry": "aligned"
+      },
+      "n_members": 10,
+      "V_hold": 1.08844,
+      "V_exit": 1.22726,
+      "E_hold": 1.21235,
+      "DD_hold": 0.24781,
+      "margin": -0.13882,
+      "optimal_action": "EXIT_NOW",
+      "static_action": "HOLD_AND_TRAIL",
+      "agree_with_static": false,
+      "cpcv": {
+        "sign_stable": false,
+        "stability_fraction": null,
+        "signs": [],
+        "status": "CPCV_INSUFFICIENT"
+      },
+      "economically_sensible": false,
+      "forward": {
+        "oos_2023_24": "EXIT_NOW",
+        "forward_2025_26": null,
+        "agree": false
+      },
+      "per_regime": {
+        "hiking": "EXIT_NOW",
+        "cutting": "EXIT_NOW"
+      },
+      "regime_window_252": "EXIT_NOW",
+      "signal_frozen_action": "EXIT_NOW"
+    },
+    "97": {
+      "evaluated": false,
+      "reason": "carry not-aligned \u2192 REVERSAL / N/A"
+    },
+    "98": {
+      "evaluated": true,
+      "coords": {
+        "atr_tercile": "high",
+        "excursion": "extended",
+        "hold_frac": "early",
+        "rsi_extreme": true,
+        "carry": "aligned"
+      },
+      "n_members": 12,
+      "V_hold": 1.62155,
+      "V_exit": 1.72135,
+      "E_hold": 1.70937,
+      "DD_hold": 0.17564,
+      "margin": -0.0998,
+      "optimal_action": "EXIT_NOW",
+      "static_action": "HOLD_AND_TRAIL",
+      "agree_with_static": false,
+      "cpcv": {
+        "sign_stable": false,
+        "stability_fraction": null,
+        "signs": [],
+        "status": "CPCV_INSUFFICIENT"
+      },
+      "economically_sensible": false,
+      "forward": {
+        "oos_2023_24": null,
+        "forward_2025_26": null,
+        "agree": false
+      },
+      "per_regime": {
+        "hiking": "EXIT_NOW",
+        "cutting": null
+      },
+      "regime_window_252": "EXIT_NOW",
+      "signal_frozen_action": "EXIT_NOW"
+    },
+    "99": {
+      "evaluated": false,
+      "reason": "carry not-aligned \u2192 REVERSAL / N/A"
+    },
+    "100": {
+      "evaluated": true,
+      "coords": {
+        "atr_tercile": "high",
+        "excursion": "extended",
+        "hold_frac": "mid",
+        "rsi_extreme": false,
+        "carry": "aligned"
+      },
+      "n_members": 37,
+      "V_hold": 1.55492,
+      "V_exit": 1.6297,
+      "E_hold": 1.62209,
+      "DD_hold": 0.13433,
+      "margin": -0.07478,
+      "optimal_action": "EXIT_NOW",
+      "static_action": "HOLD_AND_TRAIL",
+      "agree_with_static": false,
+      "cpcv": {
+        "sign_stable": true,
+        "stability_fraction": 0.9333333333333333,
+        "signs": [
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1
+        ],
+        "status": "OK"
+      },
+      "economically_sensible": true,
+      "forward": {
+        "oos_2023_24": "EXIT_NOW",
+        "forward_2025_26": null,
+        "agree": false
+      },
+      "per_regime": {
+        "hiking": "EXIT_NOW",
+        "cutting": "EXIT_NOW"
+      },
+      "regime_window_252": "EXIT_NOW",
+      "signal_frozen_action": "EXIT_NOW"
+    },
+    "101": {
+      "evaluated": false,
+      "reason": "carry not-aligned \u2192 REVERSAL / N/A"
+    },
+    "102": {
+      "evaluated": true,
+      "coords": {
+        "atr_tercile": "high",
+        "excursion": "extended",
+        "hold_frac": "mid",
+        "rsi_extreme": true,
+        "carry": "aligned"
+      },
+      "n_members": 20,
+      "V_hold": 2.03199,
+      "V_exit": 2.08681,
+      "E_hold": 2.08333,
+      "DD_hold": 0.10268,
+      "margin": -0.05482,
+      "optimal_action": "EXIT_NOW",
+      "static_action": "HOLD_AND_TRAIL",
+      "agree_with_static": false,
+      "cpcv": {
+        "sign_stable": false,
+        "stability_fraction": null,
+        "signs": [],
+        "status": "CPCV_INSUFFICIENT"
+      },
+      "economically_sensible": false,
+      "forward": {
+        "oos_2023_24": "EXIT_NOW",
+        "forward_2025_26": "HOLD_AND_TRAIL",
+        "agree": false
+      },
+      "per_regime": {
+        "hiking": "EXIT_NOW",
+        "cutting": "EXIT_NOW"
+      },
+      "regime_window_252": "EXIT_NOW",
+      "signal_frozen_action": "EXIT_NOW"
+    },
+    "103": {
+      "evaluated": false,
+      "reason": "carry not-aligned \u2192 REVERSAL / N/A"
+    },
+    "104": {
+      "evaluated": true,
+      "coords": {
+        "atr_tercile": "high",
+        "excursion": "extended",
+        "hold_frac": "late",
+        "rsi_extreme": false,
+        "carry": "aligned"
+      },
+      "n_members": 33,
+      "V_hold": 1.35495,
+      "V_exit": 1.41396,
+      "E_hold": 1.41257,
+      "DD_hold": 0.11524,
+      "margin": -0.059,
+      "optimal_action": "EXIT_NOW",
+      "static_action": "HOLD_AND_TRAIL",
+      "agree_with_static": false,
+      "cpcv": {
+        "sign_stable": false,
+        "stability_fraction": 0.7333333333333333,
+        "signs": [
+          -1,
+          1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          1,
+          -1,
+          -1,
+          1,
+          -1,
+          1,
+          -1
+        ],
+        "status": "OK"
+      },
+      "economically_sensible": false,
+      "forward": {
+        "oos_2023_24": "EXIT_NOW",
+        "forward_2025_26": "HOLD_AND_TRAIL",
+        "agree": false
+      },
+      "per_regime": {
+        "hiking": "EXIT_NOW",
+        "cutting": "EXIT_NOW"
+      },
+      "regime_window_252": "EXIT_NOW",
+      "signal_frozen_action": "EXIT_NOW"
+    },
+    "105": {
+      "evaluated": false,
+      "reason": "carry not-aligned \u2192 REVERSAL / N/A"
+    },
+    "106": {
+      "evaluated": true,
+      "coords": {
+        "atr_tercile": "high",
+        "excursion": "extended",
+        "hold_frac": "late",
+        "rsi_extreme": true,
+        "carry": "aligned"
+      },
+      "n_members": 7,
+      "V_hold": 2.19767,
+      "V_exit": 2.23132,
+      "E_hold": 2.22826,
+      "DD_hold": 0.06118,
+      "margin": -0.03365,
+      "optimal_action": "EXIT_NOW",
+      "static_action": "HOLD_AND_TRAIL",
+      "agree_with_static": false,
+      "cpcv": {
+        "sign_stable": false,
+        "stability_fraction": null,
+        "signs": [],
+        "status": "CPCV_INSUFFICIENT"
+      },
+      "economically_sensible": false,
+      "forward": {
+        "oos_2023_24": "EXIT_NOW",
+        "forward_2025_26": "HOLD_AND_TRAIL",
+        "agree": false
+      },
+      "per_regime": {
+        "hiking": "HOLD_AND_TRAIL",
+        "cutting": "EXIT_NOW"
+      },
+      "regime_window_252": "EXIT_NOW",
+      "signal_frozen_action": "EXIT_NOW"
+    },
+    "107": {
+      "evaluated": false,
+      "reason": "carry not-aligned \u2192 REVERSAL / N/A"
+    }
+  },
+  "summary": {
+    "forward_agreement_fraction": 0.8695652173913043,
+    "forward_cells_compared": 23,
+    "separability_agreement": 0.8620689655172413,
+    "separability_cells_compared": 29,
+    "regime_window_agreement": 0.8541666666666666,
+    "regime_window_cells_compared": 48,
+    "regime_window_robust": false,
+    "n_exit_now_cells": 45,
+    "n_cpcv_stable_sensible_divergences": 10,
+    "n_divergences_forward_consistent": 9,
+    "gross_R_caveat": "R is gross (locked); swap/carry would shift marginal EXIT_NOW cells toward EXIT.",
+    "forward_window_thin_note": "forward (2025-26) members = 242; treat its agreement cautiously.",
+    "interpretation_caveat": "Vol innovations are ~white; any structure is excursion geometry conditioned on entry regime, NOT intra-trade vol momentum.",
+    "pass_fail_sentence": "PASS \u2014 10 CPCV-stable economically-sensible EXIT_NOW divergence(s); 9 of them agree across the 2023-24 and 2025-26 windows."
+  }
+}
