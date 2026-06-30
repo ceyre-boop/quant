@@ -1,3 +1,6 @@
+# DEPRECATED 2026-06-30 — writes to Firebase path not read by any live dashboard.
+# Dashboards read Render backend (/api/* endpoints) and committed JSON snapshots.
+# This script is a no-op stub kept for reference. Remove after confirming no dependents.
 """
 scripts/push_to_firebase.py
 ============================
@@ -30,6 +33,10 @@ Firebase paths written:
     /system/health                       ← system heartbeat
 """
 from __future__ import annotations
+
+import sys
+print("[push_to_firebase] DEPRECATED — no-op. See script header for details.", file=sys.stderr)
+sys.exit(0)
 
 import argparse
 import json
