@@ -1,0 +1,216 @@
+# ════════════════════════════════════════════════════════════════════════════════════════════════
+#  ⛔ SUPERSEDED — this is HYP-071 v1, frozen verbatim for audit. The canonical spec is
+#  HYP-071_tabular_exit_value.yaml (v2). Reason superseded: the block length L was derived from the
+#  1/e autocorrelation crossing of the ATR% LEVEL series — but ATR% is a 14-day SMA, autocorrelated to
+#  ~lag 14 by construction, so all four raw crossings (25–86) overshot the [5,15] clamp and the CLAMP,
+#  not the data, set L=15. v2 re-derives L from the ATR% INNOVATION (first difference) with a [5,60]
+#  clamp. This file is unchanged below; its hash_lock still verifies to c4f29ac3…41546 (this banner is
+#  a comment and is not part of the hashed dict). DO NOT use v1 for Step 2.
+# ════════════════════════════════════════════════════════════════════════════════════════════════
+# ════════════════════════════════════════════════════════════════════════════════════════════════
+#  HYP-071 — Tabular Exit Value Function (Stockfish/NNUE-style L2 exit evaluator)
+#  PRE-REGISTRATION · Step 1 of N · LOCKED BEFORE ANY LABEL IS COMPUTED.
+#
+#  This file is hash-locked (see `hash_method` / `hash_lock` footer). Any edit after signing breaks
+#  the hash — that is the tamper tripwire. Nothing in Step 2+ may revise a value here without an
+#  explicit, logged re-freeze. The validity of the experiment IS this lock-before-data ordering.
+# ════════════════════════════════════════════════════════════════════════════════════════════════
+
+id: HYP-071
+name: "Tabular exit value function over a discretized board, from regime-conditional resampled rollouts"
+family: L2-exit-evaluator
+phase: 1
+status: PREREGISTERED
+frozen_at: "2026-06-30"
+prior_expectation: >-
+  NOT_SIGNIFICANT — likely the 4th confirmation of the data-ceiling thesis (HYP-064..067 all killed).
+  The exit edge is expected to be the deterministic 6-state machine itself, not a learnable path-shape
+  structure separable from the (forward-decayed) directional entry edge. Registered anyway, rigorously,
+  so the answer is trustworthy whichever way it falls.
+isolation: "sovereign-only — no import from ict/ or ict-engine/. Reads sovereign + yfinance only."
+
+purpose: >-
+  Build a Stockfish/NNUE-shaped exit evaluator: a value function that predicts, on a live bar, the
+  expected risk-adjusted outcome of the quiet HOLD-vs-exit choice, using the 1.26M-trades/sec
+  backtester as the deep-search oracle. This step LOCKS the target/resampling/board/validation so the
+  Step-2 table cannot be p-hacked after results are seen.
+
+mechanism: >-
+  The naive label — realized R of the one historical path after a state — is prediction in evaluation's
+  costume (it depends on the future that happened, not the state). The fix: the label is a Monte-Carlo
+  statistic over RESAMPLED continuations consistent with the state, downside-penalized (Sharpe, not
+  mean R, is the objective). That is a property of the state and the resampling process — a legitimate
+  evaluation target — which is what makes it Stockfish-shaped.
+
+# ── §1 HYPOTHESIS ──────────────────────────────────────────────────────────────────────────────────
+hypothesis: >-
+  A tabular value function over a discretized board state, computed from regime-conditional resampled
+  backtester rollouts, exhibits stable, economically-sensible, CPCV-robust structure that (a) reconciles
+  against prove.py and (b) holds on BOTH the 2023-24 OOS window and the 2025-26 forward window. If it
+  does, a path-shape exit edge exists that is at least partially independent of the directional entry
+  edge. If it does not, the exit edge is entangled with the (forward-decayed) entry edge and we are at
+  the data ceiling.
+
+# ── §2 TARGET / LABEL (LOCKED) ───────────────────────────────────────────────────────────────────────
+target:
+  formula: "V(cell, action) = E[R] - lambda * DownsideDeviation(R)"
+  lambda: 0.5                       # LOCKED downside-penalty weight; may NOT be tuned post-hoc.
+  lambda_note: "Fixed at 0.5. Trying other lambdas after seeing results invalidates this preregistration."
+  downside_deviation: "sqrt( mean( min(R - MAR, 0)^2 ) )"
+  MAR: 0.0                          # minimum acceptable return
+  R_definition:
+    formula: "R = (close - entry_price) * direction / risk_per_unit"
+    risk_per_unit: "STOP_ATR_MULT * atr_pct_at_entry * entry_price"
+    STOP_ATR_MULT: 2.0              # the entry-risk denominator that defines exit_machine.stop_price
+    note: "R is the realized R-multiple when the action is applied at this state and the position is
+           carried forward through a RESAMPLED continuation to its TRUE terminal exit."
+  terminal_exit: "Whichever hard rule or trail fires first under the existing decide_exit logic."
+  ensemble: "E[R] and DownsideDeviation are taken over the ensemble of resampled continuations for the
+             given cell+action."
+  candidate_actions: [HOLD_AND_TRAIL, EXIT_NOW]
+  hard_overrides_not_candidate: [INITIAL_STOP, REVERSAL, TIME]
+  candidate_actions_note: >-
+    The table evaluates ONLY the HOLD-vs-exit choice in the quiet space (HOLD-eligible states), exactly
+    as NNUE scores only quiet positions and never overrides checkmate. INITIAL_STOP / REVERSAL / TIME
+    fire regardless and are not scored.
+
+# ── §3 RESAMPLING SCHEME (LOCKED) ────────────────────────────────────────────────────────────────────
+resampling:
+  scheme: "stationary block bootstrap (Politis & Romano, 1994)"
+  regime_conditional: >-
+    Continuations for a cell are resampled ONLY from historical bars in the SAME ATR-percentile bucket
+    as the cell. This matches the continuation distribution to the regime the state is actually in and
+    is the in-bootstrap test of the separability question.
+  iid_bootstrap: REJECTED
+  iid_bootstrap_rationale: >-
+    IID bootstrap is FORBIDDEN — it would teach the evaluator that volatility is iid, which is false
+    (it destroys volatility clustering and serial dependence).
+  continuations_per_cell: 10000     # LOCKED
+  block_length_L: 15                # LOCKED — concrete integer from sovereign/discovery/block_length.py
+  block_length_rule: >-
+    L = round( mean over the four pairs of [ first lag where daily ATR% autocorrelation drops below
+    1/e ] ), clamped to [5, 15] trading days. ATR% matches the live exit machine exactly
+    (ForexSignalEngine._compute_atr_pct: True Range -> 14-day SMA -> / Close).
+
+block_length_derivation:
+  helper: "sovereign/discovery/block_length.py :: compute_atr_block_length"
+  window: ["2015-01-01", "2026-06-30"]
+  pairs: ["EURUSD=X", "GBPUSD=X", "USDJPY=X", "AUDUSD=X"]
+  per_pair_crossing_lag: {EURUSD=X: 86, GBPUSD=X: 25, USDJPY=X: 67, AUDUSD=X: 46}
+  mean_crossing_lag: 56.0
+  clamp: [5, 15]
+  L_locked: 15
+  note: >-
+    All four raw crossing lags (25..86, mean 56) exceed the clamp ceiling, so the CLAMP — not the data —
+    sets L=15. This is expected: ATR% is a 14-day SMA, structurally autocorrelated out to ~lag 14, and
+    volatility persistence pushes the 1/e crossing well past 15. Recorded for auditability; the locked
+    value is frozen regardless of later yfinance data drift.
+
+# ── §4 BOARD DISCRETIZATION (LOCKED) ─────────────────────────────────────────────────────────────────
+board:
+  total_cells: 108                  # 3 x 3 x 3 x 2 x 2
+  evaluated_cells_note: >-
+    Cells a hard rule always captures are recorded N/A, NOT silently dropped — chiefly the
+    carry-signal 'not-aligned' half, which REVERSAL handles (~54 evaluated + ~54 N/A).
+  dimensions:
+    atr_percentile:
+      buckets: 3                    # terciles: low / mid / high
+      basis: "rolling 60-day ATR% percentile"
+    excursion_state:
+      buckets: 3
+      definition: "current unrealized R relative to entry-risk"
+      cut_points: {underwater: "<0R", modest: "0..1R", extended: ">1R"}
+    hold_fraction:
+      buckets: 3
+      definition: "hold_count / hold_limit"
+      cut_points: {early: "<0.33", mid: "0.33..0.66", late: ">0.66"}
+    rsi14_extreme_flag:
+      buckets: 2
+      definition: "extreme = (>70 for long / <30 for short); else not-extreme"
+    carry_signal_state:
+      buckets: 2
+      definition: "aligned = (signal direction == position direction); else not-aligned"
+      included_rationale: >-
+        Included deliberately. Without it the table would disagree with the static config on
+        CB_REFRESH-adjacent cells for the wrong reason. Signal state is already in the board.
+
+# ── §5 VALIDATION PROTOCOL (LOCKED) ──────────────────────────────────────────────────────────────────
+validation:
+  reconciliation:
+    target_sharpe: 0.6886
+    tolerance: 0.01
+    procedure: >-
+      The unbucketed, un-resampled full-decade Sharpe produced by the same harness must equal
+      0.6886 +/- 0.01:
+      weighted_portfolio_sharpe( ForexBacktester('2015-01-01','2024-12-31').backtest_all() ).
+    on_mismatch: "HALT and report — the harness is misconfigured. Do NOT interpret the table."
+  robustness:
+    method: "purged combinatorial cross-validation (Lopez de Prado Ch.12)"
+    impl: "sovereign/discovery/cpcv.py :: combinatorial_purged_splits"
+    rule: "A cell's structure counts as real only if the sign of (V_hold - V_exit) is STABLE across CPCV paths."
+  forward_test:
+    windows: {oos: ["2023-01-01", "2024-12-31"], forward: ["2025-01-01", "2026-12-31"]}
+    procedure: "Compute the WHOLE table independently on each window and compare."
+    acceptance: "The optimal action per cell agrees between the two windows in the economically-sensible direction."
+    record: "agreement_fraction"
+  separability_test:
+    runs_inside: "the same computation"
+    regimes:
+      hiking: ["2022", "2023"]
+      cutting: ["2021", "2024", "2025"]
+    rule: >-
+      If the optimal policy is similar across both regimes, path-shape structure is regime-stable and
+      partially independent of the directional edge. If the policies flip, the exit edge is entangled
+      with the entry edge -> data ceiling. Record which.
+
+# ── §6 STATIC-CONFIG COMPARISON (LOCKED first-class output) ───────────────────────────────────────────
+static_config_comparison:
+  per_cell_record:
+    - "table-optimal action (HOLD_AND_TRAIL or EXIT_NOW) and its V"
+    - "what the current static v015 config does in that cell"
+    - "whether they agree within CPCV noise"
+  interpretation_rule_fixed_in_advance:
+    confirm_95pct: "If ~95% of cells confirm the static config -> the exit machine is proven near-optimal
+                    with evidence, not assumption. Strong positive result even with no net."
+    sensible_divergence: "Cells that diverge in economically-sensible directions (e.g. high-ATR + late-hold
+                          -> table says exit faster) become candidate TARGETED RULE ADDITIONS — not a net,
+                          not a rewrite."
+    nonsensical_divergence: "Divergence in nonsensical or CPCV-unstable directions -> noise, ignored,
+                             recorded as such."
+
+# ── §7 PASS / FAIL GATE (LOCKED, one sentence) ───────────────────────────────────────────────────────
+pass_fail:
+  PASS: >-
+    The table reconciles, shows CPCV-stable structure, AND the optimal policy agrees across the 2023-24
+    and 2025-26 windows in economically-sensible directions -> proceed to Step 2 (build the label
+    generator and compute the table for real).
+  FAIL: >-
+    Structure is in-sample only, or flips forward, or doesn't reconcile -> data thesis confirmed a third
+    time; the unlock is new data, not a cleverer exit. Log to hypothesis ledger and stop.
+  ledger: "data/agent/hypothesis_ledger.json"
+
+# ── flagged defaults (locked as specified; surfaced for the reviewer) ────────────────────────────────
+flagged_defaults:
+  - "ATR%-LEVEL autocorrelation is persistent; L is set by the [5,15] clamp ceiling (=15), not by the
+     data (raw crossings 25..86). A more informative decorrelation time would use ATR% CHANGES/log-returns,
+     but the spec says 'the ATR% series' — locked as the level."
+  - "2025 double-use: the 'cutting' separability regime (2021, 2024-2025) overlaps the 2025-26 forward
+     acceptance window, so 2025 feeds both tests. Restricting cutting to (2021, 2024) would keep 2025-26
+     purely forward. Locked as written."
+  - "Board uses a 60-day ATR% percentile in TERCILES; HYP-066 precedent used a 252-day BINARY median split.
+     60-day is the faster state-read requested. Locked per spec."
+
+# ── this-step deliverables / constraints ─────────────────────────────────────────────────────────────
+deliverables_this_step:
+  - "this file (hash-locked)"
+  - "sovereign/discovery/block_length.py + tests/unit/test_block_length.py (13 tests green)"
+constraints:
+  - "No labels, no rollouts, no value computation, no Sharpe this step."
+  - "Prereg + helper are NOT committed without Colin's approval (the L2 feature commit was the exception)."
+  - "ICT/sovereign isolation holds."
+  - "The prereg is locked BEFORE Step 2 sees data — that ordering is the experiment's validity."
+
+# ── hash lock ────────────────────────────────────────────────────────────────────────────────────────
+hash_method: "sha256 of json.dumps(doc, sort_keys=True, separators=(',',':')) where doc = the YAML
+  parsed to a dict MINUS the hash_lock field. Mirrors scripts/research/exit_regime_conditioning.py::_canonical_hash."
+hash_lock: "c4f29ac387669fc77ac33f1d2570042898d8f81bc0409e1fd0e7d57ba9a41546"
