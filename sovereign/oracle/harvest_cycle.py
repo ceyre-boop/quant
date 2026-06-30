@@ -104,9 +104,10 @@ def _detect_anomalies(records: list[dict], trades: list[dict]) -> list[str]:
         else:
             run = 0
 
-    # Commitment score divergence
-    commit_wins  = [r.get("commitment_score", 0.5) for r in records if r.get("outcome") == "WIN"]
-    commit_loss  = [r.get("commitment_score", 0.5) for r in records if r.get("outcome") == "LOSS"]
+    # Commitment score divergence (None-safe: a null commitment_score means the live
+    # CommitmentDetector did not run for that entry — treat as neutral 0.5, never feed None to mean())
+    commit_wins  = [(r.get("commitment_score") if r.get("commitment_score") is not None else 0.5) for r in records if r.get("outcome") == "WIN"]
+    commit_loss  = [(r.get("commitment_score") if r.get("commitment_score") is not None else 0.5) for r in records if r.get("outcome") == "LOSS"]
     if commit_wins and commit_loss:
         delta = statistics.mean(commit_wins) - statistics.mean(commit_loss)
         if delta < 0.05:
@@ -189,8 +190,8 @@ def run_harvest(date: Optional[str] = None, hours: int = 24) -> dict:
     loss_forensics = [r for r in forensics if r.get("outcome") == "LOSS"]
     win_forensics  = [r for r in forensics if r.get("outcome") == "WIN"]
 
-    commit_wins  = [r.get("commitment_score", 0.5) for r in win_forensics]
-    commit_loss  = [r.get("commitment_score", 0.5) for r in loss_forensics]
+    commit_wins  = [(r.get("commitment_score") if r.get("commitment_score") is not None else 0.5) for r in win_forensics]
+    commit_loss  = [(r.get("commitment_score") if r.get("commitment_score") is not None else 0.5) for r in loss_forensics]
 
     r_multiples = [t.get("pnl_r", 0) for t in trades]
 

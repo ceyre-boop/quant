@@ -560,6 +560,13 @@ class ICTPipeline:
             )
         # DEVELOPING: execute at reduced size (handled downstream via size_multiplier)
         _commit_size_mult = getattr(_commit, "size_multiplier", 1.0) if _commit is not None else 1.0
+        # RQ-REST-018: log the real commitment SCORE (price-action quality 0-1), not the size
+        # multiplier. In the live `ict.orchestrator` path _commit is None (the sovereign
+        # CommitmentDetector bridge is orphaned, not wired into the live scanner), so the score
+        # is None = honest "unknown" — NOT a constant 1.0 that biased Oracle toward "fully
+        # committed". Consumers default/skip None. Wiring the detector into the live path is a
+        # separate architectural change (see NEXT.md / param_change_log).
+        _commit_score = getattr(_commit, "score", None) if _commit is not None else None
 
         # ══════════════════════════════════════════════════════════════════
         # STAGE 6 — Risk engine gate
@@ -623,7 +630,8 @@ class ICTPipeline:
                 _snapshot = {
                     "score": round(float(total_score), 3),
                     "grade": getattr(_effective_grade, "value", str(_effective_grade)),
-                    "commitment_score": _commit_size_mult,
+                    "commitment_score": _commit_score,
+                    "commitment_size_mult": _commit_size_mult,
                     "component_scores": {k: round(float(v), 3) for k, v in scores.items()},
                     "n_confirmations": len(confirmations),
                     "n_missing": len(missing),
@@ -637,7 +645,7 @@ class ICTPipeline:
                     _lessons.append("L-001")  # grade-quality-inversion downgrade (A+→A)
                 _dl.log_ict_decision(
                     signal=_sig,
-                    commitment_score=_commit_size_mult,
+                    commitment_score=_commit_score,
                     bars_since_signal=_bars,
                     present_state_snapshot=_snapshot,
                     active_lessons=_lessons,

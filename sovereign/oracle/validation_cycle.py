@@ -77,7 +77,7 @@ def _apply_rule(records: list[dict], rule_expr: str) -> tuple[list[float], list[
         try:
             # Safe eval with record fields as locals
             safe_locals = {
-                "commitment_score":   float(r.get("commitment_score", 0.5)),
+                "commitment_score":   float(r.get("commitment_score") if r.get("commitment_score") is not None else 0.5),
                 "session":            str(r.get("session", "")),
                 "grade":              str(r.get("grade", "")),
                 "failure_label":      str(r.get("failure_label", "")),
