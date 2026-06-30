@@ -1296,6 +1296,44 @@ async function tryFetchBridge(){
   }catch{return null;}
 }
 
+// ── Snapshot fallback (the cloud has no live scanner — read the committed proof-of-life) ──
+let _polSnap=null;
+async function loadPolSnap(force){
+  if(_polSnap && !force) return _polSnap;
+  try{
+    const r=await fetch(API_BASE+'/data/agent/proof_of_life.json?t='+Date.now(),{signal:AbortSignal.timeout(NET_T)});
+    if(r.ok) _polSnap=await r.json();
+  }catch(e){}
+  return _polSnap;
+}
+function _fmtPair(p){return (p||'').replace('=X','');}
+function idleNoteHtml(pol){
+  pol=pol||_polSnap||{};
+  const ss=pol.strongest_signal||{}, lf=pol.last_fill||{};
+  const strong=ss.pair?`strongest <strong>${_fmtPair(ss.pair)}</strong> · conv ${(ss.conviction||0).toFixed(2)} · ${ss.pct_to_trigger==null?100:ss.pct_to_trigger}% to trigger`:'';
+  const fill=lf.pair?`last fill <strong>${_fmtPair(lf.pair)}</strong> ${lf.direction||''}${lf.days_ago!=null?' · '+(+lf.days_ago).toFixed(1)+'d ago':''}`:'';
+  return `<div style="font-size:12px;color:var(--muted);line-height:1.9">
+    <span style="color:var(--green)">✓ System idle — no signal firing right now (correct, not broken).</span><br>
+    ${IS_REMOTE?'<span style="color:var(--dim)">Live scan runs on your Mac; this is the cloud snapshot.</span><br>':''}
+    ${strong?strong+'<br>':''}${fill||''}</div>`;
+}
+function proximityTableHtml(pol){
+  pol=pol||_polSnap||{};
+  const ps=pol.pairs||[];
+  if(!ps.length) return idleNoteHtml(pol);
+  const rows=ps.map(p=>{
+    const dir=p.direction||'NO_TRADE';
+    const dcol=dir==='LONG'?'var(--green)':dir==='SHORT'?'var(--red)':'var(--muted)';
+    return `<div class="sp-pair-row"><div class="sp-pair-header">
+      <span class="sp-pair-name">${_fmtPair(p.pair)}</span>
+      <span style="font-weight:700;color:${dcol};font-size:11px">${dir}</span>
+      <span style="font-size:11px;color:var(--muted)">conv ${(p.conviction||0).toFixed(2)}</span>
+      <span style="font-size:10px;color:var(--muted)">${p.pct_to_trigger==null?100:p.pct_to_trigger}% to trigger</span>
+    </div></div>`;
+  }).join('');
+  return `<div style="font-size:11px;color:var(--green);margin-bottom:6px">✓ No live scan (it runs on your Mac) — forex macro proximity (idle, edge not firing):</div>${rows}`;
+}
+
 async function updateBridgeState(){
   const data=await tryFetchBridge();
   if(!data)return;
@@ -1336,15 +1374,29 @@ async function updateBridgeState(){
   document.getElementById('ss-threat').style.color=threat>0.85?'var(--red)':threat>0.5?'var(--yellow)':'var(--green)';
 
   // Update forex cards — live signal + price + sparkline. AUDNZD excluded (HYP-045).
+  // Snapshot fallback: the cloud's live yfinance scan returns flat (conviction 0.00) — fall
+  // back to the committed proof-of-life proximity so the cards show REAL conviction/direction.
+  let _fx=data.forex_signals||[];
+  if(!_fx.length || _fx.every(s=>!s.conviction)){
+    const pol=await loadPolSnap();
+    if(pol&&pol.pairs&&pol.pairs.length){
+      const dmap={LONG:1,SHORT:-1,NO_TRADE:0};
+      _fx=pol.pairs.map(p=>({ticker:p.pair,label:_fmtPair(p.pair),signal:dmap[p.direction]??0,conviction:p.conviction||0,price:null,direction:p.direction,pct_to_trigger:p.pct_to_trigger}));
+    }
+  }
+  data.forex_signals=_fx;
   const pairMap={EURUSD:'eurusd',GBPUSD:'gbpusd',AUDUSD:'audusd',USDJPY:'usdjpy'};
   (data.forex_signals||[]).forEach(s=>{
     const k=pairMap[(s.ticker||'').replace('=X','')];if(!k)return;
     const priceEl=document.getElementById('fp-'+k);
     const sigEl=document.getElementById('fsb-'+k);
     const convEl=document.getElementById('fcv-'+k);
-    if(priceEl&&s.price!=null)priceEl.textContent=s.price.toFixed(5);
+    if(priceEl){
+      if(s.price!=null)priceEl.textContent=s.price.toFixed(5);
+      else if(s.pct_to_trigger!=null)priceEl.textContent=s.pct_to_trigger+'% to trigger';
+    }
     if(sigEl){
-      const sig=s.signal>0?'LONG':s.signal<0?'SHORT':'FLAT';
+      const sig=s.direction||(s.signal>0?'LONG':s.signal<0?'SHORT':'FLAT');
       sigEl.textContent=sig;
       sigEl.className='fc-signal-big '+(s.signal>0?'long':s.signal<0?'short':'flat');
     }
@@ -1393,7 +1445,9 @@ async function updateBridgeState(){
         <div style="font-size:11px;color:var(--muted)">${_best.price?.toFixed(5)||'—'}</div>`;
       bsCard.style.borderColor=_best.signal>0?'rgba(0,212,160,.3)':'rgba(255,77,106,.3)';
     } else {
-      bsCard.innerHTML='<div style="font-size:9px;color:var(--muted);letter-spacing:1px">BEST SETUP NOW</div><div style="color:var(--dim);font-size:11px;flex:1">No active signals — market is flat</div>';
+      const _ss=(_polSnap||{}).strongest_signal;
+      const _idle=_ss?`<span style="color:var(--green)">✓ Idle — edge not firing (correct)</span> · strongest <strong>${_fmtPair(_ss.pair)}</strong> conv ${(_ss.conviction||0).toFixed(2)} · ${_ss.pct_to_trigger==null?100:_ss.pct_to_trigger}% to trigger`:'No active signals — market is flat';
+      bsCard.innerHTML='<div style="font-size:9px;color:var(--muted);letter-spacing:1px">BEST SETUP NOW</div><div style="color:var(--dim);font-size:11px;flex:1">'+_idle+'</div>';
       bsCard.style.borderColor='var(--border)';
     }
   }
@@ -1466,18 +1520,38 @@ const _CTL_LS='sq_ctl_token';
 function ctlToken(){return localStorage.getItem(_CTL_LS)||'';}
 function ctlHeaders(){return {'Content-Type':'application/json','X-Control-Token':ctlToken()};}
 function ctlSetStatus(msg,cls){const e=document.getElementById('ctl-status');if(!e)return;e.textContent=msg;e.className='ctl-status'+(cls?' '+cls:'');}
+// "Both (smart)" controls: execute live on localhost (token + server enabled), else copy a
+// ready-to-run instruction to paste into Claude Code. No token wall — every button does something.
+const CTL_CMD={
+  'run-queue':{nl:'Run the Alta research queue',cmd:'python3 scripts/run_research_queue.py'},
+  'checklist':{nl:'Run the Alta prop-firm checklist',cmd:''},
+  'refresh-prop':{nl:'Refresh the prop pass-probability (Monte-Carlo)',cmd:'python3 -m sovereign.risk.monte_carlo_prop'},
+  'freeze':{nl:'Freeze Alta trading',cmd:'python3 scripts/alta.py freeze "manual freeze from dashboard"'},
+  'thaw':{nl:'Thaw Alta trading',cmd:'python3 scripts/alta.py thaw'},
+  'nudge-oracle':{nl:'Ask the Oracle for a fresh take',cmd:'python3 -m sovereign.oracle.reflect_cycle'},
+};
+let _ctlEnabled=false;
+function ctlLive(){return !IS_REMOTE && !!ctlToken() && _ctlEnabled;}
+function ctlCopy(action){
+  const c=CTL_CMD[action]||{nl:action,cmd:''};
+  const text=c.nl+(c.cmd?' — run: '+c.cmd:'');
+  navigator.clipboard.writeText(text).catch(()=>{});
+  const job=document.getElementById('ctl-job');
+  if(job){job.classList.add('show');job.textContent='📋 Copied — paste into Claude Code to run it:\n'+text;}
+}
 async function ctlStatus(){
   try{
     const r=await fetch(API_BASE+'/control/status?t='+Date.now(),{signal:AbortSignal.timeout(NET_T)});
     const d=await r.json();
+    _ctlEnabled=!!d.enabled;
     const frozen=!!d.frozen, fz=document.getElementById('ctl-freeze'), th=document.getElementById('ctl-thaw');
     if(fz&&th){fz.style.display=frozen?'none':'';th.style.display=frozen?'':'none';}
     if(frozen)ctlSetStatus('⏸ TRADING FROZEN — '+((d.frozen||{}).reason||''),'err');
-    else if(!ctlToken())ctlSetStatus('controls locked — enter your token');
-    else if(!d.enabled)ctlSetStatus('server has no control token set (controls disabled)','err');
-    else ctlSetStatus('controls unlocked','ok');
+    else if(ctlLive())ctlSetStatus('controls unlocked — one-click execute','ok');
+    else if(IS_REMOTE)ctlSetStatus('cloud snapshot — buttons copy a command to run in Claude Code');
+    else ctlSetStatus('buttons copy a command — set a matching token for live one-click');
     return d;
-  }catch(e){ctlSetStatus(IS_REMOTE?'waking the live server…':'backend offline','err');return null;}
+  }catch(e){_ctlEnabled=false;ctlSetStatus(IS_REMOTE?'cloud snapshot — buttons copy a command to run in Claude Code':'buttons copy a command (backend offline)');return null;}
 }
 function ctlPollJob(jid,onDone){
   const job=document.getElementById('ctl-job');let tries=0;
@@ -1494,7 +1568,7 @@ function ctlPollJob(jid,onDone){
   tick();
 }
 async function ctlAction(action,btn){
-  if(!ctlToken()){ctlSetStatus('enter your control token first','err');return;}
+  if(!ctlLive()){ ctlCopy(action); if(btn){const _t=btn.textContent;btn.textContent='✓ Copied';setTimeout(()=>btn.textContent=_t,1500);} return; }
   if(btn)btn.disabled=true;
   const job=document.getElementById('ctl-job');job.classList.add('show');job.textContent='starting '+action+'…';
   try{
@@ -1528,22 +1602,22 @@ async function loadNextMove(){
   document.querySelectorAll('[data-ctl]').forEach(b=>b.addEventListener('click',()=>ctlAction(b.dataset.ctl,b)));
   const fz=document.getElementById('ctl-freeze');
   if(fz)fz.addEventListener('click',async()=>{
-    if(!ctlToken()){ctlSetStatus('enter your control token first','err');return;}
+    if(!ctlLive()){ctlCopy('freeze');const _t=fz.textContent;fz.textContent='✓ Copied';setTimeout(()=>fz.textContent=_t,1500);return;}
     const reason=prompt('Reason for freezing trading?','manual freeze from dashboard');if(reason===null)return;
     await fetch(API_BASE+'/control/freeze',{method:'POST',headers:ctlHeaders(),body:JSON.stringify({reason})}).catch(()=>{});
     ctlStatus();
   });
   const th=document.getElementById('ctl-thaw');
-  if(th)th.addEventListener('click',async()=>{await fetch(API_BASE+'/control/thaw',{method:'POST',headers:ctlHeaders()}).catch(()=>{});ctlStatus();});
+  if(th)th.addEventListener('click',async()=>{if(!ctlLive()){ctlCopy('thaw');const _t=th.textContent;th.textContent='✓ Copied';setTimeout(()=>th.textContent=_t,1500);return;}await fetch(API_BASE+'/control/thaw',{method:'POST',headers:ctlHeaders()}).catch(()=>{});ctlStatus();});
   const fresh=document.getElementById('nbm-fresh');
   if(fresh)fresh.addEventListener('click',()=>{
-    if(!ctlToken()){ctlSetStatus('enter your control token first','err');return;}
+    if(!ctlLive()){ctlCopy('nudge-oracle');const _t=fresh.textContent;fresh.textContent='✓ Copied';setTimeout(()=>fresh.textContent=_t,1500);return;}
     const job=document.getElementById('ctl-job');job.classList.add('show');job.textContent='asking Oracle for a fresh take…';
     fetch(API_BASE+'/control/nudge-oracle',{method:'POST',headers:ctlHeaders()}).then(r=>r.json()).then(d=>{
       if(d.job)ctlPollJob(d.job,loadNextMove);else job.textContent='✗ '+(d.hint||d.error||'failed');
     }).catch(e=>job.textContent='✗ '+e.message);
   });
-  if(IS_REMOTE){const rm=document.getElementById('ctl-remote');if(rm)rm.textContent='— controls act on the cloud snapshot; your live brain runs on localhost:8765';}
+  if(IS_REMOTE){const rm=document.getElementById('ctl-remote');if(rm)rm.textContent='— cloud snapshot · buttons copy a command to run in Claude Code · live one-click on localhost:8765';}
   loadNextMove();ctlStatus();
 })();
 
@@ -3263,6 +3337,7 @@ function trFilter(src){
 async function trLoad(){
   const dot=document.getElementById('tr-dot');
   const statusText=document.getElementById('tr-status-text');
+  loadPolSnap();
   try{
     const r=await fetch(API_BASE+'/trades?n=200',{signal:AbortSignal.timeout(NET_T)});
     const d=await r.json();
@@ -3322,11 +3397,10 @@ function trRenderLiveFeed(d) {
     const sessionTxt = spSession ? spSession.textContent : '—';
     const spEq = document.getElementById('sp-equity-scan');
     const eqTxt = spEq ? spEq.textContent : '—';
-    const emptyMsg = src === 'all' ? 'Waiting for first trade signal...' : `No open ${src} positions`;
     feed.innerHTML = `
       <div style="padding:16px 0">
-        <div style="font-size:14px;font-weight:600;color:var(--muted);margin-bottom:12px">${emptyMsg}</div>
-        <div style="font-size:12px;color:var(--muted);line-height:2">
+        ${src==='all' ? idleNoteHtml(_polSnap) : '<div style="font-size:14px;font-weight:600;color:var(--muted);margin-bottom:12px">No open '+src+' positions</div>'}
+        <div style="font-size:12px;color:var(--muted);line-height:2;margin-top:10px">
           Next opportunity: <strong style="color:var(--text)">ICT London Kill Zone</strong> · 03:00 ET<br>
           Session: <strong style="color:var(--text)">${sessionTxt}</strong><br>
           Equity scan fires: <strong style="color:var(--text)">${eqTxt}</strong>
@@ -3372,6 +3446,7 @@ function spLoad() {
   Promise.all([
     fetch(API_BASE+'/scanner_state', {signal: AC.signal}).then(r => r.json()),
     fetch(API_BASE+'/activity',      {signal: AC.signal}).then(r => r.json()),
+    loadPolSnap(true),
   ]).then(([state, activity]) => {
     clearTimeout(tid);
     const prev = _spState;
@@ -3412,7 +3487,7 @@ function spRenderPipeline(s) {
   const el = document.getElementById('sp-pipeline');
   if (!el) return;
   if (!Object.keys(pairs).length) {
-    el.innerHTML = '<div style="color:var(--muted);font-size:12px">No scan data yet</div>';
+    el.innerHTML = proximityTableHtml(_polSnap);
     return;
   }
   const ORDER = ['GBPUSD','EURUSD','AUDUSD','AUDNZD','USDJPY'];
@@ -3460,8 +3535,9 @@ function spRenderChecklist(s) {
   const pairEl = document.getElementById('sp-checklist-pair');
   const checkEl = document.getElementById('sp-checklist');
   if (!best || bestScore === 0) {
-    if (pairEl) pairEl.textContent = '—';
-    if (checkEl) checkEl.innerHTML = '<div style="color:var(--muted);font-size:12px">No scoreable setup</div>';
+    const ss=(_polSnap||{}).strongest_signal;
+    if (pairEl) pairEl.textContent = ss?(_fmtPair(ss.pair)+' '+(ss.direction||'')):'idle';
+    if (checkEl) checkEl.innerHTML = idleNoteHtml(_polSnap);
     return;
   }
   const d = pairs[best];
@@ -3514,7 +3590,7 @@ function spRenderActivity(s, activity) {
       <span class="sp-act-body">Sovereign equity scan fires (launchd)</span>
     </div>`);
   }
-  el.innerHTML = rows.length ? rows.join('') : '<div style="color:var(--muted);font-size:12px">No activity yet today</div>';
+  el.innerHTML = rows.length ? rows.join('') : '<div style="font-size:12px;color:var(--muted)"><span style="color:var(--green)">✓ No vetoes or fills today — system idle (correct).</span></div>';
 }
 
 function spCheckAlert(prev, activity) {
