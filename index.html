@@ -1832,12 +1832,24 @@ async function calLoad(){
   grid.innerHTML='<div style="padding:40px;text-align:center;color:var(--muted)">Loading…</div>';
   try{
     const r=await fetch(API_BASE+'/calendar?month='+_calMonth,{signal:AbortSignal.timeout(NET_T)});
+    if(!r.ok) throw new Error('calendar unavailable');
     const d=await r.json();
     if(d.error){grid.innerHTML='<div style="padding:40px;text-align:center;color:var(--muted)">Unavailable</div>';return;}
     calRender(d);
   }catch(e){
-    if(IS_REMOTE && !calLoad._retried){calLoad._retried=true; grid.innerHTML='<div style="padding:40px;text-align:center;color:var(--muted)">⏳ waking the live server (~30s)…</div>'; setTimeout(()=>calLoad(),9000);}
-    else grid.innerHTML='<div style="padding:40px;text-align:center;color:var(--muted)">'+(IS_REMOTE?'Live server unavailable — try again in a moment.':'Backend offline — the calendar needs the server running.')+'</div>';
+    if(IS_REMOTE && !calLoad._retried){calLoad._retried=true; grid.innerHTML='<div style="padding:40px;text-align:center;color:var(--muted)">⏳ waking the live server (~30s)…</div>'; setTimeout(()=>calLoad(),9000); return;}
+    // Snapshot fallback: no live calendar server — render the committed empty-days snapshot.
+    try{
+      const sr=await fetch(API_BASE+'/data/agent/calendar_snapshot.json?t='+Date.now(),{signal:AbortSignal.timeout(NET_T)});
+      if(sr.ok){
+        const snap=await sr.json();
+        calRender({month:_calMonth, days:snap.days||[], month_total:snap.month_total||{pnl:0,n:0}});
+        const mtEl=document.getElementById('cal-month-total');
+        if(mtEl) mtEl.innerHTML='<span style="color:var(--muted)">[snapshot] — no live calendar data</span>';
+        return;
+      }
+    }catch(e2){}
+    grid.innerHTML='<div style="padding:40px;text-align:center;color:var(--muted)">'+(IS_REMOTE?'Live server unavailable — try again in a moment.':'Backend offline — the calendar needs the server running.')+'</div>';
   }
 }
 function calNav(delta){
@@ -2561,10 +2573,21 @@ async function oracleRefresh(){
 }
 
 async function macroRefresh(){
+  // Snapshot fallback: the cloud has no live macro fetcher — try live, then fall back to the
+  // committed data/macro/macro_snapshot.json (same {summary,series,fetched_at} shape).
+  let d=null, isSnapshot=false;
   try{
     const r = await fetch(API_BASE+'/macro?t='+Date.now(), {signal: AbortSignal.timeout(NET_T)});
-    if(!r.ok) return;
-    const d = await r.json();
+    if(r.ok) d = await r.json();
+  }catch{}
+  if(!d){
+    try{
+      const sr = await fetch(API_BASE+'/data/macro/macro_snapshot.json?t='+Date.now(), {signal: AbortSignal.timeout(NET_T)});
+      if(sr.ok){ d = await sr.json(); isSnapshot=true; }
+    }catch{}
+  }
+  if(!d) return;
+  try{
     const s = d.summary||{};
     const ser = d.series||{};
 
@@ -2616,11 +2639,15 @@ async function macroRefresh(){
       tagsEl.innerHTML=tags.map(([t,c])=>`<span class="mb-tag ${c}">${t}</span>`).join('');
     }
 
-    // Updated timestamp
+    // Updated timestamp ([snapshot] label when serving the committed fallback)
     const updEl=document.getElementById('mb-updated');
-    if(updEl && d.fetched_at){
-      const mins=Math.round((Date.now()-new Date(d.fetched_at).getTime())/60000);
-      updEl.textContent=mins<2?'updated now':`updated ${mins}m ago`;
+    if(updEl){
+      if(isSnapshot){
+        updEl.textContent='[snapshot]'+(d.fetched_at?' · '+new Date(d.fetched_at).toLocaleDateString():'');
+      }else if(d.fetched_at){
+        const mins=Math.round((Date.now()-new Date(d.fetched_at).getTime())/60000);
+        updEl.textContent=mins<2?'updated now':`updated ${mins}m ago`;
+      }
     }
   }catch{}
 }
