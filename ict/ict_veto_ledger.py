@@ -34,6 +34,11 @@ Record schema (all fields):
     stop:              hypothetical stop-loss price (float | null)
     tp1:               hypothetical TP1 price (float | null)
     tp2:               hypothetical TP2 price (float | null)
+    intended_direction: pipeline's evaluated LONG/SHORT, captured even when the
+                       top-level ``signal`` reads "VETO" — the field retrospective
+                       labeling keys off (str | null)
+    intended_entry:    intended entry/limit price the gate prevented (float | null)
+    structural_stop:   intended structural stop the gate prevented (float | null)
     adr_pct:           ADR consumed at signal time (float)
     risk_pct:          risk fraction of account (float)
     confirmations:     list of confirmed ICT factors
@@ -85,6 +90,9 @@ class ICTVetoLedger:
         stop: Optional[float] = None,
         tp1: Optional[float] = None,
         tp2: Optional[float] = None,
+        intended_direction: Optional[str] = None,
+        intended_entry: Optional[float] = None,
+        structural_stop: Optional[float] = None,
         adr_pct: float = 0.0,
         risk_pct: float = 0.0,
         confirmations: Optional[List[str]] = None,
@@ -107,6 +115,15 @@ class ICTVetoLedger:
             "stop":                 stop,
             "tp1":                  tp1,
             "tp2":                  tp2,
+            # Retrospective-labeling fields — the trade the gate prevented.
+            # intended_direction is the pipeline's evaluated LONG/SHORT (present
+            # even when the top-level `signal` reads "VETO"); intended_entry and
+            # structural_stop are the limit/stop that would have defined the
+            # trade, or None when the veto fired before they were computed
+            # (e.g. ADR / displacement gates that veto pre-entry).
+            "intended_direction":   intended_direction,
+            "intended_entry":       intended_entry,
+            "structural_stop":      structural_stop,
             "adr_pct":              round(float(adr_pct), 4),
             "risk_pct":             round(float(risk_pct), 4),
             "confirmations":        confirmations or [],

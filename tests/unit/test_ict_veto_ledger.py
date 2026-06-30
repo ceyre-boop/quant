@@ -161,6 +161,9 @@ def test_record_veto_with_all_fields(tmp_path):
         stop=1.0880,
         tp1=1.0820,
         tp2=1.0790,
+        intended_direction="SHORT",
+        intended_entry=1.0850,
+        structural_stop=1.0880,
         adr_pct=0.72,
         risk_pct=0.02,
         confirmations=["sweep", "fvg_tap"],
@@ -174,3 +177,26 @@ def test_record_veto_with_all_fields(tmp_path):
     assert rec["adr_pct"] == 0.72
     assert rec["confirmations"] == ["sweep", "fvg_tap"]
     assert rec["component_scores"]["sweep"] == 2.5
+    assert rec["intended_direction"] == "SHORT"
+    assert rec["intended_entry"] == 1.0850
+    assert rec["structural_stop"] == 1.0880
+
+
+def test_record_veto_defaults_new_fields_to_none(tmp_path):
+    """Backward-compat: vetoes that omit the new fields record them as None,
+    never failing — e.g. ADR/displacement gates that veto before entry exists."""
+    ledger = _ledger(tmp_path)
+    ledger.record_veto(
+        pair="GBPUSD",
+        session="London",
+        signal="VETO",
+        grade="VETOED",
+        score=0.0,
+        veto_reason="ADR exhausted: 92% of average daily range consumed",
+        veto_stage="grade",
+        timestamp="2026-05-08T08:00:00+00:00",
+    )
+    rec = ledger.get_unlabeled()[0]
+    assert rec["intended_direction"] is None
+    assert rec["intended_entry"] is None
+    assert rec["structural_stop"] is None

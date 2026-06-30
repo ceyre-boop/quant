@@ -388,6 +388,9 @@ class ICTOrchestrator:
                             stop=r.stop,
                             tp1=r.tp1,
                             tp2=r.tp2,
+                            intended_direction=best.direction,
+                            intended_entry=r.entry_level,
+                            structural_stop=r.stop,
                             adr_pct=r.adr_pct,
                             risk_pct=r.risk_pct,
                             confirmations=list(r.confirmations),
@@ -417,10 +420,17 @@ class ICTOrchestrator:
                         score=r.score,
                         veto_reason=best.reason,
                         veto_stage="grade",
-                        entry_level=None,
-                        stop=None,
+                        entry_level=getattr(best, 'entry_level', None),
+                        stop=getattr(best, 'stop', None),
                         tp1=None,
                         tp2=None,
+                        # `signal` reads "VETO" here; best.direction holds the
+                        # pipeline's evaluated LONG/SHORT — recover it so the
+                        # record is directionally labelable. entry/stop are
+                        # present only for gates that fire after Stage 3.
+                        intended_direction=getattr(best, 'direction', None),
+                        intended_entry=getattr(best, 'entry_level', None),
+                        structural_stop=getattr(best, 'stop', None),
                         adr_pct=0.0,
                         risk_pct=0.0,
                         confirmations=list(best.confirmations),

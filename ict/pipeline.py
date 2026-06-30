@@ -127,6 +127,12 @@ class ICTVeto:
     component_scores: Dict[str, float] = field(default_factory=dict)
     confirmations:    List[str] = field(default_factory=list)
     missing:          List[str] = field(default_factory=list)
+    # Retrospective-labeling metadata (no trading effect): the intended entry
+    # limit and structural stop the veto prevented, populated only when they
+    # were already computed before the gate fired. Early gates (ADR exhaustion,
+    # HYP046 displacement) veto before entry exists, so these stay None there.
+    entry_level:      Optional[float] = None
+    stop:             Optional[float] = None
 
 
 # ── Pipeline ───────────────────────────────────────────────────────────────── #
@@ -493,6 +499,7 @@ class ICTPipeline:
                         f"(EMA20={_wema20:.5f} > EMA50={_wema50:.5f})"
                     ),
                     component_scores=scores, confirmations=confirmations, missing=missing,
+                    entry_level=entry_level,
                 )
             elif direction == "LONG" and _weekly_bearish:
                 return ICTVeto(
@@ -503,6 +510,7 @@ class ICTPipeline:
                         f"(EMA20={_wema20:.5f} < EMA50={_wema50:.5f})"
                     ),
                     component_scores=scores, confirmations=confirmations, missing=missing,
+                    entry_level=entry_level,
                 )
             elif _weekly_bullish or _weekly_bearish:
                 _trend_dir = "bullish" if _weekly_bullish else "bearish"
@@ -526,6 +534,7 @@ class ICTPipeline:
                     f"(WR decays monotonically above 8; score 9+ = negative R)"
                 ),
                 component_scores=scores, confirmations=confirmations, missing=missing,
+                entry_level=entry_level,
             )
 
         # ══════════════════════════════════════════════════════════════════
@@ -541,6 +550,7 @@ class ICTPipeline:
                 score=total_score, grade=ICTGrade.VETOED,
                 reason=f"NY_PM session blocked — forensics: -0.283R avg vs London +0.471R",
                 component_scores=scores, confirmations=confirmations, missing=missing,
+                entry_level=entry_level,
             )
         # A+ paradox: downgrade A+ to A for trade decision only
         # (score still logged as A+ for monitoring)
@@ -557,6 +567,7 @@ class ICTPipeline:
                 score=total_score, grade=ICTGrade.VETOED,
                 reason=f"COMMITMENT_DETECTOR: {_commit.reason}",
                 component_scores=scores, confirmations=confirmations, missing=missing,
+                entry_level=entry_level,
             )
         # DEVELOPING: execute at reduced size (handled downstream via size_multiplier)
         _commit_size_mult = getattr(_commit, "size_multiplier", 1.0) if _commit is not None else 1.0
@@ -597,7 +608,8 @@ class ICTPipeline:
                                score=total_score, grade=ICTGrade.VETOED,
                                reason=f"Risk gate: {sz.reason} — {sz.detail}",
                                component_scores=scores,
-                               confirmations=confirmations, missing=missing)
+                               confirmations=confirmations, missing=missing,
+                               entry_level=ep, stop=stop)
             # Apply allocation weight to position size (continuous dimmer)
             if _ict_alloc_weight < 1.0 and hasattr(sz, 'units') and sz.units:
                 sz = sz.__class__(**{
@@ -659,6 +671,7 @@ class ICTPipeline:
             score=total_score, grade=grade,
             reason=f"Score {total_score:.1f} < threshold {threshold:.1f} (grade {grade})",
             component_scores=scores, confirmations=confirmations, missing=missing,
+            entry_level=entry_level,
         )
 
     # ── Stage 2.5: Displacement helper ────────────────────────────────────── #
