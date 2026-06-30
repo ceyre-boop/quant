@@ -133,6 +133,10 @@ class ICTVeto:
     # HYP046 displacement) veto before entry exists, so these stay None there.
     entry_level:      Optional[float] = None
     stop:             Optional[float] = None
+    # ADR consumed at signal time (0–1). Computed by the ADR-exhaustion gate
+    # and carried here so the veto ledger records the structured value instead
+    # of having to parse it back out of the reason string.
+    adr_pct:          float = 0.0
 
 
 # ── Pipeline ───────────────────────────────────────────────────────────────── #
@@ -249,7 +253,8 @@ class ICTPipeline:
         if adr_pct >= adr_hard:
             return ICTVeto(symbol=symbol, direction=direction, timestamp=timestamp,
                            score=0.0, grade=ICTGrade.VETOED,
-                           reason=f"ADR exhausted: {adr_pct:.0%} of average daily range consumed")
+                           reason=f"ADR exhausted: {adr_pct:.0%} of average daily range consumed",
+                           adr_pct=adr_pct)
 
         # ── Volatility-adaptive threshold ─────────────────────────────────
         vol_ratio = atr / price if price > 0 else 0.0

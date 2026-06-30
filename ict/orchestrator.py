@@ -431,7 +431,7 @@ class ICTOrchestrator:
                         intended_direction=getattr(best, 'direction', None),
                         intended_entry=getattr(best, 'entry_level', None),
                         structural_stop=getattr(best, 'stop', None),
-                        adr_pct=0.0,
+                        adr_pct=getattr(best, 'adr_pct', 0.0),
                         risk_pct=0.0,
                         confirmations=list(best.confirmations),
                         missing=list(best.missing),
