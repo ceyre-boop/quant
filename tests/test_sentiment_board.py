@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import ast
 import inspect
+import math
 from datetime import datetime, timezone
 
 import numpy as np
@@ -16,7 +17,7 @@ import pytest
 
 from config.loader import params
 from sovereign.sentiment import (
-    store, board_state, vix_feed, news_feed, macro_feed, gdelt_feed, surprise_feed, cot_feed,
+    store, board_state, vix_feed, news_feed, macro_feed, gdelt_feed, surprise_feed, cot_feed, vrp_feed,
 )
 
 NOW = datetime(2026, 6, 30, tzinfo=timezone.utc)
@@ -82,6 +83,20 @@ def con():
     )
     store.upsert(c, "sentiment_cot_weekly", cot, ["measurement_date", "pair"])
 
+    # VRP (EURUSD) — dated to the observable EOD close (iv_obs_date == rv_last_date == date). A later
+    # obs (2024-11-29) must NOT be visible to earlier board dates (ASOF). 2023-07-07 shows RV>IV → negative.
+    vrp = pd.DataFrame(
+        [(pd.Timestamp("2023-01-06").date(), "EURUSD", "FXE", pd.Timestamp("2023-02-03").date(), 28, 102.0,
+          0.085, 0.070, 0.015, 0.60, "bs_invert", pd.Timestamp("2023-01-06").date(), pd.Timestamp("2023-01-06").date(), NOW),
+         (pd.Timestamp("2023-07-07").date(), "EURUSD", "FXE", pd.Timestamp("2023-08-04").date(), 28, 106.0,
+          0.070, 0.090, -0.020, 0.10, "bs_invert", pd.Timestamp("2023-07-07").date(), pd.Timestamp("2023-07-07").date(), NOW),
+         (pd.Timestamp("2024-11-29").date(), "EURUSD", "FXE", pd.Timestamp("2024-12-27").date(), 28, 104.0,
+          0.095, 0.060, 0.035, 0.90, "bs_invert", pd.Timestamp("2024-11-29").date(), pd.Timestamp("2024-11-29").date(), NOW)],
+        columns=["date", "pair", "symbol", "expiry", "dte", "atm_strike", "iv_atm", "rv_trailing",
+                 "vrp_signal", "vrp_pct", "iv_source", "iv_obs_date", "rv_last_date", "fetched_at"],
+    )
+    store.upsert(c, "sentiment_vrp_daily", vrp, ["date", "pair"])
+
     board_state.rebuild(con=c)
     yield c
     c.close()
@@ -137,7 +152,7 @@ def test_no_forward_look(con):
 # 6 — isolation: no sentiment module imports ict / ict-engine / layer1 / layer2 (AST-checked)
 def test_sentiment_does_not_import_ict():
     forbidden_roots = {"ict", "ict_engine", "layer1", "layer2"}
-    for mod in (store, news_feed, macro_feed, vix_feed, gdelt_feed, surprise_feed, cot_feed, board_state):
+    for mod in (store, news_feed, macro_feed, vix_feed, gdelt_feed, surprise_feed, cot_feed, vrp_feed, board_state):
         tree = ast.parse(inspect.getsource(mod))
         names = set()
         for node in ast.walk(tree):
@@ -150,15 +165,41 @@ def test_sentiment_does_not_import_ict():
                 f"{mod.__name__} imports forbidden module {name!r}"
 
 
-# news polarity scorer — bounded, correct labels, exact (pos-neg)/total formula
-def test_news_scorer():
-    assert news_feed.score_article("euro rallies on strong growth") == 1
-    assert news_feed.score_article("pound plunges as recession fears mount") == -1
-    assert news_feed.score_article("the central bank met today") == 0
-    # the locked aggregate formula is bounded in [-1, 1]
-    for n_pos, n_neg, n_tot in [(7, 2, 10), (0, 5, 5), (3, 3, 6), (10, 0, 10)]:
-        score = (n_pos - n_neg) / n_tot
-        assert -1.0 <= score <= 1.0
+# AV NEWS_SENTIMENT scorer — pair→ticker mapping, directional per-article score, bounded aggregate
+def test_pair_tickers_mapping():
+    assert news_feed.pair_tickers("EURUSD") == ("FOREX:EUR", "FOREX:USD")
+    assert news_feed.pair_tickers("USD_JPY") == ("FOREX:USD", "FOREX:JPY")   # OANDA underscore form
+    assert news_feed.pair_tickers("GBPJPY") == ("FOREX:GBP", "FOREX:JPY")
+    assert news_feed.pair_tickers("NZDCAD") == ("FOREX:NZD", "FOREX:CAD")    # auto-decomposed, not listed
+
+
+def _art(**tickers):
+    """AV-shaped article: tickers={'FOREX:EUR': (relevance, sentiment), ...}."""
+    return {"time_published": "20230115T120000",
+            "ticker_sentiment": [{"ticker": t, "relevance_score": str(r), "ticker_sentiment_score": str(s)}
+                                 for t, (r, s) in tickers.items()]}
+
+
+def test_article_pair_score_directional():
+    B, Q = "FOREX:EUR", "FOREX:USD"
+    # bullish base → pair up (+); bullish quote → pair down (−); neither present → None
+    assert news_feed.article_pair_score(_art(**{"FOREX:EUR": (0.8, 0.5)}), B, Q) > 0
+    assert news_feed.article_pair_score(_art(**{"FOREX:USD": (0.8, 0.5)}), B, Q) < 0
+    assert news_feed.article_pair_score(_art(**{"FOREX:JPY": (0.8, 0.5)}), B, Q) is None
+    # relevance weighting: exact formula rel_base*sent_base − rel_quote*sent_quote
+    s = news_feed.article_pair_score(_art(**{"FOREX:EUR": (0.5, 0.4), "FOREX:USD": (0.5, 0.2)}), B, Q)
+    assert s == pytest.approx(0.5 * 0.4 - 0.5 * 0.2)
+
+
+def test_news_aggregate_bounded():
+    B, Q = "FOREX:EUR", "FOREX:USD"
+    arts = [_art(**{"FOREX:EUR": (1.0, 0.3)}), _art(**{"FOREX:USD": (1.0, 0.4)}),
+            _art(**{"FOREX:JPY": (1.0, 0.9)})]                      # last mentions neither → ignored
+    n_total, n_pos, n_neg, score = news_feed._aggregate(arts, B, Q)
+    assert n_total == 2 and n_pos == 1 and n_neg == 1
+    assert -1.0 <= score <= 1.0
+    # empty / no-coverage → NULL score, not fabricated
+    assert news_feed._aggregate([], B, Q) == (0, 0, 0, None)
 
 
 # ── Step 1: GDELT texture ─────────────────────────────────────────────────────
@@ -282,3 +323,78 @@ class TestCOT:
         pct = s.rolling(5, min_periods=2).apply(lambda x: float((x <= x[-1]).mean()), raw=True)
         assert pct.iloc[3] == pytest.approx(1.0)          # 40 is the max SO FAR → 100th pct (ignores the future 5)
         assert pct.iloc[4] == pytest.approx(0.2)          # 5 is the min of the 5 → 20th pct
+
+
+# ── VRP-001: implied vol − realized vol FEATURE (ThetaData FX-ETF options) ─────────────────────
+class TestVRP:
+    # ── the MANDATORY, load-bearing look-ahead guard ──
+    def test_forward_look_guard_mandatory(self, con):
+        # no IV or RV term may use data dated AFTER the feature's own date — 0 violations, always
+        bad = con.execute(
+            "SELECT COUNT(*) FROM sentiment_vrp_daily WHERE iv_obs_date > date OR rv_last_date > date"
+        ).fetchone()[0]
+        assert bad == 0
+
+    def test_feature_is_forward_vol_free_by_construction(self, con):
+        # provenance is pinned to the observation date — the forward realized vol (the thing a VRP
+        # trade bets on) is structurally absent from the feature; it may only ever be a later OUTCOME.
+        df = con.execute("SELECT date, iv_obs_date, rv_last_date FROM sentiment_vrp_daily").df()
+        assert (pd.to_datetime(df["iv_obs_date"]) <= pd.to_datetime(df["date"])).all()
+        assert (pd.to_datetime(df["rv_last_date"]) <= pd.to_datetime(df["date"])).all()
+
+    # ── RV leg is a PURE function of past+present (truncation-invariant) ──
+    def test_rv_trailing_is_causal_pure(self):
+        from sovereign.research.vrp.vrp_calculator import realized_variance
+        rng = np.random.default_rng(7)
+        close = pd.Series(100 + np.cumsum(rng.normal(0, 1, 400)),
+                          index=pd.date_range("2020-01-01", periods=400, freq="B"))
+        D = close.index[300]
+        full = np.sqrt(realized_variance(close, window=20, forward=False)).asof(D)
+        truncated = np.sqrt(realized_variance(close.loc[:D], window=20, forward=False)).asof(D)
+        assert full == pytest.approx(truncated)           # deleting the future does not change RV at D
+
+    # ── Black-76 ATM IV inverter round-trips a known sigma (pure, no network) ──
+    def test_bs_inversion_roundtrip_atm(self):
+        T, r, sigma = 30 / 365.0, 0.04, 0.12
+        F = K = 50.0
+        price = vrp_feed._bs76_call(F, K, T, r, sigma)     # ATM: call == put (parity, F=K)
+        iv = vrp_feed.implied_vol_atm(price, price, K, T, r)
+        assert iv == pytest.approx(sigma, abs=1e-3)
+
+    def test_bs_inversion_roundtrip_forward_from_parity(self):
+        T, r, sigma = 45 / 365.0, 0.03, 0.09
+        F, K = 51.0, 50.0
+        call = vrp_feed._bs76_call(F, K, T, r, sigma)
+        put = call - math.exp(-r * T) * (F - K)            # put-call parity
+        iv = vrp_feed.implied_vol_atm(call, put, K, T, r)  # recovers F=51 from (C−P), then sigma
+        assert iv == pytest.approx(sigma, abs=1e-3)
+
+    def test_bs_inversion_unusable_inputs_return_nan(self):
+        assert math.isnan(vrp_feed.implied_vol_atm(float("nan"), 1.0, 50.0, 0.1, 0.04))
+        assert math.isnan(vrp_feed.implied_vol_atm(0.0, 0.0, 50.0, 0.1, 0.04))     # no time value
+
+    # ── board fusion + ASOF visibility (no forward leak) ──
+    def test_board_has_vrp_columns(self, con):
+        h = board_state.get_history("2023-01-01", "2024-12-31", "EURUSD", con=con)
+        for col in ("vrp_signal", "vrp_pct", "vrp_iv_atm", "vrp_rv_trailing"):
+            assert col in h.columns
+
+    def test_board_asof_no_lookahead(self, con):
+        # a board date sees only the VRP obs dated on/before it — the future obs stays invisible
+        assert board_state.get_state(pd.Timestamp("2023-03-01").date(), "EURUSD", con=con)["vrp_signal"] == pytest.approx(0.015)
+        assert board_state.get_state(pd.Timestamp("2023-09-01").date(), "EURUSD", con=con)["vrp_signal"] == pytest.approx(-0.020)
+        # 2024-11-01 must still see the 2023-07-07 obs (−0.020) — the 2024-11-29 obs is NOT yet observable
+        assert board_state.get_state(pd.Timestamp("2024-11-01").date(), "EURUSD", con=con)["vrp_signal"] == pytest.approx(-0.020)
+
+    def test_rv_spike_compresses_vrp(self, con):
+        # eyeball the mechanism: when RV spikes past IV (2023-07-07: rv 0.09 > iv 0.07) VRP goes negative
+        st = board_state.get_state(pd.Timestamp("2023-09-01").date(), "EURUSD", con=con)
+        assert st["vrp_iv_atm"] < st["vrp_rv_trailing"] and st["vrp_signal"] < 0
+
+    # ── idempotency: delete-then-insert upsert leaves the table identical on a re-run ──
+    def test_upsert_idempotent(self, con):
+        before = con.execute("SELECT COUNT(*), SUM(vrp_signal) FROM sentiment_vrp_daily").fetchone()
+        dup = con.execute("SELECT * FROM sentiment_vrp_daily").df()
+        store.upsert(con, "sentiment_vrp_daily", dup, ["date", "pair"])   # re-write the same rows
+        after = con.execute("SELECT COUNT(*), SUM(vrp_signal) FROM sentiment_vrp_daily").fetchone()
+        assert before == after
