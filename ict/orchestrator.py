@@ -54,6 +54,66 @@ FIREBASE_ROOT   = 'signals/ICT_ENGINE'
 ACCOUNT_SIZE    = 10_000.0
 
 
+# ── Veto sub-reasons ─────────────────────────────────────────────────────────── #
+
+def build_gate_veto_reason(
+    *,
+    mem_veto: bool,
+    mem_similarity: float,
+    mem_historical_wr: float,
+    floor_ok: bool,
+    decision_score: float,
+    score_floor: Optional[float],
+    heatmap_conflict: bool,
+    heatmap_detail: Optional[str],
+    bias_agrees: bool,
+    bias_dir: str,
+    signal_direction: str,
+    session_ok: bool,
+    session_name: str,
+    pair: str,
+    blackout: bool,
+    grade: str,
+    score: float,
+    time_utc: str,
+) -> tuple[str, str]:
+    """Map a blocked A-grade signal to ``(veto_stage, veto_reason)``.
+
+    The stage is the coarse category the ledger buckets on; the reason carries
+    the SPECIFIC triggering values (similarity, floor, magnet, bias direction,
+    time…) so the veto ledger records WHY the gate fired, not just its name.
+    Order mirrors the ``is_actionable`` short-circuit in ``scan()``.
+    """
+    if mem_veto:
+        return "memory", (
+            f"MEMORY_VETO: sim={mem_similarity:.2f} "
+            f"historical_wr={mem_historical_wr:.2f} (losing/low-similarity cluster)"
+        )
+    if not floor_ok:
+        _floor = f"{score_floor:.2f}" if score_floor is not None else "n/a"
+        return "memory", (
+            f"MEMORY_FLOOR: score {decision_score:.2f} < cluster floor {_floor}"
+        )
+    if heatmap_conflict:
+        return "heatmap", (
+            f"HEATMAP_CONFLICT: {heatmap_detail}" if heatmap_detail
+            else "HEATMAP_CONFLICT: opposing magnet closer than TP1"
+        )
+    if not bias_agrees:
+        return "bias", (
+            f"BIAS_CONFLICT: library bias={bias_dir} vs signal={signal_direction}"
+        )
+    if not session_ok:
+        return "session", (
+            f"SESSION_BLOCK: {session_name} not tradeable for {pair} @ {time_utc}"
+        )
+    if blackout:
+        return "gate", f"BLACKOUT: {pair} in high-impact event blackout"
+    return "gate", (
+        f"GATE: grade={grade} score={score:.2f} failed post-pipeline actionability check"
+    )
+
+
 # ── Result ─────────────────────────────────────────────────────────────────── #
 
 @dataclass
@@ -87,11 +147,33 @@ class ICTPublisher:
         self._init()
 
     def _init(self):
+        sa = os.environ.get('FIREBASE_SERVICE_ACCOUNT', 'config/firebase_service_account.json')
+
+        # Fail loud when the service account is missing. The live scanner path
+        # publishes to signals/ICT_ENGINE/* — without credentials every push
+        # silently no-ops and the dashboard goes stale unnoticed. A missing SA
+        # is a misconfiguration, not a normal state, so raise unless offline mode
+        # is explicitly requested via ICT_FIREBASE_OFFLINE (local/dev runs).
+        if not Path(sa).exists():
+            offline_ok = os.getenv('ICT_FIREBASE_OFFLINE', '').lower() in ('1', 'true', 'yes')
+            msg = (
+                f"Firebase service account not found at '{sa}'. The ICT scanner "
+                f"publishes live signals to {FIREBASE_ROOT}/* and cannot write "
+                f"without it. Provide the key (config/firebase_service_account.json "
+                f"or FIREBASE_SERVICE_ACCOUNT=/path/to/key.json), or set "
+                f"ICT_FIREBASE_OFFLINE=1 to run intentionally offline."
+            )
+            if not offline_ok:
+                logger.critical("FIREBASE SERVICE ACCOUNT MISSING — %s", msg)
+                raise RuntimeError(msg)
+            logger.warning("Firebase offline (ICT_FIREBASE_OFFLINE set) — %s", msg)
+            return
+
+        # Service account present — behaviour unchanged from before.
         try:
             import firebase_admin
             from firebase_admin import db as rtdb
-            sa = os.environ.get('FIREBASE_SERVICE_ACCOUNT', 'config/firebase_service_account.json')
-            if not firebase_admin._apps and Path(sa).exists():
+            if not firebase_admin._apps:
                 from firebase_admin import credentials
                 firebase_admin.initialize_app(
                     credentials.Certificate(sa),
@@ -301,6 +383,7 @@ class ICTOrchestrator:
 
                     # Lever 5: Heatmap conflict — opposing magnet closer than TP1
                     heatmap_conflict = False
+                    heatmap_detail: Optional[str] = None
                     try:
                         from ict.liquidity_heatmap import compute_heatmap
                         hm = compute_heatmap(clean, df, atr)
@@ -318,6 +401,10 @@ class ICTOrchestrator:
                                 )
                                 if not opposing_side and magnet_dist < tp1_dist:
                                     heatmap_conflict = True
+                                    heatmap_detail = (
+                                        f"magnet {top['price']:.5f} prob={top['prob']:.2f} "
+                                        f"closer than TP1 (dist {magnet_dist:.5f} < {tp1_dist:.5f})"
+                                    )
                                     logger.info("%s: heatmap conflict — magnet %.5f prob=%.2f blocks TP1",
                                                 clean, top['price'], top['prob'])
                     except Exception:
@@ -368,13 +455,28 @@ class ICTOrchestrator:
                         actionable.append(r)
                     else:
                         # A-grade signal that didn't clear post-pipeline gates —
-                        # record to veto ledger for retroactive labeling.
-                        veto_stage = (
-                            "memory" if mem_veto else
-                            "heatmap" if heatmap_conflict else
-                            "bias" if not bias_agrees else
-                            "session" if not session_ok else
-                            "gate"
+                        # record to veto ledger for retroactive labeling. The
+                        # reason carries the specific triggering values (WHY the
+                        # gate fired), not just the stage category.
+                        veto_stage, veto_reason = build_gate_veto_reason(
+                            mem_veto=mem_veto,
+                            mem_similarity=getattr(mem_check, "similarity", 0.0),
+                            mem_historical_wr=getattr(mem_check, "historical_wr", 0.0),
+                            floor_ok=_floor_ok,
+                            decision_score=decision_score,
+                            score_floor=_score_floor,
+                            heatmap_conflict=heatmap_conflict,
+                            heatmap_detail=heatmap_detail,
+                            bias_agrees=bias_agrees,
+                            bias_dir=bias_dir,
+                            signal_direction=best.direction,
+                            session_ok=session_ok,
+                            session_name=sess_name,
+                            pair=clean,
+                            blackout=blackout,
+                            grade=r.grade,
+                            score=r.score,
+                            time_utc=f"{now:%H:%M} UTC",
                         )
                         self._veto_ledger.record_veto(
                             pair=clean,
@@ -382,7 +484,7 @@ class ICTOrchestrator:
                             signal=best.direction,
                             grade=r.grade,
                             score=r.score,
-                            veto_reason=veto_stage,
+                            veto_reason=veto_reason,
                             veto_stage=veto_stage,
                             entry_level=r.entry_level,
                             stop=r.stop,
@@ -486,6 +588,34 @@ class ICTOrchestrator:
                 if isinstance(r, ScanResult) and r.actionable:
                     if regime_targets['skip']:
                         logger.info("%s: regime says SKIP (%s)", clean, regime_targets['reason'])
+                        # G1_LIBRARY gate: the macro library regime vetoed an
+                        # otherwise-actionable signal. Record it with the regime
+                        # value so the ledger says WHY (not just that it skipped).
+                        self._veto_ledger.record_veto(
+                            pair=clean,
+                            session=sess_name,
+                            signal=r.signal,
+                            grade=r.grade,
+                            score=r.score,
+                            veto_reason=(
+                                f"G1_LIBRARY: regime={library_ctx['regime']} "
+                                f"threat={library_ctx['threat']} — {regime_targets['reason']}"
+                            ),
+                            veto_stage="gate",
+                            entry_level=r.entry_level,
+                            stop=r.stop,
+                            tp1=r.tp1,
+                            tp2=r.tp2,
+                            intended_direction=r.signal,
+                            intended_entry=r.entry_level,
+                            structural_stop=r.stop,
+                            adr_pct=r.adr_pct,
+                            risk_pct=r.risk_pct,
+                            confirmations=list(r.confirmations),
+                            missing=list(r.missing),
+                            component_scores=dict(r.component_scores),
+                            timestamp=r.timestamp,
+                        )
                     else:
                         # Pass regime targets + risk multiplier into paper trader
                         opened = self._paper.open_trade(

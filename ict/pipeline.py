@@ -550,10 +550,17 @@ class ICTPipeline:
         # ══════════════════════════════════════════════════════════════════
         _current_session = getattr(session_pre, "session_name", "")
         if _current_session == "NY_PM" and not ny_am_mode:
+            _blk_time = (
+                timestamp.strftime("%H:%M UTC")
+                if hasattr(timestamp, "strftime") else str(timestamp)
+            )
             return ICTVeto(
                 symbol=symbol, direction=direction, timestamp=timestamp,
                 score=total_score, grade=ICTGrade.VETOED,
-                reason=f"NY_PM session blocked — forensics: -0.283R avg vs London +0.471R",
+                reason=(
+                    f"NY_PM_BLOCK @ {_blk_time} — session blocked, forensics: "
+                    f"-0.283R avg vs London +0.471R"
+                ),
                 component_scores=scores, confirmations=confirmations, missing=missing,
                 entry_level=entry_level,
             )
