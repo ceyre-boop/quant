@@ -1,0 +1,26 @@
+{
+  "date": "2026-06-17",
+  "generated_at": "2026-06-17T17:48:27.695527+00:00",
+  "input_tokens": 5378,
+  "output_tokens": 965,
+  "estimated_cost_usd": 0.153045,
+  "harvest_days_read": 7,
+  "reflection": {
+    "candidate_lesson": {
+      "lesson_text": "When the external regime confirmation drops to internal-only (TV signals=0) AND consensus conviction is below 33% on every pair, the day is a structural NO_TRADE \u2014 forcing entries here harvests noise, not edge.",
+      "mechanism": "When TradingView has zero corroborating signals, the only directional vote comes from the internal MOMENTUM read, which the briefing itself flags as an INPUT for sizing, not a trade signal. With consensus conviction <33% the 30-indicator panel is internally contradicting (e.g. EURUSD 5 bull/5 bear, conv=0%), meaning institutional order flow has not yet committed a direction. Entering on uncommitted flow means trading against the eventual liquidity sweep rather than with it \u2014 the CONCENTRATION/FRAGILE regime in the briefing makes any directional move more likely to reverse.",
+      "testable_rule": "if tv_signal_count == 0 and max(pair.conviction for pair in consensus) < 0.33: return RegimeVeto('NO_TRADE_uncommitted_flow')",
+      "expected_impact": "Drawdown reduction and Sharpe uplift via variance suppression \u2014 avoiding ~negative-expectancy noise days should lift Sharpe toward target by removing low-quality trades from the denominator; estimate +0.01\u20130.03 Sharpe.",
+      "evidence_from_harvest": "7 consecutive zero-trade days (2026-06-11 through 2026-06-17) coincide with consensus conviction maxing at 42% (USDJPY) but green_matches=0 and hist_hr=0% across ALL pairs, plus the briefing's explicit 'NO_TRADE_TODAY' forex call \u2014 the system is already implicitly avoiding these days; this lesson codifies the gate rather than relying on incidental silence.",
+      "evidence_from_reasoning": null,
+      "reasoning_component_targeted": "consensus_conviction / tv_signal_count",
+      "sample_needed": 30
+    },
+    "retirement_flag": {
+      "lesson_to_review": "L5",
+      "reason": "Pair-specific half-lives (GBPUSD 6d, AUDUSD 5d, etc.) were calibrated in a prior regime; with 7 days of zero trades there is no fresh evidence these hold periods still hold, and CONCENTRATION/FRAGILE regime may compress momentum half-lives \u2014 worth a re-validation flag, not yet retirement."
+    },
+    "system_health_note": "System is in a healthy self-imposed freeze \u2014 7 days zero trades aligns with UNKNOWN regime, NO_TRADE briefing, and zero TV confirmation; the gap-closing risk is forcing trades into uncommitted flow rather than waiting for the L1 exact setup."
+  },
+  "auto_validation": null
+}

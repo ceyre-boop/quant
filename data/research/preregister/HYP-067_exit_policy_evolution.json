@@ -1,0 +1,136 @@
+{
+  "id": "HYP-067",
+  "name": "exit_policy_evolution",
+  "status": "PREREGISTERED",
+  "frozen_at": "2026-06-29",
+  "family": "L2_evaluative",
+  "phase": "research",
+  "purpose": "Evolutionary search for a regime- AND trade-age-conditioned forex exit policy. A policy maps (vix_tercile 0-2, atr_tercile 0-2, hold_count_bucket early/mid/late) -> (stop_atr_mult, trailing_atr_mult, hold_limit), evaluated per-bar as a trade ages. Generalises HYP-066 (a 2x2 median split that returned NOT_SIGNIFICANT) to a 3x3x3 grid searched by a genetic algorithm under a CPCV-Sharpe fitness. Meta-labeling (AFML ch.3): the primary model (carry entries) is FIXED to the canonical v015 decade trades; only the secondary exit policy is evolved.",
+  "mechanism": "Optimal stop/trail width and hold horizon may depend BOTH on the volatility regime (VIX x ATR percentile) and on how long a trade has already been open (early/mid/late). A static or entry-only-conditioned config leaves this on the table. If true, a per-bar regime-and-age-keyed policy beats the static config out-of-sample AND survives the multiple-testing correction for the genetic search.",
+  "prior_expectation": "Strongly leaning NOT_SIGNIFICANT / NOT_ROBUST. HYP-066's 2x2 entry-regime split already failed (permutation p=0.605, 0/4 BH). A 27-cell GA over ~408 decade trades (~15 trades/cell) has a far larger overfitting surface; the deflated-Sharpe hurdle (n_trials = GA search size) and the locked 2025-2026 holdout are calibrated to catch in-sample optimisation. An honest null is the expected and acceptable result. This study is GATED: it only runs against HYP-066 if HYP-066 returned VALID_EDGE; otherwise it runs only under --standalone as an independent pre-registered hypothesis.",
+  "gate": {
+    "prior_hypothesis": "HYP-066",
+    "prior_result_file": "data/research/exit_regime_conditioning_results.json",
+    "rule": "Default run HALTS unless HYP-066 verdict == VALID_EDGE. --standalone overrides the gate and runs this as an independent hypothesis with a stricter (search-size) deflated-Sharpe correction.",
+    "hyp066_verdict_at_freeze": "NOT_SIGNIFICANT"
+  },
+  "design": {
+    "universe_pairs": [
+      "EURUSD=X",
+      "GBPUSD=X",
+      "USDJPY=X",
+      "AUDUSD=X"
+    ],
+    "entry_universe": "the canonical v015 static-config decade trades (logs/forex_backtest_trades.json) - fixed primary-model output; the exit policy is the only thing varied",
+    "policy": {
+      "shape": "3x3x3 lookup table (27 cells) -> (stop_atr_mult, trailing_atr_mult, hold_limit)",
+      "axes": {
+        "vix_tercile": "trailing-252d ^VIX percentile, binned into terciles at the decade 1/3 and 2/3 thresholds (recorded in results)",
+        "atr_tercile": "trailing-252d per-pair ATR percentile, binned into terciles at the decade 1/3 and 2/3 thresholds",
+        "hold_count_bucket": "bars-in-trade: early [0,5), mid [5,15), late [15, inf)"
+      },
+      "evaluation": "PER-BAR: each bar the active cell is (current vix_tercile, current atr_tercile, current hold_count_bucket); stop_atr_mult and trailing_atr_mult are read from that cell each bar (decide_exit takes cfg per call). hold_limit and the initial ATR stop are read ONCE from the ENTRY cell and held fixed for the trade (PositionState.hold_limit). decide_exit itself is the SAME function live+backtest use - parity preserved.",
+      "min_cell_trades_fallback": "any cell with fewer than 30 bar-visits across the decade falls back to its coarser parent: collapse the hold axis (average over populated hold buckets within the vix x atr cell), then fall back to the global config. Empty cells are never noise-fit."
+    },
+    "param_bounds": {
+      "stop_atr_mult": [
+        1.0,
+        3.0
+      ],
+      "trailing_atr_mult": [
+        0.75,
+        2.5
+      ],
+      "hold_limit": [
+        10,
+        90
+      ],
+      "discretisation": "stop/trail snapped to 0.05; hold_limit snapped to integer"
+    },
+    "static_baseline": {
+      "stop_atr_mult": 2.0,
+      "trailing_atr_mult_per_pair": {
+        "GBPUSD=X": 2.0,
+        "AUDUSD=X": 1.0,
+        "EURUSD=X": 1.25,
+        "USDJPY=X": 1.25
+      },
+      "note": "canonical v015 config; per-pair trailing overrides from ForexBacktester.PAIR_TRAILING_OVERRIDES"
+    },
+    "exit_evaluation": "single-trade exit replay via sovereign.forex.exit_machine.decide_exit from each fixed entry over the pair price/atr/signal path, no re-entry/pyramiding; costs applied via the ForexBacktester cost model (spread+slippage+swap). Reconciled separately against the canonical sequential backtest (0.6886 +/- 0.01)."
+  },
+  "genetic_algorithm": {
+    "population": 200,
+    "init": "80% random within param_bounds, 20% seeded from HYP-066 decade_best_cfg (4 entries) mapped 2x2 -> 3x3 (tercile 0 -> lo, 2 -> hi, 1 -> nearest; hold axis broadcast)",
+    "fitness": "CPCV Sharpe with robustness penalty: mean(path_sharpes) - 0.3 * std(path_sharpes), computed on the TRAIN window only",
+    "selection": "tournament, k=5",
+    "crossover": "uniform (each cell-param drawn independently from parent A or B)",
+    "mutation": {
+      "rate_per_param": 0.15,
+      "sigma": "0.2 * param_range, Gaussian, clipped to bounds then snapped to grid"
+    },
+    "generations": 50,
+    "early_stop": "best fitness unchanged for 10 consecutive generations",
+    "seed": 42,
+    "determinism": "fully reproducible under the fixed seed"
+  },
+  "cpcv": {
+    "n_groups": 6,
+    "test_groups": 2,
+    "n_splits": 15,
+    "n_paths": 5,
+    "embargo_frac": 0.01,
+    "purge": "AFML interval-overlap purge at trade granularity (sovereign.discovery.cpcv.combinatorial_purged_splits); path sharpe computed on each test combination's pooled trades under the fixed policy",
+    "robustness_penalty": 0.3
+  },
+  "splits": {
+    "train": {
+      "start": "2015-01-01",
+      "end": "2024-12-31",
+      "use": "GA, CPCV fitness, in-sample best-cell selection - the genetic search NEVER sees the holdout"
+    },
+    "holdout": {
+      "start": "2025-01-01",
+      "end": "2026-06-29",
+      "use": "one-shot forward non-degradation gate AND out-of-sample permutation/BH; never used to choose configs"
+    }
+  },
+  "validation_protocol": {
+    "cpcv_fitness": "GA objective; reported as winner mean/std path Sharpe on train",
+    "forward_holdout": "winner pooled costed Sharpe on 2025-2026 vs static; non_degrade iff winner >= static - 0.05",
+    "permutation": {
+      "null": "the 27-cell config mapping carries no out-of-sample information",
+      "method": "shuffle the winner's 27 cell-config assignments; recompute the winner's pooled HOLDOUT (2025-2026) Sharpe. Permuting on the holdout (which the GA never saw) is an honest OOS test of the conditioning structure, not an in-sample re-confirmation.",
+      "n_permutations": 2000,
+      "seed": 42,
+      "p_formula": "(n_ge + 1)/(N + 1)"
+    },
+    "multiple_trials": "deflated_sharpe_ratio applied to the winner's pooled train Sharpe at n_trials = number of UNIQUE policies evaluated by the GA (the true search size) - require deflated_sr > 0",
+    "fdr": "benjamini_hochberg across the 9 (vix x atr) marginal cells' holdout permutation p-values (marginals, not the 27 thin cells, for FDR power), alpha=0.05 - require >=1 survivor",
+    "reconcile_guard": "canonical ForexBacktester(2015-2024).backtest_all() weighted_portfolio_sharpe must equal 0.6886 +/- 0.01 or HALT before any GA work (same number prove.py reports)"
+  },
+  "prove_gate": {
+    "method": "winner's fixed-entry costed replay weighted-portfolio Sharpe must land inside the documented bands",
+    "full_decade_band": [
+      0.68,
+      0.7
+    ],
+    "oos_band": [
+      1.17,
+      1.25
+    ],
+    "note": "Two-sided RECONCILIATION bands per the spec: a winner whose honest replay Sharpe lands OUTSIDE the band (especially above) is the overfit tell -> halt + log NOT_ROBUST. The oos_band reflects the sized/sequential v015 number (CLAUDE.md), which differs from the fixed-entry replay methodology used here; the replay static baseline (winner vs static, both replay) is recorded in results so the band can be recalibrated and re-signed if the gate is to be used as a one-sided non-degradation check later.",
+    "on_fail": "halt + ledger status NOT_ROBUST"
+  },
+  "success_criteria": "VALID_EDGE iff ALL: holdout permutation p < 0.05 AND deflated_sr > 0 at n_trials = unique policies evaluated AND >=1 (vix x atr) marginal survives Benjamini-Hochberg AND 2025-2026 winner Sharpe >= static - 0.05 (non-degradation) AND prove bands cleared.",
+  "failure_criteria": "NOT_ROBUST if the prove bands are missed (evolutionary loop overfit). NOT_SIGNIFICANT if any other gate fails. Either way the hypothesis is killed and logged; static config stays; no live deployment.",
+  "deployment_if_valid": "NONE without Colin's explicit sign-off. A valid policy would deploy as a per-bar cfg lookup in the L2 exit manager via a separate logged param_change, never bundled with the SHADOW->live flip.",
+  "outputs": {
+    "results": "data/research/exit_policy_evolution_results.json",
+    "pareto": "data/research/exit_policy_evolution_pareto.json",
+    "winner": "data/research/exit_policy_evolution_winner.json",
+    "ledger": "data/agent/hypothesis_ledger.json (one appended entry)"
+  },
+  "hash_method": "sha256 of json.dumps(doc, sort_keys=True, separators=(',',':')) where doc = this object MINUS the hash_lock field",
+  "hash_lock": "38885f04ab9d9ac9872645ed6cff52d6512c968cc1327437517145a1f73e5527"
+}

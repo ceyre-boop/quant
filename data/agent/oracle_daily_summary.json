@@ -1,14 +1,14 @@
 {
-  "last_updated": "2026-06-07T06:30:18.498496+00:00",
+  "last_updated": "2026-06-30T06:30:50.210111+00:00",
   "harvest": {
     "trades_closed": 0,
     "win_rate": null,
     "failure_taxonomy": {}
   },
   "reflection": {
-    "candidate_lesson": "When the 30-indicator consensus shows conv=100% but green_matches=0 and hist_hr is 0%, the signal is structurally unvalidated and must be sized down or vetoed despite the conviction reading.",
-    "mechanism": "conv=100% measures live indicator agreement (how many of 30 point the same way right now), but green_matches=0 means no historical analog exists for this exact configuration \u2014 and hist_hr=0% confirms the few analogs that did exist lost. High live agreement with zero validated precedent is the signature of a crowded directional read into a catalyst (NFP morning), where institutional flow reverses on the print. EURUSD (conv 100% SHORT, hist_hr 0%) and USDJPY (conv 100% LONG, hist_hr 0%) are exactly this trap; GBPUSD (conv 100%, hist_hr 67%) and AUDUSD (conv 100%, hist_hr 72%) are validated and tradeable.",
-    "testable_rule": "if consensus_conviction >= 1.0 and green_matches == 0 and hist_hr < 0.40: size *= 0.0  # veto. elif consensus_conviction >= 1.0 and hist_hr >= 0.60: size *= 1.0  # full"
+    "candidate_lesson": "When the 30-indicator consensus shows high conviction but green_matches=0, treat the signal as historically un-anchored and cut size, not as a high-confidence entry.",
+    "mechanism": "green_matches counts how many times the current live indicator configuration has previously resolved into a profitable forward outcome. When conviction is high (e.g. AUDUSD 100%, USDJPY 83%) but green_matches=0, the system is extrapolating from an indicator alignment that has no validated historical analog \u2014 institutional flow may be transient noise that the indicator stack mistakes for a regime. High conviction with zero matched precedent is the signature of an over-fit live snapshot, not a durable edge.",
+    "testable_rule": "if consensus_conviction >= 0.80 and green_matches == 0: size_multiplier *= 0.5  # require historical anchor before full size"
   },
   "validation": {
     "verdict": "REJECTED",
@@ -21,8 +21,8 @@
     "codify_error": null
   },
   "cycle": {
-    "cost_usd": 0.14676,
+    "cost_usd": 0.14712,
     "status": "COMPLETE",
-    "date": "2026-06-07"
+    "date": "2026-06-30"
   }
 }

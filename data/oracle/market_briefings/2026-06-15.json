@@ -1,0 +1,129 @@
+{
+  "date": "2026-06-15",
+  "generated_at": "2026-06-15T12:15:37.264867+00:00",
+  "meta_regime": "BREADTH",
+  "regime_read": "ES & NQ moving together \u2014 broad agreement, more DURABLE directional signal. Trust the direction more.",
+  "narrative": "PRE-US-OPEN BRIEFING \u2014 ES/NQ (research only; no CME execution path here).\n\n1) RECENT MOVE-BY-MOVE READ\nBoth indices are in a clear up-leg. ES last 7596.5 (+2.17% day, +2.43% week) and NQ 30601.25 (+3.17% day, +3.89% week) \u2014 both printing fresh highs above prior-day and prior-week highs and trading well above their respective session VWAPs (ES 7556.21, NQ 30487.87). The dominant catalyst appears geopolitical risk-off unwind: the cluster of Iran headlines (draft US deal with nuclear limits, Strait of Hormuz reopening, $25B asset release) is a textbook de-escalation/peace-premium that pulls a war/oil risk premium OUT of equities \u2014 supportive of a melt-up, and the slightly larger NQ pop fits a duration/long-tech relief bid as feared-tail risk fades. The counterweight in the tape: an INFLATION-tagged poll item flagging climbing fuel/food prices and energy-dividend stories \u2014 a soft reminder that the inflation narrative hasn't fully cleared, which matters with FOMC two days out. Net: momentum is up, RSI mid-50s on both (53.5 / 54.6) \u2014 trending, NOT overbought, so there's room without a stretched-tape warning.\n\n2) VOLUME-PROFILE READ (volume-at-price, NOT order-flow delta \u2014 respect that)\nImportant caveat: this is WHERE volume traded over 5 days, not buy/sell aggression. ES POC sits at 7306.33 with a value area 7279.23\u20137432.80; NQ POC 28794.91 with VA 28621.67\u201329661.06. Price has decisively LEFT and is trading ABOVE the entire 5-day value area on both \u2014 current prices (ES ~7596, NQ ~30601) are at/above the top of the 5-day range (ES range top 7599.92, NQ 30613.83). That means there is essentially NO accepted volume shelf above us; this is low-volume-node, breakout territory \u2014 fast in both directions. The accumulation zone / line in the sand on a pullback is value-area-high: ES ~7432, NQ ~29661, with POC the deeper magnet far below. Practically, the nearer structural line that matters today is session VWAP \u2014 holding above it keeps the breakout honest.\n\n3) NQ/ES LEAD-LAG REGIME\nRegime = BREADTH. Contemporaneous correlation 0.95, best lag at 0 (corr 0.897), no clean leader, divergence=false. ES and NQ are moving together \u2014 broad agreement, which makes the directional signal more DURABLE and more trustworthy than a concentration/single-engine move. No rotation warning. Implication: you can trust the UP direction more than usual and this argues for normal-to-modestly-confident sizing on the directional read \u2014 BUT see section 4, because the event calendar caps how much that trust should translate into size.\n\n4) EVENT-CALENDAR AWARENESS\nFOMC is in 2 DAYS (2026-06-17) \u2014 this is the governing constraint. Standard discipline: reduce size / widen stops into the window. With an unresolved inflation sub-narrative in the news, the meeting is a genuine two-way risk and the worst place to be max-long into. Further out and lower priority: PCE (~Jun 30), ISM Mfg (~Jul 1), NFP (~Jul 3) \u2014 all cadence ESTIMATES, treat as approximate. Bottom line: directional thesis is fine, but FOMC proximity should HALVE conviction-to-size; don't carry oversized risk into the print.\n\n5) SYNTHESIS \u2014 META-REGIME + NARROWED BIAS\nMeta-regime: durable BREADTH up-trend (corr 0.95, both above 200-SMA \u2014 ES +9.9%, NQ +18.4%) + a genuine geopolitical de-risking catalyst, in breakout/low-volume-node air, BUT into a 2-day FOMC window with a lingering inflation tail. That combination = real directional edge, capped confidence. Signals are mostly aligned (clean lead-lag, supportive news) which justifies a LONG lean; the FOMC proximity and the fact that price is in unaccepted territory above all value keep me from high conviction.\n\nBIAS: LONG (long-the-strength / buy-the-VWAP-hold), ~58%, INVALIDATED below NQ session VWAP 30487 (loss of VWAP flips this to neutral; sustained trade back into the 5-day value area, i.e. below ~29661, kills the breakout thesis entirely). For ES the analog invalidation is loss of ~7556 VWAP.\n\nHUMILITY / STATUS: This briefing is INTELLIGENCE, not a validated edge. My own scorecard is n=4 (dir hit 1.0 on tiny sample, regime accuracy only 0.375) \u2014 that is CALIBRATING and statistically meaningless until ~30-60 samples. Size from your own risk rules, not from this confidence number, and respect the FOMC size-down.",
+  "big_move_headline": {
+    "headline": "Today's likeliest institutional move: LONG EURUSD (P 69%, ~0.61% range, conf 38%).",
+    "pair": "EURUSD",
+    "direction": "LONG",
+    "p_big": 0.6923,
+    "confidence": 0.375,
+    "expected_magnitude_pct": 0.6077,
+    "session": "LONDON",
+    "drivers": [
+      [
+        "event_risk",
+        0.9
+      ],
+      [
+        "momentum",
+        0.2487
+      ],
+      [
+        "displacement",
+        0.1952
+      ]
+    ],
+    "validation_status": "UNVALIDATED \u2014 display only (run scripts/validate_big_move.py)"
+  },
+  "directional_bias": "LONG",
+  "confidence": 58,
+  "regime_call": "BREADTH",
+  "key_level": 30487,
+  "synthesis_source": "claude-opus-4-8",
+  "lead_lag": {
+    "regime": "BREADTH",
+    "spread_avg": 0.00129,
+    "leader": "NONE",
+    "corr": 0.95,
+    "divergence": false
+  },
+  "volume_profile": {
+    "ES=F": {
+      "symbol": "ES=F",
+      "as_of": "2026-06-15T12:15:07.213943+00:00",
+      "days": 5,
+      "bins": 40,
+      "poc": 7306.33,
+      "value_area_low": 7279.23,
+      "value_area_high": 7432.8,
+      "high_volume_nodes": [
+        7306.33,
+        7324.4,
+        7432.8,
+        7297.3,
+        7423.77
+      ],
+      "price_range": [
+        7238.58,
+        7599.92
+      ],
+      "limitation": "Volume profile = WHERE volume traded (volume-at-price). NOT order-flow delta (buy/sell aggression). True delta needs a CME order-flow feed (Databento/CQG)."
+    },
+    "NQ=F": {
+      "symbol": "NQ=F",
+      "as_of": "2026-06-15T12:15:07.270902+00:00",
+      "days": 5,
+      "bins": 40,
+      "poc": 28794.91,
+      "value_area_low": 28621.67,
+      "value_area_high": 29661.06,
+      "high_volume_nodes": [
+        28794.91,
+        28737.16,
+        28910.39,
+        28852.65,
+        28679.42
+      ],
+      "price_range": [
+        28304.08,
+        30613.83
+      ],
+      "limitation": "Volume profile = WHERE volume traded (volume-at-price). NOT order-flow delta (buy/sell aggression). True delta needs a CME order-flow feed (Databento/CQG)."
+    }
+  },
+  "news_count": 12,
+  "event_calendar": [
+    {
+      "event": "FOMC meeting",
+      "date": "2026-06-17",
+      "source": "seed",
+      "action": "reduce size / widen stops into the window",
+      "days_until": 2,
+      "note": "in 2d \u2014 reduce size / widen stops into the window"
+    },
+    {
+      "event": "PCE (Fed's preferred inflation)",
+      "date": "2026-06-30",
+      "source": "cadence_estimate",
+      "action": "8:30 ET \u2014 reduce size into window",
+      "days_until": 15,
+      "note": "in 15d \u2014 8:30 ET \u2014 reduce size into window"
+    },
+    {
+      "event": "ISM Manufacturing PMI",
+      "date": "2026-07-01",
+      "source": "cadence_estimate",
+      "action": "reduce size into the 10:00 ET print",
+      "days_until": 16,
+      "note": "in 16d \u2014 reduce size into the 10:00 ET print"
+    },
+    {
+      "event": "Nonfarm Payrolls",
+      "date": "2026-07-03",
+      "source": "cadence_estimate",
+      "action": "high-impact 8:30 ET \u2014 widen stops / size down",
+      "days_until": 18,
+      "note": "in 18d \u2014 high-impact 8:30 ET \u2014 widen stops / size down"
+    }
+  ],
+  "scorecard_summary": "Briefing scorecard: n=4 dir-calls, hit 1.0, regime acc 0.375 \u2014 CALIBRATING \u2014 need ~30-60 samples before the hit-rate/calibration mean anything",
+  "bias": "size to regime: trust direction more in BREADTH, less in CONCENTRATION; ROTATION_WARN = treat tech-led longs as suspect",
+  "provenance": {
+    "source": "oracle_morning_briefing",
+    "verified": false,
+    "note": "Analyst/Oracle journal \u2014 qualitative regime context + a self-scored directional call, NOT a verified data feed or validated edge. Numbers here are never ingested as trading inputs."
+  }
+}

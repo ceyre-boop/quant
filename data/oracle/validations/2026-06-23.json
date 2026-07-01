@@ -1,0 +1,9 @@
+{
+  "date": "2026-06-23",
+  "generated_at": "2026-06-23T08:33:58.177775+00:00",
+  "candidate_lesson": "When internal regime is MOMENTUM but TradingView confirms with 0 signals, the 75% sizing multiplier should be treated as a hard gate against new entries on pairs with green_matches=0, not merely a size reduction.",
+  "testable_rule": "if consensus.green_matches == 0 and consensus.hist_hr < 0.50: veto_entry() # require at least one historical green match before trusting 100% conviction",
+  "verdict": "REJECTED",
+  "reason": "Rule filters only 0 trades \u2014 insufficient sample",
+  "trades_available": 1160
+}

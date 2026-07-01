@@ -1,0 +1,51 @@
+{
+ "meta": {
+  "note": "Claude Pro has no usage API. This is a local ledger. Sync weekly_used manually from claude.ai/settings or run: python3 sovereign/tools/claude_usage_tracker.py sync --used 142000",
+  "weekly_reset_day": "Saturday",
+  "weekly_total_estimate": 200000,
+  "human_share": 0.7,
+  "agent_share": 0.3
+ },
+ "week": {
+  "start_date": "2026-05-31",
+  "weekly_used": 41200,
+  "weekly_remaining": 158800,
+  "last_synced": null,
+  "note": "REST-015 2026-06-15T01:10Z \u2014 RQ-REST-010 CB-blackout gate CONFIRMED (HYP-061) on clean BOE+FOMC calendar: dSharpe +0.130, perm p=0.005, robust both sub-periods. Queued RQ-REST-015 to wire (Colin approval). Flagged cb_decisions.json contamination + 2 loops down (forex_scan/morning_briefing ~60h). ~9k tokens."
+ },
+ "today": {
+  "date": "2026-06-15",
+  "human_used": 0,
+  "agent_used": 9000,
+  "daily_agent_budget": 8571,
+  "agent_allowed_today": 8571,
+  "note": "REST-015: CB-blackout MC validation -> CONFIRMED. Left ample buffer for Colin."
+ },
+ "session": {
+  "started": "2026-06-15T01:05:00Z",
+  "ended": "2026-06-15T01:14:53.247550Z",
+  "mode": "REST_MODE",
+  "tasks_completed": [
+   "RQ-REST-010-cb-blackout-mc",
+   "health-recheck"
+  ],
+  "findings_written": 3,
+  "hypotheses_updated": [
+   "HYP-061"
+  ],
+  "new_hypotheses": [
+   "HYP-061"
+  ],
+  "new_tasks_added": [
+   "RQ-REST-015"
+  ],
+  "key_finding": "CB-blackout veto (3-14d pre BOE/FED) CONFIRMED on clean calendar, dSharpe +0.130, robust both sub-periods; wire pending Colin approval. cb_decisions.json contaminated 2023-24. forex_scan+morning_briefing loops down ~60h."
+ },
+ "mode": "REST_MODE_COMPLETE",
+ "thresholds": {
+  "weekly_danger": 20000,
+  "weekly_light_mode": 50000,
+  "human_minimum_buffer": 8000,
+  "heavy_task_minimum": 15000
+ }
+}

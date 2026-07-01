@@ -1,0 +1,26 @@
+{
+  "date": "2026-06-21",
+  "generated_at": "2026-06-21T07:05:28.279977+00:00",
+  "input_tokens": 6501,
+  "output_tokens": 904,
+  "estimated_cost_usd": 0.165315,
+  "harvest_days_read": 7,
+  "reflection": {
+    "candidate_lesson": {
+      "lesson_text": "ICT entries with bars_since_signal > 100 are stale execution artifacts \u2014 the signal context that justified the trade no longer reflects current price structure and must be vetoed regardless of grade.",
+      "mechanism": "Sweeps, displacements and FVGs are mean-reverting microstructure events with short half-lives (minutes to a few bars). When bars_since_signal=1070, the institutional liquidity event that the setup keys on (the sweep at 0.69906) was consumed and likely reversed hundreds of bars ago. Entering on a stale signal means taking the limit fill after the FVG has fully filled and the displacement leg has exhausted \u2014 you are the late retail buyer that the original sweep was designed to trap, the exact pd_alignment trap codified in L4.",
+      "testable_rule": "if signal_layers_active includes 'SWEEP' or 'FVG_TAP' and bars_since_signal > 20: return ICTVeto  # stale microstructure context",
+      "expected_impact": "Eliminates stale-context losses like the -1.004R AUDUSD trade; expected win-rate lift on ICT entries +3-5% and Sharpe contribution toward the +0.05 gap by removing high-variance late fills.",
+      "evidence_from_harvest": "The only closed trade (AUDUSD ICT LONG, Grade A, full commitment_score=1.0) lost -1.004R despite a perfect 7-confirmation setup \u2014 the single distinguishing anomaly is bars_since_signal=1070.",
+      "evidence_from_reasoning": "The losing entry had commitment_score=1.0, grade A, and 7 active confirmations yet still lost; the only degraded reasoning field is bars_since_signal=1070, indicating the sweep/FVG context was massively stale at fill.",
+      "reasoning_component_targeted": "bars_since_signal",
+      "sample_needed": 25
+    },
+    "retirement_flag": {
+      "lesson_to_review": "L1",
+      "reason": "L1 ('London + Grade A + structure<1.5 \u2192 execute') validated this AUDUSD trade as Grade A but it was an NY_Open, not London, and still lost \u2014 L1's execute-trigger may need an explicit bars_since_signal freshness guard to avoid greenlighting stale Grade A setups."
+    },
+    "system_health_note": "Zero trades in 7 days with only 1 historical loss and Regime=UNKNOWN/TradingView UNKNOWN \u2014 system is effectively idle and data-starved, so any lesson here is provisional until paper-trade volume (RQ-006) clears the 30-trade gate."
+  },
+  "auto_validation": null
+}

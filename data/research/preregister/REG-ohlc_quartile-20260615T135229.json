@@ -1,0 +1,17 @@
+{
+  "hypothesis_id": "REG-ohlc_quartile-20260615T135229",
+  "validator": "big_move",
+  "frozen_at": "2026-06-15T13:52:29+00:00",
+  "script": "scripts/validate_big_move.py",
+  "args": [
+    "--nperm",
+    "10000",
+    "--seed",
+    "42"
+  ],
+  "methodology": {
+    "permutation": true,
+    "walk_forward": true,
+    "both_sides": true
+  }
+}

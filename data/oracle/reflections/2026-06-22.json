@@ -1,0 +1,26 @@
+{
+  "date": "2026-06-22",
+  "generated_at": "2026-06-22T14:48:09.539261+00:00",
+  "input_tokens": 6501,
+  "output_tokens": 882,
+  "estimated_cost_usd": 0.163665,
+  "harvest_days_read": 7,
+  "reflection": {
+    "candidate_lesson": {
+      "lesson_text": "An ICT entry where bars_since_signal exceeds ~10 (signal is hours stale) is anti-edge even with commitment_score=1.0 and Grade A \u2014 the sweep liquidity has already been absorbed by the time price returns to the FVG.",
+      "mechanism": "A bullish sweep + displacement is an institutional footprint with a short half-life: smart money fills its book in the minutes after the sweep. When bars_since_signal is large, the imbalance the FVG represents has been re-traded and the limit fill is into exhausted, not fresh, institutional flow \u2014 you are buying the retail echo of a move that already completed.",
+      "testable_rule": "if signal_layers_active includes 'SWEEP' and bars_since_signal > 10: apply ICTVeto (or size x0.0); only execute sweep-driven entries when bars_since_signal <= 3",
+      "expected_impact": "Removes stale-sweep losers like the -1.004R AUDUSD trade; expected avgR lift on ICT sweep trades from negative toward the L6 fresh-pullback baseline, supporting +0.02-0.03 Sharpe via loss avoidance.",
+      "evidence_from_harvest": "Only 1 closed trade in window, a LOSS at -1.004R; it was Grade A, commitment 1.0, full 7-confirmation stack \u2014 quality gates all passed yet it still lost, pointing to a non-quality failure axis.",
+      "evidence_from_reasoning": "The single AUDUSD LOSS had bars_since_signal=1070 with commitment_score=1.0, grade A, and a confirmed BULLISH_SWEEP \u2014 maximal price-action quality but extreme staleness, the one reasoning field that was clearly degenerate.",
+      "reasoning_component_targeted": "bars_since_signal",
+      "sample_needed": 20
+    },
+    "retirement_flag": {
+      "lesson_to_review": "L1",
+      "reason": "L1 says London+GradeA+structure<1.5 is THE setup, but the only logged trade was Grade A in NY_Open (not London) and still lost \u2014 confirms L1's session restriction but suggests Grade A alone is being trusted to execute outside the London window; verify the executor is actually enforcing the London gate."
+    },
+    "system_health_note": "Regime=UNKNOWN with 0 trades in 7 days and only 1 closed trade total \u2014 the system is effectively idle/quarantined, so any Sharpe move must come from gate refinement (loss avoidance) rather than new entries until trade flow resumes."
+  },
+  "auto_validation": null
+}

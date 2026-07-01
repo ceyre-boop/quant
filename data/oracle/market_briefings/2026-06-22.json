@@ -1,0 +1,145 @@
+{
+  "date": "2026-06-22",
+  "generated_at": "2026-06-22T12:21:25.235403+00:00",
+  "meta_regime": "CONCENTRATION",
+  "regime_read": "NQ leading / pulling away from ES \u2014 narrow, tech/AI-driven, FRAGILE. Trust directional moves less; watch for reversal when AI names cool.",
+  "narrative": "Macro backdrop \u2014\n[2026-06-22] US economic state (FRED):\n  Growth: real GDP 1.6% (q/q ann)\n  Inflation: CPI 3.9% YoY | core CPI 2.58% | core PCE 2.78% (Fed target 2%)\n  Labor: unemployment 4.3%\n  Rates: fed funds 3.63% | 10Y 4.49% | 10Y-2Y 0.27% (NORMAL)\n  Consumer: UMich sentiment 49.8 | VIX 18.44\n\n---\nPRE-US-OPEN BRIEFING \u2014 ES/NQ (research only; no execution path on this pair).\n\n1) RECENT MOVE-BY-MOVE READ\nBoth indices are firmly above session VWAP (ES 7568 vs 7556.71 VWAP; NQ 30770.5 vs 30708.08 VWAP) and well above the 200-day (ES +9.2%, NQ +18.5%) \u2014 an established uptrend, not a fresh breakout. NQ did the heavy lifting: daily return +1.68% and weekly +3.74%, versus ES +0.79% daily / +1.79% weekly. NQ has cleared its prior-week high (30664.5 -> 30770.5), while ES is still below its prior-week high (7514.5 prior-day high < 7568 last, but 7584.5 prior-week high not yet taken). The likely catalyst is AI/tech leadership doing the pulling \u2014 consistent with the concentration regime below. On the macro side, the news flow is dominated by Iran headlines (Trump backlash, Vance to Switzerland for talks, US/Iran negotiators meeting). This is a two-sided geopolitical setup: de-escalation/talks are risk-on supportive, but any breakdown (Strait of Hormuz toll threats) is a tail-risk gap catalyst. RSI is neutral on both (ES 47.8, NQ 51.4) \u2014 momentum is NOT overbought, so there's room to extend without a stretched oscillator. Net: trend up, momentum neutral, leadership narrow.\n\n2) VOLUME-PROFILE READ (where volume traded \u2014 NOT order-flow delta; true buy/sell aggression needs a CME feed)\nNQ: 5-day POC at 30450.2 with a tight high-volume cluster (30400\u201330525) \u2014 that's the accumulation shelf and the line in the sand. Value-area high 30826.7, value-area low 30299.6. Price at 30770.5 is in the upper third of value, pressing toward VAH ~30827. Holding above ~30450 keeps the constructive structure; a loss of 30450 drops price back into the body of the profile and neutralizes the bid.\nES: POC 7546.72 doubles as value-area low; VAH 7631.33. Notable HVNs at 7546\u20137589 and 7612. ES last 7568 sits just above POC \u2014 less extended than NQ, which fits the concentration story (NQ stretched ahead of its own value, ES still digesting near POC). The line in the sand for ES is the 7546 POC/VWAP confluence.\n\n3) NQ/ES LEAD-LAG REGIME \u2014 CONCENTRATION\nContemporaneous correlation is high (0.944) but the lead-lag matrix shows no clean leader (best lag corr only -0.13, leader = NONE) \u2014 meaning the cross-asset timing edge is weak; this is a co-moving, NQ-stretched tape rather than a clean rotation. The system flags CONCENTRATION: NQ pulling away from ES (1d spread +0.88%, 5d +0.39%, cumulative +3.27%), narrow tech/AI-driven and FRAGILE. Implication: trust directional moves LESS and size DOWN. Concentration regimes extend further than feels comfortable but reverse violently when AI names cool. This is a regime INPUT, not an edge.\n\n4) EVENT-CALENDAR AWARENESS\nNo high-impact print today. PCE (Fed's preferred inflation) in 8 days (6/30, 8:30 ET \u2014 reduce size into window); ISM Manufacturing 7/1; NFP 7/3 (high-impact, widen stops/size down); CPI 7/12. All except FOMC seeds are cadence ESTIMATES \u2014 verify. Near-term the calendar is clear, so today's risk is event-light EXCEPT for the live Iran/Switzerland headline tape, which can override technicals intraday.\n\n5) SYNTHESIS \u2014 META-REGIME + NARROWED BIAS\nMeta-regime: established uptrend + neutral momentum + above all VWAPs/200-day, but NARROW (concentration) leadership and a live geopolitical headline wildcard. The structural tape favors longs; the regime quality argues against conviction. These partially offset, so confidence is deliberately capped.\nBias: LONG / long-the-dip, ~52%, invalidated below NQ 30450 (POC/accumulation shelf \u2014 losing it neutralizes and would flip me to NEUTRAL, not short, given the underlying uptrend). Above 30450, structure favors a push toward VAH ~30827 then prior-week-high area. Confidence is MODERATE-LOW because: (a) the regime is fragile/concentrated \u2014 explicitly a trust-reducer; (b) news is two-sided (talks = risk-on, Hormuz threat = tail risk), so the headline driver is NOT clean; (c) lead-lag shows no clear leader. Per the rules, high confidence requires clean news AND clean lead-lag \u2014 we have neither, so I am NOT manufacturing certainty.\n\nHumility note: this briefing scorecard is n=6 (hit 0.833, regime acc 0.308) \u2014 statistically meaningless until ~30-60 samples. Treat this as intelligence, not a validated edge. Size into the concentration regime accordingly.",
+  "big_move_headline": {
+    "headline": "Today's likeliest institutional move: LONG USDJPY (P 70%, ~0.34% range, conf 48%).",
+    "pair": "USDJPY",
+    "direction": "LONG",
+    "p_big": 0.704,
+    "confidence": 0.479,
+    "expected_magnitude_pct": 0.3351,
+    "session": "LONDON",
+    "drivers": [
+      [
+        "event_risk",
+        0.9
+      ],
+      [
+        "momentum",
+        0.5427
+      ],
+      [
+        "displacement",
+        0.2721
+      ]
+    ],
+    "validation_status": "UNVALIDATED \u2014 display only (run scripts/validate_big_move.py)"
+  },
+  "directional_bias": "LONG",
+  "confidence": 52,
+  "regime_call": "CONCENTRATION",
+  "key_level": 30450,
+  "synthesis_source": "claude-opus-4-8",
+  "lead_lag": {
+    "regime": "CONCENTRATION",
+    "spread_avg": 0.00163,
+    "leader": "NONE",
+    "corr": 0.944,
+    "divergence": false
+  },
+  "volume_profile": {
+    "ES=F": {
+      "symbol": "ES=F",
+      "as_of": "2026-06-22T12:20:56.243395+00:00",
+      "days": 5,
+      "bins": 40,
+      "poc": 7546.72,
+      "value_area_low": 7546.72,
+      "value_area_high": 7631.33,
+      "high_volume_nodes": [
+        7546.72,
+        7573.64,
+        7589.02,
+        7554.41,
+        7612.1
+      ],
+      "price_range": [
+        7479.42,
+        7633.25
+      ],
+      "limitation": "Volume profile = WHERE volume traded (volume-at-price). NOT order-flow delta (buy/sell aggression). True delta needs a CME order-flow feed (Databento/CQG)."
+    },
+    "NQ=F": {
+      "symbol": "NQ=F",
+      "as_of": "2026-06-22T12:20:56.281708+00:00",
+      "days": 5,
+      "bins": 40,
+      "poc": 30450.2,
+      "value_area_low": 30299.6,
+      "value_area_high": 30826.7,
+      "high_volume_nodes": [
+        30450.2,
+        30475.3,
+        30425.1,
+        30400.0,
+        30525.5
+      ],
+      "price_range": [
+        29960.75,
+        30964.75
+      ],
+      "limitation": "Volume profile = WHERE volume traded (volume-at-price). NOT order-flow delta (buy/sell aggression). True delta needs a CME order-flow feed (Databento/CQG)."
+    }
+  },
+  "macro_economic": {
+    "text": "[2026-06-22] US economic state (FRED):\n  Growth: real GDP 1.6% (q/q ann)\n  Inflation: CPI 3.9% YoY | core CPI 2.58% | core PCE 2.78% (Fed target 2%)\n  Labor: unemployment 4.3%\n  Rates: fed funds 3.63% | 10Y 4.49% | 10Y-2Y 0.27% (NORMAL)\n  Consumer: UMich sentiment 49.8 | VIX 18.44",
+    "summary": {
+      "gdp_growth_pct": 1.6,
+      "cpi_yoy_pct": 3.9,
+      "core_cpi_yoy_pct": 2.58,
+      "core_pce_yoy_pct": 2.78,
+      "unemployment_pct": 4.3,
+      "fed_funds_pct": 3.63,
+      "ten_year_pct": 4.49,
+      "yield_curve_10y2y": 0.27,
+      "yield_curve_state": "NORMAL",
+      "consumer_sentiment": 49.8,
+      "vix": 18.44
+    }
+  },
+  "news_count": 11,
+  "event_calendar": [
+    {
+      "event": "PCE (Fed's preferred inflation)",
+      "date": "2026-06-30",
+      "source": "cadence_estimate",
+      "action": "8:30 ET \u2014 reduce size into window",
+      "days_until": 8,
+      "note": "in 8d \u2014 8:30 ET \u2014 reduce size into window"
+    },
+    {
+      "event": "ISM Manufacturing PMI",
+      "date": "2026-07-01",
+      "source": "cadence_estimate",
+      "action": "reduce size into the 10:00 ET print",
+      "days_until": 9,
+      "note": "in 9d \u2014 reduce size into the 10:00 ET print"
+    },
+    {
+      "event": "Nonfarm Payrolls",
+      "date": "2026-07-03",
+      "source": "cadence_estimate",
+      "action": "high-impact 8:30 ET \u2014 widen stops / size down",
+      "days_until": 11,
+      "note": "in 11d \u2014 high-impact 8:30 ET \u2014 widen stops / size down"
+    },
+    {
+      "event": "CPI",
+      "date": "2026-07-12",
+      "source": "cadence_estimate",
+      "action": "inflation print 8:30 ET \u2014 reduce size into window",
+      "days_until": 20,
+      "note": "in 20d \u2014 inflation print 8:30 ET \u2014 reduce size into window"
+    }
+  ],
+  "scorecard_summary": "Briefing scorecard: n=6 dir-calls, hit 0.833, regime acc 0.308 \u2014 CALIBRATING \u2014 need ~30-60 samples before the hit-rate/calibration mean anything",
+  "bias": "size to regime: trust direction more in BREADTH, less in CONCENTRATION; ROTATION_WARN = treat tech-led longs as suspect",
+  "provenance": {
+    "source": "oracle_morning_briefing",
+    "verified": false,
+    "note": "Analyst/Oracle journal \u2014 qualitative regime context + a self-scored directional call, NOT a verified data feed or validated edge. Numbers here are never ingested as trading inputs."
+  }
+}

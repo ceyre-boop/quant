@@ -1,0 +1,16 @@
+{
+  "id": "rule_lowvol_trend",
+  "name": "lowvol_trend",
+  "description": "Low-vol expansion: enter trend when vol compressed",
+  "family": "rule",
+  "spec": "Low-vol expansion: enter trend when vol compressed",
+  "train_window": [
+    "2015-01-01",
+    "2022-12-31"
+  ],
+  "holdout_window": [
+    "2023-01-01",
+    "2024-12-31"
+  ],
+  "preregistered_at": "2026-06-23T19:25:59.736591+00:00"
+}

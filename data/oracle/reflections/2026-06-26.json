@@ -1,0 +1,26 @@
+{
+  "date": "2026-06-26",
+  "generated_at": "2026-06-26T06:30:53.159264+00:00",
+  "input_tokens": 5748,
+  "output_tokens": 975,
+  "estimated_cost_usd": 0.159345,
+  "harvest_days_read": 7,
+  "reflection": {
+    "candidate_lesson": {
+      "lesson_text": "When the 30-indicator consensus reports conv>=100% but green_matches=0 and hist_hr=0% (no historical analog), suppress entries \u2014 the consensus is mechanically extreme but has zero empirical track record at that configuration.",
+      "mechanism": "A 100% conviction reading with zero green_matches means every indicator agrees in the live snapshot but the system has never seen this exact configuration resolve profitably in memory. USDJPY (14/30 bull, conv=100%, hist_hr=0%) and AUDNZD (conv=75%, hist_hr=0%) are precisely the safe-haven pairs L8 warns about: unanimous directional agreement on a rate-sensitive pair usually reflects a transient flow shock (carry unwind / haven bid), not a durable institutional position \u2014 so the crowd is fully committed at exactly the moment mean-reversion risk peaks.",
+      "testable_rule": "if consensus.conviction >= 0.95 and consensus.green_matches == 0 and consensus.hist_hr <= 0.05: veto_entry()  # require at least one historical green analog before trusting extreme conviction",
+      "expected_impact": "Filters anti-edge USDJPY/AUDNZD entries; expected to lift win rate by removing zero-track-record signals, modeled Sharpe contribution +0.02 to +0.03 via reduced variance of losers.",
+      "evidence_from_harvest": "Live consensus shows USDJPY dir=LONG conv=100% hist_hr=0% and AUDNZD dir=LONG conv=75% hist_hr=0% \u2014 both with green_matches=0, while SHORT pairs (GBPUSD hist_hr=69%, AUDUSD hist_hr=72%) have strong historical hit rates. The zero-hr longs are the structurally untrusted signals.",
+      "evidence_from_reasoning": null,
+      "reasoning_component_targeted": "consensus.hist_hr (paired with conviction and green_matches)",
+      "sample_needed": 30
+    },
+    "retirement_flag": {
+      "lesson_to_review": "L8",
+      "reason": "L8 sets the USDJPY/AUDNZD VIX gate at 13 for a bull market; with VIX now 18.63 and falling and regime UNKNOWN/MOMENTUM rather than clean bull, the fixed-13 threshold may be mis-calibrated \u2014 worth re-validating whether the gate should flex with regime confidence rather than stay static."
+    },
+    "system_health_note": "Zero trades in the last 7 days with regime=UNKNOWN and TradingView providing 0 signals (internal-only sizing at 75%) \u2014 the system is correctly in a low-conviction holding state, so no execution-level decay, but the empty decision log means harvest-only lessons are the only validatable path right now."
+  },
+  "auto_validation": null
+}

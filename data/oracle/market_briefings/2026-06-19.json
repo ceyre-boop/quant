@@ -1,0 +1,98 @@
+{
+  "date": "2026-06-19",
+  "generated_at": "2026-06-19T18:01:57.502138+00:00",
+  "meta_regime": "BREADTH",
+  "regime_read": "ES & NQ moving together \u2014 broad agreement, more DURABLE directional signal. Trust the direction more.",
+  "narrative": "Session open 2026-06-19. NQ/ES regime: BREADTH \u2014 ES & NQ moving together \u2014 broad agreement, more DURABLE directional signal. Trust the direction more. NQ 30581.0 / ES 7543.2, corr 0.943, lead-lag leader NONE. Volume profile NQ POC ~30450.2. Forex: NO_TRADE_TODAY \u2014 USDJPY=X closest at 100%. Event watch: PCE (Fed's preferred inflation) (in 11d \u2014 8:30 ET \u2014 reduce size into window), ISM Manufacturing PMI (in 12d \u2014 reduce size into the 10:00 ET print), Nonfarm Payrolls (in 14d \u2014 high-impact 8:30 ET \u2014 widen stops / size down). Briefing scorecard: n=6 dir-calls, hit 0.833, regime acc 0.333 \u2014 CALIBRATING \u2014 need ~30-60 samples before the hit-rate/calibration mean anything Regime read is an INPUT for sizing/trust, not a trade signal (deterministic fallback \u2014 Opus synthesis unavailable this run).",
+  "big_move_headline": {},
+  "directional_bias": "NEUTRAL",
+  "confidence": 0,
+  "regime_call": "BREADTH",
+  "key_level": null,
+  "synthesis_source": "deterministic_fallback",
+  "lead_lag": {
+    "regime": "BREADTH",
+    "spread_avg": 0.00148,
+    "leader": "NONE",
+    "corr": 0.943,
+    "divergence": false
+  },
+  "volume_profile": {
+    "ES=F": {
+      "symbol": "ES=F",
+      "as_of": "2026-06-19T12:19:16.786174+00:00",
+      "days": 5,
+      "bins": 40,
+      "poc": 7631.58,
+      "value_area_low": 7544.03,
+      "value_area_high": 7644.08,
+      "high_volume_nodes": [
+        7631.58,
+        7614.9,
+        7627.41,
+        7610.73,
+        7589.89
+      ],
+      "price_range": [
+        7479.42,
+        7646.17
+      ],
+      "limitation": "Volume profile = WHERE volume traded (volume-at-price). NOT order-flow delta (buy/sell aggression). True delta needs a CME order-flow feed (Databento/CQG)."
+    },
+    "NQ=F": {
+      "symbol": "NQ=F",
+      "as_of": "2026-06-19T12:19:16.815985+00:00",
+      "days": 5,
+      "bins": 40,
+      "poc": 30450.2,
+      "value_area_low": 30374.9,
+      "value_area_high": 30876.9,
+      "high_volume_nodes": [
+        30450.2,
+        30475.3,
+        30726.3,
+        30826.7,
+        30851.8
+      ],
+      "price_range": [
+        29960.75,
+        30964.75
+      ],
+      "limitation": "Volume profile = WHERE volume traded (volume-at-price). NOT order-flow delta (buy/sell aggression). True delta needs a CME order-flow feed (Databento/CQG)."
+    }
+  },
+  "news_count": 15,
+  "event_calendar": [
+    {
+      "event": "PCE (Fed's preferred inflation)",
+      "date": "2026-06-30",
+      "source": "cadence_estimate",
+      "action": "8:30 ET \u2014 reduce size into window",
+      "days_until": 11,
+      "note": "in 11d \u2014 8:30 ET \u2014 reduce size into window"
+    },
+    {
+      "event": "ISM Manufacturing PMI",
+      "date": "2026-07-01",
+      "source": "cadence_estimate",
+      "action": "reduce size into the 10:00 ET print",
+      "days_until": 12,
+      "note": "in 12d \u2014 reduce size into the 10:00 ET print"
+    },
+    {
+      "event": "Nonfarm Payrolls",
+      "date": "2026-07-03",
+      "source": "cadence_estimate",
+      "action": "high-impact 8:30 ET \u2014 widen stops / size down",
+      "days_until": 14,
+      "note": "in 14d \u2014 high-impact 8:30 ET \u2014 widen stops / size down"
+    }
+  ],
+  "scorecard_summary": "Briefing scorecard: n=6 dir-calls, hit 0.833, regime acc 0.333 \u2014 CALIBRATING \u2014 need ~30-60 samples before the hit-rate/calibration mean anything",
+  "bias": "size to regime: trust direction more in BREADTH, less in CONCENTRATION; ROTATION_WARN = treat tech-led longs as suspect",
+  "provenance": {
+    "source": "oracle_morning_briefing",
+    "verified": false,
+    "note": "Analyst/Oracle journal \u2014 qualitative regime context + a self-scored directional call, NOT a verified data feed or validated edge. Numbers here are never ingested as trading inputs."
+  }
+}

@@ -1,0 +1,95 @@
+# ════════════════════════════════════════════════════════════════════════════════════════════════
+#  HYP-071 — INTERPRETATION ADDENDUM (extends the v2 prereg, hash-locked)
+#  Frozen BEFORE any cell of the table is computed. Resolves ambiguities in the hash-locked v2 prose
+#  and pre-specifies the "economically-sensible" map so nothing is chosen post-hoc. The Step-2 driver
+#  verifies BOTH this file's hash AND the v2 prereg hash before it runs.
+# ════════════════════════════════════════════════════════════════════════════════════════════════
+
+id: HYP-071-INTERP
+extends_prereg: HYP-071_tabular_exit_value.yaml
+extends_hash: 3d500bda3249c4615698ce311a7cbad41a35600a23abd2a4ea4526416eac06a4   # v2 prereg hash
+frozen_at: "2026-06-30"
+status: LOCKED
+purpose: >-
+  The v2 prereg locks the target/board/resampling/validation, but three points of its prose are
+  ambiguous or, read literally, contradict its own rationale. These rulings (decided by Colin
+  2026-06-30, before any data is touched) fix the interpretation. They do NOT change any locked v2
+  value; they disambiguate how the locked design is implemented. Recorded as a separate hash-locked
+  file so the v2 hash (3d500bda…) is untouched and the lock-before-data ordering is preserved.
+
+rulings:
+
+  carry_signal_state:
+    question: >-
+      The board's carry-signal axis. Literal 'aligned = (signal == direction)' marks signal==0 (flat,
+      HOLD-eligible) bars as 'not-aligned' — but the prereg says not-aligned cells are N/A because
+      REVERSAL captures them, and REVERSAL fires only when signal == -direction, never when signal==0.
+    ruling: >-
+      aligned := signal in {+direction, 0}  (carry not opposing the position).
+      not_aligned := signal == -direction  ONLY  → these bars always trigger REVERSAL, so they are the
+      genuinely-N/A cells. Flat-signal (signal==0) bars are HOLD-eligible and are EVALUATED in the
+      aligned half. This matches the prereg's stated rationale.
+    consequence: "Sets which ~54 of the 108 cells are evaluated (not-aligned half = N/A)."
+
+  resampling_pool:
+    question: >-
+      'Continuations drawn ONLY from bars in the same ATR-tercile' vs a contiguous stationary block
+      (geometric mean L=5). A 5-bar contiguous block will not stay inside one tercile.
+    ruling: >-
+      START-CONDITIONED contiguous blocks: block STARTS are restricted to bars whose 60-day ATR%
+      percentile is in the cell's tercile; the geometric-length run (mean L=5) may DRIFT across terciles
+      within the block. This preserves the volatility clustering the entire L-derivation exists to
+      capture and collapses to the strict 'every bar in-tercile' reading only in the degenerate IID case
+      the prereg explicitly rejects.
+
+  rollout_signal:
+    question: >-
+      In HOLD_AND_TRAIL rollouts, may the resampled carry signal terminate the rollout via REVERSAL /
+      CB_REFRESH? The prereg terminal-exit is 'whichever hard rule or trail fires first under decide_exit'
+      (which includes REVERSAL/TIME), but resampling the signal injects entry-edge noise.
+    ruling: >-
+      LIVE: the carry signal is resampled with each block, so REVERSAL/CB_REFRESH/TIME can terminate a
+      rollout — matching the prereg's explicit terminal-exit definition. ADDITIONALLY emit a
+      signal_frozen sensitivity variant (signal held at the member's aligned value, so only trail/stop/
+      time can terminate) so we can see how much the reversal channel drives any structure. The LIVE
+      variant is the primary; signal_frozen is reported alongside, not gated on.
+
+economically_sensible_map:    # pre-specified — part of the locked "economically-sensible direction"
+  definition: >-
+    sensible_exit(cell) := optimal_action == EXIT_NOW AND ( atr_tercile == HIGH OR hold_frac == LATE OR
+    excursion == EXTENDED OR rsi_extreme == True ).
+  rationale:
+    atr_high:    "vol expanding → the ATR trail gives back more before it fires"
+    hold_late:   "hold_frac > 0.66 → carry signal edge has decayed"
+    excursion_extended: "unrealized > 1R → runner already paid, remaining distribution downside-asymmetric"
+    rsi_extreme: "overbought-long / oversold-short → mean-reversion risk against the position"
+  nonsensical_exit: >-
+    EXIT_NOW in {low-ATR, early-hold, underwater (<0R), not-rsi-extreme} = capitulation → treated as
+    noise, recorded as such, never counted as a candidate rule.
+  counting_rule: "A divergence COUNTS only if sensible_exit AND CPCV sign-stable."
+
+design_clarifications:
+  rollout_anchor: >-
+    A rollout reconstructs the synthetic close path from the MEMBER's current close (close_now), not the
+    entry price. The carried-forward stop/best/worst are absolute price levels tied to the real path up
+    to the evaluation bar; entry_price survives only as the R-numerator reference.
+  block_length_geometric: "L=5 is the EXPECTED GEOMETRIC block length (stationary bootstrap: restart prob 1/L), not a fixed 5."
+  R_is_gross: >-
+    R follows the locked formula (gross). Holding accrues swap/carry that gross R ignores and EXIT_NOW
+    avoids future swap that HOLD pays; for marginal EXIT_NOW cells this can flip the sign. Computed on
+    gross R as locked; the net-swap caveat is recorded in the results summary, not silently corrected.
+  fixed_cuts: >-
+    Every axis cut is fixed, NOT fitted: ATR tercile at 1/3 & 2/3 of the 60-day percentile; excursion at
+    0R and 1R; hold_frac at 0.33 & 0.66; RSI at 70 (long) / 30 (short). Zero fitted thresholds in this study.
+  seeding: "Every Monte-Carlo draw and CPCV fold is seeded deterministically as SEED + cell_id + window_id → bit-reproducible."
+  static_config_is_degenerate: >-
+    In the quiet (HOLD-eligible) space the live v015 machine never voluntarily exits, so static_action ==
+    HOLD_AND_TRAIL for every evaluated cell. The first-class deliverable is therefore the list of cells
+    where the table says EXIT_NOW, gated by sensible_exit AND CPCV-stable.
+  interpretation_caveat: >-
+    Vol innovations are ~white (Δ(ATR%) decorrelates in ~1 day; see v2 block_length_derivation), so any
+    structure the table finds is attributable to EXCURSION GEOMETRY conditioned on entry regime, NOT to
+    intra-trade vol momentum. Do not credit clustering the bootstrap did not inject.
+
+hash_method: "sha256 of json.dumps(doc, sort_keys=True, separators=(',',':')) where doc = this YAML parsed to a dict MINUS hash_lock."
+hash_lock: "c1fab80730f1ebf3af7c35e4bbd8fc80e2bafd86419fc0125acc140b414d806f"

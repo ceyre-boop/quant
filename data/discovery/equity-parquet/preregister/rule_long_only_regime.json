@@ -1,0 +1,16 @@
+{
+  "id": "rule_long_only_regime",
+  "name": "long_only_regime",
+  "description": "Long-only above 200-SMA",
+  "family": "rule",
+  "spec": "Long-only above 200-SMA",
+  "train_window": [
+    "2018-01-01",
+    "2023-12-31"
+  ],
+  "holdout_window": [
+    "2024-01-01",
+    "2026-06-09"
+  ],
+  "preregistered_at": "2026-06-24T01:57:21.137544+00:00"
+}

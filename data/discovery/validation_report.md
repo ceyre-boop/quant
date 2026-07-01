@@ -17,7 +17,7 @@
 | continuity:USDJPY | ⚠️ WARN | flat OHLC bars=2, calendar-gaps>5d=0, >5σ-range bars=11 |
 | feature_health | ✅ PASS | 19 features; dead=none; >5%NaN=none |
 | drift:within_run | ✅ PASS | two back-to-back pulls of AUDUSD identical=True |
-| drift:vs_baseline | ✅ PASS | baseline 0d old; n=84 bars; mean drift 0.0000%, max 0.0000% (gate: max>0.1%⇒flag) |
+| drift:vs_baseline | ✅ PASS | baseline 0d old; n=160 bars; mean drift 0.0000%, max 0.0000% (gate: max>0.1%⇒flag) |
 | drift:snapshot | ℹ️ INFO | snapshot saved → data/drift_snapshots/snapshot_2024-12-30.json (re-run --drift-compare tomorrow for the true 24h test) |
 | lookahead_canary | ✅ PASS | canary(future-peek) Sharpe=1.65 perm_p=0.0099 vs real Sharpe=0.353 → gate DETECTS leaks (real features clean) |
 | tradegen:sample_size | ✅ PASS | 580 base trades total; per-pair {AUDUSD:129, EURUSD:146, GBPUSD:148, USDJPY:157} (floor 30) |

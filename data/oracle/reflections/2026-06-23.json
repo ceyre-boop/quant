@@ -1,0 +1,26 @@
+{
+  "date": "2026-06-23",
+  "generated_at": "2026-06-23T08:33:58.157688+00:00",
+  "input_tokens": 5772,
+  "output_tokens": 844,
+  "estimated_cost_usd": 0.14988,
+  "harvest_days_read": 7,
+  "reflection": {
+    "candidate_lesson": {
+      "lesson_text": "When internal regime is MOMENTUM but TradingView confirms with 0 signals, the 75% sizing multiplier should be treated as a hard gate against new entries on pairs with green_matches=0, not merely a size reduction.",
+      "mechanism": "The 30-indicator consensus shows conv=100% across all pairs but green_matches=0 \u2014 meaning the live signal pattern has NO historical analog in memory. A consensus with no precedent is statistical novelty masquerading as conviction; institutions are not crowding a known setup, so the directional read is untested out-of-sample. USDJPY (hist_hr=0%) and AUDNZD (hist_hr=0%) explicitly have zero historical hit rate, confirming the consensus is firing on configurations that have never paid.",
+      "testable_rule": "if consensus.green_matches == 0 and consensus.hist_hr < 0.50: veto_entry() # require at least one historical green match before trusting 100% conviction",
+      "expected_impact": "Drawdown reduction and Sharpe +0.02-0.04 by filtering precedent-free signals (esp. USDJPY/AUDNZD hist_hr=0%) that would otherwise size up on UNKNOWN regime noise.",
+      "evidence_from_harvest": "All 5 pairs show conv=100% with green_matches=0; USDJPY and AUDNZD show hist_hr=0% despite LONG conviction. Regime is UNKNOWN, TV confirms 0 signals, sizing already cut to 75% \u2014 the system is flagging its own unreliability (Tenet 3).",
+      "evidence_from_reasoning": null,
+      "reasoning_component_targeted": "green_matches",
+      "sample_needed": 40
+    },
+    "retirement_flag": {
+      "lesson_to_review": "L8",
+      "reason": "L8 tightens USDJPY/AUDNZD VIX gate to 13, but current VIX has dropped 18.44\u219216.78 intraday while USDJPY shows hist_hr=0% \u2014 the VIX gate alone is not catching the precedent-free signal failure; the gate may need a green_matches component layered on top."
+    },
+    "system_health_note": "System is correctly in a defensive posture \u2014 UNKNOWN regime, 0 TV signals, 0 trades in 7 days, and 100% conviction signals with zero historical matches all argue for the current 75% sizing and continued non-execution until precedent reappears."
+  },
+  "auto_validation": null
+}

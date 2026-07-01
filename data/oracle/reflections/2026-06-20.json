@@ -1,0 +1,26 @@
+{
+  "date": "2026-06-20",
+  "generated_at": "2026-06-20T06:30:21.543272+00:00",
+  "input_tokens": 6068,
+  "output_tokens": 865,
+  "estimated_cost_usd": 0.155895,
+  "harvest_days_read": 7,
+  "reflection": {
+    "candidate_lesson": {
+      "lesson_text": "An ICT entry with bars_since_signal in the thousands is a stale signal acting on a price level the market has long abandoned, and should be vetoed regardless of grade or commitment.",
+      "mechanism": "ICT sweep/FVG levels are institutional liquidity reference points with a short shelf-life. Once price has traveled ~1000 bars past the originating signal, the order block has been mitigated and the limit fill catches no institutional flow \u2014 it is a retail entry into a vacuum. The single closed trade had bars_since_signal=1070, commitment_score=1.0, grade A, and still lost -1.004R, showing that signal freshness gates outcome independent of setup quality.",
+      "testable_rule": "if signal_layers_active includes 'SWEEP' and bars_since_signal > 50: return ICTVeto  # sweep liquidity is stale, structure already mitigated",
+      "expected_impact": "Filters the single dominant loss pattern observed (-1.004R) before it enters; targets win rate and drawdown, contributing to Sharpe gap closure by removing negative-expectancy stale fills.",
+      "evidence_from_harvest": "Only 1 closed trade in the window, a LOSS at -1.004R. Despite a near-perfect setup (Grade A, commitment_score=1.0, 7 confirmations, NY_Open kill zone) it failed \u2014 the one anomalous reasoning field is bars_since_signal=1070.",
+      "evidence_from_reasoning": "The lone loss entry had bars_since_signal=1070 with commitment_score=1.0 and grade A \u2014 every quality signal passed but the trade still lost, isolating signal staleness as the failure driver rather than setup quality.",
+      "reasoning_component_targeted": "bars_since_signal",
+      "sample_needed": 25
+    },
+    "retirement_flag": {
+      "lesson_to_review": "L1",
+      "reason": "L1 says 'London + Grade A + structure<1.5 \u2192 execute' but the only trade was Grade A in NY_Open (not London) and still lost \u2014 if NY_Open Grade A trades keep firing despite L2's anti-edge classification, the execution gate may not be enforcing the session filter L1/L2 imply."
+    },
+    "system_health_note": "Zero trades in 7 days with regime=UNKNOWN and forex flagged NO_TRADE_TODAY \u2014 system is correctly idle, but the lone -1.004R stale-signal loss is the only data point, so all inference is provisional until sample grows."
+  },
+  "auto_validation": null
+}

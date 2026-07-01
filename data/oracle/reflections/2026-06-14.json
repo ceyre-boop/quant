@@ -1,0 +1,26 @@
+{
+  "date": "2026-06-14",
+  "generated_at": "2026-06-14T06:59:49.914163+00:00",
+  "input_tokens": 5500,
+  "output_tokens": 976,
+  "estimated_cost_usd": 0.1557,
+  "harvest_days_read": 7,
+  "reflection": {
+    "candidate_lesson": {
+      "lesson_text": "When the 30-indicator consensus shows a directional signal (SHORT/LONG) with green_matches=0 and hist_hr=0%, the signal has no historical analog and must be sized down or vetoed regardless of conviction percentage.",
+      "mechanism": "green_matches counts how many times the current live indicator configuration has appeared in historical memory with a profitable outcome. When green_matches=0, the system is extrapolating into an unseen state \u2014 the conviction% reflects only current cross-sectional agreement, not out-of-sample reliability. Institutionally, a novel indicator alignment with no profitable precedent is a regime the system has never been paid in; trading it is paying tuition, not collecting edge. Note EURUSD is the exception here: dir=SHORT, conv=58%, green_matches=0 BUT hist_hr=66% \u2014 the historical hit rate survives even with zero green matches, so the gate must key on hist_hr, not green_matches alone.",
+      "testable_rule": "if consensus_dir in ('SHORT','LONG') and green_matches == 0 and hist_hr < 0.50: size_multiplier *= 0.0  # veto. elif green_matches == 0 and hist_hr >= 0.55: size_multiplier *= 0.75  # novel config but historical edge holds",
+      "expected_impact": "Filters out AUDNZD (SHORT, conv=42%, hist_hr=0%) and GBPUSD/USDJPY/AUDUSD NEUTRAL-but-noisy reads while preserving EURUSD (SHORT, hist_hr=66%); expected to cut low-quality entries and lift win rate ~2-4%, contributing +0.02-0.03 Sharpe by removing negative-expectancy novel-state trades.",
+      "evidence_from_harvest": "Live consensus snapshot: AUDNZD dir=SHORT conv=42% green_matches=0 hist_hr=0%; EURUSD dir=SHORT conv=58% green_matches=0 hist_hr=66%. The two SHORT signals differ ONLY in hist_hr, isolating it as the discriminating field. Zero trades in last 7 days means the system is already (correctly) standing aside on the hist_hr=0% configs.",
+      "evidence_from_reasoning": null,
+      "reasoning_component_targeted": "hist_hr (historical hit rate of current indicator config) gated jointly with green_matches",
+      "sample_needed": 40
+    },
+    "retirement_flag": {
+      "lesson_to_review": null,
+      "reason": null
+    },
+    "system_health_note": "Regime=UNKNOWN with 0 trades over 7 days and TradingView showing 0 signals \u2014 the system is correctly frozen/standing aside, but no decision logs means all lessons must remain harvest-derived until trades accumulate."
+  },
+  "auto_validation": null
+}

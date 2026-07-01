@@ -1,0 +1,9 @@
+{
+  "date": "2026-06-30",
+  "generated_at": "2026-06-30T06:30:50.196381+00:00",
+  "candidate_lesson": "When the 30-indicator consensus shows high conviction but green_matches=0, treat the signal as historically un-anchored and cut size, not as a high-confidence entry.",
+  "testable_rule": "if consensus_conviction >= 0.80 and green_matches == 0: size_multiplier *= 0.5  # require historical anchor before full size",
+  "verdict": "REJECTED",
+  "reason": "Rule filters only 0 trades \u2014 insufficient sample",
+  "trades_available": 1160
+}

@@ -1,0 +1,229 @@
+{
+  "meta": {
+    "task": "RQ-REST-020 cost-stress / break-even robustness",
+    "src": "logs/forex_backtest_trades.json",
+    "n_trades": 318,
+    "model": "net_R = (pnl_pct - k*spread_frac + swap_frac)/risk_pct ; k=1 live",
+    "note": "Spread is the stressed transaction cost. Swap=carry kept signed. Offline; no price paths needed."
+  },
+  "baseline_k1": {
+    "n": 318,
+    "wr": 45.28,
+    "meanR": 0.2998,
+    "sumR": 95.346,
+    "sharpe_per_trade": 0.1758
+  },
+  "gross_price_only": {
+    "n": 318,
+    "wr": 45.91,
+    "meanR": 0.3285,
+    "sumR": 104.457,
+    "sharpe_per_trade": 0.1925
+  },
+  "decomposition": {
+    "price_sumR": 104.457,
+    "carry_swap_sumR": -0.789,
+    "spread_cost_sumR_at_k1": -8.321,
+    "net_sumR_k1": 95.346
+  },
+  "portfolio_breakeven_k": 12.458,
+  "stress_curve": {
+    "k=1": {
+      "n": 318,
+      "wr": 45.28,
+      "meanR": 0.2998,
+      "sumR": 95.346,
+      "sharpe_per_trade": 0.1758
+    },
+    "k=2": {
+      "n": 318,
+      "wr": 43.71,
+      "meanR": 0.2737,
+      "sumR": 87.025,
+      "sharpe_per_trade": 0.1604
+    },
+    "k=3": {
+      "n": 318,
+      "wr": 42.77,
+      "meanR": 0.2475,
+      "sumR": 78.704,
+      "sharpe_per_trade": 0.1451
+    },
+    "k=5": {
+      "n": 318,
+      "wr": 42.14,
+      "meanR": 0.1952,
+      "sumR": 62.062,
+      "sharpe_per_trade": 0.1144
+    },
+    "k=8": {
+      "n": 318,
+      "wr": 40.88,
+      "meanR": 0.1167,
+      "sumR": 37.098,
+      "sharpe_per_trade": 0.0683
+    },
+    "k=10": {
+      "n": 318,
+      "wr": 39.62,
+      "meanR": 0.0643,
+      "sumR": 20.456,
+      "sharpe_per_trade": 0.0377
+    },
+    "k=15": {
+      "n": 318,
+      "wr": 37.74,
+      "meanR": -0.0665,
+      "sumR": -21.15,
+      "sharpe_per_trade": -0.0388
+    }
+  },
+  "bootstrap": {
+    "meanR_95ci_at_k1": [
+      0.1118,
+      0.4906
+    ],
+    "sig_breakeven_k": 5.57,
+    "interpretation": "Largest spread-cost multiple at which the edge stays significantly>0 (95%)."
+  },
+  "per_pair": {
+    "EURUSD=X": {
+      "baseline_k1": {
+        "n": 77,
+        "wr": 48.05,
+        "meanR": 0.206,
+        "sumR": 15.86,
+        "sharpe_per_trade": 0.1331
+      },
+      "gross_price_only_sumR": 17.963,
+      "carry_sumR": -0.252,
+      "breakeven_k": 9.57,
+      "live_modeled_spread_pips": 2.0,
+      "breakeven_spread_pips": 19.15
+    },
+    "GBPUSD=X": {
+      "baseline_k1": {
+        "n": 82,
+        "wr": 50.0,
+        "meanR": 0.4729,
+        "sumR": 38.78,
+        "sharpe_per_trade": 0.2415
+      },
+      "gross_price_only_sumR": 40.775,
+      "carry_sumR": -0.242,
+      "breakeven_k": 23.118,
+      "live_modeled_spread_pips": 2.2,
+      "breakeven_spread_pips": 50.83
+    },
+    "USDJPY=X": {
+      "baseline_k1": {
+        "n": 77,
+        "wr": 41.56,
+        "meanR": 0.273,
+        "sumR": 21.021,
+        "sharpe_per_trade": 0.1743
+      },
+      "gross_price_only_sumR": 22.189,
+      "carry_sumR": -0.093,
+      "breakeven_k": 20.563,
+      "live_modeled_spread_pips": 1.21,
+      "breakeven_spread_pips": 24.94
+    },
+    "AUDUSD=X": {
+      "baseline_k1": {
+        "n": 82,
+        "wr": 41.46,
+        "meanR": 0.2401,
+        "sumR": 19.685,
+        "sharpe_per_trade": 0.1421
+      },
+      "gross_price_only_sumR": 23.531,
+      "carry_sumR": -0.203,
+      "breakeven_k": 6.404,
+      "live_modeled_spread_pips": 2.4,
+      "breakeven_spread_pips": 15.36
+    }
+  },
+  "per_year": {
+    "2015": {
+      "baseline_k1": {
+        "n": 14,
+        "wr": 50.0,
+        "meanR": 0.2039,
+        "sumR": 2.855,
+        "sharpe_per_trade": 0.1247
+      },
+      "breakeven_k": 10.806
+    },
+    "2016": {
+      "baseline_k1": {
+        "n": 55,
+        "wr": 45.45,
+        "meanR": 0.4365,
+        "sumR": 24.009,
+        "sharpe_per_trade": 0.2247
+      },
+      "breakeven_k": 18.277
+    },
+    "2017": {
+      "baseline_k1": {
+        "n": 46,
+        "wr": 54.35,
+        "meanR": 0.3355,
+        "sumR": 15.435,
+        "sharpe_per_trade": 0.2757
+      },
+      "breakeven_k": 15.691
+    },
+    "2018": {
+      "baseline_k1": {
+        "n": 39,
+        "wr": 43.59,
+        "meanR": 0.0218,
+        "sumR": 0.852,
+        "sharpe_per_trade": 0.021
+      },
+      "breakeven_k": 1.812
+    },
+    "2019": {
+      "baseline_k1": {
+        "n": 54,
+        "wr": 31.48,
+        "meanR": 0.063,
+        "sumR": 3.403,
+        "sharpe_per_trade": 0.0447
+      },
+      "breakeven_k": 3.307
+    },
+    "2020": {
+      "baseline_k1": {
+        "n": 22,
+        "wr": 54.55,
+        "meanR": 0.5095,
+        "sumR": 11.21,
+        "sharpe_per_trade": 0.3204
+      },
+      "breakeven_k": 20.148
+    },
+    "2021": {
+      "baseline_k1": {
+        "n": 23,
+        "wr": 56.52,
+        "meanR": 0.1888,
+        "sumR": 4.342,
+        "sharpe_per_trade": 0.2882
+      },
+      "breakeven_k": 7.418
+    },
+    "2022": {
+      "baseline_k1": {
+        "n": 65,
+        "wr": 43.08,
+        "meanR": 0.5114,
+        "sumR": 33.24,
+        "sharpe_per_trade": 0.2098
+      },
+      "breakeven_k": 19.434
+    }
+  }
+}

@@ -1,0 +1,85 @@
+{
+  "id": "HYP-066",
+  "name": "exit_regime_conditioning",
+  "status": "PREREGISTERED",
+  "frozen_at": "2026-06-29",
+  "family": "L2_evaluative",
+  "phase": "research",
+  "purpose": "Test whether the forex exit parameters (stop_atr_mult, trailing_atr_mult) should be conditioned on entry-observable regime instead of held static. First evaluative-side closed-loop step: the Oracle's first 'student'. Meta-labeling (Lopez de Prado AFML ch.3): the primary model (carry entries) is fixed; the secondary policy (exit config) is conditioned on regime.",
+  "mechanism": "Optimal stop/trail width may depend on volatility regime at entry: in high-VIX/high-ATR regimes a wider trail avoids premature stop-outs on noise; in calm regimes a tighter trail locks gains. If true, a regime-keyed config beats the single global config out-of-sample.",
+  "prior_expectation": "Uncertain, leaning NOT_SIGNIFICANT. 411 decade trades, 4 buckets, 48 trials \u2014 the deflated-Sharpe hurdle is high and the decade is the same data v015's static params were tuned on. An honest null is the expected and acceptable result (HYP-064/065 spirit).",
+  "design": {
+    "universe_pairs": [
+      "EURUSD=X",
+      "GBPUSD=X",
+      "USDJPY=X",
+      "AUDUSD=X"
+    ],
+    "entry_universe": "the canonical v015 static-config decade trades (logs/forex_backtest_trades.json) \u2014 fixed primary-model output; exit config is the only thing varied",
+    "buckets": {
+      "scheme": "2x2 median split",
+      "axes": [
+        "entry_time_vix_percentile",
+        "entry_time_atr_percentile"
+      ],
+      "percentile_window": "trailing 252 trading days (no look-ahead); thresholds = decade medians of the per-trade entry values, recorded in results",
+      "n_buckets": 4
+    },
+    "grid": {
+      "stop_atr_mult": [
+        1.5,
+        2.0,
+        2.5
+      ],
+      "trailing_atr_mult": [
+        1.0,
+        1.25,
+        1.5,
+        2.0
+      ],
+      "hold_limit": "FIXED at 60 (dropped from grid \u2014 lives per-trade, not in ExitConfig)",
+      "n_configs": 12
+    },
+    "static_baseline": {
+      "stop_atr_mult": 2.0,
+      "trailing_atr_mult_per_pair": {
+        "GBPUSD=X": 2.0,
+        "AUDUSD=X": 1.0,
+        "EURUSD=X": 1.25,
+        "USDJPY=X": 1.25
+      },
+      "note": "canonical v015 config; per-pair trailing overrides from ForexBacktester.PAIR_TRAILING_OVERRIDES (USDJPY default 1.25)"
+    },
+    "exit_evaluation": "single-trade exit replay via sovereign.forex.exit_machine.decide_exit (the SAME function live+backtest use) from each fixed entry over the pair price/atr/signal path, no re-entry/pyramiding; costs applied via the ForexBacktester cost model (spread+slippage+swap). Isolates the exit-parameter effect; reconciled separately against the canonical sequential backtest."
+  },
+  "splits": {
+    "train": {
+      "start": "2015-01-01",
+      "end": "2024-12-31",
+      "use": "bucketing, grid search, purged k-fold, permutation"
+    },
+    "holdout": {
+      "start": "2025-01-01",
+      "end": "2026-06-29",
+      "use": "one-shot forward non-degradation gate; never used to choose configs"
+    }
+  },
+  "validation_protocol": {
+    "point_estimate": "per-bucket OOS Sharpe via purged+embargoed 5-fold (walk_forward_validation.purge_train_indices/embargo_train_indices), best-config-on-train evaluated on test; regime-keyed vs static",
+    "permutation": {
+      "null": "entry-regime label carries no exit-config information",
+      "method": "shuffle bucket labels across the fixed entry universe; recompute the \u221an-weighted in-sample best-config-minus-static improvement",
+      "n_permutations": 10000,
+      "seed": 42,
+      "p_formula": "(n_ge + 1)/(N + 1)"
+    },
+    "multiple_trials": "deflated_sharpe_ratio at n_trials=48 (4 buckets x 12 configs) \u2014 require deflated_sr > 0",
+    "fdr": "benjamini_hochberg across the 4 per-bucket permutation p-values, alpha=0.05",
+    "reconcile_guard": "canonical ForexBacktester(2015-2024).backtest_all() weighted_portfolio_sharpe must equal 0.6886 \u00b1 0.01 or HALT before any grid work"
+  },
+  "success_criteria": "VALID_EDGE iff ALL: portfolio permutation p < 0.05 AND deflated_sr > 0 at n_trials=48 AND >=1 bucket survives Benjamini-Hochberg AND 2025-2026 portfolio Sharpe (regime-keyed) >= static - 0.05 tolerance (non-degradation).",
+  "failure_criteria": "NOT_SIGNIFICANT if any gate fails \u2014 hypothesis killed and logged; static config stays; Step 5 go-live ships unchanged.",
+  "deployment_if_valid": "regime-keyed lookup in sovereign/execution/forex_exit_manager.py::cfg_for_pair; backtest==live parity preserved (decide_exit takes cfg as a parameter); separate logged param_change, never bundled with the SHADOW->live flip.",
+  "hash_method": "sha256 of json.dumps(doc, sort_keys=True, separators=(',',':')) where doc = this object MINUS the hash_lock field",
+  "hash_lock": "a348c6f48c7ed17a14f031e591d62b50c0aa996a16d69e69b71a3297c4bcd0e1"
+}

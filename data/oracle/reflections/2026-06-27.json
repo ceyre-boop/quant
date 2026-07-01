@@ -1,0 +1,26 @@
+{
+  "date": "2026-06-27",
+  "generated_at": "2026-06-27T06:30:50.386185+00:00",
+  "input_tokens": 5733,
+  "output_tokens": 861,
+  "estimated_cost_usd": 0.15057,
+  "harvest_days_read": 7,
+  "reflection": {
+    "candidate_lesson": {
+      "lesson_text": "When the 30-indicator consensus shows conv>=90% SHORT but green_matches=0 (no historical analog pattern confirmation), defer entry rather than treating high conviction as a green light.",
+      "mechanism": "A high live-conviction read with zero green_matches means the current indicator configuration has no successful precedent in historical memory \u2014 the bears are crowded in real-time but the setup has never resolved profitably before, which is the signature of a consensus that arrived late after the institutional move already exhausted. Crowded directional agreement with no historical analog is a fade-the-crowd warning, not a momentum confirmation.",
+      "testable_rule": "if consensus_conviction >= 0.90 and green_matches == 0: size *= 0.5  # require historical analog before full size",
+      "expected_impact": "Win rate +3-5% and drawdown reduction by avoiding late-stage crowded entries; Sharpe contribution ~+0.02 via fewer reversal losses on EURUSD/AUDUSD SHORT signals.",
+      "evidence_from_harvest": "Live consensus shows EURUSD conv=100% and AUDUSD conv=100% SHORT, both with green_matches=0 and hist_hr 66%/70% \u2014 the historical hit rate is decent but the CURRENT configuration has no green match, indicating this specific high-conviction state is unvalidated against memory. USDJPY/AUDNZD show conv 83%/92% with hist_hr=0%, reinforcing that conviction without analog support is unreliable.",
+      "evidence_from_reasoning": null,
+      "reasoning_component_targeted": "green_matches",
+      "sample_needed": 25
+    },
+    "retirement_flag": {
+      "lesson_to_review": "L8",
+      "reason": "L8 tightened the USDJPY/AUDNZD VIX gate to 13 in a bull market; current regime is UNKNOWN/MOMENTUM with VIX ~18.9 and UMich sentiment collapsing (49.8 -> 44.8), so the bull-market premise underlying the 13 threshold may no longer hold \u2014 worth re-validating whether the gate should adapt to deteriorating sentiment regimes."
+    },
+    "system_health_note": "Zero trades in last 7 days with regime=UNKNOWN and TradingView providing no confirming signals \u2014 system is correctly idling at 75% internal-only sizing, but the lack of closed decisions means all lessons remain harvest-derived until the logger accumulates entries."
+  },
+  "auto_validation": null
+}

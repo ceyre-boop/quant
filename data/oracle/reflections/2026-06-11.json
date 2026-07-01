@@ -1,0 +1,26 @@
+{
+  "date": "2026-06-11",
+  "generated_at": "2026-06-11T06:43:41.511646+00:00",
+  "input_tokens": 5468,
+  "output_tokens": 934,
+  "estimated_cost_usd": 0.15207,
+  "harvest_days_read": 7,
+  "reflection": {
+    "candidate_lesson": {
+      "lesson_text": "When the 30-indicator consensus shows conv=100% SHORT but green_matches=0, only trade the pair whose hist_hr exceeds 65% \u2014 the others are conviction without historical confirmation.",
+      "mechanism": "A 100% indicator agreement with zero green_matches means the live state has no analog in the historical memory bank \u2014 the consensus is internally coherent but never validated against past outcomes. Pairs like EURUSD (hist_hr=66%) and AUDUSD (hist_hr=72%) carry institutional flow patterns that recurred profitably; USDJPY SHORT-equivalent and GBPUSD at hist_hr=0% are novel configurations that haven't survived a single forward test. Institutional positioning leaves repeatable footprints \u2014 when none match, the signal is regime noise dressed as conviction.",
+      "testable_rule": "if consensus_conviction >= 1.0 and green_matches == 0 and hist_hr < 0.65: veto_trade()  # require historical hit-rate confirmation when no green matches exist",
+      "expected_impact": "Filters out conv=100% traps on USDJPY (hist_hr=0%) and GBPUSD; routes capital only to EURUSD/AUDUSD shorts with proven 66-72% hit rates. Expected win-rate lift +4-7%, Sharpe contribution +0.02-0.03 via reduced false-positive entries.",
+      "evidence_from_harvest": "Live consensus state shows EURUSD SHORT conv=100% hist_hr=66% and AUDUSD SHORT conv=100% hist_hr=72%, but USDJPY LONG conv=100% hist_hr=0% and GBPUSD NEUTRAL hist_hr=0% \u2014 identical conviction, opposite historical validation. All green_matches=0, isolating hist_hr as the discriminating field.",
+      "evidence_from_reasoning": null,
+      "reasoning_component_targeted": "hist_hr",
+      "sample_needed": 40
+    },
+    "retirement_flag": {
+      "lesson_to_review": "L8",
+      "reason": "L8 tightens USDJPY/AUDNZD VIX gate assuming safe-haven corruption, but current live state shows USDJPY consensus LONG conv=100% with hist_hr=0% \u2014 the gate may be filtering on VIX when the real failure driver is missing historical match; worth re-validating which field actually predicts USDJPY failure."
+    },
+    "system_health_note": "Zero trades in last 7 days with Regime=UNKNOWN and TV showing 0 signals \u2014 system is in observational drought; capital_allocator should hold at 75% sizing until regime resolves and decision logs accumulate."
+  },
+  "auto_validation": null
+}

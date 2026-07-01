@@ -1,0 +1,26 @@
+{
+  "date": "2026-06-15",
+  "generated_at": "2026-06-15T06:30:14.148565+00:00",
+  "input_tokens": 5504,
+  "output_tokens": 787,
+  "estimated_cost_usd": 0.141585,
+  "harvest_days_read": 7,
+  "reflection": {
+    "candidate_lesson": {
+      "lesson_text": "When internal regime is MOMENTUM but TradingView reports zero confirming signals in the last 2h, the 75% sizing multiplier is too generous \u2014 internal-only MOMENTUM with no external confirmation should size at 50% or freeze until a TV signal appears.",
+      "mechanism": "MOMENTUM regimes are durable only when multiple independent data sources agree on direction. A single-source MOMENTUM read with no external corroboration is statistically indistinguishable from a chop regime that the internal model has mislabeled \u2014 institutional flow that creates genuine momentum leaves footprints across multiple venues, so the absence of any TV signal means the move is likely retail/noise-driven and mean-reverting.",
+      "testable_rule": "if internal_regime == 'MOMENTUM' and tv_signal_count_2h == 0: sizing_multiplier = min(sizing_multiplier, 0.50)",
+      "expected_impact": "Reduces variance of returns during false-MOMENTUM periods; estimated Sharpe +0.02 to +0.04 via lower denominator volatility on unconfirmed signals.",
+      "evidence_from_harvest": "Current state shows Internal=MOMENTUM, TradingView=UNKNOWN (0 signals), sizing at 75% \u2014 yet 30-indicator consensus reads NEUTRAL/FLAT across all 5 pairs (conv 8-25%, hist_hr=0%, green_matches=0), directly contradicting the MOMENTUM label. This is a live false-positive MOMENTUM read being sized at 75%.",
+      "evidence_from_reasoning": null,
+      "reasoning_component_targeted": "external_regime_confirmation.sizing_multiplier",
+      "sample_needed": 30
+    },
+    "retirement_flag": {
+      "lesson_to_review": null,
+      "reason": null
+    },
+    "system_health_note": "Zero trades in last 7 days with Regime=UNKNOWN and a contradicted MOMENTUM label (consensus NEUTRAL/FLAT, hist_hr=0%) \u2014 system is correctly in a low-conviction holding pattern, but the 75% sizing on unconfirmed MOMENTUM is the main exposure risk worth gating before the next signal fires."
+  },
+  "auto_validation": null
+}

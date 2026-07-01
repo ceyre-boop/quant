@@ -1,0 +1,326 @@
+{
+  "baseline_metadata_sharpe_by_pair": {
+    "EURUSD=X": 0.503,
+    "GBPUSD=X": 0.776,
+    "USDJPY=X": 0.736,
+    "AUDUSD=X": 0.67
+  },
+  "baseline_portfolio_sharpe_reproduced": 0.6702,
+  "ann_factors": {
+    "EURUSD=X": 2.908,
+    "GBPUSD=X": 3.011,
+    "USDJPY=X": 2.556,
+    "AUDUSD=X": 3.052
+  },
+  "n_trades": 276,
+  "PRIMARY_causal_abs_90d": {
+    "base_portfolio_sharpe": 0.6702,
+    "gated_portfolio_sharpe": 0.6354,
+    "base_maxdd": -0.0967,
+    "gated_maxdd": -0.0967,
+    "mult_dist": {
+      "0.25": 27,
+      "0.50": 20,
+      "1.00": 229
+    },
+    "avg_mult": 0.89,
+    "per_year": {
+      "2015": {
+        "n": 6,
+        "base_sharpe": 1.406,
+        "gated_sharpe": 1.509,
+        "avg_mult": 0.62
+      },
+      "2016": {
+        "n": 51,
+        "base_sharpe": 0.642,
+        "gated_sharpe": 0.608,
+        "avg_mult": 0.99
+      },
+      "2017": {
+        "n": 41,
+        "base_sharpe": 1.292,
+        "gated_sharpe": 1.234,
+        "avg_mult": 0.96
+      },
+      "2018": {
+        "n": 35,
+        "base_sharpe": 1.241,
+        "gated_sharpe": 1.241,
+        "avg_mult": 1.0
+      },
+      "2019": {
+        "n": 45,
+        "base_sharpe": 0.389,
+        "gated_sharpe": 0.379,
+        "avg_mult": 0.91
+      },
+      "2020": {
+        "n": 20,
+        "base_sharpe": 1.179,
+        "gated_sharpe": 1.125,
+        "avg_mult": 0.7
+      },
+      "2021": {
+        "n": 17,
+        "base_sharpe": 2.79,
+        "gated_sharpe": 2.113,
+        "avg_mult": 0.35
+      },
+      "2022": {
+        "n": 61,
+        "base_sharpe": 0.555,
+        "gated_sharpe": 0.583,
+        "avg_mult": 0.92
+      }
+    }
+  },
+  "robust_fullsample_abs_90d_LOOKAHEAD": {
+    "base_portfolio_sharpe": 0.6702,
+    "gated_portfolio_sharpe": 0.6606,
+    "base_maxdd": -0.0967,
+    "gated_maxdd": -0.0967,
+    "mult_dist": {
+      "0.25": 27,
+      "0.50": 61,
+      "1.00": 188
+    },
+    "avg_mult": 0.816,
+    "per_year": {
+      "2015": {
+        "n": 6,
+        "base_sharpe": 1.406,
+        "gated_sharpe": 1.445,
+        "avg_mult": 0.38
+      },
+      "2016": {
+        "n": 51,
+        "base_sharpe": 0.642,
+        "gated_sharpe": 0.675,
+        "avg_mult": 0.77
+      },
+      "2017": {
+        "n": 41,
+        "base_sharpe": 1.292,
+        "gated_sharpe": 1.39,
+        "avg_mult": 0.87
+      },
+      "2018": {
+        "n": 35,
+        "base_sharpe": 1.241,
+        "gated_sharpe": 1.044,
+        "avg_mult": 0.94
+      },
+      "2019": {
+        "n": 45,
+        "base_sharpe": 0.389,
+        "gated_sharpe": 0.428,
+        "avg_mult": 0.87
+      },
+      "2020": {
+        "n": 20,
+        "base_sharpe": 1.179,
+        "gated_sharpe": 1.125,
+        "avg_mult": 0.7
+      },
+      "2021": {
+        "n": 17,
+        "base_sharpe": 2.79,
+        "gated_sharpe": 2.113,
+        "avg_mult": 0.35
+      },
+      "2022": {
+        "n": 61,
+        "base_sharpe": 0.555,
+        "gated_sharpe": 0.583,
+        "avg_mult": 0.92
+      }
+    }
+  },
+  "robust_causal_abs_60d": {
+    "base_portfolio_sharpe": 0.6702,
+    "gated_portfolio_sharpe": 0.6423,
+    "base_maxdd": -0.0967,
+    "gated_maxdd": -0.0967,
+    "mult_dist": {
+      "0.25": 35,
+      "0.50": 25,
+      "1.00": 216
+    },
+    "avg_mult": 0.86,
+    "per_year": {
+      "2015": {
+        "n": 6,
+        "base_sharpe": 1.406,
+        "gated_sharpe": 1.443,
+        "avg_mult": 0.62
+      },
+      "2016": {
+        "n": 51,
+        "base_sharpe": 0.642,
+        "gated_sharpe": 0.623,
+        "avg_mult": 0.91
+      },
+      "2017": {
+        "n": 41,
+        "base_sharpe": 1.292,
+        "gated_sharpe": 1.222,
+        "avg_mult": 0.89
+      },
+      "2018": {
+        "n": 35,
+        "base_sharpe": 1.241,
+        "gated_sharpe": 1.189,
+        "avg_mult": 0.94
+      },
+      "2019": {
+        "n": 45,
+        "base_sharpe": 0.389,
+        "gated_sharpe": 0.465,
+        "avg_mult": 0.9
+      },
+      "2020": {
+        "n": 20,
+        "base_sharpe": 1.179,
+        "gated_sharpe": 0.77,
+        "avg_mult": 0.55
+      },
+      "2021": {
+        "n": 17,
+        "base_sharpe": 2.79,
+        "gated_sharpe": 2.649,
+        "avg_mult": 0.44
+      },
+      "2022": {
+        "n": 61,
+        "base_sharpe": 0.555,
+        "gated_sharpe": 0.576,
+        "avg_mult": 0.96
+      }
+    }
+  },
+  "robust_causal_abs_120d": {
+    "base_portfolio_sharpe": 0.6702,
+    "gated_portfolio_sharpe": 0.6406,
+    "base_maxdd": -0.0967,
+    "gated_maxdd": -0.0967,
+    "mult_dist": {
+      "0.25": 22,
+      "0.50": 23,
+      "1.00": 231
+    },
+    "avg_mult": 0.899,
+    "per_year": {
+      "2015": {
+        "n": 6,
+        "base_sharpe": 1.406,
+        "gated_sharpe": 0.863,
+        "avg_mult": 0.71
+      },
+      "2016": {
+        "n": 51,
+        "base_sharpe": 0.642,
+        "gated_sharpe": 0.642,
+        "avg_mult": 1.0
+      },
+      "2017": {
+        "n": 41,
+        "base_sharpe": 1.292,
+        "gated_sharpe": 1.291,
+        "avg_mult": 0.95
+      },
+      "2018": {
+        "n": 35,
+        "base_sharpe": 1.241,
+        "gated_sharpe": 1.241,
+        "avg_mult": 1.0
+      },
+      "2019": {
+        "n": 45,
+        "base_sharpe": 0.389,
+        "gated_sharpe": 0.379,
+        "avg_mult": 0.91
+      },
+      "2020": {
+        "n": 20,
+        "base_sharpe": 1.179,
+        "gated_sharpe": 1.031,
+        "avg_mult": 0.81
+      },
+      "2021": {
+        "n": 17,
+        "base_sharpe": 2.79,
+        "gated_sharpe": 3.376,
+        "avg_mult": 0.31
+      },
+      "2022": {
+        "n": 61,
+        "base_sharpe": 0.555,
+        "gated_sharpe": 0.583,
+        "avg_mult": 0.92
+      }
+    }
+  },
+  "robust_causal_signed_90d": {
+    "base_portfolio_sharpe": 0.6702,
+    "gated_portfolio_sharpe": 0.6784,
+    "base_maxdd": -0.0967,
+    "gated_maxdd": -0.0388,
+    "mult_dist": {
+      "0.25": 129,
+      "0.50": 74,
+      "1.00": 73
+    },
+    "avg_mult": 0.515,
+    "per_year": {
+      "2015": {
+        "n": 6,
+        "base_sharpe": 1.406,
+        "gated_sharpe": 1.757,
+        "avg_mult": 0.5
+      },
+      "2016": {
+        "n": 51,
+        "base_sharpe": 0.642,
+        "gated_sharpe": 0.411,
+        "avg_mult": 0.4
+      },
+      "2017": {
+        "n": 41,
+        "base_sharpe": 1.292,
+        "gated_sharpe": 1.211,
+        "avg_mult": 0.37
+      },
+      "2018": {
+        "n": 35,
+        "base_sharpe": 1.241,
+        "gated_sharpe": 0.924,
+        "avg_mult": 0.34
+      },
+      "2019": {
+        "n": 45,
+        "base_sharpe": 0.389,
+        "gated_sharpe": 0.61,
+        "avg_mult": 0.64
+      },
+      "2020": {
+        "n": 20,
+        "base_sharpe": 1.179,
+        "gated_sharpe": 1.179,
+        "avg_mult": 1.0
+      },
+      "2021": {
+        "n": 17,
+        "base_sharpe": 2.79,
+        "gated_sharpe": 2.79,
+        "avg_mult": 1.0
+      },
+      "2022": {
+        "n": 61,
+        "base_sharpe": 0.555,
+        "gated_sharpe": 0.575,
+        "avg_mult": 0.43
+      }
+    }
+  }
+}

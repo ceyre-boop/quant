@@ -1,0 +1,35 @@
+{
+  "generated_at": "2026-07-01T01:56:00.608119+00:00",
+  "hypothesis": "OHLC intrabar quartile levels (4H+5min) predict next-4H direction on ES/NQ",
+  "mode": "live",
+  "mechanism": "NONE STATED \u2014 exploratory (see plan; expected base case NOT_SIGNIFICANT)",
+  "params": {
+    "nperm": 10000,
+    "alpha": 0.05,
+    "cost_pct": 0.0001,
+    "min_oos_sharpe": 0.3,
+    "model": "logistic_regression"
+  },
+  "verdict": "FAIL",
+  "gates": {
+    "oos_sharpe>=min": false,
+    "permutation<alpha": false,
+    "walkforward_robust": false
+  },
+  "portfolio": {
+    "oos_sharpe": 0.0,
+    "pooled_permutation_p": null,
+    "walkforward_verdict": "FRAGILE"
+  },
+  "per_instrument": [
+    {
+      "instrument": "MES",
+      "error": "insufficient feature rows"
+    },
+    {
+      "instrument": "MNQ",
+      "error": "no/insufficient data"
+    }
+  ],
+  "discipline_note": "Shadow test only. A FAIL is the expected, valid outcome \u2014 the idea got a fair cheap test instead of a live deployment. Never auto-deployed."
+}

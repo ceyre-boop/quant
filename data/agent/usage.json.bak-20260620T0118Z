@@ -1,0 +1,49 @@
+{
+ "meta": {
+  "note": "Claude Pro has no usage API. This is a local ledger. Sync weekly_used manually from claude.ai/settings or run: python3 sovereign/tools/claude_usage_tracker.py sync --used 142000",
+  "weekly_reset_day": "Saturday",
+  "weekly_total_estimate": 200000,
+  "human_share": 0.7,
+  "agent_share": 0.3
+ },
+ "week": {
+  "start_date": "2026-05-31",
+  "weekly_used": 78200,
+  "weekly_remaining": 121800,
+  "last_synced": null,
+  "note": "REST-019 2026-06-19T01:1xZ \u2014 ran RQ-REST-019 ex-ante gate forensic (no-network) follow-up to RQ-REST-013. Result NEGATIVE-USEFUL: no entry-known proxy for the 3-5d trailing whipsaw; Tuesday gate is a confounded EURUSD artifact. Reaffirms exit re-sim (RQ-REST-013) as the lever; still Yahoo-403 blocked. Loops green; health.json sweep 10d stale + commitment_score dead-feature persist (both await Colin). ~11k tokens. Weekly manual sync still overdue (ledger start 05-31)."
+ },
+ "today": {
+  "date": "2026-06-19",
+  "human_used": 0,
+  "agent_used": 11000,
+  "daily_agent_budget": 8571,
+  "agent_allowed_today": 8571,
+  "note": "REST-019: offline ex-ante gate forensic + loop/health check. No network. Full buffer left for Colin."
+ },
+ "session": {
+  "started": "2026-06-19T01:05:00Z",
+  "ended": "2026-06-19T01:15:13.240911+00:00",
+  "mode": "REST_MODE",
+  "tasks_completed": [
+   "RQ-REST-019 ex-ante gate forensic (no-network)",
+   "loop + health validation"
+  ],
+  "findings_written": 2,
+  "hypotheses_updated": [
+   "HYP-059 (annotated, status unchanged CONFIRMED)"
+  ],
+  "new_hypotheses": [],
+  "new_tasks_added": [
+   "RQ-REST-019 (DONE record)"
+  ],
+  "key_finding": "No entry-known proxy for the 3-5d trailing whipsaw cluster. Tuesday gate is confounded (EURUSD-only, month-position), captures ~40% of the -42R drag, nets negative. Whipsaw confirmed an EXIT-mechanism problem; RQ-REST-013 trailing-activation-delay re-sim stays the priority, still network-blocked."
+ },
+ "mode": "REST_MODE_COMPLETE",
+ "thresholds": {
+  "weekly_danger": 20000,
+  "weekly_light_mode": 50000,
+  "human_minimum_buffer": 8000,
+  "heavy_task_minimum": 15000
+ }
+}

@@ -1,0 +1,16 @@
+{
+  "id": "regime_vix20",
+  "name": "vixgate_20",
+  "description": "Suppress in bull + VIX>20 (uniform)",
+  "family": "regime",
+  "spec": "bull & VIX>20",
+  "train_window": [
+    "2015-01-01",
+    "2022-12-31"
+  ],
+  "holdout_window": [
+    "2023-01-01",
+    "2024-12-31"
+  ],
+  "preregistered_at": "2026-06-23T19:48:53.271002+00:00"
+}

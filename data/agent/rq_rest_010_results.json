@@ -1,0 +1,60 @@
+{
+ "universe": "GBPUSD London",
+ "N": 101,
+ "baseline": {
+  "n": 101,
+  "wr": 0.297029702970297,
+  "avgR": 0.4063168316831683,
+  "sumR": 41.038,
+  "sharpe": 0.17640490340629286
+ },
+ "kept": {
+  "n": 75,
+  "wr": 0.37333333333333335,
+  "avgR": 0.7471733333333332,
+  "sumR": 56.038,
+  "sharpe": 0.30612619773269545
+ },
+ "vetoed": {
+  "n": 26,
+  "wr": 0.07692307692307693,
+  "avgR": -0.5769230769230769,
+  "sumR": -15.0,
+  "sharpe": -0.3860035343674758
+ },
+ "delta_sharpe": 0.1297212943264026,
+ "delta_avgR": 0.34085650165016496,
+ "forgone_sumR": 15.0,
+ "mc1_perm_p": 0.00455,
+ "mc1_obs_gap": -0.9832399086062451,
+ "mc2_dSharpe_mean": 0.13134378418043607,
+ "mc2_ci": [
+  0.04751468323908025,
+  0.21825040021307385
+ ],
+ "mc2_p_pos": 0.9985,
+ "mc3_pass_base": 0.633,
+ "mc3_pass_gate": 0.82825,
+ "verdict": "WIRE HARD VETO (dSharpe>0.10, robust)",
+ "cb_calendar": "reconstructed clean BOE+FOMC (2025 matches cb_calendar.py)",
+ "note": "cb_decisions.json contaminated 2023-24; original n=172 finding used dirty calendar",
+ "verification": {
+  "subperiod_2023_08__2024_06": {
+   "N": 61,
+   "dSharpe": 0.104,
+   "kept_avgR": 0.717
+  },
+  "subperiod_2024_07__2025_03": {
+   "N": 40,
+   "dSharpe": 0.165,
+   "kept_avgR": 0.793
+  },
+  "window_sensitivity": "all pre-CB windows 0-14d have vetoed-avgR -0.44..-1.0; result not knife-edge",
+  "grade_mix_vetoed": {
+   "A": 18,
+   "A+": 8
+  },
+  "note": "robust in BOTH sub-periods (not regime-fragile); vetoed set proportional A/A+ (not a grade artifact)"
+ },
+ "hypothesis_id": "HYP-061"
+}

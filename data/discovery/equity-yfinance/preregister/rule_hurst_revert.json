@@ -1,0 +1,16 @@
+{
+  "id": "rule_hurst_revert",
+  "name": "hurst_revert",
+  "description": "Mean-revert only in reverting regime (Hurst<0.45)",
+  "family": "rule",
+  "spec": "Mean-revert only in reverting regime (Hurst<0.45)",
+  "train_window": [
+    "2018-01-01",
+    "2023-12-31"
+  ],
+  "holdout_window": [
+    "2024-01-01",
+    "2026-06-09"
+  ],
+  "preregistered_at": "2026-06-24T01:57:26.976508+00:00"
+}

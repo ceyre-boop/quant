@@ -1,0 +1,16 @@
+{
+  "id": "regime_vixgate_deployed",
+  "name": "vixgate_deployed",
+  "description": "Deployed HYP-027 VIX gate (per-pair thresholds) \u2014 re-validate vs ungated base",
+  "family": "regime",
+  "spec": "SPY>200SMA & VIX>pair_thr -> suppress",
+  "train_window": [
+    "2015-01-01",
+    "2022-12-31"
+  ],
+  "holdout_window": [
+    "2023-01-01",
+    "2024-12-31"
+  ],
+  "preregistered_at": "2026-06-23T19:48:53.271002+00:00"
+}

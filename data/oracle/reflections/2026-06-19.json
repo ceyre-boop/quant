@@ -1,0 +1,26 @@
+{
+  "date": "2026-06-19",
+  "generated_at": "2026-06-19T06:30:19.603230+00:00",
+  "input_tokens": 6068,
+  "output_tokens": 771,
+  "estimated_cost_usd": 0.148845,
+  "harvest_days_read": 7,
+  "reflection": {
+    "candidate_lesson": {
+      "lesson_text": "An ICT entry with bars_since_signal > 100 is a stale-thesis execution and should be vetoed regardless of grade or commitment_score.",
+      "mechanism": "The only closed trade fired at bars_since_signal=1070 \u2014 the sweep/FVG structure that justified entry was over a thousand bars old. Institutional order flow that creates a liquidity sweep is consumed within tens of bars; by the time price returns to the FVG that far downstream, the original imbalance has been absorbed and the limit fill is into exhausted, not fresh, flow. A perfect commitment_score (1.0) and Grade A label are measuring structure quality at signal time, not at execution time \u2014 they cannot detect that the edge has already decayed.",
+      "testable_rule": "if bars_since_signal > 100: return ICTVeto  # even if grade=='A' and commitment_score>=1.0",
+      "expected_impact": "Eliminates stale-FVG losses like the -1.004R AUDUSD entry; expected win-rate lift on ICT executions and modest Sharpe contribution toward the +0.05 gap by cutting a structural loss cluster.",
+      "evidence_from_harvest": "The single closed trade (0W/1L, avgR=-1.004) was a Grade A, commitment_score=1.0, 7-confirmation ICT setup that still lost \u2014 the only abnormal field is bars_since_signal=1070.",
+      "evidence_from_reasoning": "The losing AUDUSD LONG had commitment_score=1.0, full signal_layers (KILL_ZONE/SWEEP/DISPLACEMENT/FVG_TAP), grade A, yet bars_since_signal=1070 \u2014 every quality field passed while the staleness field was the lone outlier preceding the loss.",
+      "reasoning_component_targeted": "bars_since_signal",
+      "sample_needed": 25
+    },
+    "retirement_flag": {
+      "lesson_to_review": null,
+      "reason": null
+    },
+    "system_health_note": "Regime UNKNOWN with 0 trades in 7 days and only 1 closed trade total \u2014 the system is data-starved, so this lesson is a single-sample hypothesis to queue for validation, not a confirmed gate."
+  },
+  "auto_validation": null
+}

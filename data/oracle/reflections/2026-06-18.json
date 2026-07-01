@@ -1,0 +1,26 @@
+{
+  "date": "2026-06-18",
+  "generated_at": "2026-06-18T06:30:35.991161+00:00",
+  "input_tokens": 6205,
+  "output_tokens": 949,
+  "estimated_cost_usd": 0.16425,
+  "harvest_days_read": 7,
+  "reflection": {
+    "candidate_lesson": {
+      "lesson_text": "ICT entries with bars_since_signal > 100 are stale-context trades \u2014 the signal layers were valid hours ago but execution arrives after institutional positioning has reset, neutralizing the sweep/displacement edge.",
+      "mechanism": "A bullish sweep + displacement + FVG signal reflects a liquidity grab that institutions exploit within a tight window (minutes to a few bars). When bars_since_signal=1070, the limit/context that justified the entry is long expired: the FVG has filled, the swept liquidity has been re-accumulated, and price is now trading on fresh order flow that the original signal never measured. The system is executing on a memory, not a live imbalance \u2014 so even a perfect commitment_score=1.0 and Grade A label describe a setup that no longer exists.",
+      "testable_rule": "if entry_context['bars_since_signal'] > 50: veto_or_size_x0.0  # require fresh signal; only execute when displacement/FVG context is current",
+      "expected_impact": "Removes stale-context losses like the AUDUSD -1.004R trade; expected to lift win rate and avgR on ICT entries, contributing toward Sharpe +0.02-0.03 by eliminating a structurally-doomed entry class.",
+      "evidence_from_harvest": "The only closed trade (AUDUSD ICT LONG, Grade A, commitment 1.0) lost -1.004R despite a perfect signal stack \u2014 the single distinguishing anomaly was bars_since_signal=1070.",
+      "evidence_from_reasoning": "The AUDUSD loss had commitment_score=1.0, n_confirmations=7, full signal_layers_active (KILL_ZONE/SWEEP/DISPLACEMENT/FVG_TAP) \u2014 every quality field passed, yet bars_since_signal=1070 means the trade fired ~1070 bars after the sweep formed, indicating a stale-context execution rather than a fresh imbalance.",
+      "reasoning_component_targeted": "bars_since_signal",
+      "sample_needed": 15
+    },
+    "retirement_flag": {
+      "lesson_to_review": "L1",
+      "reason": "L1 ('London + Grade A + structure<1.5 \u2192 execute') gates on grade and structure but not on signal freshness; the AUDUSD loss shows a Grade A NY_Open setup with stale bars_since_signal still executed and lost \u2014 L1 may need a freshness clause to remain valid."
+    },
+    "system_health_note": "Zero trades in 7 days with regime UNKNOWN and FOMC-day reduce-size window active means the only signal is a single stale-context loss \u2014 insufficient sample to act aggressively, so treat the bars_since_signal lesson as a candidate gate pending 15 trades."
+  },
+  "auto_validation": null
+}

@@ -1,0 +1,113 @@
+{
+  "date": "2026-06-12",
+  "generated_at": "2026-06-12T12:28:38.814175+00:00",
+  "meta_regime": "BREADTH",
+  "regime_read": "ES & NQ moving together \u2014 broad agreement, more DURABLE directional signal. Trust the direction more.",
+  "narrative": "PRE-US-OPEN BRIEFING \u2014 ES/NQ Pair \u2014 as of 2026-06-12 12:28 UTC. CAVEAT UP FRONT: this briefing is intelligence, not a validated edge. My own scorecard is n=3 directional calls (hit 1.0) and regime accuracy 0.286 \u2014 that's CALIBRATING, statistically meaningless until ~30-60 samples. Treat everything below as a structured read, not a guarantee. And critically: CPI prints at 8:30 ET TODAY \u2014 that single event can override every structural argument here.\n\n1) MOVE-BY-MOVE READ. Both indices are constructively positioned but not stretched. ES last 7432.5, up ~0.49% on the day and ~0.43% on the week; NQ last 29579.5, up ~0.39% on the day and a stronger ~1.91% on the week. The weekly divergence \u2014 NQ +1.9% vs ES +0.4% \u2014 tells you tech carried the bounce while the broad tape lagged, consistent with the 5-day spread (+0.30%) favoring NQ even as the 20-day spread is essentially flat (+0.05%). Both trade ABOVE prior-day highs (ES 7420, NQ 29544) and above their session VWAPs (ES 7419, NQ 29503), so the overnight/pre-open auction is leaning bid. RSI is neutral-to-soft (ES 45.9, NQ 50.2) \u2014 no momentum exhaustion, plenty of room either way. Likely catalysts: the dominant news theme is GEOPOLITICS/ENERGY \u2014 escalating Trump-Iran rhetoric (Kharg Island, Hormuz oil, 'bomb' threats) plus an ECB rate HIKE explicitly tied to Iran-war energy costs. That's a stagflationary-tilt overhang (higher energy \u2192 sticky inflation \u2192 central-bank hawkishness) that caps upside conviction and raises CPI-day tail risk. Both indices holding above prior-day highs INTO that backdrop is mildly impressive, but it's fragile.\n\n2) VOLUME-PROFILE READ (where volume traded \u2014 NOT order-flow delta; no buy/sell aggression info here). ES: POC 7395.57, value area 7290.91\u20137450.97, HVNs clustered 7395/7414/7445 above and 7297/7321 below. Price at 7432.5 sits in the upper third of the value area, just under the 7445 HVN and the 7451 VAH \u2014 that band is the immediate ceiling. The line in the sand is the POC at ~7396; losing it puts 7321 and 7297 (the lower accumulation shelf) in play. NQ: POC 29457.43, value area 28625.51\u201329684.32, HVNs 29457/29192 below and a thin shelf up toward 29684. NQ at 29579.5 is above its POC and pressing toward the VAH at 29684 \u2014 that's the upside magnet/resistance. The accumulation floor sits at the 29457 POC, then a large air pocket down to 28890/28738. NQ's line in the sand is the POC ~29457: above it, the upper-VA grind stays intact; a clean break below opens fast-fill territory toward the high-28k HVNs.\n\n3) NQ/ES LEAD-LAG REGIME. Regime = BREADTH. Contemporaneous correlation 0.941, lag-0 cross-correlation 0.966, no meaningful leader (best_lag -2 at -0.037 is noise), divergence FALSE. ES and NQ are moving as one body \u2014 broad agreement means the directional signal is more DURABLE and more trustworthy than in a concentration regime where a handful of mega-caps drag NQ around. Implication: you can size a touch more confidently on DIRECTION when it appears, because both legs confirm. Note the regime label is an INPUT, not an edge, and there's no execution path for these CME futures in this stack (research only).\n\n4) EVENT CALENDAR. CPI is TODAY, 8:30 ET (cadence estimate, but treat as live) \u2014 this dominates. Reduce size into the window; do not carry conviction through the print. FOMC in 5 days (June 17, seed) \u2014 widen stops / trim size into that window too. PCE ~June 30, ISM ~July 1, NFP ~July 3 are further out (cadence estimates, approximate). The near-term calendar is HEAVY: CPI today + FOMC in a week, layered on Iran/energy headline risk. That argues for smaller size and faster hands regardless of bias.\n\n5) SYNTHESIS \u2014 META-REGIME + NARROWED BIAS. Meta-regime: a BREADTH-confirmed, modestly constructive tape (both indices above prior-day highs and VWAP, well above the 200-SMA \u2014 ES +7.6%, NQ +14.6%) operating UNDER a stagflationary geopolitical cloud and INTO a CPI print. The structural picture (clean correlation, holding above value, NQ leading the week) tilts mildly LONG. But the news is NOT clean \u2014 energy/Iran escalation plus an ECB hike is a genuine two-sided risk \u2014 and CPI can flip everything in one candle. So per my own rules, confidence stays capped. NARROWED BIAS: mild long-the-trend / buy-pullbacks-into-value bias, ~55% (degraded to an effective ~48% blended confidence given CPI tail risk and an unproven scorecard). Preferred long zone is pullbacks into the NQ POC ~29457 (and ES POC ~7396) where accumulation sits. INVALIDATION: bias is invalidated on a sustained break and acceptance below NQ 29457 (POC) \u2014 below there the air pocket toward 28890/28738 opens and the BREADTH signal flips bearish since ES would simultaneously be losing its own 7396 POC. NEUTRALIZE into 8:30 ET CPI regardless of this read.",
+  "directional_bias": "LONG",
+  "confidence": 48,
+  "regime_call": "BREADTH",
+  "key_level": 29457,
+  "synthesis_source": "claude-opus-4-8",
+  "lead_lag": {
+    "regime": "BREADTH",
+    "spread_avg": 0.00053,
+    "leader": "NONE",
+    "corr": 0.941,
+    "divergence": false
+  },
+  "volume_profile": {
+    "ES=F": {
+      "symbol": "ES=F",
+      "as_of": "2026-06-12T12:28:02.769686+00:00",
+      "days": 5,
+      "bins": 40,
+      "poc": 7395.57,
+      "value_area_low": 7290.91,
+      "value_area_high": 7450.97,
+      "high_volume_nodes": [
+        7395.57,
+        7321.69,
+        7297.07,
+        7414.04,
+        7444.82
+      ],
+      "price_range": [
+        7238.58,
+        7484.83
+      ],
+      "limitation": "Volume profile = WHERE volume traded (volume-at-price). NOT order-flow delta (buy/sell aggression). True delta needs a CME order-flow feed (Databento/CQG)."
+    },
+    "NQ=F": {
+      "symbol": "NQ=F",
+      "as_of": "2026-06-12T12:28:02.824467+00:00",
+      "days": 5,
+      "bins": 40,
+      "poc": 29457.43,
+      "value_area_low": 28625.51,
+      "value_area_high": 29684.32,
+      "high_volume_nodes": [
+        29457.43,
+        28738.95,
+        28890.21,
+        28852.39,
+        29192.73
+      ],
+      "price_range": [
+        28304.08,
+        29816.67
+      ],
+      "limitation": "Volume profile = WHERE volume traded (volume-at-price). NOT order-flow delta (buy/sell aggression). True delta needs a CME order-flow feed (Databento/CQG)."
+    }
+  },
+  "news_count": 13,
+  "event_calendar": [
+    {
+      "event": "CPI",
+      "date": "2026-06-12",
+      "source": "cadence_estimate",
+      "action": "inflation print 8:30 ET \u2014 reduce size into window",
+      "days_until": 0,
+      "note": "TODAY \u2014 inflation print 8:30 ET \u2014 reduce size into window"
+    },
+    {
+      "event": "FOMC meeting",
+      "date": "2026-06-17",
+      "source": "seed",
+      "action": "reduce size / widen stops into the window",
+      "days_until": 5,
+      "note": "in 5d \u2014 reduce size / widen stops into the window"
+    },
+    {
+      "event": "PCE (Fed's preferred inflation)",
+      "date": "2026-06-30",
+      "source": "cadence_estimate",
+      "action": "8:30 ET \u2014 reduce size into window",
+      "days_until": 18,
+      "note": "in 18d \u2014 8:30 ET \u2014 reduce size into window"
+    },
+    {
+      "event": "ISM Manufacturing PMI",
+      "date": "2026-07-01",
+      "source": "cadence_estimate",
+      "action": "reduce size into the 10:00 ET print",
+      "days_until": 19,
+      "note": "in 19d \u2014 reduce size into the 10:00 ET print"
+    },
+    {
+      "event": "Nonfarm Payrolls",
+      "date": "2026-07-03",
+      "source": "cadence_estimate",
+      "action": "high-impact 8:30 ET \u2014 widen stops / size down",
+      "days_until": 21,
+      "note": "in 21d \u2014 high-impact 8:30 ET \u2014 widen stops / size down"
+    }
+  ],
+  "scorecard_summary": "Briefing scorecard: n=3 dir-calls, hit 1.0, regime acc 0.286 \u2014 CALIBRATING \u2014 need ~30-60 samples before the hit-rate/calibration mean anything",
+  "bias": "size to regime: trust direction more in BREADTH, less in CONCENTRATION; ROTATION_WARN = treat tech-led longs as suspect",
+  "provenance": {
+    "source": "oracle_morning_briefing",
+    "verified": false,
+    "note": "Analyst/Oracle journal \u2014 qualitative regime context + a self-scored directional call, NOT a verified data feed or validated edge. Numbers here are never ingested as trading inputs."
+  }
+}

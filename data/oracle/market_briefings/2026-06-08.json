@@ -1,0 +1,89 @@
+{
+  "date": "2026-06-08",
+  "generated_at": "2026-06-08T12:15:40.703290+00:00",
+  "meta_regime": "BREADTH",
+  "regime_read": "ES & NQ moving together \u2014 broad agreement, more DURABLE directional signal. Trust the direction more.",
+  "narrative": "PRE-US-OPEN BRIEFING \u2014 ES/NQ correlated pair \u2014 as of 2026-06-08 12:15 UTC\n\n1) RECENT MOVE-BY-MOVE READ\nThe tape is in a bounce-off-the-lows posture. Both contracts are green on the day (ES +0.68%, NQ +1.27%) but still red on the week (ES -2.13%, NQ -3.83%), so what we're watching is a relief recovery inside a worse weekly downtrend, not a fresh breakout. NQ is leading the daily rebound, which fits the headline backdrop: the Nvidia/SK cooperation story amid a 'prolonged chip shortage' is a constructive, semis-specific catalyst that disproportionately lifts the Nasdaq complex over the broad index. The drag on the week is consistent with the geopolitical cluster dominating the feed \u2014 active Iran conflict ('100th day,' drones shot down), Putin rejecting talks with Zelenskyy, oil/energy noise out of Venezuela, and consumer-spending caution stories. That risk-off geopolitics explains why both indices sit below their prior-week highs (ES 7632.25, NQ 30807.75) even as today buys some back. Net: a risk-relief day grafted onto a still-defensive week. RSI on both (ES 52, NQ 53.7) is dead-neutral \u2014 neither stretched nor washed out \u2014 confirming this is mid-range chop, not a momentum extreme.\n\n2) VOLUME-PROFILE READ (where volume traded \u2014 NOT order-flow delta)\nCaveat first: this is volume-at-price, not buy/sell aggression. True delta needs a CME order-flow feed. With that limitation respected:\n- NQ: POC sits up at 30568, with the 5-day value area 29128 (VAL) to 30717 (VAH). Price at 29395 is trading in the LOWER third of the value area, BELOW its POC and BELOW session VWAP (29204 is below price now, so price has reclaimed VWAP intraday \u2014 modestly constructive). The heavy high-volume nodes are clustered up at 30320-30667, meaning the bulk of recent accepted trade is above current price. That overhead shelf is resistance; the line in the sand is the value-area low at ~29128.\n- ES: POC at 7569, value area 7405 (VAL) to 7608 (VAH). ES at 7451 is just inside the lower value area and above session VWAP (7422). Same structural story: most volume sits overhead (7569-7589), so rallies face supply into the 7570s.\nInterpretation: both are recovering from the low end of their volume shelves. Holding above VWAP/VAL keeps the bounce alive; losing the value-area lows says the bounce failed and the weekly downtrend reasserts.\n\n3) NQ/ES LEAD-LAG REGIME\nClassification: BREADTH. Contemporaneous correlation is 0.943 with the cleanest signal at lag 0 (0.932) \u2014 ES and NQ are moving together with no meaningful leader (best lag corr only 0.037, leader NONE). No divergence flagged. This is the more durable, trustworthy directional regime: when both move as one, the direction is more reliable and you can lean on it slightly harder than in a rotation/concentration tape. That said, the regime is an INPUT, not an edge, and there is NO execution path here (CME futures; OANDA is forex-only). Practically: BREADTH supports trusting the recovery direction modestly, but the still-negative weekly spread and overhead volume keep this from being a high-conviction setup.\n\n4) EVENT-CALENDAR AWARENESS\nTwo size-down windows ahead. CPI is a cadence estimate for ~2026-06-12 (in 4 days), 8:30 ET \u2014 treat the date as approximate but reduce size into that window regardless; an inflation print into an already-tense geopolitical/oil backdrop is a fat-tail risk for a chip-led tech bounce. FOMC is ~2026-06-17 (in 9 days, maintained seed \u2014 verify vs Fed calendar) \u2014 widen stops and cut size into it. Bottom line: this bounce has a short runway before event risk. Don't build size you'd hate to hold through CPI.\n\n5) SYNTHESIS \u2014 META-REGIME + NARROWED BIAS\nMeta-regime: BREADTH-confirmed relief bounce inside a still-negative weekly trend, both indices above their 200-day SMA (ES +8.2%, NQ +14.4%) so the larger structure is intact and not broken. The constructive catalyst (Nvidia/SK semis) is NQ-specific and clear; the bearish catalyst (geopolitics/Iran/consumer caution) is broad and persistent \u2014 so news is MIXED, not clean. Lead-lag is clean (BREADTH, high corr), but news is not, and price sits below POC with overhead supply. Per the rules, mixed news caps confidence even with a clean regime.\n\nNARROWED BIAS: cautious LONG-the-recovery, ~52%, invalidated below NQ 29128 (value-area low / structural line in the sand). Above VWAP (29204) and VAL the bounce can grind toward the 30320 volume shelf; a break and acceptance below 29128 flips the read to bearish continuation of the weekly downtrend and the long thesis is dead. Confidence is deliberately modest because (a) the bullish catalyst is sector-narrow while the bearish catalyst is broad, and (b) CPI risk is only 4 days out.\n\nHUMILITY NOTE: This briefing is INTELLIGENCE, not a validated edge. The scorecard is n=1 (hit 1.0, regime acc 0.333) \u2014 statistically meaningless; ~30-60 samples are needed before any hit-rate or calibration figure means anything. Treat this as a structured read, not a signal to trust blindly.",
+  "directional_bias": "LONG",
+  "confidence": 52,
+  "regime_call": "BREADTH",
+  "key_level": 29128,
+  "synthesis_source": "claude-opus-4-8",
+  "lead_lag": {
+    "regime": "BREADTH",
+    "spread_avg": -5e-05,
+    "leader": "NONE",
+    "corr": 0.943,
+    "divergence": false
+  },
+  "volume_profile": {
+    "ES=F": {
+      "symbol": "ES=F",
+      "as_of": "2026-06-08T12:15:06.714712+00:00",
+      "days": 5,
+      "bins": 40,
+      "poc": 7569.55,
+      "value_area_low": 7405.49,
+      "value_area_high": 7608.93,
+      "high_volume_nodes": [
+        7569.55,
+        7582.68,
+        7405.49,
+        7576.11,
+        7589.24
+      ],
+      "price_range": [
+        7362.83,
+        7625.33
+      ],
+      "limitation": "Volume profile = WHERE volume traded (volume-at-price). NOT order-flow delta (buy/sell aggression). True delta needs a CME order-flow feed (Databento/CQG)."
+    },
+    "NQ=F": {
+      "symbol": "NQ=F",
+      "as_of": "2026-06-08T12:15:06.747102+00:00",
+      "days": 5,
+      "bins": 40,
+      "poc": 30568.61,
+      "value_area_low": 29128.46,
+      "value_area_high": 30717.59,
+      "high_volume_nodes": [
+        30568.61,
+        30667.93,
+        30320.31,
+        30618.27,
+        30469.29
+      ],
+      "price_range": [
+        28805.67,
+        30792.08
+      ],
+      "limitation": "Volume profile = WHERE volume traded (volume-at-price). NOT order-flow delta (buy/sell aggression). True delta needs a CME order-flow feed (Databento/CQG)."
+    }
+  },
+  "news_count": 10,
+  "event_calendar": [
+    {
+      "event": "CPI",
+      "date": "2026-06-12",
+      "source": "cadence_estimate",
+      "action": "inflation print 8:30 ET \u2014 reduce size into window",
+      "days_until": 4,
+      "note": "in 4d \u2014 inflation print 8:30 ET \u2014 reduce size into window"
+    },
+    {
+      "event": "FOMC meeting",
+      "date": "2026-06-17",
+      "source": "seed",
+      "action": "reduce size / widen stops into the window",
+      "days_until": 9,
+      "note": "in 9d \u2014 reduce size / widen stops into the window"
+    }
+  ],
+  "scorecard_summary": "Briefing scorecard: n=1 dir-calls, hit 1.0, regime acc 0.333 \u2014 CALIBRATING \u2014 need ~30-60 samples before the hit-rate/calibration mean anything",
+  "bias": "size to regime: trust direction more in BREADTH, less in CONCENTRATION; ROTATION_WARN = treat tech-led longs as suspect",
+  "provenance": {
+    "source": "oracle_morning_briefing",
+    "verified": false,
+    "note": "Analyst/Oracle journal \u2014 qualitative regime context + a self-scored directional call, NOT a verified data feed or validated edge. Numbers here are never ingested as trading inputs."
+  }
+}

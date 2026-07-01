@@ -1,12 +1,48 @@
 {
-  "timestamp": "2026-05-30T00:00:00Z",
+  "timestamp": "2026-06-30T11:44:23.003217+00:00",
   "overall": "WAIT",
   "gates": [
-    {"id":"G1","name":"MC Pass Rate","status":"GREEN","value":"74.4% (5,000 sims)","detail":"Median days to pass: 34.0 | P90: 76.0 days"},
-    {"id":"G2a","name":"Signal Validation","status":"YELLOW","value":"not run","detail":"Run: python3 scripts/validate_signals_retrospective.py"},
-    {"id":"G2b","name":"Execution Validation","status":"RED","value":"1/8","detail":"Need 7 more — OANDA bridge live since 2026-05-28. Use run_fvg_express.py to accelerate."},
-    {"id":"G3","name":"WR Alignment","status":"YELLOW","value":"collecting","detail":"Need ≥10 closed trades to measure"},
-    {"id":"G4","name":"Bridge Macro Threat","status":"GREEN","value":"0.00 NORMAL","detail":"Threat score 0.00 | ICT mode: NORMAL"},
-    {"id":"G5","name":"Non-Bust Days","status":"YELLOW","value":"collecting","detail":"Needs more closed trade data"}
+    {
+      "id": "G1",
+      "name": "MC Pass Rate",
+      "status": "GREEN",
+      "value": "74.4% (5,000 sims)",
+      "detail": "Median days to pass: 34.0 | P90: 76.0 days"
+    },
+    {
+      "id": "G2a",
+      "name": "Signal Validation",
+      "status": "GREEN",
+      "value": "PASS \u2014 20 signals, WR 63.6%",
+      "detail": "Signal pipeline validated against 30 days of real data"
+    },
+    {
+      "id": "G2b",
+      "name": "Execution Validation",
+      "status": "GREEN",
+      "value": "12/8",
+      "detail": "Execution pipeline validated!"
+    },
+    {
+      "id": "G3",
+      "name": "WR Alignment",
+      "status": "YELLOW",
+      "value": "collecting",
+      "detail": "Need \u226510 closed trades to measure"
+    },
+    {
+      "id": "G4",
+      "name": "Bridge Macro Threat",
+      "status": "GREEN",
+      "value": "0.00 NORMAL",
+      "detail": "Threat score 0.00 | ICT mode: NORMAL"
+    },
+    {
+      "id": "G5",
+      "name": "Non-Bust Days",
+      "status": "YELLOW",
+      "value": "collecting",
+      "detail": "Needs more closed trade data"
+    }
   ]
 }

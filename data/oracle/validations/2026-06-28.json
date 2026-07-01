@@ -1,0 +1,9 @@
+{
+  "date": "2026-06-28",
+  "generated_at": "2026-06-28T06:56:10.011102+00:00",
+  "candidate_lesson": "When the 30-indicator consensus shows high conviction (>=83%) but green_matches=0, treat the signal as historically unvalidated and require external regime confirmation before sizing above 50%.",
+  "testable_rule": "if consensus_conviction >= 0.83 and green_matches == 0 and tradingview_confidence < 0.70: size_multiplier = min(size_multiplier, 0.50)",
+  "verdict": "REJECTED",
+  "reason": "Rule filters only 0 trades \u2014 insufficient sample",
+  "trades_available": 1160
+}

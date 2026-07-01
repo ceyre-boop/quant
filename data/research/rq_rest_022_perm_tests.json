@@ -1,0 +1,60 @@
+{
+  "perm_N": 20000,
+  "seed": 42,
+  "live_pairs": [
+    "GBPUSD",
+    "EURUSD",
+    "AUDUSD",
+    "GBPJPY"
+  ],
+  "results": {
+    "HYP-047": {
+      "test": "Spearman(score, pnl_r) on ICT graded trades; expect NEGATIVE (inversion)",
+      "n": 310,
+      "spearman": -0.1597,
+      "p_two_sided": 0.00425,
+      "A_meanR": 0.313,
+      "A_n": 218,
+      "Aplus_meanR": -0.235,
+      "Aplus_n": 92,
+      "A_minus_Aplus_meanR": 0.548,
+      "status": "DEPLOYED"
+    },
+    "HYP-050": {
+      "test": "meanR(Tue+Thu) - meanR(other) on ICT pattern trades; expect NEGATIVE",
+      "n": 310,
+      "n_tue_thu": 127,
+      "meanR_tuethu": -0.409,
+      "WR_tuethu": 0.181,
+      "meanR_other": 0.539,
+      "WR_other": 0.41,
+      "diff": -0.949,
+      "p_two_sided": 5e-05,
+      "status": "CONFIRMED"
+    },
+    "HYP-052c": {
+      "test": "Sharpe(widening |rd|) - Sharpe(not) on 4-pair forex; expect POSITIVE",
+      "n": 511,
+      "n_widen": 207,
+      "sharpe_widen": 0.231,
+      "meanR_widen": 0.315,
+      "sharpe_not": 0.108,
+      "meanR_not": 0.151,
+      "delta_sharpe": 0.123,
+      "p_two_sided": 0.13499,
+      "status": "CONFIRMED"
+    },
+    "HYP-054": {
+      "test": "Sharpe(|rd|>1.0) - Sharpe(|rd|<=1.0) on 4-pair forex; expect POSITIVE",
+      "n": 515,
+      "n_pass": 332,
+      "sharpe_pass": 0.201,
+      "meanR_pass": 0.274,
+      "sharpe_fail": 0.084,
+      "meanR_fail": 0.12,
+      "delta_sharpe": 0.117,
+      "p_two_sided": 0.17059,
+      "status": "CONFIRMED"
+    }
+  }
+}

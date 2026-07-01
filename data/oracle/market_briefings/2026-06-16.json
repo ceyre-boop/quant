@@ -1,0 +1,129 @@
+{
+  "date": "2026-06-16",
+  "generated_at": "2026-06-16T16:44:16.318485+00:00",
+  "meta_regime": "CONCENTRATION",
+  "regime_read": "NQ leading / pulling away from ES \u2014 narrow, tech/AI-driven, FRAGILE. Trust directional moves less; watch for reversal when AI names cool.",
+  "narrative": "Session open 2026-06-16. NQ/ES regime: CONCENTRATION \u2014 NQ leading / pulling away from ES \u2014 narrow, tech/AI-driven, FRAGILE. Trust directional moves less; watch for reversal when AI names cool. NQ 30896.5 / ES 7628.5, corr 0.951, lead-lag leader NONE. Volume profile NQ POC ~30878.0. Forex: NO_TRADE_TODAY \u2014 USDJPY=X closest at 100%. Event watch: FOMC meeting (in 1d \u2014 reduce size / widen stops into the window), PCE (Fed's preferred inflation) (in 14d \u2014 8:30 ET \u2014 reduce size into window), ISM Manufacturing PMI (in 15d \u2014 reduce size into the 10:00 ET print). Briefing scorecard: n=5 dir-calls, hit 1.0, regime acc 0.333 \u2014 CALIBRATING \u2014 need ~30-60 samples before the hit-rate/calibration mean anything Regime read is an INPUT for sizing/trust, not a trade signal (deterministic fallback \u2014 Opus synthesis unavailable this run).",
+  "big_move_headline": {
+    "headline": "Today's likeliest institutional move: LONG EURUSD (P 71%, ~0.60% range, conf 29%).",
+    "pair": "EURUSD",
+    "direction": "LONG",
+    "p_big": 0.7115,
+    "confidence": 0.294,
+    "expected_magnitude_pct": 0.6026,
+    "session": "OFF_HOURS",
+    "drivers": [
+      [
+        "event_risk",
+        0.9
+      ],
+      [
+        "compression",
+        0.2868
+      ],
+      [
+        "momentum",
+        0.172
+      ]
+    ],
+    "validation_status": "UNVALIDATED \u2014 display only (run scripts/validate_big_move.py)"
+  },
+  "directional_bias": "NEUTRAL",
+  "confidence": 0,
+  "regime_call": "CONCENTRATION",
+  "key_level": null,
+  "synthesis_source": "deterministic_fallback",
+  "lead_lag": {
+    "regime": "CONCENTRATION",
+    "spread_avg": 0.00176,
+    "leader": "NONE",
+    "corr": 0.951,
+    "divergence": false
+  },
+  "volume_profile": {
+    "ES=F": {
+      "symbol": "ES=F",
+      "as_of": "2026-06-16T12:28:49.472806+00:00",
+      "days": 5,
+      "bins": 40,
+      "poc": 7622.95,
+      "value_area_low": 7297.96,
+      "value_area_high": 7641.52,
+      "high_volume_nodes": [
+        7622.95,
+        7632.24,
+        7437.24,
+        7409.39,
+        7613.67
+      ],
+      "price_range": [
+        7274.75,
+        7646.17
+      ],
+      "limitation": "Volume profile = WHERE volume traded (volume-at-price). NOT order-flow delta (buy/sell aggression). True delta needs a CME order-flow feed (Databento/CQG)."
+    },
+    "NQ=F": {
+      "symbol": "NQ=F",
+      "as_of": "2026-06-16T12:28:49.512943+00:00",
+      "days": 5,
+      "bins": 40,
+      "poc": 30878.0,
+      "value_area_low": 28738.25,
+      "value_area_high": 30878.0,
+      "high_volume_nodes": [
+        30878.0,
+        30820.17,
+        29547.88,
+        28796.08,
+        29663.55
+      ],
+      "price_range": [
+        28651.5,
+        30964.75
+      ],
+      "limitation": "Volume profile = WHERE volume traded (volume-at-price). NOT order-flow delta (buy/sell aggression). True delta needs a CME order-flow feed (Databento/CQG)."
+    }
+  },
+  "news_count": 11,
+  "event_calendar": [
+    {
+      "event": "FOMC meeting",
+      "date": "2026-06-17",
+      "source": "seed",
+      "action": "reduce size / widen stops into the window",
+      "days_until": 1,
+      "note": "in 1d \u2014 reduce size / widen stops into the window"
+    },
+    {
+      "event": "PCE (Fed's preferred inflation)",
+      "date": "2026-06-30",
+      "source": "cadence_estimate",
+      "action": "8:30 ET \u2014 reduce size into window",
+      "days_until": 14,
+      "note": "in 14d \u2014 8:30 ET \u2014 reduce size into window"
+    },
+    {
+      "event": "ISM Manufacturing PMI",
+      "date": "2026-07-01",
+      "source": "cadence_estimate",
+      "action": "reduce size into the 10:00 ET print",
+      "days_until": 15,
+      "note": "in 15d \u2014 reduce size into the 10:00 ET print"
+    },
+    {
+      "event": "Nonfarm Payrolls",
+      "date": "2026-07-03",
+      "source": "cadence_estimate",
+      "action": "high-impact 8:30 ET \u2014 widen stops / size down",
+      "days_until": 17,
+      "note": "in 17d \u2014 high-impact 8:30 ET \u2014 widen stops / size down"
+    }
+  ],
+  "scorecard_summary": "Briefing scorecard: n=5 dir-calls, hit 1.0, regime acc 0.333 \u2014 CALIBRATING \u2014 need ~30-60 samples before the hit-rate/calibration mean anything",
+  "bias": "size to regime: trust direction more in BREADTH, less in CONCENTRATION; ROTATION_WARN = treat tech-led longs as suspect",
+  "provenance": {
+    "source": "oracle_morning_briefing",
+    "verified": false,
+    "note": "Analyst/Oracle journal \u2014 qualitative regime context + a self-scored directional call, NOT a verified data feed or validated edge. Numbers here are never ingested as trading inputs."
+  }
+}

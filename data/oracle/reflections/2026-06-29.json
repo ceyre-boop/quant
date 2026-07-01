@@ -1,0 +1,26 @@
+{
+  "date": "2026-06-29",
+  "generated_at": "2026-06-29T07:12:23.059553+00:00",
+  "input_tokens": 5731,
+  "output_tokens": 920,
+  "estimated_cost_usd": 0.154965,
+  "harvest_days_read": 7,
+  "reflection": {
+    "candidate_lesson": {
+      "lesson_text": "When live indicator conviction reads 100% but green_matches=0 (no historical analog confirmed in memory), treat the signal as UNVERIFIED and cap size \u2014 full conviction without a single matched historical pattern is overfit noise, not edge.",
+      "mechanism": "The 30-indicator consensus reaching 100% (EURUSD 14/30 bear, AUDUSD 16/30 bear) while green_matches=0 means the current configuration has never resolved favorably in the stored library. Institutional flow that produces durable moves leaves repeated fingerprints; a 'perfect' live read with zero historical confirmation is the signature of a one-off crowding event (here, a fading AI-euphoria tape per the briefing) that mean-reverts rather than trends. The hist_hr of 66-70% is a category average, not a confirmation of THIS instance.",
+      "testable_rule": "if consensus_conviction >= 0.90 and green_matches == 0: size_multiplier *= 0.6  # require at least 1 matched historical analog before full size",
+      "expected_impact": "Reduces variance of high-conviction-but-unconfirmed entries; expected Sharpe +0.02-0.03 by trimming the worst tail of overfit-signal trades while preserving matched-analog winners.",
+      "evidence_from_harvest": "Current consensus shows EURUSD conv=100% green_matches=0 and AUDUSD conv=100% green_matches=0; meanwhile USDJPY conv=83% green_matches=0 has hist_hr=0%, showing that conviction and historical confirmation are decoupled fields. The briefing flags the directional impulse as FADING, consistent with high-conviction reads lacking durable backing.",
+      "evidence_from_reasoning": null,
+      "reasoning_component_targeted": "green_matches",
+      "sample_needed": 40
+    },
+    "retirement_flag": {
+      "lesson_to_review": "L8",
+      "reason": "L8 tightened the USDJPY/AUDNZD VIX gate to 13 in a bull-market frame; current macro shows GDP only 2.1%, UMich sentiment collapsing 49.8\u219244.8, and VIX ~18.9 \u2014 the 'bull market + VIX>13' premise may no longer hold, so the gate could be vetoing valid safe-haven trades in a deteriorating-growth regime."
+    },
+    "system_health_note": "Zero trades in 7 days with Regime=UNKNOWN and TradingView showing 0 signals \u2014 the system is correctly in a low-conviction freeze, but the 100%-conviction/0-match consensus reads are exactly the trap to gate before any thaw."
+  },
+  "auto_validation": null
+}

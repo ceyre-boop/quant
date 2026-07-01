@@ -1,0 +1,9 @@
+{
+  "date": "2026-06-25",
+  "generated_at": "2026-06-25T06:39:32.484476+00:00",
+  "candidate_lesson": "When the 30-indicator consensus shows conv=100% but green_matches=0 and hist_hr=0% (USDJPY LONG, AUDNZD LONG), the signal is a directional artifact with no historical precedent \u2014 treat conv=100%/hist_hr=0% pairs as UNRELIABLE and veto, regardless of indicator agreement.",
+  "testable_rule": "if consensus_conv == 1.0 and consensus_hist_hr == 0.0 and green_matches == 0: return Veto('OOD_consensus_no_precedent')",
+  "verdict": "REJECTED",
+  "reason": "Rule filters only 0 trades \u2014 insufficient sample",
+  "trades_available": 1160
+}

@@ -7,46 +7,40 @@
     "agent_share": 0.3
   },
   "week": {
-    "start_date": "2026-05-31",
-    "weekly_used": 6800,
-    "weekly_remaining": 193200,
+    "start_date": "2026-06-27",
+    "weekly_used": 56000,
+    "weekly_remaining": 144000,
     "last_synced": null,
-    "note": "REST MODE Jun 1 01:30-01:52 UTC \u2014 HYP-039 partial confirmed (CB blackout), HYP-053 discovered (regime velocity), health check, paper trading status"
+    "note": "REST-030 2026-07-01T01:10Z: light cycle, +6k est. Budget gate healthy post REST-029 window roll. STILL stay light until manual sync (run claude_usage_tracker.py sync). weekly_used is a conservative running estimate, not measured."
   },
   "today": {
-    "date": "2026-06-01",
+    "date": "2026-07-01",
     "human_used": 0,
-    "agent_used": 2600,
-    "daily_human_budget": 20000,
+    "agent_used": 6000,
     "daily_agent_budget": 8571,
-    "agent_extra_from_rollover": 10000,
-    "agent_allowed_today": 18571,
-    "note": "REST MODE Jun 1 01:30 UTC \u2014 CB blackout analysis, regime fragility study, 4 findings, 4 messages, 2 tasks added"
+    "agent_allowed_today": 7000,
+    "note": "REST-030 light cycle: read-only code forensics of the Oracle outcome loop. Root-caused OUTCOME_LOOP_STALL to backtest pollution of the live decision log (not just missing trade_id). Wrote fix spec Plans/REST-030. No live code/config touched."
   },
   "session": {
-    "started": "2026-06-01T01:30:00+00:00",
-    "ended": "2026-06-01T01:52:00+00:00",
+    "started": "2026-07-01T01:10:00Z",
+    "ended": "2026-07-01T01:10:00Z",
     "mode": "REST_MODE",
     "tasks_completed": [
-      "HYP-039-cb-blackout",
-      "HYP-053-regime-velocity",
-      "health-check",
-      "paper-trading-status"
+      "Validated loop health (7 alive, 0 down; USD_CAD fired today; 2 known YELLOWs = the loop-pollution issue)",
+      "Root-caused OUTCOME_LOOP_STALL: live decision log polluted by backtest replay (1919 rows, entry_timestamps 2023-2026; pipeline.py:663 ungated)",
+      "Discovered RQ-REST-018 commitment_score fix already landed (c7908a9 06-30) -> marked DONE_VERIFY (REST-029 alarm was stale)",
+      "Wrote paste-ready fix spec Plans/REST-030_oracle_loop_fix_spec.md (3 changes + verification + Colin decisions)",
+      "3 findings written; queue updated (RQ-REST-018 resolved, RQ-REST-019b added P1); 1 Colin message"
     ],
-    "findings_written": 4,
-    "hypotheses_updated": [
-      "HYP-039"
-    ],
-    "new_hypotheses": [
-      "HYP-053"
-    ],
+    "findings_written": 3,
+    "hypotheses_updated": [],
+    "new_hypotheses": [],
     "new_tasks_added": [
-      "RQ-REST-010",
-      "RQ-REST-011"
+      "RQ-REST-019b"
     ],
-    "key_finding": "Rate divergence velocity predicts forex regime; current 2026 signal is FULL SIZE (91st pct). CB danger zone is days 3-14 pre-meeting, not 0-2d."
+    "key_finding": "OUTCOME_LOOP_STALL is a DATA-POLLUTION bug: backtests write into the live decision log (1919 mixed rows) making backfill + pulse alarms meaningless. Fix spec written; commitment_score already fixed by c7908a9. Both need Colin approval (execution-path change)."
   },
-  "mode": "REST_MODE_COMPLETE",
+  "mode": "REST_MODE",
   "thresholds": {
     "weekly_danger": 20000,
     "weekly_light_mode": 50000,

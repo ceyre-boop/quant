@@ -1,0 +1,52 @@
+{
+  "id": "BENCH-THROUGHPUT",
+  "generated_at": "2026-06-29T22:02:43.201592+00:00",
+  "environment": {
+    "cpu": "Apple M4 Pro",
+    "physical_cores": 12,
+    "numba": "NOT INSTALLED \u2014 @njit kernels run as pure-Python fallback",
+    "numba_active": false,
+    "python": "3.14.4",
+    "platform": "macOS-26.3.1-arm64-arm-64bit-Mach-O"
+  },
+  "legacy_claim_backtests_per_sec": 148193,
+  "headline": {
+    "single_core_90bar": 25223.0,
+    "parallel_ceiling": 123168.2,
+    "best_bar_evals_per_sec": 11085141.0,
+    "numba_active": false,
+    "beats_legacy_claim": false
+  },
+  "matrix": [
+    {
+      "tier": "90bar",
+      "kernel": "nojit_fallback_1core",
+      "n_bars": 90,
+      "n_backtests": 10090,
+      "cores": 1,
+      "backtests_per_sec": 25223.0,
+      "ms_per_backtest": 0.039646,
+      "bar_evals_per_sec": 2270067.0
+    },
+    {
+      "tier": "90bar",
+      "kernel": "nojit_fallback_12core",
+      "n_bars": 90,
+      "n_backtests": 106077,
+      "cores": 12,
+      "backtests_per_sec": 123168.2,
+      "ms_per_backtest": 0.008119,
+      "bar_evals_per_sec": 11085141.0
+    },
+    {
+      "tier": "90bar",
+      "kernel": "pure_python_forex",
+      "n_bars": 90,
+      "n_backtests": 2786,
+      "cores": 1,
+      "backtests_per_sec": 6963.4,
+      "ms_per_backtest": 0.143609,
+      "bar_evals_per_sec": 626702.0
+    }
+  ]
+}

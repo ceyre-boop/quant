@@ -1,0 +1,16 @@
+{
+  "id": "cluster_3",
+  "name": "cluster3_long",
+  "description": "KMeans cluster 3 (train fwd-return +), k=6",
+  "family": "cluster",
+  "spec": "kmeans k=6 cluster 3 dir=1",
+  "train_window": [
+    "2015-01-01",
+    "2022-12-31"
+  ],
+  "holdout_window": [
+    "2023-01-01",
+    "2024-12-31"
+  ],
+  "preregistered_at": "2026-06-23T19:25:59.736591+00:00"
+}

@@ -1,0 +1,9 @@
+{
+  "date": "2026-06-14",
+  "generated_at": "2026-06-14T06:59:49.956599+00:00",
+  "candidate_lesson": "When the 30-indicator consensus shows a directional signal (SHORT/LONG) with green_matches=0 and hist_hr=0%, the signal has no historical analog and must be sized down or vetoed regardless of conviction percentage.",
+  "testable_rule": "if consensus_dir in ('SHORT','LONG') and green_matches == 0 and hist_hr < 0.50: size_multiplier *= 0.0  # veto. elif green_matches == 0 and hist_hr >= 0.55: size_multiplier *= 0.75  # novel config but historical edge holds",
+  "verdict": "REJECTED",
+  "reason": "Rule filters only 0 trades \u2014 insufficient sample",
+  "trades_available": 1160
+}

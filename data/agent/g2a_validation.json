@@ -1,14 +1,14 @@
 {
-  "run_at": "2026-05-31T05:05:58.558495Z",
+  "run_at": "2026-06-30T13:25:43.820565Z",
   "days_scanned": 90,
-  "signals_generated": 6,
-  "wins": 2,
-  "losses": 2,
-  "pending": 2,
-  "win_rate": 0.5,
+  "signals_generated": 20,
+  "wins": 7,
+  "losses": 4,
+  "pending": 9,
+  "win_rate": 0.6364,
   "backtest_expectation": 0.41,
   "status": "PASS",
-  "status_reason": "WR 50.0% \u2265 floor 30% on 6 signals (4 closed)",
+  "status_reason": "WR 63.6% \u2265 floor 30% on 20 signals (11 closed)",
   "pairs_breakdown": {
     "GBPUSD=X": {
       "signals": 0,
@@ -35,13 +35,123 @@
       "pending": 1
     },
     "USDJPY=X": {
-      "signals": 2,
-      "wins": 1,
-      "losses": 0,
-      "pending": 1
+      "signals": 16,
+      "wins": 6,
+      "losses": 2,
+      "pending": 8
     }
   },
   "signals": [
+    {
+      "date": "2026-06-25",
+      "pair": "USDJPY=X",
+      "direction": "LONG",
+      "grade": "A",
+      "score": 7.46,
+      "entry": 161.6375,
+      "stop": 161.18927,
+      "tp1": 162.53395,
+      "outcome": "PENDING"
+    },
+    {
+      "date": "2026-06-24",
+      "pair": "USDJPY=X",
+      "direction": "LONG",
+      "grade": "A",
+      "score": 7.59,
+      "entry": 161.6375,
+      "stop": 161.19025,
+      "tp1": 162.532,
+      "outcome": "PENDING"
+    },
+    {
+      "date": "2026-06-23",
+      "pair": "USDJPY=X",
+      "direction": "LONG",
+      "grade": "A",
+      "score": 6.51,
+      "entry": 161.45799,
+      "stop": 161.18718,
+      "tp1": 161.99962,
+      "outcome": "PENDING"
+    },
+    {
+      "date": "2026-06-22",
+      "pair": "USDJPY=X",
+      "direction": "LONG",
+      "grade": "A",
+      "score": 6.71,
+      "entry": 161.346,
+      "stop": 160.16874,
+      "tp1": 163.70052,
+      "outcome": "PENDING"
+    },
+    {
+      "date": "2026-06-16",
+      "pair": "USDJPY=X",
+      "direction": "LONG",
+      "grade": "A",
+      "score": 6.82,
+      "entry": 160.034,
+      "stop": 159.93627,
+      "tp1": 160.22945,
+      "outcome": "WIN"
+    },
+    {
+      "date": "2026-06-15",
+      "pair": "USDJPY=X",
+      "direction": "LONG",
+      "grade": "A",
+      "score": 8.09,
+      "entry": 160.034,
+      "stop": 159.93713,
+      "tp1": 160.22773,
+      "outcome": "WIN"
+    },
+    {
+      "date": "2026-06-11",
+      "pair": "USDJPY=X",
+      "direction": "LONG",
+      "grade": "A",
+      "score": 7.8,
+      "entry": 160.397,
+      "stop": 159.81428,
+      "tp1": 161.56243,
+      "outcome": "LOSS"
+    },
+    {
+      "date": "2026-06-10",
+      "pair": "USDJPY=X",
+      "direction": "LONG",
+      "grade": "A",
+      "score": 7.47,
+      "entry": 160.004,
+      "stop": 159.81404,
+      "tp1": 160.38391,
+      "outcome": "WIN"
+    },
+    {
+      "date": "2026-06-09",
+      "pair": "USDJPY=X",
+      "direction": "LONG",
+      "grade": "A",
+      "score": 7.26,
+      "entry": 160.004,
+      "stop": 159.81232,
+      "tp1": 160.38735,
+      "outcome": "WIN"
+    },
+    {
+      "date": "2026-06-08",
+      "pair": "USDJPY=X",
+      "direction": "LONG",
+      "grade": "A",
+      "score": 7.44,
+      "entry": 159.8765,
+      "stop": 159.81079,
+      "tp1": 160.00793,
+      "outcome": "WIN"
+    },
     {
       "date": "2026-05-20",
       "pair": "AUDNZD=X",
@@ -52,6 +162,50 @@
       "stop": 1.21575,
       "tp1": 1.22272,
       "outcome": "LOSS"
+    },
+    {
+      "date": "2026-05-19",
+      "pair": "USDJPY=X",
+      "direction": "LONG",
+      "grade": "A",
+      "score": 6.77,
+      "entry": 159.04401,
+      "stop": 157.46366,
+      "tp1": 162.20471,
+      "outcome": "PENDING"
+    },
+    {
+      "date": "2026-05-18",
+      "pair": "USDJPY=X",
+      "direction": "LONG",
+      "grade": "A",
+      "score": 7.53,
+      "entry": 158.258,
+      "stop": 157.46379,
+      "tp1": 159.84642,
+      "outcome": "PENDING"
+    },
+    {
+      "date": "2026-05-15",
+      "pair": "USDJPY=X",
+      "direction": "LONG",
+      "grade": "A",
+      "score": 7.47,
+      "entry": 158.258,
+      "stop": 157.46311,
+      "tp1": 159.84778,
+      "outcome": "PENDING"
+    },
+    {
+      "date": "2026-05-13",
+      "pair": "USDJPY=X",
+      "direction": "LONG",
+      "grade": "A",
+      "score": 7.0,
+      "entry": 157.826,
+      "stop": 156.96234,
+      "tp1": 159.55333,
+      "outcome": "PENDING"
     },
     {
       "date": "2026-04-24",
@@ -76,15 +230,26 @@
       "outcome": "PENDING"
     },
     {
-      "date": "2026-03-12",
+      "date": "2026-03-23",
       "pair": "USDJPY=X",
       "direction": "LONG",
       "grade": "A",
-      "score": 7.51,
-      "entry": 158.7275,
-      "stop": 157.50789,
-      "tp1": 161.16672,
-      "outcome": "PENDING"
+      "score": 6.66,
+      "entry": 159.272,
+      "stop": 158.62941,
+      "tp1": 160.55718,
+      "outcome": "LOSS"
+    },
+    {
+      "date": "2026-03-16",
+      "pair": "USDJPY=X",
+      "direction": "LONG",
+      "grade": "A",
+      "score": 6.92,
+      "entry": 158.7695,
+      "stop": 158.65076,
+      "tp1": 159.00699,
+      "outcome": "WIN"
     },
     {
       "date": "2026-03-03",
@@ -96,17 +261,6 @@
       "stop": 1.18544,
       "tp1": 1.2005,
       "outcome": "LOSS"
-    },
-    {
-      "date": "2026-02-16",
-      "pair": "USDJPY=X",
-      "direction": "LONG",
-      "grade": "A",
-      "score": 7.74,
-      "entry": 153.1935,
-      "stop": 152.4963,
-      "tp1": 154.5879,
-      "outcome": "WIN"
     }
   ]
 }

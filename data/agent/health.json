@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-05-28T20:32:00",
-  "overall": "RED",
+  "timestamp": "2026-06-30T07:44:19",
+  "overall": "YELLOW",
   "components": {
     "duckdb": {
       "status": "GREEN",
@@ -16,7 +16,7 @@
     },
     "ict_scanner": {
       "status": "GREEN",
-      "detail": "outside session hours \u2014 last run 4.7h ago"
+      "detail": "outside session hours \u2014 last run 3.2h ago"
     },
     "backtest_engine": {
       "status": "GREEN",
@@ -24,15 +24,15 @@
     },
     "alpaca": {
       "status": "GREEN",
-      "detail": "paper account equity=$104,029"
+      "detail": "paper account equity=$106,403"
     },
     "fred": {
-      "status": "YELLOW",
-      "detail": "FRED unreachable (network timeout) \u2014 key is configured correctly"
+      "status": "GREEN",
+      "detail": "fed funds series ok"
     },
     "alpha_vantage": {
       "status": "GREEN",
-      "detail": "latest bar 2026-05-27"
+      "detail": "latest bar 2026-06-29"
     },
     "tiingo": {
       "status": "GREEN",
@@ -40,11 +40,11 @@
     },
     "news_api": {
       "status": "GREEN",
-      "detail": "54 business articles"
+      "detail": "69 business articles"
     },
     "oanda": {
       "status": "GREEN",
-      "detail": "NAV=$110,000 practice"
+      "detail": "NAV=$109,666 practice"
     },
     "firebase": {
       "status": "GREEN",
@@ -63,18 +63,18 @@
       "detail": "WIKI prices ok (1 rows)"
     },
     "reddit": {
-      "status": "YELLOW",
-      "detail": "cache 2953m old \u2014 needs refresh"
+      "status": "GREEN",
+      "detail": "0 posts | 42m ago | no signals"
     },
     "decision_logs": {
       "status": "YELLOW",
-      "detail": "WARNING: decisions_2026_05.jsonl not updated in 49h \u2014 pipeline may be silent"
+      "detail": "WARNING: 19 trades >7d old missing outcome backfill (GBPUSD=X, GBPUSD=X, AUDUSD=X...)"
     },
     "oracle_pulse": {
       "status": "YELLOW",
       "detail": "0 new entries, 1 anomalies",
-      "last_pulse": "2026-06-07T16:13:32+00:00"
+      "last_pulse": "2026-07-01T01:56:30+00:00"
     }
   },
-  "last_checked": "2026-05-28T20:32:00"
+  "last_checked": "2026-06-30T07:44:19"
 }

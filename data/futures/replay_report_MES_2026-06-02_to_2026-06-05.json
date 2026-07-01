@@ -1,0 +1,104 @@
+{
+  "generated_at": "2026-06-08T02:34:05.516801+00:00",
+  "instrument": "MES",
+  "source": "yf",
+  "bias_mode": "auto",
+  "orb_size": "safe",
+  "summary": {
+    "instrument": "MES",
+    "sessions": 4,
+    "n_trades": 2,
+    "net_total_usd": 113.52,
+    "win_rate": 1.0,
+    "profit_factor": 113520000000.0,
+    "total_r": 0.892,
+    "avg_r": 0.446,
+    "run_trailing_dd_usd": 0.0,
+    "best_day_usd": 56.76,
+    "worst_day_usd": 0.0,
+    "prop_profit_target_usd": 3000.0,
+    "prop_trailing_dd_usd": 2500.0,
+    "prop_progress_pct": 3.8,
+    "prop_breaches": [
+      "CONSISTENCY: best day 50% > 30%"
+    ],
+    "consistency_ok": false,
+    "verdict": "BREACH"
+  },
+  "sessions": [
+    {
+      "day": "2026-06-02",
+      "bias": "NEUTRAL",
+      "trades": [],
+      "net_usd": 0.0,
+      "max_drawdown_usd": 0.0,
+      "day_low_equity_usd": 0.0,
+      "n_trades": 0
+    },
+    {
+      "day": "2026-06-03",
+      "bias": "SHORT",
+      "trades": [
+        {
+          "day": "2026-06-03",
+          "instrument": "MES",
+          "setup": "ORB",
+          "direction": "SHORT",
+          "entry": 7590.5,
+          "stop": 7614.75,
+          "target": 7578.5,
+          "exit": 7578.5,
+          "exit_reason": "T1_HIT",
+          "contracts": 1,
+          "gross_usd": 60.0,
+          "cost_usd": 3.24,
+          "net_usd": 56.76,
+          "r_realized": 0.495,
+          "entry_ts": "2026-06-03T13:45:00+00:00",
+          "exit_ts": "2026-06-03T13:48:00+00:00"
+        }
+      ],
+      "net_usd": 56.76,
+      "max_drawdown_usd": 0.0,
+      "day_low_equity_usd": 0.0,
+      "n_trades": 1
+    },
+    {
+      "day": "2026-06-04",
+      "bias": "SHORT",
+      "trades": [],
+      "net_usd": 0.0,
+      "max_drawdown_usd": 0.0,
+      "day_low_equity_usd": 0.0,
+      "n_trades": 0
+    },
+    {
+      "day": "2026-06-05",
+      "bias": "SHORT",
+      "trades": [
+        {
+          "day": "2026-06-05",
+          "instrument": "MES",
+          "setup": "ORB",
+          "direction": "SHORT",
+          "entry": 7522.75,
+          "stop": 7553.0,
+          "target": 7510.75,
+          "exit": 7510.75,
+          "exit_reason": "T1_HIT",
+          "contracts": 1,
+          "gross_usd": 60.0,
+          "cost_usd": 3.24,
+          "net_usd": 56.76,
+          "r_realized": 0.397,
+          "entry_ts": "2026-06-05T13:52:00+00:00",
+          "exit_ts": "2026-06-05T13:59:00+00:00"
+        }
+      ],
+      "net_usd": 56.76,
+      "max_drawdown_usd": 0.0,
+      "day_low_equity_usd": 0.0,
+      "n_trades": 1
+    }
+  ]
+}

@@ -1,0 +1,152 @@
+{
+  "run_date": "2026-06-24T01:12:54.833013+00:00",
+  "task": "RQ-REST-023",
+  "purpose": "Reconcile HYP-054/HYP-052c magnitude discrepancy; add bootstrap CI + permutation p on native statistic.",
+  "data": "data/research/trade_forensics.json",
+  "scenarios": {
+    "HYP-054__all7__rd_ge_1.0": {
+      "n_total": 863,
+      "pass": {
+        "n": 509,
+        "sharpe": 0.1524,
+        "mean_r": 0.2031,
+        "win_rate": 0.499
+      },
+      "fail": {
+        "n": 354,
+        "sharpe": 0.1135,
+        "mean_r": 0.151,
+        "win_rate": 0.4746
+      },
+      "delta_sharpe_per_trade": 0.0389,
+      "mean_r_diff": 0.0521,
+      "curve_sharpe_pass_annualized": 3.6536,
+      "curve_sharpe_fail_annualized": 2.5983,
+      "perm_p_two_sided": 0.54527,
+      "boot_ci95_delta_sharpe": [
+        -0.0898,
+        0.1684
+      ]
+    },
+    "HYP-054__all7__rd_gt_1.0": {
+      "n_total": 863,
+      "pass": {
+        "n": 509,
+        "sharpe": 0.1524,
+        "mean_r": 0.2031,
+        "win_rate": 0.499
+      },
+      "fail": {
+        "n": 354,
+        "sharpe": 0.1135,
+        "mean_r": 0.151,
+        "win_rate": 0.4746
+      },
+      "delta_sharpe_per_trade": 0.0389,
+      "mean_r_diff": 0.0521,
+      "curve_sharpe_pass_annualized": 3.6536,
+      "curve_sharpe_fail_annualized": 2.5983,
+      "perm_p_two_sided": 0.54507,
+      "boot_ci95_delta_sharpe": [
+        -0.089,
+        0.1692
+      ]
+    },
+    "HYP-054__live4__rd_ge_1.0": {
+      "n_total": 515,
+      "pass": {
+        "n": 332,
+        "sharpe": 0.2011,
+        "mean_r": 0.2736,
+        "win_rate": 0.5301
+      },
+      "fail": {
+        "n": 183,
+        "sharpe": 0.0839,
+        "mean_r": 0.1197,
+        "win_rate": 0.4645
+      },
+      "delta_sharpe_per_trade": 0.1172,
+      "mean_r_diff": 0.154,
+      "curve_sharpe_pass_annualized": 4.3451,
+      "curve_sharpe_fail_annualized": 1.6332,
+      "perm_p_two_sided": 0.16654,
+      "boot_ci95_delta_sharpe": [
+        -0.0483,
+        0.2916
+      ]
+    },
+    "HYP-054__live4__rd_gt_1.0": {
+      "n_total": 515,
+      "pass": {
+        "n": 332,
+        "sharpe": 0.2011,
+        "mean_r": 0.2736,
+        "win_rate": 0.5301
+      },
+      "fail": {
+        "n": 183,
+        "sharpe": 0.0839,
+        "mean_r": 0.1197,
+        "win_rate": 0.4645
+      },
+      "delta_sharpe_per_trade": 0.1172,
+      "mean_r_diff": 0.154,
+      "curve_sharpe_pass_annualized": 4.3451,
+      "curve_sharpe_fail_annualized": 1.6332,
+      "perm_p_two_sided": 0.17194,
+      "boot_ci95_delta_sharpe": [
+        -0.0521,
+        0.296
+      ]
+    },
+    "HYP-052c__all7__widening": {
+      "n_total": 856,
+      "pass": {
+        "n": 305,
+        "sharpe": 0.2021,
+        "mean_r": 0.2621,
+        "win_rate": 0.5213
+      },
+      "fail": {
+        "n": 551,
+        "sharpe": 0.0974,
+        "mean_r": 0.1302,
+        "win_rate": 0.4701
+      },
+      "delta_sharpe_per_trade": 0.1047,
+      "mean_r_diff": 0.1319,
+      "curve_sharpe_pass_annualized": 3.85,
+      "curve_sharpe_fail_annualized": 2.3456,
+      "perm_p_two_sided": 0.11434,
+      "boot_ci95_delta_sharpe": [
+        -0.022,
+        0.2284
+      ]
+    },
+    "HYP-052c__live4__widening": {
+      "n_total": 511,
+      "pass": {
+        "n": 207,
+        "sharpe": 0.2311,
+        "mean_r": 0.3154,
+        "win_rate": 0.5411
+      },
+      "fail": {
+        "n": 304,
+        "sharpe": 0.1079,
+        "mean_r": 0.1509,
+        "win_rate": 0.4836
+      },
+      "delta_sharpe_per_trade": 0.1232,
+      "mean_r_diff": 0.1646,
+      "curve_sharpe_pass_annualized": 4.3715,
+      "curve_sharpe_fail_annualized": 2.1298,
+      "perm_p_two_sided": 0.13734,
+      "boot_ci95_delta_sharpe": [
+        -0.035,
+        0.2804
+      ]
+    }
+  }
+}

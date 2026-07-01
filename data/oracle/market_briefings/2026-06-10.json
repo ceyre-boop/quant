@@ -1,0 +1,105 @@
+{
+  "date": "2026-06-10",
+  "generated_at": "2026-06-10T12:25:08.424473+00:00",
+  "meta_regime": "BREADTH",
+  "regime_read": "ES & NQ moving together \u2014 broad agreement, more DURABLE directional signal. Trust the direction more.",
+  "narrative": "PRE-US-OPEN BRIEFING \u2014 ES/NQ \u2014 as of 2026-06-10 ~12:22 UTC\n\n1) RECENT MOVE-BY-MOVE READ\nThe tape is in a clear corrective downswing inside a larger uptrend. ES is -0.9% on the day and -3.24% on the week; NQ is heavier at -1.47% on the day and -6.35% on the week. The faster bleed in NQ tells you the selling is concentrated in the high-beta growth/tech complex \u2014 typical of a risk-trim / de-leveraging week rather than a fundamental break (both indices remain well above their 200-day: ES +6.21%, NQ +11.41%). The news flow offers no clean single catalyst \u2014 headlines are dominated by geopolitics (US-Iran tensions, Gulf positioning, Indonesia export controls) and general inflation worry, which reads as a risk-off backdrop and a justification for paring exposure ahead of Friday's CPI rather than a specific shock. Both instruments are trading BELOW session VWAP (ES last 7326.5 vs VWAP 7338.83; NQ last 28688 vs VWAP 28810.26), so sellers control the intraday auction so far. RSI is soft but NOT washed out (ES 38.8, NQ 41.7) \u2014 there's room lower before oversold.\n\n2) VOLUME-PROFILE READ (volume-at-price, NOT order-flow delta \u2014 respect that limitation)\nThis is WHERE volume traded over 5 days, not buy/sell aggression. ES: POC 7413.73, value area 7335.88\u20137522.73; high-volume nodes cluster 7405\u20137460. NQ: POC 29444.1, value area 28869.62\u201329827.08; HVNs cluster 29156\u201329683. Critically, price has fallen BELOW both value areas \u2014 ES last 7326.5 sits just under VAL 7335.88, and NQ last 28688 sits below VAL 28869.62. Trading beneath the value area with the bulk of accepted volume overhead means there is no accumulation shelf directly below \u2014 the heavy volume is a ceiling, not a floor. The line in the sand: reclaiming the value-area lows (ES ~7336 / NQ ~28870) would neutralize the bearish tilt and put a magnet back toward the POCs (ES 7413, NQ 29444). Failure to reclaim leaves prior-day lows (ES 7247.25 = also the prior-WEEK low; NQ 28227.75) as the next test, and those are the structural bull-defense levels.\n\n3) NQ/ES LEAD-LAG REGIME\nRegime = BREADTH. Contemporaneous correlation is high at 0.931, lag-0 correlation dominates at 0.961, and no instrument is cleanly leading (best_lag -2 but best_corr only -0.044 \u2014 noise; leader = NONE). Divergence is FALSE. Interpretation: ES and NQ are moving together, so the DIRECTION is more durable and more trustworthy than in a rotation/divergence regime. This is a regime INPUT, not an edge, and there is no execution path here (CME futures; the desk's broker is forex-only) \u2014 this is research/intelligence. Because breadth agrees on direction (down, with NQ leading the magnitude), I trust the directional read MORE, but the regime accuracy on my own scorecard is poor (0.2), so I am not over-weighting it.\n\n4) EVENT-CALENDAR AWARENESS\nCPI is in ~2 days (2026-06-12, 8:30 ET) \u2014 this is the dominant near-term risk and almost certainly the reason markets are de-risking now. FOMC follows in ~7 days (2026-06-17). PCE (~20d) and ISM Manufacturing (~21d) are further out and are cadence estimates, not verified dates. Sizing implication: REDUCE SIZE and widen stops into the CPI window; do not carry conviction-sized directional exposure through an 8:30 ET inflation print. Treat any pre-CPI trade as small and tactical. The whole week's drift lower is consistent with the market positioning defensively into that print.\n\n5) SYNTHESIS \u2014 META-REGIME + NARROWED BIAS\nMeta-regime: an orderly RISK-TRIM correction inside an intact long-term uptrend, with breadth agreement confirming the down-direction and NQ carrying the bulk of the selling. Price is below VWAP and below both value areas, with no volume shelf beneath \u2014 the path of least resistance intraday is sideways-to-lower UNTIL value-area lows are reclaimed. Bias: modest SHORT / sell-the-rip toward VWAP, ~42% confidence. Confidence is deliberately capped because (a) the news is diffuse, not a clean catalyst, (b) RSI isn't oversold, (c) CPI in 2 days argues for small size, and (d) my own track record is unproven/calibrating (n=2). For NQ specifically: the bearish tilt is INVALIDATED ON A RECLAIM ABOVE ~29848 (prior-day high) \u2014 above that, breadth flips the durable direction back up toward the POC at 29444 and beyond. Downside reference if pressure continues: prior-day low 28227.75. This briefing is INTELLIGENCE, not a validated edge \u2014 size accordingly and respect the CPI window.",
+  "directional_bias": "SHORT",
+  "confidence": 42,
+  "regime_call": "BREADTH",
+  "key_level": 29848.0,
+  "synthesis_source": "claude-opus-4-8",
+  "lead_lag": {
+    "regime": "BREADTH",
+    "spread_avg": -9e-05,
+    "leader": "NONE",
+    "corr": 0.931,
+    "divergence": false
+  },
+  "volume_profile": {
+    "ES=F": {
+      "symbol": "ES=F",
+      "as_of": "2026-06-10T12:22:45.438086+00:00",
+      "days": 5,
+      "bins": 40,
+      "poc": 7413.73,
+      "value_area_low": 7335.88,
+      "value_area_high": 7522.73,
+      "high_volume_nodes": [
+        7413.73,
+        7444.87,
+        7405.95,
+        7460.44,
+        7452.66
+      ],
+      "price_range": [
+        7261.92,
+        7573.33
+      ],
+      "limitation": "Volume profile = WHERE volume traded (volume-at-price). NOT order-flow delta (buy/sell aggression). True delta needs a CME order-flow feed (Databento/CQG)."
+    },
+    "NQ=F": {
+      "symbol": "NQ=F",
+      "as_of": "2026-06-10T12:22:45.565206+00:00",
+      "days": 5,
+      "bins": 40,
+      "poc": 29444.1,
+      "value_area_low": 28869.62,
+      "value_area_high": 29827.08,
+      "high_volume_nodes": [
+        29444.1,
+        29491.97,
+        29587.72,
+        29683.46,
+        29156.86
+      ],
+      "price_range": [
+        28319.08,
+        30234.0
+      ],
+      "limitation": "Volume profile = WHERE volume traded (volume-at-price). NOT order-flow delta (buy/sell aggression). True delta needs a CME order-flow feed (Databento/CQG)."
+    }
+  },
+  "news_count": 10,
+  "event_calendar": [
+    {
+      "event": "CPI",
+      "date": "2026-06-12",
+      "source": "cadence_estimate",
+      "action": "inflation print 8:30 ET \u2014 reduce size into window",
+      "days_until": 2,
+      "note": "in 2d \u2014 inflation print 8:30 ET \u2014 reduce size into window"
+    },
+    {
+      "event": "FOMC meeting",
+      "date": "2026-06-17",
+      "source": "seed",
+      "action": "reduce size / widen stops into the window",
+      "days_until": 7,
+      "note": "in 7d \u2014 reduce size / widen stops into the window"
+    },
+    {
+      "event": "PCE (Fed's preferred inflation)",
+      "date": "2026-06-30",
+      "source": "cadence_estimate",
+      "action": "8:30 ET \u2014 reduce size into window",
+      "days_until": 20,
+      "note": "in 20d \u2014 8:30 ET \u2014 reduce size into window"
+    },
+    {
+      "event": "ISM Manufacturing PMI",
+      "date": "2026-07-01",
+      "source": "cadence_estimate",
+      "action": "reduce size into the 10:00 ET print",
+      "days_until": 21,
+      "note": "in 21d \u2014 reduce size into the 10:00 ET print"
+    }
+  ],
+  "scorecard_summary": "Briefing scorecard: n=2 dir-calls, hit 1.0, regime acc 0.2 \u2014 CALIBRATING \u2014 need ~30-60 samples before the hit-rate/calibration mean anything",
+  "bias": "size to regime: trust direction more in BREADTH, less in CONCENTRATION; ROTATION_WARN = treat tech-led longs as suspect",
+  "provenance": {
+    "source": "oracle_morning_briefing",
+    "verified": false,
+    "note": "Analyst/Oracle journal \u2014 qualitative regime context + a self-scored directional call, NOT a verified data feed or validated edge. Numbers here are never ingested as trading inputs."
+  }
+}

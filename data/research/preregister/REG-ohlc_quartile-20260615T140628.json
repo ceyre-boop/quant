@@ -1,0 +1,17 @@
+{
+  "hypothesis_id": "REG-ohlc_quartile-20260615T140628",
+  "validator": "ohlc_quartile",
+  "frozen_at": "2026-06-15T14:06:28+00:00",
+  "script": "scripts/validate_ohlc_quartile.py",
+  "args": [
+    "--nperm",
+    "10000",
+    "--seed",
+    "42"
+  ],
+  "methodology": {
+    "permutation": true,
+    "walk_forward": true,
+    "both_sides": true
+  }
+}

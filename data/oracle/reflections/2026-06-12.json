@@ -1,0 +1,26 @@
+{
+  "date": "2026-06-12",
+  "generated_at": "2026-06-12T06:30:36.065981+00:00",
+  "input_tokens": 5324,
+  "output_tokens": 798,
+  "estimated_cost_usd": 0.13971,
+  "harvest_days_read": 7,
+  "reflection": {
+    "candidate_lesson": {
+      "lesson_text": "When the 30-indicator consensus shows dir=SHORT with conv=100% but green_matches=0, the live signal has no historical analog and must be sized down, not up \u2014 high live conviction without a memory match is a regime-novelty trap.",
+      "mechanism": "green_matches counts how many times the current indicator configuration produced a profitable outcome in historical memory. AUDUSD shows 14/30 bear, conv=100%, hist_hr=70% \u2014 but green_matches=0 means the EXACT live pattern has never been seen winning. Institutional flow that produces a 'never-before-seen' consensus config is usually a one-sided liquidation cascade that mean-reverts violently once stops are swept, not a durable trend. Conviction measures agreement among indicators; green_matches measures whether that agreement has ever paid. They are orthogonal.",
+      "testable_rule": "if consensus_conv >= 0.90 and green_matches == 0: size *= 0.5  # high conviction with zero memory match = novelty trap, halve size",
+      "expected_impact": "Reduces drawdown contribution from false-breakout entries; expected Sharpe +0.02-0.03 by avoiding the largest single-trade losers that come from chasing unmatched 100%-conviction signals.",
+      "evidence_from_harvest": "AUDUSD live: 2/30 bull, 14/30 bear, dir=SHORT, conv=100%, green_matches=0, hist_hr=70%. EURUSD similarly: conv=58%, green_matches=0, hist_hr=66%. Every pair currently shows green_matches=0 despite non-zero hist_hr \u2014 the live configs are not matching historical winners, so the hist_hr is from DIFFERENT configurations and cannot be trusted for these live entries.",
+      "evidence_from_reasoning": null,
+      "reasoning_component_targeted": "green_matches",
+      "sample_needed": 40
+    },
+    "retirement_flag": {
+      "lesson_to_review": null,
+      "reason": null
+    },
+    "system_health_note": "Zero trades in last 7 days with regime=UNKNOWN and forex flagged NO_TRADE_TODAY \u2014 system is correctly frozen and accumulating no decision logs, so all lessons must remain harvest-grounded until trade flow resumes."
+  },
+  "auto_validation": null
+}

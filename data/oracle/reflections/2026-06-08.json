@@ -1,0 +1,26 @@
+{
+  "date": "2026-06-08",
+  "generated_at": "2026-06-08T06:30:21.224940+00:00",
+  "input_tokens": 5483,
+  "output_tokens": 929,
+  "estimated_cost_usd": 0.15192,
+  "harvest_days_read": 7,
+  "reflection": {
+    "candidate_lesson": {
+      "lesson_text": "When the 30-indicator consensus shows 100% conviction SHORT but green_matches=0, treat the historical hit_rate as unanchored and cut size \u2014 high live conviction without a single historical green match is pattern-novelty, not pattern-confirmation.",
+      "mechanism": "green_matches counts how many times this exact live-indicator configuration mapped to a profitable historical outcome. When conv=100% but green_matches=0, the system is extrapolating a clean directional read it has never actually seen pay off. Institutions are not fading anything here \u2014 the live bears are real, but the system has no out-of-sample anchor that this specific bear cluster resolves favorably, so the 67%/66%/72% hist_hr is borrowed from looser analogues, not this signature. NFP morning (days_until=0) amplifies the risk: high-impact prints break the indicator-to-outcome mapping that the hist_hr was estimated on.",
+      "testable_rule": "if consensus_conviction >= 0.99 and green_matches == 0: size_multiplier *= 0.5; if news_high_impact_days_until == 0: veto_new_entries == True",
+      "expected_impact": "Drawdown reduction and Sharpe +0.02-0.04 by suppressing over-sized entries on unconfirmed 100%-conviction signals; avoids the variance spike of trading novel signatures into NFP.",
+      "evidence_from_harvest": "All five pairs report green_matches=0 today while GBPUSD/EURUSD/AUDUSD show conv=100% SHORT with hist_hr 66-72%, and USDJPY shows conv=100% LONG with hist_hr=0% \u2014 the hist_hr is decoupled from any actual matching green configuration. Zero trades in last 7 days means no live confirmation either.",
+      "evidence_from_reasoning": null,
+      "reasoning_component_targeted": "green_matches",
+      "sample_needed": 40
+    },
+    "retirement_flag": {
+      "lesson_to_review": "L8",
+      "reason": "L8 tightened the USDJPY/AUDNZD VIX gate to 13 assuming a bull-market safe-haven dynamic; today's briefing flags GEOPOLITICS-dominated de-risking with USDJPY consensus LONG at hist_hr=0% \u2014 if the carry-corruption regime has shifted, the fixed 13 threshold may need re-validation against the current rate-signal decoupling."
+    },
+    "system_health_note": "System is correctly inactive (0 trades/7 days) into an NFP print with UNKNOWN regime, TV providing no signals, and every consensus signal showing green_matches=0 \u2014 a healthy freeze, not a malfunction."
+  },
+  "auto_validation": null
+}

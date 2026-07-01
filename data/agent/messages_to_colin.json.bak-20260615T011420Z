@@ -1,0 +1,457 @@
+{
+  "messages": [
+    {
+      "id": "pulse-20260615T0100",
+      "priority": "FYI",
+      "emoji": "\ud83d\udfe2",
+      "text": "[PULSE] STALE_ENTRY: 16 entries with bars_since_signal > 5 \u2014 entries may be chasing stale FVGs",
+      "timestamp": "2026-06-15T01:00:31+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260615T0100",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "[PULSE] COMMITMENT_SCORE_STUCK: All 16 entries have commitment_score=1.0. Detector may be defaulting \u2014 check ict.pipeline logs for 'Commitment detector failed'.",
+      "timestamp": "2026-06-15T01:00:31+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "loophealth-20260615T010031",
+      "timestamp": "2026-06-15T01:00:31.053431+00:00",
+      "priority": "CRITICAL",
+      "source": "LOOP_HEALTH",
+      "subject": "\ud83d\udea8 LOOP CRITICAL: morning_briefing silent 60h",
+      "message": "morning_briefing has not run for 60h (expected < 26h; >2x threshold = broken, not late). The self-improvement machinery is degraded \u2014 a system that doesn't reflect doesn't compound. Check the loop's launchd plist is loaded (`launchctl list | grep alta`) and its logs/.heartbeat_<loop> mtime.",
+      "action_required": true
+    },
+    {
+      "id": "loophealth-20260615T010031",
+      "timestamp": "2026-06-15T01:00:31.031545+00:00",
+      "priority": "CRITICAL",
+      "source": "LOOP_HEALTH",
+      "subject": "\ud83d\udea8 LOOP CRITICAL: forex_scan silent 61h",
+      "message": "forex_scan has not run for 61h (expected < 30h; >2x threshold = broken, not late). The self-improvement machinery is degraded \u2014 a system that doesn't reflect doesn't compound. Check the loop's launchd plist is loaded (`launchctl list | grep alta`) and its logs/.heartbeat_<loop> mtime.",
+      "action_required": true
+    },
+    {
+      "id": "pulse-20260614T2214",
+      "priority": "FYI",
+      "emoji": "\ud83d\udfe2",
+      "text": "[PULSE] STALE_ENTRY: 16 entries with bars_since_signal > 5 \u2014 entries may be chasing stale FVGs",
+      "timestamp": "2026-06-14T22:14:47+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260614T2214",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "[PULSE] COMMITMENT_SCORE_STUCK: All 16 entries have commitment_score=1.0. Detector may be defaulting \u2014 check ict.pipeline logs for 'Commitment detector failed'.",
+      "timestamp": "2026-06-14T22:14:47+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "loophealth-20260614T221447",
+      "timestamp": "2026-06-14T22:14:47.049196+00:00",
+      "priority": "CRITICAL",
+      "source": "LOOP_HEALTH",
+      "subject": "\ud83d\udea8 LOOP CRITICAL: morning_briefing silent 58h",
+      "message": "morning_briefing has not run for 58h (expected < 26h; >2x threshold = broken, not late). The self-improvement machinery is degraded \u2014 a system that doesn't reflect doesn't compound. Check the loop's launchd plist is loaded (`launchctl list | grep alta`) and its logs/.heartbeat_<loop> mtime.",
+      "action_required": true
+    },
+    {
+      "id": "loophealth-20260614T221447",
+      "timestamp": "2026-06-14T22:14:47.048493+00:00",
+      "priority": "RED",
+      "source": "LOOP_HEALTH",
+      "subject": "LOOP DOWN: forex_scan silent 58h",
+      "message": "forex_scan has not run for 58h (expected < 30h). The self-improvement machinery is degraded \u2014 a system that doesn't reflect doesn't compound. Check the loop's launchd plist is loaded (`launchctl list | grep alta`) and its logs/.heartbeat_<loop> mtime.",
+      "action_required": true
+    },
+    {
+      "id": "pulse-20260614T2014",
+      "priority": "FYI",
+      "emoji": "\ud83d\udfe2",
+      "text": "[PULSE] STALE_ENTRY: 16 entries with bars_since_signal > 5 \u2014 entries may be chasing stale FVGs",
+      "timestamp": "2026-06-14T20:14:43+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260614T2014",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "[PULSE] COMMITMENT_SCORE_STUCK: All 16 entries have commitment_score=1.0. Detector may be defaulting \u2014 check ict.pipeline logs for 'Commitment detector failed'.",
+      "timestamp": "2026-06-14T20:14:43+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "loophealth-20260614T201443",
+      "timestamp": "2026-06-14T20:14:43.051671+00:00",
+      "priority": "CRITICAL",
+      "source": "LOOP_HEALTH",
+      "subject": "\ud83d\udea8 LOOP CRITICAL: morning_briefing silent 56h",
+      "message": "morning_briefing has not run for 56h (expected < 26h; >2x threshold = broken, not late). The self-improvement machinery is degraded \u2014 a system that doesn't reflect doesn't compound. Check the loop's launchd plist is loaded (`launchctl list | grep alta`) and its logs/.heartbeat_<loop> mtime.",
+      "action_required": true
+    },
+    {
+      "id": "pulse-20260614T0453",
+      "priority": "FYI",
+      "emoji": "\ud83d\udfe2",
+      "text": "[PULSE] STALE_ENTRY: 10 entries with bars_since_signal > 5 \u2014 entries may be chasing stale FVGs",
+      "timestamp": "2026-06-14T04:53:49+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260614T0453",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "[PULSE] COMMITMENT_SCORE_STUCK: All 10 entries have commitment_score=1.0. Detector may be defaulting \u2014 check ict.pipeline logs for 'Commitment detector failed'.",
+      "timestamp": "2026-06-14T04:53:49+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "loophealth-20260614T045349",
+      "timestamp": "2026-06-14T04:53:49.780991+00:00",
+      "priority": "RED",
+      "source": "LOOP_HEALTH",
+      "subject": "LOOP DOWN: morning_briefing silent 40h",
+      "message": "morning_briefing has not run for 40h (expected < 26h). The self-improvement machinery is degraded \u2014 a system that doesn't reflect doesn't compound. Check the loop's launchd plist is loaded (`launchctl list | grep alta`) and its logs/.heartbeat_<loop> mtime.",
+      "action_required": true
+    },
+    {
+      "id": "pulse-20260614T0253",
+      "priority": "FYI",
+      "emoji": "\ud83d\udfe2",
+      "text": "[PULSE] STALE_ENTRY: 10 entries with bars_since_signal > 5 \u2014 entries may be chasing stale FVGs",
+      "timestamp": "2026-06-14T02:53:04+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260614T0253",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "[PULSE] COMMITMENT_SCORE_STUCK: All 10 entries have commitment_score=1.0. Detector may be defaulting \u2014 check ict.pipeline logs for 'Commitment detector failed'.",
+      "timestamp": "2026-06-14T02:53:04+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "loophealth-20260614T025304",
+      "timestamp": "2026-06-14T02:53:04.337403+00:00",
+      "priority": "RED",
+      "source": "LOOP_HEALTH",
+      "subject": "LOOP DOWN: morning_briefing silent 38h",
+      "message": "morning_briefing has not run for 38h (expected < 26h). The self-improvement machinery is degraded \u2014 a system that doesn't reflect doesn't compound. Check the loop's launchd plist is loaded (`launchctl list | grep alta`) and its logs/.heartbeat_<loop> mtime.",
+      "action_required": true
+    },
+    {
+      "id": "pulse-20260613T1814",
+      "priority": "FYI",
+      "emoji": "\ud83d\udfe2",
+      "text": "[PULSE] STALE_ENTRY: 12 entries with bars_since_signal > 5 \u2014 entries may be chasing stale FVGs",
+      "timestamp": "2026-06-13T18:14:28+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260613T1814",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "[PULSE] COMMITMENT_SCORE_STUCK: All 12 entries have commitment_score=1.0. Detector may be defaulting \u2014 check ict.pipeline logs for 'Commitment detector failed'.",
+      "timestamp": "2026-06-13T18:14:28+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "loophealth-20260613T181428",
+      "timestamp": "2026-06-13T18:14:28.144008+00:00",
+      "priority": "RED",
+      "source": "LOOP_HEALTH",
+      "subject": "LOOP DOWN: morning_briefing silent 30h",
+      "message": "morning_briefing has not run for 30h (expected < 26h). The self-improvement machinery is degraded \u2014 a system that doesn't reflect doesn't compound. Check the loop's launchd plist is loaded (`launchctl list | grep alta`) and its logs/.heartbeat_<loop> mtime.",
+      "action_required": true
+    },
+    {
+      "id": "pulse-20260613T0135",
+      "priority": "FYI",
+      "emoji": "\ud83d\udfe2",
+      "text": "[PULSE] STALE_ENTRY: 17 entries with bars_since_signal > 5 \u2014 entries may be chasing stale FVGs",
+      "timestamp": "2026-06-13T01:35:40+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260613T0135",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "[PULSE] COMMITMENT_SCORE_STUCK: All 17 entries have commitment_score=1.0. Detector may be defaulting \u2014 check ict.pipeline logs for 'Commitment detector failed'.",
+      "timestamp": "2026-06-13T01:35:40+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260612T1449",
+      "priority": "FYI",
+      "emoji": "\ud83d\udfe2",
+      "text": "[PULSE] STALE_ENTRY: 7 entries with bars_since_signal > 5 \u2014 entries may be chasing stale FVGs",
+      "timestamp": "2026-06-12T14:49:42+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260612T1449",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "[PULSE] COMMITMENT_SCORE_STUCK: All 7 entries have commitment_score=1.0. Detector may be defaulting \u2014 check ict.pipeline logs for 'Commitment detector failed'.",
+      "timestamp": "2026-06-12T14:49:42+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "loophealth-20260611T164843",
+      "timestamp": "2026-06-11T16:48:43.974286+00:00",
+      "priority": "RED",
+      "source": "LOOP_HEALTH",
+      "subject": "LOOP DOWN: ict_scanner silent 1h",
+      "message": "ict_scanner has not run for 1h (expected < 0.5h). The self-improvement machinery is degraded \u2014 a system that doesn't reflect doesn't compound. Check the loop's launchd plist is loaded (`launchctl list | grep alta`) and its logs/.heartbeat_<loop> mtime.",
+      "action_required": true
+    },
+    {
+      "id": "pulse-20260611T0236",
+      "priority": "FYI",
+      "emoji": "\ud83d\udfe2",
+      "text": "[PULSE] STALE_ENTRY: 3 entries with bars_since_signal > 5 \u2014 entries may be chasing stale FVGs",
+      "timestamp": "2026-06-11T02:36:54+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260611T0236",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "[PULSE] COMMITMENT_SCORE_STUCK: All 3 entries have commitment_score=1.0. Detector may be defaulting \u2014 check ict.pipeline logs for 'Commitment detector failed'.",
+      "timestamp": "2026-06-11T02:36:54+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "rest010-20260611T011411",
+      "timestamp": "2026-06-11T01:14:11Z",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83e\udded",
+      "source": "REST_MODE_010",
+      "read": false,
+      "subject": "REST-010: velocity overlay does NOT fix the trailing-stop drag (they're orthogonal)",
+      "text": "RQ-REST-014 (HYP-060) closes the open question from last night. I'd flagged HYP-058 (velocity size overlay) and HYP-059 (trailing-stop drag) as 'same flat regimes' \u2014 implying you might fix the -49R trailing bleed for free with the overlay. The data says NO. Tagging all 318 costed trades by velocity bucket: the overlay throttles trailing-stop exits (mean mult 0.871) essentially the same as the +142R time-winners (0.883), perm p=0.39 (null). The trailing losses are spread across velocity regimes \u2014 77/97 sit in the full-size HIGH bucket the overlay never touches. So the two levers are independent and stack; the overlay buys drawdown control by shrinking whole windows (and costs ~-8R of return on the 2015-22 log), while the trailing drag still needs an actual exit-rule fix. Bottom line: RQ-010/RQ-REST-013 (replace/widen the 1.25x ATR trailing, exit re-sim) is the only lever that addresses the trailing cluster \u2014 still needs a network-enabled run + your sign-off (live exit change). System health green: all loops <19h (forex 13h, briefing 13h, oracle 18h). Capacity barely touched (~19k/200k weekly)."
+    },
+    {
+      "id": "pulse-20260611T0036",
+      "priority": "FYI",
+      "emoji": "\ud83d\udfe2",
+      "text": "[PULSE] STALE_ENTRY: 3 entries with bars_since_signal > 5 \u2014 entries may be chasing stale FVGs",
+      "timestamp": "2026-06-11T00:36:49+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260611T0036",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "[PULSE] COMMITMENT_SCORE_STUCK: All 3 entries have commitment_score=1.0. Detector may be defaulting \u2014 check ict.pipeline logs for 'Commitment detector failed'.",
+      "timestamp": "2026-06-11T00:36:49+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260610T2024",
+      "priority": "FYI",
+      "emoji": "\ud83d\udfe2",
+      "text": "[PULSE] STALE_ENTRY: 3 entries with bars_since_signal > 5 \u2014 entries may be chasing stale FVGs",
+      "timestamp": "2026-06-10T20:24:50+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260610T2024",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "[PULSE] COMMITMENT_SCORE_STUCK: All 3 entries have commitment_score=1.0. Detector may be defaulting \u2014 check ict.pipeline logs for 'Commitment detector failed'.",
+      "timestamp": "2026-06-10T20:24:50+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260610T1820",
+      "priority": "FYI",
+      "emoji": "\ud83d\udfe2",
+      "text": "[PULSE] STALE_ENTRY: 3 entries with bars_since_signal > 5 \u2014 entries may be chasing stale FVGs",
+      "timestamp": "2026-06-10T18:20:09+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260610T1820",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "[PULSE] COMMITMENT_SCORE_STUCK: All 3 entries have commitment_score=1.0. Detector may be defaulting \u2014 check ict.pipeline logs for 'Commitment detector failed'.",
+      "timestamp": "2026-06-10T18:20:09+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260610T1556",
+      "priority": "FYI",
+      "emoji": "\ud83d\udfe2",
+      "text": "[PULSE] STALE_ENTRY: 3 entries with bars_since_signal > 5 \u2014 entries may be chasing stale FVGs",
+      "timestamp": "2026-06-10T15:56:11+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260610T1556",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "[PULSE] COMMITMENT_SCORE_STUCK: All 3 entries have commitment_score=1.0. Detector may be defaulting \u2014 check ict.pipeline logs for 'Commitment detector failed'.",
+      "timestamp": "2026-06-10T15:56:11+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260610T1356",
+      "priority": "FYI",
+      "emoji": "\ud83d\udfe2",
+      "text": "[PULSE] STALE_ENTRY: 3 entries with bars_since_signal > 5 \u2014 entries may be chasing stale FVGs",
+      "timestamp": "2026-06-10T13:56:07+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260610T1356",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "[PULSE] COMMITMENT_SCORE_STUCK: All 3 entries have commitment_score=1.0. Detector may be defaulting \u2014 check ict.pipeline logs for 'Commitment detector failed'.",
+      "timestamp": "2026-06-10T13:56:07+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260610T0201",
+      "priority": "FYI",
+      "emoji": "\ud83d\udfe2",
+      "text": "[PULSE] STALE_ENTRY: 2 entries with bars_since_signal > 5 \u2014 entries may be chasing stale FVGs",
+      "timestamp": "2026-06-10T02:01:57+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260610T0201",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "[PULSE] COMMITMENT_SCORE_STUCK: All 2 entries have commitment_score=1.0. Detector may be defaulting \u2014 check ict.pipeline logs for 'Commitment detector failed'.",
+      "timestamp": "2026-06-10T02:01:57+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "rest-20260610T0110",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udd0d",
+      "text": "[REST-009] Found WHERE the forex regime-fragility lives: the trailing stop. On the costed 4-pair log (318 trades 2015-22) the whole +95R edge is 'time' exits (+142R, 70% WR); the 1.25x ATR trailing stop is -49R (26% WR) and only positive in trending years 2015 & 2020 \u2014 it bleeds -7..-19R every flat year. Robust across all 4 pairs (bootstrap P(meanR<0)=99.9%, time>trailing perm p<0.0001). This independently REPLICATES the old RQ-010 forensic on fresh costed data. Takeaway: the highest-leverage fix is EXIT-RULE design, not a new entry gate. RQ-010 (fixed TP/SL vs trailing) has sat un-run since May 18 \u2014 it's now the priority. Needs a network-enabled exit re-sim + your approval before any live change (NON-NEGOTIABLE #4). Full: data/agent/rq_rest_012_results.json + FIND-REST-012-a/b/c.",
+      "timestamp": "2026-06-10T01:10:00+00:00",
+      "read": false,
+      "source": "rest_mode",
+      "action_required": true
+    },
+    {
+      "id": "pulse-20260610T0001",
+      "priority": "FYI",
+      "emoji": "\ud83d\udfe2",
+      "text": "[PULSE] STALE_ENTRY: 2 entries with bars_since_signal > 5 \u2014 entries may be chasing stale FVGs",
+      "timestamp": "2026-06-10T00:01:53+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260610T0001",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "[PULSE] COMMITMENT_SCORE_STUCK: All 2 entries have commitment_score=1.0. Detector may be defaulting \u2014 check ict.pipeline logs for 'Commitment detector failed'.",
+      "timestamp": "2026-06-10T00:01:53+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260609T2201",
+      "priority": "FYI",
+      "emoji": "\ud83d\udfe2",
+      "text": "[PULSE] STALE_ENTRY: 2 entries with bars_since_signal > 5 \u2014 entries may be chasing stale FVGs",
+      "timestamp": "2026-06-09T22:01:48+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260609T2201",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "[PULSE] COMMITMENT_SCORE_STUCK: All 2 entries have commitment_score=1.0. Detector may be defaulting \u2014 check ict.pipeline logs for 'Commitment detector failed'.",
+      "timestamp": "2026-06-09T22:01:48+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260609T2001",
+      "priority": "FYI",
+      "emoji": "\ud83d\udfe2",
+      "text": "[PULSE] STALE_ENTRY: 2 entries with bars_since_signal > 5 \u2014 entries may be chasing stale FVGs",
+      "timestamp": "2026-06-09T20:01:44+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260609T2001",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "[PULSE] COMMITMENT_SCORE_STUCK: All 2 entries have commitment_score=1.0. Detector may be defaulting \u2014 check ict.pipeline logs for 'Commitment detector failed'.",
+      "timestamp": "2026-06-09T20:01:44+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260609T1635",
+      "priority": "FYI",
+      "emoji": "\ud83d\udfe2",
+      "text": "[PULSE] STALE_ENTRY: 2 entries with bars_since_signal > 5 \u2014 entries may be chasing stale FVGs",
+      "timestamp": "2026-06-09T16:35:21+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260609T1635",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "[PULSE] COMMITMENT_SCORE_STUCK: All 2 entries have commitment_score=1.0. Detector may be defaulting \u2014 check ict.pipeline logs for 'Commitment detector failed'.",
+      "timestamp": "2026-06-09T16:35:21+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "loophealth-20260609T163521",
+      "timestamp": "2026-06-09T16:35:21.702017+00:00",
+      "priority": "CRITICAL",
+      "source": "LOOP_HEALTH",
+      "subject": "\ud83d\udea8 LOOP CRITICAL: ict_scanner silent 1h",
+      "message": "ict_scanner has not run for 1h (expected < 0.5h; >2x threshold = broken, not late). The self-improvement machinery is degraded \u2014 a system that doesn't reflect doesn't compound. Check the loop's launchd plist is loaded (`launchctl list | grep alta`) and its logs/.heartbeat_<loop> mtime.",
+      "action_required": true
+    }
+  ],
+  "last_updated": "2026-06-15T01:00:31+00:00"
+}

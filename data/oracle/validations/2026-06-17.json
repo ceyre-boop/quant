@@ -1,0 +1,9 @@
+{
+  "date": "2026-06-17",
+  "generated_at": "2026-06-17T17:48:27.705536+00:00",
+  "candidate_lesson": "When the external regime confirmation drops to internal-only (TV signals=0) AND consensus conviction is below 33% on every pair, the day is a structural NO_TRADE \u2014 forcing entries here harvests noise, not edge.",
+  "testable_rule": "if tv_signal_count == 0 and max(pair.conviction for pair in consensus) < 0.33: return RegimeVeto('NO_TRADE_uncommitted_flow')",
+  "verdict": "REJECTED",
+  "reason": "Rule filters only 0 trades \u2014 insufficient sample",
+  "trades_available": 1160
+}

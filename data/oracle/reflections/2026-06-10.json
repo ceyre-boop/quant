@@ -1,0 +1,26 @@
+{
+  "date": "2026-06-10",
+  "generated_at": "2026-06-10T06:53:07.419961+00:00",
+  "input_tokens": 5317,
+  "output_tokens": 964,
+  "estimated_cost_usd": 0.152055,
+  "harvest_days_read": 7,
+  "reflection": {
+    "candidate_lesson": {
+      "lesson_text": "When the 30-indicator consensus shows conv=100% but green_matches=0 AND hist_hr is undefined (0%), treat the signal as NOVEL-REGIME and freeze sizing \u2014 full conviction with zero historical analogue is an unvalidated extrapolation, not an edge.",
+      "mechanism": "green_matches=0 means the current live indicator configuration has no precedent in historical memory. A 100% conviction reading derived from a state the system has never traded before is conviction about untested ground \u2014 the indicators agree, but agreement has never been validated to outcome in this exact regime. USDJPY (LONG, conv=100%, hist_hr=0%) and AUDNZD (SHORT, conv=58%, hist_hr=0%) both show this: confident direction, no survival data. Institutional flow in unprecedented configurations is the dominant driver, and the consensus is measuring price agreement, not flow durability.",
+      "testable_rule": "if consensus_conviction >= 0.90 and green_matches == 0 and hist_hr == 0.0: size_multiplier = 0.0  # freeze until a green_match precedent exists or hist_hr populates",
+      "expected_impact": "Drawdown reduction and Sharpe +0.02-0.04 by suppressing high-confidence trades into unvalidated regime states (notably USDJPY LONG hist_hr=0% which would otherwise pass conviction gates).",
+      "evidence_from_harvest": "Live consensus shows USDJPY dir=LONG conv=100% green_matches=0 hist_hr=0% and AUDNZD dir=SHORT conv=58% green_matches=0 hist_hr=0% \u2014 both maximal/moderate conviction with zero historical hit-rate support, while GBPUSD/EURUSD/AUDUSD carry hist_hr 66-72% on comparable conviction.",
+      "evidence_from_reasoning": null,
+      "reasoning_component_targeted": "consensus_conviction / green_matches / hist_hr",
+      "sample_needed": 40
+    },
+    "retirement_flag": {
+      "lesson_to_review": "L8",
+      "reason": "L8 tightened the USDJPY/AUDNZD VIX gate to 13 assuming safe-haven corruption; current state shows USDJPY conv=100% LONG with hist_hr=0% \u2014 the VIX gate may be masking a deeper issue (no historical precedent) rather than a VIX-driven one, worth re-checking whether the gate or the green_match absence is the real filter."
+    },
+    "system_health_note": "Zero trades in last 7 days with regime=UNKNOWN and forex flagged NO_TRADE_TODAY \u2014 system is correctly idle, but no decision logs means lessons must remain harvest/consensus-grounded until trades close."
+  },
+  "auto_validation": null
+}

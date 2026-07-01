@@ -1,0 +1,105 @@
+{
+  "date": "2026-06-11",
+  "generated_at": "2026-06-11T15:34:02.489048+00:00",
+  "meta_regime": "BREADTH",
+  "regime_read": "ES & NQ moving together \u2014 broad agreement, more DURABLE directional signal. Trust the direction more.",
+  "narrative": "Session open 2026-06-11. NQ/ES regime: BREADTH \u2014 ES & NQ moving together \u2014 broad agreement, more DURABLE directional signal. Trust the direction more. NQ 28874.8 / ES 7326.5, corr 0.931, lead-lag leader NONE. Volume profile NQ POC ~29457.43. Forex: NO_TRADE_TODAY \u2014 USDJPY=X closest at 100%. Event watch: CPI (in 1d \u2014 inflation print 8:30 ET \u2014 reduce size into window), FOMC meeting (in 6d \u2014 reduce size / widen stops into the window), PCE (Fed's preferred inflation) (in 19d \u2014 8:30 ET \u2014 reduce size into window). Briefing scorecard: n=3 dir-calls, hit 1.0, regime acc 0.333 \u2014 CALIBRATING \u2014 need ~30-60 samples before the hit-rate/calibration mean anything Regime read is an INPUT for sizing/trust, not a trade signal (deterministic fallback \u2014 Opus synthesis unavailable this run).",
+  "directional_bias": "NEUTRAL",
+  "confidence": 0,
+  "regime_call": "BREADTH",
+  "key_level": null,
+  "synthesis_source": "deterministic_fallback",
+  "lead_lag": {
+    "regime": "BREADTH",
+    "spread_avg": 0.0,
+    "leader": "NONE",
+    "corr": 0.931,
+    "divergence": false
+  },
+  "volume_profile": {
+    "ES=F": {
+      "symbol": "ES=F",
+      "as_of": "2026-06-11T12:29:43.216551+00:00",
+      "days": 5,
+      "bins": 40,
+      "poc": 7414.04,
+      "value_area_low": 7290.91,
+      "value_area_high": 7463.29,
+      "high_volume_nodes": [
+        7414.04,
+        7444.82,
+        7334.01,
+        7389.41,
+        7450.97
+      ],
+      "price_range": [
+        7238.58,
+        7484.83
+      ],
+      "limitation": "Volume profile = WHERE volume traded (volume-at-price). NOT order-flow delta (buy/sell aggression). True delta needs a CME order-flow feed (Databento/CQG)."
+    },
+    "NQ=F": {
+      "symbol": "NQ=F",
+      "as_of": "2026-06-11T12:29:43.256903+00:00",
+      "days": 5,
+      "bins": 40,
+      "poc": 29457.43,
+      "value_area_low": 28512.06,
+      "value_area_high": 29684.32,
+      "high_volume_nodes": [
+        29457.43,
+        28738.95,
+        28890.21,
+        29192.73,
+        28852.39
+      ],
+      "price_range": [
+        28304.08,
+        29816.67
+      ],
+      "limitation": "Volume profile = WHERE volume traded (volume-at-price). NOT order-flow delta (buy/sell aggression). True delta needs a CME order-flow feed (Databento/CQG)."
+    }
+  },
+  "news_count": 10,
+  "event_calendar": [
+    {
+      "event": "CPI",
+      "date": "2026-06-12",
+      "source": "cadence_estimate",
+      "action": "inflation print 8:30 ET \u2014 reduce size into window",
+      "days_until": 1,
+      "note": "in 1d \u2014 inflation print 8:30 ET \u2014 reduce size into window"
+    },
+    {
+      "event": "FOMC meeting",
+      "date": "2026-06-17",
+      "source": "seed",
+      "action": "reduce size / widen stops into the window",
+      "days_until": 6,
+      "note": "in 6d \u2014 reduce size / widen stops into the window"
+    },
+    {
+      "event": "PCE (Fed's preferred inflation)",
+      "date": "2026-06-30",
+      "source": "cadence_estimate",
+      "action": "8:30 ET \u2014 reduce size into window",
+      "days_until": 19,
+      "note": "in 19d \u2014 8:30 ET \u2014 reduce size into window"
+    },
+    {
+      "event": "ISM Manufacturing PMI",
+      "date": "2026-07-01",
+      "source": "cadence_estimate",
+      "action": "reduce size into the 10:00 ET print",
+      "days_until": 20,
+      "note": "in 20d \u2014 reduce size into the 10:00 ET print"
+    }
+  ],
+  "scorecard_summary": "Briefing scorecard: n=3 dir-calls, hit 1.0, regime acc 0.333 \u2014 CALIBRATING \u2014 need ~30-60 samples before the hit-rate/calibration mean anything",
+  "bias": "size to regime: trust direction more in BREADTH, less in CONCENTRATION; ROTATION_WARN = treat tech-led longs as suspect",
+  "provenance": {
+    "source": "oracle_morning_briefing",
+    "verified": false,
+    "note": "Analyst/Oracle journal \u2014 qualitative regime context + a self-scored directional call, NOT a verified data feed or validated edge. Numbers here are never ingested as trading inputs."
+  }
+}

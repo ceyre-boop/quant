@@ -1,0 +1,97 @@
+{
+  "date": "2026-06-09",
+  "generated_at": "2026-06-09T14:40:41.750857+00:00",
+  "meta_regime": "BREADTH",
+  "regime_read": "ES & NQ moving together \u2014 broad agreement, more DURABLE directional signal. Trust the direction more.",
+  "narrative": "Session open 2026-06-09. NQ/ES regime: BREADTH \u2014 ES & NQ moving together \u2014 broad agreement, more DURABLE directional signal. Trust the direction more. NQ 29693.0 / ES 7446.0, corr 0.927, lead-lag leader NONE. Volume profile NQ POC ~29452.49. Forex: NO_TRADE_TODAY \u2014 GBPUSD=X closest at 100%. Event watch: CPI (in 3d \u2014 inflation print 8:30 ET \u2014 reduce size into window), FOMC meeting (in 8d \u2014 reduce size / widen stops into the window), PCE (Fed's preferred inflation) (in 21d \u2014 8:30 ET \u2014 reduce size into window). Briefing scorecard: n=2 dir-calls, hit 1.0, regime acc 0.25 \u2014 CALIBRATING \u2014 need ~30-60 samples before the hit-rate/calibration mean anything Regime read is an INPUT for sizing/trust, not a trade signal (deterministic fallback \u2014 Opus synthesis unavailable this run).",
+  "directional_bias": "NEUTRAL",
+  "confidence": 0,
+  "regime_call": "BREADTH",
+  "key_level": null,
+  "synthesis_source": "deterministic_fallback",
+  "lead_lag": {
+    "regime": "BREADTH",
+    "spread_avg": 0.00046,
+    "leader": "NONE",
+    "corr": 0.927,
+    "divergence": false
+  },
+  "volume_profile": {
+    "ES=F": {
+      "symbol": "ES=F",
+      "as_of": "2026-06-09T12:15:09.331467+00:00",
+      "days": 5,
+      "bins": 40,
+      "poc": 7415.39,
+      "value_area_low": 7403.02,
+      "value_area_high": 7607.08,
+      "high_volume_nodes": [
+        7415.39,
+        7440.12,
+        7403.02,
+        7452.49,
+        7458.67
+      ],
+      "price_range": [
+        7362.83,
+        7610.17
+      ],
+      "limitation": "Volume profile = WHERE volume traded (volume-at-price). NOT order-flow delta (buy/sell aggression). True delta needs a CME order-flow feed (Databento/CQG)."
+    },
+    "NQ=F": {
+      "symbol": "NQ=F",
+      "as_of": "2026-06-09T12:15:09.382668+00:00",
+      "days": 5,
+      "bins": 40,
+      "poc": 29452.49,
+      "value_area_low": 29140.23,
+      "value_area_high": 30567.7,
+      "high_volume_nodes": [
+        29452.49,
+        29586.31,
+        29407.88,
+        29497.1,
+        30255.44
+      ],
+      "price_range": [
+        28805.67,
+        30590.0
+      ],
+      "limitation": "Volume profile = WHERE volume traded (volume-at-price). NOT order-flow delta (buy/sell aggression). True delta needs a CME order-flow feed (Databento/CQG)."
+    }
+  },
+  "news_count": 9,
+  "event_calendar": [
+    {
+      "event": "CPI",
+      "date": "2026-06-12",
+      "source": "cadence_estimate",
+      "action": "inflation print 8:30 ET \u2014 reduce size into window",
+      "days_until": 3,
+      "note": "in 3d \u2014 inflation print 8:30 ET \u2014 reduce size into window"
+    },
+    {
+      "event": "FOMC meeting",
+      "date": "2026-06-17",
+      "source": "seed",
+      "action": "reduce size / widen stops into the window",
+      "days_until": 8,
+      "note": "in 8d \u2014 reduce size / widen stops into the window"
+    },
+    {
+      "event": "PCE (Fed's preferred inflation)",
+      "date": "2026-06-30",
+      "source": "cadence_estimate",
+      "action": "8:30 ET \u2014 reduce size into window",
+      "days_until": 21,
+      "note": "in 21d \u2014 8:30 ET \u2014 reduce size into window"
+    }
+  ],
+  "scorecard_summary": "Briefing scorecard: n=2 dir-calls, hit 1.0, regime acc 0.25 \u2014 CALIBRATING \u2014 need ~30-60 samples before the hit-rate/calibration mean anything",
+  "bias": "size to regime: trust direction more in BREADTH, less in CONCENTRATION; ROTATION_WARN = treat tech-led longs as suspect",
+  "provenance": {
+    "source": "oracle_morning_briefing",
+    "verified": false,
+    "note": "Analyst/Oracle journal \u2014 qualitative regime context + a self-scored directional call, NOT a verified data feed or validated edge. Numbers here are never ingested as trading inputs."
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "date": "2026-06-16",
+  "generated_at": "2026-06-16T06:35:09.599053+00:00",
+  "input_tokens": 5468,
+  "output_tokens": 846,
+  "estimated_cost_usd": 0.14547,
+  "harvest_days_read": 7,
+  "reflection": {
+    "candidate_lesson": {
+      "lesson_text": "When the 30-indicator consensus shows green_matches=0 and hist_hr=0% across ALL pairs, the live signal has no historical analog \u2014 freeze new entries regardless of conviction, because directional conviction without a matched historical regime is untested pattern-fitting.",
+      "mechanism": "green_matches counts how many times the current indicator configuration has appeared in the historical library with a positive forward outcome. When it is 0 on every pair, the system is in a configuration it has literally never profited from \u2014 institutional flow is in a regime the strategy's memory does not cover. Acting on conv=50% (AUDNZD LONG) here is trading the narrative (BREADTH melt-up) not the verified edge, which Tenet 1 explicitly forbids.",
+      "testable_rule": "if consensus.green_matches == 0 and consensus.hist_hr == 0.0: return RegimeFreeze(pair)  # even if conv >= 0.50",
+      "expected_impact": "Drawdown reduction and Sharpe protection: avoids untested-regime entries that add variance without expected edge; estimated +0.02-0.04 Sharpe by cutting zero-expectancy trades from the sample.",
+      "evidence_from_harvest": "All 5 pairs report green_matches=0 and hist_hr=0% as of 2026-06-16T03:14, including AUDNZD which shows dir=LONG conv=50% \u2014 the highest conviction signal is simultaneously the one with zero historical confirmation. Zero trades in last 7 days means the system is already cautious; this codifies the gate.",
+      "evidence_from_reasoning": null,
+      "reasoning_component_targeted": "green_matches",
+      "sample_needed": 40
+    },
+    "retirement_flag": {
+      "lesson_to_review": "L8",
+      "reason": "L8 tightens the USDJPY/AUDNZD VIX gate to 13 on a bull-market assumption; current regime is UNKNOWN with TradingView reporting 0 signals and internal MOMENTUM at only 65% confidence \u2014 the bull-market premise underlying L8 is unverified in this regime, so its gate may be mis-calibrated until regime confirms."
+    },
+    "system_health_note": "System is correctly idle (0 trades/7d) under UNKNOWN regime with zero historical green_matches and external regime unconfirmed \u2014 verified=False on the BREADTH briefing means narrative context must not override the frozen-edge state."
+  },
+  "auto_validation": null
+}

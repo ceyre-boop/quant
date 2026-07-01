@@ -1,0 +1,26 @@
+{
+  "date": "2026-06-09",
+  "generated_at": "2026-06-09T06:33:18.990033+00:00",
+  "input_tokens": 5456,
+  "output_tokens": 940,
+  "estimated_cost_usd": 0.15234,
+  "harvest_days_read": 7,
+  "reflection": {
+    "candidate_lesson": {
+      "lesson_text": "When the 30-indicator consensus shows 100% conviction SHORT but green_matches=0, treat conviction as unconfirmed and require a non-zero historical green_match before sizing above 0.5x.",
+      "mechanism": "green_matches counts how often the current live indicator configuration has historically aligned with a profitable forward move. A conviction of 100% with green_matches=0 means the consensus is internally agreed but has NEVER been validated against realized outcomes in memory \u2014 it is narrative coherence (many indicators agree) without statistical utility (no proven forward edge). Institutionally, broad indicator agreement at range-mid (RSI ~52-53 per briefing) reflects crowded positioning that mean-reverts, not directional commitment.",
+      "testable_rule": "if consensus_conviction >= 0.90 and green_matches == 0: size_multiplier = min(size_multiplier, 0.5)",
+      "expected_impact": "Reduces drawdown contribution from unvalidated high-conviction signals; expected Sharpe +0.02 to +0.04 by cutting variance on the 4/5 pairs currently flashing 100% conv with zero green_matches.",
+      "evidence_from_harvest": "Live consensus shows GBPUSD (100% conv, green_matches=0, hist_hr=67%), EURUSD (100% conv, green_matches=0, hist_hr=66%), USDJPY (100% conv LONG, green_matches=0, hist_hr=0%), AUDUSD (92% conv, green_matches=0, hist_hr=72%) \u2014 every high-conviction signal currently has zero green_matches, and USDJPY pairs a 100% LONG conviction with a 0% historical hit rate, the exact narrative-over-statistics trap Tenet 1 warns against.",
+      "evidence_from_reasoning": null,
+      "reasoning_component_targeted": "green_matches",
+      "sample_needed": 30
+    },
+    "retirement_flag": {
+      "lesson_to_review": "L8",
+      "reason": "L8 tightened the USDJPY/AUDNZD VIX gate to 13 on a bull-market premise; current regime is UNKNOWN/MOMENTUM with a defensive risk-off weekly tape per briefing \u2014 the bull-market assumption underpinning the gate may no longer hold, warranting a regime recheck."
+    },
+    "system_health_note": "Zero trades in the last 7 days with regime=UNKNOWN and TradingView providing 0 signals \u2014 the system is correctly idle/unreliable rather than forcing entries, but the consensus layer is emitting 100%-conviction signals with no green_match validation, so any reactivation must gate on harvest-proven configurations before sizing up."
+  },
+  "auto_validation": null
+}

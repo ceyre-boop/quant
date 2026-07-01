@@ -1,0 +1,49 @@
+{
+ "meta": {
+  "note": "Claude Pro has no usage API. This is a local ledger. Sync weekly_used manually from claude.ai/settings or run: python3 sovereign/tools/claude_usage_tracker.py sync --used 142000",
+  "weekly_reset_day": "Saturday",
+  "weekly_total_estimate": 200000,
+  "human_share": 0.7,
+  "agent_share": 0.3
+ },
+ "week": {
+  "start_date": "2026-05-31",
+  "weekly_used": 32200,
+  "weekly_remaining": 167800,
+  "last_synced": null,
+  "note": "REST-011 2026-06-12T01:15Z \u2014 RQ-REST-011 velocity size-gate REJECTED (HYP-053). dSharpe negative at every causal lookback + under look-ahead on canonical v003 log; signed variant variance-only. 2 findings, HYP-053 added REJECTED, RQ-REST-011 DONE. All 3 loops healthy. ~7000 tokens. RQ-REST-013 still blocked (no network + needs Colin approval). Weekly ledger stale vs claude.ai \u2014 re-sync."
+ },
+ "today": {
+  "date": "2026-06-12",
+  "human_used": 0,
+  "agent_used": 7000,
+  "daily_agent_budget": 8571,
+  "agent_allowed_today": 8571,
+  "note": "REST-011: RQ-REST-011 velocity size-gate forensic run -> REJECTED. Buffer healthy; left ample capacity for Colin's next session."
+ },
+ "session": {
+  "started": "2026-06-12T01:08:00+00:00",
+  "ended": "2026-06-12T01:15:00Z",
+  "mode": "REST_MODE",
+  "tasks_completed": [
+   "RQ-REST-011-velocity-size-gate",
+   "health-recheck"
+  ],
+  "findings_written": 2,
+  "hypotheses_updated": [
+   "HYP-053"
+  ],
+  "new_hypotheses": [
+   "HYP-053"
+  ],
+  "new_tasks_added": [],
+  "key_finding": "RQ-REST-011: the proposed rate-spread |velocity| position-size gate does NOT improve risk-adjusted return on the canonical v003 costed log (n=276). It LOWERS portfolio Sharpe at every causal lookback (60/90/120d) and even under full-sample look-ahead, because low-velocity periods (2020/2021) were good years it throttled. The signed variant only de-risks (maxDD -0.097->-0.039) with flat Sharpe at half exposure -> variance control, not alpha. HYP-053 REJECTED. The exit-rule lever (HYP-059/RQ-REST-013) remains the open high-leverage item, blocked on network + Colin approval."
+ },
+ "mode": "REST_MODE_COMPLETE",
+ "thresholds": {
+  "weekly_danger": 20000,
+  "weekly_light_mode": 50000,
+  "human_minimum_buffer": 8000,
+  "heavy_task_minimum": 15000
+ }
+}

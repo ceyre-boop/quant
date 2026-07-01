@@ -1,0 +1,26 @@
+{
+  "date": "2026-06-25",
+  "generated_at": "2026-06-25T06:39:32.468446+00:00",
+  "input_tokens": 5721,
+  "output_tokens": 860,
+  "estimated_cost_usd": 0.150315,
+  "harvest_days_read": 7,
+  "reflection": {
+    "candidate_lesson": {
+      "lesson_text": "When the 30-indicator consensus shows conv=100% but green_matches=0 and hist_hr=0% (USDJPY LONG, AUDNZD LONG), the signal is a directional artifact with no historical precedent \u2014 treat conv=100%/hist_hr=0% pairs as UNRELIABLE and veto, regardless of indicator agreement.",
+      "mechanism": "A 100% conviction reading with zero historically-matching green setups means the indicator stack has never co-aligned this way in a winning configuration \u2014 it is an out-of-distribution state, not a strong signal. Institutionally, USDJPY LONG and AUDNZD LONG here are safe-haven/carry-driven, and per L8 rising VIX (17.28\u219219.49) corrupts the rate signal exactly when consensus looks most confident.",
+      "testable_rule": "if consensus_conv == 1.0 and consensus_hist_hr == 0.0 and green_matches == 0: return Veto('OOD_consensus_no_precedent')",
+      "expected_impact": "Avoids zero-precedent entries on USDJPY/AUDNZD; expected to remove negative-tail trades and lift Sharpe ~+0.02 by trimming variance from unprecedented configurations.",
+      "evidence_from_harvest": "Live consensus: USDJPY 16/30 bull conv=100% hist_hr=0% green_matches=0; AUDNZD 15/30 bull conv=100% hist_hr=0% green_matches=0 \u2014 both contrast sharply with GBPUSD/EURUSD/AUDUSD SHORT signals at hist_hr 66-72%.",
+      "evidence_from_reasoning": null,
+      "reasoning_component_targeted": "consensus_hist_hr",
+      "sample_needed": 25
+    },
+    "retirement_flag": {
+      "lesson_to_review": "L8",
+      "reason": "VIX has risen from 17.28 to 19.49 across two pulses; if the 13 gate is now vetoing all USDJPY/AUDNZD flow continuously, the rule may be over-firing and should be checked against whether any safe-haven trades are still surviving the gate."
+    },
+    "system_health_note": "Regime UNKNOWN with 0 trades in 7 days and TradingView showing 0 signals \u2014 system is in a low-conviction internal-only state at 75% sizing, so any consensus showing 100% conv with 0% historical hit rate should be treated as suspect rather than actionable."
+  },
+  "auto_validation": null
+}

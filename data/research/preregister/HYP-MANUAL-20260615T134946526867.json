@@ -1,0 +1,17 @@
+{
+  "hypothesis_id": "HYP-MANUAL-20260615T134946526867",
+  "validator": "ohlc_quartile",
+  "frozen_at": "2026-07-01T01:55:53+00:00",
+  "script": "scripts/validate_ohlc_quartile.py",
+  "args": [
+    "--nperm",
+    "10000",
+    "--seed",
+    "42"
+  ],
+  "methodology": {
+    "permutation": true,
+    "walk_forward": true,
+    "both_sides": true
+  }
+}

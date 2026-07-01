@@ -1,0 +1,26 @@
+{
+  "date": "2026-06-28",
+  "generated_at": "2026-06-28T06:56:09.991191+00:00",
+  "input_tokens": 5733,
+  "output_tokens": 772,
+  "estimated_cost_usd": 0.143895,
+  "harvest_days_read": 7,
+  "reflection": {
+    "candidate_lesson": {
+      "lesson_text": "When the 30-indicator consensus shows high conviction (>=83%) but green_matches=0, treat the signal as historically unvalidated and require external regime confirmation before sizing above 50%.",
+      "mechanism": "green_matches=0 means the current live indicator configuration has never matched a profitable historical pattern in memory \u2014 high conviction here reflects crowded agreement on a fresh, untested setup, which institutionally is exactly when consensus trades get faded by liquidity providers who have no positioning history to lean on.",
+      "testable_rule": "if consensus_conviction >= 0.83 and green_matches == 0 and tradingview_confidence < 0.70: size_multiplier = min(size_multiplier, 0.50)",
+      "expected_impact": "Reduces drawdown contribution from unvalidated high-conviction entries; expected Sharpe +0.02-0.03 by trimming variance on USDJPY/AUDNZD where hist_hr=0% coincides with green_matches=0.",
+      "evidence_from_harvest": "Live consensus shows GBPUSD conv=83%, EURUSD conv=100%, AUDUSD conv=100% all with green_matches=0; USDJPY conv=83% and AUDNZD conv=92% have green_matches=0 AND hist_hr=0% \u2014 conviction is decoupled from historical hit rate across every pair right now.",
+      "evidence_from_reasoning": null,
+      "reasoning_component_targeted": "green_matches",
+      "sample_needed": 30
+    },
+    "retirement_flag": {
+      "lesson_to_review": "L8",
+      "reason": "L8 tightened USDJPY/AUDNZD VIX gate to 13 for safe-haven corruption, but current VIX=18.89 with both pairs showing hist_hr=0% suggests the gate alone is not filtering the unreliable rate signal \u2014 the green_matches=0 condition may be the dominant failure driver, partially overlapping L8's domain."
+    },
+    "system_health_note": "Regime=UNKNOWN with 0 trades in 7 days and every consensus signal at green_matches=0 means the system is in an unvalidated-signal state and should remain near-frozen until live decision logs accumulate."
+  },
+  "auto_validation": null
+}

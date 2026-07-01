@@ -1,0 +1,26 @@
+{
+  "date": "2026-06-30",
+  "generated_at": "2026-06-30T06:30:50.181060+00:00",
+  "input_tokens": 5753,
+  "output_tokens": 811,
+  "estimated_cost_usd": 0.14712,
+  "harvest_days_read": 7,
+  "reflection": {
+    "candidate_lesson": {
+      "lesson_text": "When the 30-indicator consensus shows high conviction but green_matches=0, treat the signal as historically un-anchored and cut size, not as a high-confidence entry.",
+      "mechanism": "green_matches counts how many times the current live indicator configuration has previously resolved into a profitable forward outcome. When conviction is high (e.g. AUDUSD 100%, USDJPY 83%) but green_matches=0, the system is extrapolating from an indicator alignment that has no validated historical analog \u2014 institutional flow may be transient noise that the indicator stack mistakes for a regime. High conviction with zero matched precedent is the signature of an over-fit live snapshot, not a durable edge.",
+      "testable_rule": "if consensus_conviction >= 0.80 and green_matches == 0: size_multiplier *= 0.5  # require historical anchor before full size",
+      "expected_impact": "Reduces drawdown variance and lifts Sharpe by ~0.03-0.05 by suppressing position size on high-conviction-but-unprecedented signals (USDJPY 83% conv / hist_hr=0% is the clearest current trap).",
+      "evidence_from_harvest": "Live consensus shows USDJPY dir=LONG conv=83% but hist_hr=0% and green_matches=0; AUDUSD conv=100% green_matches=0. Conviction and historical hit-rate are decoupled \u2014 USDJPY's 0% historical hit rate at high live conviction directly contradicts the conviction reading.",
+      "evidence_from_reasoning": null,
+      "reasoning_component_targeted": "green_matches",
+      "sample_needed": 40
+    },
+    "retirement_flag": {
+      "lesson_to_review": "L8",
+      "reason": "L8 tightened USDJPY/AUDNZD VIX gate to 13 for a bull market; current VIX is 18.41 and falling with regime=UNKNOWN/BREADTH \u2014 the bull-market precondition may no longer hold, so the 13 threshold should be re-validated against current regime before relying on it."
+    },
+    "system_health_note": "Zero trades in last 7 days with regime=UNKNOWN and TradingView providing 0 signals \u2014 the system is correctly conservative (75% sizing, internal-only), but no decision logs means lessons must stay harvest-based until trade flow resumes."
+  },
+  "auto_validation": null
+}

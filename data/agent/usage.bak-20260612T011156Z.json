@@ -1,0 +1,50 @@
+{
+  "meta": {
+    "note": "Claude Pro has no usage API. This is a local ledger. Sync weekly_used manually from claude.ai/settings or run: python3 sovereign/tools/claude_usage_tracker.py sync --used 142000",
+    "weekly_reset_day": "Saturday",
+    "weekly_total_estimate": 200000,
+    "human_share": 0.7,
+    "agent_share": 0.3
+  },
+  "week": {
+    "start_date": "2026-05-31",
+    "weekly_used": 25200,
+    "weekly_remaining": 174800,
+    "last_synced": null,
+    "note": "REST-010 2026-06-11T01:14Z \u2014 RQ-REST-014 velocity-overlay x exit-drag redundancy (HYP-060 CONFIRMED orthogonal; perm p=0.39). 2 findings, 1 new hyp, HYP-059 patched. All 3 loops healthy (forex 13h, briefing 13h, oracle 18h). ~6000 tokens. Weekly ledger still stale vs claude.ai \u2014 re-sync from settings."
+  },
+  "today": {
+    "date": "2026-06-10",
+    "human_used": 0,
+    "agent_used": 11000,
+    "daily_agent_budget": 8571,
+    "agent_allowed_today": 18571,
+    "note": "REST-009 + REST-010 same UTC-day. REST-010: RQ-REST-014 forensic redundancy test \u2014 HYP-058 overlay throttles trailing & time exits equally (orthogonal, not redundant). RQ-010/RQ-REST-013 confirmed as the only lever for the -49R trailing drag. Buffer healthy."
+  },
+  "session": {
+    "started": "2026-06-11T01:14:33+00:00",
+    "ended": "2026-06-11T01:14:33+00:00",
+    "mode": "REST_MODE",
+    "tasks_completed": [
+      "RQ-REST-014-velocity-exit-redundancy",
+      "health-recheck"
+    ],
+    "findings_written": 2,
+    "hypotheses_updated": [
+      "HYP-059",
+      "HYP-060"
+    ],
+    "new_hypotheses": [
+      "HYP-060"
+    ],
+    "new_tasks_added": [],
+    "key_finding": "HYP-058 velocity size overlay does NOT preferentially suppress the HYP-059 trailing-stop loss cluster (mean mult 0.871 trailing vs 0.883 time, perm p=0.39 null; 77/97 trailing trades in full-size HIGH bucket). The overlay and an exit-rule fix are ORTHOGONAL and stack -> RQ-010/RQ-REST-013 is the non-substitutable lever for the -49R trailing drag. Overlay's only value is variance/maxDD control, and on the 2015-22 entry log it costs ~-8R of return."
+  },
+  "mode": "REST_MODE_COMPLETE",
+  "thresholds": {
+    "weekly_danger": 20000,
+    "weekly_light_mode": 50000,
+    "human_minimum_buffer": 8000,
+    "heavy_task_minimum": 15000
+  }
+}

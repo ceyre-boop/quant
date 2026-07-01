@@ -1,0 +1,26 @@
+{
+  "date": "2026-06-13",
+  "generated_at": "2026-06-13T06:37:15.159657+00:00",
+  "input_tokens": 5497,
+  "output_tokens": 777,
+  "estimated_cost_usd": 0.14073,
+  "harvest_days_read": 7,
+  "reflection": {
+    "candidate_lesson": {
+      "lesson_text": "When the 30-indicator consensus shows conviction=100% on a pair (AUDUSD: 14/30 bear) but green_matches=0 against historical memory, treat the signal as direction-only and gate size down \u2014 high live conviction with zero historical regime match is an unvalidated extrapolation, not a confirmed edge.",
+      "mechanism": "Indicator consensus measures present-bar agreement, but green_matches=0 means no analogous historical bar produced this configuration with a known good outcome. Institutional flow that creates durable trends leaves repeated, recognizable footprints; a 100%-conviction reading with no historical twin is more consistent with a transient liquidity sweep or one-sided positioning that mean-reverts than with a committed trend. The hist_hr=70% is a base rate from a DIFFERENT (matched) population, so applying it to an unmatched live state overstates expected win rate.",
+      "testable_rule": "if consensus_conviction >= 0.90 and green_matches == 0: size_multiplier *= 0.6  # require historical match before full size on extreme-conviction reads",
+      "expected_impact": "Reduces variance of high-conviction entries that lack historical confirmation; expected Sharpe +0.02 to +0.04 via avoided drawdown on false-extreme signals, win rate stabilization on AUDUSD/EURUSD shorts.",
+      "evidence_from_harvest": "Current live state: AUDUSD conv=100% green_matches=0 hist_hr=70%; EURUSD conv=58% green_matches=0 hist_hr=66%. Both flash strong directional reads with zero historical regime matches \u2014 the hr figures are borrowed from non-matching populations and cannot be trusted as live expectations.",
+      "evidence_from_reasoning": null,
+      "reasoning_component_targeted": "green_matches",
+      "sample_needed": 30
+    },
+    "retirement_flag": {
+      "lesson_to_review": null,
+      "reason": null
+    },
+    "system_health_note": "Zero trades in 7 days with Regime=UNKNOWN and TradingView showing 0 signals \u2014 the system is in an observation freeze, so no decision-log lessons are possible yet and harvest-only inference is the correct fallback."
+  },
+  "auto_validation": null
+}

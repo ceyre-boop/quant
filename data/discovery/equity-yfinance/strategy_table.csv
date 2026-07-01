@@ -1,0 +1,18 @@
+name,verdict,family,train_sharpe,full_sharpe,holdout_sharpe,n_trades,perm_p,dsr_prob,bh_survives,description
+lowvol_trend,NOT_SIGNIFICANT,rule,0.768,0.744,0.701,194,0.0494,1.0,False,Low-vol expansion: enter trend when vol compressed
+cluster0_long,NOT_SIGNIFICANT,cluster,0.922,0.709,0.294,196,0.0617,1.0,False,"KMeans cluster 0 (train fwd-return +), k=6"
+long_only_regime,NOT_SIGNIFICANT,rule,0.526,0.486,0.42,286,0.358,1.0,False,Long-only above 200-SMA
+mtf_align,NOT_SIGNIFICANT,rule,0.139,0.358,0.941,246,0.1975,1.0,False,Multi-timeframe alignment (price vs 50 vs 200)
+hurst_revert,NOT_SIGNIFICANT,rule,0.143,0.183,0.299,33,0.0123,1.0,False,Mean-revert only in reverting regime (Hurst<0.45)
+cluster5_long,SCREENED_OUT,cluster,0.08,0.0,0.0,69,,,,"KMeans cluster 5 (train fwd-return +), k=6"
+rsi_meanrevert,SCREENED_OUT,rule,0.049,0.0,0.0,63,,,,Mean-revert RSI extremes
+trend_filtered,SCREENED_OUT,rule,0.043,0.0,0.0,213,,,,Trend-follow gated by 200-SMA regime
+cluster1_long,SCREENED_OUT,cluster,-0.125,0.0,0.0,83,,,,"KMeans cluster 1 (train fwd-return +), k=6"
+bb_fade,SCREENED_OUT,rule,-0.13,0.0,0.0,82,,,,Bollinger fade (mean-revert)
+trend_mom20,SCREENED_OUT,rule,-0.205,0.0,0.0,344,,,,Trend-follow: 20-bar momentum sign
+macd_cross,SCREENED_OUT,rule,-0.332,0.0,0.0,343,,,,MACD histogram sign
+sma50_dist,SCREENED_OUT,rule,-0.416,0.0,0.0,311,,,,Distance from 50-SMA momentum
+rsi_trend_combo,SCREENED_OUT,rule,-0.503,0.0,0.0,112,,,,RSI pullback in uptrend
+hurst_trend,SCREENED_OUT,rule,-0.675,0.0,0.0,81,,,,Trend-follow only in trending regime (Hurst>0.55)
+adx_trend,SCREENED_OUT,rule,-0.957,0.0,0.0,147,,,,ADX-confirmed momentum
+bb_breakout,SCREENED_OUT,rule,-1.727,0.0,0.0,71,,,,Bollinger breakout (momentum)

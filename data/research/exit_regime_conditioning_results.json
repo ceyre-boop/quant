@@ -1,0 +1,190 @@
+{
+  "id": "HYP-066",
+  "verdict": "NOT_SIGNIFICANT",
+  "passes": {
+    "permutation_p<0.05": false,
+    "deflated_sr>0": true,
+    "bh_survivors>=1": false,
+    "forward_non_degrade": true
+  },
+  "reconcile_weighted_sharpe": 0.6886,
+  "n_trades": 408,
+  "buckets": {
+    "Vhi_Ahi": 139,
+    "Vhi_Alo": 65,
+    "Vlo_Ahi": 65,
+    "Vlo_Alo": 139
+  },
+  "medians": {
+    "vix_pct": 0.39880952380952384,
+    "atr_pct": 0.3849206349206349
+  },
+  "grid": [
+    [
+      1.5,
+      1.0
+    ],
+    [
+      1.5,
+      1.25
+    ],
+    [
+      1.5,
+      1.5
+    ],
+    [
+      1.5,
+      2.0
+    ],
+    [
+      2.0,
+      1.0
+    ],
+    [
+      2.0,
+      1.25
+    ],
+    [
+      2.0,
+      1.5
+    ],
+    [
+      2.0,
+      2.0
+    ],
+    [
+      2.5,
+      1.0
+    ],
+    [
+      2.5,
+      1.25
+    ],
+    [
+      2.5,
+      1.5
+    ],
+    [
+      2.5,
+      2.0
+    ]
+  ],
+  "in_sample": {
+    "Vhi_Ahi": {
+      "n": 139,
+      "best": 0.7369589713742714,
+      "static": 0.7896365842978469,
+      "best_cfg": 1,
+      "improvement": -0.052677612923575534
+    },
+    "Vhi_Alo": {
+      "n": 65,
+      "best": 0.7101744058644952,
+      "static": 0.596006430091793,
+      "best_cfg": 2,
+      "improvement": 0.11416797577270221
+    },
+    "Vlo_Ahi": {
+      "n": 65,
+      "best": 0.8568177210935134,
+      "static": 0.8037134427978851,
+      "best_cfg": 11,
+      "improvement": 0.05310427829562825
+    },
+    "Vlo_Alo": {
+      "n": 139,
+      "best": 0.7000084838832655,
+      "static": 0.835395705217899,
+      "best_cfg": 1,
+      "improvement": -0.13538722133463343
+    }
+  },
+  "oos": {
+    "Vhi_Ahi": {
+      "n": 139,
+      "rk_oos": 1.0260858753197604,
+      "static_oos": 1.1025879898639854
+    },
+    "Vhi_Alo": {
+      "n": 65,
+      "rk_oos": 0.7301909886007736,
+      "static_oos": 0.5958272133183918
+    },
+    "Vlo_Ahi": {
+      "n": 65,
+      "rk_oos": 0.8768807030509201,
+      "static_oos": 1.1291614951024846
+    },
+    "Vlo_Alo": {
+      "n": 139,
+      "rk_oos": 0.46422187774400053,
+      "static_oos": 0.7532642759524576
+    }
+  },
+  "portfolio_oos": {
+    "regime_keyed": 0.7688637544148945,
+    "static": 0.9013532114848057
+  },
+  "permutation": {
+    "obs_improvement": -0.021878299398797776,
+    "portfolio_p": 0.605039496050395,
+    "bucket_obs": {
+      "Vhi_Ahi": -0.052677612923575534,
+      "Vhi_Alo": 0.11416797577270221,
+      "Vlo_Ahi": 0.05310427829562825,
+      "Vlo_Alo": -0.13538722133463343
+    },
+    "bucket_p": {
+      "Vhi_Ahi": 0.6004399560043996,
+      "Vhi_Alo": 0.12068793120687932,
+      "Vlo_Ahi": 0.31526847315268475,
+      "Vlo_Alo": 0.8911108889111089
+    },
+    "n_perm": 10000,
+    "seed": 42
+  },
+  "deflated_sharpe": {
+    "deflated_sr": 0.12012001328928323,
+    "prob": 0.6555690541893777,
+    "n_trials": 48
+  },
+  "benjamini_hochberg": {
+    "pvals": {
+      "Vhi_Ahi": 0.6004399560043996,
+      "Vhi_Alo": 0.12068793120687932,
+      "Vlo_Ahi": 0.31526847315268475,
+      "Vlo_Alo": 0.8911108889111089
+    },
+    "survive": {
+      "Vhi_Ahi": false,
+      "Vhi_Alo": false,
+      "Vlo_Ahi": false,
+      "Vlo_Alo": false
+    },
+    "n_survive": 0
+  },
+  "forward_gate": {
+    "n": 51,
+    "rk_sharpe": 0.515939186073927,
+    "static_sharpe": 0.5051200033773586,
+    "non_degrade": true
+  },
+  "decade_best_cfg": {
+    "Vhi_Ahi": [
+      1.5,
+      1.25
+    ],
+    "Vhi_Alo": [
+      1.5,
+      1.5
+    ],
+    "Vlo_Ahi": [
+      2.5,
+      2.0
+    ],
+    "Vlo_Alo": [
+      1.5,
+      1.25
+    ]
+  }
+}
