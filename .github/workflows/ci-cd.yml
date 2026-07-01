@@ -1,3 +1,11 @@
+# ============================================================================
+# LEGACY (audited 2026-07-01): The `deploy-firebase` job below is DEAD.
+# It deploys `firebase/functions`, which no longer exists in this repo, and the
+# live dashboards read the Render backend + committed JSON, not Firebase.
+# The job is disabled via `if: false` (see below). The `test` job is still valid
+# and left active. Re-enable deploy-firebase only if a Firebase Functions
+# deployment target is ever restored. Do not delete — kept for reference.
+# ============================================================================
 name: CI/CD - Test and Deploy
 
 on:
@@ -58,8 +66,11 @@ jobs:
   deploy-firebase:
     needs: test
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master' && github.event_name == 'push'
-    
+    # LEGACY: disabled 2026-07-01 — `firebase/functions` no longer exists and no
+    # live dashboard reads Firebase. Original trigger was:
+    #   github.ref == 'refs/heads/master' && github.event_name == 'push'
+    if: false
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4

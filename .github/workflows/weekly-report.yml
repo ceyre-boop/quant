@@ -1,9 +1,20 @@
-name: Weekly Performance Report
+# ============================================================================
+# LEGACY (audited 2026-07-01): This workflow targets the ARCHIVED ML subsystem.
+# It runs from `working-directory: ./quant/clawd_trading` (does not exist),
+# calls `meta_evaluator/performance_monitor.py`, and pushes to Firebase via
+# `integration.firebase_client.FirebaseClient` (module no longer exists). The
+# live system does not use this reporting path. The weekly cron is disabled
+# below to stop it auto-firing (and reddening) every Monday. `workflow_dispatch`
+# is kept so it can be manually run if the ML subsystem is ever revived.
+# Do not delete — kept for reference.
+# ============================================================================
+name: Weekly Performance Report (LEGACY - disabled)
 
 on:
-  schedule:
-    # Run every Monday at 9:00 AM EST (2:00 PM UTC)
-    - cron: '0 14 * * 1'
+  # LEGACY: weekly cron disabled 2026-07-01 — archived ML subsystem, dead paths.
+  # schedule:
+  #   # Run every Monday at 9:00 AM EST (2:00 PM UTC)
+  #   - cron: '0 14 * * 1'
   workflow_dispatch:
 
 env:

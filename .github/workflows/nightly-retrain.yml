@@ -1,9 +1,20 @@
-name: Nightly Model Retraining
+# ============================================================================
+# LEGACY (audited 2026-07-01): This workflow targets the ARCHIVED ML subsystem.
+# It runs from `working-directory: ./quant/clawd_trading` (does not exist) and
+# calls `meta_evaluator/refit_scheduler.py` + `data.pipeline` for the old
+# XGBoost/bias-engine ML line, pushing to Firebase. That line is dead; the live
+# system is the sovereign-v2 forex/ICT stack. The daily cron is disabled below
+# to stop it auto-firing (and reddening) every night. `workflow_dispatch` is
+# kept so it can be manually run if the ML subsystem is ever revived.
+# Do not delete — kept for reference.
+# ============================================================================
+name: Nightly Model Retraining (LEGACY - disabled)
 
 on:
-  schedule:
-    # Run at 2:00 AM EST (7:00 AM UTC) every day
-    - cron: '0 7 * * *'
+  # LEGACY: daily cron disabled 2026-07-01 — archived ML subsystem, dead paths.
+  # schedule:
+  #   # Run at 2:00 AM EST (7:00 AM UTC) every day
+  #   - cron: '0 7 * * *'
   workflow_dispatch:
     inputs:
       model_type:
