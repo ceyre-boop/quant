@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>EnvironmentVariables</key>
+	<dict>
+		<key>FIREBASE_SERVICE_ACCOUNT</key>
+		<string>/Users/taboost/quant/config/firebase_service_account.json</string>
+		<key>PATH</key>
+		<string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+	</dict>
+	<key>Label</key>
+	<string>com.sovereign.fvg_express</string>
+	<key>LowPriorityBackgroundIO</key>
+	<true/>
+	<key>LowPriorityIO</key>
+	<true/>
+	<key>Nice</key>
+	<integer>10</integer>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/bin/bash</string>
+		<string>/Users/taboost/quant/scripts/launch_fvg_express.sh</string>
+	</array>
+	<key>RunAtLoad</key>
+	<false/>
+	<key>StandardErrorPath</key>
+	<string>/Users/taboost/quant/logs/fvg_express_launchd.log</string>
+	<key>StandardOutPath</key>
+	<string>/Users/taboost/quant/logs/fvg_express_launchd.log</string>
+	<key>StartInterval</key>
+	<integer>3600</integer>
+	<key>WorkingDirectory</key>
+	<string>/Users/taboost/quant</string>
+</dict>
+</plist>
