@@ -37,9 +37,9 @@ SESSION_CLOSE_HOUR_ET = 16
 #   GBPUSD: Sharpe 1.094, WR 59.4%, PF 1.76 — BOE/FED rate differential
 #   EURUSD: Sharpe 0.982, WR 54.5%, PF 1.62 — ECB/FED rate differential
 #   AUDUSD: Sharpe 0.896, WR 52.5%, PF 1.56 — RBA/FED rate differential
-#   AUDNZD: Sharpe 0.884, WR 56.3%, PF 1.61 — RBA/RBNZ rate differential
 # ICT entry precision + macro direction filter = compounding edge
-PROVEN_PAIRS = ['GBPUSD=X', 'EURUSD=X', 'AUDUSD=X', 'AUDNZD=X']
+# AUDNZD removed 2026-07-01: 0 signals, 100% displacement-gate fail
+PROVEN_PAIRS = ['GBPUSD=X', 'EURUSD=X', 'AUDUSD=X']
 
 # Forensics 2026-05-18: NY_PM averages -0.283R across all pairs.
 # London averages +0.471R. London-only MC pass rate: 90.3% vs 58.4%.
@@ -48,7 +48,7 @@ PROVEN_PAIRS = ['GBPUSD=X', 'EURUSD=X', 'AUDUSD=X', 'AUDNZD=X']
 # PRIMARY_SESSION kept as NY_PM for scheduling continuity; pipeline does the filtering.
 ACTIVE_SESSIONS   = {'NY_PM', 'London'}
 PRIMARY_SESSION   = 'London'    # London is now the primary edge session
-LONDON_PAIRS      = {'GBPUSD', 'EURUSD', 'AUDUSD', 'AUDNZD'}  # all pairs in London
+LONDON_PAIRS      = {'GBPUSD', 'EURUSD', 'AUDUSD'}  # AUDNZD removed 2026-07-01: 0 signals, 100% displacement-gate fail
 
 FIREBASE_ROOT   = 'signals/ICT_ENGINE'
 ACCOUNT_SIZE    = 10_000.0
@@ -814,7 +814,8 @@ if __name__ == '__main__':
 
     if args.ny_am:
         ny_am_pairs = args.pairs or [
-            'GBPUSD=X', 'EURUSD=X', 'AUDUSD=X', 'AUDNZD=X', 'USDJPY=X'
+            # AUDNZD removed 2026-07-01: 0 signals, 100% displacement-gate fail
+            'GBPUSD=X', 'EURUSD=X', 'AUDUSD=X', 'USDJPY=X'
         ]
         orch = ICTOrchestrator(pairs=ny_am_pairs, ny_am_mode=True)
     else:

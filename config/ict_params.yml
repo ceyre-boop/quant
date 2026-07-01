@@ -129,7 +129,8 @@ risk:
 
 sessions:
   london_only_pairs: ["GBPUSD"]
-  ny_pm_pairs: ["GBPUSD", "EURUSD", "AUDUSD", "AUDNZD"]
+  # AUDNZD removed 2026-07-01: 0 signals, 100% displacement-gate fail
+  ny_pm_pairs: ["GBPUSD", "EURUSD", "AUDUSD"]
 
 # ML mutation metadata:
 # - value: current champion value
@@ -173,7 +174,8 @@ ml_lab:
       min: null
       max: null
     ny_pm_pairs:
-      value: ["GBPUSD", "EURUSD", "AUDUSD", "AUDNZD"]
+      # AUDNZD removed 2026-07-01: 0 signals, 100% displacement-gate fail
+      value: ["GBPUSD", "EURUSD", "AUDUSD"]
       mutable_by_ml: false
       min: null
       max: null
@@ -214,7 +216,8 @@ ml_lab:
 ny_am_session:
   enabled: true
   hours_utc: "12:00-15:00"
-  pairs: [GBPUSD, EURUSD, AUDUSD, AUDNZD, USDJPY]
+  # AUDNZD removed 2026-07-01: 0 signals, 100% displacement-gate fail
+  pairs: [GBPUSD, EURUSD, AUDUSD, USDJPY]
   min_score: 6.0
   risk_pct: 0.005
   bypass_ny_pm_veto: true
