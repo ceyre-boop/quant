@@ -441,6 +441,14 @@ class TestOptionsSurface:
         assert row[2] < 0                                            # fixture term structure is upward (10% < 12%)
         assert row[3] == pytest.approx(-0.0031, abs=4e-4)
 
+    def test_board_never_fuses_fixture_rows(self, con):
+        # FIXTURE-stamped surface rows are test scaffolding — the board fusion must exclude them
+        from sovereign.sentiment import options_surface_feed as osf
+        osf.update(con=con, fixture=True)
+        board_state.rebuild(con=con)
+        fused = con.execute("SELECT COUNT(*) FROM sentiment_board_state WHERE rr25 IS NOT NULL").fetchone()[0]
+        assert fused == 0
+
     def test_look_ahead_auditor_covers_surface(self, con):
         from sovereign.sentiment import options_surface_feed as osf
         from scripts.audit_look_ahead import audit
