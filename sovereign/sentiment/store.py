@@ -86,6 +86,29 @@ CREATE TABLE IF NOT EXISTS sentiment_cot_weekly (
     net_spec         BIGINT,       -- long - short (large speculators)
     net_oi           DOUBLE,       -- net_spec / open_interest (scale-invariant level)
     net_pct          DOUBLE,       -- trailing-3yr percentile of net_spec [0,1] — the contrarian-extreme feature
+    net_pct_1y       DOUBLE,       -- trailing-1yr (52w) percentile of net_spec [0,1]
+    net_z_1y         DOUBLE,       -- trailing-1yr z-score of net_spec
+    net_z_3y         DOUBLE,       -- trailing-3yr z-score of net_spec
+    flush_1w         DOUBLE,       -- WoW Δnet_spec / trailing-1yr std of Δnet_spec (the "flush" feature)
+    release_ts       TIMESTAMP,    -- provenance: CFTC release ~Friday 15:30 ET (naive ET; publish_date + 15:30)
+    open_interest    BIGINT,
+    fetched_at       TIMESTAMP,
+    PRIMARY KEY (measurement_date, pair)
+);
+-- CFTC Traders in Financial Futures (TFF, futures-only, gpe5-46if) — leveraged-funds positioning,
+-- the professional-speculator analog of legacy non-commercial. Same Tuesday-measured/Friday-published
+-- keying and look-ahead guard as sentiment_cot_weekly. Crosses (AUDNZD) are leg differences.
+CREATE TABLE IF NOT EXISTS sentiment_cot_tff_weekly (
+    measurement_date DATE,
+    publish_date     DATE,
+    pair             VARCHAR,
+    lev_long         BIGINT,
+    lev_short        BIGINT,
+    lev_net          BIGINT,       -- leveraged-funds long − short
+    lev_net_oi       DOUBLE,       -- lev_net / open_interest
+    lev_net_pct      DOUBLE,       -- trailing-3yr percentile of lev_net [0,1]
+    lev_net_pct_1y   DOUBLE,       -- trailing-1yr percentile of lev_net [0,1]
+    release_ts       TIMESTAMP,
     open_interest    BIGINT,
     fetched_at       TIMESTAMP,
     PRIMARY KEY (measurement_date, pair)
@@ -145,6 +168,15 @@ ALTER TABLE sentiment_board_state ADD COLUMN IF NOT EXISTS vrp_signal DOUBLE;
 ALTER TABLE sentiment_board_state ADD COLUMN IF NOT EXISTS vrp_pct DOUBLE;
 ALTER TABLE sentiment_board_state ADD COLUMN IF NOT EXISTS vrp_iv_atm DOUBLE;
 ALTER TABLE sentiment_board_state ADD COLUMN IF NOT EXISTS vrp_rv_trailing DOUBLE;
+ALTER TABLE sentiment_cot_weekly ADD COLUMN IF NOT EXISTS net_pct_1y DOUBLE;
+ALTER TABLE sentiment_cot_weekly ADD COLUMN IF NOT EXISTS net_z_1y DOUBLE;
+ALTER TABLE sentiment_cot_weekly ADD COLUMN IF NOT EXISTS net_z_3y DOUBLE;
+ALTER TABLE sentiment_cot_weekly ADD COLUMN IF NOT EXISTS flush_1w DOUBLE;
+ALTER TABLE sentiment_cot_weekly ADD COLUMN IF NOT EXISTS release_ts TIMESTAMP;
+ALTER TABLE sentiment_board_state ADD COLUMN IF NOT EXISTS cot_net_pct_1y DOUBLE;
+ALTER TABLE sentiment_board_state ADD COLUMN IF NOT EXISTS cot_net_z DOUBLE;
+ALTER TABLE sentiment_board_state ADD COLUMN IF NOT EXISTS cot_flush_1w DOUBLE;
+ALTER TABLE sentiment_board_state ADD COLUMN IF NOT EXISTS tff_lev_net_pct DOUBLE;
 """
 
 

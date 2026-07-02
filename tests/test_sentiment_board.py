@@ -324,6 +324,62 @@ class TestCOT:
         assert pct.iloc[3] == pytest.approx(1.0)          # 40 is the max SO FAR → 100th pct (ignores the future 5)
         assert pct.iloc[4] == pytest.approx(0.2)          # 5 is the min of the 5 → 20th pct
 
+    # ── positioning-layer extension: TFF + 1y/3y percentiles, z-scores, flush, crosses ──
+
+    def test_feature_helpers_causal_pure(self):
+        # truncating the future must not change past feature values (trailing-only guarantee)
+        s = pd.Series(np.linspace(-5, 7, 80) + np.sin(np.arange(80)), dtype=float)
+        for fn in (lambda x: cot_feed._trailing_pct(x, 52, 26), lambda x: cot_feed._trailing_z(x, 52, 26)):
+            full, cut = fn(s), fn(s.iloc[:60])
+            pd.testing.assert_series_equal(full.iloc[:60], cut, check_names=False)
+
+    def test_cross_frame_leg_difference(self):
+        dts = pd.to_datetime(["2024-01-02", "2024-01-09", "2024-01-16"])
+        base = pd.DataFrame({"measurement_date": dts, "long": [10, 12, 14], "short": [2, 2, 2],
+                             "net": [8, 10, 12], "net_oi": [0.4, 0.5, 0.6], "open_interest": [20, 20, 20]})
+        quote = pd.DataFrame({"measurement_date": dts[:2], "long": [5, 5], "short": [1, 2],
+                              "net": [4, 3], "net_oi": [0.2, 0.15], "open_interest": [20, 20]})
+        x = cot_feed._cross_frame(base, quote)
+        assert len(x) == 2                                    # inner join — unmatched leg dates drop
+        assert list(x["net"]) == [4, 7]                       # base_net − quote_net
+        assert x["net_oi"].tolist() == pytest.approx([0.2, 0.35])
+        assert (x["open_interest"] == 0).all()                # OI is meaningless for a leg difference
+
+    def test_release_ts_provenance(self):
+        df = pd.DataFrame({"measurement_date": pd.to_datetime(["2024-06-04"]),  # a Tuesday
+                           "net": [5], "net_oi": [0.1], "long": [6], "short": [1], "open_interest": [50]})
+        out = cot_feed._date_stamp(df, lag=3, release_time_et="15:30")
+        assert out["publish_date"].iloc[0] == pd.Timestamp("2024-06-07").date()   # the Friday
+        assert out["release_ts"].iloc[0] == pd.Timestamp("2024-06-07 15:30")      # 3:30pm ET provenance
+        assert out["release_ts"].iloc[0].date() > out["measurement_date"].iloc[0]  # never the Tuesday
+
+    def test_new_columns_schema_roundtrip(self, con):
+        cot = pd.DataFrame(
+            [(pd.Timestamp("2024-05-28").date(), pd.Timestamp("2024-05-31").date(), "AUDNZD",
+              0, 0, 1500, 0.12, 0.97, 0.99, 2.3, 1.8, -2.4, pd.Timestamp("2024-05-31 15:30"), 0, NOW)],
+            columns=["measurement_date", "publish_date", "pair", "noncomm_long", "noncomm_short",
+                     "net_spec", "net_oi", "net_pct", "net_pct_1y", "net_z_1y", "net_z_3y",
+                     "flush_1w", "release_ts", "open_interest", "fetched_at"])
+        store.upsert(con, "sentiment_cot_weekly", cot, ["measurement_date", "pair"])
+        r = con.execute("SELECT net_pct_1y, net_z_1y, flush_1w, release_ts FROM sentiment_cot_weekly "
+                        "WHERE pair='AUDNZD'").fetchone()
+        assert r[0] == pytest.approx(0.99) and r[2] == pytest.approx(-2.4)
+        assert r[3] == pd.Timestamp("2024-05-31 15:30")
+
+    def test_tff_table_exists_and_guarded(self, con):
+        tff = pd.DataFrame(
+            [(pd.Timestamp("2024-05-28").date(), pd.Timestamp("2024-05-31").date(), "EURUSD",
+              90000, 40000, 50000, 0.2, 0.88, 0.91, pd.Timestamp("2024-05-31 15:30"), 250000, NOW)],
+            columns=["measurement_date", "publish_date", "pair", "lev_long", "lev_short", "lev_net",
+                     "lev_net_oi", "lev_net_pct", "lev_net_pct_1y", "release_ts",
+                     "open_interest", "fetched_at"])
+        store.upsert(con, "sentiment_cot_tff_weekly", tff, ["measurement_date", "pair"])
+        bad = con.execute("SELECT COUNT(*) FROM sentiment_cot_tff_weekly "
+                          "WHERE publish_date <= measurement_date").fetchone()[0]
+        assert bad == 0
+        pcts = con.execute("SELECT lev_net_pct, lev_net_pct_1y FROM sentiment_cot_tff_weekly").df()
+        assert pcts.stack().between(0, 1).all()
+
 
 # ── VRP-001: implied vol − realized vol FEATURE (ThetaData FX-ETF options) ─────────────────────
 class TestVRP:
