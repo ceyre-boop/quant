@@ -1,0 +1,73 @@
+{
+  "id": "HYP-074",
+  "slug": "rr_extreme_reversion",
+  "name": "25-delta risk-reversal z beyond +/-2 precedes spot mean-reversion",
+  "status": "PREREGISTERED",
+  "frozen_at": "2026-07-02T05:30:00Z",
+  "family": "POSITIONING-BOARD-2026-07",
+  "phase": "prereg \u2014 data substrate in flight (Track B); no feature values read",
+  "thesis": "Extreme skew pricing marks one-sided hedging/fear that overshoots; spot mean-reverts as the skew normalizes.",
+  "mechanism": "Options skew embeds crowd fear; extremes are typically hedging climaxes, not information about drift.",
+  "event_definition": "rr25_z (vs trailing 252 obs) crossing beyond +/-2.0; de-overlap: one event per crossing, re-arm inside +/-1.0",
+  "direction_rule": "spot moves OPPOSITE the skew extreme (rr25_z > +2 = calls bid = crowd long topside -> fade down)",
+  "universe": [
+    "EURUSD",
+    "GBPUSD",
+    "USDJPY",
+    "AUDUSD"
+  ],
+  "universe_note": "4 live pairs; AUDNZD included wherever both futures legs (6A 232741, 6N 112741) carry data \u2014 constitutional carry-complex scope, not the live trading universe",
+  "horizon_trading_days": [
+    10,
+    20
+  ],
+  "validation_protocol": {
+    "permutation": {
+      "n": 10000,
+      "seed": 42,
+      "p_formula": "(n_ge + 1) / (N + 1)",
+      "null": "event-label shuffle preserving per-pair event counts"
+    },
+    "multiple_testing": {
+      "family": "POSITIONING-BOARD-2026-07",
+      "method": "benjamini_hochberg",
+      "alpha": 0.05,
+      "rule": "the 10 primary p-values (one per HYP, pooled-universe cell) correct together"
+    },
+    "ic_threshold_oos": 0.15,
+    "de_overlap_standard": "ONE observation per distinct event/crossing (NOT per day in state); binomial null at the REAL de-overlapped N; median primary (mean is outlier-dragged); report full sample AND ex-2020",
+    "min_sample": {
+      "per_pair_cell": 30,
+      "pooled_primary": 50,
+      "underpowered_rule": "below pooled minimum -> verdict UNDERPOWERED, never a directional claim"
+    },
+    "diversifier_gate": {
+      "applies": "all members except HYP-077",
+      "benchmark_primary": "DBV carry proxy (VRP-001 convention)",
+      "benchmark_secondary": "v015 forex backtest pnl_pct (logs/forex_backtest_trades.json)",
+      "true_diversifier_iff": "abs(full_rho) < 0.25 AND max_crisis_rho < 0.35",
+      "crisis_windows": [
+        [
+          "2008-06-01",
+          "2009-03-31"
+        ],
+        [
+          "2020-02-20",
+          "2020-04-30"
+        ],
+        [
+          "2022-01-01",
+          "2022-12-31"
+        ]
+      ]
+    },
+    "no_model_training": "event studies only; no fitted parameters beyond pre-registered thresholds",
+    "data_substrate": "positioning board tables (sentiment_cot_weekly legacy+TFF features, sentiment_options_surface, econ_surprise_z, gdelt_tone) \u2014 release/publish-date keyed, look-ahead audited (scripts/audit_look_ahead.py)"
+  },
+  "success_criteria": "candidate iff: pooled primary permutation p < 0.05 AND survives family BH AND median effect sign stable full/ex-2020 AND pooled N >= 50 de-overlapped AND (diversifier gate passes, unless exempt)",
+  "failure_criteria": "anything else -> NOT_SIGNIFICANT (the prior); direction-unstable -> REJECTED",
+  "prior_expectation": "NOT_SIGNIFICANT",
+  "verdict": null,
+  "hash_method": "sha256 of json.dumps(doc, sort_keys=True, separators=(',',':')) where doc = this object MINUS the hash_lock field",
+  "hash_lock": "df3f2b0ce1ed0fc8b1f3e3013d4eab7ad8fbba27bb55fd453d2132d2d419bc52"
+}

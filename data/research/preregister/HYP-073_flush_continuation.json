@@ -1,0 +1,73 @@
+{
+  "id": "HYP-073",
+  "slug": "flush_continuation",
+  "name": "Largest weekly net-spec flush continues in the flush direction",
+  "status": "PREREGISTERED",
+  "frozen_at": "2026-07-02T05:30:00Z",
+  "family": "POSITIONING-BOARD-2026-07",
+  "phase": "prereg \u2014 data substrate in flight (Track B); no feature values read",
+  "thesis": "A top-decile week-over-week net-spec unwind (flush) marks forced de-risking that continues: stopped-out positioning takes more than a week to clear.",
+  "mechanism": "Forced liquidation is autocorrelated \u2014 margin/stop cascades unwind over weeks, not in one print.",
+  "event_definition": "|flush_1w| (WoW delta net_spec / trailing-1y delta std) >= 2.0; de-overlap: one event per flush episode, re-arm after |flush_1w| < 1.0",
+  "direction_rule": "forward spot move in the SAME direction as the flush (crowd cut longs -> pair falls further)",
+  "universe": [
+    "EURUSD",
+    "GBPUSD",
+    "USDJPY",
+    "AUDUSD"
+  ],
+  "universe_note": "4 live pairs; AUDNZD included wherever both futures legs (6A 232741, 6N 112741) carry data \u2014 constitutional carry-complex scope, not the live trading universe",
+  "horizon_trading_days": [
+    10,
+    20
+  ],
+  "validation_protocol": {
+    "permutation": {
+      "n": 10000,
+      "seed": 42,
+      "p_formula": "(n_ge + 1) / (N + 1)",
+      "null": "event-label shuffle preserving per-pair event counts"
+    },
+    "multiple_testing": {
+      "family": "POSITIONING-BOARD-2026-07",
+      "method": "benjamini_hochberg",
+      "alpha": 0.05,
+      "rule": "the 10 primary p-values (one per HYP, pooled-universe cell) correct together"
+    },
+    "ic_threshold_oos": 0.15,
+    "de_overlap_standard": "ONE observation per distinct event/crossing (NOT per day in state); binomial null at the REAL de-overlapped N; median primary (mean is outlier-dragged); report full sample AND ex-2020",
+    "min_sample": {
+      "per_pair_cell": 30,
+      "pooled_primary": 50,
+      "underpowered_rule": "below pooled minimum -> verdict UNDERPOWERED, never a directional claim"
+    },
+    "diversifier_gate": {
+      "applies": "all members except HYP-077",
+      "benchmark_primary": "DBV carry proxy (VRP-001 convention)",
+      "benchmark_secondary": "v015 forex backtest pnl_pct (logs/forex_backtest_trades.json)",
+      "true_diversifier_iff": "abs(full_rho) < 0.25 AND max_crisis_rho < 0.35",
+      "crisis_windows": [
+        [
+          "2008-06-01",
+          "2009-03-31"
+        ],
+        [
+          "2020-02-20",
+          "2020-04-30"
+        ],
+        [
+          "2022-01-01",
+          "2022-12-31"
+        ]
+      ]
+    },
+    "no_model_training": "event studies only; no fitted parameters beyond pre-registered thresholds",
+    "data_substrate": "positioning board tables (sentiment_cot_weekly legacy+TFF features, sentiment_options_surface, econ_surprise_z, gdelt_tone) \u2014 release/publish-date keyed, look-ahead audited (scripts/audit_look_ahead.py)"
+  },
+  "success_criteria": "candidate iff: pooled primary permutation p < 0.05 AND survives family BH AND median effect sign stable full/ex-2020 AND pooled N >= 50 de-overlapped AND (diversifier gate passes, unless exempt)",
+  "failure_criteria": "anything else -> NOT_SIGNIFICANT (the prior); direction-unstable -> REJECTED",
+  "prior_expectation": "NOT_SIGNIFICANT",
+  "verdict": null,
+  "hash_method": "sha256 of json.dumps(doc, sort_keys=True, separators=(',',':')) where doc = this object MINUS the hash_lock field",
+  "hash_lock": "03bcab0436a3bcd6846a019bf98f0b818bff3fb0ae58f34d262328b620528bcc"
+}
