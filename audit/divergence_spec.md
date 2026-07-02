@@ -57,10 +57,13 @@ block, donchian NaN — strict_mode is False in the live config).
 
 - `decision`, `action`-consistency, `reentry_signal`, and post-state must match
   **exactly**; recomputed `trail_price` / `would_amend_stop_to` within
-  `tol_price_abs` (derived from the log's round5/round6 quantization:
-  worst-case ≈1.2e-5; threshold set 1.6× above).
-- Records where the comparison sits inside `boundary_band_abs` of a decision
-  threshold (|close−stop|, |close−trail|, |trail−last_stop|) are
+  `tol_price(close) = tol_price_abs + close · trailing_mult · tol_atr_quantum ·
+  tol_safety` — the ATR-quantization term scales with price level (v2: the v1
+  flat bound silently assumed ~1.4-level prices and was 5× too tight for JPY
+  quotes near 160; see §10).
+- Records where the comparison sits inside `boundary_band(close)` (same
+  formula) of a decision threshold (|close−stop|, |close−trail|,
+  |trail−last_stop|) are
   **BOUNDARY_INDETERMINATE**: excluded from the L1 denominator, counted, and
   warned above `boundary_share_warn`.
 - cb_refresh ambiguity (`hold_today` unlogged): records with
@@ -93,7 +96,13 @@ kernel over the yfinance bars.
 - **Required: decision match rate ≥ `l2_decision_match_min` over the full
   window**, with every mismatch classified (§5) and zero left unexplained.
 - Always report per-pair |Δclose| and |Δatr| percentiles — the continuous
-  divergence measure — and warn when median |Δclose| > `close_delta_warn_abs`.
+  divergence measure — and warn when median |Δclose|/close >
+  `close_delta_warn_rel` (v2: relative, not absolute — a fixed 5e-4 was
+  16 pips of headroom on EURUSD and permanently tripped on USDJPY at 160).
+- C2 (calendar) and C4 (SKIP) records are excluded from the L2 denominator:
+  OANDA publishes weekend-dated candles that have no yfinance counterpart —
+  those are calendar-structure facts, not decision divergences. They are
+  counted and reported.
 - yfinance unreachable → `l2_status: SKIPPED_OFFLINE` (loud), gate PENDING,
   L1 + watchdog still run; ≥ `l2_offline_consecutive_warn` consecutive skips
   escalates IMPORTANT.
@@ -104,7 +113,7 @@ kernel over the yfinance bars.
 |-------|---------|-------------------|
 | C1 | Price-source | Substitution rerun (OANDA close and/or atr into the L2 bar, that bar only) reproduces the logged decision AND the input delta is real (|Δclose|>2e-5 or |Δatr|>1e-6). Variant + deltas recorded. |
 | C2 | Timing/calendar | Unalignable date, holiday, weekend candle, mid-window shift instability. |
-| C3 | Documented incident | The bar_date/trade is covered by the incident register; the register entry is cited. |
+| C3 | Documented incident | The record's **run date or bar_date** is covered by the incident register; the register entry is cited. (v2: incidents are operations — a double-step performed on Jun 30 re-stepped bar_date Jun 28; run-date matching is the correct key.) |
 | C4 | Data unavailable | SKIP records; excluded from the L2 denominator. |
 | C5 | **UNEXPLAINED** | Everything else. **Allowed count: 0.** Same-day URGENT escalation. |
 
@@ -166,11 +175,12 @@ the fence count ≠ 1. Reports record `spec_version`, `spec_sha256` (whole file)
 and the analyzer's git commit.
 
 ```yaml audit-spec
-spec_version: 1
+spec_version: 2
 shadow_window_start: 2026-06-29
 shadow_window_expected_end: 2026-07-28
 tol_price_abs: 2.0e-5
-boundary_band_abs: 2.0e-5
+tol_atr_quantum: 5.0e-7
+tol_safety: 2.0
 boundary_share_warn: 0.02
 l1_required_pass_rate: 1.0
 hold_today_assumed: 60
@@ -186,7 +196,7 @@ live_records_allowed: 0
 staleness_grace_min: 30
 exit_manager_fire_local: "08:30"
 l2_offline_consecutive_warn: 2
-close_delta_warn_abs: 5.0e-4
+close_delta_warn_rel: 2.0e-3
 messages_cap: 50
 report_dir: audit/reports
 shadow_log: data/exec/exit_manager_shadow.jsonl
@@ -204,3 +214,17 @@ one.
 
 - 2026-07-02 — v1 — Initial spec. Committed before any log read; analyzer does
   not exist yet.
+- 2026-07-02 — v2 — Amended AFTER the first smoke run (logs had been read;
+  disclosed). Three corrections, all forced by arithmetic or by pre-documented
+  facts — none by wanting a result to pass: (1) trail tolerance and boundary
+  band become price-scaled — the v1 flat 2e-5 embedded a ~1.4 price-level
+  assumption; the ATR round-6 quantization contributes close·mult·5e-7
+  (~1.0e-4 at USDJPY 160), and the three v1 "failures" were exactly this
+  quantization (Δ 3.8–8.8e-5, all inside the corrected bound). (2) Incident
+  matching keys on run date as well as bar_date — the pre-registered Jun-30
+  double-step re-stepped bar_date Jun-28; v1's bar_date-only key misclassified
+  the pre-explained incident as C5. (3) `close_delta_warn_abs` → relative
+  (`close_delta_warn_rel: 2.0e-3`) — an absolute pip threshold cannot serve
+  1.1-level and 160-level quotes simultaneously. No threshold governing
+  PASS/FAIL of *unexplained* divergence was loosened: C5 allowance stays 0,
+  L1 required rate stays 100%, L2 floor stays 0.95.

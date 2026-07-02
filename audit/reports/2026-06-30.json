@@ -1,0 +1,147 @@
+{
+  "report_date": "2026-06-30",
+  "spec_version": 2,
+  "spec_sha256": "6800b9a709327b21c5474a125be8b9952b66c60b51f680bba8ff2d961109a0c3",
+  "analyzer_commit": "838244b",
+  "records_total": 10,
+  "records_normal": 9,
+  "records_today": 5,
+  "parse_problems": [],
+  "watchdog": {
+    "heartbeat_today": "not-due",
+    "job_loaded": true,
+    "plist_matches_tracked": true,
+    "shadow_mode_true": true
+  },
+  "l1": {
+    "passed": 7,
+    "failed": [],
+    "boundary": 2,
+    "ambiguous": 0,
+    "pass_rate": 1.0,
+    "continuity_violations": [
+      {
+        "trade_id": "105",
+        "bar_date": "2026-06-28",
+        "class": "C3",
+        "detail": "hold_count 2\u21923",
+        "incident": "INC-2026-06-30 manual+launchd double-step pre-guard (param_change_log 2026-06-30T22:32Z); standing hold_count +1 offset"
+      },
+      {
+        "trade_id": "123",
+        "bar_date": "2026-06-28",
+        "class": "C3",
+        "detail": "hold_count 1\u21922",
+        "incident": "INC-2026-06-30 manual+launchd double-step pre-guard (param_change_log 2026-06-30T22:32Z); standing hold_count +1 offset"
+      }
+    ],
+    "action_unverifiable": 0
+  },
+  "l2": {
+    "status": "OK",
+    "scored": 5,
+    "matched": 4,
+    "match_rate": 0.8,
+    "mismatches": [
+      {
+        "trade_id": "105",
+        "bar_date": "2026-06-28",
+        "class": "C2",
+        "detail": "no yfinance bar at shifted date 2026-06-27"
+      },
+      {
+        "trade_id": "105",
+        "bar_date": "2026-06-28",
+        "class": "C2",
+        "detail": "no yfinance bar at shifted date 2026-06-27"
+      },
+      {
+        "trade_id": "105",
+        "bar_date": "2026-06-29",
+        "class": "C2",
+        "detail": "no yfinance bar at shifted date 2026-06-28"
+      },
+      {
+        "trade_id": "130",
+        "bar_date": "2026-06-28",
+        "class": "C2",
+        "detail": "no yfinance bar at shifted date 2026-06-28"
+      },
+      {
+        "trade_id": "177",
+        "bar_date": "2026-06-29",
+        "class": "C1",
+        "detail": "substituting OANDA close reproduces it (\u0394close=6.66e-01, \u0394atr=6.70e-04)"
+      }
+    ],
+    "shifts": {
+      "AUD_NZD": 0,
+      "EUR_USD": -1,
+      "USD_JPY": 1
+    },
+    "seed_modes": {
+      "105": "ENTRY",
+      "123": "ENTRY",
+      "130": "ENTRY",
+      "177": "ENTRY"
+    },
+    "delta_stats": {
+      "EUR_USD": {
+        "dclose_p50": 0.0005457649230957706,
+        "dclose_p90": 0.0005457649230957706,
+        "dclose_rel_p50": 0.00047937191312759825,
+        "datr_p50": 0.0007950469953112325,
+        "n": 1
+      },
+      "USD_JPY": {
+        "dclose_p50": 0.1569974365234259,
+        "dclose_p90": 0.6659958496093736,
+        "dclose_rel_p50": 0.0009694550988207399,
+        "datr_p50": 0.0007166504378981597,
+        "n": 3
+      },
+      "AUD_NZD": {
+        "dclose_p50": 0.003620020942687985,
+        "dclose_p90": 0.003620020942687985,
+        "dclose_rel_p50": 0.002969859336698048,
+        "datr_p50": 0.0005439484754128981,
+        "n": 1
+      }
+    },
+    "cache_revisions": 0
+  },
+  "taxonomy": {
+    "C1": 1,
+    "C2": 4,
+    "C3": 2,
+    "C4": 1,
+    "C5": 0
+  },
+  "gate": {
+    "gates": {
+      "l1_pass_rate_100": [
+        "PASS",
+        "1.0000 (7/7)"
+      ],
+      "c5_zero": [
+        "PASS",
+        "0"
+      ],
+      "l2_match": [
+        "PENDING",
+        "0.8000 (4/5) below floor at current n"
+      ],
+      "coverage": [
+        "PENDING",
+        "3 weekdays / 9 records"
+      ],
+      "no_live_records": [
+        "PASS",
+        "0"
+      ]
+    },
+    "overall": "NOT-YET",
+    "c5": 0,
+    "live_records": 0
+  }
+}
