@@ -93,10 +93,22 @@ def main() -> dict:
             "SELECT 100.0*AVG(CASE WHEN vrp_signal IS NOT NULL THEN 1 ELSE 0 END) FROM sentiment_board_state").fetchone()[0]
         print(f"   board rows with vrp_signal: {board_pct:.1f}%")
         print(f"BOARD: {board_rows} rows (sentiment_board_state)")
+        # ── automated look-ahead audit (ALFRED standard) — every run, fail loud ──
+        from scripts.audit_look_ahead import audit as _la_audit
+        la = _la_audit(con)
+        la_viol = sum(r["violations"] for r in la)
+        print(f"LOOK-AHEAD AUDIT: {la_viol} violations across "
+              f"{sum(r['total'] for r in la)} provenance-checked rows"
+              + ("" if la_viol == 0 else "  ⚠️ VIOLATIONS — DO NOT TRUST THE BOARD"))
+        if la_viol:
+            for r in la:
+                if r["violations"]:
+                    print(f"   ✗ {r['table']}.{r['check']}: {r['violations']}/{r['total']}")
         print(f"DB: {store.DB_PATH}")
         return {"board_rows": board_rows, "news": news_cov, "gdelt": gdelt_cov, "macro": macro_cov,
                 "vix": vix_cov, "surprise": surprise_cov, "cot": cot_cov, "vrp": vrp_cov,
-                "vrp_board_pct": board_pct, "news_probe": news_probe}
+                "vrp_board_pct": board_pct, "news_probe": news_probe,
+                "look_ahead_violations": la_viol}
     finally:
         con.close()
 

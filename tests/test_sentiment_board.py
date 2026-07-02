@@ -366,6 +366,26 @@ class TestCOT:
         assert r[0] == pytest.approx(0.99) and r[2] == pytest.approx(-2.4)
         assert r[3] == pd.Timestamp("2024-05-31 15:30")
 
+    def test_look_ahead_auditor_clean_on_seeded_db(self, con):
+        # the standalone auditor must report zero violations on the honest seeded fixture
+        from scripts.audit_look_ahead import audit
+        results = audit(con)
+        assert results, "auditor returned no checks"
+        assert sum(r["violations"] for r in results) == 0, results
+
+    def test_look_ahead_auditor_catches_seeded_leak(self, con):
+        # seed a row PUBLISHED BEFORE ITS MEASUREMENT — the auditor must flag exactly that
+        from scripts.audit_look_ahead import audit
+        leak = pd.DataFrame(
+            [(pd.Timestamp("2024-06-04").date(), pd.Timestamp("2024-06-03").date(), "LEAKPAIR",
+              1, 1, 0, 0.0, 0.5, 100, NOW)],
+            columns=["measurement_date", "publish_date", "pair", "noncomm_long", "noncomm_short",
+                     "net_spec", "net_oi", "net_pct", "open_interest", "fetched_at"])
+        store.upsert(con, "sentiment_cot_weekly", leak, ["measurement_date", "pair"])
+        viol = {(r["table"], r["check"]): r["violations"] for r in audit(con)}
+        assert viol[("sentiment_cot_weekly", "publish_after_measurement")] == 1
+        con.execute("DELETE FROM sentiment_cot_weekly WHERE pair='LEAKPAIR'")
+
     def test_tff_table_exists_and_guarded(self, con):
         tff = pd.DataFrame(
             [(pd.Timestamp("2024-05-28").date(), pd.Timestamp("2024-05-31").date(), "EURUSD",
