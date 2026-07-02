@@ -133,6 +133,28 @@ CREATE TABLE IF NOT EXISTS sentiment_vrp_daily (
     fetched_at   TIMESTAMP,
     PRIMARY KEY (date, pair)
 );
+-- FX-ETF options SURFACE (ThetaData) — one table serving VRP-001 (ATM term structure) AND the
+-- positioning board (25Δ risk reversals, 25Δ butterflies). Weekly Friday obs; iv_obs_date == date
+-- (forward-look audited). iv_source LIKE 'FIXTURE%' rows are test scaffolding — never hypothesis input.
+CREATE TABLE IF NOT EXISTS sentiment_options_surface (
+    date        DATE,
+    pair        VARCHAR,
+    symbol      VARCHAR,       -- currency-ETF underlying (FXE/FXB/FXY/FXA)
+    expiry_1m   DATE,          -- ~30d expiration used
+    dte_1m      INTEGER,
+    atm_iv_1m   DOUBLE,        -- ATM implied vol, annualized (Black-76 inversion from EOD mids)
+    rr25        DOUBLE,        -- iv(25Δ call) − iv(25Δ put) — skew / crowd direction
+    bf25        DOUBLE,        -- 0.5·(iv25c+iv25p) − atm_iv_1m — wings / tail demand
+    n_strikes   INTEGER,       -- OTM strikes feeding the smile read (quality)
+    expiry_3m   DATE,          -- ~90d expiration used
+    dte_3m      INTEGER,
+    atm_iv_3m   DOUBLE,
+    term_slope  DOUBLE,        -- atm_iv_1m − atm_iv_3m (>0 = inverted term structure)
+    iv_source   VARCHAR,       -- 'bs_invert' | 'native' | 'FIXTURE:…' (fixture rows are test-only)
+    iv_obs_date DATE,          -- provenance (== date; forward-look guard)
+    fetched_at  TIMESTAMP,
+    PRIMARY KEY (date, pair)
+);
 CREATE TABLE IF NOT EXISTS sentiment_board_state (
     date            DATE,
     pair            VARCHAR,
@@ -177,6 +199,9 @@ ALTER TABLE sentiment_board_state ADD COLUMN IF NOT EXISTS cot_net_pct_1y DOUBLE
 ALTER TABLE sentiment_board_state ADD COLUMN IF NOT EXISTS cot_net_z DOUBLE;
 ALTER TABLE sentiment_board_state ADD COLUMN IF NOT EXISTS cot_flush_1w DOUBLE;
 ALTER TABLE sentiment_board_state ADD COLUMN IF NOT EXISTS tff_lev_net_pct DOUBLE;
+ALTER TABLE sentiment_board_state ADD COLUMN IF NOT EXISTS rr25 DOUBLE;
+ALTER TABLE sentiment_board_state ADD COLUMN IF NOT EXISTS bf25 DOUBLE;
+ALTER TABLE sentiment_board_state ADD COLUMN IF NOT EXISTS atm_term_slope DOUBLE;
 """
 
 

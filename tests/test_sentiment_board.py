@@ -401,6 +401,54 @@ class TestCOT:
         assert pcts.stack().between(0, 1).all()
 
 
+# ── Options SURFACE: ATM term structure + 25Δ RR/BF (HYP-074/075/078/079 substrate) ────────────
+class TestOptionsSurface:
+    """Offline: the FXE fixture chains were PRICED from a known smile
+    (data/fixtures/thetadata/FXE.json smile_params) — the surface math must recover it."""
+
+    def test_smile_recovery_from_known_fixture(self):
+        import json
+        from sovereign.sentiment.options_surface_feed import FixtureLoader, smile_read
+        L = FixtureLoader()
+        doc = json.load(open("data/fixtures/thetadata/FXE.json"))
+        near = doc["smile_params"]["2026-07-24"]
+        out = smile_read(L.get_option_chain("FXE", "2026-06-26", "2026-07-24"),
+                         100.0, near["dte"], 0.04, 5)
+        assert out is not None and out["n_strikes"] >= 5
+        assert out["atm_iv"] == pytest.approx(near["atm"], abs=1e-3)
+        # analytic rr25 ≈ skew·(x_c25 − x_p25) with x ≈ ±σ√T·z(0.25); for these params ≈ −0.0031
+        assert out["rr25"] == pytest.approx(-0.0031, abs=4e-4)
+        assert abs(out["bf25"]) < 5e-4                      # wings ~flat at these tight moneyness levels
+
+    def test_fixture_mode_is_loud_and_stamped(self, con, capsys):
+        from sovereign.sentiment import options_surface_feed as osf
+        cov = osf.update(con=con, fixture=True)
+        printed = capsys.readouterr().out
+        assert "FIXTURE MODE — NOT REAL DATA" in printed
+        assert any(k.startswith("FIXTURE:") for k in cov)   # coverage keys stamped
+        src = con.execute("SELECT DISTINCT iv_source FROM sentiment_options_surface").df()
+        assert src["iv_source"].str.startswith("FIXTURE:").all()   # every row stamped
+
+    def test_surface_provenance_and_term_slope(self, con):
+        from sovereign.sentiment import options_surface_feed as osf
+        osf.update(con=con, fixture=True)
+        bad = con.execute("SELECT COUNT(*) FROM sentiment_options_surface WHERE iv_obs_date > date").fetchone()[0]
+        assert bad == 0
+        row = con.execute("SELECT atm_iv_1m, atm_iv_3m, term_slope, rr25 FROM sentiment_options_surface "
+                          "WHERE pair='EURUSD'").fetchone()
+        assert row is not None
+        assert row[2] == pytest.approx(row[0] - row[1], abs=1e-12)  # slope = 1m − 3m
+        assert row[2] < 0                                            # fixture term structure is upward (10% < 12%)
+        assert row[3] == pytest.approx(-0.0031, abs=4e-4)
+
+    def test_look_ahead_auditor_covers_surface(self, con):
+        from sovereign.sentiment import options_surface_feed as osf
+        from scripts.audit_look_ahead import audit
+        osf.update(con=con, fixture=True)
+        checks = {(r["table"], r["check"]) for r in audit(con)}
+        assert ("sentiment_options_surface", "provenance_not_after_date") in checks
+
+
 # ── VRP-001: implied vol − realized vol FEATURE (ThetaData FX-ETF options) ─────────────────────
 class TestVRP:
     # ── the MANDATORY, load-bearing look-ahead guard ──

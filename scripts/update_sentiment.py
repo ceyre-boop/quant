@@ -26,7 +26,8 @@ for lib in ("yfinance", "peewee", "urllib3", "requests", "fredapi"):
 
 from config.loader import params
 from sovereign.sentiment import (
-    store, news_feed, macro_feed, vix_feed, gdelt_feed, surprise_feed, cot_feed, vrp_feed, board_state,
+    store, news_feed, macro_feed, vix_feed, gdelt_feed, surprise_feed, cot_feed, vrp_feed,
+    options_surface_feed, board_state,
 )
 
 HEARTBEAT = ROOT / "logs" / ".heartbeat_sentiment"
@@ -35,6 +36,8 @@ HEARTBEAT = ROOT / "logs" / ".heartbeat_sentiment"
 def main() -> dict:
     ap = argparse.ArgumentParser(description="Sentiment board-state daily updater")
     ap.add_argument("--backfill", action="store_true", help="pull full FRED/VIX history from sentiment.macro_start")
+    ap.add_argument("--fixture", action="store_true",
+                    help="options surface from data/fixtures/thetadata (LOUD test-only mode — never real)")
     args = ap.parse_args()
 
     # Heartbeat FIRST (loop_health monitoring), before any network call.
@@ -52,6 +55,7 @@ def main() -> dict:
         surprise_cov = surprise_feed.update(con=con, start=start)  # release-innovation spine
         cot_cov = cot_feed.update(con=con)                         # CFTC COT positioning (Friday-published)
         vrp_cov = vrp_feed.update(con=con)                         # VRP feature (ThetaData FX-ETF options)
+        surf_cov = options_surface_feed.update(con=con, fixture=args.fixture)  # RR25/BF25/term structure
         board_rows = board_state.rebuild(con=con)
 
         # ── coverage report (required deliverable) ──
@@ -92,6 +96,14 @@ def main() -> dict:
         board_pct = con.execute(
             "SELECT 100.0*AVG(CASE WHEN vrp_signal IS NOT NULL THEN 1 ELSE 0 END) FROM sentiment_board_state").fetchone()[0]
         print(f"   board rows with vrp_signal: {board_pct:.1f}%")
+        print("OPTIONS SURFACE (ThetaData FX-ETF, weekly rr25/bf25/term):")
+        if not surf_cov:
+            print("   NOT REACHABLE — ThetaTerminal down (feature skipped, board carries NULL rr25/bf25/atm_term_slope)")
+        for key, c in surf_cov.items():
+            tag = "⚠️ FIXTURE — NOT REAL DATA  " if key.startswith("FIXTURE:") else ""
+            span = f"{c.get('start')}→{c.get('end')}" if c.get("rows") else f"NO DATA ({c.get('note','')})"
+            print(f"   {tag}{key:14} [{c.get('symbol','?'):3}] obs={c.get('rows'):>4}  {span}"
+                  f"  rr25_nonnull={c.get('rr25_nonnull', 0)}")
         print(f"BOARD: {board_rows} rows (sentiment_board_state)")
         # ── automated look-ahead audit (ALFRED standard) — every run, fail loud ──
         from scripts.audit_look_ahead import audit as _la_audit
@@ -107,7 +119,7 @@ def main() -> dict:
         print(f"DB: {store.DB_PATH}")
         return {"board_rows": board_rows, "news": news_cov, "gdelt": gdelt_cov, "macro": macro_cov,
                 "vix": vix_cov, "surprise": surprise_cov, "cot": cot_cov, "vrp": vrp_cov,
-                "vrp_board_pct": board_pct, "news_probe": news_probe,
+                "options_surface": surf_cov, "vrp_board_pct": board_pct, "news_probe": news_probe,
                 "look_ahead_violations": la_viol}
     finally:
         con.close()

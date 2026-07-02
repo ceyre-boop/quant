@@ -12,14 +12,14 @@ justified buying real chains. This runbook is Stages 2–4 on those chains.
 
 ## 0. Prereqs
 - ThetaData Options Value subscription active.
-- **ThetaTerminal running locally** (it exposes the REST gateway, default `127.0.0.1:25510`).
+- **ThetaTerminal running locally** (it exposes the REST gateway, default `127.0.0.1:25503` (code default; older docs said 25510 — 25503 is what data_loader/vrp_feed/schema_verify all use)).
 - Pre-registration is signed and frozen: `python3 scripts/vrp_sign_prereg.py --check` → `OK`.
 
 ## 1. Add credentials
 Copy `.env.example` → `.env` (if not already) and set:
 ```
 THETADATA_API_KEY=...            # if your ThetaTerminal login requires it
-THETADATA_BASE_URL=http://127.0.0.1:25510
+THETADATA_BASE_URL=http://127.0.0.1:25503
 ```
 
 ## 2. Verify the schema (one request — the only API touch before coding)

@@ -134,7 +134,7 @@ def _best_expiry(loader, symbol: str, d: pd.Timestamp, cfg: dict) -> tuple[str, 
 
 def _atm_iv_for_date(loader, symbol: str, d: pd.Timestamp, spot: float, cfg: dict) -> dict | None:
     """One (iv_atm, source, strike, expiry, dte) reading for `symbol` on trading day `d`, or None."""
-    exp, dte = _best_expiry(loader, symbol, d)
+    exp, dte = _best_expiry(loader, symbol, d, cfg)
     if not exp:
         return None
     chain = loader.get_option_chain(symbol, str(d.date()), exp)
