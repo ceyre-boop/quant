@@ -1,0 +1,42 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# config/risk_constitution.yaml
+# Machine-readable twin of RISK_CONSTITUTION.md, Articles 1-3.
+#
+# GOVERNANCE: this file must NOT be imported by live trading code (it is not
+# referenced by config/loader.py, and tests/test_risk_constitution.py guards
+# that). It exists solely so the drift test can prove the prose constitution
+# and these constants never diverge.
+#
+# UNITS: all *_frac values are decimal fractions of account equity
+# (0.0075 == 0.75%). The percent form lives only in the prose; the /100
+# conversion lives only in the test.
+#
+# AMENDMENT (Article 5): change this file and RISK_CONSTITUTION.md in the SAME
+# commit, with a dated entry in the MD Amendments section. Do not "fix" the
+# drift test.
+# ─────────────────────────────────────────────────────────────────────────────
+
+meta:
+  status: DRAFT            # DRAFT until ratification; test enforces the MD banner matches
+  ratified: false
+  version: 0.1.0
+  source: RISK_CONSTITUTION.md
+  last_amended: 2026-07-01
+
+article_1_per_trade:
+  hard_cap_frac: 0.0075    # 0.75% of equity, worst-case loss at stop, per trade
+
+article_2_carry_complex:
+  # The constitution deliberately names FIVE pairs (AUDNZD included) even though
+  # the live universe currently trades four (HYP-045). Constitutional scope >
+  # live scope. Do not "fix" this list down to the live universe.
+  carry_pairs: [GBPUSD, EURUSD, AUDUSD, AUDNZD, USDJPY]
+  carry_heat_cap_frac: 0.025    # 2.5% combined worst-case open risk; one bet under stress
+
+article_3_breakers:
+  halve_sizing_at_dd_frac: 0.05        # -5% peak-to-trough: halve all new sizing
+  halt_new_entries_at_dd_frac: 0.07    # -7%: no new entries
+  flatten_predictive_at_dd_frac: 0.085 # -8.5%: flatten the predictive layer
+  # Rationale only, NOT a constant of this constitution: the 10% prop kill line
+  # belongs to the prop account; internal floors live in
+  # sovereign/risk/config/risk_config.yaml.
