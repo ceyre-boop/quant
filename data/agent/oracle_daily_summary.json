@@ -1,14 +1,14 @@
 {
-  "last_updated": "2026-06-30T06:30:50.210111+00:00",
+  "last_updated": "2026-07-01T06:31:00.042219+00:00",
   "harvest": {
     "trades_closed": 0,
     "win_rate": null,
     "failure_taxonomy": {}
   },
   "reflection": {
-    "candidate_lesson": "When the 30-indicator consensus shows high conviction but green_matches=0, treat the signal as historically un-anchored and cut size, not as a high-confidence entry.",
-    "mechanism": "green_matches counts how many times the current live indicator configuration has previously resolved into a profitable forward outcome. When conviction is high (e.g. AUDUSD 100%, USDJPY 83%) but green_matches=0, the system is extrapolating from an indicator alignment that has no validated historical analog \u2014 institutional flow may be transient noise that the indicator stack mistakes for a regime. High conviction with zero matched precedent is the signature of an over-fit live snapshot, not a durable edge.",
-    "testable_rule": "if consensus_conviction >= 0.80 and green_matches == 0: size_multiplier *= 0.5  # require historical anchor before full size"
+    "candidate_lesson": "When the 30-indicator consensus shows high conviction (>=80%) but green_matches=0 and hist_hr=0, treat the signal as UNVALIDATED and freeze \u2014 conviction without historical pattern confirmation is unproven direction, not tradeable edge.",
+    "mechanism": "green_matches=0 means the current live indicator configuration has never been seen paired with a winning outcome in memory; conviction only measures agreement among indicators at this instant, not whether that agreement historically resolved profitably. USDJPY today shows the trap: conv=100% LONG but hist_hr=0% \u2014 a fresh, untested consensus that safe-haven flow (L8) can corrupt. Institutional rate-signal reliability degrades exactly when indicators cluster without historical precedent, because clustering often reflects a crowded one-way positioning about to mean-revert.",
+    "testable_rule": "if consensus_conviction >= 0.80 and green_matches == 0 and hist_hr <= 0.10: veto_entry() # require at least one historical green_match before trusting high-conviction direction"
   },
   "validation": {
     "verdict": "REJECTED",
@@ -21,8 +21,8 @@
     "codify_error": null
   },
   "cycle": {
-    "cost_usd": 0.14712,
+    "cost_usd": 0.15789,
     "status": "COMPLETE",
-    "date": "2026-06-30"
+    "date": "2026-07-01"
   }
 }

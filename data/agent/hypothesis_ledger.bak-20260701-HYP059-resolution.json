@@ -1098,37 +1098,11 @@
         "date": "2026-06-19T01:14:52.560003+00:00",
         "by": "REST-019",
         "note": "Entry-gate alternative tested and REJECTED (FIND-REST-019-a): no entry-known feature (pair/dir/DOW/DOM) cleanly proxies the 3-5d trailing whipsaw. Tuesday 'edge' is a confounded EURUSD artifact capturing only ~40% of the -42R drag while sacrificing net winners. This strengthens HYP-059: the drag is an EXIT-mechanism problem. Status unchanged CONFIRMED. Next lever stays the trailing-activation-delay re-sim (RQ-REST-013, network-blocked)."
-      },
-      {
-        "date": "2026-07-01T00:00:00+00:00",
-        "by": "EXIT-SWEEP",
-        "note": "RESOLVED (actionable lever). 180-config full grid (stop x trail x hold, 4 pairs, 2015-2024): 0/180 beat v015 (0.6886) in both regimes, 0/180 FDR-significant; 1/180 beats on point estimate only (regime-fragile). The -60.8R trailing 'drag' is a per-trade counterfactual, not a portfolio A/B effect. Trail loosen/disable does NOT improve risk-adjusted returns -> v015 CONFIRMED OPTIMAL. Structural per-trade fact unchanged (still FWER-robust per HYP-063). See Trading/Research/ExitConfig-Sweep-2026-07-01.md."
       }
     ],
     "notes": [
-      "2026-06-25 REST-024: REPLICATED on independent v015 proof set (411 trades). 3-5d trailing cluster = 95% of drag (CI excludes 0). Flat-year drag + 2023/24 OOS (-0.6/-14.1R) confirm regime-fragility signature. Data_limitation '2023-24 not testable' partially closed. Status stays CONFIRMED, now multi-dataset.",
-      "2026-07-01 EXIT-SWEEP: actionable exit-lever REFUTED by 180-config full grid; v015 at global optimum (0/180 both-regime beats, 0/180 FDR-sig). Structural status stays CONFIRMED. Do not reopen without new evidence."
-    ],
-    "actionable_lever_status": "REFUTED",
-    "resolution": {
-      "date": "2026-07-01",
-      "by": "EXIT-SWEEP (ExitConfig 180-config full grid)",
-      "verdict": "REFUTED as a live lever -> v015 CONFIRMED OPTIMAL",
-      "text": "HYP-059 finding (trailing stop = net drag, -60.8R) was a per-trade counterfactual artifact, NOT a portfolio A/B effect. The 180-config parameter sweep (2026-07-01, ExitConfig-Sweep-2026-07-01.md) found 0/180 configs beat v015 (0.6886 full-decade sqrt(n) Sharpe) in both regime states, 0/180 FDR-significant. v015 confirmed at global optimum. Trail loosening/disabling does NOT improve risk-adjusted returns. Status: REFUTED -> v015 CONFIRMED OPTIMAL. Do not reopen without new evidence.",
-      "sweep": {
-        "n_configs": 180,
-        "grid": "stop x trail x hold, 4 pairs, 2015-2024 proof set",
-        "v015_baseline_sharpe": 0.6886,
-        "reproduced_exact_vs_prove_py": true,
-        "beat_on_point_estimate": "1/180 (stop1.5/trail1.5/hold5 -> 0.6951, +0.9%, regime-fragile)",
-        "beat_in_both_regimes": "0/180",
-        "fdr_significant": "0/180",
-        "note_60_8R": "the -60.8R trailing drag is a per-trade counterfactual, not a portfolio A/B gain; a moderate 1.5x trail maximizes return AND Sharpe AND drawdown; hold cap inert past ~45d; per-pair trailing beats every uniform trail"
-      },
-      "artifact": "Trading/Research/ExitConfig-Sweep-2026-07-01.md",
-      "structural_status_note": "Top-level status stays CONFIRMED: the per-trade fact that the trailing exit is net-negative is real and is the single FWER-robust deployable result per HYP-063. What is REFUTED is the ACTIONABLE claim that loosening/disabling the trail improves PORTFOLIO risk-adjusted returns. Structural fact != portfolio lever.",
-      "reopen": "Do not reopen without new evidence."
-    }
+      "2026-06-25 REST-024: REPLICATED on independent v015 proof set (411 trades). 3-5d trailing cluster = 95% of drag (CI excludes 0). Flat-year drag + 2023/24 OOS (-0.6/-14.1R) confirm regime-fragility signature. Data_limitation '2023-24 not testable' partially closed. Status stays CONFIRMED, now multi-dataset."
+    ]
   },
   {
     "id": "HYP-060",
@@ -1419,7 +1393,7 @@
     "status": "NOT_SIGNIFICANT",
     "date_tested": "2026-06-29",
     "hash_lock": "a348c6f48c7ed17a14f031e591d62b50c0aa996a16d69e69b71a3297c4bcd0e1",
-    "result": "NOT_SIGNIFICANT: regime-keying exit params DEGRADED OOS \u2014 portfolio Sharpe 0.901->0.769, permutation p=0.605 (obs improvement -0.022), 0/4 buckets survive BH, forward 2025-26 ~ tie (both ~0.51). N=408 trades (Vhi_Ahi 139 / Vlo_Alo 139 / off-diagonals 65 each). In-sample picked distinct per-bucket configs that vanish OOS = textbook overfit. Static exit config retained.",
+    "result": "NOT_SIGNIFICANT: regime-keying exit params DEGRADED OOS — portfolio Sharpe 0.901->0.769, permutation p=0.605 (obs improvement -0.022), 0/4 buckets survive BH, forward 2025-26 ~ tie (both ~0.51). N=408 trades (Vhi_Ahi 139 / Vlo_Alo 139 / off-diagonals 65 each). In-sample picked distinct per-bucket configs that vanish OOS = textbook overfit. Static exit config retained.",
     "mechanism": "Meta-labeling (AFML ch.3): canonical decade entries fixed, single-trade exit replay through the shared decide_exit (parity-deployable), 12-config grid (stop in {1.5,2.0,2.5} x trail in {1.0,1.25,1.5,2.0}) keyed by entry VIX x FX-ATR 2x2 median split; purged interval-overlap 5-fold, 10k-permutation, deflated-Sharpe(n_trials=48), Benjamini-Hochberg.",
     "methodology_note": "scripts/research/exit_regime_conditioning.py (pre-registered, hash-locked, self-verifies + HALTs on mismatch); reconcile gate 0.6886 exact vs canonical v015; exit-machine parity 22/22 green. Re-runnable. Backfilled 2026-07-01 to reconcile the JSON ledger with 00-BRAIN/DECISIONS.md D-Q-2026-06-29, where this NULL was recorded but the ledger entry was missing.",
     "standalone": true,
@@ -1511,12 +1485,7 @@
     "mechanism": "CFTC COT large-spec (non-comm) NET positioning, trailing-3yr percentile (cot_net_pct), Friday-publish-dated (no look-ahead, commit 85eb56b). Tested CONTRARIAN fade of extreme positioning (>0.8 / <0.2 crossings) -> forward move per pair at 5/10/20 trading days, USD-signed (USDJPY inverse verified), on DE-OVERLAPPED distinct crossing events. STRATEGIC QUESTION: is this an edge UNCORRELATED with carry that could raise blended Calmar (carry's ~1.07 too thin for a 10/10 prop cap)? ANSWER: no on both clauses.",
     "result": {
       "finding": "No significant contrarian edge AND positively correlated with carry. Distinct extreme-crossing events: EURUSD 24 (12hi/12lo), GBPUSD 27, AUDUSD 36, USDJPY 40 (real N per pair, not the ~23-32% of weeks at extreme). Forward tables: EVERY cell p>0.13. 40-60th baseline a clean ~50% (51/46/50/48). Only whisper EURUSD 10d 67% +0.27% / 20d 67% +0.64% (p=0.15, N=24); ex-2020 10d 68% p=0.13; 5d 42% wrong-way. GBPUSD 10d 37% (fades wrong way); AUDUSD/USDJPY ~50%.",
-      "distinct_events_N": {
-        "EURUSD": 24,
-        "GBPUSD": 27,
-        "AUDUSD": 36,
-        "USDJPY": 40
-      },
+      "distinct_events_N": {"EURUSD": 24, "GBPUSD": 27, "AUDUSD": 36, "USDJPY": 40},
       "best_cell": "EURUSD 20d: hit 67%, median +0.64%, p=0.15, N=24 (NOT significant)",
       "correlation_to_carry": "daily-return corr +0.09 all days / +0.18 both-active (n=686); position agreement EUR 58% GBP 54% AUD 41% JPY 46% (whisper pairs AGREE with carry); carry drawdown when COT-active -2.90% vs -3.17% all days (COT fires when carry is HEALTHY, not in pain); COT contrarian standalone daily Sharpe -0.14 vs carry +0.92.",
       "interpretation": "COT large-spec extremes COINCIDE with the carry trade (large specs ARE the carry crowd), they don't oppose it -> no uncorrelated second edge. Fails BOTH clauses of the pre-register gate (directional edge AND uncorrelated-with-carry). Does NOT provide the diversifying leg the prop-firm Calmar math needed.",

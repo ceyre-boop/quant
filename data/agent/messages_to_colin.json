@@ -1,6 +1,231 @@
 {
   "messages": [
     {
+      "id": "rest-031-20260702T011353Z",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "[REST-031] The URGENT OUTCOME_LOOP_STALL alarm is a FALSE POSITIVE \u2014 the forex loop IS closing. pulse re-scans OANDA's last-100 closed trades every 2h and screams whenever 0 re-match, but 0 re-matches is the healthy steady state (run_oanda_paper closes them at close time; native records show real outcomes: tid29 USD_JPY WIN, tid25/59/119 AUD_NZD LOSS, tid134-165 USD_CAD LOSS). The alarm can't tell 'already closed' from 'never matched.' Two real gaps remain: (1) alarm should fire only on closed trades whose decision record is still OPEN/absent; (2) a few AUD_USD/GBP_USD/EUR_USD fills (tid47/51/72/83/93/105) never close because update_outcome matches on pair+timestamp, not trade_id \u2014 and the trade_id join key ALREADY exists in oanda_fills.jsonl + the decision records, just unused (that's REST-030 Change 2; data's already there). Also VERIFIED RQ-REST-018: c7908a9 killed the constant-1.0 commitment_score (July entries now log honest None); real score still unwired = REST-030 Change 1. Net: the URGENT stall is noisy, not on fire. RQ-REST-019b sharpened with both fixes.",
+      "timestamp": "2026-07-02T01:13:53Z",
+      "read": false,
+      "source": "rest_mode"
+    },
+    {
+      "id": "pulse-20260702T0048",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "[PULSE] REST_MODE_WEEK_TWO: HYP-063 validated 10 days ago, still in rest_mode. Week 2 \u2014 decision needed.",
+      "timestamp": "2026-07-02T00:48:35+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260702T0048",
+      "priority": "FYI",
+      "emoji": "\ud83d\udfe2",
+      "text": "[PULSE] STALE_ENTRY: 3 entries with bars_since_signal > 5 \u2014 entries may be chasing stale FVGs",
+      "timestamp": "2026-07-02T00:48:35+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260702T0048",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] OUTCOME_LOOP_STALL: 15 closed OANDA trades but 0 matched to open decisions \u2014 the win/loss loop is not closing (CLAUDE.md NON-NEGOTIABLE #2). Oracle is learning from nothing. Check pair/timestamp/system matching in decision_logger.update_outcome.",
+      "timestamp": "2026-07-02T00:48:33+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260701T1957",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "[PULSE] REST_MODE_WEEK_TWO: HYP-063 validated 9 days ago, still in rest_mode. Week 2 \u2014 decision needed.",
+      "timestamp": "2026-07-01T19:57:22+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260701T1957",
+      "priority": "FYI",
+      "emoji": "\ud83d\udfe2",
+      "text": "[PULSE] STALE_ENTRY: 3 entries with bars_since_signal > 5 \u2014 entries may be chasing stale FVGs",
+      "timestamp": "2026-07-01T19:57:22+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260701T1957",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] OUTCOME_LOOP_STALL: 15 closed OANDA trades but 0 matched to open decisions \u2014 the win/loss loop is not closing (CLAUDE.md NON-NEGOTIABLE #2). Oracle is learning from nothing. Check pair/timestamp/system matching in decision_logger.update_outcome.",
+      "timestamp": "2026-07-01T19:57:20+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260701T1757",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "[PULSE] REST_MODE_WEEK_TWO: HYP-063 validated 9 days ago, still in rest_mode. Week 2 \u2014 decision needed.",
+      "timestamp": "2026-07-01T17:57:16+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260701T1757",
+      "priority": "FYI",
+      "emoji": "\ud83d\udfe2",
+      "text": "[PULSE] STALE_ENTRY: 3 entries with bars_since_signal > 5 \u2014 entries may be chasing stale FVGs",
+      "timestamp": "2026-07-01T17:57:16+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260701T1757",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] OUTCOME_LOOP_STALL: 15 closed OANDA trades but 0 matched to open decisions \u2014 the win/loss loop is not closing (CLAUDE.md NON-NEGOTIABLE #2). Oracle is learning from nothing. Check pair/timestamp/system matching in decision_logger.update_outcome.",
+      "timestamp": "2026-07-01T17:57:15+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260701T1557",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "[PULSE] REST_MODE_WEEK_TWO: HYP-063 validated 9 days ago, still in rest_mode. Week 2 \u2014 decision needed.",
+      "timestamp": "2026-07-01T15:57:10+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260701T1557",
+      "priority": "FYI",
+      "emoji": "\ud83d\udfe2",
+      "text": "[PULSE] STALE_ENTRY: 3 entries with bars_since_signal > 5 \u2014 entries may be chasing stale FVGs",
+      "timestamp": "2026-07-01T15:57:10+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260701T1557",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] OUTCOME_LOOP_STALL: 15 closed OANDA trades but 0 matched to open decisions \u2014 the win/loss loop is not closing (CLAUDE.md NON-NEGOTIABLE #2). Oracle is learning from nothing. Check pair/timestamp/system matching in decision_logger.update_outcome.",
+      "timestamp": "2026-07-01T15:57:08+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260701T1357",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "[PULSE] REST_MODE_WEEK_TWO: HYP-063 validated 9 days ago, still in rest_mode. Week 2 \u2014 decision needed.",
+      "timestamp": "2026-07-01T13:57:04+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260701T1357",
+      "priority": "FYI",
+      "emoji": "\ud83d\udfe2",
+      "text": "[PULSE] STALE_ENTRY: 3 entries with bars_since_signal > 5 \u2014 entries may be chasing stale FVGs",
+      "timestamp": "2026-07-01T13:57:04+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260701T1357",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] OUTCOME_LOOP_STALL: 15 closed OANDA trades but 0 matched to open decisions \u2014 the win/loss loop is not closing (CLAUDE.md NON-NEGOTIABLE #2). Oracle is learning from nothing. Check pair/timestamp/system matching in decision_logger.update_outcome.",
+      "timestamp": "2026-07-01T13:57:03+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260701T1156",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "[PULSE] REST_MODE_WEEK_TWO: HYP-063 validated 9 days ago, still in rest_mode. Week 2 \u2014 decision needed.",
+      "timestamp": "2026-07-01T11:56:58+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260701T0956",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "[PULSE] REST_MODE_WEEK_TWO: HYP-063 validated 9 days ago, still in rest_mode. Week 2 \u2014 decision needed.",
+      "timestamp": "2026-07-01T09:56:53+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260701T0956",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] OUTCOME_LOOP_STALL: 15 closed OANDA trades but 0 matched to open decisions \u2014 the win/loss loop is not closing (CLAUDE.md NON-NEGOTIABLE #2). Oracle is learning from nothing. Check pair/timestamp/system matching in decision_logger.update_outcome.",
+      "timestamp": "2026-07-01T09:56:52+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260701T0756",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "[PULSE] REST_MODE_WEEK_TWO: HYP-063 validated 9 days ago, still in rest_mode. Week 2 \u2014 decision needed.",
+      "timestamp": "2026-07-01T07:56:47+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260701T0756",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] OUTCOME_LOOP_STALL: 15 closed OANDA trades but 0 matched to open decisions \u2014 the win/loss loop is not closing (CLAUDE.md NON-NEGOTIABLE #2). Oracle is learning from nothing. Check pair/timestamp/system matching in decision_logger.update_outcome.",
+      "timestamp": "2026-07-01T07:56:46+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260701T0556",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "[PULSE] REST_MODE_WEEK_TWO: HYP-063 validated 9 days ago, still in rest_mode. Week 2 \u2014 decision needed.",
+      "timestamp": "2026-07-01T05:56:41+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260701T0556",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] OUTCOME_LOOP_STALL: 15 closed OANDA trades but 0 matched to open decisions \u2014 the win/loss loop is not closing (CLAUDE.md NON-NEGOTIABLE #2). Oracle is learning from nothing. Check pair/timestamp/system matching in decision_logger.update_outcome.",
+      "timestamp": "2026-07-01T05:56:40+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260701T0356",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "[PULSE] REST_MODE_WEEK_TWO: HYP-063 validated 9 days ago, still in rest_mode. Week 2 \u2014 decision needed.",
+      "timestamp": "2026-07-01T03:56:35+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260701T0356",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] OUTCOME_LOOP_STALL: 15 closed OANDA trades but 0 matched to open decisions \u2014 the win/loss loop is not closing (CLAUDE.md NON-NEGOTIABLE #2). Oracle is learning from nothing. Check pair/timestamp/system matching in decision_logger.update_outcome.",
+      "timestamp": "2026-07-01T03:56:33+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
       "id": "pulse-20260701T0156",
       "priority": "IMPORTANT",
       "emoji": "\ud83d\udfe1",
@@ -233,223 +458,7 @@
       "timestamp": "2026-06-29T14:56:35+00:00",
       "read": false,
       "source": "oracle_pulse"
-    },
-    {
-      "id": "loophealth-20260629T145635",
-      "timestamp": "2026-06-29T14:56:35.797309+00:00",
-      "priority": "RED",
-      "source": "LOOP_HEALTH",
-      "subject": "LOOP DOWN: morning_briefing silent 26h",
-      "message": "morning_briefing has not run for 26h (expected < 26h). The self-improvement machinery is degraded \u2014 a system that doesn't reflect doesn't compound. Check the loop's launchd plist is loaded (`launchctl list | grep alta`) and its logs/.heartbeat_<loop> mtime.",
-      "action_required": true
-    },
-    {
-      "id": "loophealth-20260629T145635",
-      "timestamp": "2026-06-29T14:56:35.796784+00:00",
-      "priority": "CRITICAL",
-      "source": "LOOP_HEALTH",
-      "subject": "\ud83d\udea8 LOOP CRITICAL: ict_scanner silent 3h",
-      "message": "ict_scanner has not run for 3h (expected < 0.5h; >2x threshold = broken, not late). The self-improvement machinery is degraded \u2014 a system that doesn't reflect doesn't compound. Check the loop's launchd plist is loaded (`launchctl list | grep alta`) and its logs/.heartbeat_<loop> mtime.",
-      "action_required": true
-    },
-    {
-      "id": "pulse-20260629T1456",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[PULSE] OUTCOME_LOOP_STALL: 9 closed OANDA trades but 0 matched to open decisions \u2014 the win/loss loop is not closing (CLAUDE.md NON-NEGOTIABLE #2). Oracle is learning from nothing. Check pair/timestamp/system matching in decision_logger.update_outcome.",
-      "timestamp": "2026-06-29T14:56:33+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "pulse-20260629T0308",
-      "priority": "IMPORTANT",
-      "emoji": "\ud83d\udfe1",
-      "text": "[PULSE] REST_MODE_WEEK_TWO: HYP-063 validated 7 days ago, still in rest_mode. Week 2 \u2014 decision needed.",
-      "timestamp": "2026-06-29T03:08:33+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "pulse-20260629T0308",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[PULSE] OUTCOME_LOOP_STALL: 9 closed OANDA trades but 0 matched to open decisions \u2014 the win/loss loop is not closing (CLAUDE.md NON-NEGOTIABLE #2). Oracle is learning from nothing. Check pair/timestamp/system matching in decision_logger.update_outcome.",
-      "timestamp": "2026-06-29T03:08:32+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "rest-028-summary-20260629T0110",
-      "priority": "IMPORTANT",
-      "emoji": "\ud83d\udfe1",
-      "source": "REST_MODE",
-      "timestamp": "2026-06-29T01:10:00Z",
-      "read": false,
-      "text": "[REST-028] 4th HOLD. Two things need YOU, in priority order:\n1) BUDGET SYNC (do this first): the budget gate is blind. usage.json still says week started 2026-05-31 and remaining=31.8k, but ~3 Saturday resets have passed unrecorded. Every HOLD cycle still burns ~5-6k off that stale counter, so it will hit the 20k danger floor and lock the agent out of even light cycles -- for no real reason. Run: python3 sovereign/tools/claude_usage_tracker.py sync --used <N from claude.ai/settings>. Then REST research can resume.\n2) OUTCOME_LOOP_STALL is real and now schema-confirmed (NON-NEGOTIABLE #2): oanda_fills.jsonl has trade_id+order_id; decision_logs/*.jsonl have NEITHER. 10 closed fills, 0 matched -> Oracle learning from nothing. Fix = persist OANDA trade_id onto the decision record at fill time + join by id in update_outcome(). Needs a Claude Code session (live decision-logging change -> approve + log per NON-NEGOTIABLE #4).\nGOOD NEWS: the CRITICAL 'ict_scanner silent 2h' pulse was transient -- scanner self-recovered (beat at 01:06Z). All agent ledgers JSON-valid. forex_scan flaky again (4th time) -- check its launchd plist when convenient.\nSTILL BLOCKED ON YOU: RQ-REST-016 (cb_calendar.CB_MEETINGS holds only 1 date) gates the CB-blackout wiring (RQ-REST-015) and the cb_decisions.json rebuild (RQ-REST-017). And HYP-063 has been validated 7 days -- the rest-mode-vs-implement decision is yours."
-    },
-    {
-      "id": "pulse-20260629T0056",
-      "priority": "IMPORTANT",
-      "emoji": "\ud83d\udfe1",
-      "text": "[PULSE] REST_MODE_WEEK_TWO: HYP-063 validated 7 days ago, still in rest_mode. Week 2 \u2014 decision needed.",
-      "timestamp": "2026-06-29T00:56:25+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "pulse-20260629T0056",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[PULSE] OUTCOME_LOOP_STALL: 9 closed OANDA trades but 0 matched to open decisions \u2014 the win/loss loop is not closing (CLAUDE.md NON-NEGOTIABLE #2). Oracle is learning from nothing. Check pair/timestamp/system matching in decision_logger.update_outcome.",
-      "timestamp": "2026-06-29T00:56:23+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "pulse-20260629T0024",
-      "priority": "IMPORTANT",
-      "emoji": "\ud83d\udfe1",
-      "text": "[PULSE] REST_MODE_WEEK_TWO: HYP-063 validated 7 days ago, still in rest_mode. Week 2 \u2014 decision needed.",
-      "timestamp": "2026-06-29T00:24:48+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "loophealth-20260629T002448",
-      "timestamp": "2026-06-29T00:24:48.064562+00:00",
-      "priority": "CRITICAL",
-      "source": "LOOP_HEALTH",
-      "subject": "\ud83d\udea8 LOOP CRITICAL: ict_scanner silent 2h",
-      "message": "ict_scanner has not run for 2h (expected < 0.5h; >2x threshold = broken, not late). The self-improvement machinery is degraded \u2014 a system that doesn't reflect doesn't compound. Check the loop's launchd plist is loaded (`launchctl list | grep alta`) and its logs/.heartbeat_<loop> mtime.",
-      "action_required": true
-    },
-    {
-      "id": "pulse-20260629T0024",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[PULSE] OUTCOME_LOOP_STALL: 9 closed OANDA trades but 0 matched to open decisions \u2014 the win/loss loop is not closing (CLAUDE.md NON-NEGOTIABLE #2). Oracle is learning from nothing. Check pair/timestamp/system matching in decision_logger.update_outcome.",
-      "timestamp": "2026-06-29T00:24:45+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "pulse-20260628T1833",
-      "priority": "FYI",
-      "emoji": "\ud83d\udfe2",
-      "text": "[PULSE] REST_MODE_PENDING: HYP-063 validated 6 days ago, awaiting implementation.",
-      "timestamp": "2026-06-28T18:33:00+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "pulse-20260628T1832",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[PULSE] OUTCOME_LOOP_STALL: 9 closed OANDA trades but 0 matched to open decisions \u2014 the win/loss loop is not closing (CLAUDE.md NON-NEGOTIABLE #2). Oracle is learning from nothing. Check pair/timestamp/system matching in decision_logger.update_outcome.",
-      "timestamp": "2026-06-28T18:32:58+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "pulse-20260628T0331",
-      "priority": "FYI",
-      "emoji": "\ud83d\udfe2",
-      "text": "[PULSE] REST_MODE_PENDING: HYP-063 validated 6 days ago, awaiting implementation.",
-      "timestamp": "2026-06-28T03:31:45+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "pulse-20260628T0331",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[PULSE] OUTCOME_LOOP_STALL: 9 closed OANDA trades but 0 matched to open decisions \u2014 the win/loss loop is not closing (CLAUDE.md NON-NEGOTIABLE #2). Oracle is learning from nothing. Check pair/timestamp/system matching in decision_logger.update_outcome.",
-      "timestamp": "2026-06-28T03:31:43+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "pulse-20260627T2108",
-      "priority": "FYI",
-      "emoji": "\ud83d\udfe2",
-      "text": "[PULSE] REST_MODE_PENDING: HYP-063 validated 5 days ago, awaiting implementation.",
-      "timestamp": "2026-06-27T21:08:31+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "pulse-20260627T2108",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[PULSE] OUTCOME_LOOP_STALL: 9 closed OANDA trades but 0 matched to open decisions \u2014 the win/loss loop is not closing (CLAUDE.md NON-NEGOTIABLE #2). Oracle is learning from nothing. Check pair/timestamp/system matching in decision_logger.update_outcome.",
-      "timestamp": "2026-06-27T21:08:30+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "pulse-20260627T1843",
-      "priority": "FYI",
-      "emoji": "\ud83d\udfe2",
-      "text": "[PULSE] REST_MODE_PENDING: HYP-063 validated 5 days ago, awaiting implementation.",
-      "timestamp": "2026-06-27T18:43:16+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "pulse-20260627T1843",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[PULSE] OUTCOME_LOOP_STALL: 9 closed OANDA trades but 0 matched to open decisions \u2014 the win/loss loop is not closing (CLAUDE.md NON-NEGOTIABLE #2). Oracle is learning from nothing. Check pair/timestamp/system matching in decision_logger.update_outcome.",
-      "timestamp": "2026-06-27T18:43:15+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "pulse-20260627T0625",
-      "priority": "FYI",
-      "emoji": "\ud83d\udfe2",
-      "text": "[PULSE] REST_MODE_PENDING: HYP-063 validated 5 days ago, awaiting implementation.",
-      "timestamp": "2026-06-27T06:25:24+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "pulse-20260627T0625",
-      "priority": "FYI",
-      "emoji": "\ud83d\udfe2",
-      "text": "[PULSE] STALE_ENTRY: 9 entries with bars_since_signal > 5 \u2014 entries may be chasing stale FVGs",
-      "timestamp": "2026-06-27T06:25:24+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "pulse-20260627T0625",
-      "priority": "IMPORTANT",
-      "emoji": "\ud83d\udfe1",
-      "text": "[PULSE] COMMITMENT_SCORE_STUCK: All 9 entries have commitment_score=1.0. Detector may be defaulting \u2014 check ict.pipeline logs for 'Commitment detector failed'.",
-      "timestamp": "2026-06-27T06:25:24+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "pulse-20260627T0625",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[PULSE] OUTCOME_LOOP_STALL: 9 closed OANDA trades but 0 matched to open decisions \u2014 the win/loss loop is not closing (CLAUDE.md NON-NEGOTIABLE #2). Oracle is learning from nothing. Check pair/timestamp/system matching in decision_logger.update_outcome.",
-      "timestamp": "2026-06-27T06:25:23+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "pulse-20260627T0425",
-      "priority": "FYI",
-      "emoji": "\ud83d\udfe2",
-      "text": "[PULSE] REST_MODE_PENDING: HYP-063 validated 5 days ago, awaiting implementation.",
-      "timestamp": "2026-06-27T04:25:19+00:00",
-      "read": false,
-      "source": "oracle_pulse"
     }
   ],
-  "last_updated": "2026-07-01T01:56:30+00:00"
+  "last_updated": "2026-07-02T00:48:35+00:00"
 }

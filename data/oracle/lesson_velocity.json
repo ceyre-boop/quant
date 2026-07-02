@@ -1,9 +1,10 @@
 {
-  "generated_at": "2026-06-30T06:30:50.209429+00:00",
-  "as_of_date": "2026-06-30",
+  "generated_at": "2026-07-01T06:31:00.041515+00:00",
+  "as_of_date": "2026-07-01",
   "current_lesson": {
     "components": [
       "against",
+      "block",
       "config",
       "conviction",
       "fields",
@@ -16,17 +17,17 @@
       "reliability",
       "with"
     ],
-    "component_label": "green_matches",
+    "component_label": "consensus green_matches / hist_hr (30-indicator consensus block)",
     "first_seen": "2026-06-02",
-    "last_seen": "2026-06-30",
-    "days_forming": 28,
-    "n_revisions": 23,
-    "n_days_appeared": 23,
+    "last_seen": "2026-07-01",
+    "days_forming": 29,
+    "n_revisions": 24,
+    "n_days_appeared": 24,
     "stable_days": 1,
     "status": "forming",
     "time_to_converge_days": null,
-    "latest_lesson_text": "When the 30-indicator consensus shows high conviction but green_matches=0, treat the signal as historically un-anchored and cut size, not as a high-confidence entry.",
-    "latest_rule": "if consensus_conviction >= 0.80 and green_matches == 0: size_multiplier *= 0.5  # require historical anchor before full size",
+    "latest_lesson_text": "When the 30-indicator consensus shows high conviction (>=80%) but green_matches=0 and hist_hr=0, treat the signal as UNVALIDATED and freeze \u2014 conviction without historical pattern confirmation is unproven direction, not tradeable edge.",
+    "latest_rule": "if consensus_conviction >= 0.80 and green_matches == 0 and hist_hr <= 0.10: veto_entry() # require at least one historical green_match before trusting high-conviction direction",
     "history": [
       {
         "date": "2026-06-02",
@@ -119,6 +120,10 @@
       {
         "date": "2026-06-30",
         "rule": "if consensus_conviction >= 0.80 and green_matches == 0: size_multiplier *= 0.5  # require historical anchor before full size"
+      },
+      {
+        "date": "2026-07-01",
+        "rule": "if consensus_conviction >= 0.80 and green_matches == 0 and hist_hr <= 0.10: veto_entry() # require at least one historical green_match before trusting high-conviction direction"
       }
     ]
   },
@@ -126,6 +131,7 @@
     {
       "components": [
         "against",
+        "block",
         "config",
         "conviction",
         "fields",
@@ -138,17 +144,17 @@
         "reliability",
         "with"
       ],
-      "component_label": "green_matches",
+      "component_label": "consensus green_matches / hist_hr (30-indicator consensus block)",
       "first_seen": "2026-06-02",
-      "last_seen": "2026-06-30",
-      "days_forming": 28,
-      "n_revisions": 23,
-      "n_days_appeared": 23,
+      "last_seen": "2026-07-01",
+      "days_forming": 29,
+      "n_revisions": 24,
+      "n_days_appeared": 24,
       "stable_days": 1,
       "status": "forming",
       "time_to_converge_days": null,
-      "latest_lesson_text": "When the 30-indicator consensus shows high conviction but green_matches=0, treat the signal as historically un-anchored and cut size, not as a high-confidence entry.",
-      "latest_rule": "if consensus_conviction >= 0.80 and green_matches == 0: size_multiplier *= 0.5  # require historical anchor before full size",
+      "latest_lesson_text": "When the 30-indicator consensus shows high conviction (>=80%) but green_matches=0 and hist_hr=0, treat the signal as UNVALIDATED and freeze \u2014 conviction without historical pattern confirmation is unproven direction, not tradeable edge.",
+      "latest_rule": "if consensus_conviction >= 0.80 and green_matches == 0 and hist_hr <= 0.10: veto_entry() # require at least one historical green_match before trusting high-conviction direction",
       "history": [
         {
           "date": "2026-06-02",
@@ -241,6 +247,10 @@
         {
           "date": "2026-06-30",
           "rule": "if consensus_conviction >= 0.80 and green_matches == 0: size_multiplier *= 0.5  # require historical anchor before full size"
+        },
+        {
+          "date": "2026-07-01",
+          "rule": "if consensus_conviction >= 0.80 and green_matches == 0 and hist_hr <= 0.10: veto_entry() # require at least one historical green_match before trusting high-conviction direction"
         }
       ]
     }

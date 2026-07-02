@@ -8,37 +8,34 @@
   },
   "week": {
     "start_date": "2026-06-27",
-    "weekly_used": 56000,
-    "weekly_remaining": 144000,
+    "weekly_used": 61000,
+    "weekly_remaining": 139000,
     "last_synced": null,
-    "note": "REST-030 2026-07-01T01:10Z: light cycle, +6k est. Budget gate healthy post REST-029 window roll. STILL stay light until manual sync (run claude_usage_tracker.py sync). weekly_used is a conservative running estimate, not measured."
+    "note": "REST-031 2026-07-02T01Z: light read-only cycle, +~5k est. Weekly ~61000/200k -> stay LIGHT (>50k light floor, >>20k danger). STILL awaiting manual sync (claude_usage_tracker.py sync); weekly_used is a conservative running estimate."
   },
   "today": {
     "date": "2026-07-01",
     "human_used": 0,
-    "agent_used": 6000,
+    "agent_used": 5000,
     "daily_agent_budget": 8571,
     "agent_allowed_today": 7000,
-    "note": "REST-030 light cycle: read-only code forensics of the Oracle outcome loop. Root-caused OUTCOME_LOOP_STALL to backtest pollution of the live decision log (not just missing trade_id). Wrote fix spec Plans/REST-030. No live code/config touched."
+    "note": "REST-031 fresh local day (prior 6k was the REST-030 cycle ~24h earlier). Light read-only Oracle-loop forensics; no live code/config touched."
   },
   "session": {
-    "started": "2026-07-01T01:10:00Z",
-    "ended": "2026-07-01T01:10:00Z",
+    "started": "2026-07-02T01:13:53Z",
+    "ended": "2026-07-02T01:13:53Z",
     "mode": "REST_MODE",
     "tasks_completed": [
-      "Validated loop health (7 alive, 0 down; USD_CAD fired today; 2 known YELLOWs = the loop-pollution issue)",
-      "Root-caused OUTCOME_LOOP_STALL: live decision log polluted by backtest replay (1919 rows, entry_timestamps 2023-2026; pipeline.py:663 ungated)",
-      "Discovered RQ-REST-018 commitment_score fix already landed (c7908a9 06-30) -> marked DONE_VERIFY (REST-029 alarm was stale)",
-      "Wrote paste-ready fix spec Plans/REST-030_oracle_loop_fix_spec.md (3 changes + verification + Colin decisions)",
-      "3 findings written; queue updated (RQ-REST-018 resolved, RQ-REST-019b added P1); 1 Colin message"
+      "Verified RQ-REST-018: c7908a9 removed constant-1.0 commitment_score; July live entries log honest None (DONE_VERIFY -> DONE)",
+      "Diagnosed the URGENT OUTCOME_LOOP_STALL as a steady-state FALSE POSITIVE on the FOREX/OANDA path (forex loop is closing; alarm can't tell 'already closed' from 'never matched')",
+      "Found forex trade_id join key already exists on both sides (oanda_fills.jsonl + decision records) but update_outcome/backfill ignore it -> reinforces REST-030 Change 2",
+      "3 findings written; RQ-REST-019b sharpened with alarm-logic + trade_id-join fixes; RQ-REST-018 closed; 1 Colin message"
     ],
     "findings_written": 3,
     "hypotheses_updated": [],
     "new_hypotheses": [],
-    "new_tasks_added": [
-      "RQ-REST-019b"
-    ],
-    "key_finding": "OUTCOME_LOOP_STALL is a DATA-POLLUTION bug: backtests write into the live decision log (1919 mixed rows) making backfill + pulse alarms meaningless. Fix spec written; commitment_score already fixed by c7908a9. Both need Colin approval (execution-path change)."
+    "new_tasks_added": [],
+    "key_finding": "OUTCOME_LOOP_STALL URGENT alarm is a false positive: the forex/OANDA loop is closing (native records carry real WIN/LOSS); the alarm fires on re-scan count and cannot distinguish already-closed from never-matched. Real remaining work = alarm-logic fix + consume the trade_id join key that already exists (both folded into RQ-REST-019b / REST-030)."
   },
   "mode": "REST_MODE",
   "thresholds": {

@@ -1,0 +1,26 @@
+{
+  "date": "2026-07-01",
+  "generated_at": "2026-07-01T06:31:00.015685+00:00",
+  "input_tokens": 5726,
+  "output_tokens": 960,
+  "estimated_cost_usd": 0.15789,
+  "harvest_days_read": 7,
+  "reflection": {
+    "candidate_lesson": {
+      "lesson_text": "When the 30-indicator consensus shows high conviction (>=80%) but green_matches=0 and hist_hr=0, treat the signal as UNVALIDATED and freeze \u2014 conviction without historical pattern confirmation is unproven direction, not tradeable edge.",
+      "mechanism": "green_matches=0 means the current live indicator configuration has never been seen paired with a winning outcome in memory; conviction only measures agreement among indicators at this instant, not whether that agreement historically resolved profitably. USDJPY today shows the trap: conv=100% LONG but hist_hr=0% \u2014 a fresh, untested consensus that safe-haven flow (L8) can corrupt. Institutional rate-signal reliability degrades exactly when indicators cluster without historical precedent, because clustering often reflects a crowded one-way positioning about to mean-revert.",
+      "testable_rule": "if consensus_conviction >= 0.80 and green_matches == 0 and hist_hr <= 0.10: veto_entry() # require at least one historical green_match before trusting high-conviction direction",
+      "expected_impact": "Filters out zero-precedent high-conviction entries (e.g. USDJPY LONG conv=100%/hist_hr=0%); expected to prevent -0.3R to -0.5R losers on untested clusters, lifting win rate ~3-5% and Sharpe toward the +0.05 gap by removing high-variance unproven trades.",
+      "evidence_from_harvest": "Live consensus shows USDJPY conv=100% LONG with green_matches=0 and hist_hr=0%, while GBPUSD/EURUSD/AUDUSD SHORT signals carry green_matches=0 but hist_hr 66-70% \u2014 the contrast isolates hist_hr and green_matches as the discriminating fields, not conviction alone.",
+      "evidence_from_reasoning": null,
+      "reasoning_component_targeted": "consensus green_matches / hist_hr (30-indicator consensus block)",
+      "sample_needed": 30
+    },
+    "retirement_flag": {
+      "lesson_to_review": "L8",
+      "reason": "L8 tightens the USDJPY/AUDNZD VIX gate to 13 for safe-haven corruption; with VIX now 17.65 and a live USDJPY conv=100%/hist_hr=0% signal, L8's gate should already be vetoing this trade \u2014 if it is not, the gate threshold or wiring may be decaying and needs re-verification."
+    },
+    "system_health_note": "Zero trades in the last 7 days with regime=UNKNOWN and TradingView showing 0 signals means the system is effectively in observation-only mode \u2014 no decision logs to mine, so lessons must stay harvest/consensus-grounded until trade flow resumes."
+  },
+  "auto_validation": null
+}

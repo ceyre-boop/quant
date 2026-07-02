@@ -568,7 +568,7 @@
     {
       "id": "RQ-REST-018",
       "priority": 1,
-      "status": "DONE_VERIFY",
+      "status": "DONE",
       "name": "Wire computed CommitmentState into decision logger (fix COMMITMENT_SCORE_STUCK) \u2014 Colin approval required",
       "description": "FIND-REST-017-a/b: commitment_score logged constant 1.0 (1774/1797 June entries) because the computed CommitmentState is discarded. FIX: in ict-engine/orchestrator.py _evaluate_pair, retain the `commit` object computed by _compute_commitment for each surviving ICTSignal and pass commit.score into _log_decisions -> log_ict_decision(signal, commitment_score=commit.score); optionally log commit.size_multiplier as a separate field 'commitment_size_mult'. In ict/pipeline.py, stop logging the always-1.0 _commit_size_mult under 'commitment_score' (it is the size multiplier and is always defaulted because orchestrator passes commitment_result=None). Also fix the pulse_check.py COMMITMENT_SCORE_STUCK message which mis-points to 'detector failed'. Isolation-safe (logging goes through the sanctioned importlib hook / orchestrator). Code change touching live decision logging that feeds Oracle => NON-NEGOTIABLE #4: Colin approval + param_change_log before applying. No network needed.",
       "hypothesis_id": null,
@@ -580,8 +580,8 @@
       "estimated_minutes": 25,
       "added": "2026-06-17T01:09:48.331634+00:00",
       "source": "REST_MODE_FINDING_017",
-      "last_result": "SUPERSEDED/DONE: commitment_score code fix already committed c7908a9 (2026-06-30 07:49 'log real score not size-mult'). The 'constant 1.0' evidence was pre-fix backtest history. Remaining orchestrator None-path (orchestrator.py:341) folded into REST-030 spec Change 1. Verify next live scan logs varied CommitmentDetector.score with mode=='live'.",
-      "updated_at": "2026-07-01T01:10:00Z"
+      "last_result": "VERIFIED (REST-031): c7908a9 removed the constant-1.0 commitment_score; July live entries (decisions_2026_07.jsonl) log commitment_score=None honestly with commitment_size_mult as its own field. Constant-1.0 bug CLOSED. Residual: wire real commit.score = REST-030 Change 1, tracked in RQ-REST-019b. See FIND-REST-031-c.",
+      "updated_at": "2026-07-02T01:13:53Z"
     },
     {
       "id": "RQ-REST-019",
@@ -654,15 +654,16 @@
       "status": "QUEUED",
       "created": "2026-07-01T01:10:00Z",
       "name": "Close Oracle loop at root: gate backtest out of live decision log + add broker join key (REST-030 spec)",
-      "description": "Implement Plans/REST-030_oracle_loop_fix_spec.md. Change 1: env/context gate so backtests write to data/decision_logs/backtest/ not the live log (+ mode field); Change 2: signal_id uuid + broker_trade_id on DecisionRecord, attach_broker_id() from live execution, deterministic update_outcome by id; Change 3: archive the 1919 polluted records to data/decision_logs/archive/. Verify with tests/unit/test_decision_logging.py + isolation guard + ICT 21/21. ROOT CAUSE of OUTCOME_LOOP_STALL beyond the trade_id symptom prior cycles saw.",
+      "description": "Implement Plans/REST-030_oracle_loop_fix_spec.md. Change 1: env/context gate so backtests write to data/decision_logs/backtest/ not the live log (+ mode field); Change 2: signal_id uuid + broker_trade_id on DecisionRecord, attach_broker_id() from live execution, deterministic update_outcome by id; Change 3: archive the 1919 polluted records to data/decision_logs/archive/. Verify with tests/unit/test_decision_logging.py + isolation guard + ICT 21/21. ROOT CAUSE of OUTCOME_LOOP_STALL beyond the trade_id symptom prior cycles saw. [REST-031 SHARPEN] Add two items to the spec: (A) Fix the OUTCOME_LOOP_STALL alarm logic in sovereign/oracle/pulse_check.py._backfill_decision_outcomes \u2014 it currently fires URGENT whenever n_backfilled==0, which is the healthy steady state (run_oanda_paper's in-memory tracker already closes trades; the 2h re-scan then matches 0). Fire ONLY when a closed OANDA trade's decision record is still outcome==None OR absent (a real unclosed trade). (B) REST-030 Change 2 (broker_trade_id join): the forex trade_id join key ALREADY EXISTS on both sides (oanda_fills.jsonl keyed by trade_id; decision records store trade_id/order_id) \u2014 update_outcome + the backfill just need to consume it; this also closes the AUD_USD/GBP_USD/EUR_USD fills (tid47/51/72/83/93/105) that currently fall through. See FIND-REST-031-a/b.",
       "hypothesis_id": null,
       "needs_network": false,
       "requires_human": true,
       "is_code_change": true,
       "estimated_minutes": 90,
       "source": "REST-030",
-      "blocks_alarm": "OUTCOME_LOOP_STALL / decision_logs YELLOW"
+      "blocks_alarm": "OUTCOME_LOOP_STALL / decision_logs YELLOW",
+      "updated_at": "2026-07-02T01:13:53Z"
     }
   ],
-  "last_updated": "2026-06-30T11:40:35.041318+00:00"
+  "last_updated": "2026-07-02T01:13:53Z"
 }
