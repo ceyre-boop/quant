@@ -90,6 +90,26 @@ CREATE TABLE IF NOT EXISTS sentiment_cot_weekly (
     fetched_at       TIMESTAMP,
     PRIMARY KEY (measurement_date, pair)
 );
+-- VRP-001 diversifier FEATURE — iv_atm (currency-ETF option implied vol) − rv_trailing (pair-spot
+-- realized vol). Dated to the OBSERVABLE EOD close: iv_obs_date/rv_last_date both == date (the
+-- forward-look test asserts both <= date). vrp_pct = trailing percentile of vrp_signal (rich vs cheap).
+CREATE TABLE IF NOT EXISTS sentiment_vrp_daily (
+    date         DATE,
+    pair         VARCHAR,
+    symbol       VARCHAR,       -- currency-ETF option underlying used as the IV proxy (FXE/FXB/FXY/FXA)
+    expiry       DATE,          -- option expiration used for iv_atm
+    dte          INTEGER,
+    atm_strike   DOUBLE,
+    iv_atm       DOUBLE,        -- at-the-money implied vol, annualized (native tier IV or BS-inverted)
+    rv_trailing  DOUBLE,        -- trailing realized vol of the PAIR spot, annualized (causal)
+    vrp_signal   DOUBLE,        -- iv_atm − rv_trailing
+    vrp_pct      DOUBLE,        -- trailing percentile of vrp_signal over its own history [0,1]
+    iv_source    VARCHAR,       -- 'native' | 'bs_invert'
+    iv_obs_date  DATE,          -- provenance: last data date feeding IV (== date; forward-look guard)
+    rv_last_date DATE,          -- provenance: last data date feeding RV (== date; forward-look guard)
+    fetched_at   TIMESTAMP,
+    PRIMARY KEY (date, pair)
+);
 CREATE TABLE IF NOT EXISTS sentiment_board_state (
     date            DATE,
     pair            VARCHAR,
@@ -100,6 +120,10 @@ CREATE TABLE IF NOT EXISTS sentiment_board_state (
     econ_surprise_z DOUBLE,
     cot_net_pct     DOUBLE,
     cot_net_oi      DOUBLE,
+    vrp_signal      DOUBLE,
+    vrp_pct         DOUBLE,
+    vrp_iv_atm      DOUBLE,
+    vrp_rv_trailing DOUBLE,
     macro_curve     DOUBLE,
     macro_spread    DOUBLE,
     macro_inflation DOUBLE,
@@ -117,6 +141,10 @@ ALTER TABLE sentiment_board_state ADD COLUMN IF NOT EXISTS econ_surprise_z DOUBL
 ALTER TABLE sentiment_surprise_release ADD COLUMN IF NOT EXISTS usd_sign DOUBLE;
 ALTER TABLE sentiment_board_state ADD COLUMN IF NOT EXISTS cot_net_pct DOUBLE;
 ALTER TABLE sentiment_board_state ADD COLUMN IF NOT EXISTS cot_net_oi DOUBLE;
+ALTER TABLE sentiment_board_state ADD COLUMN IF NOT EXISTS vrp_signal DOUBLE;
+ALTER TABLE sentiment_board_state ADD COLUMN IF NOT EXISTS vrp_pct DOUBLE;
+ALTER TABLE sentiment_board_state ADD COLUMN IF NOT EXISTS vrp_iv_atm DOUBLE;
+ALTER TABLE sentiment_board_state ADD COLUMN IF NOT EXISTS vrp_rv_trailing DOUBLE;
 """
 
 

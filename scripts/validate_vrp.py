@@ -83,7 +83,8 @@ def _run_options_stage(args) -> None:
                              base_url=env.get("THETADATA_BASE_URL", "http://127.0.0.1:25503"))
     spy = dl.load_underlying("SPY")["Close"]
     vix = dl.load_vol_index("^VIX")
-    result = iron_condor_simulate(loader, spy_daily=spy, params=params, split=split, vix_daily=vix)
+    result = iron_condor_simulate(loader, spy_daily=spy, params=params, split=split, vix_daily=vix,
+                                  account=args.account)
 
     doc = json.loads(OPTIONS_OUT.read_text()) if OPTIONS_OUT.exists() else {"id": "VRP-001-OPTIONS", "stages": {}}
     doc["generated_at"] = datetime.now(timezone.utc).isoformat()
@@ -194,6 +195,9 @@ def main():
     ap.add_argument("--stage", type=int, choices=(2, 3, 4), default=None,
                     help="options iron-condor backtest phase: 2=IS, 3=OOS, 4=holdout (requires ThetaData)")
     ap.add_argument("--confirm-once", action="store_true", help="required for --stage 4 (holdout runs once)")
+    ap.add_argument("--account", type=float, default=100_000.0,
+                    help="research account size for options sizing (NOT a frozen param; ~$250k makes the "
+                         "1-SD/25pt condor place >=1 contract — the live $100k cannot)")
     args = ap.parse_args()
     _check_prereg()
     if args.stage:

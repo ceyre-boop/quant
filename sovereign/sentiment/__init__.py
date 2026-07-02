@@ -13,8 +13,8 @@ populatable only for recent dates; FRED + VIX backfill to 2015. The board carrie
 uncovered (historical) dates.
 """
 from sovereign.sentiment import (
-    store, news_feed, macro_feed, vix_feed, gdelt_feed, surprise_feed, cot_feed, board_state,
+    store, news_feed, macro_feed, vix_feed, gdelt_feed, surprise_feed, cot_feed, vrp_feed, board_state,
 )
 
 __all__ = ["store", "news_feed", "macro_feed", "vix_feed", "gdelt_feed", "surprise_feed",
-           "cot_feed", "board_state"]
+           "cot_feed", "vrp_feed", "board_state"]

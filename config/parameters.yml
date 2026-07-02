@@ -153,7 +153,7 @@ regime_params:
   REVERSION:
     stop_atr_mult: 1.0
     tp_rr: 1.5
-    fitted_on: '2026-06-01'
+    fitted_on: '2026-07-01'
 
 # ── Sentiment board-state pipeline (sovereign/sentiment/) — Step 0 data layer ──────────────────────
 # Thresholds live here (never hardcoded). VIX regime cutoffs and the news rolling window are config.
@@ -221,3 +221,28 @@ sentiment:
       GBPUSD: '096742'   # BRITISH POUND
       USDJPY: '097741'   # JAPANESE YEN — NB: JPY-long = USDJPY DOWN (inverse; sign handled in the diagnostic)
       AUDUSD: '232741'   # AUSTRALIAN DOLLAR
+  # ── VRP feature (ThetaData FX-ETF options) — sentiment board vrp_* columns ──
+  # Weekly (Friday-sampled) ATM implied vol minus trailing realized vol per pair,
+  # via currency-ETF option chains (no FX options at ThetaData; ETFs are the proxy).
+  # Feeder: sovereign/sentiment/vrp_feed.py — skips LOUDLY when ThetaTerminal is
+  # down / key unset (board carries NULL vrp_*, never fabricated).
+  vrp:
+    dte_target: 30               # target days-to-expiry for the ATM IV read
+    dte_min: 25                  # accept expirations in [dte_min, dte_max]
+    dte_max: 45
+    rv_window: 20                # trailing realized-vol window (trading days)
+    percentile_window: 252       # vrp_pct trailing percentile window
+    percentile_min_periods: 40   # min observations before a percentile is emitted
+    risk_free_rate: 0.04         # Black-76 discounting for the IV inversion
+    sample_freq: W-FRI           # weekly sampling anchor (Friday)
+    backfill_start: '2016-01-01' # resumable monthly backfill start
+    etf:                         # pair -> currency-ETF option underlier
+      EURUSD: FXE
+      GBPUSD: FXB
+      USDJPY: FXY
+      AUDUSD: FXA
+    spot:                        # pair -> yfinance spot symbol for RV
+      EURUSD: EURUSD=X
+      GBPUSD: GBPUSD=X
+      USDJPY: USDJPY=X
+      AUDUSD: AUDUSD=X

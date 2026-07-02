@@ -26,7 +26,7 @@ for lib in ("yfinance", "peewee", "urllib3", "requests", "fredapi"):
 
 from config.loader import params
 from sovereign.sentiment import (
-    store, news_feed, macro_feed, vix_feed, gdelt_feed, surprise_feed, cot_feed, board_state,
+    store, news_feed, macro_feed, vix_feed, gdelt_feed, surprise_feed, cot_feed, vrp_feed, board_state,
 )
 
 HEARTBEAT = ROOT / "logs" / ".heartbeat_sentiment"
@@ -51,6 +51,7 @@ def main() -> dict:
         vix_cov = vix_feed.update(con=con, start=start)
         surprise_cov = surprise_feed.update(con=con, start=start)  # release-innovation spine
         cot_cov = cot_feed.update(con=con)                         # CFTC COT positioning (Friday-published)
+        vrp_cov = vrp_feed.update(con=con)                         # VRP feature (ThetaData FX-ETF options)
         board_rows = board_state.rebuild(con=con)
 
         # ── coverage report (required deliverable) ──
@@ -80,10 +81,22 @@ def main() -> dict:
         for pair, c in cot_cov.items():
             span = f"{c.get('start')}→{c.get('end')}" if c.get("rows") else "NO DATA"
             print(f"   {pair:14} weeks={c.get('rows'):>5}  {span}")
+        print("VRP (ThetaData FX-ETF options, weekly iv_atm−rv_trailing):")
+        if not vrp_cov:
+            print("   NOT REACHABLE — ThetaTerminal down / key unset (feature skipped, board carries NULL vrp_*)")
+        for pair, c in vrp_cov.items():
+            span = f"{c.get('start')}→{c.get('end')}" if c.get("rows") else f"NO DATA ({c.get('note','')})"
+            src = c.get("iv_source", {})
+            print(f"   {pair:6} [{c.get('symbol','?'):3}] obs={c.get('rows'):>4}  {span}"
+                  f"  iv_src={src}  earliest_exp={c.get('earliest_expiry','?')}")
+        board_pct = con.execute(
+            "SELECT 100.0*AVG(CASE WHEN vrp_signal IS NOT NULL THEN 1 ELSE 0 END) FROM sentiment_board_state").fetchone()[0]
+        print(f"   board rows with vrp_signal: {board_pct:.1f}%")
         print(f"BOARD: {board_rows} rows (sentiment_board_state)")
         print(f"DB: {store.DB_PATH}")
         return {"board_rows": board_rows, "news": news_cov, "gdelt": gdelt_cov, "macro": macro_cov,
-                "vix": vix_cov, "surprise": surprise_cov, "cot": cot_cov, "news_probe": news_probe}
+                "vix": vix_cov, "surprise": surprise_cov, "cot": cot_cov, "vrp": vrp_cov,
+                "vrp_board_pct": board_pct, "news_probe": news_probe}
     finally:
         con.close()
 
