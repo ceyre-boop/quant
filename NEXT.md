@@ -64,6 +64,23 @@ hypothesis).
 
 **Push:** ✅ b20aec3..593d46d + this entry pushed to origin/sovereign-v2.
 
+**Late addendum (post-backfill, ~00:30 Jul 3):**
+- **Options surface LANDED + fused:** 1,306 real rows (bs_invert, 2020-01-03→2026-07-02);
+  board rr25/bf25 **96.5%** of post-2020 rows (term_slope 28.5% — thin far-dated FX-ETF
+  listings); look-ahead audit **0 violations** incl. the surface ASOF check. Coverage
+  truth for all future options-leg seals: **Value-tier chain history starts ~2020 — six
+  years, not the decade** (verified: 2016 chain 403s while 2024 returns 200 same-second;
+  it's an entitlement depth wall, not rate limiting).
+- **VRP leg NOT filled tonight** — three attempts, three distinct causes, all now handled
+  in code (7337cab): depth-wall 403s → skip-and-count; terminal stall timeouts →
+  skip-and-count + 10-consecutive circuit breaker + per-pair persistence + 0.1s pacing;
+  final attempt found the terminal DOWN at start → graceful skip (board vrp_* stays NULL,
+  never fabricated). **Needed: a stable ThetaTerminal session** — then one run of
+  `python3 -c "from sovereign.sentiment import vrp_feed; vrp_feed.update()"` (+ board
+  rebuild) finishes it; every chain fetched so far is parquet-cached, retries only advance.
+- TICK-001 done · TICK-003 ticketed (options-leg family run, awaits TICK-002).
+
+
 ---
 
 ## 2026-07-02 (Claude Code / Molly)
