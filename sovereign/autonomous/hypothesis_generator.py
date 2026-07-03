@@ -49,8 +49,16 @@ def _load_reps() -> list[dict]:
     for f in sorted(glob.glob(DECISION_GLOB)):
         for line in Path(f).read_text().splitlines():
             line = line.strip()
-            if line:
-                reps.append(json.loads(line))
+            if not line:
+                continue
+            rec = json.loads(line)
+            # RED-1 fix: exclude decisions the strategy never authored. Fill-backfilled
+            # records (source="fills_backfill") and synthetic test fills (test_fill=True)
+            # carry forbidden pairs and no entry reasoning — they must not enter the reps
+            # population that hypothesis rules mine.
+            if rec.get("source") == "fills_backfill" or rec.get("test_fill") is True:
+                continue
+            reps.append(rec)
     return reps
 
 

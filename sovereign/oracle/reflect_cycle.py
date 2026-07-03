@@ -275,6 +275,15 @@ def _load_decision_log_summary(days: int = 7, max_entries: int = 20) -> str:
                 if not line.strip():
                     continue
                 rec = json.loads(line)
+                # RED-1 fix: the Oracle must reason ONLY over strategy-authored
+                # decisions. Records reconstructed from broker fills
+                # (source="fills_backfill") were never authored by the strategy — they
+                # carry forbidden pairs (USD_CAD, AUD_NZD) the strategy never traded and
+                # have no entry reasoning to learn from. Synthetic test fills
+                # (test_fill=True) are likewise not real decisions. Exclude both from
+                # reflection input.
+                if rec.get("source") == "fills_backfill" or rec.get("test_fill") is True:
+                    continue
                 # Only REAL closed trades — exclude OPEN and EXPIRED (never-filled
                 # scan signals), which are not trade outcomes and would pollute analysis.
                 if rec.get("outcome") in (None, "OPEN", "EXPIRED"):
