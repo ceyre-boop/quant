@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.alta.invariant_guard</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/opt/homebrew/bin/python3</string>
+    <string>/Users/taboost/quant/audit/invariant_guard.py</string>
+    <string>--run</string>
+  </array>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+  </dict>
+  <key>WorkingDirectory</key>
+  <string>/Users/taboost/quant</string>
+  <key>Nice</key>
+  <integer>5</integer>
+  <key>StandardOutPath</key>
+  <string>/Users/taboost/quant/logs/invariant_guard.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/taboost/quant/logs/invariant_guard.err</string>
+  <!-- Daily at 09:20 (after com.alta.shadow_audit 09:05 and the overnight oracle cycle).
+       No Weekday key = fires all 7 days: rogue broker writes and contamination don't respect weekends. -->
+  <key>StartCalendarInterval</key>
+  <dict>
+    <key>Hour</key><integer>9</integer>
+    <key>Minute</key><integer>20</integer>
+  </dict>
+</dict>
+</plist>

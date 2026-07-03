@@ -6,6 +6,44 @@ Standing constraints live in `CLAUDE.md` — not restated here.
 
 ---
 
+## 2026-07-03 · afternoon (Claude Code / Molly) — Layer-4 audit → standing Adversarial Invariant Guard
+
+**Context:** Colin's "four correctness layers" reframe → chose *map the layers, target the weak one*.
+3-agent read-only audit: L1 Reality **STRONG**, L2 Signal **MEDIUM**, L3 Environment **MEDIUM-STRONG**,
+**L4 Adversarial WEAK** — the two failures that materialized (RED-1 Oracle contamination; rogue USD_CAD
+writer) were caught only by ad-hoc human audit; the red-team skills auto-fire nowhere.
+
+**Shipped (TICK-004):**
+- **`audit/invariant_guard.py`** — read-only, spec-first, self-escalating Layer-4 detector (sibling to
+  `shadow_divergence`). I1 Oracle-reflection purity, I2 no rogue/sentinel OANDA writes, I3 forbidden-pair
+  guard. Reimplements probe/insane-risk heuristics *independently* of the audited code; imports nothing
+  from the execution path (AST-tested).
+- **`audit/invariants_spec.md`** — hashed single-fence contract (mirrors `divergence_spec.md`); consolidated
+  what the plan drafted as a separate `config/invariants.yml` into the one hashed spec (no 2nd source).
+- **`audit/CORRECTNESS_LAYERS.md`** — the four-layer map, durable.
+- **`tests/test_invariant_guard.py`** — 19/19 green, incl. the I1 exclusion test RED-1 lacked + an
+  independence cross-check vs `backfill_decision_records._is_test_fill` + the no-execution-import guard.
+- **`scripts/com.alta.invariant_guard.plist`** — daily 09:20, **tracked but NOT loaded** (see blockers).
+
+**Verdicts:** guard `--run` = **FAIL** (correct) — I1=5, I2=14, I3=18. I1 caught the exact RED-1 records
+(AUD_NZD + 4× USD_CAD `fills_backfill` LOSS into Oracle); I2 caught the `USD_CAD units=1 stop=1.0` sentinel
+probes. 3 URGENT escalations written to `messages_to_colin.json`. Report: `audit/reports/invariants_2026-07-03.*`.
+
+**Blockers (yours):**
+- **Load the guard to make it standing** — `launchctl load` was blocked as unauthorized persistence (correct;
+  operator-promotes). Run: `cp scripts/com.alta.invariant_guard.plist ~/Library/LaunchAgents/ && launchctl load ~/Library/LaunchAgents/com.alta.invariant_guard.plist` (or authorize me).
+- The RED-1 **fix** (source/pair exclusion in `reflect_cycle`) is still the pre-registered Blue change awaiting
+  your review — the guard is its regression test, not a substitute. Until it lands, I1/I3 keep screaming (intended).
+
+**Refused to shortcut:** did not touch the execution path or `reflect_cycle` (guard is read-only + detect-only);
+did not import the audited code into the adversarial check; did not silence the day-1 escalation on a real,
+confirmed contamination; did not work around the persistence denial.
+
+**Push:** ⏳ committing guard + spec + map + tests + plist + this entry to `sovereign-v2` (report artifact
+included; `messages_to_colin.json` live state NOT committed).
+
+---
+
 ## 2026-07-02 · evening (Claude Code / Molly) — Phase 2: verdicts · memory organ · trial · factory · heartbeat
 
 **Shipped (b20aec3..593d46d + TICK-001):**

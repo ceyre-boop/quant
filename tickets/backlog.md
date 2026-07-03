@@ -55,3 +55,17 @@ Schema per ticket:
 - [ ] VRP-001 stage 2/3 per TICK-002; no param re-optimization after seeing OOS
 **status:** ready
 **pre_approved:** false
+
+## TICK-004
+**title:** Standing Adversarial Invariant Guard — close the weak (Layer-4) correctness layer
+**description:** A 4-layer audit rated Adversarial WEAK: RED-1 Oracle contamination + the rogue USD_CAD writer were caught only by manual audit, no standing detector/test. Built `audit/invariant_guard.py` (read-only, spec-first, self-escalating; I1 Oracle-reflection purity, I2 no rogue/sentinel OANDA writes, I3 forbidden-pair guard), `audit/invariants_spec.md` (hashed single-fence contract), `audit/CORRECTNESS_LAYERS.md` (the map), `tests/test_invariant_guard.py` (19/19), `scripts/com.alta.invariant_guard.plist` (daily 09:20). Detect-only — does NOT fix RED-1 (that's the pre-registered Blue change); the guard is its regression test.
+**depends_on:** []
+**blocks:** []
+**acceptance_criteria:**
+- [x] `python3 audit/invariant_guard.py --run` = FAIL on the live contamination (I1=5 exact RED-1 records, I2 caught USD_CAD units=1 sentinels), 3 URGENT escalations, report written, exit 1
+- [x] 19/19 tests green incl. I1 exclusion test, independence cross-check, no-execution-import AST guard
+- [x] spec is a single hashed `yaml audit-spec` fence; guard imports nothing from `sovereign/execution/`
+- [ ] **operator:** load the launchd job to make it standing (`launchctl load ~/Library/LaunchAgents/com.alta.invariant_guard.plist`) — blocked in-session as unauthorized persistence
+- [ ] follow-on: land the pre-registered Blue fix in `reflect_cycle` (guard turns green when contamination stops)
+**status:** done (2026-07-03, build) — pending operator load
+**pre_approved:** false

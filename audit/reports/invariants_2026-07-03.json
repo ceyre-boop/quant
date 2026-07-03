@@ -1,0 +1,327 @@
+{
+  "report_date": "2026-07-03",
+  "spec_version": 1,
+  "spec_sha256": "3599b77f1b95aaad19a762be75c27c16df8f3bd46db13e20e7ad4b63ab0f176e",
+  "gate": "FAIL",
+  "i1_oracle_contamination": {
+    "count": 5,
+    "records": [
+      {
+        "pair": "AUD_NZD",
+        "source": "fills_backfill",
+        "outcome": "LOSS",
+        "r_realized": -1.0,
+        "entry_timestamp": "2026-06-29T03:08:27.698880+00:00",
+        "reasons": [
+          "forbidden pair AUD_NZD"
+        ]
+      },
+      {
+        "pair": "USD_CAD",
+        "source": "fills_backfill",
+        "outcome": "LOSS",
+        "r_realized": -0.0,
+        "entry_timestamp": "2026-06-30T13:06:47.235710+00:00",
+        "reasons": [
+          "forbidden pair USD_CAD"
+        ]
+      },
+      {
+        "pair": "USD_CAD",
+        "source": "fills_backfill",
+        "outcome": "LOSS",
+        "r_realized": -0.0,
+        "entry_timestamp": "2026-06-30T13:08:08.422033+00:00",
+        "reasons": [
+          "forbidden pair USD_CAD"
+        ]
+      },
+      {
+        "pair": "USD_CAD",
+        "source": "fills_backfill",
+        "outcome": "LOSS",
+        "r_realized": -0.0,
+        "entry_timestamp": "2026-06-30T13:33:11.455520+00:00",
+        "reasons": [
+          "forbidden pair USD_CAD"
+        ]
+      },
+      {
+        "pair": "USD_CAD",
+        "source": "fills_backfill",
+        "outcome": "LOSS",
+        "r_realized": -0.0,
+        "entry_timestamp": "2026-06-30T22:30:04.240520+00:00",
+        "reasons": [
+          "forbidden pair USD_CAD"
+        ]
+      }
+    ]
+  },
+  "i2_rogue_oanda_writes": {
+    "count": 14,
+    "fills": [
+      {
+        "src": "data/ledger/oanda_fills.jsonl",
+        "pair": "AUD_NZD",
+        "units": 10000,
+        "stop_price": 1.2184699773788452,
+        "timestamp": "2026-06-29T03:08:27.698880+00:00",
+        "reasons": [
+          "forbidden pair AUD_NZD"
+        ]
+      },
+      {
+        "src": "data/ledger/oanda_fills.jsonl",
+        "pair": "AUD_NZD",
+        "units": 10000,
+        "stop_price": 1.22353994846344,
+        "timestamp": "2026-06-30T12:01:22.747876+00:00",
+        "reasons": [
+          "forbidden pair AUD_NZD"
+        ]
+      },
+      {
+        "src": "data/ledger/oanda_fills.jsonl",
+        "pair": "USD_CAD",
+        "units": 1,
+        "stop_price": 1.0,
+        "timestamp": "2026-06-30T13:06:47.235710+00:00",
+        "reasons": [
+          "forbidden pair USD_CAD",
+          "sentinel/probe fill"
+        ]
+      },
+      {
+        "src": "data/ledger/oanda_fills.jsonl",
+        "pair": "USD_CAD",
+        "units": 1,
+        "stop_price": 1.0,
+        "timestamp": "2026-06-30T13:08:08.422033+00:00",
+        "reasons": [
+          "forbidden pair USD_CAD",
+          "sentinel/probe fill"
+        ]
+      },
+      {
+        "src": "data/ledger/oanda_fills.jsonl",
+        "pair": "USD_CAD",
+        "units": 1,
+        "stop_price": 1.0,
+        "timestamp": "2026-06-30T13:33:11.455520+00:00",
+        "reasons": [
+          "forbidden pair USD_CAD",
+          "sentinel/probe fill"
+        ]
+      },
+      {
+        "src": "data/ledger/oanda_fills.jsonl",
+        "pair": "USD_CAD",
+        "units": 1,
+        "stop_price": 1.0,
+        "timestamp": "2026-06-30T22:30:04.240520+00:00",
+        "reasons": [
+          "forbidden pair USD_CAD",
+          "sentinel/probe fill"
+        ]
+      },
+      {
+        "src": "data/ledger/oanda_fills.jsonl",
+        "pair": "USD_CAD",
+        "units": 1,
+        "stop_price": 1.0,
+        "timestamp": "2026-07-02T18:35:03.977325+00:00",
+        "reasons": [
+          "forbidden pair USD_CAD",
+          "sentinel/probe fill"
+        ]
+      },
+      {
+        "src": "data/ledger/oanda_fills.jsonl",
+        "pair": "USD_CAD",
+        "units": 1,
+        "stop_price": 1.0,
+        "timestamp": "2026-07-02T18:36:04.838104+00:00",
+        "reasons": [
+          "forbidden pair USD_CAD",
+          "sentinel/probe fill"
+        ]
+      },
+      {
+        "src": "data/ledger/oanda_fills.jsonl",
+        "pair": "USD_CAD",
+        "units": 1,
+        "stop_price": 1.0,
+        "timestamp": "2026-07-02T18:55:24.056260+00:00",
+        "reasons": [
+          "forbidden pair USD_CAD",
+          "sentinel/probe fill"
+        ]
+      },
+      {
+        "src": "data/ledger/oanda_fills.jsonl",
+        "pair": "USD_CAD",
+        "units": 1,
+        "stop_price": 1.0,
+        "timestamp": "2026-07-03T01:51:57.427597+00:00",
+        "reasons": [
+          "forbidden pair USD_CAD",
+          "sentinel/probe fill"
+        ]
+      },
+      {
+        "src": "data/execution/fills.jsonl",
+        "pair": "AUD_NZD",
+        "units": null,
+        "stop_price": null,
+        "timestamp": "2026-06-29T03:08:27.700703+00:00",
+        "reasons": [
+          "forbidden pair AUD_NZD",
+          "sentinel/probe fill"
+        ]
+      },
+      {
+        "src": "data/execution/fills.jsonl",
+        "pair": "USD_JPY",
+        "units": null,
+        "stop_price": null,
+        "timestamp": "2026-06-29T03:08:28.498936+00:00",
+        "reasons": [
+          "sentinel/probe fill"
+        ]
+      },
+      {
+        "src": "data/execution/fills.jsonl",
+        "pair": "AUD_NZD",
+        "units": null,
+        "stop_price": null,
+        "timestamp": "2026-06-30T12:01:22.750320+00:00",
+        "reasons": [
+          "forbidden pair AUD_NZD",
+          "sentinel/probe fill"
+        ]
+      },
+      {
+        "src": "data/execution/fills.jsonl",
+        "pair": "USD_JPY",
+        "units": null,
+        "stop_price": null,
+        "timestamp": "2026-07-01T02:55:52.513384+00:00",
+        "reasons": [
+          "sentinel/probe fill"
+        ]
+      }
+    ]
+  },
+  "i3_forbidden_pairs": {
+    "count": 18,
+    "hits": [
+      {
+        "where": "decision",
+        "pair": "AUD_NZD",
+        "outcome": "LOSS",
+        "ts": "2026-06-29T03:08:27.698880+00:00"
+      },
+      {
+        "where": "decision",
+        "pair": "AUD_NZD",
+        "outcome": null,
+        "ts": "2026-06-30T12:01:22.747876+00:00"
+      },
+      {
+        "where": "decision",
+        "pair": "USD_CAD",
+        "outcome": "LOSS",
+        "ts": "2026-06-30T13:06:47.235710+00:00"
+      },
+      {
+        "where": "decision",
+        "pair": "USD_CAD",
+        "outcome": "LOSS",
+        "ts": "2026-06-30T13:08:08.422033+00:00"
+      },
+      {
+        "where": "decision",
+        "pair": "USD_CAD",
+        "outcome": "LOSS",
+        "ts": "2026-06-30T13:33:11.455520+00:00"
+      },
+      {
+        "where": "decision",
+        "pair": "USD_CAD",
+        "outcome": "LOSS",
+        "ts": "2026-06-30T22:30:04.240520+00:00"
+      },
+      {
+        "where": "data/ledger/oanda_fills.jsonl",
+        "pair": "AUD_NZD",
+        "ts": "2026-06-29T03:08:27.698880+00:00"
+      },
+      {
+        "where": "data/ledger/oanda_fills.jsonl",
+        "pair": "AUD_NZD",
+        "ts": "2026-06-30T12:01:22.747876+00:00"
+      },
+      {
+        "where": "data/ledger/oanda_fills.jsonl",
+        "pair": "USD_CAD",
+        "ts": "2026-06-30T13:06:47.235710+00:00"
+      },
+      {
+        "where": "data/ledger/oanda_fills.jsonl",
+        "pair": "USD_CAD",
+        "ts": "2026-06-30T13:08:08.422033+00:00"
+      },
+      {
+        "where": "data/ledger/oanda_fills.jsonl",
+        "pair": "USD_CAD",
+        "ts": "2026-06-30T13:33:11.455520+00:00"
+      },
+      {
+        "where": "data/ledger/oanda_fills.jsonl",
+        "pair": "USD_CAD",
+        "ts": "2026-06-30T22:30:04.240520+00:00"
+      },
+      {
+        "where": "data/ledger/oanda_fills.jsonl",
+        "pair": "USD_CAD",
+        "ts": "2026-07-02T18:35:03.977325+00:00"
+      },
+      {
+        "where": "data/ledger/oanda_fills.jsonl",
+        "pair": "USD_CAD",
+        "ts": "2026-07-02T18:36:04.838104+00:00"
+      },
+      {
+        "where": "data/ledger/oanda_fills.jsonl",
+        "pair": "USD_CAD",
+        "ts": "2026-07-02T18:55:24.056260+00:00"
+      },
+      {
+        "where": "data/ledger/oanda_fills.jsonl",
+        "pair": "USD_CAD",
+        "ts": "2026-07-03T01:51:57.427597+00:00"
+      },
+      {
+        "where": "data/execution/fills.jsonl",
+        "pair": "AUD_NZD",
+        "ts": "2026-06-29T03:08:27.700703+00:00"
+      },
+      {
+        "where": "data/execution/fills.jsonl",
+        "pair": "AUD_NZD",
+        "ts": "2026-06-30T12:01:22.750320+00:00"
+      }
+    ]
+  },
+  "soft": {
+    "unknown_pairs": [],
+    "fills_present": [
+      "data/ledger/oanda_fills.jsonl",
+      "data/execution/fills.jsonl"
+    ],
+    "fills_stale": [
+      "data/execution/fills.jsonl"
+    ]
+  }
+}
