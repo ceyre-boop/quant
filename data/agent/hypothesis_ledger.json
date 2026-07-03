@@ -1758,5 +1758,18 @@
         "note": "INTERIM SEAL \u2014 NO VERDICT (family BH across all 10 primaries awaits the options legs). raw p=0.35596, N=389 de-overlapped, h=5, statistic=0.000221, hit={\"n\": 389, \"wins\": 201, \"hit\": 0.5167095115681234, \"binom_p\": 0.27148047728307656}, IC=0.07135073531980744, medians={\"full_h5\": 0.000221, \"ex2020_h5\": 0.000214}, corr_carry={\"rho_full\": -0.0293, \"n_overlap\": 730, \"benchmark\": \"v015 daily curve (DBV leg deferred to final family run per VRP-001 convention)\", \"rho_2020\": -0.195, \"rho_2022\": 0.1009}, sample_status=OK, deviations=['full-history branch unavailable (calendar file missing/unsourced) \u2014 verified-subset only']; null-interpretation: locked 'event-label shuffle preserving per-pair event counts' read as PER-PAIR DATE-SHUFFLE onto eligible dates (sign-flip rejected \u2014 destroyed by carry drift); event-level shuffle is the defense for overlapping forward windows; primary horizon interpretation: one pooled primary per HYP -> h=20 (072/073/077), h=5 (081); h=10 sealed secondary; artifacts=data/research/positioning_family/HYP-081.json"
       }
     ]
+  },
+  {
+    "id": "PROP-2026-W27-exit-reason-capture",
+    "name": "Record the exit MECHANISM on outcome backfill so attributions stop being AMBIGUOUS",
+    "status": "PROPOSED",
+    "date_proposed": "2026-06-29",
+    "source": "experience/weekly_review.py (machine-proposed; operator promotion required)",
+    "observation": "Week 2026-W27: 7 of 7 closed decisions unclassifiable under ATTRIBUTION_RUBRIC v1 \u2014 the outcome matcher records WIN/LOSS+R but not HOW the trade exited, and carry entries carry no falsification predicates.",
+    "proposal": "At outcome-backfill time, join the OANDA fill's close reason (or the shadow log's decision for the same trade/date) onto the decision record; going forward, predictive entries must carry Track-T predicates so the thesis-alive test is mechanical.",
+    "promotion_path": "operator review -> preregister under standard protocol if testable",
+    "result": null,
+    "p_value": null,
+    "auto_generated": true
   }
 ]
