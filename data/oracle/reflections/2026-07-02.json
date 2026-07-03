@@ -1,0 +1,26 @@
+{
+  "date": "2026-07-02",
+  "generated_at": "2026-07-02T07:33:48.733795+00:00",
+  "input_tokens": 7482,
+  "output_tokens": 902,
+  "estimated_cost_usd": 0.17988,
+  "harvest_days_read": 7,
+  "reflection": {
+    "candidate_lesson": {
+      "lesson_text": "Trades whose decision path did not call log_forex_decision() (reconstructed-from-fills entries) cluster catastrophically at 1W/5L \u2014 untraceable entries are a proxy for entries that bypassed the signal-gating stack entirely and must be blocked, not just logged.",
+      "mechanism": "When an entry is reconstructed from the OANDA fills ledger with empty entry_context, signal_layers_active=[], and null commitment_score, it means the order was placed outside the vetted EdgePipeline path \u2014 no session gate (L2 NY_PM veto), no grade check (L1), no VIX carry gate (L8) fired. These are exactly the ungated impulse trades the tenets exist to prevent; the four USD_CAD LONGs all scratched at -0.0R (stopped at breakeven/entry noise) because there was no thesis behind them to defend the position.",
+      "testable_rule": "if decision.signal_layers_active == [] or decision.commitment_score is None: return ForexVeto('untraced_entry \u2014 no gated signal path'); log for audit.",
+      "expected_impact": "Removes the 5 zero/negative-R untraced trades from the sample \u2014 with only the 1 properly-signaled USD_JPY LONG (+1.921R) surviving, this directly lifts win rate and avg R, reducing return variance and improving Sharpe toward the +0.05 gap.",
+      "evidence_from_harvest": "6 closed trades: 1W/5L, avg R +0.153. The single winner (USD_JPY +1.921R) is the only one with a plausible macro thesis (consensus 16/30 bull, dir=LONG); the 4 USD_CAD losers and 1 AUD_NZD loser all realized \u2264 0R.",
+      "evidence_from_reasoning": "All 6 entries share why_this_trade='RECONSTRUCTED from fills ledger; entry path did not call log_forex_decision()', empty entry_context={}, signal_layers_active=[], null commitment_score \u2014 5 of these 6 untraced trades produced \u22640R (four USD_CAD at exactly -0.0R).",
+      "reasoning_component_targeted": "signal_layers_active",
+      "sample_needed": 30
+    },
+    "retirement_flag": {
+      "lesson_to_review": null,
+      "reason": null
+    },
+    "system_health_note": "System is effectively blind \u2014 0 trades in the last 7 days and all 6 historical trades were untraceable fills with no logged reasoning, so no reliable in-sample edge can be measured until the logging path is enforced and 30+ properly-gated trades accumulate."
+  },
+  "auto_validation": null
+}

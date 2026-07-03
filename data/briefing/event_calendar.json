@@ -1,30 +1,22 @@
 {
-  "as_of": "2026-07-01T12:15:04.224412+00:00",
+  "as_of": "2026-07-02T12:20:56.217186+00:00",
   "horizon_days": 21,
   "events": [
-    {
-      "event": "ISM Manufacturing PMI",
-      "date": "2026-07-01",
-      "source": "cadence_estimate",
-      "action": "reduce size into the 10:00 ET print",
-      "days_until": 0,
-      "note": "TODAY \u2014 reduce size into the 10:00 ET print"
-    },
     {
       "event": "Nonfarm Payrolls",
       "date": "2026-07-03",
       "source": "cadence_estimate",
       "action": "high-impact 8:30 ET \u2014 widen stops / size down",
-      "days_until": 2,
-      "note": "in 2d \u2014 high-impact 8:30 ET \u2014 widen stops / size down"
+      "days_until": 1,
+      "note": "in 1d \u2014 high-impact 8:30 ET \u2014 widen stops / size down"
     },
     {
       "event": "CPI",
       "date": "2026-07-12",
       "source": "cadence_estimate",
       "action": "inflation print 8:30 ET \u2014 reduce size into window",
-      "days_until": 11,
-      "note": "in 11d \u2014 inflation print 8:30 ET \u2014 reduce size into window"
+      "days_until": 10,
+      "note": "in 10d \u2014 inflation print 8:30 ET \u2014 reduce size into window"
     }
   ],
   "provenance_note": "FOMC dates are a maintained seed (verify vs Fed calendar); CPI/PCE/NFP/ISM are cadence ESTIMATES, not verified release dates."

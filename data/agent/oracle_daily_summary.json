@@ -1,14 +1,14 @@
 {
-  "last_updated": "2026-07-01T06:31:00.042219+00:00",
+  "last_updated": "2026-07-02T07:33:48.761612+00:00",
   "harvest": {
     "trades_closed": 0,
     "win_rate": null,
     "failure_taxonomy": {}
   },
   "reflection": {
-    "candidate_lesson": "When the 30-indicator consensus shows high conviction (>=80%) but green_matches=0 and hist_hr=0, treat the signal as UNVALIDATED and freeze \u2014 conviction without historical pattern confirmation is unproven direction, not tradeable edge.",
-    "mechanism": "green_matches=0 means the current live indicator configuration has never been seen paired with a winning outcome in memory; conviction only measures agreement among indicators at this instant, not whether that agreement historically resolved profitably. USDJPY today shows the trap: conv=100% LONG but hist_hr=0% \u2014 a fresh, untested consensus that safe-haven flow (L8) can corrupt. Institutional rate-signal reliability degrades exactly when indicators cluster without historical precedent, because clustering often reflects a crowded one-way positioning about to mean-revert.",
-    "testable_rule": "if consensus_conviction >= 0.80 and green_matches == 0 and hist_hr <= 0.10: veto_entry() # require at least one historical green_match before trusting high-conviction direction"
+    "candidate_lesson": "Trades whose decision path did not call log_forex_decision() (reconstructed-from-fills entries) cluster catastrophically at 1W/5L \u2014 untraceable entries are a proxy for entries that bypassed the signal-gating stack entirely and must be blocked, not just logged.",
+    "mechanism": "When an entry is reconstructed from the OANDA fills ledger with empty entry_context, signal_layers_active=[], and null commitment_score, it means the order was placed outside the vetted EdgePipeline path \u2014 no session gate (L2 NY_PM veto), no grade check (L1), no VIX carry gate (L8) fired. These are exactly the ungated impulse trades the tenets exist to prevent; the four USD_CAD LONGs all scratched at -0.0R (stopped at breakeven/entry noise) because there was no thesis behind them to defend the position.",
+    "testable_rule": "if decision.signal_layers_active == [] or decision.commitment_score is None: return ForexVeto('untraced_entry \u2014 no gated signal path'); log for audit."
   },
   "validation": {
     "verdict": "REJECTED",
@@ -21,8 +21,8 @@
     "codify_error": null
   },
   "cycle": {
-    "cost_usd": 0.15789,
+    "cost_usd": 0.17988,
     "status": "COMPLETE",
-    "date": "2026-07-01"
+    "date": "2026-07-02"
   }
 }

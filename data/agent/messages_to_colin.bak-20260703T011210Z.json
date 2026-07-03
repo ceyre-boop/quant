@@ -449,25 +449,7 @@
       "timestamp": "2026-07-01T03:56:33+00:00",
       "read": false,
       "source": "oracle_pulse"
-    },
-    {
-      "id": "MSG-REST-032-1",
-      "priority": "HIGH",
-      "emoji": "\ud83d\udea8",
-      "text": "Phantom USD_CAD orders found. 7 OANDA fills are USD_CAD LONG units=1, SL=1.0, TP=2.0 (tid134/144/154/165/186/196/206 \u2014 3 placed today 18:35-18:55Z). USD_CAD isn't even in your scanned 4-pair universe, so these come from OUTSIDE the gated pipeline. This is the concrete source of Oracle's 'untraced entries cluster 1W/5L' lesson yesterday \u2014 it's being fed by an unidentified emitter. At units=1 it's not real risk, but it corrupts the Oracle's learning and, if that path ever emits real size, it's ungated risk (breaks tenets 1 & 4). Queued RQ-REST-032 to trace the emitter (read-only). Recommend you kill or gate it.",
-      "timestamp": "2026-07-03T01:12:10Z",
-      "read": false,
-      "source": "REST-032"
-    },
-    {
-      "id": "MSG-REST-032-2",
-      "priority": "MEDIUM",
-      "emoji": "\ud83d\udd17",
-      "text": "Correction to last night's REST-031 note on the Oracle loop. REST-031 said the trade_id join key 'already exists on both sides' \u2014 it doesn't. I audited all 1922 gated Jun+Jul decision records: 0 carry trade_id, 0 carry order_id. The only records with a trade_id are the 11 reconstructed fills_backfill stubs. So RQ-REST-019b Change 2 can't just 'consume an existing key' \u2014 the gated entry path has to PERSIST the broker id at fill time (attach_broker_id()) before any id-join is possible. Good news: the bulk loop is healthy (1915/1922 gated records DO close), so OUTCOME_LOOP_STALL remains a false-positive alarm. The real gap is small and now enumerated: 4 FOREX + 3 ICT records rotting, 10 orphan fills. Sharpened RQ-REST-019b with the specifics.",
-      "timestamp": "2026-07-03T01:12:10Z",
-      "read": false,
-      "source": "REST-032"
     }
   ],
-  "last_updated": "2026-07-03T01:12:10Z"
+  "last_updated": "2026-07-03T00:40:31+00:00"
 }

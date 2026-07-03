@@ -8,34 +8,36 @@
   },
   "week": {
     "start_date": "2026-06-27",
-    "weekly_used": 61000,
-    "weekly_remaining": 139000,
+    "weekly_used": 65000,
+    "weekly_remaining": 135000,
     "last_synced": null,
-    "note": "REST-031 2026-07-02T01Z: light read-only cycle, +~5k est. Weekly ~61000/200k -> stay LIGHT (>50k light floor, >>20k danger). STILL awaiting manual sync (claude_usage_tracker.py sync); weekly_used is a conservative running estimate."
+    "note": "REST-032 2026-07-03T01Z: light read-only join-audit cycle, +~4k est. Weekly ~65000/200k -> stay LIGHT (>50k light floor). STILL awaiting manual sync (claude_usage_tracker.py sync); weekly_used is a conservative running estimate."
   },
   "today": {
-    "date": "2026-07-01",
+    "date": "2026-07-03",
     "human_used": 0,
-    "agent_used": 5000,
+    "agent_used": 4000,
     "daily_agent_budget": 8571,
     "agent_allowed_today": 7000,
-    "note": "REST-031 fresh local day (prior 6k was the REST-030 cycle ~24h earlier). Light read-only Oracle-loop forensics; no live code/config touched."
+    "note": "REST-032 fresh local day. Read-only oanda_fills x decision_logs join audit; no live code/config touched. 3 findings, 1 queue sharpen, 1 new task, 2 Colin msgs."
   },
   "session": {
-    "started": "2026-07-02T01:13:53Z",
-    "ended": "2026-07-02T01:13:53Z",
+    "started": "2026-07-03T01:12:10Z",
+    "ended": "2026-07-03T01:12:10Z",
     "mode": "REST_MODE",
     "tasks_completed": [
-      "Verified RQ-REST-018: c7908a9 removed constant-1.0 commitment_score; July live entries log honest None (DONE_VERIFY -> DONE)",
-      "Diagnosed the URGENT OUTCOME_LOOP_STALL as a steady-state FALSE POSITIVE on the FOREX/OANDA path (forex loop is closing; alarm can't tell 'already closed' from 'never matched')",
-      "Found forex trade_id join key already exists on both sides (oanda_fills.jsonl + decision records) but update_outcome/backfill ignore it -> reinforces REST-030 Change 2",
-      "3 findings written; RQ-REST-019b sharpened with alarm-logic + trade_id-join fixes; RQ-REST-018 closed; 1 Colin message"
+      "Verified persistent decision_logs YELLOW (backfill gap): enumerated the real live-subset defect vs the healthy bulk loop",
+      "CORRECTED FIND-REST-031-b: gated decision records carry NO trade_id/order_id (0/1922); only fills_backfill stubs do -> attach_broker_id() is load-bearing for RQ-REST-019b Change 2",
+      "Flagged phantom USD_CAD units=1/SL1.0/TP2.0 orders (7 fills, 3 today) from an untraced emitter -> concrete source of Oracle's 2026-07-02 untraced-entry lesson; queued RQ-REST-032",
+      "3 findings written; RQ-REST-019b sharpened; RQ-REST-032 added; 2 Colin messages"
     ],
     "findings_written": 3,
     "hypotheses_updated": [],
     "new_hypotheses": [],
-    "new_tasks_added": [],
-    "key_finding": "OUTCOME_LOOP_STALL URGENT alarm is a false positive: the forex/OANDA loop is closing (native records carry real WIN/LOSS); the alarm fires on re-scan count and cannot distinguish already-closed from never-matched. Real remaining work = alarm-logic fix + consume the trade_id join key that already exists (both folded into RQ-REST-019b / REST-030)."
+    "new_tasks_added": [
+      "RQ-REST-032"
+    ],
+    "key_finding": "The Oracle outcome-loop join key does NOT exist on the gated side (0/1922 records carry trade_id) \u2014 only reconstructed stubs do; the bulk loop is healthy (1915/1922 closed) so the STALL alarm stays a false positive, and the true gap is a small enumerated live subset (4 FOREX + 3 ICT rotters, 10 orphan fills). Separately, an untraced path is emitting phantom USD_CAD units=1 orders that corrupt Oracle learning."
   },
   "mode": "REST_MODE",
   "thresholds": {

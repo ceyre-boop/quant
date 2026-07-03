@@ -1,0 +1,47 @@
+{
+  "meta": {
+    "note": "Claude Pro has no usage API. This is a local ledger. Sync weekly_used manually from claude.ai/settings or run: python3 sovereign/tools/claude_usage_tracker.py sync --used 142000",
+    "weekly_reset_day": "Saturday",
+    "weekly_total_estimate": 200000,
+    "human_share": 0.7,
+    "agent_share": 0.3
+  },
+  "week": {
+    "start_date": "2026-06-27",
+    "weekly_used": 61000,
+    "weekly_remaining": 139000,
+    "last_synced": null,
+    "note": "REST-031 2026-07-02T01Z: light read-only cycle, +~5k est. Weekly ~61000/200k -> stay LIGHT (>50k light floor, >>20k danger). STILL awaiting manual sync (claude_usage_tracker.py sync); weekly_used is a conservative running estimate."
+  },
+  "today": {
+    "date": "2026-07-01",
+    "human_used": 0,
+    "agent_used": 5000,
+    "daily_agent_budget": 8571,
+    "agent_allowed_today": 7000,
+    "note": "REST-031 fresh local day (prior 6k was the REST-030 cycle ~24h earlier). Light read-only Oracle-loop forensics; no live code/config touched."
+  },
+  "session": {
+    "started": "2026-07-02T01:13:53Z",
+    "ended": "2026-07-02T01:13:53Z",
+    "mode": "REST_MODE",
+    "tasks_completed": [
+      "Verified RQ-REST-018: c7908a9 removed constant-1.0 commitment_score; July live entries log honest None (DONE_VERIFY -> DONE)",
+      "Diagnosed the URGENT OUTCOME_LOOP_STALL as a steady-state FALSE POSITIVE on the FOREX/OANDA path (forex loop is closing; alarm can't tell 'already closed' from 'never matched')",
+      "Found forex trade_id join key already exists on both sides (oanda_fills.jsonl + decision records) but update_outcome/backfill ignore it -> reinforces REST-030 Change 2",
+      "3 findings written; RQ-REST-019b sharpened with alarm-logic + trade_id-join fixes; RQ-REST-018 closed; 1 Colin message"
+    ],
+    "findings_written": 3,
+    "hypotheses_updated": [],
+    "new_hypotheses": [],
+    "new_tasks_added": [],
+    "key_finding": "OUTCOME_LOOP_STALL URGENT alarm is a false positive: the forex/OANDA loop is closing (native records carry real WIN/LOSS); the alarm fires on re-scan count and cannot distinguish already-closed from never-matched. Real remaining work = alarm-logic fix + consume the trade_id join key that already exists (both folded into RQ-REST-019b / REST-030)."
+  },
+  "mode": "REST_MODE",
+  "thresholds": {
+    "weekly_danger": 20000,
+    "weekly_light_mode": 50000,
+    "human_minimum_buffer": 8000,
+    "heavy_task_minimum": 15000
+  }
+}
