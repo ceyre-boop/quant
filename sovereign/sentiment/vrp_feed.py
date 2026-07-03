@@ -204,13 +204,19 @@ def update(con=None, start: str | None = None) -> dict:
         # weekly sample dates = last real ETF trading day per week, on/after `start`
         idx = etf_close.index[etf_close.index >= pd.Timestamp(start)]
         weekly = pd.Series(idx, index=idx).resample(cfg["sample_freq"]).last().dropna()
-        recs = []
+        recs, skipped_forbidden = [], 0
         for d in weekly:
             d = pd.Timestamp(d)
             spot = etf_close.asof(d)                      # ETF spot at/just-before D (the option underlying)
             if not np.isfinite(spot):
                 continue
-            iv = _atm_iv_for_date(loader, symbol, d, float(spot), cfg)
+            try:
+                iv = _atm_iv_for_date(loader, symbol, d, float(spot), cfg)
+            except Exception as exc:                      # Value-tier depth wall 403s pre-~2020 chains
+                if "403" in str(exc):
+                    skipped_forbidden += 1
+                    continue
+                raise
             if iv is None:
                 continue
             rv_d = rv.asof(d)                             # trailing RV, window ends at D (<= D)
@@ -224,6 +230,7 @@ def update(con=None, start: str | None = None) -> dict:
                          "fetched_at": now})
         if not recs:
             coverage[pair] = {"symbol": symbol, "rows": 0, "earliest_expiry": earliest_exp,
+                              "skipped_forbidden": skipped_forbidden,
                               "note": "no option data in window"}
             continue
         df = pd.DataFrame(recs).sort_values("date").reset_index(drop=True)
@@ -237,6 +244,7 @@ def update(con=None, start: str | None = None) -> dict:
         src = out["iv_source"].value_counts().to_dict()
         coverage[pair] = {"symbol": symbol, "rows": int(len(out)), "start": str(out["date"].min()),
                           "end": str(out["date"].max()), "earliest_expiry": earliest_exp,
+                          "skipped_forbidden": skipped_forbidden,
                           "iv_source": {k: int(v) for k, v in src.items()}}
     if frames:
         upsert(con, "sentiment_vrp_daily", pd.concat(frames, ignore_index=True), ["date", "pair"])

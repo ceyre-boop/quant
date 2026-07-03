@@ -145,16 +145,17 @@ class ThetaDataLoader:
         import urllib.request
         headers = {} if self._is_local() else {"Authorization": f"Bearer {self.api_key}"}
         req = urllib.request.Request(self.base_url + path, headers=headers)
-        # ThetaTerminal rate-limits burst backfills with transient 403s (observed
-        # 2026-07-02 mid-backfill; the same request succeeds after a cooldown).
-        # Bounded backoff — anything still failing after 3 waits raises as before.
-        for attempt in range(4):
+        # 403 is AMBIGUOUS at this layer: transient rate-limit OR the Value-tier
+        # history-depth wall (verified 2026-07-02: 2016 chains 403 while 2024 chains 200
+        # in the same second). One quick retry covers the transient case; persistent
+        # 403 raises so CALLERS decide (feeders skip-and-count depth-walled dates).
+        for attempt in range(2):
             try:
                 with urllib.request.urlopen(req, timeout=timeout) as resp:
                     return resp.read().decode()
             except urllib.error.HTTPError as exc:
-                if exc.code == 403 and attempt < 3:
-                    time.sleep(15 * (attempt + 1))
+                if exc.code == 403 and attempt < 1:
+                    time.sleep(5)
                     continue
                 raise
         raise RuntimeError("unreachable")
