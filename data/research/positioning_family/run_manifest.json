@@ -1,0 +1,59 @@
+{
+  "run_ts": "2026-07-02T19:21:41.561535+00:00",
+  "seed": 42,
+  "n_perm": 10000,
+  "git": "a298378",
+  "gate_zero": {
+    "HYP-072_cot_extreme_fade.json": {
+      "hash": "6316469c85b26fb1",
+      "ok": true
+    },
+    "HYP-073_flush_continuation.json": {
+      "hash": "03bcab0436a3bcd6",
+      "ok": true
+    },
+    "HYP-077_crowded_carry_drawdown_gate.json": {
+      "hash": "731ebb95c49368df",
+      "ok": true
+    },
+    "HYP-081_extreme_into_event_fade.json": {
+      "hash": "258d0d242448c940",
+      "ok": true
+    },
+    "HYP-072-081_positioning_family.json": {
+      "hash": "8d48daccfa4644eb",
+      "ok": true
+    }
+  },
+  "null_interpretation": "null-interpretation: locked 'event-label shuffle preserving per-pair event counts' read as PER-PAIR DATE-SHUFFLE onto eligible dates (sign-flip rejected \u2014 destroyed by carry drift); event-level shuffle is the defense for overlapping forward windows",
+  "primary_h": "primary horizon interpretation: one pooled primary per HYP -> h=20 (072/073/077), h=5 (081); h=10 sealed secondary",
+  "hyp_order": [
+    "HYP-072",
+    "HYP-073",
+    "HYP-077",
+    "HYP-081"
+  ],
+  "cot_rows": 8163,
+  "spot_spans": {
+    "EURUSD": [
+      "2014-06-02",
+      "2026-07-02"
+    ],
+    "GBPUSD": [
+      "2014-06-02",
+      "2026-07-02"
+    ],
+    "USDJPY": [
+      "2014-06-02",
+      "2026-07-02"
+    ],
+    "AUDUSD": [
+      "2014-06-02",
+      "2026-07-02"
+    ],
+    "AUDNZD": [
+      "2014-06-02",
+      "2026-07-01"
+    ]
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "hyp": "HYP-081",
+  "branch": "verified_subset",
+  "calendar_counts": {
+    "FED": 28,
+    "BOE": 28,
+    "ECB": 16,
+    "RBA": 16
+  },
+  "n_event_days": 205,
+  "per_pair_N": {
+    "EURUSD": 93,
+    "GBPUSD": 72,
+    "USDJPY": 78,
+    "AUDUSD": 70,
+    "AUDNZD": 76
+  },
+  "primary": {
+    "h": 5,
+    "statistic_median": 0.000221,
+    "raw_p": 0.35596,
+    "n_perm": 10000,
+    "N_deoverlapped": 389
+  },
+  "medians": {
+    "full_h5": 0.000221,
+    "ex2020_h5": 0.000214
+  },
+  "hit_h5": {
+    "n": 389,
+    "wins": 201,
+    "hit": 0.5167095115681234,
+    "binom_p": 0.27148047728307656
+  },
+  "ic_h5": 0.07135073531980744,
+  "dropped_missing_data": 0,
+  "corr_carry": {
+    "rho_full": -0.0293,
+    "n_overlap": 730,
+    "benchmark": "v015 daily curve (DBV leg deferred to final family run per VRP-001 convention)",
+    "rho_2020": -0.195,
+    "rho_2022": 0.1009
+  },
+  "sample_status": "OK",
+  "deviations": [
+    "full-history branch unavailable (calendar file missing/unsourced) \u2014 verified-subset only"
+  ],
+  "cross_sectional_caveat": "one event day can appear for multiple pairs (cross-sectional dependence) \u2014 known interim caveat, resolved at family stage"
+}

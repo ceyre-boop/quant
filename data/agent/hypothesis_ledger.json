@@ -1549,7 +1549,14 @@
     "is_sharpe": null,
     "standalone": false,
     "auto_generated": false,
-    "source": "manual"
+    "source": "manual",
+    "annotations": [
+      {
+        "date": "2026-07-02T19:21:41.578881+00:00",
+        "by": "POSITIONING-BOARD-2026-07/interim-cot-subset",
+        "note": "INTERIM SEAL \u2014 NO VERDICT (family BH across all 10 primaries awaits the options legs). raw p=0.77162, N=168 de-overlapped, h=20, statistic=-0.001567, hit={\"n\": 168, \"wins\": 80, \"hit\": 0.47619047619047616, \"binom_p\": 0.7562165022100065}, IC=0.1467455605722967, medians={\"full_h20\": -0.001567, \"ex2020_h20\": -0.001019, \"full_h10\": -0.00033}, corr_carry={\"rho_full\": 0.0354, \"n_overlap\": 2069, \"benchmark\": \"v015 daily curve (DBV leg deferred to final family run per VRP-001 convention)\", \"rho_2020\": 0.085, \"rho_2022\": 0.0325}, sample_status=OK, deviations=[]; null-interpretation: locked 'event-label shuffle preserving per-pair event counts' read as PER-PAIR DATE-SHUFFLE onto eligible dates (sign-flip rejected \u2014 destroyed by carry drift); event-level shuffle is the defense for overlapping forward windows; primary horizon interpretation: one pooled primary per HYP -> h=20 (072/073/077), h=5 (081); h=10 sealed secondary; artifacts=data/research/positioning_family/HYP-072.json"
+      }
+    ]
   },
   {
     "id": "HYP-073",
@@ -1569,7 +1576,14 @@
     "is_sharpe": null,
     "standalone": false,
     "auto_generated": false,
-    "source": "manual"
+    "source": "manual",
+    "annotations": [
+      {
+        "date": "2026-07-02T19:21:41.581426+00:00",
+        "by": "POSITIONING-BOARD-2026-07/interim-cot-subset",
+        "note": "INTERIM SEAL \u2014 NO VERDICT (family BH across all 10 primaries awaits the options legs). raw p=0.72313, N=168 de-overlapped, h=20, statistic=-0.001227, hit={\"n\": 168, \"wins\": 83, \"hit\": 0.49404761904761907, \"binom_p\": 0.5914767555096098}, IC=0.025923638774859415, medians={\"full_h20\": -0.001227, \"ex2020_h20\": -0.001383, \"full_h10\": -0.000849}, corr_carry={\"rho_full\": 0.0288, \"n_overlap\": 1694, \"benchmark\": \"v015 daily curve (DBV leg deferred to final family run per VRP-001 convention)\", \"rho_2020\": -0.0666, \"rho_2022\": 0.2702}, sample_status=OK, deviations=[]; null-interpretation: locked 'event-label shuffle preserving per-pair event counts' read as PER-PAIR DATE-SHUFFLE onto eligible dates (sign-flip rejected \u2014 destroyed by carry drift); event-level shuffle is the defense for overlapping forward windows; primary horizon interpretation: one pooled primary per HYP -> h=20 (072/073/077), h=5 (081); h=10 sealed secondary; artifacts=data/research/positioning_family/HYP-073.json"
+      }
+    ]
   },
   {
     "id": "HYP-074",
@@ -1649,7 +1663,14 @@
     "is_sharpe": null,
     "standalone": false,
     "auto_generated": false,
-    "source": "manual"
+    "source": "manual",
+    "annotations": [
+      {
+        "date": "2026-07-02T19:21:41.582911+00:00",
+        "by": "POSITIONING-BOARD-2026-07/interim-cot-subset",
+        "note": "INTERIM SEAL \u2014 NO VERDICT (family BH across all 10 primaries awaits the options legs). raw p=0.17098, N=9 de-overlapped, h=20, statistic=-0.006313, hit={}, IC=None, medians={}, corr_carry={}, sample_status=UNDERPOWERED_INTERIM, deviations=['DEVIATION (operator-authorized): rr25_z term omitted \u2014 options surface has no data; COT-only interim variant. Hash-locked composite unchanged; final family verdict requires the full composite rerun.']; null-interpretation: locked 'event-label shuffle preserving per-pair event counts' read as PER-PAIR DATE-SHUFFLE onto eligible dates (sign-flip rejected \u2014 destroyed by carry drift); event-level shuffle is the defense for overlapping forward windows; primary horizon interpretation: one pooled primary per HYP -> h=20 (072/073/077), h=5 (081); h=10 sealed secondary; artifacts=data/research/positioning_family/HYP-077.json"
+      }
+    ]
   },
   {
     "id": "HYP-078",
@@ -1729,6 +1750,13 @@
     "is_sharpe": null,
     "standalone": false,
     "auto_generated": false,
-    "source": "manual"
+    "source": "manual",
+    "annotations": [
+      {
+        "date": "2026-07-02T19:21:41.584498+00:00",
+        "by": "POSITIONING-BOARD-2026-07/interim-cot-subset",
+        "note": "INTERIM SEAL \u2014 NO VERDICT (family BH across all 10 primaries awaits the options legs). raw p=0.35596, N=389 de-overlapped, h=5, statistic=0.000221, hit={\"n\": 389, \"wins\": 201, \"hit\": 0.5167095115681234, \"binom_p\": 0.27148047728307656}, IC=0.07135073531980744, medians={\"full_h5\": 0.000221, \"ex2020_h5\": 0.000214}, corr_carry={\"rho_full\": -0.0293, \"n_overlap\": 730, \"benchmark\": \"v015 daily curve (DBV leg deferred to final family run per VRP-001 convention)\", \"rho_2020\": -0.195, \"rho_2022\": 0.1009}, sample_status=OK, deviations=['full-history branch unavailable (calendar file missing/unsourced) \u2014 verified-subset only']; null-interpretation: locked 'event-label shuffle preserving per-pair event counts' read as PER-PAIR DATE-SHUFFLE onto eligible dates (sign-flip rejected \u2014 destroyed by carry drift); event-level shuffle is the defense for overlapping forward windows; primary horizon interpretation: one pooled primary per HYP -> h=20 (072/073/077), h=5 (081); h=10 sealed secondary; artifacts=data/research/positioning_family/HYP-081.json"
+      }
+    ]
   }
 ]

@@ -1,0 +1,63 @@
+{
+  "hyp": "HYP-072",
+  "direction_rule": "fade: crowd long base -> base depreciates; USDJPY inverted",
+  "per_pair_N": {
+    "EURUSD": 86,
+    "GBPUSD": 110,
+    "USDJPY": 111,
+    "AUDUSD": 88,
+    "AUDNZD": 61
+  },
+  "pair_spans": {
+    "EURUSD": [
+      "1986-01-18",
+      "2026-06-26"
+    ],
+    "GBPUSD": [
+      "1988-05-02",
+      "2026-06-26"
+    ],
+    "USDJPY": [
+      "1986-01-18",
+      "2026-06-26"
+    ],
+    "AUDUSD": [
+      "1987-02-02",
+      "2026-06-26"
+    ],
+    "AUDNZD": [
+      "1999-01-08",
+      "2026-06-26"
+    ]
+  },
+  "primary": {
+    "h": 20,
+    "statistic_median": -0.001567,
+    "raw_p": 0.77162,
+    "n_perm": 10000,
+    "N_deoverlapped": 168
+  },
+  "dropped_missing_data": 288,
+  "medians": {
+    "full_h20": -0.001567,
+    "ex2020_h20": -0.001019,
+    "full_h10": -0.00033
+  },
+  "hit_h20": {
+    "n": 168,
+    "wins": 80,
+    "hit": 0.47619047619047616,
+    "binom_p": 0.7562165022100065
+  },
+  "ic_h20": 0.1467455605722967,
+  "ic_h10": 0.063953176112942,
+  "corr_carry": {
+    "rho_full": 0.0354,
+    "n_overlap": 2069,
+    "benchmark": "v015 daily curve (DBV leg deferred to final family run per VRP-001 convention)",
+    "rho_2020": 0.085,
+    "rho_2022": 0.0325
+  },
+  "sample_status": "OK",
+  "deviations": []
+}

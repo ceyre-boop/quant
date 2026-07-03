@@ -1,0 +1,88 @@
+{
+  "hyp": "HYP-077",
+  "reconcile_guard": {
+    "target": 0.6886,
+    "recomputed": 0.6885,
+    "pass": true
+  },
+  "n_crossings": 9,
+  "N_deoverlapped": 9,
+  "primary": {
+    "h": 20,
+    "N_deoverlapped": 9,
+    "statistic_median_dd_diff": -0.006313,
+    "raw_p": 0.17098,
+    "n_perm": 10000,
+    "medians": {
+      "event_dd": -0.006418,
+      "unconditional_dd": -0.000105
+    }
+  },
+  "sample_status": "UNDERPOWERED_INTERIM",
+  "deviations": [
+    "DEVIATION (operator-authorized): rr25_z term omitted \u2014 options surface has no data; COT-only interim variant. Hash-locked composite unchanged; final family verdict requires the full composite rerun."
+  ],
+  "composite_mapping_sample": [
+    {
+      "date": "2015-01-02",
+      "pairs": {
+        "USDJPY": {
+          "direction": 1,
+          "net_pct_1y": 0.28846153846153844,
+          "aligned": 0.28846153846153844
+        }
+      }
+    },
+    {
+      "date": "2015-02-06",
+      "pairs": {
+        "USDJPY": {
+          "direction": 1,
+          "net_pct_1y": 0.9230769230769231,
+          "aligned": 0.9230769230769231
+        },
+        "AUDUSD": {
+          "direction": -1,
+          "net_pct_1y": 0.019230769230769232,
+          "aligned": 0.9807692307692307
+        }
+      }
+    },
+    {
+      "date": "2015-02-13",
+      "pairs": {
+        "USDJPY": {
+          "direction": 1,
+          "net_pct_1y": 0.9615384615384616,
+          "aligned": 0.9615384615384616
+        },
+        "AUDUSD": {
+          "direction": -1,
+          "net_pct_1y": 0.038461538461538464,
+          "aligned": 0.9615384615384616
+        }
+      }
+    },
+    {
+      "date": "2015-02-20",
+      "pairs": {
+        "AUDUSD": {
+          "direction": -1,
+          "net_pct_1y": 0.038461538461538464,
+          "aligned": 0.9615384615384616
+        }
+      }
+    },
+    {
+      "date": "2015-03-06",
+      "pairs": {
+        "USDJPY": {
+          "direction": 1,
+          "net_pct_1y": 0.9615384615384616,
+          "aligned": 0.9615384615384616
+        }
+      }
+    }
+  ],
+  "diversifier_gate": "EXEMPT (prereg)"
+}
