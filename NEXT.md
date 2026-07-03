@@ -6,6 +6,66 @@ Standing constraints live in `CLAUDE.md` — not restated here.
 
 ---
 
+## 2026-07-02 · evening (Claude Code / Molly) — Phase 2: verdicts · memory organ · trial · factory · heartbeat
+
+**Shipped (b20aec3..593d46d + TICK-001):**
+- **V — interim seals under the locked protocol** (b20aec3): gate-zero hash verify held;
+  HYP-072 raw p=0.772 (N=168) · HYP-073 p=0.723 (N=168) · HYP-077 COT-only p=0.171 (N=9
+  UNDERPOWERED; reconcile guard reproduced 0.6886 first) · HYP-081 p=0.356 (N=389,
+  verified-subset calendar). Sealed as dated ledger ANNOTATIONS; status stays
+  PREREGISTERED. **Family BH adjudication awaits the options legs — no verdict is
+  CONFIRMED, so factory ignition stays LOCKED (no command unlocked).** Priors holding.
+- **T — thesis-exit spec** (62744ed, sha 0340424056db3277): predicates DSL;
+  `thesis_invalidated` first-class; **ownership: the predictive paper loop owns
+  predictive exits; the frozen L2 manager keeps carry** (two-layer wall).
+- **W — memory organ LIVE** (0c4c6ab rubric first, then c7197c9): journal with
+  abstentions (Article 4 observable), rubric v1 hash-pinned `7e646084468f7e71`,
+  backfill **30 rows** / 7 attributions, `com.alta.journal_sync` 09:15 Mon-Fri +
+  `com.alta.weekly_review` Sun 17:00 **both loaded**.
+- **D — factory built, ignition gated** (58d69e0): hashed snapshots, CPCV validation,
+  calibrated zoo + abstain wrapper, append-only registry;
+  `python -m factory.train --hyp HYP-072` → **IGNITION REFUSED, Article 6 printed
+  verbatim** (test + live demo). Paper adapter DRAFT-CAPS-stamped, NOT enabled.
+- **S — subtraction trial** (e221827: attic 34 dead files, pure renames, reversible;
+  2e4dd67: verdicts). **Ambiguous list needs your ruling** (execute_daily.py — it IS
+  the loaded papertrading job; train_core.py; the ict-engine bridge story; firebase/,
+  layer2/3, dashboards, ~12 legacy dirs batched with the equity-engine ruling).
+  40 pre-existing failures re-diagnosed: **API/timezone/network drift — sklearn IS
+  installed**; verdict keep-as-known-failure, dated; ml_stack is NOT a factory input.
+  Baseline unchanged: 40 failed / 1039 passed (34 new tests, 0 new failures).
+- **F — FIRM.md + DEFINITION_OF_DONE.md + THE FIRST HEARTBEAT** (593d46d): board →
+  journal → attribution → `review/2026-W27.md` → **the review job itself wrote the
+  ledger's first PROPOSED entry, `PROP-2026-W27-exit-reason-capture`**. The metabolized
+  triple: the stray AUD_NZD fills-reconstructed loss → AMBIGUOUS (exit mechanism never
+  recorded) → the machine proposes recording it. Promotion is yours. Sunday Jul 5 =
+  first organic beat.
+- **TICK-001 done** (pre_approved): vrp_schema_verify now probes the nearest expiration
+  ≥ probe date — FXE exits 0 (probe 2022-03-11, MATCH True), SPY passes.
+
+**Live mid-session:** your terminal restore landed — constraint-4 probe found FXE
+serving, so the **full 2016→ options-surface + VRP backfill is running in the
+background** (board rebuild + look-ahead audit at its tail). Next session: verify
+coverage → rr25_z history → **VRP-001 first, then HYP-074/075/076/078/079 + HYP-077
+full composite** under the locked protocol (TICK-002 path) → family BH still blocked on
+HYP-080's GDELT backfill.
+
+**Verdicts:** 4 interim seals (above); TICK-001 acceptance 4/4; no final ledger verdicts
+(by design — the family adjudicates together).
+
+**Blockers (yours):** ratify RISK_CONSTITUTION (DRAFT) · S2 ambiguous rulings ·
+keep/kill com.sovereign.papertrading · promote/decline PROP-2026-W27 ·
+cb_meetings_historical.json (fetch agent died on session limits — retry or supply dates).
+
+**Refused to shortcut:** no improvised family adjudication on 4/10 primaries; no
+exit-reason guessing (AMBIGUOUS over invention — it became the machine's own first
+proposal); no fixture rows anywhere near hypothesis input; no test-greening of the 40;
+zero execution-path edits; no speculative label construction (the label IS the
+hypothesis).
+
+**Push:** ✅ b20aec3..593d46d + this entry pushed to origin/sovereign-v2.
+
+---
+
 ## 2026-07-02 (Claude Code / Molly)
 
 **Shipped**

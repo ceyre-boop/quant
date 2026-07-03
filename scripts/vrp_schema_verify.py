@@ -86,11 +86,19 @@ def main() -> int:
     print(f"  IS-2022 boundary: {'OK (<= 2022-01-01)' if earliest <= '2022-01-01' else 'earliest > 2022-01-01 -> STOP, log param_change'}")
 
     # 2) one real chain -> schema diff against the contract
-    exp = exps.iloc[len(exps) // 2]
-    d = exp  # any trading day <= exp; using exp's own date keeps it valid for a recent expiry probe
+    # TICK-001: probe an expiration ON/AFTER the probe date (the old median-of-all-expirations
+    # pick chose a ~2019 expired contract against the fixed 2022-03-07 probe -> HTTP 472 NO_DATA).
+    probe_date = "2022-03-07"
+    live_exps = exps[exps >= probe_date]
+    if live_exps.empty:
+        print(f"  no listed expiration on/after {probe_date} — cannot probe", file=sys.stderr)
+        return 2
+    exp = live_exps.iloc[0]
     raw = pd.read_csv(StringIO(_get(
-        base, f"/v3/option/history/eod?symbol={args.symbol}&expiration={exp}&start_date=2022-03-07&end_date=2022-03-07",
+        base, f"/v3/option/history/eod?symbol={args.symbol}&expiration={exp}"
+              f"&start_date={probe_date}&end_date={probe_date}",
         headers)))
+    print(f"  probe: expiration {exp} (nearest >= {probe_date})")
     print(f"\n/v3/option/history/eod raw columns: {list(raw.columns)}")
     have = {"strike", "right", "bid", "ask"}.issubset(raw.columns)
     print(f"  MATCH (strike,right,bid,ask present -> contract derivable): {have}")

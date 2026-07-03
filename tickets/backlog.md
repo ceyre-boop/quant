@@ -21,11 +21,11 @@ Schema per ticket:
 **depends_on:** []
 **blocks:** [TICK-002]
 **acceptance_criteria:**
-- [ ] `python3 scripts/vrp_schema_verify.py --symbol FXE` exits 0 and prints the loader-contract columns
-- [ ] `--symbol SPY` also passes
-- [ ] Expiration chosen for the EOD probe is >= the probe date (no expired-contract queries)
-- [ ] No change to `THETADATA_BASE_URL` handling or the local-no-auth path
-**status:** ready
+- [x] `python3 scripts/vrp_schema_verify.py --symbol FXE` exits 0 and prints the loader-contract columns (2026-07-02: probe expiration 2022-03-11, MATCH True)
+- [x] `--symbol SPY` also passes (probe 2022-03-07, MATCH True)
+- [x] Expiration chosen for the EOD probe is >= the probe date (nearest listed on/after)
+- [x] No change to `THETADATA_BASE_URL` handling or the local-no-auth path
+**status:** done (2026-07-02, pre_approved build)
 **pre_approved:** true
 
 ## TICK-002
