@@ -1,9 +1,12 @@
-# SOVEREIGN / QUANT — CLAUDE.md
-# Last updated: 2026-05-26 | Repo: ceyre-boop/quant.git
+# CLAUDE.md — Alta Investments (quant)
+# Repo: ceyre-boop/quant.git | Live: Forex v015 · branch sovereign-v2 | Updated: 2026-07-02
+
+Loads at the start of every session in this repo, regardless of task — so keep it short;
+instruction-following degrades as it grows. Detail lives in the files this points to, not here.
 
 ---
 
-## NON-NEGOTIABLES (read these even in compressed context)
+## NON-NEGOTIABLES (trading-correctness — read these even in compressed context)
 
 1. **ICT/sovereign isolation.** `ict/` and `ict-engine/` must never import from `sovereign/`.
    Enforced by test: `python3 -m pytest tests/ -k test_pipeline_does_not_import_sovereign`
@@ -17,10 +20,59 @@
    conviction-based sizing pipeline. Check `config/parameters.yml` for thresholds.
 
 4. **No live parameter changes without logging.** Any change to `config/parameters.yml`,
-   `config/ict_params.yml`, or risk limits requires a logged rationale before applying.
+   `config/ict_params.yml`, or risk limits requires a logged rationale
+   (`data/agent/param_change_log.jsonl`) before applying.
 
 5. **Read TRADING_PHILOSOPHY.md before any architectural decision.**
    Every component must serve one of the six tenets or it should not exist.
+
+---
+
+## Standing constraints (workflow — always active; don't restate these in tickets)
+
+- **Shadow / execution-path freeze.** Current status lives in `audit/divergence_spec.md` and
+  `NEXT.md`. Never modify `forex_exit_manager`, `decide_exit`, or anything importable by the
+  live/backtest execution path without an explicit unlock recorded in `NEXT.md`. (Extends NN#1.)
+- **Training gate.** Model training runs only against a hypothesis-ledger entry with
+  `verdict == CONFIRMED`. See `RISK_CONSTITUTION.md` Art. 6 (Unproven Edges) and
+  `sovereign/autonomous/research_factory.py` (gate: `config/autonomous.yml`) for the enforced
+  refusal. Building infrastructure is unrestricted; ignition is not.
+- **Risk caps.** Current values live in `RISK_CONSTITUTION.md`. Don't hardcode numbers here —
+  they drift, this file shouldn't.
+- **No silent mocking.** Missing credentials or infra → stop and say exactly what's needed.
+- **Spec-first.** Anything with a pass/fail definition (audits, tests, gates) gets its spec
+  written before the thing that measures it.
+- **Push at least once per session.** An unpushed branch is a single-machine point of failure.
+
+---
+
+## Workflow: plan → build
+
+A plan → build separation: scope in chat, ticket it, **plan** in-session before touching code,
+**build** as a distinct pass. The goal isn't ceremony — a pre-scoped plan lets the build pass
+skip re-deriving context, which is most of what a session actually burns.
+
+**Ticket protocol** — before implementing anything touching more than ~3 files, or that isn't
+a one-line fix:
+1. Check for a Linear MCP connection (`/mcp`). If connected, pull the relevant issue — title,
+   description, dependencies, blockers, acceptance criteria. (Connect:
+   `claude mcp add --transport http linear-server https://mcp.linear.app/mcp` → `/mcp` to auth.)
+2. If Linear isn't connected, use `tickets/backlog.md` — same schema, no setup. Don't block on
+   connecting Linear; the fallback is equally valid.
+3. No ticket and the task is non-trivial → say so and propose one before writing code.
+
+**Plan before build** — for any ticketed task:
+1. Use Plan Mode (`claude --plan`, or check `/help`) or explicitly declare a research-only pass.
+   Write the plan — approach, files touched, risks, size — to `plans/<ticket-id>.md`,
+   referencing the ticket's dependencies and acceptance criteria directly.
+2. **Stop.** Don't implement in the same turn the plan is produced, unless the ticket is
+   tagged `pre_approved: true`.
+3. Implement against the plan file, not from scratch. If reality diverges mid-build, update the
+   plan and flag the divergence — don't silently improvise around it.
+
+Model routing: the plan is the highest-leverage, lowest-volume step — worth the best model
+available. The build is highest-volume — route it to a cheaper model or a `.claude/agents/`
+subagent once the plan is solid enough not to need frontier judgment.
 
 ---
 
@@ -30,8 +82,6 @@ When wiring a new decision point, always capture:
 - commitment score, rate differential, library match, bars since signal
 - Use: `sovereign/intelligence/decision_logger.py`
 - Wire through `ict-engine/orchestrator.py` (isolation-safe), NOT `ict/pipeline.py`
-
----
 
 ## ORACLE FEEDBACK LOOP
 
@@ -45,6 +95,18 @@ decision_logger.update_outcome(trade_id, outcome)
 
 Oracle reads logs via `sovereign/oracle/reflect_cycle.py`.
 Skipping `update_outcome()` is silent data loss — oracle degrades without it.
+
+---
+
+## Reporting
+
+End every session with an entry in **repo-root `NEXT.md`** — the authoritative per-session log,
+committed and pushed with the work: what shipped, push confirmation, any verdicts (ledger
+entries, test results), blockers, and anything refused to shortcut and why. Don't repeat the
+standing constraints above — assume the next session reads this file too.
+
+The **Obsidian brain** (`~/Obsidian/Obsidian/00-BRAIN/{CONTEXT,DECISIONS,NEXT}.md`) is the
+cross-project rollup — update it after substantive sessions, not every turn.
 
 ---
 
@@ -84,6 +146,10 @@ python3 scripts/run_replay_validation.py
 | Decision logger | `sovereign/intelligence/decision_logger.py` | All decision contexts |
 | Config | `config/parameters.yml`, `config/ict_params.yml` | Never hardcode thresholds |
 
+---
+
+## Current live state
+
 Current live version: Forex v015 — anchored as logs/research/v003 (tracked snapshot), HYP-045 4-pair portfolio (AUDNZD excluded).
 v007 per-pair hold overrides ROLLED BACK 2026-06-07 (NOT_SIGNIFICANT — fails walk-forward; ledger V007-HOLD-VALIDATION).
 Live config now 60d default for all pairs; re-measured OOS Sharpe **1.25** (decay 2.17 ROBUST, permutation p<0.001) on
@@ -103,3 +169,15 @@ Evidence status (2026-06-02):
   diversifier. (Measured vs DBV proxy, died 2023-03; real v015 overlap thin: n=39, ρ=0.036.)
 - Next: v007 per-pair hold implementation (GBPUSD 6d/2.0×, AUDUSD/EURUSD 5d, GBPJPY 5d) toward the 1.5 Sharpe target.
 Full system state: `~/.claude/memory/alta-investments-architecture.md`
+
+---
+
+## Efficiency notes
+
+- Don't re-explore repo structure each session — point to the ticket and plan file. If broader
+  context is genuinely needed, say what's missing rather than reading broadly by default.
+- Keep tickets self-contained. A ticket requiring three other documents to understand defeats
+  the point of having tickets.
+- Prefer git worktrees for anything running parallel to the shadow-window audit or other live
+  jobs — the June 29 launch-agent incident happened because two unrelated processes touched the
+  same files without isolation.
