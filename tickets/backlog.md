@@ -41,3 +41,17 @@ Schema per ticket:
 - [ ] Verdict written to repo-root `NEXT.md`; Colin reviews before any deploy
 **status:** backlog
 **pre_approved:** false
+
+## TICK-003
+**title:** Options-leg family run — VRP-001, HYP-074/075/076/078/079 + HYP-077 full composite, then family BH
+**description:** Real surface data landed 2026-07-02 (sentiment_options_surface: 1,306 rows, 2020-01-03→2026-07-02, rr25/bf25 96.5% of post-2020 board rows, 0 look-ahead violations, all bs_invert). Extend scripts/research/run_positioning_family.py with the six options-leg members under the SAME locked protocol (gate-zero hash verify; rr25_z/bf25_z = trailing-252-obs z on the weekly surface series; HYP-076 needs econ_surprise_z×crowding; HYP-080 stays blocked on the GDELT backfill — family BH cannot run until 080 has a primary p or the family documents its handling). Re-run HYP-077 with the FULL composite (COT + rr25 alignment) superseding the COT-only interim seal. VRP-001 first per the standing V4 mandate: TICK-002's stage 2/3 on real chains (verify loader bodies, prereg check, account-size note in NEXT.md before interpreting NO_TRADES). Coverage caveat to stamp on every seal: options history starts 2020-01-03 (Value-tier depth) — six years, not the decade.
+**depends_on:** [TICK-002]
+**blocks:** []
+**acceptance_criteria:**
+- [ ] rr25_z/bf25_z computed trailing-only (truncation-invariance test, same standard as cot features)
+- [ ] Six new primaries sealed as dated interim annotations (or UNDERPOWERED/BLOCKED stamps where data forbids), statuses stay PREREGISTERED
+- [ ] HYP-077 full-composite seal supersedes the COT-only interim (both annotations remain)
+- [ ] Family BH runs ONLY when all 10 primaries exist; otherwise the blocker (HYP-080/GDELT) is stamped
+- [ ] VRP-001 stage 2/3 per TICK-002; no param re-optimization after seeing OOS
+**status:** ready
+**pre_approved:** false

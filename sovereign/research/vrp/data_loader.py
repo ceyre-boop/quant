@@ -140,11 +140,24 @@ class ThetaDataLoader:
         return "127.0.0.1" in self.base_url or "localhost" in self.base_url
 
     def _get(self, path: str, timeout: int = 60) -> str:
+        import time
+        import urllib.error
         import urllib.request
         headers = {} if self._is_local() else {"Authorization": f"Bearer {self.api_key}"}
         req = urllib.request.Request(self.base_url + path, headers=headers)
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
-            return resp.read().decode()
+        # ThetaTerminal rate-limits burst backfills with transient 403s (observed
+        # 2026-07-02 mid-backfill; the same request succeeds after a cooldown).
+        # Bounded backoff — anything still failing after 3 waits raises as before.
+        for attempt in range(4):
+            try:
+                with urllib.request.urlopen(req, timeout=timeout) as resp:
+                    return resp.read().decode()
+            except urllib.error.HTTPError as exc:
+                if exc.code == 403 and attempt < 3:
+                    time.sleep(15 * (attempt + 1))
+                    continue
+                raise
+        raise RuntimeError("unreachable")
 
     @staticmethod
     def _csv(text: str) -> pd.DataFrame:
