@@ -191,7 +191,7 @@ def update(con=None, start: str | None = None) -> dict:
     own = con is None
     con = con or connect()
     now = datetime.now(timezone.utc)
-    frames, coverage = [], {}
+    coverage = {}
     for pair, symbol in cfg["etf"].items():
         etf_close = _yf_close(symbol)
         pair_close = _yf_close(cfg["spot"].get(pair, ""))
@@ -204,19 +204,28 @@ def update(con=None, start: str | None = None) -> dict:
         # weekly sample dates = last real ETF trading day per week, on/after `start`
         idx = etf_close.index[etf_close.index >= pd.Timestamp(start)]
         weekly = pd.Series(idx, index=idx).resample(cfg["sample_freq"]).last().dropna()
-        recs, skipped_forbidden = [], 0
+        recs, skipped_forbidden, skipped_unreachable, consec_fail = [], 0, 0, 0
         for d in weekly:
+            import time as _t
+            _t.sleep(0.1)                                 # pacing: the terminal stalls under burst pressure
             d = pd.Timestamp(d)
             spot = etf_close.asof(d)                      # ETF spot at/just-before D (the option underlying)
             if not np.isfinite(spot):
                 continue
             try:
                 iv = _atm_iv_for_date(loader, symbol, d, float(spot), cfg)
-            except Exception as exc:                      # Value-tier depth wall 403s pre-~2020 chains
-                if "403" in str(exc):
+                consec_fail = 0
+            except Exception as exc:
+                if "403" in str(exc):                     # Value-tier depth wall (pre-~2020 chains)
                     skipped_forbidden += 1
                     continue
-                raise
+                skipped_unreachable += 1                  # terminal stall/timeout — count, don't crash
+                consec_fail += 1
+                if consec_fail >= 10:                     # circuit breaker: keep what we have, abort pair LOUDLY
+                    print(f"  [vrp] {symbol}: {consec_fail} consecutive unreachable dates — "
+                          f"aborting this pair's fill (partial data kept; re-run resumes from cache)")
+                    break
+                continue
             if iv is None:
                 continue
             rv_d = rv.asof(d)                             # trailing RV, window ends at D (<= D)
@@ -231,6 +240,7 @@ def update(con=None, start: str | None = None) -> dict:
         if not recs:
             coverage[pair] = {"symbol": symbol, "rows": 0, "earliest_expiry": earliest_exp,
                               "skipped_forbidden": skipped_forbidden,
+                              "skipped_unreachable": skipped_unreachable,
                               "note": "no option data in window"}
             continue
         df = pd.DataFrame(recs).sort_values("date").reset_index(drop=True)
@@ -240,14 +250,13 @@ def update(con=None, start: str | None = None) -> dict:
             lambda x: float((x <= x[-1]).mean()), raw=True)
         out = df[["date", "pair", "symbol", "expiry", "dte", "atm_strike", "iv_atm", "rv_trailing",
                   "vrp_signal", "vrp_pct", "iv_source", "iv_obs_date", "rv_last_date", "fetched_at"]]
-        frames.append(out)
         src = out["iv_source"].value_counts().to_dict()
+        upsert(con, "sentiment_vrp_daily", out, ["date", "pair"])   # per-pair persistence
         coverage[pair] = {"symbol": symbol, "rows": int(len(out)), "start": str(out["date"].min()),
                           "end": str(out["date"].max()), "earliest_expiry": earliest_exp,
                           "skipped_forbidden": skipped_forbidden,
+                          "skipped_unreachable": skipped_unreachable,
                           "iv_source": {k: int(v) for k, v in src.items()}}
-    if frames:
-        upsert(con, "sentiment_vrp_daily", pd.concat(frames, ignore_index=True), ["date", "pair"])
     if own:
         con.close()
     return coverage
