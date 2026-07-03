@@ -120,3 +120,45 @@ hypothesis).
 **Push:** ✅ Committed + pushed to `origin/sovereign-v2` (`[INFRA]` — CLAUDE.md workflow layer +
 tickets/backlog.md + repo-root NEXT.md), Colin approved. (Terminal `.env` files are
 gitignored/non-repo and carry no secrets into git.)
+
+---
+
+## 2026-07-03 — Red/Blue/White audit of the 2026-07-01 overnight builds (READ-ONLY, no commits)
+
+Full report in Obsidian: `Trading/Research/Team-Audit-2026-07-01.md` + `Blue-Team-Proposed-Fix-2026-07-01.md`.
+
+- **RED-1 CONFIRMED (SEVERE):** Oracle reflection is contaminated. `reflect_cycle._load_decision_log_summary`
+  only drops OPEN/EXPIRED, so backfilled probe/stray records (attributed outcomes) pass. Live 7-day FOREX
+  window = **7/7 backfilled, 5/7 forbidden pairs (USD_CAD/AUD_NZD), 0 genuine trades, fabricated 1W/6L**.
+  `update_outcome()` and the summary have no pair/source filter. Root cause is the cognition read path,
+  NOT the backfill (which correctly closes the loop).
+- **RED-2 CLEARED:** AV `news_feed` scorer sign (`rel·sent(base) − rel·sent(quote)`, +=long-base) and
+  6-char decomposition correct; `board_state` is a pure feature-store join with no live consumer yet.
+- **RED-3 FALSE ALARM on named jobs** (`hypothesis.generator`, `oracle.session_close`, `cache.refresh`
+  all git-tracked, repaired from `.corrupt-20260701`, none trade). **But found a still-live unlogged OANDA
+  writer:** 1-unit USD_CAD LONG probes (sentinel `stop=1.0/tp=2.0`, demo acct), 8×, **most recent
+  2026-07-03 01:51 UTC**. NOT fvg_express (killed), NOT execute_daily/papertrading (equities). Source
+  unidentified — spun off as a task: trace + gate it (same class as fvg_express).
+- **BLUE (pre-registered, NOT committed):** source-exclusion of `fills_backfill`/`test_fill` records in
+  `reflect_cycle`. Awaiting Colin's review before any code change (NON-NEGOTIABLE #4).
+- Shadow/exit path untouched. No unlock. No commits this session.
+
+---
+
+## 2026-07-03 — Blue Team fix APPLIED (RED-1), full autonomy granted
+
+Applied the pre-registered Blue fix above. Commit `78c8c0b` on `sovereign-v2`.
+
+- **Read-path guard added** in `reflect_cycle._load_decision_log_summary` AND
+  `hypothesis_generator._load_reps`: exclude `source == "fills_backfill"` and `test_fill is True`
+  before records enter the Oracle reflection input / reps population. Read path only — the backfill
+  writer (which correctly closes the exit loop) is untouched.
+- **Tests:** new `tests/unit/test_oracle_backfill_exclusion.py` (6 tests: backfilled USD_CAD absent,
+  genuine FOREX decision present, test_fill excluded, reps guard). Related sweep 45 passed, ICT/
+  sovereign isolation 61 passed — no regressions.
+- **Live verification:** the Oracle's real 7-day window (2026-06-26→07-03) held **7/7 backfilled,
+  forbidden pairs USD_CAD×4 / AUD_NZD×1 / USD_JPY×2, 0 genuine** → **0 after fix** (correct fallback
+  to harvest-based lesson, no forbidden pairs). RED-1 was a total, active contamination, now clean.
+  Detail: Obsidian `Trading/Ops/Oracle-Fix-Verification-2026-07-03.md`.
+- **Push:** ✅ `origin/sovereign-v2` — remote SHA `78c8c0b` verified == local HEAD.
+- Shadow/exit path untouched. No unlock. No live parameter changes.
