@@ -294,6 +294,10 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--adjudicate", action="store_true", help="family BH (all 10 primaries required)")
+    ap.add_argument("--only", default=None, metavar="HYP-ID",
+                    help="run/seal ONLY this member (e.g. HYP-080 after its data dependency clears) — "
+                         "prevents duplicate annotations on already-sealed legs; the single leg consumes "
+                         "a fresh seed-42 stream (prereg specifies the seed, not stream position)")
     a = ap.parse_args()
     checks = gate_zero()
     print("gate zero: all 11 prereg hashes verified", all(v["ok"] for v in checks.values()))
@@ -329,84 +333,93 @@ def main() -> int:
         return out
 
     results: dict[str, tuple[dict, str | None]] = {}
+    want = (lambda h: a.only is None or a.only == h)
 
-    ev074 = ol.events_074(rr_z)
-    results["HYP-074"] = (signed_leg_report("HYP-074", ev074, closes, elig(rr_z, 20), 20, 10, rng, v015_eq), None)
+    if want("HYP-074"):
+        ev074 = ol.events_074(rr_z)
+        results["HYP-074"] = (signed_leg_report("HYP-074", ev074, closes, elig(rr_z, 20), 20, 10, rng, v015_eq), None)
 
-    ev075 = ol.events_075(closes, rr_z)
-    results["HYP-075"] = (signed_leg_report("HYP-075", ev075, closes, elig(rr_z, 20), 20, 10, rng, v015_eq), None)
+    if want("HYP-075"):
+        ev075 = ol.events_075(closes, rr_z)
+        results["HYP-075"] = (signed_leg_report("HYP-075", ev075, closes, elig(rr_z, 20), 20, 10, rng, v015_eq), None)
 
-    rels = load_releases()
-    rels["publish_date"] = pd.to_datetime(rels["publish_date"]).dt.date
-    ev076 = ol.events_076(rels, cot_pct)
-    r076 = {"hyp": "HYP-076", "primary": None, "deviations": []}
-    two = ol.perm_p_two_cell(ev076, closes, 5, rng, N_PERM)
-    r076["primary"] = {"h": 5, "statistic_median_cell_diff": two.get("obs"),
-                       "raw_p": round(two["p"], 5) if isinstance(two.get("p"), float) else two.get("p"),
-                       "n_perm": N_PERM, "N_deoverlapped": two.get("n_crowded", 0),
-                       "cells": {k: two.get(k) for k in ("n_crowded", "n_control", "median_crowded", "median_control", "note") if k in two}}
-    two10 = ol.perm_p_two_cell(ev076, closes, 10, np.random.default_rng(SEED), N_PERM)
-    r076["secondary"] = {"h": 10, "statistic": two10.get("obs"), "raw_p": two10.get("p")}
-    r076["sample_status"] = "OK" if (two.get("n_crowded") or 0) >= 50 else "UNDERPOWERED_INTERIM"
-    results["HYP-076"] = (r076, None)
+    if want("HYP-076"):
+        rels = load_releases()
+        rels["publish_date"] = pd.to_datetime(rels["publish_date"]).dt.date
+        ev076 = ol.events_076(rels, cot_pct)
+        r076 = {"hyp": "HYP-076", "primary": None, "deviations": []}
+        two = ol.perm_p_two_cell(ev076, closes, 5, rng, N_PERM)
+        r076["primary"] = {"h": 5, "statistic_median_cell_diff": two.get("obs"),
+                           "raw_p": round(two["p"], 5) if isinstance(two.get("p"), float) else two.get("p"),
+                           "n_perm": N_PERM, "N_deoverlapped": two.get("n_crowded", 0),
+                           "cells": {k: two.get(k) for k in ("n_crowded", "n_control", "median_crowded", "median_control", "note") if k in two}}
+        two10 = ol.perm_p_two_cell(ev076, closes, 10, np.random.default_rng(SEED), N_PERM)
+        r076["secondary"] = {"h": 10, "statistic": two10.get("obs"), "raw_p": two10.get("p")}
+        r076["sample_status"] = "OK" if (two.get("n_crowded") or 0) >= 50 else "UNDERPOWERED_INTERIM"
+        results["HYP-076"] = (r076, None)
 
-    ev078 = ol.events_078(slope, cot_pct)
-    stat078 = {p: pd.Series({ts: ol.range_ratio(ohlc[p]["High"], ohlc[p]["Low"], ts.date())
-                             for ts in slope[p].dropna().index}).dropna() for p in ol.OPT_PAIRS}
-    pr078 = ol.perm_p_stat(stat078, {p: [e.signal_date for e in ev078[p]] for p in ol.OPT_PAIRS}, rng, N_PERM)
-    results["HYP-078"] = ({"hyp": "HYP-078", "per_pair_N": {p: len(ev078[p]) for p in ol.OPT_PAIRS},
-                           "primary": {"h": 10, "statistic_median_range_ratio": None if np.isnan(pr078.obs) else round(pr078.obs, 6),
-                                       "raw_p": None if np.isnan(pr078.p) else round(pr078.p, 5),
-                                       "n_perm": pr078.n_perm, "N_deoverlapped": pr078.n_events},
-                           "sample_status": "OK" if pr078.n_events >= 50 else "UNDERPOWERED_INTERIM",
-                           "deviations": []}, None)
+    if want("HYP-078"):
+        ev078 = ol.events_078(slope, cot_pct)
+        stat078 = {p: pd.Series({ts: ol.range_ratio(ohlc[p]["High"], ohlc[p]["Low"], ts.date())
+                                 for ts in slope[p].dropna().index}).dropna() for p in ol.OPT_PAIRS}
+        pr078 = ol.perm_p_stat(stat078, {p: [e.signal_date for e in ev078[p]] for p in ol.OPT_PAIRS}, rng, N_PERM)
+        results["HYP-078"] = ({"hyp": "HYP-078", "per_pair_N": {p: len(ev078[p]) for p in ol.OPT_PAIRS},
+                               "primary": {"h": 10, "statistic_median_range_ratio": None if np.isnan(pr078.obs) else round(pr078.obs, 6),
+                                           "raw_p": None if np.isnan(pr078.p) else round(pr078.p, 5),
+                                           "n_perm": pr078.n_perm, "N_deoverlapped": pr078.n_events},
+                               "sample_status": "OK" if pr078.n_events >= 50 else "UNDERPOWERED_INTERIM",
+                               "deviations": []}, None)
 
-    ev079 = ol.events_079(bf_z, cot_pct)
-    stat079 = {p: pd.Series({ts: ol.abs_move(closes[p], ts.date())
-                             for ts in bf_z[p].dropna().index}).dropna() for p in ol.OPT_PAIRS}
-    pr079 = ol.perm_p_stat(stat079, {p: [e.signal_date for e in ev079[p]] for p in ol.OPT_PAIRS}, rng, N_PERM)
-    sec079 = {p: [es.Event(p, ol.shift_pub(e.signal_date), -e.crowd_pair_side, 1.0) for e in ev079[p]]
-              for p in ol.OPT_PAIRS}
-    sec_rets, _, _ = es.signed_returns([e for v in sec079.values() for e in v], closes, 10)
-    results["HYP-079"] = ({"hyp": "HYP-079", "per_pair_N": {p: len(ev079[p]) for p in ol.OPT_PAIRS},
-                           "primary": {"h": 10, "statistic_median_abs_move": None if np.isnan(pr079.obs) else round(pr079.obs, 6),
-                                       "raw_p": None if np.isnan(pr079.p) else round(pr079.p, 5),
-                                       "n_perm": pr079.n_perm, "N_deoverlapped": pr079.n_events},
-                           "secondary_signed_vs_crowd": {"h": 10, "median": round(float(np.median(sec_rets)), 6) if sec_rets else None,
-                                                          "hit": es.binomial_hit(sec_rets)},
-                           "sample_status": "OK" if pr079.n_events >= 50 else "UNDERPOWERED_INTERIM",
-                           "deviations": []}, None)
+    if want("HYP-079"):
+        ev079 = ol.events_079(bf_z, cot_pct)
+        stat079 = {p: pd.Series({ts: ol.abs_move(closes[p], ts.date())
+                                 for ts in bf_z[p].dropna().index}).dropna() for p in ol.OPT_PAIRS}
+        pr079 = ol.perm_p_stat(stat079, {p: [e.signal_date for e in ev079[p]] for p in ol.OPT_PAIRS}, rng, N_PERM)
+        sec079 = {p: [es.Event(p, ol.shift_pub(e.signal_date), -e.crowd_pair_side, 1.0) for e in ev079[p]]
+                  for p in ol.OPT_PAIRS}
+        sec_rets, _, _ = es.signed_returns([e for v in sec079.values() for e in v], closes, 10)
+        results["HYP-079"] = ({"hyp": "HYP-079", "per_pair_N": {p: len(ev079[p]) for p in ol.OPT_PAIRS},
+                               "primary": {"h": 10, "statistic_median_abs_move": None if np.isnan(pr079.obs) else round(pr079.obs, 6),
+                                           "raw_p": None if np.isnan(pr079.p) else round(pr079.p, 5),
+                                           "n_perm": pr079.n_perm, "N_deoverlapped": pr079.n_events},
+                               "secondary_signed_vs_crowd": {"h": 10, "median": round(float(np.median(sec_rets)), 6) if sec_rets else None,
+                                                              "hit": es.binomial_hit(sec_rets)},
+                               "sample_status": "OK" if pr079.n_events >= 50 else "UNDERPOWERED_INTERIM",
+                               "deviations": []}, None)
 
-    dts, vals, mapping = ol.crowding_composite_full(cot, rr_z, trades, ["EURUSD", "GBPUSD", "USDJPY", "AUDUSD"],
-                                                    vr.open_positions_on)
-    cross = es.detect_crossings(dts, vals, enter=lambda v: 1 if v >= 0.90 else 0, rearm=lambda v: v < 0.75)
-    t0s = [es.effective_t0(d, closes["EURUSD"].index) for d, _, _ in cross]
-    t0s = [t for t in t0s if t is not None]
-    dds = [vr.fwd_max_drawdown(v015_eq, t, 20) for t in t0s]
-    dds = [d for d in dds if d is not None]
-    elig_pos = np.arange(0, len(closes["EURUSD"].index) - 21)
-    all_dds = np.array([float((v015_eq.iloc[q:q + 21] / v015_eq.iloc[q:q + 21].cummax() - 1).min()) for q in elig_pos])
-    obs77 = (float(np.median(dds)) - float(np.median(all_dds))) if dds else float("nan")
-    n_ge = 0
-    if dds:
-        for _ in range(N_PERM):
-            pick = rng.choice(elig_pos, size=len(dds), replace=False)
-            if float(np.median(all_dds[pick])) - float(np.median(all_dds)) <= obs77:
-                n_ge += 1
-    r077 = {"hyp": "HYP-077", "variant": "FULL COMPOSITE (cot + Phi(rr25_z) aligned) — supersedes the "
-                                          "COT-only interim for the family stage; both annotations remain",
-            "reconcile_guard": {"target": 0.6886, "recomputed": got, "pass": True},
-            "n_crossings": len(cross), "N_deoverlapped": len(dds),
-            "primary": {"h": 20, "N_deoverlapped": len(dds),
-                        "statistic_median_dd_diff": round(obs77, 6) if dds else None,
-                        "raw_p": round((n_ge + 1) / (N_PERM + 1), 5) if dds else None, "n_perm": N_PERM},
-            "sample_status": "OK" if len(dds) >= 50 else "UNDERPOWERED_INTERIM",
-            "composite_mapping_sample": mapping[:5], "diversifier_gate": "EXEMPT (prereg)",
-            "deviations": []}
-    results["HYP-077"] = (r077, "HYP-077_full.json")
+    if want("HYP-077"):
+        dts, vals, mapping = ol.crowding_composite_full(cot, rr_z, trades, ["EURUSD", "GBPUSD", "USDJPY", "AUDUSD"],
+                                                        vr.open_positions_on)
+        cross = es.detect_crossings(dts, vals, enter=lambda v: 1 if v >= 0.90 else 0, rearm=lambda v: v < 0.75)
+        t0s = [es.effective_t0(d, closes["EURUSD"].index) for d, _, _ in cross]
+        t0s = [t for t in t0s if t is not None]
+        dds = [vr.fwd_max_drawdown(v015_eq, t, 20) for t in t0s]
+        dds = [d for d in dds if d is not None]
+        elig_pos = np.arange(0, len(closes["EURUSD"].index) - 21)
+        all_dds = np.array([float((v015_eq.iloc[q:q + 21] / v015_eq.iloc[q:q + 21].cummax() - 1).min()) for q in elig_pos])
+        obs77 = (float(np.median(dds)) - float(np.median(all_dds))) if dds else float("nan")
+        n_ge = 0
+        if dds:
+            for _ in range(N_PERM):
+                pick = rng.choice(elig_pos, size=len(dds), replace=False)
+                if float(np.median(all_dds[pick])) - float(np.median(all_dds)) <= obs77:
+                    n_ge += 1
+        r077 = {"hyp": "HYP-077", "variant": "FULL COMPOSITE (cot + Phi(rr25_z) aligned) — supersedes the "
+                                              "COT-only interim for the family stage; both annotations remain",
+                "reconcile_guard": {"target": 0.6886, "recomputed": got, "pass": True},
+                "n_crossings": len(cross), "N_deoverlapped": len(dds),
+                "primary": {"h": 20, "N_deoverlapped": len(dds),
+                            "statistic_median_dd_diff": round(obs77, 6) if dds else None,
+                            "raw_p": round((n_ge + 1) / (N_PERM + 1), 5) if dds else None, "n_perm": N_PERM},
+                "sample_status": "OK" if len(dds) >= 50 else "UNDERPOWERED_INTERIM",
+                "composite_mapping_sample": mapping[:5], "diversifier_gate": "EXEMPT (prereg)",
+                "deviations": []}
+        results["HYP-077"] = (r077, "HYP-077_full.json")
 
     cov = gdelt_coverage(board)
-    if cov >= 0.70:
+    if not want("HYP-080"):
+        pass
+    elif cov >= 0.70:
         ev080 = ol.events_080(tone_z, cot_pct)
         results["HYP-080"] = (signed_leg_report("HYP-080", ev080, closes, elig(tone_z, 20), 20, 10, rng, v015_eq), None)
         results["HYP-080"][0]["gdelt_coverage"] = round(cov, 4)
@@ -431,7 +444,8 @@ def main() -> int:
                 "gate_zero": checks, "interpretations": INTERP_TEXT, "coverage": COVERAGE_TEXT,
                 "gdelt_coverage": round(cov, 4), "hyp_order": list(results)}
     OUT.mkdir(parents=True, exist_ok=True)
-    (OUT / "run_manifest_options.json").write_text(json.dumps(manifest, indent=2) + "\n")
+    mname = "run_manifest_options.json" if a.only is None else f"run_manifest_options_{a.only}.json"
+    (OUT / mname).write_text(json.dumps(manifest, indent=2) + "\n")
     for hyp_id, (res, art) in results.items():
         seal(hyp_id, res, a.dry_run, art)
     print("\n== options-leg interim summary (NO verdicts) ==")
