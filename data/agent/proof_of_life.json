@@ -1,15 +1,15 @@
 {
-  "generated_at": "2026-07-03T00:40:31.980365+00:00",
+  "generated_at": "2026-07-04T01:01:26.712888+00:00",
   "alive": true,
   "fired_today": true,
   "frozen": null,
-  "scan_age_hours": 12.5,
+  "scan_age_hours": 7.6,
   "n_pairs_scanned": 4,
-  "n_would_fire_today": 0,
+  "n_would_fire_today": 2,
   "strongest_signal": {
     "pair": "USDJPY=X",
-    "conviction": 0.481,
-    "direction": "NO_TRADE",
+    "conviction": 0.405,
+    "direction": "SHORT",
     "pct_to_trigger": 100.0,
     "regime": "TRENDING",
     "rate_differential": 3.603
@@ -17,46 +17,46 @@
   "pairs": [
     {
       "pair": "USDJPY=X",
-      "conviction": 0.481,
-      "direction": "NO_TRADE",
+      "conviction": 0.405,
+      "direction": "SHORT",
       "pct_to_trigger": 100.0,
       "regime": "TRENDING",
       "rate_differential": 3.603
     },
     {
-      "pair": "GBPUSD=X",
-      "conviction": 0.341,
-      "direction": "NO_TRADE",
-      "pct_to_trigger": 100.0,
-      "regime": "TRENDING",
-      "rate_differential": 0.17
-    },
-    {
       "pair": "AUDUSD=X",
-      "conviction": 0.146,
+      "conviction": 0.292,
       "direction": "NO_TRADE",
       "pct_to_trigger": 100.0,
       "regime": "TRENDING",
       "rate_differential": 0.1
     },
     {
-      "pair": "EURUSD=X",
-      "conviction": 0.067,
+      "pair": "GBPUSD=X",
+      "conviction": 0.284,
       "direction": "NO_TRADE",
-      "pct_to_trigger": 67.0,
+      "pct_to_trigger": 100.0,
+      "regime": "TRENDING",
+      "rate_differential": 0.17
+    },
+    {
+      "pair": "EURUSD=X",
+      "conviction": 0.113,
+      "direction": "SHORT",
+      "pct_to_trigger": 100.0,
       "regime": "TRENDING",
       "rate_differential": -1.83
     }
   ],
   "last_fill": {
-    "pair": "USD_CAD",
-    "direction": "LONG",
-    "fill_price": 1.41819,
-    "date": "2026-07-02",
-    "days_ago": 0.2
+    "pair": "USD_JPY",
+    "direction": "SHORT",
+    "fill_price": 161.323,
+    "date": "2026-07-03",
+    "days_ago": 0.3
   },
   "loops_alive": 7,
   "loops_down": [],
-  "summary_line": "\ud83d\udfe2 TRADE FIRED today: USD_CAD LONG @ 1.41819. 4 pairs scanned 12.5h ago \u2014 all NO_TRADE (edge not firing \u2014 correct, not broken). Highest conviction: USDJPY=X 0.481. ",
+  "summary_line": "\ud83d\udfe2 TRADE FIRED today: USD_JPY SHORT @ 161.323. 4 pairs scanned 7.6h ago \u2014 2 signalling (USDJPY=X SHORT, EURUSD=X SHORT). Highest conviction: USDJPY=X 0.405. ",
   "note": "Honest proof-of-life: would-be signals + proximity, never a forced trade. Read-only."
 }

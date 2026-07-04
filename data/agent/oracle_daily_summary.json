@@ -1,14 +1,14 @@
 {
-  "last_updated": "2026-07-02T07:33:48.761612+00:00",
+  "last_updated": "2026-07-03T07:13:03.693611+00:00",
   "harvest": {
     "trades_closed": 0,
     "win_rate": null,
     "failure_taxonomy": {}
   },
   "reflection": {
-    "candidate_lesson": "Trades whose decision path did not call log_forex_decision() (reconstructed-from-fills entries) cluster catastrophically at 1W/5L \u2014 untraceable entries are a proxy for entries that bypassed the signal-gating stack entirely and must be blocked, not just logged.",
-    "mechanism": "When an entry is reconstructed from the OANDA fills ledger with empty entry_context, signal_layers_active=[], and null commitment_score, it means the order was placed outside the vetted EdgePipeline path \u2014 no session gate (L2 NY_PM veto), no grade check (L1), no VIX carry gate (L8) fired. These are exactly the ungated impulse trades the tenets exist to prevent; the four USD_CAD LONGs all scratched at -0.0R (stopped at breakeven/entry noise) because there was no thesis behind them to defend the position.",
-    "testable_rule": "if decision.signal_layers_active == [] or decision.commitment_score is None: return ForexVeto('untraced_entry \u2014 no gated signal path'); log for audit."
+    "candidate_lesson": "Trades that must be RECONSTRUCTED from the fills ledger (no log_forex_decision() call) are structurally blind and should be treated as UNRELIABLE \u2014 6 of 7 such trades lost (WR=14%, avg R=-0.011).",
+    "mechanism": "When the entry path bypasses log_forex_decision(), it means the trade fired outside the vetted signal pipeline \u2014 no commitment_score, no VIX gate, no rate_diff_z check, no session filter ran. These are orphaned fills from a code path that skips every one of the Six Tenets' gates, so they entered with zero regime-appropriateness or health verification. The single win (USD_JPY +1.92R) is survivorship noise, not edge.",
+    "testable_rule": "if decision.why_this_trade.startswith('RECONSTRUCTED') or decision.signal_layers_active == []: flag UNRELIABLE, block auto-execution, require pipeline re-entry with populated commitment_score before sizing."
   },
   "validation": {
     "verdict": "REJECTED",
@@ -21,8 +21,8 @@
     "codify_error": null
   },
   "cycle": {
-    "cost_usd": 0.17988,
+    "cost_usd": 0.18255,
     "status": "COMPLETE",
-    "date": "2026-07-02"
+    "date": "2026-07-03"
   }
 }

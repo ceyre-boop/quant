@@ -1,0 +1,26 @@
+{
+  "date": "2026-07-03",
+  "generated_at": "2026-07-03T07:13:03.673264+00:00",
+  "input_tokens": 7680,
+  "output_tokens": 898,
+  "estimated_cost_usd": 0.18255,
+  "harvest_days_read": 7,
+  "reflection": {
+    "candidate_lesson": {
+      "lesson_text": "Trades that must be RECONSTRUCTED from the fills ledger (no log_forex_decision() call) are structurally blind and should be treated as UNRELIABLE \u2014 6 of 7 such trades lost (WR=14%, avg R=-0.011).",
+      "mechanism": "When the entry path bypasses log_forex_decision(), it means the trade fired outside the vetted signal pipeline \u2014 no commitment_score, no VIX gate, no rate_diff_z check, no session filter ran. These are orphaned fills from a code path that skips every one of the Six Tenets' gates, so they entered with zero regime-appropriateness or health verification. The single win (USD_JPY +1.92R) is survivorship noise, not edge.",
+      "testable_rule": "if decision.why_this_trade.startswith('RECONSTRUCTED') or decision.signal_layers_active == []: flag UNRELIABLE, block auto-execution, require pipeline re-entry with populated commitment_score before sizing.",
+      "expected_impact": "Removes the -1.0R tail losses (AUD_NZD, USD_JPY) and the four flat-to-negative USD_CAD scratches; eliminating ungated entries should lift realized WR from 14% toward the gated baseline and cut variance \u2014 directly improving Sharpe by reducing uncompensated loss dispersion.",
+      "evidence_from_harvest": "All 7 closed trades have why_this_trade='RECONSTRUCTED from fills ledger; entry path did not call log_forex_decision()' with empty entry_context, null commitment_score, and empty signal_layers_active. 6L/1W, avg R=-0.011. The USD_CAD cluster (4 trades) all scratched at -0.0R, indicating entries with no thesis that died on spread/noise.",
+      "evidence_from_reasoning": "Every entry has signal_layers_active=[], commitment_score=null, rate_differential_zscore=null, and entry_context={} \u2014 the reasoning layer is entirely absent, which is itself the failure predictor: 100% of ungated trades either lost or scratched except one noise win.",
+      "reasoning_component_targeted": "signal_layers_active",
+      "sample_needed": 30
+    },
+    "retirement_flag": {
+      "lesson_to_review": null,
+      "reason": null
+    },
+    "system_health_note": "System is in a data-integrity crisis, not a strategy crisis \u2014 0 logged trades in 7 days and all closed trades are unlogged reconstructions, so no lesson can be validated until the entry path calls log_forex_decision() and populates decision context."
+  },
+  "auto_validation": null
+}

@@ -7,37 +7,37 @@
     "agent_share": 0.3
   },
   "week": {
-    "start_date": "2026-06-27",
-    "weekly_used": 65000,
-    "weekly_remaining": 135000,
+    "start_date": "2026-07-04",
+    "weekly_used": 5500,
+    "weekly_remaining": 194500,
     "last_synced": null,
-    "note": "REST-032 2026-07-03T01Z: light read-only join-audit cycle, +~4k est. Weekly ~65000/200k -> stay LIGHT (>50k light floor). STILL awaiting manual sync (claude_usage_tracker.py sync); weekly_used is a conservative running estimate."
+    "note": "Weekly RESET on Saturday 2026-07-04 (reset_day=Saturday). Prior week (start 2026-06-27) closed at ~65000/200k est. New week opens with REST-033 light read-only cycle ~5.5k. STILL awaiting manual sync (claude_usage_tracker.py sync); weekly_used is a conservative running estimate."
   },
   "today": {
-    "date": "2026-07-03",
+    "date": "2026-07-04",
     "human_used": 0,
-    "agent_used": 4000,
+    "agent_used": 5500,
     "daily_agent_budget": 8571,
     "agent_allowed_today": 7000,
-    "note": "REST-032 fresh local day. Read-only oanda_fills x decision_logs join audit; no live code/config touched. 3 findings, 1 queue sharpen, 1 new task, 2 Colin msgs."
+    "note": "REST-033 fresh UTC day. Light read-only RQ-REST-032 emitter trace; no live code/config touched. 1 finding, RQ-REST-032 diagnosed, RQ-REST-033 added, 1 HIGH Colin msg. Left ~1.5k+ daily buffer."
   },
   "session": {
-    "started": "2026-07-03T01:12:10Z",
-    "ended": "2026-07-03T01:12:10Z",
+    "started": "2026-07-04T01:08:00+00:00",
+    "ended": "2026-07-04T01:08:00+00:00",
     "mode": "REST_MODE",
     "tasks_completed": [
-      "Verified persistent decision_logs YELLOW (backfill gap): enumerated the real live-subset defect vs the healthy bulk loop",
-      "CORRECTED FIND-REST-031-b: gated decision records carry NO trade_id/order_id (0/1922); only fills_backfill stubs do -> attach_broker_id() is load-bearing for RQ-REST-019b Change 2",
-      "Flagged phantom USD_CAD units=1/SL1.0/TP2.0 orders (7 fills, 3 today) from an untraced emitter -> concrete source of Oracle's 2026-07-02 untraced-entry lesson; queued RQ-REST-032",
-      "3 findings written; RQ-REST-019b sharpened; RQ-REST-032 added; 2 Colin messages"
+      "RQ-REST-032 read-only trace: traced every place_trade() caller -> phantom units=1/SL1.0/TP2.0 signature exists in NO repo code path",
+      "Discovered emitter is LIVE (8th fill tid217 @2026-07-03T01:51Z, after REST-032) -> external/detached process, not a stale artifact",
+      "Confirmed live Oracle pollution: 2026-07-03 reflection synthesized a false USD_CAD 'cluster scratched / WR 14%' lesson from emitter noise",
+      "Wrote FIND-REST-033-a; marked RQ-REST-032 DIAGNOSED; queued RQ-REST-033 (quarantine); 1 HIGH Colin message"
     ],
-    "findings_written": 3,
+    "findings_written": 1,
     "hypotheses_updated": [],
     "new_hypotheses": [],
     "new_tasks_added": [
-      "RQ-REST-032"
+      "RQ-REST-033"
     ],
-    "key_finding": "The Oracle outcome-loop join key does NOT exist on the gated side (0/1922 records carry trade_id) \u2014 only reconstructed stubs do; the bulk loop is healthy (1915/1922 closed) so the STALL alarm stays a false positive, and the true gap is a small enumerated live subset (4 FOREX + 3 ICT rotters, 10 orphan fills). Separately, an untraced path is emitting phantom USD_CAD units=1 orders that corrupt Oracle learning."
+    "key_finding": "The phantom USD_CAD units=1 emitter is a LIVE external process with no source in the tracked repo (all place_trade callers compute real params; zero literal 1/1.0/2.0 call sites). It fired an 8th time after last night's run and is actively poisoning Oracle's daily reflection. Fix needs an OS-level process hunt + fills quarantine - both Colin-gated. REST cycle stayed fully read-only."
   },
   "mode": "REST_MODE",
   "thresholds": {

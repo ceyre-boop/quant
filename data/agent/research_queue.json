@@ -666,10 +666,16 @@
     },
     {
       "id": "RQ-REST-032",
+      "status": "DIAGNOSED",
+      "priority": 1,
+      "description": "FIND-REST-032-c: an untraced path is emitting USD_CAD LONG orders with units=1, stop_price=1.0, tp1_price=2.0 (7 fills: tid134/144/154/165/186/196/206; 3 placed 2026-07-02). USD_CAD is NOT in the vetted 4-pair scanned universe, so these bypass the gated EdgePipeline entirely and pollute the fills ledger + decision log + Oracle reflection (source of the 2026-07-02 untraced-entry 1W/5L candidate lesson). TASK (read-only trace first): identify the emitter \u2014 grep execution/monitor loops and any leftover smoke-test/keepalive order path that hardcodes units=1 / SL=1.0 / TP=2.0 for USD_CAD; confirm whether it is a live loop or a stale test artifact. Then Colin decision: kill or gate it. Precondition to trusting Oracle's daily reflection (garbage-in). Read-only diagnosis is REST-safe; any code change needs Colin approval + param_change_log (NON-NEGOTIABLE #4). || REST-033 CONCLUSION (2026-07-04, read-only): emitter is NOT in the repo - every place_trade() caller computes real units/stop/tp; zero literal units=1/SL1.0/TP2.0 call sites; no code hardcodes USD_CAD as an order pair. It is a LIVE external/detached process (8th fill tid217 landed 2026-07-03T01:51Z, after REST-032). Cannot be killed by a code edit - needs an OS-level process/scheduled-job hunt on Colin's machine (launchd/cron/detached python/curl smoke). Handing the KILL decision to Colin; diagnosis portion of this ticket is complete."
+    },
+    {
+      "id": "RQ-REST-033",
       "status": "QUEUED",
       "priority": 1,
-      "description": "FIND-REST-032-c: an untraced path is emitting USD_CAD LONG orders with units=1, stop_price=1.0, tp1_price=2.0 (7 fills: tid134/144/154/165/186/196/206; 3 placed 2026-07-02). USD_CAD is NOT in the vetted 4-pair scanned universe, so these bypass the gated EdgePipeline entirely and pollute the fills ledger + decision log + Oracle reflection (source of the 2026-07-02 untraced-entry 1W/5L candidate lesson). TASK (read-only trace first): identify the emitter \u2014 grep execution/monitor loops and any leftover smoke-test/keepalive order path that hardcodes units=1 / SL=1.0 / TP=2.0 for USD_CAD; confirm whether it is a live loop or a stale test artifact. Then Colin decision: kill or gate it. Precondition to trusting Oracle's daily reflection (garbage-in). Read-only diagnosis is REST-safe; any code change needs Colin approval + param_change_log (NON-NEGOTIABLE #4)."
+      "description": "Quarantine the 8 phantom USD_CAD units=1 fills (tid 134/144/154/165/186/196/206/217) from Oracle ingestion so reflect_cycle stops synthesizing lessons from stale-emitter noise (proven: 2026-07-03 reflection built a false 'USD_CAD cluster scratched / WR 14%' lesson). PRECONDITION: RQ-REST-032 kill must land first, else new phantom fills keep arriving. Approach (Colin approval + param_change_log, NON-NEGOTIABLE #4): add a source/universe filter in reflect_cycle so fills for pairs outside the vetted scanned universe (USDJPY/GBPUSD/AUDUSD/EURUSD) and/or with degenerate risk params (SL=1.0/TP=2.0/units=1) are excluded from reflection, and one-time tag the 8 existing fills as quarantined in the ledger. Do NOT delete history - tag. Blocked on Colin: process kill (RQ-REST-032) + data/reflect change."
     }
   ],
-  "last_updated": "2026-07-03T01:12:10Z"
+  "last_updated": "2026-07-04T01:08:00+00:00"
 }

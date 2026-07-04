@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-02T07:33:48.761154+00:00",
-  "as_of_date": "2026-07-02",
+  "generated_at": "2026-07-03T07:13:03.693032+00:00",
+  "as_of_date": "2026-07-03",
   "current_lesson": {
     "components": [
       "active",
@@ -8,19 +8,23 @@
     ],
     "component_label": "signal_layers_active",
     "first_seen": "2026-07-02",
-    "last_seen": "2026-07-02",
-    "days_forming": 0,
-    "n_revisions": 1,
-    "n_days_appeared": 1,
+    "last_seen": "2026-07-03",
+    "days_forming": 1,
+    "n_revisions": 2,
+    "n_days_appeared": 2,
     "stable_days": 1,
     "status": "forming",
     "time_to_converge_days": null,
-    "latest_lesson_text": "Trades whose decision path did not call log_forex_decision() (reconstructed-from-fills entries) cluster catastrophically at 1W/5L \u2014 untraceable entries are a proxy for entries that bypassed the signal-gating stack entirely and must be blocked, not just logged.",
-    "latest_rule": "if decision.signal_layers_active == [] or decision.commitment_score is None: return ForexVeto('untraced_entry \u2014 no gated signal path'); log for audit.",
+    "latest_lesson_text": "Trades that must be RECONSTRUCTED from the fills ledger (no log_forex_decision() call) are structurally blind and should be treated as UNRELIABLE \u2014 6 of 7 such trades lost (WR=14%, avg R=-0.011).",
+    "latest_rule": "if decision.why_this_trade.startswith('RECONSTRUCTED') or decision.signal_layers_active == []: flag UNRELIABLE, block auto-execution, require pipeline re-entry with populated commitment_score before sizing.",
     "history": [
       {
         "date": "2026-07-02",
         "rule": "if decision.signal_layers_active == [] or decision.commitment_score is None: return ForexVeto('untraced_entry \u2014 no gated signal path'); log for audit."
+      },
+      {
+        "date": "2026-07-03",
+        "rule": "if decision.why_this_trade.startswith('RECONSTRUCTED') or decision.signal_layers_active == []: flag UNRELIABLE, block auto-execution, require pipeline re-entry with populated commitment_score before sizing."
       }
     ]
   },
@@ -32,19 +36,23 @@
       ],
       "component_label": "signal_layers_active",
       "first_seen": "2026-07-02",
-      "last_seen": "2026-07-02",
-      "days_forming": 0,
-      "n_revisions": 1,
-      "n_days_appeared": 1,
+      "last_seen": "2026-07-03",
+      "days_forming": 1,
+      "n_revisions": 2,
+      "n_days_appeared": 2,
       "stable_days": 1,
       "status": "forming",
       "time_to_converge_days": null,
-      "latest_lesson_text": "Trades whose decision path did not call log_forex_decision() (reconstructed-from-fills entries) cluster catastrophically at 1W/5L \u2014 untraceable entries are a proxy for entries that bypassed the signal-gating stack entirely and must be blocked, not just logged.",
-      "latest_rule": "if decision.signal_layers_active == [] or decision.commitment_score is None: return ForexVeto('untraced_entry \u2014 no gated signal path'); log for audit.",
+      "latest_lesson_text": "Trades that must be RECONSTRUCTED from the fills ledger (no log_forex_decision() call) are structurally blind and should be treated as UNRELIABLE \u2014 6 of 7 such trades lost (WR=14%, avg R=-0.011).",
+      "latest_rule": "if decision.why_this_trade.startswith('RECONSTRUCTED') or decision.signal_layers_active == []: flag UNRELIABLE, block auto-execution, require pipeline re-entry with populated commitment_score before sizing.",
       "history": [
         {
           "date": "2026-07-02",
           "rule": "if decision.signal_layers_active == [] or decision.commitment_score is None: return ForexVeto('untraced_entry \u2014 no gated signal path'); log for audit."
+        },
+        {
+          "date": "2026-07-03",
+          "rule": "if decision.why_this_trade.startswith('RECONSTRUCTED') or decision.signal_layers_active == []: flag UNRELIABLE, block auto-execution, require pipeline re-entry with populated commitment_score before sizing."
         }
       ]
     },
@@ -67,7 +75,7 @@
       "component_label": "consensus green_matches / hist_hr (30-indicator consensus block)",
       "first_seen": "2026-06-02",
       "last_seen": "2026-07-01",
-      "days_forming": 30,
+      "days_forming": 31,
       "n_revisions": 24,
       "n_days_appeared": 24,
       "stable_days": 1,

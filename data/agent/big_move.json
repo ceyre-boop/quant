@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-03T00:40:31+00:00",
+  "timestamp": "2026-07-04T01:01:26+00:00",
   "session": "OFF_HOURS",
   "context_keys": [
     "high_impact_event_today"
@@ -8,12 +8,12 @@
   "estimates": {
     "GBPUSD": {
       "pair": "GBPUSD",
-      "p_big": 0.6708,
+      "p_big": 0.6649,
       "direction": "LONG",
-      "expected_magnitude_pct": 0.7333,
-      "expected_vs_adr": 1.404,
+      "expected_magnitude_pct": 0.7298,
+      "expected_vs_adr": 1.398,
       "session": "OFF_HOURS",
-      "confidence": 0.314,
+      "confidence": 0.331,
       "drivers": [
         [
           "event_risk",
@@ -21,84 +21,55 @@
         ],
         [
           "momentum",
-          0.2579
-        ],
-        [
-          "compression",
-          0.038
+          0.2743
         ],
         [
           "displacement",
-          -0.0296
-        ]
-      ],
-      "timestamp": "2026-07-03T00:40:30.139032+00:00",
-      "notes": []
-    },
-    "EURUSD": {
-      "pair": "EURUSD",
-      "p_big": 0.6543,
-      "direction": "NEUTRAL",
-      "expected_magnitude_pct": 0.6803,
-      "expected_vs_adr": 1.389,
-      "session": "OFF_HOURS",
-      "confidence": 0.274,
-      "drivers": [
-        [
-          "event_risk",
-          0.9
-        ],
-        [
-          "momentum",
-          0.136
-        ],
-        [
-          "displacement",
-          -0.0511
-        ],
-        [
-          "compression",
-          0.0463
-        ]
-      ],
-      "timestamp": "2026-07-03T00:40:30.139032+00:00",
-      "notes": []
-    },
-    "USDJPY": {
-      "pair": "USDJPY",
-      "p_big": 0.6375,
-      "direction": "NEUTRAL",
-      "expected_magnitude_pct": 0.4209,
-      "expected_vs_adr": 1.374,
-      "session": "OFF_HOURS",
-      "confidence": 0.265,
-      "drivers": [
-        [
-          "event_risk",
-          0.9
-        ],
-        [
-          "displacement",
-          0.148
-        ],
-        [
-          "momentum",
-          -0.0953
+          0.0128
         ],
         [
           "compression",
           0.0
         ]
       ],
-      "timestamp": "2026-07-03T00:40:30.139032+00:00",
+      "timestamp": "2026-07-04T01:01:25.716230+00:00",
       "notes": []
     },
-    "AUDUSD": {
-      "pair": "AUDUSD",
-      "p_big": 0.6697,
+    "EURUSD": {
+      "pair": "EURUSD",
+      "p_big": 0.6485,
+      "direction": "LONG",
+      "expected_magnitude_pct": 0.6768,
+      "expected_vs_adr": 1.384,
+      "session": "OFF_HOURS",
+      "confidence": 0.302,
+      "drivers": [
+        [
+          "event_risk",
+          0.9
+        ],
+        [
+          "momentum",
+          0.1667
+        ],
+        [
+          "displacement",
+          0.0167
+        ],
+        [
+          "compression",
+          0.0
+        ]
+      ],
+      "timestamp": "2026-07-04T01:01:25.716230+00:00",
+      "notes": []
+    },
+    "USDJPY": {
+      "pair": "USDJPY",
+      "p_big": 0.6394,
       "direction": "NEUTRAL",
-      "expected_magnitude_pct": 0.8455,
-      "expected_vs_adr": 1.403,
+      "expected_magnitude_pct": 0.4217,
+      "expected_vs_adr": 1.375,
       "session": "OFF_HOURS",
       "confidence": 0.251,
       "drivers": [
@@ -107,19 +78,48 @@
           0.9
         ],
         [
-          "compression",
-          0.1761
+          "displacement",
+          0.1095
         ],
         [
           "momentum",
-          0.0453
+          -0.1075
+        ],
+        [
+          "compression",
+          0.0
+        ]
+      ],
+      "timestamp": "2026-07-04T01:01:25.716230+00:00",
+      "notes": []
+    },
+    "AUDUSD": {
+      "pair": "AUDUSD",
+      "p_big": 0.6567,
+      "direction": "LONG",
+      "expected_magnitude_pct": 0.8351,
+      "expected_vs_adr": 1.391,
+      "session": "OFF_HOURS",
+      "confidence": 0.319,
+      "drivers": [
+        [
+          "event_risk",
+          0.9
+        ],
+        [
+          "momentum",
+          0.1237
         ],
         [
           "displacement",
-          -0.0404
+          0.1211
+        ],
+        [
+          "compression",
+          0.065
         ]
       ],
-      "timestamp": "2026-07-03T00:40:30.139032+00:00",
+      "timestamp": "2026-07-04T01:01:25.716230+00:00",
       "notes": []
     }
   }
