@@ -25,6 +25,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from config.loader import params  # noqa: E402
 from experience import attribution as att  # noqa: E402
 from experience import journal  # noqa: E402
 
@@ -135,6 +136,44 @@ def build_review(week_of: date, dry_run: bool = False) -> Path:
         *(f"- {p['id']}: {p['name']}" for p in (proposals or [])),
         *([] if proposals else ["- none this week"]),
     ]
+
+    # ── Precedents (Alexandrian Library) — guarded additive section (TICK-005) ─────────────
+    # Whole block in ONE try/except: a library/board-DB error must never take down the Sunday
+    # review. Flag-gated (config/parameters.yml :: experience.precedents.review_enabled) —
+    # off => no section, no citations. dry_run shows the section but writes no citations.
+    precedents_lines: list[str] = []
+    try:
+        precedents_cfg = (params.get("experience") or {}).get("precedents", {})
+        if precedents_cfg.get("review_enabled", False):
+            from experience import citations as cit
+            from experience import precedents as prec
+            extremes = prec.week_board_extremes(w[0], w[1])
+            ctx_tags = prec.week_context_tags(rows, week_atts, extremes)
+            found = prec.find_precedents(ctx_tags, top_k=precedents_cfg.get("top_k", 3))
+            if found:
+                precedents_lines = [
+                    "",
+                    "## Precedents (Alexandrian Library)",
+                    f"_Structured retrieval (method: structured_v1); context tags: "
+                    f"{', '.join(sorted(ctx_tags)) or 'none'}._",
+                    "",
+                    *(f"- **{p['label']}** ({p['event_date']}, {p['source']}): {p['why']} → "
+                      f"{p['what_followed']} (~{p['outcome_days']}d, severity={p['severity']}, "
+                      f"matched={p['matched_tags']})"
+                      for p in found),
+                ]
+                if not dry_run:
+                    week_info = {"tag": tag, "end": end, "review_path": str(path)}
+                    cit.append_citations([
+                        cit.make_citation(week_info, p, [r["decision_id"] for r in acted],
+                                          basis={"board_extremes": extremes})
+                        for p in found
+                    ])
+    except Exception as e:
+        precedents_lines = ["", "## Precedents (Alexandrian Library)",
+                            f"_Precedent retrieval unavailable this week ({e})._"]
+    lines.extend(precedents_lines)
+
     path.write_text("\n".join(lines) + "\n")
     added = propose_to_ledger(proposals, dry_run)
     print(f"[weekly_review] {path.name}: {len(rows)} rows, {len(week_atts)} attributions, "

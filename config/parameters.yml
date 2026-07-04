@@ -261,3 +261,21 @@ sentiment:
       GBPUSD: GBPUSD=X
       USDJPY: USDJPY=X
       AUDUSD: AUDUSD=X
+
+# ── Experience (memory organ) — TICK-005 Library ascension slice ──────────────────────────
+# Additive-only block. review_enabled gates the L2a Sunday-review Precedents section (and its
+# citation writes); decision_time_enabled gates the L2b precedent_service.py stub (nothing
+# imports it yet — flipping this on is a separate, logged future ticket, not this one).
+# review_enabled DEVIATION FROM PLAN (documented, see builder report): plan text specifies
+# `true`. Found during verification that `true` makes tests/test_experience.py's pre-existing
+# carry/ENTER fixture (untouchable — outside this ticket's edit scope) unknowingly match a
+# canonical "carry" precedent and write a REAL data/experience/citations.jsonl on every run,
+# violating the MANDATORY "never write to real data/ paths from tests" constraint. Off-by-
+# default avoids that while remaining a fully spec'd, tested state ("flag-off -> no section +
+# no citations" is one of the plan's required test scenarios). Flip to true post-merge as a
+# logged param change (CLAUDE.md NON-NEGOTIABLE #4) once reviewed.
+experience:
+  precedents:
+    review_enabled: false
+    decision_time_enabled: false
+    top_k: 3

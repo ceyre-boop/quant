@@ -69,3 +69,91 @@ Schema per ticket:
 - [ ] follow-on: land the pre-registered Blue fix in `reflect_cycle` (guard turns green when contamination stops)
 **status:** done (2026-07-03, build) — pending operator load
 **pre_approved:** false
+
+## TICK-005
+**title:** Library ascension slice — lived annex + review-time precedents + scored citations
+**description:** Wire the Alexandrian Library into the memory loop (it already serves ICT live via ict/library_bridge — query every scan; the review loop is the missing theater). L1 ingest (reviews/attributions/interim seals → `data/experience/library_annex.jsonl`), L2a review-time Precedents section, L2b flagged decision-time stub (default OFF), L3 citation records with `scoring_due` so attribution can later score each analogy. `models/alexandrian_library.json` is LIVE-read AND live-written (`learn()`) — never touched; byte-equality test enforces. Full verified design: `plans/TICK-005.md`.
+**depends_on:** []
+**blocks:** [TICK-006]
+**acceptance_criteria:** see plans/TICK-005.md §Acceptance (suite baseline holds; canonical json byte-identical; W27 dry-run produces cited Precedents section; flag-off = no section)
+**status:** in_progress (2026-07-03 builder dispatched; approved via the Day-2 operating plan)
+**pre_approved:** true
+
+## TICK-006
+**title:** Review forensics feeds — oracle health, ledger results, veto ratio, audit parity (+ lesson-velocity & macro-block ports)
+**description:** `experience/weekly_review.py` reads none of: oracle reflection `system_health_note` (the 07-03 one flags a data-integrity crisis the W27 review shipped blind to), the week's hypothesis-ledger RESULTS (the loop proposes but never hears verdicts), veto ledgers (acted:abstained:vetoed ratio), shadow-audit parity, `lesson_velocity.json`, morning-briefing FRED macro block. Six small guarded reads, each in try/except — the review must never die on a feed. Oracle-derived text is context-only and marked contaminated-source until TICK-011 lands (RED-1). exit_reason stays AMBIGUOUS — inference refused (PROP-2026-W27 is the sanctioned path).
+**depends_on:** [TICK-005]
+**blocks:** []
+**acceptance_criteria:**
+- [ ] W27 dry-run shows: system-health line, tested-status Counter, acted:abstained:vetoed ratio, audit parity line
+- [ ] Any feed absent/corrupt → review still generates (test per feed)
+- [ ] Suite baseline holds
+**status:** ready
+**pre_approved:** true
+
+## TICK-007
+**title:** Dashboard parity — nightly positioning-board export + panel
+**description:** The board's institutional-positioning family (cot_net_pct/_z/flush, tff_lev_net_pct, vrp_*, rr25/bf25/atm_term_slope, econ_surprise_z, gdelt_tone) reaches no dashboard panel (R6). Step 1 (SAFE-NOW): exporter → `data/agent/positioning_board.json` (latest per-pair board row + staleness marker). Step 2: "Positioning" panel in root `index.html` (master-branch worktree deploy — see project_dashboard_deploy). DISPLAY-ONLY: no live gate reads the board without a CONFIRMED verdict (Article 6 — R6's "wire the stubs" suggestion explicitly refused).
+**depends_on:** []
+**blocks:** []
+**status:** ready (step 1 first; step 2 own session)
+**pre_approved:** false
+
+## TICK-008
+**title:** Health resurrection — watchdog trifecta diagnosis + staleness deadlines + log redirects
+**description:** health.responder (the watchdog itself) dead since Jun 14; oracle reflect stale Jun 28 (yfinance errors); hypothesis.generator + research.factory stale Jun 15; stray_tripwire WatchPaths inert since Jun 7; bench/evening_prep/render_keepalive log to /tmp or nowhere (R7). Diagnose root cause per job BEFORE restarting anything; per-job staleness deadlines surfaced in morning brief + dashboard; plist log-redirect batch prepared as a DIFF for Colin (plist edits = live-organ config, not applied unilaterally).
+**depends_on:** []
+**blocks:** []
+**status:** backlog
+**pre_approved:** false
+
+## TICK-009
+**title:** Re-enable Numba for the fast backtester (py3.14 incompat)
+**description:** Bench history: Numba-active 728k bt/s single / 1.26M parallel (2026-06-29 18:06); Numba-inactive same day 25k/123k — ~10× research throughput behind one env fix (numba upgrade or pinned venv for the backtest path). Own session; full suite before/after.
+**depends_on:** []
+**blocks:** [TICK-012]
+**status:** backlog
+**pre_approved:** false
+
+## TICK-010
+**title:** Journal context preservation — keep decision-logger reasoning fields at sync time
+**description:** journal_sync keeps 3 of ~60 DecisionRecord fields; why_this_trade / signal_layers_active / component_scores / grade / commitment_score are discarded — the machine's memory forgets its own reasoning (R3). Additive pass-through + backfill where source records exist. SEQUENCED after the first unattended Sunday beat (Jul 5): do not touch the memory organ's writer before its organic-fire verification (DoD item).
+**depends_on:** []
+**blocks:** []
+**blocked_until:** 2026-07-07
+**status:** backlog
+**pre_approved:** false
+
+## TICK-011
+**title:** RED-1 BLUE fix — source-exclusion in oracle reflect_cycle
+**description:** Implement the pre-registered fix from the 2026-07-03 Red/Blue audit (exclude fills_backfill/test_fill + pair filter in `_load_decision_log_summary`). Oracle outputs stay quarantined from every consumer until this lands; TICK-004's invariant guard I1 turns green when it does.
+**depends_on:** []
+**blocks:** []
+**blocked_until:** colin_review (Blue-Team-Proposed-Fix-2026-07-01.md)
+**status:** backlog
+**pre_approved:** false
+
+## TICK-012
+**title:** Successor research harness on the fast engine
+**description:** Hypothesis testing replays static v015 trades while fast_backtester idles (R4). Design the NEXT-generation harness (signal → simulate → prereg-gated verdict, CPCV-integrated) for successor families + the discovery bench. MUST NOT touch HYP-072..081 — their hash-locked protocol is event-study by design; swapping engines mid-family is a prereg violation dressed as an optimization.
+**depends_on:** [TICK-009]
+**blocks:** []
+**blocked_until:** family_adjudicated
+**status:** backlog
+**pre_approved:** false
+
+## TICK-013
+**title:** Load com.alta.sentiment_update (Colin's hand — one command)
+**description:** The board's daily schedule exists as a verified plist but was never installed; the sensory organ updates only manually (3 days stale at audit; the machine's permission layer correctly refused installing a persistent job — same denial as TICK-004's guard plist). Command: `cp scripts/com.alta.sentiment_update.plist ~/Library/LaunchAgents/ && launchctl load ~/Library/LaunchAgents/com.alta.sentiment_update.plist && python3 scripts/plist_watchdog.py --rebaseline "loaded sentiment_update"`.
+**depends_on:** []
+**blocks:** []
+**status:** ready — owner: Colin
+**pre_approved:** n/a (human action)
+
+## TICK-014
+**title:** Small sensor/vault efficiency batch
+**description:** GDELT off-peak retry mechanism (paced fill throttled 8/8 even at 5s spacing on 2026-07-03 ~19:30 ET — schedule the retry inside an off-peak job, e.g. the 02:30 ET oracle window; HYP-080 + family BH unblock on it); GDELT resume-cursor (gdelt_feed.py:80); vault-graph post-learn regen hook (3 lines); optional bench regression alert (5 lines) pending Colin's bench ruling.
+**depends_on:** []
+**blocks:** []
+**status:** backlog
+**pre_approved:** false

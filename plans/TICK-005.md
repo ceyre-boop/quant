@@ -1,4 +1,5 @@
-# Plan — TICK-004: Library ascension slice (L1 + L2a + L2b-stub + L3)
+# Plan — TICK-005: Library ascension slice (L1 + L2a + L2b-stub + L3)
+<!-- renumbered from TICK-004 on 2026-07-03: a concurrent session claimed TICK-004 (invariant guard) -->
 
 Design verified against code 2026-07-03 (Plan-agent pass; approved in
 `Plans/context-day-2-imperative-stonebraker.md` Appendix). ADDITIVE ONLY.
