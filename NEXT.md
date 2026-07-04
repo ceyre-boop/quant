@@ -6,6 +6,86 @@ Standing constraints live in `CLAUDE.md` — not restated here.
 
 ---
 
+## 2026-07-03 · evening (Claude Code / Molly) — DAY 2: THE REWIRING — retargeting audit · options-leg seals · Library ascension
+
+**Push:** ✅ 33cdcab → e9e05d3 → f243283 → 226149e all on origin/sovereign-v2 (+ this entry at close).
+
+**P1 (preflight):** surface backfill LANDED + look-ahead GREEN (per the overnight addendum); VRP board leg
+was partial — `sentiment_vrp_daily` 519 rows (2020→06-18), board vrp_signal 28% after today's rebuild;
+full `update_sentiment.py` (VRP tail + all feeders + rebuild + inline audit) kicked at close — idempotent,
+one re-run completes it if interrupted. ThetaTerminal healthy all day (schema probes exit 0).
+
+**E — evidence race:**
+- **VRP-001-OPTIONS (TICK-002, full verdict): `NO_TRADES` at the specced $100k account** — IS 2022: 1
+  trade/51 sizing-skips (net −438); OOS 2023-01→2024-06: 0 trades/78 skips. Signature f07e9f2 OK, real
+  chains (1,414 cached), 15/15 VRP tests. The 06-16 sizing wall is now PROVEN on both splits: 1% × 25-pt
+  wings can't floor ≥1 contract at $100k. **Yours: raise the research account (unfrozen `--account`,
+  plain re-run) or re-spec wings/risk% (signed change).** Recovered context: a **2026-06-29 stage-2 run
+  at a raised account logged 50t / Sharpe 1.248 IS** — it sat unread in the ledger until today's run
+  overwrote it (validator REPLACES its entry — result-history loss class; old record in git history).
+- **Six interim seals** (locked protocol; gate-zero 11/11; reconcile 0.6885; truncation-invariance PASS;
+  seed 42; interpretations declared PRE-RESULTS in `positioning_options_legs.py` + stamped per seal):
+  074 p=.161 N=24 UNDER · 075 p=.166 N=54 OK · 076 p=.825 N=48 UNDER · 078 p=.282 N=29 UNDER ·
+  079 p=.209 N=7 UNDER · **077-FULL composite p=1.0 N=5 UNDER (supersedes COT-only; both remain)**.
+  Coverage stamp everywhere: options history 2020+ (Value-tier depth), z-warmup eats 2020.
+- **HYP-080 BLOCKED stamped** (prereg's own data_dependency): GDELT throttled **8/8 calls even at 5s
+  pacing** (~19:30 ET) — the June "burst" theory is dead; it's sustained free-tier throttling. Off-peak
+  retry = TICK-014. **Family: 9/10 primaries exist, all raw p ≥ .16; BH correctly REFUSED** (runner
+  refuses partial adjudication; `--adjudicate` ready the moment 080 lands).
+- **No CONFIRMED → no ignition command unlocked; Article 6 stands.** (Note: VRP's verdict ladder tops at
+  PARTIAL_CONFIRMATION — it can never by itself satisfy Article 6.)
+
+**R — retargeting audit (the "what decision does it feed" trial):** `audit/retargeting/R1..R7 +
+RETARGETING_TABLE.md` — **16 RETARGET / 17 LEAVE / 10 ATTIC-CANDIDATE**. Corrections it forced:
+the Alexandrian Library is LIVE in ICT (query every scan; `learn()` live-WRITES the canonical json —
+freeze-listed forever); the "unidentified OANDA writer" was **our own `test_oanda_set_stop.py` trading
+on every plain suite run** (now env-gated `OANDA_INTEGRATION=1`; 8 fills explained); **no plist-hash
+watchdog existed** — built `scripts/plist_watchdog.py`, baselined (20 jobs), GREEN ×4 today.
+- **R4 headline:** the fast engine idles during research (family runner replays static v015 trades — by
+  prereg DESIGN; retrofit REFUSED, successor harness = TICK-012). The 1.26M bars/s claim was Numba-real;
+  **Numba is dead on py3.14 → 123k/s now** (TICK-009 recovers ~10×).
+- **R6 headline:** the positioning board (COT%/TFF/VRP/rr25/bf25/surprise/GDELT) reaches **no dashboard
+  panel** — Colin-blindness beats machine-blindness; display-only export = TICK-007. Wiring the board
+  into live readiness gates was REFUSED (Article 6 — evidence first).
+- **R7:** watchdog trifecta (health.responder + 2 research nightlies) silently dead 18+ days; nothing
+  watches the watchdogs → TICK-008 (diagnose-first).
+
+**L — Library ascension (TICK-005): SHIPPED + LIVE.** 5 new `experience/` modules + 43 tests (builder
+subagent, worktree). `library_annex.jsonl` holds its **first 17 lived entries** (1 review · 7
+attributions · 9 seals incl. today's). Sunday review gains a guarded Precedents section + **falsifiable
+citations** (`scoring_due` = attribution can later score every analogy). Canonical json byte-identical
+(test-enforced). W27 flag-on dry-run (isolated dir): real precedents matched from the week's own tags
+(carry/crowded_short → GOLDILOCKS_LOW_VOL '17, LOW_VOL_MELT_UP '13). **`review_enabled` ships FALSE**
+(deviation, documented in parameters.yml + param_change_log: legacy test fixture would write real
+citations; also keeps Sunday Jul-5's organic beat on pristine v1). **Activation = your one-line flip
+post-Monday-verification.** L2b decision-time stub: default OFF, nothing imports it.
+
+**A — `docs/REWIRING.md`** (as-is/should-be diagrams, ranked list, leave-alone list, refused list).
+Top 5: ① schedule the sensory board (TICK-013, YOUR one command — machine correctly denied
+persistence) ② Library slice (DONE) ③ review forensics feeds (TICK-006, ready) ④ suite-must-not-trade
+(DONE) ⑤ positioning-board display export (TICK-007).
+
+**T:** TICK-005..014 filed (renumbered live — a concurrent session claimed TICK-004; see memory note)
++ plans/TICK-005/006/007/008.md (+ 002/003 pointers; plans/ is gitignored → ticket plans force-added).
+
+**B:** builder merged after diff review; **suite 1120 passed / 40 known-failed (EXACT set, 0 new) /
+1 skipped** (the gated live-order test); watchdog GREEN after every batch.
+
+**Attic-candidates (your ruling, nothing moved):** com.alta.cache.refresh Reddit path · dead .env keys
+(Tiingo/OpenWeather/Firebase×/AV-technical; Polygon→equity batch) · cross_system_bridge.py ·
+.smart-env embeddings · bench telemetry (or 5-line alert) · stray_tripwire watch-mode (inert since
+Jun 7). Existing §S2 list untouched.
+
+**Operator actions queue (consolidated):** load sentiment_update (TICK-013) · load invariant_guard
+plist (afternoon session's TICK-004) · VRP account decision (above) · precedents flip after Jul-6 ·
+S2 rulings · PROP-2026-W27 promote/decline (standing).
+
+**Refused:** partial family BH · fast-engine retrofit into the locked family · exit_reason inference
+(PROP-2026-W27 is the path) · board→live-gate wiring · working around the launchctl denial · stage-4
+holdout touch · regenerating the historical W27 review in place · param tweaks after seeing any result.
+
+---
+
 ## 2026-07-03 · afternoon (Claude Code / Molly) — Layer-4 audit → standing Adversarial Invariant Guard
 
 **Context:** Colin's "four correctness layers" reframe → chose *map the layers, target the weak one*.
