@@ -1,0 +1,28 @@
+{
+  "hyp": "HYP-079",
+  "per_pair_N": {
+    "EURUSD": 4,
+    "GBPUSD": 1,
+    "USDJPY": 1,
+    "AUDUSD": 1
+  },
+  "primary": {
+    "h": 10,
+    "statistic_median_abs_move": 0.012615,
+    "raw_p": 0.20888,
+    "n_perm": 10000,
+    "N_deoverlapped": 7
+  },
+  "secondary_signed_vs_crowd": {
+    "h": 10,
+    "median": -0.009836,
+    "hit": {
+      "n": 7,
+      "wins": 2,
+      "hit": 0.2857142857142857,
+      "binom_p": 0.9375
+    }
+  },
+  "sample_status": "UNDERPOWERED_INTERIM",
+  "deviations": []
+}

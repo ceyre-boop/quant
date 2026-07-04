@@ -1603,7 +1603,14 @@
     "is_sharpe": null,
     "standalone": false,
     "auto_generated": false,
-    "source": "manual"
+    "source": "manual",
+    "annotations": [
+      {
+        "date": "2026-07-04T00:15:27.361293+00:00",
+        "by": "POSITIONING-BOARD-2026-07/interim-options-legs",
+        "note": "INTERIM SEAL \u2014 NO VERDICT (family BH across all 10 primaries). raw p=0.16088, N=24, h=20, statistic=0.006382, sample_status=UNDERPOWERED_INTERIM, deviations=[]; coverage: options surface history starts 2020-01-03 (ThetaData Value-tier depth) \u2014 six years, not the decade; z warmup consumes 2020; interpretations (declared 2026-07-03 pre-results, from data-availability arithmetic only \u2014 see positioning_options_legs.py docstring): 252-obs z = DAILY board series (ASOF-carried weekly surface; weekly reading rejected \u2014 <90 usable obs on 2020+ depth); EOD-signal t0 = first trading day STRICTLY AFTER signal date (surprise releases keep same-day t0, 08:30 ET); primary h: 074=20, 075=20, 076=5, 078=10, 079=10, 080=20; rr/bf/tone/cot are BASE-currency-signed, pair space via PAIR_FLIP once; 077-full rr term = Phi(rr25_z) aligned, per-pair mean with the cot term; 076 cells = crowded-against vs uncrowded control (extreme-aligned excluded), one event per publish_date (max |z|); rolling std ddof=1; artifacts=data/research/positioning_family/HYP-074.json"
+      }
+    ]
   },
   {
     "id": "HYP-075",
@@ -1623,7 +1630,14 @@
     "is_sharpe": null,
     "standalone": false,
     "auto_generated": false,
-    "source": "manual"
+    "source": "manual",
+    "annotations": [
+      {
+        "date": "2026-07-04T00:15:27.363130+00:00",
+        "by": "POSITIONING-BOARD-2026-07/interim-options-legs",
+        "note": "INTERIM SEAL \u2014 NO VERDICT (family BH across all 10 primaries). raw p=0.16598, N=54, h=20, statistic=0.001441, sample_status=OK, deviations=[]; coverage: options surface history starts 2020-01-03 (ThetaData Value-tier depth) \u2014 six years, not the decade; z warmup consumes 2020; interpretations (declared 2026-07-03 pre-results, from data-availability arithmetic only \u2014 see positioning_options_legs.py docstring): 252-obs z = DAILY board series (ASOF-carried weekly surface; weekly reading rejected \u2014 <90 usable obs on 2020+ depth); EOD-signal t0 = first trading day STRICTLY AFTER signal date (surprise releases keep same-day t0, 08:30 ET); primary h: 074=20, 075=20, 076=5, 078=10, 079=10, 080=20; rr/bf/tone/cot are BASE-currency-signed, pair space via PAIR_FLIP once; 077-full rr term = Phi(rr25_z) aligned, per-pair mean with the cot term; 076 cells = crowded-against vs uncrowded control (extreme-aligned excluded), one event per publish_date (max |z|); rolling std ddof=1; artifacts=data/research/positioning_family/HYP-075.json"
+      }
+    ]
   },
   {
     "id": "HYP-076",
@@ -1643,7 +1657,14 @@
     "is_sharpe": null,
     "standalone": false,
     "auto_generated": false,
-    "source": "manual"
+    "source": "manual",
+    "annotations": [
+      {
+        "date": "2026-07-04T00:15:27.364445+00:00",
+        "by": "POSITIONING-BOARD-2026-07/interim-options-legs",
+        "note": "INTERIM SEAL \u2014 NO VERDICT (family BH across all 10 primaries). raw p=0.82532, N=48, h=5, statistic=-0.001482, sample_status=UNDERPOWERED_INTERIM, deviations=[]; coverage: options surface history starts 2020-01-03 (ThetaData Value-tier depth) \u2014 six years, not the decade; z warmup consumes 2020; interpretations (declared 2026-07-03 pre-results, from data-availability arithmetic only \u2014 see positioning_options_legs.py docstring): 252-obs z = DAILY board series (ASOF-carried weekly surface; weekly reading rejected \u2014 <90 usable obs on 2020+ depth); EOD-signal t0 = first trading day STRICTLY AFTER signal date (surprise releases keep same-day t0, 08:30 ET); primary h: 074=20, 075=20, 076=5, 078=10, 079=10, 080=20; rr/bf/tone/cot are BASE-currency-signed, pair space via PAIR_FLIP once; 077-full rr term = Phi(rr25_z) aligned, per-pair mean with the cot term; 076 cells = crowded-against vs uncrowded control (extreme-aligned excluded), one event per publish_date (max |z|); rolling std ddof=1; artifacts=data/research/positioning_family/HYP-076.json"
+      }
+    ]
   },
   {
     "id": "HYP-077",
@@ -1669,6 +1690,11 @@
         "date": "2026-07-02T19:21:41.582911+00:00",
         "by": "POSITIONING-BOARD-2026-07/interim-cot-subset",
         "note": "INTERIM SEAL \u2014 NO VERDICT (family BH across all 10 primaries awaits the options legs). raw p=0.17098, N=9 de-overlapped, h=20, statistic=-0.006313, hit={}, IC=None, medians={}, corr_carry={}, sample_status=UNDERPOWERED_INTERIM, deviations=['DEVIATION (operator-authorized): rr25_z term omitted \u2014 options surface has no data; COT-only interim variant. Hash-locked composite unchanged; final family verdict requires the full composite rerun.']; null-interpretation: locked 'event-label shuffle preserving per-pair event counts' read as PER-PAIR DATE-SHUFFLE onto eligible dates (sign-flip rejected \u2014 destroyed by carry drift); event-level shuffle is the defense for overlapping forward windows; primary horizon interpretation: one pooled primary per HYP -> h=20 (072/073/077), h=5 (081); h=10 sealed secondary; artifacts=data/research/positioning_family/HYP-077.json"
+      },
+      {
+        "date": "2026-07-04T00:15:27.368735+00:00",
+        "by": "POSITIONING-BOARD-2026-07/interim-options-legs",
+        "note": "INTERIM SEAL \u2014 NO VERDICT (family BH across all 10 primaries). raw p=1.0, N=5, h=20, statistic=0.000105, sample_status=UNDERPOWERED_INTERIM, deviations=[]; coverage: options surface history starts 2020-01-03 (ThetaData Value-tier depth) \u2014 six years, not the decade; z warmup consumes 2020; interpretations (declared 2026-07-03 pre-results, from data-availability arithmetic only \u2014 see positioning_options_legs.py docstring): 252-obs z = DAILY board series (ASOF-carried weekly surface; weekly reading rejected \u2014 <90 usable obs on 2020+ depth); EOD-signal t0 = first trading day STRICTLY AFTER signal date (surprise releases keep same-day t0, 08:30 ET); primary h: 074=20, 075=20, 076=5, 078=10, 079=10, 080=20; rr/bf/tone/cot are BASE-currency-signed, pair space via PAIR_FLIP once; 077-full rr term = Phi(rr25_z) aligned, per-pair mean with the cot term; 076 cells = crowded-against vs uncrowded control (extreme-aligned excluded), one event per publish_date (max |z|); rolling std ddof=1; artifacts=data/research/positioning_family/HYP-077_full.json"
       }
     ]
   },
@@ -1690,7 +1716,14 @@
     "is_sharpe": null,
     "standalone": false,
     "auto_generated": false,
-    "source": "manual"
+    "source": "manual",
+    "annotations": [
+      {
+        "date": "2026-07-04T00:15:27.365860+00:00",
+        "by": "POSITIONING-BOARD-2026-07/interim-options-legs",
+        "note": "INTERIM SEAL \u2014 NO VERDICT (family BH across all 10 primaries). raw p=0.28167, N=29, h=10, statistic=1.087635, sample_status=UNDERPOWERED_INTERIM, deviations=[]; coverage: options surface history starts 2020-01-03 (ThetaData Value-tier depth) \u2014 six years, not the decade; z warmup consumes 2020; interpretations (declared 2026-07-03 pre-results, from data-availability arithmetic only \u2014 see positioning_options_legs.py docstring): 252-obs z = DAILY board series (ASOF-carried weekly surface; weekly reading rejected \u2014 <90 usable obs on 2020+ depth); EOD-signal t0 = first trading day STRICTLY AFTER signal date (surprise releases keep same-day t0, 08:30 ET); primary h: 074=20, 075=20, 076=5, 078=10, 079=10, 080=20; rr/bf/tone/cot are BASE-currency-signed, pair space via PAIR_FLIP once; 077-full rr term = Phi(rr25_z) aligned, per-pair mean with the cot term; 076 cells = crowded-against vs uncrowded control (extreme-aligned excluded), one event per publish_date (max |z|); rolling std ddof=1; artifacts=data/research/positioning_family/HYP-078.json"
+      }
+    ]
   },
   {
     "id": "HYP-079",
@@ -1710,7 +1743,14 @@
     "is_sharpe": null,
     "standalone": false,
     "auto_generated": false,
-    "source": "manual"
+    "source": "manual",
+    "annotations": [
+      {
+        "date": "2026-07-04T00:15:27.367299+00:00",
+        "by": "POSITIONING-BOARD-2026-07/interim-options-legs",
+        "note": "INTERIM SEAL \u2014 NO VERDICT (family BH across all 10 primaries). raw p=0.20888, N=7, h=10, statistic=0.012615, sample_status=UNDERPOWERED_INTERIM, deviations=[]; coverage: options surface history starts 2020-01-03 (ThetaData Value-tier depth) \u2014 six years, not the decade; z warmup consumes 2020; interpretations (declared 2026-07-03 pre-results, from data-availability arithmetic only \u2014 see positioning_options_legs.py docstring): 252-obs z = DAILY board series (ASOF-carried weekly surface; weekly reading rejected \u2014 <90 usable obs on 2020+ depth); EOD-signal t0 = first trading day STRICTLY AFTER signal date (surprise releases keep same-day t0, 08:30 ET); primary h: 074=20, 075=20, 076=5, 078=10, 079=10, 080=20; rr/bf/tone/cot are BASE-currency-signed, pair space via PAIR_FLIP once; 077-full rr term = Phi(rr25_z) aligned, per-pair mean with the cot term; 076 cells = crowded-against vs uncrowded control (extreme-aligned excluded), one event per publish_date (max |z|); rolling std ddof=1; artifacts=data/research/positioning_family/HYP-079.json"
+      }
+    ]
   },
   {
     "id": "HYP-080",
@@ -1730,7 +1770,14 @@
     "is_sharpe": null,
     "standalone": false,
     "auto_generated": false,
-    "source": "manual"
+    "source": "manual",
+    "annotations": [
+      {
+        "date": "2026-07-04T00:15:27.343474+00:00",
+        "by": "POSITIONING-BOARD-2026-07/interim-options-legs",
+        "note": "BLOCKED STAMP \u2014 data_dependency unmet: gdelt_tone coverage 0.0% < 70% (prereg HYP-080 line data_dependency). Family BH remains open. coverage: options surface history starts 2020-01-03 (ThetaData Value-tier depth) \u2014 six years, not the decade; z warmup consumes 2020"
+      }
+    ]
   },
   {
     "id": "HYP-081",

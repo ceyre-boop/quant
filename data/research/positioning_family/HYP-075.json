@@ -1,0 +1,41 @@
+{
+  "hyp": "HYP-075",
+  "per_pair_N": {
+    "EURUSD": 29,
+    "GBPUSD": 12,
+    "USDJPY": 7,
+    "AUDUSD": 6
+  },
+  "primary": {
+    "h": 20,
+    "statistic_median": 0.001441,
+    "raw_p": 0.16598,
+    "n_perm": 10000,
+    "N_deoverlapped": 54
+  },
+  "dropped_missing_data": 0,
+  "medians": {
+    "full_h20": 0.001441,
+    "ex2020_h20": 0.001441
+  },
+  "hit_h20": {
+    "n": 54,
+    "wins": 30,
+    "hit": 0.5555555555555556,
+    "binom_p": 0.24830871765896673
+  },
+  "ic_h20": 0.006365542214598817,
+  "secondary": {
+    "h": 10,
+    "statistic_median": -0.002446,
+    "raw_p": 0.73323,
+    "N": 54
+  },
+  "corr_carry": {
+    "rho_full": -0.0544,
+    "n_overlap": 744,
+    "benchmark": "v015 daily curve (DBV leg deferred to final family run per VRP-001 convention)"
+  },
+  "sample_status": "OK",
+  "deviations": []
+}
