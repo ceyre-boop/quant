@@ -14,6 +14,11 @@ Standing constraints live in `CLAUDE.md` — not restated here.
 was partial — `sentiment_vrp_daily` 519 rows (2020→06-18), board vrp_signal 28% after today's rebuild;
 full `update_sentiment.py` (VRP tail + all feeders + rebuild + inline audit) kicked at close — idempotent,
 one re-run completes it if interrupted. ThetaTerminal healthy all day (schema probes exit 0).
+**Close addendum:** that tail run was externally stopped mid-fetch (same kill pattern as the morning
+vrp_feed run — long background jobs don't survive here; TICK-013's daily job is the real fix). Final
+verified state: board 11,560 rows (look-ahead 0 violations from the 19:4x rebuild), vrp_signal 28.2%,
+vrp data through 2026-06-18. Completed fetches are cached; **one plain `python3
+scripts/update_sentiment.py` (or the loaded 07:45 job) finishes the tail + rebuild + audit.**
 
 **E — evidence race:**
 - **VRP-001-OPTIONS (TICK-002, full verdict): `NO_TRADES` at the specced $100k account** — IS 2022: 1
