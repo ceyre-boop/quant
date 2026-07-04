@@ -28,6 +28,14 @@ load_dotenv(dotenv_path=str(Path(__file__).resolve().parents[1] / ".env"))
 TEST_PAIR = "USD_CAD"   # liquid, outside the v015 live set → no FIFO collision risk
 TEST_UNITS = 1          # smallest position
 
+# Opt-in gate (2026-07-03): a plain `pytest tests/` run with creds present was placing this
+# real 1-unit practice probe EVERY time — 8 untraced fills in the ledger before the R7 audit
+# identified this file as the "unidentified OANDA writer". The round-trip is still fully real
+# when wanted: OANDA_INTEGRATION=1 pytest tests/test_oanda_set_stop.py -v -s
+if os.environ.get("OANDA_INTEGRATION") != "1":
+    pytest.skip("opt-in integration test: set OANDA_INTEGRATION=1 to place the real practice-"
+                "account round-trip (plain suite runs must not trade)", allow_module_level=True)
+
 
 def _bridge_or_skip():
     """Construct a practice-account bridge or skip with the documented failure mode."""
