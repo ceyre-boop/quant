@@ -1398,14 +1398,6 @@
     "date_tested": "2026-06-27"
   },
   {
-    "id": "VRP-001-OPTIONS",
-    "name": "VRP iron-condor backtest on ThetaData SPY chains (Stages 2-4)",
-    "status": "OK",
-    "date_tested": "2026-06-29",
-    "result": "[IS 2022-01-01..2022-12-31] IS:OK/50t/Sh1.248",
-    "methodology_note": "Short 1SD iron condor, 25pt wings, 30-45 DTE, manage 21DTE/50% take/2x stop, 1% risk, Monday weekly. Real SPY chains via ThetaData; strikes from prior-20d realized vol (yfinance). Pre-registered + signed (vrp_preregistration.json#options_backtest)."
-  },
-  {
     "id": "BENCH-THROUGHPUT",
     "name": "Backtest throughput benchmark (measured, replaces the 148k claim)",
     "status": "MEASURED",
@@ -1818,5 +1810,13 @@
     "result": null,
     "p_value": null,
     "auto_generated": true
+  },
+  {
+    "id": "VRP-001-OPTIONS",
+    "name": "VRP iron-condor backtest on ThetaData SPY chains (Stages 2-4)",
+    "status": "NO_TRADES",
+    "date_tested": "2026-07-04",
+    "result": "[OOS 2023-01-01..2024-06-30] IS:OK/1t/Sh0.0; OOS:NO_TRADES/0t/Sh-",
+    "methodology_note": "Short 1SD iron condor, 25pt wings, 30-45 DTE, manage 21DTE/50% take/2x stop, 1% risk, Monday weekly. Real SPY chains via ThetaData; strikes from prior-20d realized vol (yfinance). Pre-registered + signed (vrp_preregistration.json#options_backtest)."
   }
 ]
