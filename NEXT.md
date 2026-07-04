@@ -20,6 +20,22 @@ verified state: board 11,560 rows (look-ahead 0 violations from the 19:4x rebuil
 vrp data through 2026-06-18. Completed fetches are cached; **one plain `python3
 scripts/update_sentiment.py` (or the loaded 07:45 job) finishes the tail + rebuild + audit.**
 
+**Late-evening continuation ("continue"):**
+- **GDELT attempt #2 (~21:00 ET): throttled 8/8 again, now with raw 30s ReadTimeouts** — sustained
+  limiting, not burst timing. Family stays 9/10; TICK-014's scheduled off-peak mechanism is the path.
+  If the 02:30-ET class of retry ALSO fails, the manifest's "family documents its handling" branch
+  becomes a Colin-level protocol decision. Board rebuilt again on the fresher feeder rows: **11,572
+  rows, look-ahead 0 violations / 71,156.**
+- **Runner hardened for unblock day:** `--only HYP-080` flag (no duplicate seals; fresh seed-42 stream,
+  documented; own manifest file). Sequence when GDELT yields: gdelt fill → `--only HYP-080` →
+  `--adjudicate --dry-run` → `--adjudicate`.
+- **TICK-006 SHIPPED (builder, worktree):** the Sunday review now reads six forensics feeds — oracle
+  health (quarantine-marked), the week's ledger RESULTS Counter + terminal-verdict dedup (fails OPEN —
+  can never silently suppress a proposal), acted:abstained:vetoed ratio, shadow-audit parity, lesson
+  velocity, briefing macro block. 22 new tests. One test-isolation bug caught + fixed in MY OWN new
+  TICK-005 test (it read the real annex — only visible after the backfill populated it; the class of
+  bug the constraint exists for). **Suite: 40 failed exact / 1142 passed / 1 skipped. Watchdog GREEN.**
+
 **E — evidence race:**
 - **VRP-001-OPTIONS (TICK-002, full verdict): `NO_TRADES` at the specced $100k account** — IS 2022: 1
   trade/51 sizing-skips (net −438); OOS 2023-01→2024-06: 0 trades/78 skips. Signature f07e9f2 OK, real

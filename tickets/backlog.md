@@ -76,7 +76,7 @@ Schema per ticket:
 **depends_on:** []
 **blocks:** [TICK-006]
 **acceptance_criteria:** see plans/TICK-005.md §Acceptance (suite baseline holds; canonical json byte-identical; W27 dry-run produces cited Precedents section; flag-off = no section)
-**status:** in_progress (2026-07-03 builder dispatched; approved via the Day-2 operating plan)
+**status:** done (2026-07-03 — merged f243283; annex live with 17 entries; review_enabled=false pending Colin's post-Jul-6 flip)
 **pre_approved:** true
 
 ## TICK-006
@@ -85,10 +85,10 @@ Schema per ticket:
 **depends_on:** [TICK-005]
 **blocks:** []
 **acceptance_criteria:**
-- [ ] W27 dry-run shows: system-health line, tested-status Counter, acted:abstained:vetoed ratio, audit parity line
-- [ ] Any feed absent/corrupt → review still generates (test per feed)
-- [ ] Suite baseline holds
-**status:** ready
+- [x] W27 dry-run shows: system-health line (quarantine-marked), tested-status Counter, acted:abstained:vetoed ratio, audit parity line, lesson velocity, macro block — with honest per-feed degradations
+- [x] Any feed absent/corrupt → review still generates (22 tests; ledger-dedup fails OPEN)
+- [x] Suite baseline holds (40 failed exact / 1142 passed / 1 skipped)
+**status:** done (2026-07-03 late — builder merged)
 **pre_approved:** true
 
 ## TICK-007

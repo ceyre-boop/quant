@@ -80,7 +80,10 @@ class TestFindPrecedents:
     def test_no_context_tags_returns_empty(self):
         assert prec.find_precedents(set(), top_k=3) == []
 
-    def test_canonical_match_by_tag(self):
+    def test_canonical_match_by_tag(self, tmp_path, monkeypatch):
+        # Isolate from the REAL annex: once library_ingest --backfill runs, lived "carry"
+        # entries exist on disk and would legitimately outrank canonical ones here.
+        monkeypatch.setattr(la, "ANNEX_PATH", tmp_path / "empty_annex.jsonl")
         results = prec.find_precedents({"carry"}, top_k=3)
         assert results
         assert all(r["source"] == "canonical" for r in results)
