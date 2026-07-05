@@ -1,0 +1,56 @@
+{
+  "run_ts": "2026-07-04T03:35:20.882785+00:00",
+  "seed": 42,
+  "n_perm": 10000,
+  "git": "a3ec2ef",
+  "gate_zero": {
+    "HYP-072_cot_extreme_fade.json": {
+      "hash": "6316469c85b26fb1",
+      "ok": true
+    },
+    "HYP-073_flush_continuation.json": {
+      "hash": "03bcab0436a3bcd6",
+      "ok": true
+    },
+    "HYP-074_rr_extreme_reversion.json": {
+      "hash": "df3f2b0ce1ed0fc8",
+      "ok": true
+    },
+    "HYP-075_spot_extreme_rr_nonconfirmation.json": {
+      "hash": "1f2c3f039b1fd81a",
+      "ok": true
+    },
+    "HYP-076_surprise_vs_crowding.json": {
+      "hash": "c8fc17e3584d1a6b",
+      "ok": true
+    },
+    "HYP-077_crowded_carry_drawdown_gate.json": {
+      "hash": "731ebb95c49368df",
+      "ok": true
+    },
+    "HYP-078_term_inversion_breakout.json": {
+      "hash": "b3c8c75562463091",
+      "ok": true
+    },
+    "HYP-079_butterfly_spike_timing.json": {
+      "hash": "c8af4d2eab35b006",
+      "ok": true
+    },
+    "HYP-080_gdelt_tone_x_positioning.json": {
+      "hash": "2fbd408d1e451139",
+      "ok": true
+    },
+    "HYP-081_extreme_into_event_fade.json": {
+      "hash": "258d0d242448c940",
+      "ok": true
+    },
+    "HYP-072-081_positioning_family.json": {
+      "hash": "8d48daccfa4644eb",
+      "ok": true
+    }
+  },
+  "interpretations": "interpretations (declared 2026-07-03 pre-results, from data-availability arithmetic only \u2014 see positioning_options_legs.py docstring): 252-obs z = DAILY board series (ASOF-carried weekly surface; weekly reading rejected \u2014 <90 usable obs on 2020+ depth); EOD-signal t0 = first trading day STRICTLY AFTER signal date (surprise releases keep same-day t0, 08:30 ET); primary h: 074=20, 075=20, 076=5, 078=10, 079=10, 080=20; rr/bf/tone/cot are BASE-currency-signed, pair space via PAIR_FLIP once; 077-full rr term = Phi(rr25_z) aligned, per-pair mean with the cot term; 076 cells = crowded-against vs uncrowded control (extreme-aligned excluded), one event per publish_date (max |z|); rolling std ddof=1",
+  "coverage": "coverage: options surface history starts 2020-01-03 (ThetaData Value-tier depth) \u2014 six years, not the decade; z warmup consumes 2020",
+  "gdelt_coverage": 0.0,
+  "hyp_order": []
+}

@@ -1,0 +1,26 @@
+{
+  "date": "2026-07-04",
+  "generated_at": "2026-07-04T07:22:08.131152+00:00",
+  "input_tokens": 5763,
+  "output_tokens": 794,
+  "estimated_cost_usd": 0.145995,
+  "harvest_days_read": 7,
+  "reflection": {
+    "candidate_lesson": {
+      "lesson_text": "When the 30-indicator consensus shows directional agreement but green_matches=0 and hist_hr=0%, treat the signal as unvalidated and freeze new entries on that pair regardless of conviction score.",
+      "mechanism": "green_matches counts times the current live indicator fingerprint historically matched a WINNING configuration; zero matches means the present state has no precedent in the profitable memory bank \u2014 conviction% is measuring instantaneous agreement, not forward edge, so acting on it is trading a pattern the system has never won on.",
+      "testable_rule": "if consensus_dir != 'NEUTRAL' and green_matches == 0 and hist_hr == 0.0: return ConsensusVeto()  # require green_matches >= 1 before sizing on 30-indicator direction",
+      "expected_impact": "Reduces low-quality entries during unvalidated regimes; expected to lift win rate 2-4% and Sharpe +0.02-0.04 by eliminating trades with no historical profitable analog.",
+      "evidence_from_harvest": "All five pairs currently show green_matches=0 and hist_hr=0% despite GBPUSD conv=50% LONG and AUDUSD/AUDNZD conv=42% SHORT \u2014 the system is generating directional calls with zero historical winning precedent, and 0 trades fired in the last 7 days, consistent with the system correctly hesitating on unvalidated states.",
+      "evidence_from_reasoning": null,
+      "reasoning_component_targeted": "green_matches",
+      "sample_needed": 40
+    },
+    "retirement_flag": {
+      "lesson_to_review": "L5",
+      "reason": "Pair-specific macro half-lives (GBPUSD 6d, AUDUSD 5d, etc.) were calibrated in a prior regime; with 10Y-2Y at 0.35% NORMAL and CPI decelerating, macro signal persistence may be shifting \u2014 worth re-validating half-lives against recent closed trades once sample accumulates."
+    },
+    "system_health_note": "System is correctly in a hesitation state \u2014 0 trades in 7 days, regime UNKNOWN internally, TradingView blank, and all consensus pairs at green_matches=0, so the freeze reflects appropriate epistemic caution rather than a fault."
+  },
+  "auto_validation": null
+}

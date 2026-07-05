@@ -1,0 +1,9 @@
+{
+  "date": "2026-07-04",
+  "generated_at": "2026-07-04T07:22:08.145819+00:00",
+  "candidate_lesson": "When the 30-indicator consensus shows directional agreement but green_matches=0 and hist_hr=0%, treat the signal as unvalidated and freeze new entries on that pair regardless of conviction score.",
+  "testable_rule": "if consensus_dir != 'NEUTRAL' and green_matches == 0 and hist_hr == 0.0: return ConsensusVeto()  # require green_matches >= 1 before sizing on 30-indicator direction",
+  "verdict": "REJECTED",
+  "reason": "Rule filters only 0 trades \u2014 insufficient sample",
+  "trades_available": 1160
+}

@@ -1,14 +1,14 @@
 {
-  "last_updated": "2026-07-03T07:13:03.693611+00:00",
+  "last_updated": "2026-07-04T07:22:08.158800+00:00",
   "harvest": {
     "trades_closed": 0,
     "win_rate": null,
     "failure_taxonomy": {}
   },
   "reflection": {
-    "candidate_lesson": "Trades that must be RECONSTRUCTED from the fills ledger (no log_forex_decision() call) are structurally blind and should be treated as UNRELIABLE \u2014 6 of 7 such trades lost (WR=14%, avg R=-0.011).",
-    "mechanism": "When the entry path bypasses log_forex_decision(), it means the trade fired outside the vetted signal pipeline \u2014 no commitment_score, no VIX gate, no rate_diff_z check, no session filter ran. These are orphaned fills from a code path that skips every one of the Six Tenets' gates, so they entered with zero regime-appropriateness or health verification. The single win (USD_JPY +1.92R) is survivorship noise, not edge.",
-    "testable_rule": "if decision.why_this_trade.startswith('RECONSTRUCTED') or decision.signal_layers_active == []: flag UNRELIABLE, block auto-execution, require pipeline re-entry with populated commitment_score before sizing."
+    "candidate_lesson": "When the 30-indicator consensus shows directional agreement but green_matches=0 and hist_hr=0%, treat the signal as unvalidated and freeze new entries on that pair regardless of conviction score.",
+    "mechanism": "green_matches counts times the current live indicator fingerprint historically matched a WINNING configuration; zero matches means the present state has no precedent in the profitable memory bank \u2014 conviction% is measuring instantaneous agreement, not forward edge, so acting on it is trading a pattern the system has never won on.",
+    "testable_rule": "if consensus_dir != 'NEUTRAL' and green_matches == 0 and hist_hr == 0.0: return ConsensusVeto()  # require green_matches >= 1 before sizing on 30-indicator direction"
   },
   "validation": {
     "verdict": "REJECTED",
@@ -21,8 +21,8 @@
     "codify_error": null
   },
   "cycle": {
-    "cost_usd": 0.18255,
+    "cost_usd": 0.145995,
     "status": "COMPLETE",
-    "date": "2026-07-03"
+    "date": "2026-07-04"
   }
 }

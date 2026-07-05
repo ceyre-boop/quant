@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-07-04T01:01:26+00:00",
-  "session": "OFF_HOURS",
+  "timestamp": "2026-07-04T17:02:43+00:00",
+  "session": "NY_PM",
   "context_keys": [
     "high_impact_event_today"
   ],
@@ -8,12 +8,12 @@
   "estimates": {
     "GBPUSD": {
       "pair": "GBPUSD",
-      "p_big": 0.6649,
+      "p_big": 0.6772,
       "direction": "LONG",
-      "expected_magnitude_pct": 0.7298,
-      "expected_vs_adr": 1.398,
-      "session": "OFF_HOURS",
-      "confidence": 0.331,
+      "expected_magnitude_pct": 0.694,
+      "expected_vs_adr": 1.409,
+      "session": "NY_PM",
+      "confidence": 0.326,
       "drivers": [
         [
           "event_risk",
@@ -21,18 +21,18 @@
         ],
         [
           "momentum",
-          0.2743
-        ],
-        [
-          "displacement",
-          0.0128
+          0.2753
         ],
         [
           "compression",
-          0.0
+          0.055
+        ],
+        [
+          "displacement",
+          -0.0052
         ]
       ],
-      "timestamp": "2026-07-04T01:01:25.716230+00:00",
+      "timestamp": "2026-07-04T17:02:40.642279+00:00",
       "notes": []
     },
     "EURUSD": {
@@ -41,7 +41,7 @@
       "direction": "LONG",
       "expected_magnitude_pct": 0.6768,
       "expected_vs_adr": 1.384,
-      "session": "OFF_HOURS",
+      "session": "NY_PM",
       "confidence": 0.302,
       "drivers": [
         [
@@ -61,7 +61,7 @@
           0.0
         ]
       ],
-      "timestamp": "2026-07-04T01:01:25.716230+00:00",
+      "timestamp": "2026-07-04T17:02:40.642279+00:00",
       "notes": []
     },
     "USDJPY": {
@@ -70,7 +70,7 @@
       "direction": "NEUTRAL",
       "expected_magnitude_pct": 0.4217,
       "expected_vs_adr": 1.375,
-      "session": "OFF_HOURS",
+      "session": "NY_PM",
       "confidence": 0.251,
       "drivers": [
         [
@@ -90,17 +90,17 @@
           0.0
         ]
       ],
-      "timestamp": "2026-07-04T01:01:25.716230+00:00",
+      "timestamp": "2026-07-04T17:02:40.642279+00:00",
       "notes": []
     },
     "AUDUSD": {
       "pair": "AUDUSD",
-      "p_big": 0.6567,
-      "direction": "LONG",
-      "expected_magnitude_pct": 0.8351,
-      "expected_vs_adr": 1.391,
-      "session": "OFF_HOURS",
-      "confidence": 0.319,
+      "p_big": 0.6454,
+      "direction": "NEUTRAL",
+      "expected_magnitude_pct": 0.7807,
+      "expected_vs_adr": 1.381,
+      "session": "NY_PM",
+      "confidence": 0.291,
       "drivers": [
         [
           "event_risk",
@@ -108,18 +108,18 @@
         ],
         [
           "momentum",
-          0.1237
-        ],
-        [
-          "displacement",
-          0.1211
+          0.1465
         ],
         [
           "compression",
-          0.065
+          0.0
+        ],
+        [
+          "displacement",
+          0.0
         ]
       ],
-      "timestamp": "2026-07-04T01:01:25.716230+00:00",
+      "timestamp": "2026-07-04T17:02:40.642279+00:00",
       "notes": []
     }
   }
