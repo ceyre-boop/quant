@@ -105,7 +105,12 @@ def main() -> dict:
             print(f"   {tag}{key:14} [{c.get('symbol','?'):3}] obs={c.get('rows'):>4}  {span}"
                   f"  rr25_nonnull={c.get('rr25_nonnull', 0)}")
         print(f"BOARD: {board_rows} rows (sentiment_board_state)")
-        # ── automated look-ahead audit (ALFRED standard) — every run, fail loud ──
+        # ── automated look-ahead audit (ALFRED standard) — every run, fail loud AND HALT ──
+        # L2 SENTINEL: a look-ahead violation means the fused board carries future information.
+        # That is a data-integrity failure, not a warning — exiting 0 here lets the scheduler
+        # record a silent success and lets downstream (live scan / oracle) consume a
+        # contaminated board. On ANY violation we purge the just-rebuilt board so no reader can
+        # pick up leaked values, then sys.exit(1) so the run is recorded as FAILED.
         from scripts.audit_look_ahead import audit as _la_audit
         la = _la_audit(con)
         la_viol = sum(r["violations"] for r in la)
@@ -116,6 +121,14 @@ def main() -> dict:
             for r in la:
                 if r["violations"]:
                     print(f"   ✗ {r['table']}.{r['check']}: {r['violations']}/{r['total']}")
+            # Purge the contaminated board BEFORE exiting so downstream can never read leaked
+            # values. The board is a full rebuild each run, so this leaves it empty (fail-safe),
+            # never a stale/leaked mix. DuckDB autocommits, so the purge persists on close().
+            con.execute("DELETE FROM sentiment_board_state")
+            print(f"DB: {store.DB_PATH}")
+            print(f"[sentiment] ABORT — {la_viol} look-ahead violation(s) detected; "
+                  f"board purged, exiting 1 (L2 sentinel).")
+            sys.exit(1)
         print(f"DB: {store.DB_PATH}")
         return {"board_rows": board_rows, "news": news_cov, "gdelt": gdelt_cov, "macro": macro_cov,
                 "vix": vix_cov, "surprise": surprise_cov, "cot": cot_cov, "vrp": vrp_cov,

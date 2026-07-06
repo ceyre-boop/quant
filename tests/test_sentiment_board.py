@@ -530,3 +530,90 @@ class TestVRP:
         store.upsert(con, "sentiment_vrp_daily", dup, ["date", "pair"])   # re-write the same rows
         after = con.execute("SELECT COUNT(*), SUM(vrp_signal) FROM sentiment_vrp_daily").fetchone()
         assert before == after
+
+
+# ── L2 sentinel: the runner must HALT (exit nonzero) + purge the board on any leak ──
+def test_update_sentiment_halts_and_purges_on_leak(tmp_path, monkeypatch):
+    """update_sentiment.main() must sys.exit(1) AND purge the board when the look-ahead
+    auditor reports a violation. A silent exit-0 (the pre-fix behaviour) let the scheduler
+    record a success and let downstream consume a contaminated board — the L2 sentinel gap."""
+    import sys as _sys
+    import scripts.update_sentiment as us
+    from sovereign.sentiment import (
+        store as _store, news_feed, gdelt_feed, macro_feed, vix_feed,
+        surprise_feed, cot_feed, vrp_feed, options_surface_feed, board_state,
+    )
+
+    db = tmp_path / "sentiment_leak.db"
+    # Seed a temp file DB: one board row (so the coverage AVG has rows) + one LEAKED release
+    # (publish_date <= ref_date is a forward-look the auditor flags as a violation).
+    seed = _store.connect(path=str(db))
+    seed.execute("INSERT INTO sentiment_board_state (date, pair) VALUES (DATE '2024-01-02', 'EURUSD')")
+    leak = pd.DataFrame(
+        [(pd.Timestamp("2024-06-04").date(), "PAYEMS", pd.Timestamp("2024-06-05").date(),
+          1.0, 0.0, 1.0, 0.5, 1.0, NOW)],
+        columns=["publish_date", "series", "ref_date", "first_print", "baseline",
+                 "surprise", "surprise_z", "usd_sign", "fetched_at"],
+    )
+    _store.upsert(seed, "sentiment_surprise_release", leak, ["publish_date", "series"])
+    seed.close()
+
+    # Point the runner at the temp DB and stub every network feeder to a no-op so main()
+    # exercises only the audit → halt path (rebuild is a no-op to keep the seeded board row).
+    monkeypatch.setattr(_store, "DB_PATH", db)
+    for mod in (news_feed, gdelt_feed, macro_feed, vix_feed, surprise_feed,
+                cot_feed, vrp_feed, options_surface_feed):
+        monkeypatch.setattr(mod, "update", lambda *a, **k: {})
+    # vix coverage line formats vix_cov['rows'] with :>5, so it needs a shaped dict.
+    monkeypatch.setattr(vix_feed, "update", lambda *a, **k: {"rows": 0})
+    monkeypatch.setattr(news_feed, "earliest_article_date", lambda *a, **k: {})
+    monkeypatch.setattr(board_state, "rebuild", lambda con=None: 0)
+    monkeypatch.setattr(us, "HEARTBEAT", tmp_path / ".heartbeat")
+    monkeypatch.setattr(_sys, "argv", ["update_sentiment.py"])
+
+    with pytest.raises(SystemExit) as exc:
+        us.main()
+    assert exc.value.code == 1, "a look-ahead leak must force a nonzero exit (L2 sentinel)"
+
+    check = _store.connect(path=str(db), read_only=True)
+    try:
+        n = check.execute("SELECT COUNT(*) FROM sentiment_board_state").fetchone()[0]
+    finally:
+        check.close()
+    assert n == 0, "the contaminated board must be purged before exit"
+
+
+def test_update_sentiment_returns_clean_when_no_leak(tmp_path, monkeypatch):
+    """The happy path is unchanged: with no violation main() returns its coverage dict
+    (look_ahead_violations == 0) and leaves the board intact."""
+    import sys as _sys
+    import scripts.update_sentiment as us
+    from sovereign.sentiment import (
+        store as _store, news_feed, gdelt_feed, macro_feed, vix_feed,
+        surprise_feed, cot_feed, vrp_feed, options_surface_feed, board_state,
+    )
+
+    db = tmp_path / "sentiment_clean.db"
+    seed = _store.connect(path=str(db))
+    seed.execute("INSERT INTO sentiment_board_state (date, pair) VALUES (DATE '2024-01-02', 'EURUSD')")
+    seed.close()
+
+    monkeypatch.setattr(_store, "DB_PATH", db)
+    for mod in (news_feed, gdelt_feed, macro_feed, vix_feed, surprise_feed,
+                cot_feed, vrp_feed, options_surface_feed):
+        monkeypatch.setattr(mod, "update", lambda *a, **k: {})
+    # vix coverage line formats vix_cov['rows'] with :>5, so it needs a shaped dict.
+    monkeypatch.setattr(vix_feed, "update", lambda *a, **k: {"rows": 0})
+    monkeypatch.setattr(news_feed, "earliest_article_date", lambda *a, **k: {})
+    monkeypatch.setattr(board_state, "rebuild", lambda con=None: 0)
+    monkeypatch.setattr(us, "HEARTBEAT", tmp_path / ".heartbeat")
+    monkeypatch.setattr(_sys, "argv", ["update_sentiment.py"])
+
+    out = us.main()
+    assert out["look_ahead_violations"] == 0
+    check = _store.connect(path=str(db), read_only=True)
+    try:
+        n = check.execute("SELECT COUNT(*) FROM sentiment_board_state").fetchone()[0]
+    finally:
+        check.close()
+    assert n == 1, "a clean run must leave the board untouched"
