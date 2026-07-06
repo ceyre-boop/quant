@@ -6,6 +6,40 @@ Standing constraints live in `CLAUDE.md` — not restated here.
 
 ---
 
+## 2026-07-06 (Claude Code / Molly) — ICT scanner RED audit: score-floor fix validated, USDJPY "gap" is intentional (no change)
+
+**Push:** ✅ this NEXT.md entry on origin/sovereign-v2. **No trading-code change** (see below).
+
+**Question audited:** why so few ICT paper trades after the score-floor fix (`00562bf`, 06-30)?
+
+**Findings (July veto ledger, n=447):**
+- **Score-floor fix worked.** Score-threshold vetoes are only **24/447 (5%)** — no longer the
+  bottleneck. Dominant kills are **ADR-exhaustion 55% + WEEKLY_TREND_CONFLICT 31% = 85%**, both
+  protective/by-design. `veto_reason`/`veto_stage` 447/447 populated; `adr_pct` 244 non-zero
+  (9db295e5 fix live); `veto_detail` is **not a real schema field** (schema is reason+stage only).
+- **Trades:** exactly **1** paper trade since 05-24 (`USDJPY_20260621`, Grade A 7.95, NY_Open,
+  TIMEOUT 0R). Runbook's `ict_trade_ledger.jsonl` doesn't exist; real state is
+  `data/ledger/ict_paper_trades.json` + `logs/ict_paper_trade_log.csv`.
+
+**BLUE — proposed then REVERTED (RED-team caught an overclaim):**
+- Suspected USDJPY missing from `PROVEN_PAIRS`/`LONDON_PAIRS` as an unintentional gap; built + tested
+  the add (16 pre-existing env/data-drift failures unchanged, isolation invariant intact), **then
+  reverted it.** USDJPY is **intentionally NY-AM-only** — matches `config/ict_params.yml`
+  (`ny_pm_pairs`=3 pairs, `ny_am_session.pairs`=+USDJPY) and **two Colin-approved 2026-07-01
+  Config-Changes-Log entries** ("USDJPY in NY-AM mode"). BLUE gate ("missing *without logged
+  rationale*") **not met** → no change. `ict/orchestrator.py` unchanged from HEAD; the premature
+  `param_change_log.jsonl` entry was removed (nothing retained).
+
+**Refused to shortcut:** did not add USDJPY on the surface signal (ny-am list + line-818 include it);
+verified the config section structure first, found the deliberate NY-PM vs NY-AM split, reverted.
+ADR pre-session filter confirmed **draft, not wired** — left untouched (needs NN#4 logging first).
+
+**Recommendation (Colin):** don't loosen ADR/weekly-trend gates to raise trade count — ICT edge is
+unproven (p=0.52); scarcity here is the protective layer working. Full writeup:
+`~/Obsidian/Obsidian/Trading/Research/ICT-Scanner-Red-Audit-2026-07-05.md`.
+
+---
+
 ## 2026-07-03 · evening (Claude Code / Molly) — DAY 2: THE REWIRING — retargeting audit · options-leg seals · Library ascension
 
 **Push:** ✅ 33cdcab → e9e05d3 → f243283 → 226149e all on origin/sovereign-v2 (+ this entry at close).
