@@ -6,6 +6,25 @@ Standing constraints live in `CLAUDE.md` — not restated here.
 
 ---
 
+## 2026-07-06 · pm (Claude Code / Molly) — invariant guard now STANDING; two decisions parked
+
+**Shipped:** `com.alta.invariant_guard` installed + loaded (Colin-authorized this session; blocked as
+persistence on 07-03). In `launchctl list`, daily 09:20, last exit 0. Layer-4 detector is now standing.
+TICK-004 fully closed.
+
+**Parked for Colin (asked; away — held rather than act unattended):**
+- **Close 4 USD_CAD positions** (134/144/154/165) — residue of the now-gated `test_oanda_set_stop.py`
+  writer (the "rogue writer" my I2 flagged; solved by the 07-03 retargeting audit). Real broker write →
+  left for the OANDA UI or an explicit go. Guard I2 keeps flagging until closed (intended reminder).
+- **Next dig** — recommended the **RED-1 Blue fix** (`reflect_cycle` source/pair exclusion → I1 5→0),
+  but it's pre-registered + cognition-path, so it needs his review before I start. Alts offered: L3
+  regime-verify hardening (self-contained), VRP account-size re-run.
+
+**Refused to shortcut:** did not execute a broker write unattended; did not start a gated/governance
+change (RED-1 review-gated, L3 touches the training gate, VRP needs the account call) while he's away.
+
+---
+
 ## 2026-07-06 (Claude Code / Molly) — ICT scanner RED audit: score-floor fix validated, USDJPY "gap" is intentional (no change)
 
 **Push:** ✅ this NEXT.md entry on origin/sovereign-v2. **No trading-code change** (see below).

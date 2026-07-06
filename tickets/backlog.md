@@ -65,9 +65,9 @@ Schema per ticket:
 - [x] `python3 audit/invariant_guard.py --run` = FAIL on the live contamination (I1=5 exact RED-1 records, I2 caught USD_CAD units=1 sentinels), 3 URGENT escalations, report written, exit 1
 - [x] 19/19 tests green incl. I1 exclusion test, independence cross-check, no-execution-import AST guard
 - [x] spec is a single hashed `yaml audit-spec` fence; guard imports nothing from `sovereign/execution/`
-- [ ] **operator:** load the launchd job to make it standing (`launchctl load ~/Library/LaunchAgents/com.alta.invariant_guard.plist`) — blocked in-session as unauthorized persistence
+- [x] **operator:** load the launchd job to make it standing — DONE 2026-07-06 (Colin-authorized; `com.alta.invariant_guard` in `launchctl list`, daily 09:20)
 - [ ] follow-on: land the pre-registered Blue fix in `reflect_cycle` (guard turns green when contamination stops)
-**status:** done (2026-07-03, build) — pending operator load
+**status:** done + LOADED (guard standing 2026-07-06)
 **pre_approved:** false
 
 ## TICK-005
