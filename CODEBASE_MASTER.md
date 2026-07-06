@@ -229,7 +229,7 @@ sovereign orchestrator Integration Points I1-I5). Current read: CRITICAL, 0.50×
 | CB decisions | `data/cache/cb_decisions.json` | **21 days** | ⚠️ STALE | Re-run data collection script |
 | yfinance prices | `data/cache/_price_cache/` | On-demand | ✅ Auto-cached | Downloads on first use |
 | ICT paper trades | `data/ledger/ict_paper_trades.json` | 0 days | ✅ Live | Updated each scan |
-| ICT veto ledger | `data/ledger/ict_veto_ledger_2026_05.jsonl` | 0 days | ✅ Live | 68 entries in May |
+| ICT veto ledger | `data/ledger/ict_veto_ledger_YYYY_MM.jsonl` (monthly shards; current month is active) | 0 days | ✅ Live | Appended each ICT scan |
 | Live edge | `logs/live_edge.json` | 3 days | ✅ OK | Re-run pipeline after new trades |
 | Macro JSON | `data/cache/EU_macro.json` | 0 days | ✅ Fresh | Auto-updated |
 
@@ -426,7 +426,7 @@ installed in the local Python 3.14 environment. Works in CI (GitHub Actions).
    Run `python3 -c "import sys; sys.path.insert(0,'.'); from sovereign.forex.forex_backtester import ForexBacktester; print([r.sharpe for r in ForexBacktester().backtest_all()])"` to confirm after changes.
 4. **The Alexandrian Library is a live gate**. Changing `sovereign/risk/alexandrian_library.py` or `sovereign/features/alexandrian_library.py` affects both ICT and sovereign.
 5. **Firebase is always live** — anything pushed to Firebase shows on the dashboard immediately.
-6. **The veto ledger is your debug tool** — if trades aren't opening, check `data/ledger/ict_veto_ledger_2026_05.jsonl` to see exactly which gate is blocking.
+6. **The veto ledger is your debug tool** — if trades aren't opening, check the current month's shard `data/ledger/ict_veto_ledger_YYYY_MM.jsonl` (e.g. `ict_veto_ledger_2026_07.jsonl` for July 2026) to see exactly which gate is blocking. The ledger is sharded monthly; the active file is always the current month.
 7. **Backtest results that matter** are in `logs/ict_backtest_window_A.json` and `logs/ict_backtest_window_B.json`. Don't delete them — they're the validation baseline.
 8. **The prop challenge pipeline** is `scripts/run_live_pipeline.py`. Don't enable `FUNDERPRO_LIVE=live` without a 🟢 GO verdict from that script.
 9. **Tests**: `python3 -m pytest tests/ -q --ignore=tests/unit/test_ml_stack.py` for a clean run.

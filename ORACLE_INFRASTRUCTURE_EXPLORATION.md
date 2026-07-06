@@ -104,7 +104,7 @@ def _check_my_system() -> tuple:
 
 **Trade Ledger** (historical trades, CSV format):
 - Paths: `/Users/taboost/quant/data/ledger/trade_ledger_YYYY_MM.csv` (historical)
-- ICT ledger: `/Users/taboost/quant/data/ledger/ict_veto_ledger_2026_05.jsonl`
+- ICT veto ledger: `/Users/taboost/quant/data/ledger/ict_veto_ledger_YYYY_MM.jsonl` (monthly shards, e.g. `ict_veto_ledger_2026_07.jsonl` for July 2026; the current month's file is the active one)
 
 ### 3.1 Core JSONL Loading Function
 
