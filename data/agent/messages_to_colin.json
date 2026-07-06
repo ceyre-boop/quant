@@ -1,6 +1,78 @@
 {
   "messages": [
     {
+      "id": "rest-2026-07-05-rq013-resim",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe2",
+      "text": "[REST-034] Closed a stale P1: RQ-REST-013 (exit re-sim) was blocked on network since May 18. It didn't need network \u2014 cached 4-pair daily OHLC (2014-2026) is already on disk. Ran the full price-path re-sim. It INDEPENDENTLY REPLICATES your 2026-07-01 ExitConfig sweep: wider 1.5-2.0x trail ranks best, the per-trade -60.8R trailing 'drag' does NOT become a portfolio gain (my reconstruction recovers only ~1/2.9 of recorded sumR and flips 2022 from +36R to negative), and the signal-driven reversal exit carries +28R no mechanical exit reproduces. Conclusion: no new exit lever, v015 stays optimal \u2014 RQ-REST-013 marked DONE (converged), not reopened. Nothing live touched. Details: FIND-REST-034-a, data/agent/rq_rest_013_resim_results.json.",
+      "timestamp": "2026-07-06T01:36:40.058079+00:00",
+      "read": false,
+      "source": "rest_mode"
+    },
+    {
+      "id": "invariant-2026-07-06-fills_stale",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "[INVARIANT] FILLS_STALE: all fills ledgers stale (data/ledger/oanda_fills.jsonl, data/execution/fills.jsonl) \u2014 recent writes unverifiable (2026-07-06)",
+      "timestamp": "2026-07-06T01:35:48.618628+00:00",
+      "read": false,
+      "source": "invariant_guard"
+    },
+    {
+      "id": "invariant-2026-07-06-i3_forbidden_pair",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[INVARIANT] I3_FORBIDDEN_PAIR: 18 forbidden-pair record(s)/fill(s) in the recent path (pairs: AUD_NZD, USD_CAD) (2026-07-06)",
+      "timestamp": "2026-07-06T01:35:48.618624+00:00",
+      "read": false,
+      "source": "invariant_guard"
+    },
+    {
+      "id": "invariant-2026-07-06-i2_rogue_oanda_write",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[INVARIANT] I2_ROGUE_OANDA_WRITE: 14 rogue/sentinel fill(s) in the ledgers (pairs: AUD_NZD, USD_CAD, USD_JPY) (2026-07-06)",
+      "timestamp": "2026-07-06T01:35:48.618620+00:00",
+      "read": false,
+      "source": "invariant_guard"
+    },
+    {
+      "id": "invariant-2026-07-06-i1_oracle_contamination",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[INVARIANT] I1_ORACLE_CONTAMINATION: 5 contaminated record(s) enter the Oracle reflection summary (pairs: AUD_NZD, USD_CAD) (2026-07-06)",
+      "timestamp": "2026-07-06T01:35:48.618610+00:00",
+      "read": false,
+      "source": "invariant_guard"
+    },
+    {
+      "id": "pulse-20260705T2250",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "[PULSE] REST_MODE_WEEK_TWO: HYP-063 validated 13 days ago, still in rest_mode. Week 2 \u2014 decision needed.",
+      "timestamp": "2026-07-05T22:50:14+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "loophealth-20260705T225014",
+      "timestamp": "2026-07-05T22:50:14.363151+00:00",
+      "priority": "CRITICAL",
+      "source": "LOOP_HEALTH",
+      "subject": "\ud83d\udea8 LOOP CRITICAL: ict_scanner silent 2h",
+      "message": "ict_scanner has not run for 2h (expected < 0.5h; >2x threshold = broken, not late). The self-improvement machinery is degraded \u2014 a system that doesn't reflect doesn't compound. Check the loop's launchd plist is loaded (`launchctl list | grep alta`) and its logs/.heartbeat_<loop> mtime.",
+      "action_required": true
+    },
+    {
+      "id": "pulse-20260705T2250",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] OUTCOME_LOOP_STALL: 21 closed OANDA trades but 0 matched to open decisions \u2014 the win/loss loop is not closing (CLAUDE.md NON-NEGOTIABLE #2). Oracle is learning from nothing. Check pair/timestamp/system matching in decision_logger.update_outcome.",
+      "timestamp": "2026-07-05T22:50:10+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
       "id": "pulse-20260704T1702",
       "priority": "IMPORTANT",
       "emoji": "\ud83d\udfe1",
@@ -386,70 +458,7 @@
       "timestamp": "2026-07-02T04:50:24.435623+00:00",
       "read": false,
       "source": "shadow_audit"
-    },
-    {
-      "id": "audit-2026-06-29-l1_determinism_fail",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[AUDIT] L1_DETERMINISM_FAIL: 3 record(s) not reproducible (2026-06-29)",
-      "timestamp": "2026-07-02T04:50:24.435606+00:00",
-      "read": false,
-      "source": "shadow_audit"
-    },
-    {
-      "id": "pulse-20260702T0448",
-      "priority": "IMPORTANT",
-      "emoji": "\ud83d\udfe1",
-      "text": "[PULSE] REST_MODE_WEEK_TWO: HYP-063 validated 10 days ago, still in rest_mode. Week 2 \u2014 decision needed.",
-      "timestamp": "2026-07-02T04:48:46+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "pulse-20260702T0448",
-      "priority": "FYI",
-      "emoji": "\ud83d\udfe2",
-      "text": "[PULSE] STALE_ENTRY: 3 entries with bars_since_signal > 5 \u2014 entries may be chasing stale FVGs",
-      "timestamp": "2026-07-02T04:48:46+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "pulse-20260702T0448",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[PULSE] OUTCOME_LOOP_STALL: 15 closed OANDA trades but 0 matched to open decisions \u2014 the win/loss loop is not closing (CLAUDE.md NON-NEGOTIABLE #2). Oracle is learning from nothing. Check pair/timestamp/system matching in decision_logger.update_outcome.",
-      "timestamp": "2026-07-02T04:48:45+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "pulse-20260702T0248",
-      "priority": "IMPORTANT",
-      "emoji": "\ud83d\udfe1",
-      "text": "[PULSE] REST_MODE_WEEK_TWO: HYP-063 validated 10 days ago, still in rest_mode. Week 2 \u2014 decision needed.",
-      "timestamp": "2026-07-02T02:48:41+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "pulse-20260702T0248",
-      "priority": "FYI",
-      "emoji": "\ud83d\udfe2",
-      "text": "[PULSE] STALE_ENTRY: 3 entries with bars_since_signal > 5 \u2014 entries may be chasing stale FVGs",
-      "timestamp": "2026-07-02T02:48:41+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "pulse-20260702T0248",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[PULSE] OUTCOME_LOOP_STALL: 15 closed OANDA trades but 0 matched to open decisions \u2014 the win/loss loop is not closing (CLAUDE.md NON-NEGOTIABLE #2). Oracle is learning from nothing. Check pair/timestamp/system matching in decision_logger.update_outcome.",
-      "timestamp": "2026-07-02T02:48:40+00:00",
-      "read": false,
-      "source": "oracle_pulse"
     }
   ],
-  "last_updated": "2026-07-04T17:02:59+00:00"
+  "last_updated": "2026-07-06T01:36:40.058079+00:00"
 }

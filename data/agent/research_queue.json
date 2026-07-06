@@ -487,7 +487,7 @@
     },
     {
       "id": "RQ-REST-013",
-      "status": "QUEUED",
+      "status": "DONE",
       "priority": 1,
       "created": "2026-06-10T01:12:00Z",
       "name": "Run RQ-010 properly: fixed-time / fixed-TP-SL vs 1.25x ATR trailing (exit re-sim)",
@@ -497,10 +497,12 @@
       "estimated_minutes": 40,
       "source": "REST_MODE_009 HYP-059",
       "hypothesis_id": "HYP-059",
-      "last_result": "REPLICATED OFFLINE 2026-06-25 REST-024 on canonical v015 proof set (411 trades, independent of confirmation log): trailing -60.8R/meanR -0.515/sharpe -0.335; 3-5d cluster = 95% of drag (CI [-1.52,-1.03] excl 0); 11d+ trailing NET +16.2R; every flat-rate year negative, 2024 OOS -14.1R. Time-floor UPPER BOUND +0.11-0.16 book Sharpe (NOT realized -- needs price path). Full re-sim STILL BLOCKED (stooq/yahoo 403 in sandbox). Arm order reaffirmed: (1) 5-6d trailing activation-delay FIRST. Confirmation that the lever is real is now multi-dataset; awaiting network + Colin approval to run the counterfactual. See FIND-REST-024-a/b.",
+      "last_result": "DONE 2026-07-05 (REST-034, offline). Network no longer required \u2014 cached 4-pair daily OHLC (2014-2026) found in positioning_family/spot_cache. Ran full price-path exit re-sim (entries fixed, exit varied: time-N, stop-only, immediate/delayed/widened trail). Result CONVERGES with the 2026-07-01 ExitConfig 180-config sweep and HYP-059 resolution: wider 1.5-2.0x trail ranks best on return+Sharpe, the per-trade trailing drag is NOT a portfolio A/B gain (recon reproduces ~1/2.9 of recorded sumR, inverts flat-year 2022), reversal exit contributes +28R no mechanical policy reproduces. NO new deployable lever; v015 exit optimal. Independent replication, not new evidence. See FIND-REST-034-a.",
       "partial_done": "2026-06-17 (REST-018)",
       "rest_note": "REST-019 (2026-06-19): entry-gate alternative to the exit re-sim tested & REJECTED (FIND-REST-019-a) -- no entry-known proxy for the 3-5d whipsaw; Tuesday signal is a confounded EURUSD artifact. Full exit re-sim remains the only lever and is still network-blocked (Yahoo 403). Re-run priority unchanged when network returns; primary arm = trailing-activation-delay 5/6d.",
-      "last_touched": "2026-06-25T01:15:00Z"
+      "last_touched": "2026-06-25T01:15:00Z",
+      "completed": "2026-07-06T01:36:40.058079+00:00",
+      "resolved_by": "REST_MODE 2026-07-05"
     },
     {
       "id": "RQ-REST-014",

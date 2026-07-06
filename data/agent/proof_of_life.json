@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-07-04T17:02:59.573091+00:00",
+  "generated_at": "2026-07-05T22:50:14.366287+00:00",
   "alive": true,
   "fired_today": false,
   "frozen": null,
-  "scan_age_hours": 23.6,
+  "scan_age_hours": 53.4,
   "n_pairs_scanned": 4,
   "n_would_fire_today": 2,
   "strongest_signal": {
@@ -53,10 +53,12 @@
     "direction": "SHORT",
     "fill_price": 161.323,
     "date": "2026-07-03",
-    "days_ago": 1.0
+    "days_ago": 2.2
   },
-  "loops_alive": 7,
-  "loops_down": [],
-  "summary_line": "System alive. 4 pairs scanned 23.6h ago \u2014 2 signalling (USDJPY=X SHORT, EURUSD=X SHORT). Highest conviction: USDJPY=X 0.405. Last fill: USD_JPY SHORT, 1.0d ago.",
+  "loops_alive": 6,
+  "loops_down": [
+    "ict_scanner"
+  ],
+  "summary_line": "System alive. 4 pairs scanned 53.4h ago \u2014 2 signalling (USDJPY=X SHORT, EURUSD=X SHORT). Highest conviction: USDJPY=X 0.405. Last fill: USD_JPY SHORT, 2.2d ago.",
   "note": "Honest proof-of-life: would-be signals + proximity, never a forced trade. Read-only."
 }

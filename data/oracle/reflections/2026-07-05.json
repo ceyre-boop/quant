@@ -1,0 +1,26 @@
+{
+  "date": "2026-07-05",
+  "generated_at": "2026-07-05T07:55:15.738827+00:00",
+  "input_tokens": 5763,
+  "output_tokens": 860,
+  "estimated_cost_usd": 0.150945,
+  "harvest_days_read": 7,
+  "reflection": {
+    "candidate_lesson": {
+      "lesson_text": "When internal regime disagrees with or lacks external TradingView confirmation (0 TV signals), the 75% sizing multiplier should be a hard trade GATE below a consensus conviction floor, not just a size reduction \u2014 internal-only MOMENTUM signals with pair conviction < 50% are noise-dominated.",
+      "mechanism": "Internal momentum detection without independent external confirmation reflects a single sensor firing; institutionally, durable directional flow leaves footprints across multiple venues/feeds. When only the internal system sees MOMENTUM and TV sees nothing, the signal is more likely to be an intrabar artifact than committed order flow, so sizing down still exposes capital to a coin-flip.",
+      "testable_rule": "if external_confirmation.tv_signals == 0 and regime == 'MOMENTUM' and pair_consensus_conv < 0.50: veto_trade() else if sizing_multiplier <= 0.75: proceed_at_reduced_size()",
+      "expected_impact": "Filters out low-conviction internal-only entries; expected +0.02 to +0.03 Sharpe by removing near-random trades that add variance without positive expectancy, improving the denominator.",
+      "evidence_from_harvest": "External regime confirmation shows Internal=MOMENTUM vs TV=UNKNOWN with 0 TV signals, sizing forced to 75%; simultaneously 30-indicator consensus shows all pairs at conv 8-58% with hist_hr=0% and green_matches=0 \u2014 no historical validation for any current directional read.",
+      "evidence_from_reasoning": null,
+      "reasoning_component_targeted": "external_confirmation.sizing_multiplier / tv_signals",
+      "sample_needed": 30
+    },
+    "retirement_flag": {
+      "lesson_to_review": "L5",
+      "reason": "Pair-specific macro half-lives were calibrated on prior data; with 7 consecutive zero-trade days and regime=UNKNOWN, the hold-period multipliers have not been exercised recently and may be drifting out of calibration \u2014 flag for revalidation once trades resume."
+    },
+    "system_health_note": "System is in a prolonged no-trade state (0 trades over 7 days, regime UNKNOWN, internal-only confirmation at 75% sizing) \u2014 the gates are holding but there is zero fresh outcome data to validate any lesson, so all current suggestions are harvest/state-inferred rather than decision-log-grounded."
+  },
+  "auto_validation": null
+}

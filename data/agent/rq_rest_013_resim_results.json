@@ -1,0 +1,89 @@
+{
+  "meta": {
+    "K_STOP": 2.0,
+    "K_TRAIL": 1.25,
+    "recon_constant": 2.9,
+    "note": "deterministic arms exclude reversal logic; abs sumR scaled ~C vs recorded"
+  },
+  "recorded_baseline_sumR": 156.42,
+  "reconciliation_constant": 2.9,
+  "arms": {
+    "time5": {
+      "n": 411,
+      "reconSumR": 29.41,
+      "rescaledSumR": 85.3,
+      "sharpe": 0.097,
+      "maxDD": -11.95
+    },
+    "time8": {
+      "n": 411,
+      "reconSumR": 32.86,
+      "rescaledSumR": 95.3,
+      "sharpe": 0.089,
+      "maxDD": -15.99
+    },
+    "time10": {
+      "n": 411,
+      "reconSumR": 39.82,
+      "rescaledSumR": 115.5,
+      "sharpe": 0.102,
+      "maxDD": -15.45
+    },
+    "time15": {
+      "n": 411,
+      "reconSumR": 34.91,
+      "rescaledSumR": 101.2,
+      "sharpe": 0.078,
+      "maxDD": -15.05
+    },
+    "time20": {
+      "n": 411,
+      "reconSumR": 38.84,
+      "rescaledSumR": 112.6,
+      "sharpe": 0.077,
+      "maxDD": -15.73
+    },
+    "stop_only_cap20": {
+      "n": 411,
+      "reconSumR": 38.84,
+      "rescaledSumR": 112.6,
+      "sharpe": 0.077,
+      "maxDD": -15.73
+    },
+    "trail_immediate_1.25": {
+      "n": 411,
+      "reconSumR": 35.91,
+      "rescaledSumR": 104.2,
+      "sharpe": 0.098,
+      "maxDD": -14.04
+    },
+    "trail_delay5_1.25": {
+      "n": 411,
+      "reconSumR": 41.35,
+      "rescaledSumR": 119.9,
+      "sharpe": 0.1,
+      "maxDD": -12.71
+    },
+    "trail_delay6_1.25": {
+      "n": 411,
+      "reconSumR": 41.66,
+      "rescaledSumR": 120.8,
+      "sharpe": 0.097,
+      "maxDD": -14.56
+    },
+    "trail_wide_1.5": {
+      "n": 411,
+      "reconSumR": 47.76,
+      "rescaledSumR": 138.5,
+      "sharpe": 0.119,
+      "maxDD": -15.11
+    },
+    "trail_wide_2.0": {
+      "n": 411,
+      "reconSumR": 57.6,
+      "rescaledSumR": 167.0,
+      "sharpe": 0.126,
+      "maxDD": -15.57
+    }
+  }
+}

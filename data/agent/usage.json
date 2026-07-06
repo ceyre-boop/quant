@@ -8,36 +8,37 @@
   },
   "week": {
     "start_date": "2026-07-04",
-    "weekly_used": 5500,
-    "weekly_remaining": 194500,
+    "weekly_used": 14500,
+    "weekly_remaining": 185500,
     "last_synced": null,
-    "note": "Weekly RESET on Saturday 2026-07-04 (reset_day=Saturday). Prior week (start 2026-06-27) closed at ~65000/200k est. New week opens with REST-033 light read-only cycle ~5.5k. STILL awaiting manual sync (claude_usage_tracker.py sync); weekly_used is a conservative running estimate."
+    "note": "Weekly RESET Saturday 2026-07-04. REST-033 ~5.5k + REST-034 ~9k (RQ-REST-013 offline exit re-sim) = ~14.5k running estimate. STILL awaiting manual sync (claude_usage_tracker.py). Weekly capacity ample."
   },
   "today": {
-    "date": "2026-07-04",
+    "date": "2026-07-05",
     "human_used": 0,
-    "agent_used": 5500,
+    "agent_used": 9000,
     "daily_agent_budget": 8571,
-    "agent_allowed_today": 7000,
-    "note": "REST-033 fresh UTC day. Light read-only RQ-REST-032 emitter trace; no live code/config touched. 1 finding, RQ-REST-032 diagnosed, RQ-REST-033 added, 1 HIGH Colin msg. Left ~1.5k+ daily buffer."
+    "agent_allowed_today": 9000,
+    "note": "REST-034 fresh UTC day. Ran RQ-REST-013 exit re-sim OFFLINE (cached OHLC \u2014 no network needed). 1 finding (FIND-REST-034-a), HYP-059 annotated, RQ-REST-013 -> DONE (converged w/ 2026-07-01 ExitConfig sweep), 1 IMPORTANT Colin msg. No live code/config touched. Weekly buffer huge."
   },
   "session": {
-    "started": "2026-07-04T01:08:00+00:00",
-    "ended": "2026-07-04T01:08:00+00:00",
+    "started": "2026-07-06T01:37:12.897646+00:00",
+    "ended": "2026-07-06T01:37:12.897646+00:00",
     "mode": "REST_MODE",
     "tasks_completed": [
-      "RQ-REST-032 read-only trace: traced every place_trade() caller -> phantom units=1/SL1.0/TP2.0 signature exists in NO repo code path",
-      "Discovered emitter is LIVE (8th fill tid217 @2026-07-03T01:51Z, after REST-032) -> external/detached process, not a stale artifact",
-      "Confirmed live Oracle pollution: 2026-07-03 reflection synthesized a false USD_CAD 'cluster scratched / WR 14%' lesson from emitter noise",
-      "Wrote FIND-REST-033-a; marked RQ-REST-032 DIAGNOSED; queued RQ-REST-033 (quarantine); 1 HIGH Colin message"
+      "Discovered RQ-REST-013 no longer needs network: cached 4-pair daily OHLC 2014-2026 at positioning_family/spot_cache",
+      "Built + ran offline price-path exit re-sim (11 exit policies, entries fixed to 412-trade v015 proof set)",
+      "Validated reconstruction faithfulness (corr 0.60; single 2.90x R-norm reconciles time/trail/stop buckets)",
+      "Established convergence with 2026-07-01 ExitConfig 180-config sweep -> no new lever; RQ-REST-013 DONE",
+      "Wrote FIND-REST-034-a, annotated HYP-059 (verdict unchanged), 1 Colin msg, saved rq_rest_013_resim_results.json"
     ],
     "findings_written": 1,
-    "hypotheses_updated": [],
-    "new_hypotheses": [],
-    "new_tasks_added": [
-      "RQ-REST-033"
+    "hypotheses_updated": [
+      "HYP-059 (annotation only)"
     ],
-    "key_finding": "The phantom USD_CAD units=1 emitter is a LIVE external process with no source in the tracked repo (all place_trade callers compute real params; zero literal 1/1.0/2.0 call sites). It fired an 8th time after last night's run and is actively poisoning Oracle's daily reflection. Fix needs an OS-level process hunt + fills quarantine - both Colin-gated. REST cycle stayed fully read-only."
+    "new_hypotheses": [],
+    "new_tasks_added": [],
+    "key_finding": "RQ-REST-013 exit re-sim runs fully offline and INDEPENDENTLY REPLICATES the HYP-059 resolution: wider trail best, per-trade trailing drag != portfolio A/B gain (recon recovers ~1/2.9 of recorded sumR, inverts flat-year 2022 +36->neg), reversal exit carries +28R no mechanical policy reproduces. No new exit lever; v015 optimal. Stale P1 closed, not reopened."
   },
   "mode": "REST_MODE",
   "thresholds": {

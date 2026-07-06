@@ -1,14 +1,14 @@
 {
-  "last_updated": "2026-07-04T07:22:08.158800+00:00",
+  "last_updated": "2026-07-05T07:55:15.794920+00:00",
   "harvest": {
     "trades_closed": 0,
     "win_rate": null,
     "failure_taxonomy": {}
   },
   "reflection": {
-    "candidate_lesson": "When the 30-indicator consensus shows directional agreement but green_matches=0 and hist_hr=0%, treat the signal as unvalidated and freeze new entries on that pair regardless of conviction score.",
-    "mechanism": "green_matches counts times the current live indicator fingerprint historically matched a WINNING configuration; zero matches means the present state has no precedent in the profitable memory bank \u2014 conviction% is measuring instantaneous agreement, not forward edge, so acting on it is trading a pattern the system has never won on.",
-    "testable_rule": "if consensus_dir != 'NEUTRAL' and green_matches == 0 and hist_hr == 0.0: return ConsensusVeto()  # require green_matches >= 1 before sizing on 30-indicator direction"
+    "candidate_lesson": "When internal regime disagrees with or lacks external TradingView confirmation (0 TV signals), the 75% sizing multiplier should be a hard trade GATE below a consensus conviction floor, not just a size reduction \u2014 internal-only MOMENTUM signals with pair conviction < 50% are noise-dominated.",
+    "mechanism": "Internal momentum detection without independent external confirmation reflects a single sensor firing; institutionally, durable directional flow leaves footprints across multiple venues/feeds. When only the internal system sees MOMENTUM and TV sees nothing, the signal is more likely to be an intrabar artifact than committed order flow, so sizing down still exposes capital to a coin-flip.",
+    "testable_rule": "if external_confirmation.tv_signals == 0 and regime == 'MOMENTUM' and pair_consensus_conv < 0.50: veto_trade() else if sizing_multiplier <= 0.75: proceed_at_reduced_size()"
   },
   "validation": {
     "verdict": "REJECTED",
@@ -21,8 +21,8 @@
     "codify_error": null
   },
   "cycle": {
-    "cost_usd": 0.145995,
+    "cost_usd": 0.150945,
     "status": "COMPLETE",
-    "date": "2026-07-04"
+    "date": "2026-07-05"
   }
 }

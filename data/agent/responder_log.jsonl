@@ -359,3 +359,8 @@
 {"action": "pass_summary", "timestamp": "2026-07-04T05:26:01+00:00", "down": [], "dispatched": [], "skipped_dedup": [], "escalated_unknown": [], "frozen": false, "dry_run": false}
 {"action": "pass_summary", "timestamp": "2026-07-04T15:35:44+00:00", "down": [], "dispatched": [], "skipped_dedup": [], "escalated_unknown": [], "frozen": false, "dry_run": false}
 {"action": "pass_summary", "timestamp": "2026-07-05T00:04:02+00:00", "down": [], "dispatched": [], "skipped_dedup": [], "escalated_unknown": [], "frozen": false, "dry_run": false}
+{"action": "pass_summary", "timestamp": "2026-07-05T15:38:36+00:00", "down": [], "dispatched": [], "skipped_dedup": [], "escalated_unknown": [], "frozen": false, "dry_run": false}
+{"action": "pass_summary", "timestamp": "2026-07-05T18:23:35+00:00", "down": [], "dispatched": [], "skipped_dedup": [], "escalated_unknown": [], "frozen": false, "dry_run": false}
+{"action": "pass_summary", "timestamp": "2026-07-05T21:30:10+00:00", "down": [], "dispatched": [], "skipped_dedup": [], "escalated_unknown": [], "frozen": false, "dry_run": false}
+{"action": "dispatch", "timestamp": "2026-07-06T01:36:15+00:00", "failure_type": "DATA_STALE", "component": "ict_scanner", "error": "ict_scanner silent 2.0h (threshold 0.5h); last heartbeat 2026-07-05T20:48:03.621478+00:00.", "suggested_fix": "Restart the launchd job for 'ict_scanner' (launchctl kickstart -k gui/$(id -u)/com.alta.<job>); verify it writes a fresh heartbeat within one interval.", "auto_dispatched": false, "priority": "HIGH"}
+{"action": "pass_summary", "timestamp": "2026-07-06T01:36:15+00:00", "down": ["ict_scanner"], "dispatched": ["ict_scanner"], "skipped_dedup": [], "escalated_unknown": [], "frozen": false, "dry_run": false}

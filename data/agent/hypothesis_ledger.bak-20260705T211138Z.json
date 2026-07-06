@@ -1103,12 +1103,6 @@
         "date": "2026-07-01T00:00:00+00:00",
         "by": "EXIT-SWEEP",
         "note": "RESOLVED (actionable lever). 180-config full grid (stop x trail x hold, 4 pairs, 2015-2024): 0/180 beat v015 (0.6886) in both regimes, 0/180 FDR-significant; 1/180 beats on point estimate only (regime-fragile). The -60.8R trailing 'drag' is a per-trade counterfactual, not a portfolio A/B effect. Trail loosen/disable does NOT improve risk-adjusted returns -> v015 CONFIRMED OPTIMAL. Structural per-trade fact unchanged (still FWER-robust per HYP-063). See Trading/Research/ExitConfig-Sweep-2026-07-01.md."
-      },
-      {
-        "date": "2026-07-06",
-        "by": "REST_MODE (RQ-REST-013 price-path re-sim)",
-        "note": "Independent replication via offline price-path exit re-sim (cached OHLC, entries fixed): wider trail (1.5-2.0x) ranks best on return+Sharpe, the per-trade -60.8R drag does not become a portfolio A/B gain (recon reproduces ~1/2.9 of recorded sumR, inverts flat-year 2022 +36->negative), and the reversal exit contributes +28R no mechanical policy reproduces. CONVERGES with the 2026-07-01 ExitConfig sweep; NOT new evidence. v015 exit stays optimal. See FIND-REST-034-a.",
-        "changes_verdict": false
       }
     ],
     "notes": [
