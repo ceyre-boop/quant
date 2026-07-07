@@ -7,6 +7,7 @@ Usage: python3 experience/backfill.py --window 2026-06-27..2026-07-02
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 from pathlib import Path
 
@@ -23,6 +24,11 @@ RATES = {"EURUSD": ("EU", "US"), "GBPUSD": ("GB", "US"), "USDJPY": ("US", "JP"),
          "AUDUSD": ("AU", "US"), "AUDNZD": ("AU", "NZ")}
 VIX_THR = {"USDJPY": 15.0, "EURUSD": 18.0, "GBPUSD": 18.0, "AUDUSD": 20.0, "AUDNZD": 15.0}
 MACRO = ROOT / "data" / "cache" / "macro"
+
+# Shadow exit log (read-only JOIN source for closed-carry exit_reason attribution).
+# Module-level constant so tests can monkeypatch it to a tmp fixture path — backfill
+# only ever reads this file (frozen-path artifact; never renamed, never written).
+SHADOW_LOG = ROOT / "data" / "exec" / "exit_manager_shadow.jsonl"
 
 
 def _rate_series(cc: str) -> pd.Series | None:
@@ -72,7 +78,60 @@ _REASON = {"INITIAL_STOP": "STOP", "TRAILING_ATR": "TRAILING", "REVERSAL": "REVE
            "TIME": "TIME", "CB_REFRESH": "CB_REFRESH"}
 
 
-def closed_decisions(rows: list[dict]) -> list[att.ClosedDecision]:
+def _shadow_closes() -> list[dict]:
+    """Read shadow-exit CLOSE rows (read-only) — the JOIN source for carry exit_reason.
+
+    Only `action == "CLOSE"` rows carry a terminal decision; HOLD/AMEND_STOP/SKIP rows
+    are not candidates. Malformed lines are skipped, never raised — this is a
+    best-effort attribution join, not a source of truth (same tolerance as
+    journal_sync.rows_from_decision_logs)."""
+    if not SHADOW_LOG.exists():
+        return []
+    out = []
+    for line in SHADOW_LOG.read_text().splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            r = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if r.get("action") != "CLOSE":
+            continue
+        d = r.get("bar_date") or str(r.get("run_ts", ""))[:10]
+        out.append({"trade_id": r.get("trade_id"),
+                    "pair": (r.get("pair") or "").replace("_", ""),
+                    "date": d, "decision": r.get("decision")})
+    return out
+
+
+def _join_exit_reason(trade_id, pair: str, close_date: str,
+                       shadow_closes: list[dict]) -> tuple[str, bool]:
+    """JOIN one closed carry decision to its shadow-exit reason.
+
+    Match by trade_id when our side carries one (shadow rows always carry one in
+    practice); else fall back to normalized pair + close-date (UTC). Zero candidate
+    rows -> UNKNOWN. Multiple candidates that map to more than one distinct reason
+    -> UNKNOWN, flagged as a conflict (never guess). Returns (exit_reason, is_conflict).
+    """
+    tid = str(trade_id).strip() if trade_id not in (None, "") else None
+    if tid:
+        candidates = [s for s in shadow_closes
+                      if s["trade_id"] is not None and str(s["trade_id"]).strip() == tid]
+    else:
+        candidates = [s for s in shadow_closes if s["pair"] == pair and s["date"] == close_date]
+
+    if not candidates:
+        return "UNKNOWN", False
+    reasons = {_REASON.get(c["decision"], "UNKNOWN") for c in candidates}
+    if len(reasons) == 1:
+        return reasons.pop(), False
+    return "UNKNOWN", True
+
+
+def closed_decisions(rows: list[dict]) -> tuple[list[att.ClosedDecision], int]:
+    shadow_closes = _shadow_closes()
+    conflicts = 0
     out = []
     for r in rows:
         pair = (r.get("pair") or "").replace("_", "")
@@ -81,16 +140,23 @@ def closed_decisions(rows: list[dict]) -> list[att.ClosedDecision]:
             if det.get("outcome") not in ("WIN", "LOSS"):
                 continue
             entry_d, exit_d = r["decision_ts"][:10], str(det.get("exit_timestamp") or "")[:10]
+            trade_id = r.get("trade_id")
+            if trade_id is None:
+                trade_id = det.get("trade_id")
+            # JOIN against the shadow exit log for the real exit mechanism. Zero or
+            # conflicting candidate rows honestly fall back to UNKNOWN (never guess) —
+            # that gap is itself first-review material (the machine should propose
+            # recording it), same as before this JOIN existed.
+            exit_reason, conflict = _join_exit_reason(trade_id, pair, exit_d, shadow_closes)
+            if conflict:
+                conflicts += 1
             out.append(att.ClosedDecision(
                 decision_id=r["decision_id"], engine="carry", thesis_kind="structural_carry",
                 rate_diff_sign_entry=rate_diff_sign(pair, entry_d),
                 rate_diff_sign_exit=rate_diff_sign(pair, exit_d) if exit_d else None,
                 vix_gate_entry=vix_gate_state(pair, entry_d),
                 vix_gate_exit=vix_gate_state(pair, exit_d) if exit_d else None,
-                # The outcome matcher records WIN/LOSS + R but NOT the exit mechanism —
-                # honestly UNKNOWN → rubric routes these AMBIGUOUS. That gap is itself
-                # first-review material (the machine should propose recording it).
-                exit_reason="UNKNOWN",
+                exit_reason=exit_reason,
                 realized_r=det.get("r_realized"), fill_slippage_r=None))
         elif r["engine"] == "exit_shadow" and r["action"] == "CLOSE":
             det = r.get("detail") or {}
@@ -103,7 +169,7 @@ def closed_decisions(rows: list[dict]) -> list[att.ClosedDecision]:
                 exit_reason=_REASON.get(det.get("decision"), "UNKNOWN"),
                 realized_r=None,             # shadow never closed the broker trade
                 fill_slippage_r=None))
-    return out
+    return out, conflicts
 
 
 def main() -> int:
@@ -118,7 +184,7 @@ def main() -> int:
     journal_sync.attach_board_refs(rows)
     n = journal.upsert(rows)
 
-    closed = closed_decisions(rows)
+    closed, conflicts = closed_decisions(rows)
     atts = [att.classify(c) for c in closed]
     months = {r["decision_ts"][:7] for r in rows}
     n_att = sum(att.write_attributions(
@@ -127,7 +193,8 @@ def main() -> int:
     from collections import Counter
     print(f"[backfill] window {a.window}: {n} journal rows written "
           f"({len(rows)} derived, {sum(1 for r in rows if r.get('inferred'))} inferred abstentions); "
-          f"{n_att} attributions ({Counter(x.cls for x in atts)})")
+          f"{n_att} attributions ({Counter(x.cls for x in atts)}); "
+          f"{conflicts} exit-reason join conflict(s)")
     return 0
 
 
