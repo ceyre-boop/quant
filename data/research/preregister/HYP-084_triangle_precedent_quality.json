@@ -1,0 +1,21 @@
+{
+  "id": "HYP-084",
+  "slug": "triangle_precedent_quality",
+  "family": "NONE (Library-quality metric \u2014 explicitly OUTSIDE GEOMETRY-2026-07 BH)",
+  "name": "Triangle/consolidation tags improve Library precedent-retrieval quality",
+  "status": "PREREGISTERED",
+  "frozen_at": "2026-07-06T18:30:00Z",
+  "prior_materials_banner": "PRIOR MATERIALS \u2014 NON-EVIDENTIARY (A1): research/whole_chart_harvester.py, research/validate_corridor_feature.py (corridor math reused, thresholds NOT), the pre-gate FVG explorations (fvg_express origin note), and any in-sample permutation artifacts (4_permutation_real.png class) inform THESIS TEXT ONLY. Thresholds and effect sizes below are set from mechanism + realistic costs, never reverse-fit to prior results.",
+  "thesis": "Consolidation geometry (contracting range, time-in-coil) is a regime descriptor; precedents retrieved on matching geometry should produce analogies that HOLD more often than tag-overlap retrieval alone.",
+  "measurement": "two-proportion comparison over the dark month(+): citations whose matched_tags include geometry tags (consolidation / structure_extreme, emitted via BOARD_EXTREME_TAGS geometry keys) vs structured_v1-only citations; outcome = citation scored TRUE by the A2 citation-scorer harness (append-only citation_scores.jsonl; UNSCOREABLE rows excluded from both arms)",
+  "success_criteria": "geometry-arm hit-rate minus baseline >= 0.15 AND Fisher exact p < .05",
+  "failure_criteria": "anything else -> NOT_SIGNIFICANT; either arm < 20 scored citations -> UNDERPOWERED (wait longer)",
+  "dependencies": "A2 scorer built; review_enabled flip (Colin); adjudicates ~one month out BY DESIGN",
+  "validation_protocol": {
+    "note": "NOT in any BH family; single pre-stated test; no reruns on the same citation window"
+  },
+  "prior_expectation": "NOT_SIGNIFICANT",
+  "verdict": null,
+  "hash_method": "sha256 of json.dumps(doc, sort_keys=True, separators=(',',':')) where doc = this object MINUS the hash_lock field",
+  "hash_lock": "2baf644f54509273b880f5dade2a63a8f170393de21d3397ef1bc9a564408cab"
+}

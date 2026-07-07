@@ -1824,5 +1824,41 @@
     "date_tested": "2026-07-05",
     "result": "single-core(90bar)=21,585/s \u00b7 12-core ceiling=13,955/s \u00b7 best bar-evals=5,484,788/s \u00b7 legacy claim 148,193 (NOT beaten; numba INACTIVE on py3.14.4 \u2192 pure-Python fallback)",
     "methodology_note": "arm, 12 physical cores, numba INACTIVE on py3.14.4 \u2192 pure-Python fallback. Time-boxed. FastBacktestEngine vs pure-Python forex kernel across 90bar/daily/5min/1min, single vs all-cores. See backtest_benchmark JSON."
+  },
+  {
+    "id": "HYP-082",
+    "name": "Log-corridor deviation beyond carry (geometry family)",
+    "status": "PREREGISTERED",
+    "family": "GEOMETRY-2026-07",
+    "date_proposed": "2026-07-06",
+    "prereg_file": "data/research/preregister/HYP-082_fractal_beyond_carry.json",
+    "result": null,
+    "p_value": null,
+    "verdict": null,
+    "note": "hash-locked BEFORE feature construction (Day-3 G1); prior geometry materials non-evidentiary (A1)"
+  },
+  {
+    "id": "HYP-083",
+    "name": "Daily FVG event book as carry diversifier (geometry family)",
+    "status": "PREREGISTERED",
+    "family": "GEOMETRY-2026-07",
+    "date_proposed": "2026-07-06",
+    "prereg_file": "data/research/preregister/HYP-083_fvg_diversifier.json",
+    "result": null,
+    "p_value": null,
+    "verdict": null,
+    "note": "hash-locked BEFORE feature construction (Day-3 G1); prior geometry materials non-evidentiary (A1)"
+  },
+  {
+    "id": "HYP-084",
+    "name": "Triangle tags improve precedent-retrieval quality (Library metric, non-BH)",
+    "status": "PREREGISTERED",
+    "family": "NONE",
+    "date_proposed": "2026-07-06",
+    "prereg_file": "data/research/preregister/HYP-084_triangle_precedent_quality.json",
+    "result": null,
+    "p_value": null,
+    "verdict": null,
+    "note": "hash-locked BEFORE feature construction (Day-3 G1); prior geometry materials non-evidentiary (A1)"
   }
 ]

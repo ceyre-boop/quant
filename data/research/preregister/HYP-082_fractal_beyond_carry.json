@@ -1,0 +1,50 @@
+{
+  "id": "HYP-082",
+  "slug": "fractal_beyond_carry",
+  "family": "GEOMETRY-2026-07",
+  "name": "Log-corridor deviation carries OOS information beyond carry (orthogonality is the bar)",
+  "status": "PREREGISTERED",
+  "frozen_at": "2026-07-06T18:30:00Z",
+  "prior_materials_banner": "PRIOR MATERIALS \u2014 NON-EVIDENTIARY (A1): research/whole_chart_harvester.py, research/validate_corridor_feature.py (corridor math reused, thresholds NOT), the pre-gate FVG explorations (fvg_express origin note), and any in-sample permutation artifacts (4_permutation_real.png class) inform THESIS TEXT ONLY. Thresholds and effect sizes below are set from mechanism + realistic costs, never reverse-fit to prior results.",
+  "thesis": "Price locked in (or deviating from) a log-linear growth corridor encodes structural positioning pressure not captured by rate differentials; deviation extremes precede reversion toward the corridor. (Mechanism text may echo Colin's fractal-corridor explorations \u2014 prior, pre-gate, non-evidentiary.)",
+  "observation_definition": "weekly-sampled (every 5th trading day per pair \u2014 de-overlap for h=20) observations with non-NaN corridor_dev (trailing 120-bar log-linear fit; dev in residual-sigma units)",
+  "primary": {
+    "statistic": "pooled Spearman IC(corridor_dev_t, carry_residual_fwd_logret_h20)",
+    "carry_residual": "pair fwd h-day log return MINUS beta_t x v015-portfolio return over the same window; beta_t from trailing-252d OLS (trailing-only, no look-ahead)",
+    "h_trading_days": 20,
+    "null": "within-pair permutation of the feature vector across eligible observations (10k, seed 42)",
+    "sidedness": "TWO-SIDED on |IC| \u2014 deviation direction is not pre-committed (stated deviation from the positioning family's one-sided convention)"
+  },
+  "success_criteria": "BH-pass (m=2, alpha .05) AND |IC| >= 0.05 AND IC sign identical across all purged/embargoed CPCV folds (sovereign/discovery/cpcv.py, 6 groups, embargo 0.02) AND median |fwd h20 move| among top-decile |corridor_dev| obs >= 3.0 pips (2x the 1.5-pip round-trip cost assumption)",
+  "failure_criteria": "anything else -> NOT_SIGNIFICANT (the prior); fold-sign instability -> NOT_ROBUST",
+  "secondaries": "ICs of fvg_count_20d, fvg_unfilled, range_slope, days_in_consolidation (exploratory, never adjudicated)",
+  "validation_protocol": {
+    "multiple_testing": {
+      "family": "GEOMETRY-2026-07",
+      "method": "benjamini_hochberg",
+      "alpha": 0.05,
+      "rule": "the 2 primary p-values (HYP-082, HYP-083) correct together; HYP-084 is OUTSIDE this family by design (Library-quality metric)"
+    },
+    "permutation": {
+      "n": 10000,
+      "seed": 42,
+      "p_formula": "(n_ge + 1) / (N + 1)"
+    },
+    "min_sample": {
+      "pooled_primary": 50,
+      "underpowered_rule": "below minimum -> UNDERPOWERED, never a directional claim"
+    },
+    "no_model_training": "feature/event studies only; no fitted parameters beyond pre-registered thresholds",
+    "data_substrate": "sentiment_geometry_daily (BUILT AFTER THIS LOCK, look-ahead audited, trailing-only, warmup rows NULL) from daily OHLC spot cache (2014-06+); coverage note: DAILY bars \u2014 FX intraday does not exist in this system; small-N honesty over resolution fantasy"
+  },
+  "prior_expectation": "NOT_SIGNIFICANT",
+  "verdict": null,
+  "universe": [
+    "EURUSD",
+    "GBPUSD",
+    "USDJPY",
+    "AUDUSD"
+  ],
+  "hash_method": "sha256 of json.dumps(doc, sort_keys=True, separators=(',',':')) where doc = this object MINUS the hash_lock field",
+  "hash_lock": "19cca02bcae318d5dbcd07eef759e0dc65f2bf9f5de93dd27cf12dc17ae92ab8"
+}

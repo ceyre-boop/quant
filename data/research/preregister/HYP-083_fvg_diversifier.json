@@ -1,0 +1,66 @@
+{
+  "id": "HYP-083",
+  "slug": "fvg_diversifier",
+  "family": "GEOMETRY-2026-07",
+  "name": "Daily FVG-structure event book is a genuine diversifier vs carry (correlation gate is the test)",
+  "status": "PREREGISTERED",
+  "frozen_at": "2026-07-06T18:30:00Z",
+  "prior_materials_banner": "PRIOR MATERIALS \u2014 NON-EVIDENTIARY (A1): research/whole_chart_harvester.py, research/validate_corridor_feature.py (corridor math reused, thresholds NOT), the pre-gate FVG explorations (fvg_express origin note), and any in-sample permutation artifacts (4_permutation_real.png class) inform THESIS TEXT ONLY. Thresholds and effect sizes below are set from mechanism + realistic costs, never reverse-fit to prior results.",
+  "thesis": "Fair-value-gap formation marks displacement/imbalance whose continuation returns are driven by microstructure repair, not rate differentials \u2014 mechanically distinct from carry. (Prior FVG findings: pre-gate, non-evidentiary.)",
+  "event_definition": "daily-bar FVG formation (REPLICATED look-ahead-safe 3-bar kernel; min_size_atr_fraction 0.3 per config/ict_params.yml at freeze; trailing ATR ending at t), side = gap direction in PAIR space (spot-derived, no flip); de-overlap: one event per pair-day, same-direction suppression 5 trading days; t0 = first trading day strictly after formation",
+  "primary": {
+    "statistic": "pooled median signed fwd log return, h=10 (family event-study machinery)",
+    "null": "per-pair date-shuffle preserving event counts (10k, seed 42)",
+    "sidedness": "one-sided (continuation)"
+  },
+  "diversifier_gate": {
+    "joint_success_condition": true,
+    "benchmarks": [
+      "v015 daily curve",
+      "DBV carry proxy (load_carry_proxy, 2006->2023-03)"
+    ],
+    "true_diversifier_iff": "abs(full_rho) < 0.25 AND max crisis abs(rho) < 0.35",
+    "crisis_windows": [
+      [
+        "2020-02-20",
+        "2020-04-30"
+      ],
+      [
+        "2022-01-01",
+        "2022-12-31"
+      ]
+    ],
+    "coverage_note": "spot cache starts 2014-06 -> 2008 window unavailable, stated honestly"
+  },
+  "success_criteria": "BH-pass AND pooled N >= 50 de-overlapped AND diversifier gate passes",
+  "failure_criteria": "p >= .05 -> NOT_SIGNIFICANT; gate fails -> NOT_DIVERSIFIER; N < 50 -> UNDERPOWERED (daily-bar FVGs are rarer than intraday \u2014 accepted, never padded)",
+  "validation_protocol": {
+    "multiple_testing": {
+      "family": "GEOMETRY-2026-07",
+      "method": "benjamini_hochberg",
+      "alpha": 0.05,
+      "rule": "the 2 primary p-values (HYP-082, HYP-083) correct together; HYP-084 is OUTSIDE this family by design (Library-quality metric)"
+    },
+    "permutation": {
+      "n": 10000,
+      "seed": 42,
+      "p_formula": "(n_ge + 1) / (N + 1)"
+    },
+    "min_sample": {
+      "pooled_primary": 50,
+      "underpowered_rule": "below minimum -> UNDERPOWERED, never a directional claim"
+    },
+    "no_model_training": "feature/event studies only; no fitted parameters beyond pre-registered thresholds",
+    "data_substrate": "sentiment_geometry_daily (BUILT AFTER THIS LOCK, look-ahead audited, trailing-only, warmup rows NULL) from daily OHLC spot cache (2014-06+); coverage note: DAILY bars \u2014 FX intraday does not exist in this system; small-N honesty over resolution fantasy"
+  },
+  "prior_expectation": "NOT_SIGNIFICANT",
+  "verdict": null,
+  "universe": [
+    "EURUSD",
+    "GBPUSD",
+    "USDJPY",
+    "AUDUSD"
+  ],
+  "hash_method": "sha256 of json.dumps(doc, sort_keys=True, separators=(',',':')) where doc = this object MINUS the hash_lock field",
+  "hash_lock": "da070664ed285cfacd132b08de98d0005622baa2aed5d0a1e4705bb1fa1fac5d"
+}
