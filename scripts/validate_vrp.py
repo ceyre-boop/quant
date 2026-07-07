@@ -64,6 +64,66 @@ def _options_prereg() -> dict:
     return ob
 
 
+def _snapshot_prior(led: list, entry_id: str) -> tuple[list, list]:
+    """Append-only ledger discipline: return (led_without_entry, runs_history) where the
+    prior entry's top-level record has been snapshotted onto its runs[] history."""
+    prior = next((e for e in led if e.get("id") == entry_id), None)
+    runs: list = []
+    if prior is not None:
+        runs = list(prior.get("runs", []))
+        runs.append({k: v for k, v in prior.items() if k != "runs"})
+        led = [e for e in led if e.get("id") != entry_id]
+    return led, runs
+
+
+def persist_options_result(result: dict, name: str, split: tuple, run_ts: str, account: float,
+                           options_path=None, ledger_path=None) -> None:
+    """Append-only persistence for options-stage results (E0, 2026-07-06).
+
+    MEMORY INTEGRITY RULE: sealed runs are never destroyed. The old code
+    delete-and-replaced the ledger entry and upserted json stages — a second run
+    silently erased the first (proven loss: the 2026-06-29 IS run, 50t/Sh1.248 at a
+    raised account, survived only in git history). Now:
+      - json `stages[name]` is an append-only LIST of run records ({run_ts, account,
+        **result}); a legacy dict value is wrapped [legacy] once (idempotent).
+      - the ledger keeps ONE VRP-001-OPTIONS entry (consumers count entries, not
+        runs); before the top-level is refreshed to the latest run, the prior
+        top-level record is snapshotted into the append-only `runs[]` history.
+      - `account` is recorded on every run — the unrecorded knob is what made the
+        06-29 record a mystery.
+    "Preserved" means record-content-identical (files re-serialize; bytes shift).
+    """
+    options_path = options_path or OPTIONS_OUT
+    ledger_path = ledger_path or LEDGER
+
+    doc = json.loads(options_path.read_text()) if options_path.exists() else {"id": "VRP-001-OPTIONS", "stages": {}}
+    for k, v in list(doc.get("stages", {}).items()):
+        if isinstance(v, dict):                       # legacy single-run shape → wrap once
+            doc["stages"][k] = [v]
+    doc.setdefault("stages", {}).setdefault(name, []).append(
+        {"run_ts": run_ts, "account": account, **result})
+    doc["generated_at"] = run_ts
+    options_path.write_text(json.dumps(doc, indent=2, default=str))
+
+    led = json.loads(ledger_path.read_text()) if ledger_path.exists() else []
+    led, runs = _snapshot_prior(led, "VRP-001-OPTIONS")
+    summary = "; ".join(f"{k}:{v[-1].get('status')}/{v[-1].get('n_trades', '-')}t/Sh{v[-1].get('sharpe_weekly_ann', '-')}"
+                        for k, v in doc["stages"].items())
+    led.append({
+        "id": "VRP-001-OPTIONS",
+        "name": "VRP iron-condor backtest on ThetaData SPY chains (Stages 2-4)",
+        "status": result.get("status"),
+        "date_tested": run_ts[:10],
+        "account": account,
+        "result": f"[{name} {split[0]}..{split[1]}] {summary}",
+        "methodology_note": ("Short 1SD iron condor, 25pt wings, 30-45 DTE, manage 21DTE/50% take/2x stop, 1% "
+                             "risk, Monday weekly. Real SPY chains via ThetaData; strikes from prior-20d realized "
+                             "vol (yfinance). Pre-registered + signed (vrp_preregistration.json#options_backtest)."),
+        "runs": runs,
+    })
+    ledger_path.write_text(json.dumps(led, indent=2))
+
+
 def _run_options_stage(args) -> None:
     """Stages 2/3/4 — real SPY iron-condor backtest on ThetaData chains (requires subscription)."""
     ob = _options_prereg()
@@ -86,26 +146,9 @@ def _run_options_stage(args) -> None:
     result = iron_condor_simulate(loader, spy_daily=spy, params=params, split=split, vix_daily=vix,
                                   account=args.account)
 
-    doc = json.loads(OPTIONS_OUT.read_text()) if OPTIONS_OUT.exists() else {"id": "VRP-001-OPTIONS", "stages": {}}
-    doc["generated_at"] = datetime.now(timezone.utc).isoformat()
-    doc["stages"][name] = result
-    OPTIONS_OUT.write_text(json.dumps(doc, indent=2, default=str))
-
-    led = json.loads(LEDGER.read_text()) if LEDGER.exists() else []
-    led = [e for e in led if e.get("id") != "VRP-001-OPTIONS"]
-    summary = "; ".join(f"{k}:{v.get('status')}/{v.get('n_trades', '-')}t/Sh{v.get('sharpe_weekly_ann', '-')}"
-                        for k, v in doc["stages"].items())
-    led.append({
-        "id": "VRP-001-OPTIONS",
-        "name": "VRP iron-condor backtest on ThetaData SPY chains (Stages 2-4)",
-        "status": result.get("status"),
-        "date_tested": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
-        "result": f"[{name} {split[0]}..{split[1]}] {summary}",
-        "methodology_note": ("Short 1SD iron condor, 25pt wings, 30-45 DTE, manage 21DTE/50% take/2x stop, 1% "
-                             "risk, Monday weekly. Real SPY chains via ThetaData; strikes from prior-20d realized "
-                             "vol (yfinance). Pre-registered + signed (vrp_preregistration.json#options_backtest)."),
-    })
-    LEDGER.write_text(json.dumps(led, indent=2))
+    persist_options_result(result, name, split,
+                           run_ts=datetime.now(timezone.utc).isoformat(),
+                           account=args.account)
     if args.stage == 4:
         HOLDOUT_MARKER.write_text(datetime.now(timezone.utc).isoformat())
 
@@ -253,12 +296,13 @@ def main():
     OUT.write_text(json.dumps(payload, indent=2, default=str))
     _write_findings(payload)
 
-    # ── Ledger (idempotent by id) ──
+    # ── Ledger (append-only by id: prior record snapshotted into runs[], E0 2026-07-06) ──
     led = json.loads(LEDGER.read_text()) if LEDGER.exists() else []
-    led = [e for e in led if e.get("id") != "VRP-001"]
+    led, _vrp1_runs = _snapshot_prior(led, "VRP-001")
     cv = s2["vs_carry"]
     led.append({
         "id": "VRP-001",
+        "runs": _vrp1_runs,
         "name": "Volatility risk premium (SPY/QQQ) — orthogonal second edge or return-stacking?",
         "status": verdict,
         "date_tested": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
