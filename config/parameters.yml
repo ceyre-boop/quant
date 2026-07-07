@@ -261,6 +261,17 @@ sentiment:
       GBPUSD: GBPUSD=X
       USDJPY: USDJPY=X
       AUDUSD: AUDUSD=X
+  # ── Geometry (G2: corridor / FVG / tri-state) — HYP-082/083/084 substrate ──
+  # Trailing-only price-geometry features from the daily OHLC cache (data/research/positioning_family/
+  # spot_cache/{PAIR}_ohlc.parquet). Spec'd constants (data/research/preregister/HYP-082/083/084 +
+  # the GEOMETRY-2026-07 manifest, commit 01cacbd) — do not alter without re-sealing the hypotheses.
+  geometry:
+    corridor_window: 120     # trailing bars for the log-price linregress (corridor_r2/corridor_dev)
+    fvg_max_age: 20          # trailing bars scanned for 3-bar gaps (fvg_count_20d/fvg_unfilled)
+    fvg_min_atr_frac: 0.3    # restates config/ict_params.yml::fvg.min_size_atr_fraction (frozen value)
+    tri_window: 20           # trailing bars for the H-L range linregress slope (range_slope)
+    tri_pctile: 0.25         # trailing-252d percentile threshold for the "small range" leg of tri_state
+    start: '2015-01-01'      # output coverage floor (matches sentiment.macro_start / vrp.backfill_start idiom)
 
 # ── Experience (memory organ) — TICK-005 Library ascension slice ──────────────────────────
 # Additive-only block. review_enabled gates the L2a Sunday-review Precedents section (and its

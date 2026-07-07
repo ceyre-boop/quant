@@ -18,6 +18,7 @@ import pytest
 from config.loader import params
 from sovereign.sentiment import (
     store, board_state, vix_feed, news_feed, macro_feed, gdelt_feed, surprise_feed, cot_feed, vrp_feed,
+    geometry_feed,
 )
 
 NOW = datetime(2026, 6, 30, tzinfo=timezone.utc)
@@ -152,7 +153,8 @@ def test_no_forward_look(con):
 # 6 — isolation: no sentiment module imports ict / ict-engine / layer1 / layer2 (AST-checked)
 def test_sentiment_does_not_import_ict():
     forbidden_roots = {"ict", "ict_engine", "layer1", "layer2"}
-    for mod in (store, news_feed, macro_feed, vix_feed, gdelt_feed, surprise_feed, cot_feed, vrp_feed, board_state):
+    for mod in (store, news_feed, macro_feed, vix_feed, gdelt_feed, surprise_feed, cot_feed, vrp_feed,
+                geometry_feed, board_state):
         tree = ast.parse(inspect.getsource(mod))
         names = set()
         for node in ast.walk(tree):

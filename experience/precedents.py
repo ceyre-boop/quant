@@ -48,6 +48,12 @@ BOARD_EXTREME_TAGS: dict[str, dict] = {
     "vrp_pct":         {"high": (0.90,  {"vol_rich", "volatility"}),
                          "low":  (0.10,  {"vol_cheap", "complacency"})},
     "macro_curve":     {"low":  (0.0,   {"yield_curve_inversion", "recession_risk"})},
+    # G2 geometry (HYP-082/083/084 substrate; required by locked HYP-084). tri_state is stored as
+    # 0/1 (store.py::SCHEMA); Python's True == 1 so "eq": (True, ...) still matches the int. The
+    # high/low pair on corridor_dev together express the plan's |corridor_dev| >= 2 breach.
+    "tri_state":       {"eq":   (True,  {"consolidation"})},
+    "corridor_dev":    {"high": (2,     {"structure_extreme"}),
+                         "low":  (-2,   {"structure_extreme"})},
 }
 
 

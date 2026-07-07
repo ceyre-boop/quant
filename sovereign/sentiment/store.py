@@ -155,6 +155,26 @@ CREATE TABLE IF NOT EXISTS sentiment_options_surface (
     fetched_at  TIMESTAMP,
     PRIMARY KEY (date, pair)
 );
+-- G2: trailing price-geometry features (corridor / FVG / tri-state) — HYP-082/083/084 substrate.
+-- REPLICATED FVG kernel (isolation wall forbids importing ict/ — see sovereign/sentiment/
+-- geometry_feed.py). All features trailing-only; warmup rows NULL. src_last_bar_date == date
+-- ALWAYS: this is a same-day daily OHLC feed with no independent sampling cadence at the source
+-- (unlike VRP/options-surface, whose weekly source tables are legitimately dated before `date`).
+CREATE TABLE IF NOT EXISTS sentiment_geometry_daily (
+    date                  DATE,
+    pair                  VARCHAR,
+    corridor_r2           DOUBLE,     -- trailing log-price linregress R² over corridor_window bars
+    corridor_dev          DOUBLE,     -- (log p_t - fit_t) / std(residuals) — signed, in residual-sigmas
+    corridor_window       INTEGER,    -- window used (config sentiment.geometry.corridor_window; provenance)
+    fvg_count_20d         INTEGER,    -- REPLICATED 3-bar-gap count, trailing fvg_max_age bars
+    fvg_unfilled          INTEGER,    -- subset of fvg_count_20d still unfilled as of date
+    tri_state             INTEGER,    -- 1 = contracting-range consolidation, 0 = not, NULL pre-warmup
+    days_in_consolidation INTEGER,    -- consecutive qualifying days ending at date (0 when tri_state=0)
+    range_slope           DOUBLE,     -- trailing tri_window-bar linregress slope of the H-L range
+    src_last_bar_date     DATE,       -- provenance: last OHLC bar date feeding this row (== date, always)
+    fetched_at            TIMESTAMP,
+    PRIMARY KEY (date, pair)
+);
 CREATE TABLE IF NOT EXISTS sentiment_board_state (
     date            DATE,
     pair            VARCHAR,
@@ -169,6 +189,13 @@ CREATE TABLE IF NOT EXISTS sentiment_board_state (
     vrp_pct         DOUBLE,
     vrp_iv_atm      DOUBLE,
     vrp_rv_trailing DOUBLE,
+    corridor_r2           DOUBLE,
+    corridor_dev          DOUBLE,
+    fvg_count_20d         INTEGER,
+    fvg_unfilled          INTEGER,
+    tri_state             INTEGER,
+    days_in_consolidation INTEGER,
+    range_slope           DOUBLE,
     macro_curve     DOUBLE,
     macro_spread    DOUBLE,
     macro_inflation DOUBLE,
@@ -202,6 +229,13 @@ ALTER TABLE sentiment_board_state ADD COLUMN IF NOT EXISTS tff_lev_net_pct DOUBL
 ALTER TABLE sentiment_board_state ADD COLUMN IF NOT EXISTS rr25 DOUBLE;
 ALTER TABLE sentiment_board_state ADD COLUMN IF NOT EXISTS bf25 DOUBLE;
 ALTER TABLE sentiment_board_state ADD COLUMN IF NOT EXISTS atm_term_slope DOUBLE;
+ALTER TABLE sentiment_board_state ADD COLUMN IF NOT EXISTS corridor_r2 DOUBLE;
+ALTER TABLE sentiment_board_state ADD COLUMN IF NOT EXISTS corridor_dev DOUBLE;
+ALTER TABLE sentiment_board_state ADD COLUMN IF NOT EXISTS fvg_count_20d INTEGER;
+ALTER TABLE sentiment_board_state ADD COLUMN IF NOT EXISTS fvg_unfilled INTEGER;
+ALTER TABLE sentiment_board_state ADD COLUMN IF NOT EXISTS tri_state INTEGER;
+ALTER TABLE sentiment_board_state ADD COLUMN IF NOT EXISTS days_in_consolidation INTEGER;
+ALTER TABLE sentiment_board_state ADD COLUMN IF NOT EXISTS range_slope DOUBLE;
 """
 
 

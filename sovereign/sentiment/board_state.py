@@ -20,6 +20,8 @@ REQUIRED_COLUMNS = [
     "cot_net_pct", "cot_net_oi", "cot_net_pct_1y", "cot_net_z", "cot_flush_1w", "tff_lev_net_pct",
     "vrp_signal", "vrp_pct", "vrp_iv_atm", "vrp_rv_trailing",
     "rr25", "bf25", "atm_term_slope",
+    "corridor_r2", "corridor_dev", "fvg_count_20d", "fvg_unfilled", "tri_state",
+    "days_in_consolidation", "range_slope",
     "macro_curve", "macro_spread", "macro_inflation", "vix_level", "vix_momentum", "vix_regime",
 ]
 
@@ -42,6 +44,8 @@ def rebuild(con=None) -> int:
            cot_net_pct, cot_net_oi, cot_net_pct_1y, cot_net_z, cot_flush_1w, tff_lev_net_pct,
            vrp_signal, vrp_pct, vrp_iv_atm, vrp_rv_trailing,
            rr25, bf25, atm_term_slope,
+           corridor_r2, corridor_dev, fvg_count_20d, fvg_unfilled, tri_state,
+           days_in_consolidation, range_slope,
            macro_curve, macro_spread, macro_inflation, vix_level, vix_momentum, vix_regime, built_at)
         WITH macro_pivot AS (
             SELECT date,
@@ -66,6 +70,8 @@ def rebuild(con=None) -> int:
                t.lev_net_pct AS tff_lev_net_pct,
                r.vrp_signal, r.vrp_pct, r.iv_atm AS vrp_iv_atm, r.rv_trailing AS vrp_rv_trailing,
                o.rr25, o.bf25, o.term_slope AS atm_term_slope,
+               gm.corridor_r2, gm.corridor_dev, gm.fvg_count_20d, gm.fvg_unfilled, gm.tri_state,
+               gm.days_in_consolidation, gm.range_slope,
                m.macro_curve, m.macro_spread, m.macro_inflation,
                s.vix_close AS vix_level, s.vix_momentum, s.vix_regime,
                CAST(now() AS TIMESTAMP) AS built_at
@@ -83,6 +89,9 @@ def rebuild(con=None) -> int:
         ASOF LEFT JOIN (SELECT * FROM sentiment_options_surface
                         WHERE iv_source NOT LIKE 'FIXTURE%') o
             ON o.pair = s.pair AND s.date >= o.date
+        -- Geometry (corridor/FVG/tri-state) is a same-day daily feed; ASOF still carries the latest
+        -- row forward across any gap in sentiment_geometry_daily (e.g. a pair's parquet missing a date).
+        ASOF LEFT JOIN sentiment_geometry_daily gm ON gm.pair = s.pair AND s.date >= gm.date
         LEFT JOIN sentiment_news_daily    n  ON n.date  = s.date AND n.pair = s.pair
         LEFT JOIN sentiment_gdelt_daily   g  ON g.date  = s.date AND g.pair = s.pair
         LEFT JOIN sentiment_surprise_daily sd ON sd.date = s.date

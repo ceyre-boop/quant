@@ -62,6 +62,15 @@ def audit(con) -> list[dict]:
         add("sentiment_options_surface", "provenance_not_after_date",
             _count(con, "SELECT COUNT(*) FROM sentiment_options_surface WHERE iv_obs_date > date"), total)
 
+    # Geometry (corridor/FVG/tri-state) is a same-day daily feed — unlike VRP/options-surface's
+    # independently-sampled weekly source, src_last_bar_date must EQUAL date always, not merely
+    # not-be-after it (any mismatch, either direction, signals a feeder bug, not legitimate staleness).
+    if _exists(con, "sentiment_geometry_daily"):
+        total = _count(con, "SELECT COUNT(*) FROM sentiment_geometry_daily")
+        add("sentiment_geometry_daily", "provenance_last_bar_matches_date",
+            _count(con, "SELECT COUNT(*) FROM sentiment_geometry_daily WHERE src_last_bar_date != date"),
+            total)
+
     if _exists(con, "sentiment_surprise_release"):
         total = _count(con, "SELECT COUNT(*) FROM sentiment_surprise_release")
         add("sentiment_surprise_release", "publish_after_ref",
@@ -75,6 +84,13 @@ def audit(con) -> list[dict]:
             ("cot_net_pct_1y", "sentiment_cot_weekly", "net_pct_1y", "publish_date"),
             ("tff_lev_net_pct", "sentiment_cot_tff_weekly", "lev_net_pct", "publish_date"),
             ("vrp_signal", "sentiment_vrp_daily", "vrp_signal", "date"),
+            ("corridor_r2", "sentiment_geometry_daily", "corridor_r2", "date"),
+            ("corridor_dev", "sentiment_geometry_daily", "corridor_dev", "date"),
+            ("fvg_count_20d", "sentiment_geometry_daily", "fvg_count_20d", "date"),
+            ("fvg_unfilled", "sentiment_geometry_daily", "fvg_unfilled", "date"),
+            ("tri_state", "sentiment_geometry_daily", "tri_state", "date"),
+            ("days_in_consolidation", "sentiment_geometry_daily", "days_in_consolidation", "date"),
+            ("range_slope", "sentiment_geometry_daily", "range_slope", "date"),
         ):
             if not _exists(con, src):
                 continue
