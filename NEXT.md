@@ -6,6 +6,89 @@ Standing constraints live in `CLAUDE.md` — not restated here.
 
 ---
 
+## 2026-07-06/07 (Claude Code / Molly) — DAY 3: THE ADJUDICATION — health truth · E0 memory integrity · VRP dead-as-specced · geometry family through the gate
+
+**Push:** ✅ c9ad9ca → 01cacbd → 1e1b59e → dad7c47 → f1a29a0 → 78e2706 → d3ec74f (+ this entry). Zero unpushed.
+
+**P — preflight (mandate-snapshot corrections included):** No sessions ran Jul 4-5; B2/TICK-006 was
+already shipped Day-2; true baseline was 1142 (mandate's 1120 stale). **Sunday Jul-5 organic beat:
+FIRED PERFECTLY** — W27 regenerated 17:11 with the full Forensics section (my Day-2 seals reported
+back into it: 10 INTERIM SEALs + 1 BLOCKED counted; ratio 12:14:585; oracle line quarantine-marked),
+Precedents ABSENT + citations ABSENT (dark mode held) + no PROP dupes. **review_enabled flip evidence
+COMPLETE — recommendation: flip it** (your one-line logged param change). **Watchdog caught your
+invariant_guard load as designed** (RED → rebaselined with reason → GREEN ×3 today, 21 jobs).
+**P5 ratification: the task never started in-repo** — constitution still DRAFT v0.1.0, Day-1 YAML twin
+only, zero tier-config reconciliation evidence; nothing half-landed to finish; E2 used 0.75% per your
+mandate. Board tail: my one sanctioned foreground run was externally killed AGAIN (pattern now 4/4) —
+**TICK-013 (your sentiment_update load) is the only honest owner of the tail.**
+
+**H — health truth (audit/health_diagnosis_2026-07.md):** the Day-2 "dead trifecta" is **ALIVE** — all
+four fired within 24h (responder 30-min cadence, generator Jul-6 03:06, factory correctly dry-run-idle,
+oracle_cycle Jul-6 04:04); ict_scanner's Sunday alarm was CORRECT per its own mask. Real faults, exactly
+two: **stray_tripwire WatchPaths inert since Jun-16** (reload or 15-min fallback — your batch) and
+**OUTCOME_LOOP_STALL = hybrid artifact**: ~7 of "21 closed trades" are AUD_NZD/USD_CAD probe fills
+pulse_check never pre-filters + a one-UTC-day signal-vs-fill skew beyond the Tier-2 window (Jul-1
+matcher did NOT regress). Fixes named, NOT applied — **they ship with the RED-1 Blue change in ONE
+review batch of yours** (same contamination family). Third persistence denial on sentiment_update
+(consistent) — one-liner stands.
+
+**E — evidence:**
+- **E0 SHIPPED (c9ad9ca):** validator results are append-only — json stages become run lists, the
+  ledger entry snapshots its prior record into runs[] before refresh, and **the account knob is now
+  recorded on every run** (its absence made the 06-29 mystery). 4 tests prove two runs preserve both.
+  Same treatment applied to the stage-1 VRP-001 write site.
+- **E1: GDELT failed a 3rd consecutive paced attempt** (Jul-6, timeout) → built the off-peak organ:
+  `scripts/gdelt_retry.py` + `com.alta.gdelt_retry.plist` (02:30 ET; done-marker stops retries; success
+  rebuilds board, runs the auditor, and escalates the exact unblock sequence to you). **HYP-080 stamped
+  PENDING-080-SCHEDULED; family stays 9/10; BH refused partial adjudication.** If a week of off-peak
+  attempts also fails → the manifest's "family documents its handling" branch is YOUR protocol call.
+- **E2: VRP-001 dead-as-specced (mechanical, sealed):** Art.-1-compliant floor = 25pt×$100/0.0075 =
+  **$333,334** vs configs {100k, 50k, 10k} → the 25-pt structure cannot express one constitution-
+  compliant contract in this firm. Credit-based refinement REFUSED (A1); **the 1.248 run named
+  context-never-evidence in the annotation itself.** Successor **VRP-001-OPTIONS-v2 hash-locked
+  (8ab13abf): 5-pt wings, 0.75%, $100k — SPECCED, UNRUN, gated on your ack.** No VRP backtest ran today.
+- **E3: no CONFIRMED → no ignition command exists; Article 6 stands.**
+
+**G — the geometry family entered THROUGH the gate:**
+- **G1 (01cacbd): HYP-082/083/084 + GEOMETRY-2026-07 manifest hash-locked BEFORE any feature existed**
+  (19cca02b · da070664 · 2baf6445 · 88ac7e02). Gα corridor-beyond-carry (two-sided IC, CPCV
+  fold-stability, 3-pip cost floor); Gβ FVG diversifier (correlation gate IS the test; daily-bar
+  UNDERPOWERED accepted); Gγ triangle→precedent-quality (outside BH, dark-month scored). All prior
+  fractal/FVG material banner-marked non-evidentiary (A1). Ledger entries PREREGISTERED.
+- **G2 (d3ec74f): extractors BUILT + tested (24 tests)** — trailing corridor R²/dev, REPLICATED
+  look-ahead-safe daily FVG kernel (the Plan agent caught that the ict detector leaks last-bar ATR AND
+  the sentiment wall is bidirectional; the parity test then caught a real inversion bug pre-merge),
+  tri_state detector, 7 board columns, auditor blocks, AST wall extended. **The real-board fill + the
+  locked Gα/Gβ run = TICK-019 (next session's E-track).**
+
+**R — Numba scope (no ship, by rule):** numba NOT installed; py3.14 unsupported (needs ≤3.12 venv);
+fast_backtester itself is pure numpy and imported by tests only. TICK-009 updated: dedicated research
+venv + golden-set identical-output gate as acceptance; new work only, never sealed results.
+
+**B — built (suite + watchdog after each):** TICK-015 slice 1 (f1a29a0 — shadow-log JOIN, join-never-
+inference, conflicts counted, historical AMBIGUOUS untouched; slice 2 = decision_logger/oanda_bridge =
+blocked_until shadow_close, freeze ruling) · TICK-007 step 1 (78e2706 — positioning_board.json export
++ guarded tail-call; NaN→null; DISPLAY-ONLY grep-verified) · TICK-018 (above). First builder wave died
+on the account session limit (near-zero work lost, worktrees cleaned, re-dispatched clean).
+**Suite: 40 failed EXACT / 1185 passed / 1 skipped (+41 = 24+5+8+4, zero new). Watchdog GREEN.**
+
+**A — addenda:** A1 threaded through every spec/annotation by name · A2 scorer = TICK-017 (spec
+mandatory ✓ verified design committed in plans/; build next session — Gγ's clock starts at your flip)
+· A3 ratified-floor DRAFT added to DEFINITION_OF_DONE.md — **sign or strike.**
+
+**Your queue (consolidated):** flip `experience.precedents.review_enabled` (evidence complete above) ·
+load sentiment_update (TICK-013) · load gdelt_retry (TICK-016) · RED-1 review batch (Blue fix +
+pulse_check probe-prefilter + match-window widening, one package) · VRP-001-OPTIONS-v2 ack (or strike)
+· ratified-floor sign/strike · stray_tripwire reload · constitution ratification (still DRAFT) ·
+attic/§S2 (standing) · PROP-2026-W27 formally promoted via TICK-015.
+
+**Refused:** running v2 same-day by the same hands that saw old results · credit-refined sizing floors
+(A1) · partial family BH · pulse_check/reflect_cycle unilateral fixes (RED-1 family = your review) ·
+importing ict into the sentiment wall (and the look-ahead leak that import would have carried) ·
+a 5th background gamble on the board tail · touching decision_logger/oanda_bridge under the freeze.
+
+---
+
 ## 2026-07-06 · pm (Claude Code / Molly) — invariant guard now STANDING; two decisions parked
 
 **Shipped:** `com.alta.invariant_guard` installed + loaded (Colin-authorized this session; blocked as

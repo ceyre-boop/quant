@@ -96,7 +96,7 @@ Schema per ticket:
 **description:** The board's institutional-positioning family (cot_net_pct/_z/flush, tff_lev_net_pct, vrp_*, rr25/bf25/atm_term_slope, econ_surprise_z, gdelt_tone) reaches no dashboard panel (R6). Step 1 (SAFE-NOW): exporter → `data/agent/positioning_board.json` (latest per-pair board row + staleness marker). Step 2: "Positioning" panel in root `index.html` (master-branch worktree deploy — see project_dashboard_deploy). DISPLAY-ONLY: no live gate reads the board without a CONFIRMED verdict (Article 6 — R6's "wire the stubs" suggestion explicitly refused).
 **depends_on:** []
 **blocks:** []
-**status:** ready (step 1 first; step 2 own session)
+**status:** step 1 done (2026-07-07, merged 78e2706 — exporter + update_sentiment tail-call); step 2 (panel, master worktree) own session
 **pre_approved:** false
 
 ## TICK-008
@@ -163,7 +163,7 @@ Schema per ticket:
 **description:** Day-3 B1 mandate = the promotion signal. SCOPE SPLIT per plans/TICK-015.md: slice 1 (backfill.py shadow-log JOIN, join-never-inference, historical AMBIGUOUS rows untouched) builds now; slice 2 (DecisionRecord.exit_reason + oanda_bridge close records) is `blocked_until: shadow_close` — those files are execution-path under the freeze regardless of how additive the change looks. Related pulse_check probe-prefilter + match-window widening ship in Colin's RED-1 review batch (audit/health_diagnosis_2026-07.md), not here.
 **depends_on:** []
 **blocks:** []
-**status:** in_progress (2026-07-07 builder dispatched, slice 1)
+**status:** done (2026-07-07, slice 1 merged f1a29a0; slice 2 blocked_until: shadow_close)
 **pre_approved:** true (Day-3 mandate B1)
 
 ## TICK-016
@@ -187,5 +187,13 @@ Schema per ticket:
 **description:** Per plans/TICK-018.md (verified design; specs hash-locked FIRST at 01cacbd): sovereign/sentiment/geometry_feed.py (trailing corridor R²/dev, REPLICATED look-ahead-safe daily FVG kernel — the ict detector leaks last-bar ATR and the sentiment wall is bidirectional — tri_state detector), sentiment_geometry_daily table, board ASOF join + 7 columns, look-ahead auditor block, BOARD_EXTREME_TAGS geometry keys, AST-wall coverage. Real-data update() + audit + the Gα/Gβ RUN are the orchestrating session's (or TICK-019's) — builder ships code+tests only.
 **depends_on:** []
 **blocks:** []
-**status:** in_progress (2026-07-07 builder dispatched)
+**status:** done (2026-07-07, merged d3ec74f — code+tests; the real-board update()+audit run and the Gα/Gβ locked-spec run = TICK-019)
 **pre_approved:** true (Day-3 mandate G2)
+
+## TICK-019
+**title:** Geometry feature fill + Gα/Gβ run under the locked specs
+**description:** Run `geometry_feed.update()` against the real board (short — parquets are local), rebuild, look-ahead auditor 0-violations gate, THEN run HYP-082/HYP-083 exactly per their hash-locked preregs (01cacbd) with the GEOMETRY-2026-07 BH (m=2) adjudication. HYP-084 waits on the dark month + TICK-017 scorer + Colin's review_enabled flip. Same seal discipline as the positioning family (dated annotations, statuses stay PREREGISTERED until family verdicts).
+**depends_on:** [TICK-018]
+**blocks:** []
+**status:** ready
+**pre_approved:** false (evidence run — plan-first next session)
