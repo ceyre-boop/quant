@@ -118,16 +118,20 @@ def test_article2_pairs_match_yaml():
 
 
 def test_article3_breakers_match_and_ordered():
+    # Ratified 2026-07-07 (v1.0.0): 3.5/5/6.5, re-anchored below the 8% TRAILING
+    # prop halt — the draft 5/7/8.5 ladder's flatten breaker sat above the trailing
+    # line and could never fire. This expectation is the third leg of the twin and
+    # amends ONLY together with the prose + YAML (Article 5).
     pcts = _pcts(_articles(_doc())[3])
-    assert sorted(pcts) == [5.0, 7.0, 8.5], (
-        f"Article 3 must bind exactly [5%, 7%, 8.5%], found {pcts} — {AMEND}")
+    assert sorted(pcts) == [3.5, 5.0, 6.5], (
+        f"Article 3 must bind exactly [3.5%, 5%, 6.5%], found {pcts} — {AMEND}")
     br = _cfg()["article_3_breakers"]
-    _match(br["halve_sizing_at_dd_frac"], 5.0, "halve-sizing breaker")
-    _match(br["halt_new_entries_at_dd_frac"], 7.0, "halt-new-entries breaker")
-    _match(br["flatten_predictive_at_dd_frac"], 8.5, "flatten-predictive breaker")
+    _match(br["halve_sizing_at_dd_frac"], 3.5, "halve-sizing breaker")
+    _match(br["halt_new_entries_at_dd_frac"], 5.0, "halt-new-entries breaker")
+    _match(br["flatten_predictive_at_dd_frac"], 6.5, "flatten-predictive breaker")
     assert (br["halve_sizing_at_dd_frac"] < br["halt_new_entries_at_dd_frac"]
-            < br["flatten_predictive_at_dd_frac"] < 0.10), (
-        "breaker ladder must escalate and stay below the 10% prop kill line")
+            < br["flatten_predictive_at_dd_frac"] < 0.08), (
+        "breaker ladder must escalate and stay strictly below the 8% trailing prop halt")
 
 
 def test_no_stray_bold_percentages():
