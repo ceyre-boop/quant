@@ -1,0 +1,34 @@
+{
+  "run_ts": "2026-07-07T22:16:02.955898+00:00",
+  "seed": 42,
+  "n_perm": 10000,
+  "git": "9c7c964",
+  "gate_zero": {
+    "HYP-082_fractal_beyond_carry.json": {
+      "hash": "19cca02bcae318d5",
+      "ok": true
+    },
+    "HYP-083_fvg_diversifier.json": {
+      "hash": "da070664ed285cfa",
+      "ok": true
+    },
+    "HYP-084_triangle_precedent_quality.json": {
+      "hash": "2baf644f54509273",
+      "ok": true
+    },
+    "GEOMETRY-2026-07_family.json": {
+      "hash": "88ac7e02545ff72c",
+      "ok": true
+    }
+  },
+  "interpretations": "interpretations (A1 banner restated: research/whole_chart_harvester.py, research/validate_corridor_feature.py, the pre-gate FVG explorations, and any in-sample permutation artifacts are NON-EVIDENTIARY \u2014 thesis text only; thresholds set from mechanism + realistic costs, never reverse-fit). G\u03b1: obs = every 5th trading day per pair (position 0,5,10,... over the FULL geometry-board calendar, so the sampling anchor is stable regardless of the start-date/non-NaN filters applied after), non-NaN corridor_dev, from 2015-07-01; carry_residual = pair fwd h20 log return - beta_t * v015-equity fwd h20 log return, beta_t = trailing-252d rolling Cov/Var slope (equivalent to the OLS slope for a no-intercept-needed univariate regression), min_periods=252, trailing-only ending at the obs date, undefined-beta obs dropped AND counted; primary = pooled Spearman IC(corridor_dev, carry_residual), TWO-SIDED on |IC| (prereg-declared deviation from the family's one-sided convention); null = within-pair permutation of the FEATURE vector only (carry_residual held fixed) across that pair's own beta-defined eligible obs. Cost floor: per-pair top-decile (90th pct) |corridor_dev| threshold, raw |close[t0+h20]-close[t0]| price move per obs converted to PIPS via that obs's own pair pip size, then pooled across all 4 pairs into one combined median vs the 3.0-pip floor. G\u03b2: events from geometry_feed.fvg_formation_events called per trading day on df.iloc[:t+1] (REPLICATED kernel, no ict import \u2014 the board carries counts, not events); side = gap direction, PAIR SPACE, NO PAIR_FLIP applied (prereg event_definition: 'spot-derived, no flip' \u2014 unlike the COT-derived legs, this is already pair-space by construction); de-overlap one event/pair-day (structural: a 3-bar triplet can register at most one direction) + same-direction suppression 5 TRADING days (measured on the pair's own calendar positions, not event-list index); t0 = shift_pub (+1 calendar day) then es.effective_t0 (first trading day strictly after formation). Diversifier gate evaluated independently vs v015 daily curve AND vs DBV carry proxy \u2014 BOTH benchmarks must independently satisfy |rho_full|<0.25 AND max crisis |rho|<0.35 (prereg lists both benchmarks under one joint_success_condition; a crisis window with n<20 is excluded from the max rather than counted as failing, and is reported per-window).",
+  "coverage": "coverage: sentiment_geometry_daily substrate from the daily OHLC spot cache (2014-06+, output floor 2015-01-01 per config sentiment.geometry.start) \u2014 DAILY bars only, FX intraday does not exist in this system (prereg data_substrate: small-N honesty over resolution fantasy). DBV carry-proxy overlap ends 2023-03 (vrp.data_loader.load_carry_proxy) \u2014 crisis-window/full-period n stated per benchmark in the diversifier_gate block.",
+  "reconcile_guard": {
+    "target": 0.6886,
+    "recomputed": 0.6885
+  },
+  "hyp_order": [
+    "HYP-082",
+    "HYP-083"
+  ]
+}

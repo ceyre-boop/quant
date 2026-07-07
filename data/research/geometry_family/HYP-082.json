@@ -1,0 +1,101 @@
+{
+  "hyp": "HYP-082",
+  "per_pair_N": {
+    "EURUSD": 543,
+    "GBPUSD": 543,
+    "USDJPY": 543,
+    "AUDUSD": 543
+  },
+  "beta": {
+    "EURUSD": {
+      "total_obs": 573,
+      "undefined_beta_dropped": 30,
+      "undefined_fwd_return_dropped": 0,
+      "scored": 543
+    },
+    "GBPUSD": {
+      "total_obs": 573,
+      "undefined_beta_dropped": 30,
+      "undefined_fwd_return_dropped": 0,
+      "scored": 543
+    },
+    "USDJPY": {
+      "total_obs": 573,
+      "undefined_beta_dropped": 30,
+      "undefined_fwd_return_dropped": 0,
+      "scored": 543
+    },
+    "AUDUSD": {
+      "total_obs": 573,
+      "undefined_beta_dropped": 30,
+      "undefined_fwd_return_dropped": 0,
+      "scored": 543
+    }
+  },
+  "primary": {
+    "statistic_ic": 0.011273,
+    "raw_p": 0.59814,
+    "n_perm": 10000,
+    "N": 2172,
+    "sidedness": "two-sided on |IC| (prereg-declared deviation)"
+  },
+  "gates": {
+    "ic_threshold_pass": false,
+    "ic_abs": 0.011273,
+    "fold_sign_consistent": false,
+    "cpcv": {
+      "folds": [
+        -0.065408,
+        0.013977,
+        0.001073,
+        -0.113726,
+        0.001523,
+        0.189795
+      ],
+      "n_folds": 6,
+      "n_defined": 6,
+      "all_same_sign": false
+    },
+    "cost_floor_pass": true,
+    "cost_floor": {
+      "method": "per-pair top-decile |corridor_dev| threshold (90th pct of that pair's own eligible-obs |corridor_dev|); raw |close[t0+h20]-close[t0]| price move per obs converted to PIPS via that obs's own pair pip size (EURUSD/GBPUSD/AUDUSD pip=0.0001, USDJPY pip=0.01 \u2014 equivalently the prereg's 0.00030/0.030 price floors), then ALL pairs' top-decile pip-moves pooled into one combined median",
+      "per_pair": {
+        "EURUSD": {
+          "n_top_decile": 58,
+          "n_scored": 58,
+          "median_pips": 162.684,
+          "threshold_abs_corridor_dev": 2.1493
+        },
+        "GBPUSD": {
+          "n_top_decile": 58,
+          "n_scored": 58,
+          "median_pips": 166.242,
+          "threshold_abs_corridor_dev": 2.196
+        },
+        "USDJPY": {
+          "n_top_decile": 58,
+          "n_scored": 58,
+          "median_pips": 220.65,
+          "threshold_abs_corridor_dev": 2.208
+        },
+        "AUDUSD": {
+          "n_top_decile": 58,
+          "n_scored": 57,
+          "median_pips": 143.0,
+          "threshold_abs_corridor_dev": 2.2019
+        }
+      },
+      "pooled_median_pips": 164.424,
+      "floor_pips": 3.0,
+      "pass": true
+    }
+  },
+  "secondaries_exploratory": {
+    "fvg_count_20d": 0.08179017649018044,
+    "fvg_unfilled": 0.08220417859864293,
+    "range_slope": 0.003285762296835299,
+    "days_in_consolidation": -0.019225459764975104
+  },
+  "sample_status": "OK",
+  "deviations": []
+}

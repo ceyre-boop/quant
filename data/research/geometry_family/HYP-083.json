@@ -1,0 +1,74 @@
+{
+  "hyp": "HYP-083",
+  "per_pair_N": {
+    "EURUSD": 291,
+    "GBPUSD": 290,
+    "USDJPY": 334,
+    "AUDUSD": 280
+  },
+  "raw_formation_counts_pre_deoverlap": {
+    "EURUSD": 423,
+    "GBPUSD": 416,
+    "USDJPY": 475,
+    "AUDUSD": 397
+  },
+  "primary": {
+    "h": 10,
+    "statistic_median": -0.000266,
+    "raw_p": 0.74063,
+    "n_perm": 10000,
+    "N": 1190,
+    "sidedness": "one-sided (continuation)"
+  },
+  "medians": {
+    "full_h10": -0.000266
+  },
+  "dropped_missing_data": 5,
+  "diversifier_gate": {
+    "benchmarks": {
+      "v015": {
+        "full": {
+          "rho": 0.0197,
+          "n": 3065
+        },
+        "crisis_windows": {
+          "2020-02-20_2020-04-30": {
+            "rho": -0.0861,
+            "n": 51
+          },
+          "2022-01-01_2022-12-31": {
+            "rho": 0.0584,
+            "n": 246
+          }
+        },
+        "max_crisis_abs_rho": 0.0861,
+        "pass": true
+      },
+      "dbv": {
+        "full": {
+          "rho": null,
+          "n": 0,
+          "note": "n=0 < min_n=30"
+        },
+        "crisis_windows": {
+          "2020-02-20_2020-04-30": {
+            "rho": null,
+            "n": 0,
+            "note": "n=0 < min_n=20"
+          },
+          "2022-01-01_2022-12-31": {
+            "rho": null,
+            "n": 0,
+            "note": "n=0 < min_n=20"
+          }
+        },
+        "max_crisis_abs_rho": null,
+        "pass": false
+      }
+    },
+    "pass": false,
+    "rule": "abs(full_rho) < 0.25 AND max crisis abs(rho) < 0.35, evaluated independently vs v015 daily curve AND vs DBV carry proxy \u2014 BOTH must pass"
+  },
+  "sample_status": "OK",
+  "deviations": []
+}
