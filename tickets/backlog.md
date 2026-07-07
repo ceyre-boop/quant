@@ -109,7 +109,7 @@ Schema per ticket:
 
 ## TICK-009
 **title:** Re-enable Numba for the fast backtester (py3.14 incompat)
-**description:** Bench history: Numba-active 728k bt/s single / 1.26M parallel (2026-06-29 18:06); Numba-inactive same day 25k/123k — ~10× research throughput behind one env fix (numba upgrade or pinned venv for the backtest path). Own session; full suite before/after.
+**description:** Bench history: Numba-active 728k bt/s single / 1.26M parallel (2026-06-29 18:06); Numba-inactive same day 25k/123k — ~10× research throughput behind one env fix. **Day-3 R1 scope (2026-07-06):** numba NOT INSTALLED; python 3.14.4 (numba supports ≤3.12) → fix = dedicated py≤3.12 research venv + numba install, NOT a patch; the @njit kernels live in the bench harness (fast_backtester.py itself is pure numpy, imported by tests only — import-graph safe). ACCEPTANCE now includes: golden-set verification (fast engine reproduces the current engine on a pinned input set bit-identically or within a pre-declared tolerance) BEFORE any new work uses it; NEW work only — no sealed/in-flight family result ever re-runs on a different engine. Own session; full suite before/after.
 **depends_on:** []
 **blocks:** [TICK-012]
 **status:** backlog
@@ -152,8 +152,40 @@ Schema per ticket:
 
 ## TICK-014
 **title:** Small sensor/vault efficiency batch
-**description:** GDELT off-peak retry mechanism (paced fill throttled 8/8 even at 5s spacing on 2026-07-03 ~19:30 ET — schedule the retry inside an off-peak job, e.g. the 02:30 ET oracle window; HYP-080 + family BH unblock on it); GDELT resume-cursor (gdelt_feed.py:80); vault-graph post-learn regen hook (3 lines); optional bench regression alert (5 lines) pending Colin's bench ruling.
+**description:** ~~GDELT off-peak retry mechanism~~ (BUILT 2026-07-06 as TICK-016: scripts/gdelt_retry.py + com.alta.gdelt_retry.plist — Colin loads). Remaining: GDELT resume-cursor (gdelt_feed.py:80); vault-graph post-learn regen hook (3 lines); optional bench regression alert (5 lines) pending Colin's bench ruling.
 **depends_on:** []
 **blocks:** []
-**status:** backlog
+**status:** backlog (retry portion done via TICK-016)
 **pre_approved:** false
+
+## TICK-015
+**title:** close_reason capture (PROP-2026-W27 promotion) — slice 1: backfill JOIN
+**description:** Day-3 B1 mandate = the promotion signal. SCOPE SPLIT per plans/TICK-015.md: slice 1 (backfill.py shadow-log JOIN, join-never-inference, historical AMBIGUOUS rows untouched) builds now; slice 2 (DecisionRecord.exit_reason + oanda_bridge close records) is `blocked_until: shadow_close` — those files are execution-path under the freeze regardless of how additive the change looks. Related pulse_check probe-prefilter + match-window widening ship in Colin's RED-1 review batch (audit/health_diagnosis_2026-07.md), not here.
+**depends_on:** []
+**blocks:** []
+**status:** in_progress (2026-07-07 builder dispatched, slice 1)
+**pre_approved:** true (Day-3 mandate B1)
+
+## TICK-016
+**title:** GDELT off-peak retry job (Colin loads)
+**description:** BUILT: scripts/gdelt_retry.py (paced single nightly pass, done-marker stops retries, success rebuilds board + runs look-ahead auditor + escalates the exact BH-unblock sequence to messages_to_colin) + scripts/com.alta.gdelt_retry.plist (02:30 ET). Family stamped PENDING-080-SCHEDULED on HYP-080. Load: `cp scripts/com.alta.gdelt_retry.plist ~/Library/LaunchAgents/ && launchctl load ~/Library/LaunchAgents/com.alta.gdelt_retry.plist && python3 scripts/plist_watchdog.py --rebaseline "loaded gdelt_retry"`. If a week of off-peak attempts also fails → the manifest's "family documents its handling" branch (Colin's protocol decision).
+**depends_on:** []
+**blocks:** []
+**status:** ready — owner: Colin (load)
+**pre_approved:** n/a (human action)
+
+## TICK-017
+**title:** Citation scorer (A2 — Gγ/HYP-084's measurement instrument)
+**description:** Per plans/TICK-017.md (verified design): analogy_prediction_v2 via frozen SEVERITY_PREDICTION_MAP; experience/citation_scorer.py appends citation_scores.jsonl (citations.jsonl never rewritten); UNSCOREABLE first-class; one guarded forensics line. Without this the dark month produces nothing HYP-084 can adjudicate.
+**depends_on:** [TICK-005]
+**blocks:** []
+**status:** ready (build next session if Day-3 capacity ends)
+**pre_approved:** true (Day-3 mandate A2)
+
+## TICK-018
+**title:** Geometry extractors for the LOCKED HYP-082/083/084 (G2)
+**description:** Per plans/TICK-018.md (verified design; specs hash-locked FIRST at 01cacbd): sovereign/sentiment/geometry_feed.py (trailing corridor R²/dev, REPLICATED look-ahead-safe daily FVG kernel — the ict detector leaks last-bar ATR and the sentiment wall is bidirectional — tri_state detector), sentiment_geometry_daily table, board ASOF join + 7 columns, look-ahead auditor block, BOARD_EXTREME_TAGS geometry keys, AST-wall coverage. Real-data update() + audit + the Gα/Gβ RUN are the orchestrating session's (or TICK-019's) — builder ships code+tests only.
+**depends_on:** []
+**blocks:** []
+**status:** in_progress (2026-07-07 builder dispatched)
+**pre_approved:** true (Day-3 mandate G2)

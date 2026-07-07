@@ -1,0 +1,47 @@
+{
+  "id": "VRP-001-OPTIONS-v2",
+  "status": "PREREGISTERED",
+  "frozen_at": "2026-07-07T14:27:47.035832+00:00",
+  "name": "SPY iron condor, 5-pt wings, constitution-compliant sizing (successor to the dead-as-specced 25-pt structure)",
+  "supersedes": "vrp_preregistration.json#options_backtest (25-pt structure \u2014 dead-as-specced 2026-07-06, derivation in the VRP-001-OPTIONS ledger annotation)",
+  "prior_materials_banner": "A1: the 2026-06-29 raised-account run (50t/Sh1.248) and every prior VRP result are context, never evidence; no parameter below is derived from them. Wings shrank by MECHANICAL derivation (width_$ <= account x risk_pct), not by performance tuning.",
+  "params": {
+    "account": 100000.0,
+    "account_risk_pct": 0.0075,
+    "risk_note": "0.75% = RISK_CONSTITUTION Art.1 (DRAFT pending ratification; mandate-blessed for this spec)",
+    "wing_points": 5,
+    "short_strike_rule": "1 std-dev from prior-20d realized vol (unchanged)",
+    "dte_entry": [
+      30,
+      45
+    ],
+    "manage_dte": 21,
+    "profit_take_pct": 0.5,
+    "stop_x_credit": 2.0,
+    "entry_cadence": "Monday weekly (unchanged)",
+    "commission_per_contract_leg_side": 0.65,
+    "entry_slippage_pct_of_credit": 0.05,
+    "exit_slippage_pct_of_credit": 0.1,
+    "rv_window_days": 20
+  },
+  "sizing_derivation": "worst-case max_loss = 5pt x $100 = $500/contract; floor(100000 x 0.0075 / 500) = 1 contract with 1.5x headroom \u2014 sizing can never be the silent killer again",
+  "split": {
+    "IS": [
+      "2022-01-01",
+      "2022-12-31"
+    ],
+    "OOS": [
+      "2023-01-01",
+      "2024-06-30"
+    ],
+    "holdout": [
+      "2024-07-01",
+      "2026-06-30"
+    ]
+  },
+  "expected_trade_cadence": "ceiling 52/yr (Monday signal frequency; NOT derived from any prior run); realistic below that after entry conditions",
+  "falsification": "the validator ladder verbatim (NOT_SIGNIFICANT | REJECTED_OOS | DATA_INSUFFICIENT | PARTIAL_CONFIRMATION); NO_TRADES at this account is a SPEC failure (falsifies the derivation), not a data gap",
+  "execution_precondition": "UNRUN BY DESIGN. Running requires (1) Colin's acknowledgment of this spec, (2) validator wiring for v2 params (a future session's E-track), (3) E0 append-only persistence (shipped c9ad9ca).",
+  "hash_method": "sha256 of json.dumps(doc, sort_keys=True, separators=(',',':')) where doc = this object MINUS the hash_lock field",
+  "hash_lock": "8ab13abf2cd8a840ea7fe1e618bec2f4dfd6d25793152846839c574190806a45"
+}

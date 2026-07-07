@@ -27,3 +27,15 @@ ledger id) — never with intent.
 - [ ] Family BH adjudication across ALL 10 primaries → final verdicts written to the ledger
 - [ ] IF (and only if) a verdict is CONFIRMED: factory ignition unlocked — first ignition witnessed by Colin, model registered (nothing anonymous), paper adapter hosts it under DRAFT/ratified caps + Track-T predicates
 - [ ] Weekly reviews have produced ≥3 organic beats; ≥1 machine proposal promoted or explicitly declined by Colin
+
+---
+
+## Ratified floor (DRAFT — Colin signs or strikes; added 2026-07-06 per Day-3 A3)
+
+Acceptable outcome: carry + the exit engine live post-July-28 under the constitution,
+with the predictive layer still hunting. **That is a WIN condition, not a fallback.**
+A proven structural edge, executed by a parity-locked evaluator, under ratified risk
+law, with the research organ honestly reporting nulls, is the firm working as
+designed. No week-7 argument may reinterpret an all-null family as grounds to loosen
+gates, revisit sealed verdicts, or ship an unproven predictor. The predictive layer
+earns its way in through the ledger, or stays paper.

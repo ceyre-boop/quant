@@ -1766,6 +1766,11 @@
         "date": "2026-07-04T00:15:27.343474+00:00",
         "by": "POSITIONING-BOARD-2026-07/interim-options-legs",
         "note": "BLOCKED STAMP \u2014 data_dependency unmet: gdelt_tone coverage 0.0% < 70% (prereg HYP-080 line data_dependency). Family BH remains open. coverage: options surface history starts 2020-01-03 (ThetaData Value-tier depth) \u2014 six years, not the decade; z warmup consumes 2020"
+      },
+      {
+        "date": "2026-07-07T14:27:47.035832+00:00",
+        "by": "POSITIONING-BOARD-2026-07/day3",
+        "note": "FAMILY STATE: PENDING-080-SCHEDULED. GDELT throttled on a 3rd consecutive paced attempt (Jul-3 19:30, Jul-3 21:00, Jul-6 preflight \u2014 8/8 failures, raw 30s ReadTimeouts; sustained free-tier limiting, not burst timing). Off-peak retry job built: scripts/gdelt_retry.py + scripts/com.alta.gdelt_retry.plist (02:30 ET daily; done-marker stops retries; success escalates to messages_to_colin with the exact unblock sequence: --only HYP-080 -> --adjudicate --dry-run -> --adjudicate). Operator loads the plist. Family remains 9/10; BH refuses partial adjudication by construction. If the off-peak class ALSO fails for a week, the manifest's 'family documents its handling' branch becomes Colin's protocol decision."
       }
     ]
   },
@@ -1815,7 +1820,14 @@
     "status": "NO_TRADES",
     "date_tested": "2026-07-04",
     "result": "[OOS 2023-01-01..2024-06-30] IS:OK/1t/Sh0.0; OOS:NO_TRADES/0t/Sh-",
-    "methodology_note": "Short 1SD iron condor, 25pt wings, 30-45 DTE, manage 21DTE/50% take/2x stop, 1% risk, Monday weekly. Real SPY chains via ThetaData; strikes from prior-20d realized vol (yfinance). Pre-registered + signed (vrp_preregistration.json#options_backtest)."
+    "methodology_note": "Short 1SD iron condor, 25pt wings, 30-45 DTE, manage 21DTE/50% take/2x stop, 1% risk, Monday weekly. Real SPY chains via ThetaData; strikes from prior-20d realized vol (yfinance). Pre-registered + signed (vrp_preregistration.json#options_backtest).",
+    "annotations": [
+      {
+        "date": "2026-07-07T14:27:47.035832+00:00",
+        "by": "day3/E2-derivation",
+        "note": "DEAD-AS-SPECCED (mechanical derivation, rule fixed before computation): constitution-compliant sizing (Art.1 DRAFT 0.75% worst-case) requires account >= wing_width_$ / risk_pct with credit conservatively floored at 0 => 25pt x $100 / 0.0075 = $333,334. Every account size appearing in repo configs ({$100k research, $50k futures, $10k ICT}) is below the floor -> the 25-pt structure cannot express a single constitution-compliant contract in this firm as configured. Both empirical splits agree (IS 1t/51 skips; OOS 0t/78 skips). Refined credit-based floors were REFUSED (A1: observed credit distributions are seen data). The 2026-06-29 raised-account run (50t/Sh1.248) is CONTEXT, NEVER EVIDENCE (A1; preserved in runs[] history via E0). Successor structure pre-registered UNRUN: data/research/preregister/VRP-001-OPTIONS-v2.json (5-pt wings; floors 1 contract at $100k x 0.75% = $750 vs $500 worst-case loss). Running v2 requires Colin's ack of the spec."
+      }
+    ]
   },
   {
     "id": "BENCH-THROUGHPUT",
