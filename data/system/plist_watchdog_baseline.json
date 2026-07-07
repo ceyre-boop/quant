@@ -1,6 +1,6 @@
 {
-  "ts": "2026-07-03T18:58:16.938960+00:00",
-  "reason": "initial baseline \u2014 pre-change state, Day-2 session 2026-07-03 (20 jobs)",
+  "ts": "2026-07-07T01:27:43.314061+00:00",
+  "reason": "Colin loaded com.alta.invariant_guard (operator one-liner from TICK-004, observed ~Jul-5 evening; RunAtLoad fired the 01:35Z escalations) \u2014 Day-3 session baseline",
   "plists": {
     "com.alta.bench.plist": "98cf6e015b164aa94cb3712bcf44178880aaf40d9af2ba560d62f959a8f1f40b",
     "com.alta.cache.refresh.plist": "d684b72e3bfc952773a8412677a01c30b8ccde7daa0998c21acd51a6cfe83563",
@@ -10,6 +10,7 @@
     "com.alta.futures.bias.plist": "ebaa3017ef51a924cc94d2a53bb5a3826c33a17171709599711c08c84ed24dfd",
     "com.alta.health.responder.plist": "57ba494deb7073a168e11a420be4bb0d659c31f672a5c55570201df277c33368",
     "com.alta.hypothesis.generator.plist": "8fcf43c5c96058a45319d9bdb601e0243694059ef27d2492c75cab27646fdb7b",
+    "com.alta.invariant_guard.plist": "f57d3dc1eb5ecf29f7f9d961a0a8d1546bc68fc2dd2e66e71332d373091b1528",
     "com.alta.journal_sync.plist": "81f9860d2be1106cbf0f05cff5dd972963804bdb12da36ff0c7b9088af9816c8",
     "com.alta.oracle.briefing.plist": "feeb664bab2211be927480ef0024be49e7e438302cbfcb85e5882395b952c4da",
     "com.alta.oracle.killzone.plist": "2fca8612cb21a7dafc8cc04b1784397ce36c2ad249a114d991c11a17c40590dc",
@@ -32,6 +33,7 @@
     "com.alta.futures.bias",
     "com.alta.health.responder",
     "com.alta.hypothesis.generator",
+    "com.alta.invariant_guard",
     "com.alta.journal_sync",
     "com.alta.oracle.briefing",
     "com.alta.oracle.killzone",
@@ -45,5 +47,10 @@
     "com.alta.weekly_review",
     "com.sovereign.papertrading"
   ],
-  "history": []
+  "history": [
+    {
+      "ts": "2026-07-03T18:58:16.938960+00:00",
+      "reason": "initial baseline \u2014 pre-change state, Day-2 session 2026-07-03 (20 jobs)"
+    }
+  ]
 }

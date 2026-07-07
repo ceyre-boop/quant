@@ -1,6 +1,33 @@
 {
   "messages": [
     {
+      "id": "pulse-20260707T0000",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] REST_MODE_EXPIRED: HYP-063 () validated and unimplemented for 15 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
+      "timestamp": "2026-07-07T00:00:50+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260706T2200",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] REST_MODE_EXPIRED: HYP-063 () validated and unimplemented for 14 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
+      "timestamp": "2026-07-06T22:00:39+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "audit-2026-07-06-price_source_drift",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "[AUDIT] PRICE_SOURCE_DRIFT: AUD_NZD median |\u0394close|/close 0.00227 (2026-07-06)",
+      "timestamp": "2026-07-06T13:10:03.033986+00:00",
+      "read": false,
+      "source": "shadow_audit"
+    },
+    {
       "id": "rest-2026-07-05-rq013-resim",
       "priority": "IMPORTANT",
       "emoji": "\ud83d\udfe2",
@@ -422,43 +449,7 @@
       "timestamp": "2026-07-02T04:50:24.545366+00:00",
       "read": false,
       "source": "shadow_audit"
-    },
-    {
-      "id": "audit-2026-06-29-price_source_drift",
-      "priority": "IMPORTANT",
-      "emoji": "\ud83d\udfe1",
-      "text": "[AUDIT] PRICE_SOURCE_DRIFT: AUD_NZD median |\u0394close| 0.00362 (2026-06-29)",
-      "timestamp": "2026-07-02T04:50:24.435638+00:00",
-      "read": false,
-      "source": "shadow_audit"
-    },
-    {
-      "id": "audit-2026-06-29-price_source_drift",
-      "priority": "IMPORTANT",
-      "emoji": "\ud83d\udfe1",
-      "text": "[AUDIT] PRICE_SOURCE_DRIFT: USD_JPY median |\u0394close| 0.15700 (2026-06-29)",
-      "timestamp": "2026-07-02T04:50:24.435635+00:00",
-      "read": false,
-      "source": "shadow_audit"
-    },
-    {
-      "id": "audit-2026-06-29-price_source_drift",
-      "priority": "IMPORTANT",
-      "emoji": "\ud83d\udfe1",
-      "text": "[AUDIT] PRICE_SOURCE_DRIFT: EUR_USD median |\u0394close| 0.00055 (2026-06-29)",
-      "timestamp": "2026-07-02T04:50:24.435630+00:00",
-      "read": false,
-      "source": "shadow_audit"
-    },
-    {
-      "id": "audit-2026-06-29-unexplained_divergence",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[AUDIT] UNEXPLAINED_DIVERGENCE: C5 count 2 (2026-06-29)",
-      "timestamp": "2026-07-02T04:50:24.435623+00:00",
-      "read": false,
-      "source": "shadow_audit"
     }
   ],
-  "last_updated": "2026-07-06T01:36:40.058079+00:00"
+  "last_updated": "2026-07-07T00:00:50+00:00"
 }

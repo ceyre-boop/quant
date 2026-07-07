@@ -1,0 +1,26 @@
+{
+  "date": "2026-07-06",
+  "generated_at": "2026-07-06T08:04:12.827427+00:00",
+  "input_tokens": 5763,
+  "output_tokens": 844,
+  "estimated_cost_usd": 0.149745,
+  "harvest_days_read": 7,
+  "reflection": {
+    "candidate_lesson": {
+      "lesson_text": "When internal regime confirmation runs internal-only (no external TV signals in the last 2h) AND confidence is capped at 65%, the 75% sizing multiplier should be tightened further to 60% because internal-only MOMENTUM calls lack cross-validation and are the regime-appropriateness failure mode Tenet 2 warns against.",
+      "mechanism": "Internal regime detection without external confirmation is a single-source signal. When TradingView returns 0 signals, there is no independent price-action witness that the momentum regime is real vs. an artifact of internal indicator autocorrelation. Institutionally, this is the equivalent of trading on your own order flow without seeing the tape \u2014 you cannot distinguish genuine directional commitment from mean-reverting chop. Sizing at 75% still deploys meaningful risk against an unwitnessed thesis.",
+      "testable_rule": "if regime_confirmation.source == 'internal_only' and regime_confirmation.confidence <= 0.65: sizing_multiplier = min(sizing_multiplier, 0.60)",
+      "expected_impact": "Reduces variance of returns during unconfirmed-regime windows; expected Sharpe +0.02 to +0.03 via lower denominator (return volatility) with minimal numerator loss since internal-only periods historically carry low conviction.",
+      "evidence_from_harvest": "Current external regime confirmation shows Internal=MOMENTUM vs TradingView=UNKNOWN (0 signals), agreement flagged True at only 65% confidence with a 75% sizing multiplier and the explicit reason 'No TV signals in last 2h \u2014 internal-only'. The 30-indicator consensus corroborates weakness: EURUSD conv=8%, USDJPY conv=0%, hist_hr=0% across all pairs \u2014 no historical green matches to justify full-confidence internal sizing.",
+      "evidence_from_reasoning": null,
+      "reasoning_component_targeted": "regime_confirmation.sizing_multiplier",
+      "sample_needed": 30
+    },
+    "retirement_flag": {
+      "lesson_to_review": null,
+      "reason": null
+    },
+    "system_health_note": "Zero trades across the last 7 days with Regime=UNKNOWN and internal-only confirmation at 65% confidence \u2014 the system is correctly in a low-conviction hold, so lessons must be harvest/state-derived until the decision logger accumulates closed trades."
+  },
+  "auto_validation": null
+}

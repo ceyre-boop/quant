@@ -1,18 +1,14 @@
 {
-  "generated_at": "2026-07-03T20:00:08.629663+00:00",
-  "briefing": "Session close 2026-07-03T20:00Z. Scanner: EURUSD=X SHORT (PLACED); USDJPY=X SHORT (PLACED). 1 trade(s) closed today: 0W/1L, realized -0.00. Oracle has these outcomes to learn from. NAV 109,548 \u2192 109,541 (-7.52, -0.007%). 3 position(s) carried overnight. All monitored loops alive. Forex macro is a swing edge (~1 trade/pair/month) \u2014 a quiet day is the strategy working, not failing. The day's closed outcomes feed Oracle's next reflection.",
+  "generated_at": "2026-07-06T20:06:32.940216+00:00",
+  "briefing": "Session close 2026-07-06T20:06Z. No qualifying forex setup today (rate differentials within normal range). No trades closed today \u2014 nothing new for the loop to learn from. NAV: not enough snapshots today to compute a day change. Flat into the close \u2014 no overnight exposure. \u26a0\ufe0f loops down: ict_scanner. Forex macro is a swing edge (~1 trade/pair/month) \u2014 a quiet day is the strategy working, not failing. The day's closed outcomes feed Oracle's next reflection.",
   "scan_verdicts": [
-    "PLACED",
-    "PLACED"
+    "NO_SIGNALS"
   ],
-  "closed_today": 1,
-  "closed_realized_pl": -0.0,
-  "nav_day": {
-    "nav_open": 109548.04,
-    "nav_close": 109540.52,
-    "delta_usd": -7.52,
-    "delta_pct": -0.007
-  },
-  "open_overnight": 3,
-  "loops_down": []
+  "closed_today": 0,
+  "closed_realized_pl": 0,
+  "nav_day": {},
+  "open_overnight": 0,
+  "loops_down": [
+    "ict_scanner"
+  ]
 }

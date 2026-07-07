@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-05T07:55:15.793404+00:00",
-  "as_of_date": "2026-07-05",
+  "generated_at": "2026-07-06T08:04:12.863631+00:00",
+  "as_of_date": "2026-07-06",
   "current_lesson": {
     "components": [
       "confirmation",
@@ -9,17 +9,17 @@
       "signals",
       "sizing"
     ],
-    "component_label": "external_confirmation.sizing_multiplier / tv_signals",
+    "component_label": "regime_confirmation.sizing_multiplier",
     "first_seen": "2026-06-15",
-    "last_seen": "2026-07-05",
-    "days_forming": 20,
-    "n_revisions": 2,
-    "n_days_appeared": 2,
+    "last_seen": "2026-07-06",
+    "days_forming": 21,
+    "n_revisions": 3,
+    "n_days_appeared": 3,
     "stable_days": 1,
     "status": "forming",
     "time_to_converge_days": null,
-    "latest_lesson_text": "When internal regime disagrees with or lacks external TradingView confirmation (0 TV signals), the 75% sizing multiplier should be a hard trade GATE below a consensus conviction floor, not just a size reduction \u2014 internal-only MOMENTUM signals with pair conviction < 50% are noise-dominated.",
-    "latest_rule": "if external_confirmation.tv_signals == 0 and regime == 'MOMENTUM' and pair_consensus_conv < 0.50: veto_trade() else if sizing_multiplier <= 0.75: proceed_at_reduced_size()",
+    "latest_lesson_text": "When internal regime confirmation runs internal-only (no external TV signals in the last 2h) AND confidence is capped at 65%, the 75% sizing multiplier should be tightened further to 60% because internal-only MOMENTUM calls lack cross-validation and are the regime-appropriateness failure mode Tenet 2 warns against.",
+    "latest_rule": "if regime_confirmation.source == 'internal_only' and regime_confirmation.confidence <= 0.65: sizing_multiplier = min(sizing_multiplier, 0.60)",
     "history": [
       {
         "date": "2026-06-15",
@@ -28,6 +28,10 @@
       {
         "date": "2026-07-05",
         "rule": "if external_confirmation.tv_signals == 0 and regime == 'MOMENTUM' and pair_consensus_conv < 0.50: veto_trade() else if sizing_multiplier <= 0.75: proceed_at_reduced_size()"
+      },
+      {
+        "date": "2026-07-06",
+        "rule": "if regime_confirmation.source == 'internal_only' and regime_confirmation.confidence <= 0.65: sizing_multiplier = min(sizing_multiplier, 0.60)"
       }
     ]
   },
@@ -40,17 +44,17 @@
         "signals",
         "sizing"
       ],
-      "component_label": "external_confirmation.sizing_multiplier / tv_signals",
+      "component_label": "regime_confirmation.sizing_multiplier",
       "first_seen": "2026-06-15",
-      "last_seen": "2026-07-05",
-      "days_forming": 20,
-      "n_revisions": 2,
-      "n_days_appeared": 2,
+      "last_seen": "2026-07-06",
+      "days_forming": 21,
+      "n_revisions": 3,
+      "n_days_appeared": 3,
       "stable_days": 1,
       "status": "forming",
       "time_to_converge_days": null,
-      "latest_lesson_text": "When internal regime disagrees with or lacks external TradingView confirmation (0 TV signals), the 75% sizing multiplier should be a hard trade GATE below a consensus conviction floor, not just a size reduction \u2014 internal-only MOMENTUM signals with pair conviction < 50% are noise-dominated.",
-      "latest_rule": "if external_confirmation.tv_signals == 0 and regime == 'MOMENTUM' and pair_consensus_conv < 0.50: veto_trade() else if sizing_multiplier <= 0.75: proceed_at_reduced_size()",
+      "latest_lesson_text": "When internal regime confirmation runs internal-only (no external TV signals in the last 2h) AND confidence is capped at 65%, the 75% sizing multiplier should be tightened further to 60% because internal-only MOMENTUM calls lack cross-validation and are the regime-appropriateness failure mode Tenet 2 warns against.",
+      "latest_rule": "if regime_confirmation.source == 'internal_only' and regime_confirmation.confidence <= 0.65: sizing_multiplier = min(sizing_multiplier, 0.60)",
       "history": [
         {
           "date": "2026-06-15",
@@ -59,6 +63,10 @@
         {
           "date": "2026-07-05",
           "rule": "if external_confirmation.tv_signals == 0 and regime == 'MOMENTUM' and pair_consensus_conv < 0.50: veto_trade() else if sizing_multiplier <= 0.75: proceed_at_reduced_size()"
+        },
+        {
+          "date": "2026-07-06",
+          "rule": "if regime_confirmation.source == 'internal_only' and regime_confirmation.confidence <= 0.65: sizing_multiplier = min(sizing_multiplier, 0.60)"
         }
       ]
     },
@@ -81,7 +89,7 @@
       "component_label": "green_matches",
       "first_seen": "2026-06-02",
       "last_seen": "2026-07-04",
-      "days_forming": 33,
+      "days_forming": 34,
       "n_revisions": 25,
       "n_days_appeared": 25,
       "stable_days": 1,
@@ -200,7 +208,7 @@
       "component_label": "signal_layers_active",
       "first_seen": "2026-07-02",
       "last_seen": "2026-07-03",
-      "days_forming": 3,
+      "days_forming": 4,
       "n_revisions": 2,
       "n_days_appeared": 2,
       "stable_days": 1,
