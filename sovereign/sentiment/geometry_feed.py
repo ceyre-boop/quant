@@ -169,6 +169,56 @@ def detect_fvgs_daily(df: pd.DataFrame, max_age: int, min_atr_frac: float) -> tu
     return (count, unfilled)
 
 
+def fvg_formation_events(df: pd.DataFrame, cfg: dict) -> list[tuple["pd.Timestamp.date", int]]:
+    """Per-triplet (formation_date, direction) list — the SAME replicated kernel as
+    detect_fvgs_daily, restated to keep each qualifying triplet's own date instead of collapsing
+    to an aggregate (count, unfilled) tuple. direction: +1 bullish gap (c1.High < c3.Low),
+    -1 bearish gap (c1.Low > c3.High); formation_date = the date of c3 (the bar that completes/
+    reveals the 3-bar gap).
+
+    PARITY BY CONSTRUCTION: this walks the identical [start, as_of-1) triplet range, the same
+    trailing-ATR-ending-at-the-last-row size filter, and the same trailing fvg_max_age-bar window
+    as detect_fvgs_daily — so len(fvg_formation_events(df, cfg)) == detect_fvgs_daily(df,
+    cfg["fvg_max_age"], cfg["fvg_min_atr_frac"])[0] for the SAME (df, cfg), always (see
+    tests/test_sentiment_geometry.py::TestFVGFormationEvents for the reconciliation test).
+
+    Empty list under _FVG_MIN_BARS or before a full max_age-bar lookback exists — mirrors
+    detect_fvgs_daily's (0, 0) / (None, None) warmup gating exactly (a caller building a
+    multi-year event log by calling this once per trading day on df.iloc[:t+1] gets nothing
+    until both floors are cleared, same as the board's own fvg_count_20d column).
+
+    cfg reads fvg_max_age / fvg_min_atr_frac (same keys as compute_pair's cfg — pass
+    config sentiment.geometry, or a test's GEOM_CFG). Never imports ict/ (isolation wall — see
+    module docstring ISOLATION); this is a pure restatement of detect_fvgs_daily's own math.
+    """
+    d = _require_ohlc(df)
+    n = len(d)
+    max_age = int(cfg["fvg_max_age"])
+    min_atr_frac = float(cfg["fvg_min_atr_frac"])
+    if n < _FVG_MIN_BARS or n < max_age + 2:
+        return []
+
+    as_of = n - 1
+    atr = _compute_atr(d, period=14)
+    lookback = min(max_age, as_of - 1)
+    start = as_of - lookback
+
+    events: list[tuple] = []
+    for i in range(start, as_of - 1):
+        c1 = d.iloc[i]
+        c3 = d.iloc[i + 2]
+        c3_date = pd.Timestamp(d.index[i + 2]).date()
+        if c1["High"] < c3["Low"]:
+            top, bottom = float(c3["Low"]), float(c1["High"])
+            if (top - bottom) >= min_atr_frac * atr:
+                events.append((c3_date, 1))
+        if c1["Low"] > c3["High"]:
+            top, bottom = float(c1["Low"]), float(c3["High"])
+            if (top - bottom) >= min_atr_frac * atr:
+                events.append((c3_date, -1))
+    return events
+
+
 def tri_state_stats(df: pd.DataFrame, window: int, pctile: float) -> tuple[bool | None, int | None, float]:
     """Contraction/consolidation read on the daily H-L range, over df.iloc[:t+1] (last row = t).
 

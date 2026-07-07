@@ -172,6 +172,81 @@ class TestFVGParity:
         assert count == 0 and unfilled == 0
 
 
+# ── fvg_formation_events: parity with fvg_count_20d (TICK-019 Gβ substrate) ─────────────────
+# Additive thin helper (no ict import) — same replicated kernel as detect_fvgs_daily, restated
+# to return per-triplet (date, direction) instead of an aggregate (count, unfilled) tuple. The
+# helper walks the IDENTICAL [start, as_of-1) range with the SAME trailing-ATR filter, so its
+# event count reconciles with fvg_count_20d by construction — these tests pin that reconciliation
+# so any future edit to either function that breaks the parity fails loudly here.
+
+class TestFVGFormationEvents:
+    def _count_via_events(self, df, cfg=GEOM_CFG):
+        return len(geometry_feed.fvg_formation_events(df, cfg))
+
+    def _count_via_canon(self, df, cfg=GEOM_CFG):
+        count, _unfilled = geometry_feed.detect_fvgs_daily(df, cfg["fvg_max_age"], cfg["fvg_min_atr_frac"])
+        return count
+
+    def test_parity_gap_up(self):
+        df = _inject_gap(_make_ohlc(40, seed=11), at=30, kind="bull")
+        assert self._count_via_events(df) == self._count_via_canon(df) >= 1
+
+    def test_parity_gap_down(self):
+        df = _inject_gap(_make_ohlc(40, seed=12), at=30, kind="bear")
+        assert self._count_via_events(df) == self._count_via_canon(df) >= 1
+
+    def test_parity_no_gap(self):
+        idx = pd.bdate_range("2021-01-01", periods=40)
+        df = pd.DataFrame({"Open": 100.0, "High": 100.3, "Low": 99.7, "Close": 100.0}, index=idx)
+        assert self._count_via_events(df) == self._count_via_canon(df) == 0
+
+    def test_parity_two_gaps_at_multiple_as_of_points(self):
+        df = _inject_gap(_make_ohlc(90, seed=13), at=40, kind="bull")
+        df = _inject_gap(df, at=60, kind="bear")
+        for t in (45, 65, 89):
+            sub = df.iloc[: t + 1]
+            assert self._count_via_events(sub) == self._count_via_canon(sub)
+
+    def test_parity_random_walk_no_injected_gaps(self):
+        # A plain geometric random walk still throws occasional real 3-bar gaps by chance —
+        # parity must hold on "organic" frames too, not just the hand-injected ones above.
+        df = _make_ohlc(200, seed=99, vol=0.01)
+        for t in (60, 120, 199):
+            sub = df.iloc[: t + 1]
+            assert self._count_via_events(sub) == self._count_via_canon(sub)
+
+    def test_direction_and_date_match_injected_bull_gap(self):
+        df = _inject_gap(_make_ohlc(40, seed=11), at=30, kind="bull")
+        events = geometry_feed.fvg_formation_events(df, GEOM_CFG)
+        expected_date = pd.Timestamp(df.index[32]).date()   # c3 = the bar at at+2
+        assert (expected_date, 1) in events
+
+    def test_direction_and_date_match_injected_bear_gap(self):
+        df = _inject_gap(_make_ohlc(40, seed=12), at=30, kind="bear")
+        events = geometry_feed.fvg_formation_events(df, GEOM_CFG)
+        expected_date = pd.Timestamp(df.index[32]).date()
+        assert (expected_date, -1) in events
+
+    def test_empty_below_min_bars(self):
+        df = _make_ohlc(3, seed=21)
+        assert geometry_feed.fvg_formation_events(df, GEOM_CFG) == []
+
+    def test_empty_below_full_lookback(self):
+        df = _make_ohlc(15, seed=20)   # fewer than max_age(20)+2 = 22 bars
+        assert geometry_feed.fvg_formation_events(df, GEOM_CFG) == []
+
+    def test_does_not_import_ict(self):
+        # belt-and-suspenders alongside test_geometry_feed_does_not_import_ict below — the new
+        # function lives in the same module so the whole-module AST check already covers it,
+        # but this pins the intent at the function level too.
+        import ast
+        import inspect as inspect_mod
+        src = inspect_mod.getsource(geometry_feed.fvg_formation_events)
+        tree = ast.parse(src)
+        for node in ast.walk(tree):
+            assert not isinstance(node, (ast.Import, ast.ImportFrom)), "fvg_formation_events must not import anything (isolation wall)"
+
+
 # ── (4) tri_state_stats ──────────────────────────────────────────────────────────────────────
 
 class TestTriState:
