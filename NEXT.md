@@ -6,6 +6,25 @@ Standing constraints live in `CLAUDE.md` — not restated here.
 
 ---
 
+## 2026-07-07 · RATIFICATION EXECUTED (Claude Code / Molly, on Colin's order) — RISK_CONSTITUTION v1.0.0
+
+**Pushed:** 0789458 (enactment) + 565fa13 (propagation pin). The constitution is LAW: Art.1 **0.75%** ·
+Art.2 **2.5%** · Art.3 breakers **3.5/5/6.5** peak-to-trough — re-anchored below the **8% TRAILING**
+prop halt (the draft 8.5% flatten breaker sat ABOVE the trailing line and could never fire; the ratified
+final rung sits 1.5% below it). Art.6 carve-out (final wording): *"This article binds live capital only:
+paper, shadow, and research runs may exercise any pre-registered hypothesis at any evidence stage,
+provided their records stay source-tagged so a paper outcome can never masquerade as live evidence."*
+Prose + YAML twin + drift-test third leg amended in ONE commit (Art.5); drift tests 10/10;
+param_change_log entry per NN#4. **Tier configs: all three are execution-path-imported** (risk_config ←
+forex_live_scan via risk_engine/base_size · parameters ← ict/micro_risk + funderpro_executor ·
+ict_params ← ict/pipeline) → **zero edits under the freeze; dated PENDING-RECONCILIATION
+(blocked_on: shadow_close) note written into the constitution itself** — clamps + mutation tests land
+the day the window closes. One propagation catch: the factory paper-adapter's cap stamp flipped
+DRAFT-CAPS→RATIFIED-CAPS (the ratification WORKING against a DRAFT-era test pin — pin updated).
+**Suite 40 failed exact / 1185 / 1 skipped. Watchdog GREEN.**
+
+---
+
 ## 2026-07-06/07 (Claude Code / Molly) — DAY 3: THE ADJUDICATION — health truth · E0 memory integrity · VRP dead-as-specced · geometry family through the gate
 
 **Push:** ✅ c9ad9ca → 01cacbd → 1e1b59e → dad7c47 → f1a29a0 → 78e2706 → d3ec74f (+ this entry). Zero unpushed.
