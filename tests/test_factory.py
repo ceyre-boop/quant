@@ -86,7 +86,10 @@ class TestPaperAdapterStub:
                                                     "decision": "LONG"},
                                          predicates={"all": []}, board_date="2026-07-01",
                                          hyp_id="HYP-TEST", dry_run=True)
-        assert "DRAFT-CAPS" in row["detail"]["cap_stamp"]
+        # Ratified 2026-07-07 (v1.0.0): the adapter stamps caps from the constitution
+        # twin's live status — this pin flips WITH ratification state, by design.
+        assert "RATIFIED-CAPS" in row["detail"]["cap_stamp"]
+        assert "per_trade=0.0075" in row["detail"]["cap_stamp"]
         assert not (tmp_path / "j").exists()            # dry-run journals nothing
         with pytest.raises(SystemExit, match="NOT enabled"):
             adapter.decide_and_journal("EURUSD", {"p": 0.7, "confidence": 0.7, "decision": "LONG"},
