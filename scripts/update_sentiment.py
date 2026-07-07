@@ -130,6 +130,17 @@ def main() -> dict:
                   f"board purged, exiting 1 (L2 sentinel).")
             sys.exit(1)
         print(f"DB: {store.DB_PATH}")
+        # ── positioning-board dashboard export (TICK-007 Step 1, additive, display-only) ──
+        # Guarded: the export must never fail the feeder run. Reuses this run's already-open
+        # `con` (read-write) so it never takes a second lock on the same DuckDB file. Feeds no
+        # live gate — Step 2 (dashboard panel) is a separate session.
+        try:
+            from scripts.export_positioning_board import export as _export_positioning_board
+            _pb = _export_positioning_board(con=con)
+            print(f"POSITIONING BOARD EXPORT: as_of={_pb['as_of']} stale={_pb['stale']} "
+                  f"pairs={len(_pb['pairs'])}")
+        except Exception as exc:
+            print(f"[sentiment] positioning-board export failed (non-fatal): {exc}")
         return {"board_rows": board_rows, "news": news_cov, "gdelt": gdelt_cov, "macro": macro_cov,
                 "vix": vix_cov, "surprise": surprise_cov, "cot": cot_cov, "vrp": vrp_cov,
                 "options_surface": surf_cov, "vrp_board_pct": board_pct, "news_probe": news_probe,

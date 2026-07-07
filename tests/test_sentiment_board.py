@@ -561,6 +561,9 @@ def test_update_sentiment_halts_and_purges_on_leak(tmp_path, monkeypatch):
     # Point the runner at the temp DB and stub every network feeder to a no-op so main()
     # exercises only the audit → halt path (rebuild is a no-op to keep the seeded board row).
     monkeypatch.setattr(_store, "DB_PATH", db)
+    # TICK-007 tail-call must never write the real display-only export from a test
+    import scripts.export_positioning_board as _epb
+    monkeypatch.setattr(_epb, "OUTPUT_PATH", tmp_path / "positioning_board.json")
     for mod in (news_feed, gdelt_feed, macro_feed, vix_feed, surprise_feed,
                 cot_feed, vrp_feed, options_surface_feed):
         monkeypatch.setattr(mod, "update", lambda *a, **k: {})
@@ -599,6 +602,9 @@ def test_update_sentiment_returns_clean_when_no_leak(tmp_path, monkeypatch):
     seed.close()
 
     monkeypatch.setattr(_store, "DB_PATH", db)
+    # TICK-007 tail-call must never write the real display-only export from a test
+    import scripts.export_positioning_board as _epb
+    monkeypatch.setattr(_epb, "OUTPUT_PATH", tmp_path / "positioning_board.json")
     for mod in (news_feed, gdelt_feed, macro_feed, vix_feed, surprise_feed,
                 cot_feed, vrp_feed, options_surface_feed):
         monkeypatch.setattr(mod, "update", lambda *a, **k: {})
