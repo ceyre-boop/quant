@@ -195,5 +195,5 @@ Schema per ticket:
 **description:** Run `geometry_feed.update()` against the real board (short — parquets are local), rebuild, look-ahead auditor 0-violations gate, THEN run HYP-082/HYP-083 exactly per their hash-locked preregs (01cacbd) with the GEOMETRY-2026-07 BH (m=2) adjudication. HYP-084 waits on the dark month + TICK-017 scorer + Colin's review_enabled flip. Same seal discipline as the positioning family (dated annotations, statuses stay PREREGISTERED until family verdicts).
 **depends_on:** [TICK-018]
 **blocks:** []
-**status:** ready
-**pre_approved:** false (evidence run — plan-first next session)
+**status:** done (2026-07-07 — Colin's "go" on plans/TICK-019.md; fill 0-violations/163,072 rows; runner 9c7c964; ADJUDICATED 6968ba9: HYP-082 NOT_SIGNIFICANT p=.598 N=2172 · HYP-083 NOT_SIGNIFICANT p=.741 N=1190)
+**pre_approved:** false (evidence run — plan-first, honored: plan 3b8e900 preceded the go)

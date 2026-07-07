@@ -6,6 +6,31 @@ Standing constraints live in `CLAUDE.md` — not restated here.
 
 ---
 
+## 2026-07-07 · night — TICK-019 EXECUTED ON COLIN'S GO: THE GEOMETRY FAMILY ADJUDICATED
+
+**Pushed:** c64acf7 (fill) → 9c7c964 (runner) → 6968ba9 (verdicts) + this entry. Zero unpushed.
+
+**Verdicts (final, in the ledger):** **HYP-082 NOT_SIGNIFICANT** (corridor-beyond-carry: pooled residual
+IC = 0.011, two-sided p = 0.598, N = 2,172 — an order of magnitude from the BH threshold 0.025) ·
+**HYP-083 NOT_SIGNIFICANT** (daily-FVG continuation: median −0.0003, p = 0.741, N = 1,190; the
+diversifier gate was never reached). BH m=2 per the locked manifest. **Both legs WELL-POWERED — no
+UNDERPOWERED shelter; the nulls are earned.** Priors confirmed. The fractal-corridor and FVG threads
+now have their honest answer at daily resolution; the prior explorations stay non-evidentiary forever
+(A1). Gγ/HYP-084 untouched (dark-month clock — starts at your flip + TICK-017).
+
+**Process integrity, end to end in one day:** specs hash-locked BEFORE features (01cacbd) → first
+real-data geometry fill (19.4s, board 11,576 rows, **look-ahead 0 violations / 163,072 provenance
+rows**) → runner built to spec by builder (699 lines, 82 tests; 7 ambiguities resolved WITH citations,
+incl. an IEEE754 boundary catch on the cost floor and the no-flip Gβ reading) → dry-run mechanics →
+seals → BH → verdicts. Gate-zero 16/16 locks verified at preflight; reconcile 0.6885; seed 42.
+**Suite: 40 failed exact / 1,243 passed / 1 skipped. Watchdog GREEN (21).**
+
+**No CONFIRMED → Article 6 stands, ignition locked.** Remaining triggers unchanged and yours:
+gdelt_retry + sentiment_update loads (the positioning family's clock is still NOT running),
+review_enabled flip, v2 ack, RED-1 batch, floor-clause signature.
+
+---
+
 ## 2026-07-07 · RATIFICATION EXECUTED (Claude Code / Molly, on Colin's order) — RISK_CONSTITUTION v1.0.0
 
 **Pushed:** 0789458 (enactment) + 565fa13 (propagation pin). The constitution is LAW: Art.1 **0.75%** ·
