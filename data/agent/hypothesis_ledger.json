@@ -1896,5 +1896,25 @@
     "p_value": null,
     "verdict": null,
     "note": "hash-locked BEFORE feature construction (Day-3 G1); prior geometry materials non-evidentiary (A1)"
+  },
+  {
+    "id": "HYP-085",
+    "name": "Political-alpha: Trump statements produce abnormal moves in tagged instruments (event study)",
+    "status": "PREREGISTERED",
+    "date_registered": "2026-07-08",
+    "family": "NONE",
+    "hash_lock": "58e725edd55aa7255e1f953410f6fc6ead202f4236cd8307e2b690238115ceb8",
+    "prereg_file": "data/research/preregister/HYP-085_political_alpha_trump_events.json",
+    "mechanism": "policy statements from a single actor move the named sector/currency; advance positioning, if any, shows up as pre-announcement FXE rr25 / options-volume drift",
+    "methodology_note": "self-contained event study in research/political_alpha/ per the vault spec Political-Alpha-Claude-Code-Spec.md; one bootstrap primary, descriptive secondaries; TICK-020",
+    "prior_expectation": "NOT_SIGNIFICANT",
+    "result": null,
+    "p_value": null,
+    "bh_survives": null,
+    "oos_sharpe": null,
+    "is_sharpe": null,
+    "standalone": true,
+    "auto_generated": false,
+    "source": "manual"
   }
 ]

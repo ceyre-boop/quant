@@ -197,3 +197,12 @@ Schema per ticket:
 **blocks:** []
 **status:** done (2026-07-07 — Colin's "go" on plans/TICK-019.md; fill 0-violations/163,072 rows; runner 9c7c964; ADJUDICATED 6968ba9: HYP-082 NOT_SIGNIFICANT p=.598 N=2172 · HYP-083 NOT_SIGNIFICANT p=.741 N=1190)
 **pre_approved:** false (evidence run — plan-first, honored: plan 3b8e900 preceded the go)
+
+## TICK-020
+**title:** Political-alpha event study (HYP-085) — build research/political_alpha/ per the vault spec
+**description:** Pre-registered event study: do Trump public statements produce abnormal moves (±2σ of trailing 60d SD) in tagged forex pairs / sector ETFs, with a pre-announcement FXE rr25 positioning overlay? Governing spec (LAW, locked 2026-07-08): `~/Obsidian/Obsidian/Trading/Research/Political-Alpha-Claude-Code-Spec.md`. Prereg hash-locked BEFORE any event data: `data/research/preregister/HYP-085_political_alpha_trump_events.json` (hash 58e725ed…, ledger entry PREREGISTERED). Four phases, one [RESEARCH] commit each: P1 event catalog (FR API + whitehouse.gov + Truth Social probe chain + spec-authorized manual fallback; deterministic regex classifier; 5-trading-day per-instrument de-dup; <30 events → state shortfall, never loosen), P2 abnormal returns (T-252→T-10 mean-adjusted baseline; post = T0+T1 daily log returns), P3 rr25/put-call-volume positioning (ThetaTerminal localhost; FXE proxy for forex; probe native ETF chains, record gaps, never synthesize), P4 exactly 3 pre-registered tests (QQ+Shapiro, SD exceedance, 10k statement-level placebo bootstrap seed 42) → normality_plot.png + sd_test_results.json + summary_report.md. Isolation HARD: imports nothing from sovereign/ict/ict-engine/config/audit/scripts (AST test). No launchd, no OANDA, no live params. Null-not-rejected is a valid outcome; rejected null = candidate result only (gauntlet promotion is a separate ledgered step). Plan: plans/TICK-020.md.
+**depends_on:** []
+**blocks:** []
+**acceptance_criteria:** spec §9 DoD verbatim — catalog ≥30 qualifying events or shortfall stated; normality + SD charts produced; bootstrap p reported honestly; only the 3 pre-registered tests run; isolation test green; all §12 artifacts exist; four [RESEARCH] phase commits pushed; NEXT.md updated
+**status:** in_progress (2026-07-08 — Phase 0 done: HYP-085 registered + hash-verified)
+**pre_approved:** true (Colin's GREENLIGHT in the spec + approved plan 2026-07-08)
