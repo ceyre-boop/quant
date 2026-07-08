@@ -152,6 +152,16 @@ def _load_cross_system_state():
         return {}
 
 
+def _load_big_move():
+    """Big-Move-of-the-Day estimates (written by the 2h pulse). DISPLAY-ONLY until
+    scripts/validate_big_move.py PASSes — carries its own validation_status flag."""
+    try:
+        with open('data/agent/big_move.json') as f:
+            return json.load(f)
+    except Exception:
+        return {}
+
+
 def _load_ict_trades():
     try:
         with open('data/ledger/ict_paper_trades.json') as f:
@@ -431,6 +441,7 @@ def build_payload(ttl=120):
         'best_trades': best,
         'ict_trades_count': len(ict_trades),
         'ict_recent': ict_trades[-5:] if ict_trades else [],
+        'big_move': _load_big_move(),
     }
     _PAYLOAD_CACHE['data'] = payload
     _PAYLOAD_CACHE['ts'] = now

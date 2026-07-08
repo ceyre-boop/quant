@@ -453,6 +453,60 @@ class OandaBridge:
             'timestamp':  datetime.now(timezone.utc).isoformat(),
         }
 
+    def set_stop(self, trade_id: str, price: float) -> dict:
+        """
+        Amend (create-or-replace) the stop-loss order on an open trade.
+
+        Uses the OANDA v20 "set dependent orders" endpoint — TradeCRCDO,
+        PUT /v3/accounts/{accountID}/trades/{tradeID}/orders — with a
+        ``stopLoss`` spec ``{"timeInForce": "GTC", "price": <rounded>}``. This
+        creates the stop if absent or replaces the existing one in place.
+
+        This is a PLAIN stop amend — NOT a native trailing-stop order — so the
+        Step-3 exit manager can daily-amend the broker stop to the backtest's
+        ATR-trail price (EXIT_MACHINE_DESIGN.md §2, Option C: daily-amend a plain
+        stop to match the daily-close ATR trail, not OANDA native trailing).
+
+        ``price`` is rounded to the instrument's tick precision (3dp for JPY
+        pairs, 5dp otherwise). The caller passes only ``trade_id`` + ``price``,
+        so the bridge looks the trade up to learn its instrument and owns the
+        precision — this keeps JPY pairs (e.g. USD_JPY in the v015 set) at a
+        precision OANDA accepts, rather than the caller having to know it.
+
+        Args:
+            trade_id: OANDA trade ID of an open trade.
+            price:    New stop-loss price level (absolute, instrument quote).
+
+        Returns:
+            The full OANDA API response dict. On success it carries
+            ``stopLossOrderTransaction`` with the accepted ``price`` (and a
+            ``stopLossOrderCancelTransaction`` when an old stop was replaced).
+
+        Raises:
+            ValueError: the trade cannot be found (no instrument to price against).
+            V20Error:   any non-2xx OANDA response — propagated, NOT swallowed
+                        (unlike place_trade/close_trade, which normalise to a
+                        status dict; the daily exit manager needs hard failures).
+        """
+        trade = self.get_trade(trade_id)
+        if not trade:
+            raise ValueError(
+                f"set_stop: trade {trade_id} not found on account {self._account_id}"
+            )
+        instrument = trade.get("instrument", "")
+        rounded = _round_price(price, instrument)
+
+        data = {"stopLoss": {"timeInForce": "GTC", "price": rounded}}
+        req = trades.TradeCRCDO(accountID=self._account_id, tradeID=trade_id, data=data)
+        resp = self._api.request(req)  # raises V20Error on any non-2xx response
+
+        confirmed = resp.get("stopLossOrderTransaction", {}).get("price", "")
+        logger.info(
+            "[OandaBridge] set_stop trade=%s %s stop→%s (confirmed=%s)",
+            trade_id, instrument, rounded, confirmed,
+        )
+        return resp
+
     def get_closed_trades(self, limit: int = 50) -> list[dict]:
         """
         Returns recently closed trades from OANDA.

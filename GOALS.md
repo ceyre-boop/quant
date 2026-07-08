@@ -84,7 +84,11 @@ execute_daily.py → Sovereign Orchestrator
 Signals → 15 Gates → 10 Size Modulators → Paper Trade
 
 LOOP 2 — CONTINUOUS HARVESTER (24/7)
-148,193 backtests/second via Numba JIT
+Backtest throughput — MEASURED 2026-06-29 (the old "148,193" was never measured;
+see data/research/bench_findings.md): ~24k/s single-core, ~135k/s on 12 cores TODAY
+on Python 3.14 where numba is INACTIVE (the @njit kernels fall back to pure Python).
+With numba active on Python <=3.13: ~728k/s single, ~1.26M/s on 12 cores — 8.5x the
+old claim. The system is currently slower than the legend because the JIT engine is off.
 Feeds DuckDB with enriched trade data
 
 LOOP 3 — AUTO-RETRAINER (every 4 hours)

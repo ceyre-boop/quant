@@ -418,12 +418,17 @@ def _db_write(records: List[dict]) -> int:
         con.close()
 
 
-def harvest_symbol(symbol: str) -> int:
-    """Harvest all windows for one symbol. Opens/closes DB per symbol."""
+def _compute_symbol(symbol: str) -> List[dict]:
+    """Compute ALL trade records for one symbol — NO DB write.
+
+    Pure compute + returns records, so it is safe to run in a worker process. The
+    DuckDB write (single-writer) is done by the parent in run_harvest. Module-level
+    so it pickles for the fork pool.
+    """
     df = load_ohlcv(symbol)
     if df is None or len(df) < WINDOW_DAYS + 10:
         log.warning(f"  {symbol}: no data or too short, skip")
-        return 0
+        return []
 
     ctx = _compute_context(df)
     windows = _generate_windows(df)
@@ -437,14 +442,16 @@ def harvest_symbol(symbol: str) -> int:
 
         for strategy in STRATEGIES:
             for params in PARAM_GRID:
-                records = _process_window(
+                all_records.extend(_process_window(
                     symbol, strategy, window_df, window_ctx,
                     params, w_start, w_end
-                )
-                all_records.extend(records)
+                ))
+    return all_records
 
-    # Single open-write-close per symbol — lock held for milliseconds
-    return _db_write(all_records)
+
+def harvest_symbol(symbol: str) -> int:
+    """Sequential per-symbol path (compute + write). Kept for direct/test callers."""
+    return _db_write(_compute_symbol(symbol))
 
 
 def run_harvest(symbols: List[str], max_passes: int = 0) -> None:
@@ -461,13 +468,18 @@ def run_harvest(symbols: List[str], max_passes: int = 0) -> None:
         t0 = time.time()
         log.info(f"=== PASS {pass_num} START — {len(symbols)} symbols ===")
 
+        # Parallel COMPUTE across N_CORES (workers return records); SERIAL write in
+        # the parent — DuckDB is single-writer, so only the parent touches harvest.db.
+        # imap streams results in order, overlapping the next symbol's compute with
+        # the previous symbol's write.
         total_trades = 0
-        for i, sym in enumerate(symbols):
-            sym_t0 = time.time()
-            n = harvest_symbol(sym)
-            elapsed = time.time() - sym_t0
-            total_trades += n
-            log.info(f"  [{i+1}/{len(symbols)}] {sym:8s}  {n:6,} trades  {elapsed:.1f}s")
+        ctx_mp = mp.get_context("fork")
+        with ctx_mp.Pool(N_CORES) as pool:
+            for i, records in enumerate(pool.imap(_compute_symbol, symbols)):
+                n = _db_write(records)
+                total_trades += n
+                log.info(f"  [{i+1}/{len(symbols)}] {symbols[i]:8s}  {n:6,} trades  "
+                         f"(compute×{N_CORES} cores, serial write)")
 
         elapsed_pass = time.time() - t0
 

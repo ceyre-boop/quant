@@ -1,0 +1,26 @@
+{
+  "date": "2026-07-07",
+  "generated_at": "2026-07-07T08:07:37.402966+00:00",
+  "input_tokens": 6414,
+  "output_tokens": 940,
+  "estimated_cost_usd": 0.16671,
+  "harvest_days_read": 7,
+  "reflection": {
+    "candidate_lesson": {
+      "lesson_text": "A SHORT with 4 of 6 signal layers FAILING (\u2717 HTF bias against macro, \u2717 no OB/FVG zone entry, \u2717 no CHOCH/BOS structure shift) should be vetoed regardless of a strong rate_diff_z \u2014 the single confirmed liquidity sweep + FVG presence is not enough confluence to override structural disagreement.",
+      "mechanism": "When market_structure is BULLISH but macro says SHORT, entering short on a swept BSL means fading institutional order flow at the exact point institutions accumulate \u2014 the sweep is stop-hunt liquidity being COLLECTED to fuel continuation UP, not reversal down. Without a CHOCH/BOS confirming the reversal, the sweep is a trap on the trader shorting it.",
+      "testable_rule": "if direction contradicts market_structure_bias AND no CHOCH/BOS in trade direction AND not price_at_OB_or_FVG_zone: veto trade regardless of rate_diff_z magnitude",
+      "expected_impact": "Cuts counter-structure SHORT losses; improves Sharpe by removing -1.0R trades that had macro conviction but zero structural confirmation. Estimated +0.02-0.04 Sharpe by eliminating the most negatively-skewed loss cluster.",
+      "evidence_from_harvest": "The single closed trade (USDJPY SHORT, -1.002R) had 4/6 signal layers FAILING \u2014 only the BSL sweep and Asia killzone passed. Strong rate_diff_z=-0.968 did not compensate for structural contradiction.",
+      "evidence_from_reasoning": "The lone loss had why_this_trade explicitly listing '\u2717 HTF bias: market structure BULLISH vs macro SHORT', '\u2717 Price not at OB or FVG zone', and '\u2717 No structure shift (CHOCH/BOS) in trade direction' \u2014 3 hard structural failures. rate_differential_zscore=-0.968 was strong but the trade still lost full -1R, confirming macro strength cannot rescue counter-structure entries with no CHOCH/BOS.",
+      "reasoning_component_targeted": "signal_layers_active (structure_shift / HTF_bias / OB_FVG_zone flags)",
+      "sample_needed": 15
+    },
+    "retirement_flag": {
+      "lesson_to_review": null,
+      "reason": null
+    },
+    "system_health_note": "Zero trades in the last 7 days with only 1 lifetime closed loss \u2014 the system is effectively in a data-starvation state (RQ-006 blocked until 30+ trades), so all lessons remain hypotheses pending sample accumulation rather than validated edges."
+  },
+  "auto_validation": null
+}

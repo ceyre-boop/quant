@@ -8,6 +8,10 @@ from typing import List, Optional, Sequence
 
 import numpy as np
 
+from sovereign.forex.exit_machine import (
+    BarContext, ExitConfig, ExitDecision, PositionState, decide_exit,
+)
+
 HOLD_DAYS = 60
 STOP_PCT = 0.04
 EXIT_REASON_STOP = 1
@@ -75,6 +79,8 @@ def _simulate_forex_core(
     worst_price = 0.0
     next_pyramid_price = 0.0
 
+    _cfg = ExitConfig(stop_atr_mult, trailing_atr_mult, strict_mode, enable_cb_refresh)
+
     for i in range(len(closes)):
         signal_today = int(signals[i])
         hold_today = int(hold_days[i]) if i < len(hold_days) else HOLD_DAYS
@@ -83,33 +89,22 @@ def _simulate_forex_core(
         atr_pct_now = max(atr_pct_now, 1e-6)
 
         if in_trade:
-            hold_count += 1
-            best_price = max(best_price, price)
-            worst_price = min(worst_price, price)
-
-            trail_hit = False
-            if trailing_atr_mult > 0:
-                if direction == 1:
-                    trail_stop = best_price - (trailing_atr_mult * atr_pct_now * best_price)
-                    trail_hit = price <= trail_stop
-                else:
-                    trail_stop = worst_price + (trailing_atr_mult * atr_pct_now * worst_price)
-                    trail_hit = price >= trail_stop
-
-            donchian_hit = False
-            if strict_mode and direction == 1 and i < len(donchian_exit_lows):
-                exit_level = donchian_exit_lows[i]
-                if not np.isnan(exit_level):
-                    donchian_hit = price < float(exit_level)
-
-            stop_hit = (price <= stop_price) if direction == 1 else (price >= stop_price)
-            reversal = signal_today != 0 and signal_today != direction
-            time_exit = (hold_count >= hold_limit) and not strict_mode
-            cb_refresh = (
-                enable_cb_refresh and signal_today == direction and hold_today < 30 and hold_count >= 20
+            _res = decide_exit(
+                PositionState(direction, stop_price, best_price, worst_price, hold_count, hold_limit),
+                BarContext(
+                    price,
+                    float(atr_pcts[i]) if i < len(atr_pcts) else 0.0,
+                    signal_today,
+                    hold_today,
+                    float(donchian_exit_lows[i]) if i < len(donchian_exit_lows) else float("nan"),
+                ),
+                _cfg,
             )
+            best_price = _res.state.best_price
+            worst_price = _res.state.worst_price
+            hold_count = _res.state.hold_count
 
-            if stop_hit or trail_hit or donchian_hit or reversal or time_exit or cb_refresh:
+            if _res.decision != ExitDecision.HOLD:
                 pnl = direction * (price / max(avg_entry, 1e-9) - 1.0) * units
                 entries.append(entry_idx)
                 exits.append(i)
@@ -117,21 +112,10 @@ def _simulate_forex_core(
                 pnls.append(float(pnl))
                 holds.append(hold_count)
                 units_arr.append(units)
-                if stop_hit:
-                    reasons.append(EXIT_REASON_STOP)
-                elif trail_hit:
-                    reasons.append(EXIT_REASON_TRAILING)
-                elif donchian_hit:
-                    reasons.append(EXIT_REASON_DONCHIAN)
-                elif reversal:
-                    reasons.append(EXIT_REASON_REVERSAL)
-                elif cb_refresh:
-                    reasons.append(EXIT_REASON_CB_REFRESH)
-                else:
-                    reasons.append(EXIT_REASON_TIME)
+                reasons.append(int(_res.decision))
                 in_trade = False
 
-                reenter_dir = signal_today if (reversal or cb_refresh) and signal_today != 0 else 0
+                reenter_dir = _res.reentry_signal
                 if reenter_dir != 0 and i + 1 < len(opens):
                     direction = int(reenter_dir)
                     entry_price = float(opens[i + 1])

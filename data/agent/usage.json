@@ -8,37 +8,30 @@
   },
   "week": {
     "start_date": "2026-07-04",
-    "weekly_used": 14500,
-    "weekly_remaining": 185500,
+    "weekly_used": 19000,
+    "weekly_remaining": 181000,
     "last_synced": null,
-    "note": "Weekly RESET Saturday 2026-07-04. REST-033 ~5.5k + REST-034 ~9k (RQ-REST-013 offline exit re-sim) = ~14.5k running estimate. STILL awaiting manual sync (claude_usage_tracker.py). Weekly capacity ample."
+    "note": "Weekly RESET Saturday 2026-07-04. REST-033 ~5.5k + REST-034 ~9k + REST-035 ~4.5k (read-only gate-wiring reconciliation) = ~19k running estimate of 200k. STILL awaiting manual sync. Weekly buffer huge."
   },
   "today": {
-    "date": "2026-07-05",
+    "date": "2026-07-08",
     "human_used": 0,
-    "agent_used": 9000,
+    "agent_used": 4500,
     "daily_agent_budget": 8571,
-    "agent_allowed_today": 9000,
-    "note": "REST-034 fresh UTC day. Ran RQ-REST-013 exit re-sim OFFLINE (cached OHLC \u2014 no network needed). 1 finding (FIND-REST-034-a), HYP-059 annotated, RQ-REST-013 -> DONE (converged w/ 2026-07-01 ExitConfig sweep), 1 IMPORTANT Colin msg. No live code/config touched. Weekly buffer huge."
+    "agent_allowed_today": 8571,
+    "note": "REST-035 (UTC 2026-07-08 ~01:12Z, ET Tue 21:12 -> Colin offline). Read-only cycle, no live code/config/network. Reconciled 5 queued gate-wiring tasks vs ledger+FDR: 2 READY (RQ-REST-007 DOW veto, RQ-REST-015 CB blackout), 2 STALE/reject-backed (RQ-REST-005 disp, RQ-REST-008/009 DOM), 1 strategic (RQ-REST-006). Verified phantom USD_CAD emitter dormant since 07-03 (no 9th fill). 2 findings, 1 Colin msg, queue annotated + RQ-REST-035 filed. Left ample buffer for Colin's next session."
   },
   "session": {
-    "started": "2026-07-06T01:37:12.897646+00:00",
-    "ended": "2026-07-06T01:37:12.897646+00:00",
+    "started": "2026-07-08T01:12:20.701442+00:00",
+    "ended": "2026-07-08T01:12:20.701442+00:00",
     "mode": "REST_MODE",
     "tasks_completed": [
-      "Discovered RQ-REST-013 no longer needs network: cached 4-pair daily OHLC 2014-2026 at positioning_family/spot_cache",
-      "Built + ran offline price-path exit re-sim (11 exit policies, entries fixed to 412-trade v015 proof set)",
-      "Validated reconstruction faithfulness (corr 0.60; single 2.90x R-norm reconciles time/trail/stop buckets)",
-      "Established convergence with 2026-07-01 ExitConfig 180-config sweep -> no new lever; RQ-REST-013 DONE",
-      "Wrote FIND-REST-034-a, annotated HYP-059 (verdict unchanged), 1 Colin msg, saved rq_rest_013_resim_results.json"
-    ],
-    "findings_written": 1,
-    "hypotheses_updated": [
-      "HYP-059 (annotation only)"
-    ],
-    "new_hypotheses": [],
-    "new_tasks_added": [],
-    "key_finding": "RQ-REST-013 exit re-sim runs fully offline and INDEPENDENTLY REPLICATES the HYP-059 resolution: wider trail best, per-trade trailing drag != portfolio A/B gain (recon recovers ~1/2.9 of recorded sumR, inverts flat-year 2022 +36->neg), reversal exit carries +28R no mechanical policy reproduces. No new exit lever; v015 optimal. Stale P1 closed, not reopened."
+      "Gate-wiring readiness reconciliation: mapped every QUEUED wiring task -> hypothesis -> current ledger status -> FDR/perm evidence",
+      "Found 2 of 5 wiring tasks rest on REJECTED hypotheses (RQ-REST-005/HYP-046, RQ-REST-008&009/HYP-051); 2 genuinely READY (RQ-REST-007/HYP-050, RQ-REST-015/HYP-061)",
+      "Flagged two hypothesis-ID collisions (HYP-046 disp-gate vs 046a/b/c holds; queue 'HYP-052' vs ledger HYP-052)",
+      "Verified phantom USD_CAD units=1 emitter dormant since 2026-07-03 (no new phantom fill in ~4d) -> downgraded RQ-REST-032 urgency",
+      "Wrote FIND-REST-035-a/b, 1 IMPORTANT Colin message, annotated queue, filed RQ-REST-035 integrity task"
+    ]
   },
   "mode": "REST_MODE",
   "thresholds": {

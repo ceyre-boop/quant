@@ -1,14 +1,14 @@
 {
-  "generated_at": "2026-07-07T00:00:50.297830+00:00",
+  "generated_at": "2026-07-08T01:33:20.217537+00:00",
   "alive": true,
   "fired_today": false,
   "frozen": null,
-  "scan_age_hours": 11.9,
+  "scan_age_hours": 13.5,
   "n_pairs_scanned": 4,
   "n_would_fire_today": 0,
   "strongest_signal": {
     "pair": "USDJPY=X",
-    "conviction": 0.626,
+    "conviction": 0.486,
     "direction": "NO_TRADE",
     "pct_to_trigger": 100.0,
     "regime": "TRENDING",
@@ -17,35 +17,35 @@
   "pairs": [
     {
       "pair": "USDJPY=X",
-      "conviction": 0.626,
+      "conviction": 0.486,
       "direction": "NO_TRADE",
       "pct_to_trigger": 100.0,
       "regime": "TRENDING",
       "rate_differential": 3.603
     },
     {
-      "pair": "GBPUSD=X",
-      "conviction": 0.314,
+      "pair": "AUDUSD=X",
+      "conviction": 0.233,
       "direction": "NO_TRADE",
       "pct_to_trigger": 100.0,
       "regime": "TRENDING",
-      "rate_differential": 0.17
+      "rate_differential": 0.1
     },
     {
       "pair": "EURUSD=X",
-      "conviction": 0.177,
+      "conviction": 0.187,
       "direction": "NO_TRADE",
       "pct_to_trigger": 100.0,
       "regime": "TRENDING",
       "rate_differential": -2.08
     },
     {
-      "pair": "AUDUSD=X",
-      "conviction": 0.17,
+      "pair": "GBPUSD=X",
+      "conviction": 0.183,
       "direction": "NO_TRADE",
       "pct_to_trigger": 100.0,
       "regime": "TRENDING",
-      "rate_differential": 0.1
+      "rate_differential": 0.17
     }
   ],
   "last_fill": {
@@ -53,10 +53,10 @@
     "direction": "SHORT",
     "fill_price": 161.323,
     "date": "2026-07-03",
-    "days_ago": 3.3
+    "days_ago": 4.3
   },
   "loops_alive": 7,
   "loops_down": [],
-  "summary_line": "System alive. 4 pairs scanned 11.9h ago \u2014 all NO_TRADE (edge not firing \u2014 correct, not broken). Highest conviction: USDJPY=X 0.626. Last fill: USD_JPY SHORT, 3.3d ago.",
+  "summary_line": "System alive. 4 pairs scanned 13.5h ago \u2014 all NO_TRADE (edge not firing \u2014 correct, not broken). Highest conviction: USDJPY=X 0.486. Last fill: USD_JPY SHORT, 4.3d ago.",
   "note": "Honest proof-of-life: would-be signals + proximity, never a forced trade. Read-only."
 }

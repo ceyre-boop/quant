@@ -386,7 +386,8 @@
       "requires_human": true,
       "estimated_minutes": 15,
       "source": "HYP-046 confirmed by REST_MODE",
-      "hypothesis_id": "HYP-046"
+      "hypothesis_id": "HYP-046",
+      "rest035_note": "REST-035 RECONCILE: underlying HYP-046 (disp gate) ledger status=REJECTED. DO NOT WIRE as an edge. Retain only as the wiring TEMPLATE referenced by HYP-061/RQ-REST-015. See FIND-REST-035-a."
     },
     {
       "id": "RQ-REST-006",
@@ -412,7 +413,8 @@
       "needs_network": false,
       "estimated_minutes": 15,
       "source": "REST_MODE DOW analysis",
-      "hypothesis_id": "HYP-NEW-DOW-VETO"
+      "hypothesis_id": "HYP-NEW-DOW-VETO",
+      "rest035_note": "REST-035 RECONCILE: READY. HYP-050 CONFIRMED, perm p=5e-5 (RQ-REST-022 SURVIVES). One of only 2 live wiring candidates. Needs Colin approval + param_change_log (NN#4)."
     },
     {
       "id": "RQ-REST-008",
@@ -425,7 +427,8 @@
       "needs_network": false,
       "estimated_minutes": 20,
       "source": "REST_MODE_HYP-052",
-      "hypothesis_id": "HYP-052"
+      "hypothesis_id": "HYP-052",
+      "rest035_note": "REST-035 RECONCILE: DOM effect = ledger HYP-051, status=REJECTED (CB-calendar confound; 86% trades on days 3-5). Queue label 'HYP-052' is an ID collision. DO NOT WIRE. See FIND-REST-035-a/b."
     },
     {
       "id": "RQ-REST-009",
@@ -438,7 +441,8 @@
       "needs_network": false,
       "estimated_minutes": 5,
       "source": "REST_MODE_HYP-051/052",
-      "hypothesis_id": "HYP-051"
+      "hypothesis_id": "HYP-051",
+      "rest035_note": "REST-035 RECONCILE: HYP-051 REJECTED (CB-calendar confound). DOM edge is absorbed into SEED-CAL-001/002 already embedded. DO NOT WIRE. See FIND-REST-035-a."
     },
     {
       "id": "RQ-REST-010",
@@ -533,7 +537,8 @@
       "hypothesis_id": "HYP-061",
       "is_code_change": true,
       "precondition": "RQ-REST-016 (back-extend cb_calendar.py to 2023) + Colin approval",
-      "updated_at": "2026-06-16T01:16:17Z"
+      "updated_at": "2026-06-16T01:16:17Z",
+      "rest035_note": "REST-035 RECONCILE: READY pending RQ-REST-016. HYP-061 CONFIRMED, perm p=0.005, BH-FDR robust. GBPUSD-only caveat. One of only 2 live wiring candidates."
     },
     {
       "id": "RQ-REST-016",
@@ -677,7 +682,16 @@
       "status": "QUEUED",
       "priority": 1,
       "description": "Quarantine the 8 phantom USD_CAD units=1 fills (tid 134/144/154/165/186/196/206/217) from Oracle ingestion so reflect_cycle stops synthesizing lessons from stale-emitter noise (proven: 2026-07-03 reflection built a false 'USD_CAD cluster scratched / WR 14%' lesson). PRECONDITION: RQ-REST-032 kill must land first, else new phantom fills keep arriving. Approach (Colin approval + param_change_log, NON-NEGOTIABLE #4): add a source/universe filter in reflect_cycle so fills for pairs outside the vetted scanned universe (USDJPY/GBPUSD/AUDUSD/EURUSD) and/or with degenerate risk params (SL=1.0/TP=2.0/units=1) are excluded from reflection, and one-time tag the 8 existing fills as quarantined in the ledger. Do NOT delete history - tag. Blocked on Colin: process kill (RQ-REST-032) + data/reflect change."
+    },
+    {
+      "id": "RQ-REST-035",
+      "status": "QUEUED",
+      "priority": 2,
+      "task": "INTEGRITY / relabel two hypothesis-ID collisions surfaced by REST-035 reconciliation: (1) HYP-046 is used for BOTH the REJECTED displacement gate AND the FDR-robust portfolio per-pair holds (HYP-046a/b/c) \u2014 give the disp gate a distinct id or mark it clearly so 'HYP-046 survives FDR' can't be misread as endorsing the disp gate. (2) research_queue RQ-REST-008 labels DOM-8-15 sizing 'HYP-052', but ledger HYP-052 is the 30d cross-pair trend gate; the DOM idea is HYP-051. Fix the queue label. Pure ledger/queue hygiene, no live code/config. Colin approval only needed if it touches deployed-edge naming referenced elsewhere.",
+      "source": "REST_MODE",
+      "created": "2026-07-08T01:12:02.668091+00:00",
+      "rest035_note": "Filed by REST-035. See FIND-REST-035-a/b."
     }
   ],
-  "last_updated": "2026-07-04T01:08:00+00:00"
+  "last_updated": "2026-07-08T01:12:02.668091+00:00"
 }

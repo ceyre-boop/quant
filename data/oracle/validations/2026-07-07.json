@@ -1,0 +1,9 @@
+{
+  "date": "2026-07-07",
+  "generated_at": "2026-07-07T08:07:37.417249+00:00",
+  "candidate_lesson": "A SHORT with 4 of 6 signal layers FAILING (\u2717 HTF bias against macro, \u2717 no OB/FVG zone entry, \u2717 no CHOCH/BOS structure shift) should be vetoed regardless of a strong rate_diff_z \u2014 the single confirmed liquidity sweep + FVG presence is not enough confluence to override structural disagreement.",
+  "testable_rule": "if direction contradicts market_structure_bias AND no CHOCH/BOS in trade direction AND not price_at_OB_or_FVG_zone: veto trade regardless of rate_diff_z magnitude",
+  "verdict": "REJECTED",
+  "reason": "Rule filters only 0 trades \u2014 insufficient sample",
+  "trades_available": 1160
+}

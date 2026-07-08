@@ -399,7 +399,7 @@ WHAT SOVEREIGN IS:
 - Forex macro swing system (v004, avg Sharpe 0.801, 8/8 pairs positive, target 1.5)
 - ICT FVG entry system (76% pass rate, +0.40R/trade, FunderPro prop challenge target)
 - Equity paper trading system with PTJ gates, Alexandrian Library, CS229 ML stack
-- Infrastructure: Numba fast backtest engine (148k/sec), launchd scheduling, GitHub Pages dashboard
+- Infrastructure: backtest engine MEASURED 2026-06-29 at ~135k backtests/sec (Python 3.14, numba INACTIVE -> pure-Python fallback); ~1.26M/sec with numba active on Python <=3.13. The old "148k" was never measured. launchd scheduling, GitHub Pages dashboard
 
 SUGGESTION RULES:
 - Each suggestion must be SPECIFIC. Not "improve the model" — "remove NZDUSD from ALL_PAIRS, its Sharpe 0.22 drags the portfolio average by ~0.07."

@@ -151,6 +151,26 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
 .fc-signal-big.long{color:var(--green)}.fc-signal-big.short{color:var(--red)}.fc-signal-big.flat{color:var(--muted)}
 .fc-conv{font-size:9px;color:var(--muted);letter-spacing:.5px}
 .best-setup-card{margin-top:12px;background:var(--bg2);border:1px solid var(--border);padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+/* ── Big Move of the Day ── */
+.bigmove-panel{margin-top:12px;background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:10px 12px}
+.bigmove-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.bigmove-title{font-size:10px;letter-spacing:1.5px;font-weight:700;color:var(--muted)}
+.bigmove-badge{font-size:9px;letter-spacing:.5px;color:var(--yellow);border:1px solid rgba(245,200,66,.35);border-radius:3px;padding:1px 6px}
+.bigmove-badge.validated{color:var(--green);border-color:rgba(0,212,160,.4)}
+.bigmove-rows{display:flex;flex-direction:column;gap:6px}
+.bigmove-row{display:grid;grid-template-columns:64px 56px 1fr 70px 64px;align-items:center;gap:10px;padding:6px 4px;border-top:1px solid var(--border)}
+.bigmove-row:first-child{border-top:none}
+.bm-pair{font-size:13px;font-weight:700}
+.bm-dir{font-size:11px;font-weight:700;text-align:center}
+.bm-dir.long{color:var(--green)}.bm-dir.short{color:var(--red)}.bm-dir.neutral{color:var(--dim)}
+.bm-bar{position:relative;height:14px;background:var(--bg);border:1px solid var(--border);border-radius:7px;overflow:hidden}
+.bm-bar-fill{position:absolute;left:0;top:0;bottom:0;border-radius:7px}
+.bm-bar-label{position:absolute;right:6px;top:0;line-height:14px;font-size:9px;color:var(--fg)}
+.bm-mag{font-size:10px;color:var(--muted);text-align:right}
+.bm-sess{font-size:9px;color:var(--dim);text-align:right;letter-spacing:.5px}
+.bm-drivers{grid-column:1 / -1;display:flex;flex-wrap:wrap;gap:4px;padding-top:2px}
+.bm-chip{font-size:9px;color:var(--muted);background:var(--bg);border:1px solid var(--border);border-radius:3px;padding:0 5px;line-height:15px}
+.bigmove-foot{font-size:9px;color:var(--dim);margin-top:8px;line-height:1.4}
 /* ── Trader Control Panel ── */
 .ctl-section{grid-column:span 12;margin-top:4px}
 .ctl-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:12px}
@@ -579,7 +599,8 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
 }
 @media(max-width:480px){
   .hdr-tab{padding:0 8px;font-size:9px;letter-spacing:.5px}
-  .forex-grid,.ict-stats-grid,.rp-health-grid,.rp-gate-grid,.edge-outcomes{grid-template-columns:1fr 1fr}
+  .forex-grid{grid-template-columns:1fr}
+  .ict-stats-grid,.rp-health-grid,.rp-gate-grid,.edge-outcomes{grid-template-columns:1fr 1fr}
   #trade-wrap{padding:12px}
 }
 /* ── CALENDAR tab (Warrior-style monthly P&L) ── */
@@ -747,6 +768,18 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
             <span class="best-setup-tag">Best Setup</span>
             <span style="font-size:11px;color:var(--muted)">Waiting for live signal data…</span>
           </div>
+        </div>
+
+        <!-- ══ Big Move of the Day — daily institutional displacement (display-only until validated) ══ -->
+        <div id="big-move-panel" class="bigmove-panel">
+          <div class="bigmove-head">
+            <span class="bigmove-title">⚡ BIG MOVE OF THE DAY</span>
+            <span id="bigmove-status" class="bigmove-badge">unvalidated · display only</span>
+          </div>
+          <div id="bigmove-rows" class="bigmove-rows">
+            <div style="font-size:11px;color:var(--dim);padding:8px 2px">Waiting for pulse estimates…</div>
+          </div>
+          <div class="bigmove-foot" id="bigmove-foot"></div>
         </div>
       </div>
 
@@ -1108,6 +1141,7 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
         </div>
       </div>
       <div id="chat-err"></div>
+      <div id="chat-chips-container" style="max-width:900px;width:100%;margin:0 auto"></div>
       <div id="chat-input-outer">
         <div class="chat-inner-row">
           <textarea id="chat-input" placeholder="Ask about the system…" rows="1"></textarea>
@@ -1172,7 +1206,7 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
       </div>
 
       <div class="sp-card" style="margin-top:16px">
-        <div class="sp-card-title">LIVE TRADE FEED</div>
+        <div class="sp-card-title">LIVE TRADE FEED <span style="color:var(--muted);font-weight:400;text-transform:none">— matching your toolbar filter</span></div>
         <div id="tr-live-feed">
           <div style="color:var(--muted);font-size:13px;padding:12px 0">
             Waiting for first trade signal...
@@ -1296,6 +1330,60 @@ async function tryFetchBridge(){
   }catch{return null;}
 }
 
+// Render the Big Move of the Day meter from data.big_move (written by the 2h pulse).
+// DISPLAY-ONLY: never drives an order until scripts/validate_big_move.py PASSes.
+function renderBigMove(bm){
+  const rows=document.getElementById('bigmove-rows');
+  const foot=document.getElementById('bigmove-foot');
+  const badge=document.getElementById('bigmove-status');
+  if(!rows)return;
+  const ests=bm&&bm.estimates?bm.estimates:null;
+  if(!ests||!Object.keys(ests).length){
+    rows.innerHTML='<div style="font-size:11px;color:var(--dim);padding:8px 2px">No estimate yet — pulse writes data/agent/big_move.json every 2h.</div>';
+    if(foot)foot.textContent='';
+    return;
+  }
+  // Validation status flag from the file (UNVALIDATED until the gate passes).
+  if(badge){
+    const validated=/validated/i.test(bm.validation_status||'')&&!/unvalidated/i.test(bm.validation_status||'');
+    badge.textContent=validated?'validated':'unvalidated · display only';
+    badge.className='bigmove-badge'+(validated?' validated':'');
+  }
+  const order=['GBPUSD','EURUSD','USDJPY','AUDUSD'];
+  const pairs=Object.keys(ests).sort((a,b)=>{
+    const ia=order.indexOf(a),ib=order.indexOf(b);
+    return (ia<0?99:ia)-(ib<0?99:ib);
+  });
+  rows.innerHTML=pairs.map(p=>{
+    const e=ests[p]||{};
+    const dir=(e.direction||'NEUTRAL').toLowerCase();
+    const pct=Math.max(0,Math.min(1,e.p_big||0));
+    const col=dir==='long'?'var(--green)':dir==='short'?'var(--red)':'var(--dim)';
+    const arrow=dir==='long'?'▲ LONG':dir==='short'?'▼ SHORT':'— NEUT';
+    const conf=e.confidence!=null?Math.round(e.confidence*100):0;
+    const mag=e.expected_magnitude_pct!=null?e.expected_magnitude_pct.toFixed(2)+'%':'—';
+    const vsadr=e.expected_vs_adr!=null?e.expected_vs_adr.toFixed(2)+'×ADR':'';
+    const sess=e.session||'';
+    const drivers=(e.drivers||[]).slice(0,3).map(d=>{
+      const nm=Array.isArray(d)?d[0]:d.name, val=Array.isArray(d)?d[1]:d.value;
+      const sign=val>0?'+':'';
+      return `<span class="bm-chip">${nm} ${sign}${(val||0).toFixed(2)}</span>`;
+    }).join('');
+    return `<div class="bigmove-row">
+      <span class="bm-pair">${p}</span>
+      <span class="bm-dir ${dir}">${arrow}</span>
+      <span class="bm-bar"><span class="bm-bar-fill" style="width:${(pct*100).toFixed(0)}%;background:${col};opacity:.55"></span><span class="bm-bar-label">P ${(pct*100).toFixed(0)}% · conf ${conf}%</span></span>
+      <span class="bm-mag">${mag}<br>${vsadr}</span>
+      <span class="bm-sess">${sess}</span>
+      <span class="bm-drivers">${drivers}</span>
+    </div>`;
+  }).join('');
+  if(foot){
+    const ctx=(bm.context_keys||[]).join(', ')||'price-only';
+    foot.textContent=`Predicts the day's institutional displacement (range top-tercile) — not entries. Context: ${ctx}. Display-only until OOS-validated.`;
+  }
+}
+
 async function updateBridgeState(){
   const data=await tryFetchBridge();
   if(!data)return;
@@ -1397,6 +1485,9 @@ async function updateBridgeState(){
       bsCard.style.borderColor='var(--border)';
     }
   }
+
+  // Big Move of the Day meter (display-only until validated)
+  renderBigMove(data.big_move);
 
   // Chat context — live
   const ctxEl=document.getElementById('chat-ctx');
@@ -3153,11 +3244,11 @@ const CHAT_API=API_BASE+'/chat';
 const CHAT_CHIPS=['What is the best setup right now?','ICT system status?','Which forex pair has highest conviction?','Should I take a trade today?','Bridge state and threat level?','Show me the edge math'];
 
 function chatInjectChips(){
-  const outer=document.getElementById('chat-input-outer');
-  if(!outer||document.getElementById('chat-chips'))return;
+  const container=document.getElementById('chat-chips-container');
+  if(!container||document.getElementById('chat-chips'))return;
   const row=document.createElement('div');
   row.id='chat-chips';
-  row.style.cssText='display:flex;flex-wrap:wrap;gap:6px;padding:8px 16px 4px;border-top:1px solid var(--border)';
+  row.style.cssText='display:flex;flex-wrap:wrap;gap:6px;padding:8px 24px;border-top:1px solid transparent';
   CHAT_CHIPS.forEach(q=>{
     const c=document.createElement('button');
     c.textContent=q;
@@ -3167,7 +3258,7 @@ function chatInjectChips(){
     c.onclick=()=>{const inp=document.getElementById('chat-input');inp.value=q;inp.focus();};
     row.appendChild(c);
   });
-  outer.insertBefore(row,outer.firstChild);
+  container.appendChild(row);
 }
 
 function _mdRender(text){

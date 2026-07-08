@@ -7,19 +7,21 @@
 <title>SOVEREIGN // ICT Oracle</title>
 <style>
 :root {
-  --bg:     #0a0a0a;
-  --bg2:    #111111;
-  --bg3:    #181818;
-  --border: #1e1e1e;
-  --text:   #d0d0d0;
-  --muted:  #484848;
-  --dim:    #2a2a2a;
-  --green:  #00c896;
-  --yellow: #f5c518;
-  --red:    #e05252;
+  --bg:     #080b0f;
+  --bg2:    #0d1117;
+  --bg3:    #131920;
+  --border: #1e2a38;
+  --border2: #243040;
+  --text:   #e2e8f0;
+  --muted:  #6b7fa3;
+  --dim:    #2d3748;
+  --green:  #00d4a0;
+  --yellow: #ffc107;
+  --red:    #ff4d6a;
   --blue:   #4a9eff;
-  --orange: #f4923a;
-  --accent: #00c896;
+  --orange: #ed8936;
+  --teal:   #38b2ac;
+  --accent: #00d4a0;
   --font:   'SF Mono','Fira Code','Courier New',monospace;
 }
 *{box-sizing:border-box;margin:0;padding:0}
@@ -74,13 +76,18 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
 
 /* ── SYSTEM STATE CARDS ── */
 #state-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
-.state-card{background:var(--bg2);border:1px solid var(--border);padding:12px 14px}
-.state-card.alert{border-color:var(--red);background:rgba(224,82,82,.04)}
-.state-card.warn{border-color:var(--yellow);background:rgba(245,197,24,.04)}
-.state-card.ok{border-color:var(--green);background:rgba(0,200,150,.04)}
-.sc-label{font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px}
-.sc-value{font-size:18px;font-weight:700}
-.sc-sub{font-size:10px;color:var(--muted);margin-top:3px}
+.state-card{background:var(--bg2);border:1px solid var(--border);padding:14px 16px;transition:box-shadow .2s,border-color .2s;position:relative;overflow:hidden}
+.state-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:2px 2px 0 0;transition:opacity .3s}
+.state-card.alert::before{background:var(--red)}
+.state-card.warn::before{background:var(--yellow)}
+.state-card.ok::before{background:var(--green)}
+.state-card.alert{border-color:rgba(255,77,106,.35);background:rgba(255,77,106,.04)}
+.state-card.warn{border-color:rgba(255,193,7,.35);background:rgba(255,193,7,.04)}
+.state-card.ok{border-color:rgba(0,212,160,.25);background:rgba(0,212,160,.04)}
+.state-card:hover{box-shadow:0 4px 20px rgba(0,0,0,.4)}
+.sc-label{font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px}
+.sc-value{font-size:20px;font-weight:700;line-height:1}
+.sc-sub{font-size:10px;color:var(--muted);margin-top:4px;line-height:1.4}
 
 /* ── ICT STATS ── */
 #ict-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
@@ -102,8 +109,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
 
 /* ── SIDEBAR ── */
 #sidebar{display:flex;flex-direction:column;gap:14px}
-.panel{background:var(--bg2);border:1px solid var(--border);padding:16px}
-.panel-label{font-size:10px;color:var(--muted);letter-spacing:2px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.panel{background:var(--bg2);border:1px solid var(--border);padding:16px;transition:box-shadow .2s}
+.panel:hover{box-shadow:0 2px 16px rgba(0,0,0,.35)}
+.panel-label{font-size:9px;color:var(--muted);letter-spacing:2.5px;text-transform:uppercase;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
 
 /* ── EDGE METRICS ── */
 .edge-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:11px}
@@ -155,9 +163,40 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
 #statsbar{background:var(--bg2);border-top:1px solid var(--border);padding:7px 24px;display:flex;gap:32px;font-size:10px;color:var(--muted);flex-shrink:0}
 #statsbar span{color:var(--text)}
 
-@media(max-width:900px){#main{grid-template-columns:1fr;padding:16px}#state-cards{grid-template-columns:repeat(2,1fr)}#ict-stats{grid-template-columns:repeat(2,1fr)}#health-detail{min-width:auto;width:calc(100vw - 32px);right:16px}}
-@media(max-width:600px){#bridge-banner{flex-wrap:wrap;gap:8px;padding:8px 16px}.bb-threat{margin-left:0;width:100%}#statsbar{flex-wrap:wrap;gap:8px 20px;padding:8px 16px}}
-@media(max-width:480px){#header{flex-wrap:wrap;height:auto;padding:10px 16px;gap:8px}.hdr-left{flex-wrap:wrap;gap:8px}.hdr-right{width:100%;justify-content:space-between}#state-cards{grid-template-columns:1fr 1fr}#ict-stats{grid-template-columns:1fr}#main{padding:12px}}
+/* ── LOADING SKELETON ── */
+.sk{background:linear-gradient(90deg,var(--bg3) 25%,var(--dim) 50%,var(--bg3) 75%);background-size:200% 100%;animation:sk-wave 1.5s ease-in-out infinite;border-radius:3px;color:transparent!important}
+@keyframes sk-wave{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* ── OFFLINE BADGE ── */
+.offline-note{font-size:10px;color:var(--muted);font-style:italic;padding:6px 0;opacity:.7}
+
+@media(max-width:900px){
+  #main{grid-template-columns:1fr;padding:16px}
+  /* On mobile: sidebar shows AFTER main content (main intelligence first) */
+  #main > div:first-child{order:1}
+  #sidebar{order:2}
+  #state-cards{grid-template-columns:repeat(2,1fr)}
+  #ict-stats{grid-template-columns:repeat(2,1fr)}
+  #health-detail{min-width:auto;width:calc(100vw - 32px);right:16px}
+}
+@media(max-width:600px){
+  #bridge-banner{flex-wrap:wrap;gap:8px;padding:8px 16px}
+  .bb-threat{margin-left:0;width:100%}
+  #statsbar{flex-wrap:wrap;gap:8px 20px;padding:8px 16px}
+  #state-cards{grid-template-columns:1fr 1fr}
+}
+@media(max-width:480px){
+  #header{flex-wrap:wrap;height:auto;padding:10px 16px;gap:8px}
+  .hdr-left{flex-wrap:wrap;gap:8px}
+  .hdr-right{width:100%;justify-content:space-between;flex-wrap:wrap;gap:6px}
+  #state-cards{grid-template-columns:1fr}
+  #ict-stats{grid-template-columns:1fr}
+  #main{padding:10px 12px}
+  .logo{font-size:13px;letter-spacing:2px}
+  .sub,.hdr-nav{font-size:10px}
+  #reload-btn{font-size:10px;padding:3px 8px}
+  #last-refresh{font-size:9px}
+}
 </style>
 </head>
 <body>
@@ -166,7 +205,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
   <div class="hdr-left">
     <div class="logo">SOVEREIGN <span class="logo-slash">//</span> ICT</div>
     <div class="sub">Oracle Intelligence</div>
-    <div class="hdr-nav"><a href="../">← Dashboard</a></div>
+    <div class="hdr-nav"><a href="../" title="Back to main dashboard">← Dashboard</a></div>
   </div>
   <div class="hdr-right">
     <div id="health-pill" onclick="toggleHealth()" tabindex="0" role="button" aria-label="Toggle system health detail" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleHealth();}">
@@ -174,7 +213,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
       <div id="health-summary">checking…</div>
     </div>
     <div id="last-refresh">—</div>
-    <button id="reload-btn" onclick="loadAll()">↻ RELOAD</button>
+    <button id="reload-btn" onclick="loadAll()" title="Reload all data">↻ RELOAD</button>
   </div>
 </div>
 
@@ -196,17 +235,19 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
 
 <div id="main">
   <div>
-    <!-- State cards -->
+    <!-- State cards —
+         Default to ok/green (reflects current known state: NORMAL, threat 0.00).
+         JS will override class + color when live data loads. -->
     <div id="state-cards">
-      <div class="state-card alert">
+      <div class="state-card ok" id="card-bridge">
         <div class="sc-label">Bridge Mode</div>
-        <div class="sc-value" style="color:var(--red);font-size:14px" id="sc-bridge">HALT_NEW</div>
-        <div class="sc-sub" id="sc-regime">ASIAN_CURRENCY_CONTAGION</div>
+        <div class="sc-value" style="color:var(--green);font-size:16px" id="sc-bridge">NORMAL</div>
+        <div class="sc-sub" id="sc-regime">— awaiting data —</div>
       </div>
-      <div class="state-card alert">
+      <div class="state-card ok" id="card-threat">
         <div class="sc-label">Threat Score</div>
-        <div class="sc-value" style="color:var(--red)" id="sc-threat">1.00</div>
-        <div class="sc-sub" id="sc-threat-sub">CRITICAL · 0.50× size</div>
+        <div class="sc-value" style="color:var(--green)" id="sc-threat">0.00</div>
+        <div class="sc-sub" id="sc-threat-sub">NORMAL</div>
       </div>
       <div class="state-card ok">
         <div class="sc-label">London + Grade A</div>
@@ -215,7 +256,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
       </div>
       <div class="state-card ok">
         <div class="sc-label">Prop Challenge</div>
-        <div class="sc-value" style="color:var(--accent);font-size:14px">ACTIVE</div>
+        <div class="sc-value" style="color:var(--accent);font-size:16px">ACTIVE</div>
         <div class="sc-sub">Day 0 · $100k · 0/30 trades</div>
       </div>
     </div>
@@ -270,14 +311,32 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
     <!-- Prop gates -->
     <div class="panel">
       <div class="panel-label">PROP CHALLENGE GATES</div>
-      <div class="gate-row"><div class="gate-light">🟢</div><div class="gate-label">G1 MC Pass Rate<span class="gate-sub">99.7–100% ✓ DONE</span></div></div>
-      <div class="gate-row"><div class="gate-light">🟡</div><div class="gate-label">G2a Signal Validation<span class="gate-sub">not run — python3 scripts/validate_signals_retrospective.py</span></div></div>
-      <div class="gate-row"><div class="gate-light">🔴</div><div class="gate-label">G2b Execution<span class="gate-sub">1 / 8 trades</span></div></div>
-      <div class="gate-row"><div class="gate-light">🟡</div><div class="gate-label">G3 WR Alignment<span class="gate-sub">collecting (need 10+)</span></div></div>
-      <div class="gate-row"><div class="gate-light" id="g4-light">🔴</div><div class="gate-label">G4 Bridge Threat<span class="gate-sub" id="g4-sub">1.00 HALT_NEW</span></div></div>
-      <div class="gate-row"><div class="gate-light">🟡</div><div class="gate-label">G5 Non-Bust Days<span class="gate-sub">collecting</span></div></div>
-      <div id="wait-banner" style="margin-top:10px;padding:8px 10px;background:rgba(224,82,82,.06);border:1px solid var(--red);font-size:11px;color:var(--red)">
-        ⏸ WAIT — buy when G2a + G2b + G4 flip GREEN
+      <div class="gate-row" title="G1: Monte Carlo pass rate must be ≥99%">
+        <div class="gate-light">🟢</div>
+        <div class="gate-label">G1 MC Pass Rate<span class="gate-sub">99.7–100% ✓ DONE</span></div>
+      </div>
+      <div class="gate-row" title="G2a: Run validate_signals_retrospective.py to confirm signal logic">
+        <div class="gate-light">🟡</div>
+        <div class="gate-label">G2a Signal Validation<span class="gate-sub">not run — python3 scripts/validate_signals_retrospective.py</span></div>
+      </div>
+      <div class="gate-row" title="G2b: Need ≥8 live paper trades executed">
+        <div class="gate-light">🔴</div>
+        <div class="gate-label">G2b Execution<span class="gate-sub">1 / 8 trades</span></div>
+      </div>
+      <div class="gate-row" title="G3: Need 10+ live trades to confirm WR ≥35%">
+        <div class="gate-light">🟡</div>
+        <div class="gate-label">G3 WR Alignment<span class="gate-sub">collecting (need 10+)</span></div>
+      </div>
+      <div class="gate-row" title="G4: Library bridge threat must be &lt;0.85 and mode NORMAL">
+        <div class="gate-light" id="g4-light">🟢</div>
+        <div class="gate-label">G4 Bridge Threat<span class="gate-sub" id="g4-sub">0.00 NORMAL</span></div>
+      </div>
+      <div class="gate-row" title="G5: Accumulate 5+ non-bust trading days">
+        <div class="gate-light">🟡</div>
+        <div class="gate-label">G5 Non-Bust Days<span class="gate-sub">collecting</span></div>
+      </div>
+      <div id="wait-banner" style="margin-top:12px;padding:10px 12px;border:1px solid;font-size:11px;font-weight:600;letter-spacing:.3px;border-radius:2px">
+        ⏸ WAIT — buy when G2a + G2b flip GREEN
       </div>
     </div>
 
@@ -393,15 +452,15 @@ function renderBridge(crossState) {
   document.getElementById('sc-regime').textContent = regime;
   document.getElementById('sc-threat').textContent = threat.toFixed(2);
   document.getElementById('sc-threat').style.color = threat>0.85?'var(--red)':threat>0.5?'var(--yellow)':'var(--green)';
-  const bridgeCard=document.getElementById('sc-bridge')?document.getElementById('sc-bridge').closest('.state-card'):null;
-  const threatCard=document.getElementById('sc-threat')?document.getElementById('sc-threat').closest('.state-card'):null;
-  if(bridgeCard)bridgeCard.className='state-card '+(mode==='HALT_NEW'?'alert':mode==='TIGHTEN'?'warn':'ok');
-  if(threatCard)threatCard.className='state-card '+(threat>0.85?'alert':threat>0.5?'warn':'ok');
-  const threatSub=document.getElementById('sc-threat-sub');
+  const bridgeCard = document.getElementById('card-bridge');
+  const threatCard = document.getElementById('card-threat');
+  if(bridgeCard) bridgeCard.className='state-card '+(mode==='HALT_NEW'?'alert':mode==='TIGHTEN'?'warn':'ok');
+  if(threatCard) threatCard.className='state-card '+(threat>0.85?'alert':threat>0.5?'warn':'ok');
+  const threatSub = document.getElementById('sc-threat-sub');
   if(threatSub){
-    const lvl=threat>0.85?'CRITICAL':threat>0.5?'ELEVATED':'NORMAL';
-    const size=crossState.commitment_score_avg!=null?crossState.commitment_score_avg.toFixed(2)+'× size':'';
-    threatSub.textContent=size?lvl+' · '+size:lvl;
+    const lvl = threat>0.85?'CRITICAL':threat>0.5?'ELEVATED':'NORMAL';
+    const size = crossState.commitment_score_avg!=null?crossState.commitment_score_avg.toFixed(2)+'× size':'';
+    threatSub.textContent = size ? lvl+' · '+size : lvl;
   }
   document.getElementById('stat-bridge').textContent = mode;
   document.getElementById('stat-bridge').style.color = mode==='HALT_NEW'?'var(--red)':mode==='TIGHTEN'?'var(--yellow)':'var(--green)';
@@ -446,7 +505,7 @@ function updateWaitBanner() {
 function renderOracle(msgs) {
   const textEl = document.getElementById('oracle-text');
   const metaEl = document.getElementById('oracle-meta');
-  const oracleMsgs = (msgs||[]).filter(m=>m.source==='oracle'&&!m.text?.includes('DRY RUN')&&!m.text?.includes('Oracle failed')).slice(-1);
+  const oracleMsgs = (msgs||[]).filter(m=>(m.source==='oracle'||m.source==='oracle_pulse')&&!m.text?.includes('DRY RUN')&&!m.text?.includes('Oracle failed')).slice(-1);
   if (!oracleMsgs.length) { textEl.textContent='Waiting for first Oracle cycle…'; metaEl.innerHTML=''; return; }
   const latest = oracleMsgs[0];
   textEl.textContent = latest.text||'';

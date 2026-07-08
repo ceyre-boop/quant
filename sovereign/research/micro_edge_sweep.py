@@ -2,7 +2,9 @@
 Micro-Edge Sweep — systematic parameter grid search across all forex pairs.
 
 Architecture: pre-compute signals once per pair, then sweep execution parameters
-at Numba speed (~148k simulations/sec). The signal generation (macro + CB + CPI
+at Numba speed (MEASURED 2026-06-29: ~728k sims/sec single-core with numba on py3.13;
+only ~24k on py3.14 where numba is inactive — see data/research/bench_findings.md).
+The signal generation (macro + CB + CPI
 layers) is the bottleneck; the execution sweep is essentially free.
 
 Grid:

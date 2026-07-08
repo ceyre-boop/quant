@@ -39,7 +39,7 @@ They share data caches and the Alexandrian Library but are architecturally isola
 │   ├── execution/          ← Portfolio engine + cTrader bridge
 │   └── api/                ← Dashboard endpoints
 ├── execution/              ← PTJ gates, RR engine, FunderPro executor
-├── backtest/               ← Fast backtest engine (148k/sec Numba JIT)
+├── backtest/               ← Numba JIT engine. MEASURED 2026-06-29: 1.26M/s (12-core, numba on py3.13) vs ~135k/s today (py3.14, numba INACTIVE). Old "148k" never measured. See data/research/bench_findings.md
 ├── contracts/              ← Shared typed dataclasses (single source of truth)
 ├── lab/                    ← Experiment framework (baseline registry)
 ├── integration/            ← TradingAgents bridge (Ollama/Qwen3)
