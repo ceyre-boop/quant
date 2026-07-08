@@ -1,12 +1,12 @@
 {
-  "checked_at": "2026-07-08T01:33:20.213541+00:00",
+  "checked_at": "2026-07-08T05:49:17.204345+00:00",
   "market_hours": true,
   "frozen": null,
   "down": [],
   "loops": {
     "ict_scanner": {
       "status": "ALIVE",
-      "last": "2026-07-08T01:28:36.223529+00:00",
+      "last": "2026-07-08T05:44:20.614693+00:00",
       "silence_hours": 0.1,
       "threshold": 0.5,
       "kind": "periodic"
@@ -14,28 +14,28 @@
     "forex_scan": {
       "status": "ALIVE",
       "last": "2026-07-07T12:02:58.296657+00:00",
-      "silence_hours": 13.5,
+      "silence_hours": 17.8,
       "threshold": 30,
       "kind": "periodic",
-      "effective_silence_hours": 13.5
+      "effective_silence_hours": 17.8
     },
     "pulse_check": {
       "status": "ALIVE",
-      "last": "2026-07-08T01:33:20+00:00",
+      "last": "2026-07-08T05:49:17+00:00",
       "silence_hours": 0.0,
       "threshold": 3,
       "kind": "periodic"
     },
     "decision_backfill": {
       "status": "ALIVE",
-      "last": "2026-07-08T01:33:20+00:00",
+      "last": "2026-07-08T05:49:17+00:00",
       "silence_hours": 0.0,
       "threshold": 3,
       "kind": "periodic"
     },
     "big_move": {
       "status": "ALIVE",
-      "last": "2026-07-08T01:33:20+00:00",
+      "last": "2026-07-08T05:49:17+00:00",
       "silence_hours": 0.0,
       "threshold": 3,
       "kind": "periodic"
@@ -43,17 +43,17 @@
     "oracle_reflection": {
       "status": "ALIVE",
       "last": "2026-07-07T06:39:59.764662+00:00",
-      "silence_hours": 18.9,
+      "silence_hours": 23.2,
       "threshold": 26,
       "kind": "periodic"
     },
     "morning_briefing": {
       "status": "ALIVE",
       "last": "2026-07-07T12:15:43.463903+00:00",
-      "silence_hours": 13.3,
+      "silence_hours": 17.6,
       "threshold": 26,
       "kind": "periodic",
-      "effective_silence_hours": 13.3
+      "effective_silence_hours": 17.6
     },
     "edge_pipeline": {
       "status": "EVENT_DRIVEN",

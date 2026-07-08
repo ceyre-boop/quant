@@ -1,0 +1,171 @@
+{
+  "report_date": "2026-07-08",
+  "spec_version": 2,
+  "spec_sha256": "6800b9a709327b21c5474a125be8b9952b66c60b51f680bba8ff2d961109a0c3",
+  "analyzer_commit": "b16709f",
+  "records_total": 17,
+  "records_normal": 16,
+  "records_today": 2,
+  "parse_problems": [],
+  "watchdog": {
+    "heartbeat_today": true,
+    "job_loaded": true,
+    "plist_matches_tracked": true,
+    "shadow_mode_true": true
+  },
+  "l1": {
+    "passed": 13,
+    "failed": [
+      {
+        "trade_id": "130",
+        "bar_date": "2026-07-06",
+        "line": 17,
+        "problems": [
+          "action AMEND_STOP expected HOLD"
+        ]
+      }
+    ],
+    "boundary": 2,
+    "ambiguous": 0,
+    "pass_rate": 0.9285714285714286,
+    "continuity_violations": [
+      {
+        "trade_id": "105",
+        "bar_date": "2026-06-28",
+        "class": "C3",
+        "detail": "hold_count 2\u21923",
+        "incident": "INC-2026-06-30 manual+launchd double-step pre-guard (param_change_log 2026-06-30T22:32Z); standing hold_count +1 offset"
+      },
+      {
+        "trade_id": "123",
+        "bar_date": "2026-06-28",
+        "class": "C3",
+        "detail": "hold_count 1\u21922",
+        "incident": "INC-2026-06-30 manual+launchd double-step pre-guard (param_change_log 2026-06-30T22:32Z); standing hold_count +1 offset"
+      },
+      {
+        "trade_id": "130",
+        "bar_date": "2026-07-06",
+        "class": "C3",
+        "detail": "hold_count 5\u21921",
+        "incident": "param_change_log launchagent_restoration 2026-07-02T04:40:43Z"
+      },
+      {
+        "trade_id": "227",
+        "bar_date": "2026-07-06",
+        "class": "C3",
+        "detail": "hold_count 1\u21921",
+        "incident": "param_change_log launchagent_restoration 2026-07-02T04:40:43Z"
+      }
+    ],
+    "action_unverifiable": 0
+  },
+  "l2": {
+    "status": "OK",
+    "scored": 10,
+    "matched": 9,
+    "match_rate": 0.9,
+    "mismatches": [
+      {
+        "trade_id": "105",
+        "bar_date": "2026-06-28",
+        "class": "C2",
+        "detail": "no yfinance bar at shifted date 2026-06-27"
+      },
+      {
+        "trade_id": "105",
+        "bar_date": "2026-06-28",
+        "class": "C2",
+        "detail": "no yfinance bar at shifted date 2026-06-27"
+      },
+      {
+        "trade_id": "105",
+        "bar_date": "2026-06-29",
+        "class": "C2",
+        "detail": "no yfinance bar at shifted date 2026-06-28"
+      },
+      {
+        "trade_id": "177",
+        "bar_date": "2026-06-29",
+        "class": "C1",
+        "detail": "substituting OANDA close reproduces it (\u0394close=6.66e-01, \u0394atr=6.70e-04)"
+      },
+      {
+        "trade_id": "227",
+        "bar_date": "2026-07-06",
+        "class": "C2",
+        "detail": "no yfinance bar at shifted date 2026-07-05"
+      }
+    ],
+    "shifts": {
+      "AUD_NZD": 1,
+      "EUR_USD": -1,
+      "USD_JPY": 1
+    },
+    "seed_modes": {
+      "105": "ENTRY",
+      "123": "ENTRY",
+      "130": "ENTRY",
+      "177": "ENTRY",
+      "227": "ENTRY"
+    },
+    "delta_stats": {
+      "EUR_USD": {
+        "dclose_p50": 0.0007431561279296339,
+        "dclose_p90": 0.0024289233779908326,
+        "dclose_rel_p50": 0.0006531403279337978,
+        "datr_p50": 0.00034286973216753665,
+        "n": 3
+      },
+      "USD_JPY": {
+        "dclose_p50": 0.1569974365234259,
+        "dclose_p90": 0.6659958496093736,
+        "dclose_rel_p50": 0.0009694550988207399,
+        "datr_p50": 0.0007166504378981597,
+        "n": 3
+      },
+      "AUD_NZD": {
+        "dclose_p50": 0.0027589648818968637,
+        "dclose_p90": 0.0038200209426879628,
+        "dclose_rel_p50": 0.002270491368810889,
+        "datr_p50": 0.0005049484754128981,
+        "n": 4
+      }
+    },
+    "cache_revisions": 0
+  },
+  "taxonomy": {
+    "C1": 1,
+    "C2": 4,
+    "C3": 4,
+    "C4": 1,
+    "C5": 0
+  },
+  "gate": {
+    "gates": {
+      "l1_pass_rate_100": [
+        "FAIL",
+        "0.9286 (13/14)"
+      ],
+      "c5_zero": [
+        "PASS",
+        "0"
+      ],
+      "l2_match": [
+        "PENDING",
+        "0.9000 (9/10) below floor at current n"
+      ],
+      "coverage": [
+        "PENDING",
+        "7 weekdays / 16 records"
+      ],
+      "no_live_records": [
+        "PASS",
+        "0"
+      ]
+    },
+    "overall": "NO-GO",
+    "c5": 0,
+    "live_records": 0
+  }
+}
