@@ -204,5 +204,5 @@ Schema per ticket:
 **depends_on:** []
 **blocks:** []
 **acceptance_criteria:** spec §9 DoD verbatim — catalog ≥30 qualifying events or shortfall stated; normality + SD charts produced; bootstrap p reported honestly; only the 3 pre-registered tests run; isolation test green; all §12 artifacts exist; four [RESEARCH] phase commits pushed; NEXT.md updated
-**status:** in_progress (2026-07-08 — Phase 0 done: HYP-085 registered + hash-verified)
+**status:** done (2026-07-08 — all 4 phases + prereg shipped 5b5534b→abcc120; VERDICT: H0 NOT rejected p=0.3637 → HYP-085 NOT_SIGNIFICANT sealed; catalog 168 events/223 rows, honesty gate PASS; isolation 11/11)
 **pre_approved:** true (Colin's GREENLIGHT in the spec + approved plan 2026-07-08)

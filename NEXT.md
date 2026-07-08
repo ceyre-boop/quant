@@ -6,6 +6,50 @@ Standing constraints live in `CLAUDE.md` — not restated here.
 
 ---
 
+## 2026-07-08 · POLITICAL-ALPHA (HYP-085 / TICK-020): BUILT, RUN, ADJUDICATED — H0 NOT REJECTED
+
+**Pushed:** 5b5534b (P0 prereg) → 49b21c4 (P1 catalog) → 095bbdc (P2 abnormal returns) →
+ffe85af (P3 positioning) → abcc120 (P4 verdict) + this entry.
+
+**VERDICT: H0 NOT rejected — p = 0.3637** (10,000 statement-level placebo sets, seed 42,
+`(n_ge+1)/(N+1)`). Trump-statement days: **11.21%** ±2σ-move rate (25/223 rows) vs placebo null
+**10.30%** (σ 2.1%). The naive normal-theory two-day baseline (8.9%) would have called 11.2%
+"elevated" — the pre-registered bootstrap null is exactly what stopped that false positive:
+2025-26 is fat-tailed everywhere, not just around his statements. **HYP-085 verdict sealed
+NOT_SIGNIFICANT** (the pre-registered prior; hash-lock 58e725ed verified before AND after the run;
+status stays PREREGISTERED per convention). Colin's news-sniping thesis has its honest answer at
+daily resolution: **no measured edge in trading every statement.** One thread survives for a
+FUTURE, separately-preregistered look: direction-aligned pre-window skew **+1.54** (pre-announcement
+returns lean toward the eventual direction) — Test 1 is descriptive BY DESIGN (spec §10 forbade
+attaching significance machinery), so it is a lead, not a result.
+
+**Process (the spec was law):** vault spec `Political-Alpha-Claude-Code-Spec.md` → prereg
+hash-locked + ledgered + TICK-020 BEFORE any event data → 4 phases, one [RESEARCH] commit each.
+Catalog: **168 qualifying events / 223 event×instrument rows** (honesty gate PASS, ≥30) from three
+primary venues — whitehouse.gov 104 (1,327 articles scraped), Federal Register 62 (EO **+
+proclamation** — disclosed: Section-232 steel/aluminum tariffs are proclamations; an EO-only query
+missed the spec's own SLX mapping), Truth Social 57 (**10,081 own statuses** walked from the
+trumpstruth.org mirror via cursor pagination; ET display verified two independent ways; link-share
+posts excluded — his words only, disclosed tightening + a real title-concat bug found and fixed).
+Phase 2: 223/223 evaluable, zero gaps; PA-0088/USDJPY hand-verified to 6 decimals. Phase 3:
+**all five native ETF chains served on the Value tier** (probe surprise — XLE/SLX/XLF/KWEB/GLD),
+FXE proxy for forex rows; 44 thin-smile gaps recorded, never synthesized; 13/179 manipulation-signal
+flags (descriptive only). Liberation Day, steel→SLX, China→KWEB spot-checks all present.
+
+**Isolation & safety:** new `research/political_alpha/` imports NOTHING from live namespaces
+(AST wall + unit tests 11/11 green at close); zero execution-path touches; no OANDA, no launchd,
+no live params. Ledger writes were append-only with .bak backups; prereg verify green post-seal.
+**Suite: 40 failed / 1,243 passed / 1 skipped — the exact 07-07 baseline** (ml_stack errors =
+known sklearn-missing class). **Article 6 stands; ignition locked** — a null here changes nothing
+live, and even a rejection would only have been a candidate for the full gauntlet.
+
+**Refused/handled:** did not loosen the qualifying definition at any point (the gate never needed
+it — 168 events); did not fight truthsocial.com's Cloudflare (mirror + disclosure instead); did not
+attach p-values to the manipulation flags or the aligned skew (spec §10); FR signing-date clock
+pinned 12:00 ET and disclosed per row. Obsidian notes: `Political-Alpha-Phase{1..4}-2026-07.md`.
+
+---
+
 ## 2026-07-07 · night — TICK-019 EXECUTED ON COLIN'S GO: THE GEOMETRY FAMILY ADJUDICATED
 
 **Pushed:** c64acf7 (fill) → 9c7c964 (runner) → 6968ba9 (verdicts) + this entry. Zero unpushed.
