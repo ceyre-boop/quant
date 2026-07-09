@@ -468,8 +468,7 @@
     "pvalue_status": "RECONSTRUCTABLE_DEFERRED",
     "pvalue_note": "displacement gate \u2014 same: parent ICT edge insignificant; moot",
     "last_result": "DRY RUN: echo no-op",
-    "updated_at": "2026-06-08T23:50:43",
-    "id_disambiguation": "ID_DISAMBIGUATION (REST-036): This is the REJECTED London displacement>=1.5 gate. It is UNRELATED to HYP-046a/b/c (CONFIRMED EUR/GBP per-pair holds without AUDNZD). Do NOT read \"HYP-046 survives FDR\" (which refers to 046a/b/c) as validating this gate. Wiring task RQ-REST-005 rests on THIS rejected entry \u2014 do not wire."
+    "updated_at": "2026-06-08T23:50:43"
   },
   {
     "id": "HYP-047",
@@ -530,8 +529,7 @@
     "source": "REST_MODE",
     "notes": "REST MODE 2026-06-02: Rejected as confounded. DOM distribution: 362/421 trades (86%) cluster on days 3-5 (CB decision window). Days 8-31 have n=35 total \u2014 too sparse to test. The perceived day-of-month effect is CB calendar structure, not a separate DOM edge. The candidate is absorbed into SEED-CAL-001/002 which are already embedded in the system.",
     "last_result": "DRY RUN: echo no-op",
-    "updated_at": "2026-06-08T23:50:43",
-    "id_disambiguation": "ID_DISAMBIGUATION (REST-036): This REJECTED day-of-month bias (days 8-15) is the true home of the DOM effect that research_queue tasks RQ-REST-008/009 mislabel as \"HYP-052 CANDIDATE\". Rejected due to CB-calendar confound (86% of trades on days 3-5); DOM edge already absorbed into SEED-CAL-001/002. Do NOT wire."
+    "updated_at": "2026-06-08T23:50:43"
   },
   {
     "id": "HYP-045",
@@ -641,8 +639,7 @@
     "date": "2026-06-03",
     "note": "30-day cross-pair trend gate: 1/4 OOS years aligned. Rejected. See HYP-052b for reformulation.",
     "last_result": "DRY RUN: echo no-op",
-    "updated_at": "2026-06-08T23:50:43",
-    "id_disambiguation": "ID_DISAMBIGUATION (REST-036): Ledger HYP-052 = REJECTED rate-differential 30d-momentum trend gate. It is NOT the DOM size-boost that RQ-REST-008 calls \"HYP-052\"; that queue label is a collision and actually maps to HYP-051. Keep these separate."
+    "updated_at": "2026-06-08T23:50:43"
   },
   {
     "id": "HYP-052b",
@@ -1911,20 +1908,13 @@
     "mechanism": "policy statements from a single actor move the named sector/currency; advance positioning, if any, shows up as pre-announcement FXE rr25 / options-volume drift",
     "methodology_note": "self-contained event study in research/political_alpha/ per the vault spec Political-Alpha-Claude-Code-Spec.md; one bootstrap primary, descriptive secondaries; TICK-020",
     "prior_expectation": "NOT_SIGNIFICANT",
-    "result": "observed big-move exceedance 25/223 rows (11.21%) vs statement-level placebo null mean 10.30%; p=0.3637 one-sided (10,000 sets, seed 42)",
-    "p_value": 0.363664,
+    "result": null,
+    "p_value": null,
     "bh_survives": null,
     "oos_sharpe": null,
     "is_sharpe": null,
     "standalone": true,
     "auto_generated": false,
-    "source": "manual",
-    "verdict": "NOT_SIGNIFICANT",
-    "annotations": [
-      {
-        "date": "2026-07-08T21:45:20Z",
-        "note": "ADJUDICATED per prereg (hash 58e725ed\u2026 verified at run): single pre-stated bootstrap primary. Catalog 168 events/223 rows (gate PASS, >=30). p=0.3637 >= 0.05 -> NOT_SIGNIFICANT (the prior). Descriptives: aligned pre-window skew +1.54 (no significance machinery by design); 13 manipulation-signal flags of 179 positioning-evaluable rows. Artifacts: research/political_alpha/output/. TICK-020."
-      }
-    ]
+    "source": "manual"
   }
 ]

@@ -685,13 +685,15 @@
     },
     {
       "id": "RQ-REST-035",
-      "status": "QUEUED",
+      "status": "DIAGNOSED",
       "priority": 2,
       "task": "INTEGRITY / relabel two hypothesis-ID collisions surfaced by REST-035 reconciliation: (1) HYP-046 is used for BOTH the REJECTED displacement gate AND the FDR-robust portfolio per-pair holds (HYP-046a/b/c) \u2014 give the disp gate a distinct id or mark it clearly so 'HYP-046 survives FDR' can't be misread as endorsing the disp gate. (2) research_queue RQ-REST-008 labels DOM-8-15 sizing 'HYP-052', but ledger HYP-052 is the 30d cross-pair trend gate; the DOM idea is HYP-051. Fix the queue label. Pure ledger/queue hygiene, no live code/config. Colin approval only needed if it touches deployed-edge naming referenced elsewhere.",
       "source": "REST_MODE",
       "created": "2026-07-08T01:12:02.668091+00:00",
-      "rest035_note": "Filed by REST-035. See FIND-REST-035-a/b."
+      "rest035_note": "Filed by REST-035. See FIND-REST-035-a/b.",
+      "rest036_note": "REST-036: id_disambiguation fields added to ledger HYP-046/051/052 (additive, non-destructive; backup .bak-rest036). Read-level collision risk RESOLVED. Remaining open item = whether to actually RENAME an ID (breaks downstream refs) - Colin decision. Downgraded from action-needed to Colin-optional.",
+      "updated_at": "2026-07-09T01:15:00+00:00"
     }
   ],
-  "last_updated": "2026-07-08T01:12:02.668091+00:00"
+  "last_updated": "2026-07-09T01:15:00+00:00"
 }

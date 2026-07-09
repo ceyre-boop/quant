@@ -8,29 +8,28 @@
   },
   "week": {
     "start_date": "2026-07-04",
-    "weekly_used": 19000,
-    "weekly_remaining": 181000,
+    "weekly_used": 22000,
+    "weekly_remaining": 178000,
     "last_synced": null,
-    "note": "Weekly RESET Saturday 2026-07-04. REST-033 ~5.5k + REST-034 ~9k + REST-035 ~4.5k (read-only gate-wiring reconciliation) = ~19k running estimate of 200k. STILL awaiting manual sync. Weekly buffer huge."
+    "note": "Weekly RESET Saturday 2026-07-04. REST-033 ~5.5k + REST-034 ~9k + REST-035 ~4.5k + REST-036 ~3k (read-only integrity+health) = ~22k running est of 200k. STILL awaiting manual sync. Weekly buffer huge (~178k)."
   },
   "today": {
     "date": "2026-07-08",
     "human_used": 0,
-    "agent_used": 4500,
+    "agent_used": 7500,
     "daily_agent_budget": 8571,
     "agent_allowed_today": 8571,
-    "note": "REST-035 (UTC 2026-07-08 ~01:12Z, ET Tue 21:12 -> Colin offline). Read-only cycle, no live code/config/network. Reconciled 5 queued gate-wiring tasks vs ledger+FDR: 2 READY (RQ-REST-007 DOW veto, RQ-REST-015 CB blackout), 2 STALE/reject-backed (RQ-REST-005 disp, RQ-REST-008/009 DOM), 1 strategic (RQ-REST-006). Verified phantom USD_CAD emitter dormant since 07-03 (no 9th fill). 2 findings, 1 Colin msg, queue annotated + RQ-REST-035 filed. Left ample buffer for Colin's next session."
+    "note": "REST-036 (UTC 2026-07-09 ~01:15Z, ET Wed 21:15 -> Colin offline). Read-only: no live code/config/network. Resolved RQ-REST-035 via additive ledger id_disambiguation (HYP-046/051/052, backup .bak-rest036, no status changes). Health: phantom emitter 5d dormant; live decision log 2d stale vs current research loops. 1 finding, 1 IMPORTANT Colin msg, queue annotated. ~7.5k of 8.5k daily used -> ~1k daily buffer left; stopping to preserve Colin's next-session capacity."
   },
   "session": {
-    "started": "2026-07-08T01:12:20.701442+00:00",
-    "ended": "2026-07-08T01:12:20.701442+00:00",
+    "started": "2026-07-09T01:15:00+00:00",
+    "ended": "2026-07-09T01:15:00+00:00",
     "mode": "REST_MODE",
     "tasks_completed": [
-      "Gate-wiring readiness reconciliation: mapped every QUEUED wiring task -> hypothesis -> current ledger status -> FDR/perm evidence",
-      "Found 2 of 5 wiring tasks rest on REJECTED hypotheses (RQ-REST-005/HYP-046, RQ-REST-008&009/HYP-051); 2 genuinely READY (RQ-REST-007/HYP-050, RQ-REST-015/HYP-061)",
-      "Flagged two hypothesis-ID collisions (HYP-046 disp-gate vs 046a/b/c holds; queue 'HYP-052' vs ledger HYP-052)",
-      "Verified phantom USD_CAD units=1 emitter dormant since 2026-07-03 (no new phantom fill in ~4d) -> downgraded RQ-REST-032 urgency",
-      "Wrote FIND-REST-035-a/b, 1 IMPORTANT Colin message, annotated queue, filed RQ-REST-035 integrity task"
+      "RQ-REST-035 integrity: added non-destructive id_disambiguation fields to ledger HYP-046, HYP-051, HYP-052; backup + JSON round-trip validated; no verdict/status changed",
+      "Health validation: confirmed phantom USD_CAD units=1 emitter dormant 5d (last tid 217 2026-07-03); 8 phantom fills still unquarantined",
+      "Health validation: research loops current (panel 2026-07-08, harvester/retrain PIDs live, political-alpha commits today) but live decision log stale since 2026-07-06 -> flagged 2d execute_daily gap to Colin",
+      "Wrote FIND-REST-036-a, 1 IMPORTANT Colin message, annotated RQ-REST-035 -> DIAGNOSED, updated usage"
     ]
   },
   "mode": "REST_MODE",
