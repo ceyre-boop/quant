@@ -114,6 +114,12 @@ def read_json(path: Path) -> dict:
     return json.loads(Path(path).read_text())
 
 
+def write_json_pretty(path: Path, obj: dict) -> None:
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(obj, indent=2) + "\n")
+
+
 def utc_now_iso() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 

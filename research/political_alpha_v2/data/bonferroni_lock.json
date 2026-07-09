@@ -1,0 +1,25 @@
+{
+  "locked_at": "2026-07-09T08:09:04Z",
+  "universe_size": 9,
+  "n_clusters_with_events": 7,
+  "bonferroni_denominator": 63,
+  "cluster_counts_kept": {
+    "tariff_china": 23,
+    "tariff_broad": 37,
+    "energy_environment": 19,
+    "dollar_fed": 26,
+    "defense_conflict": 2,
+    "deregulation": 4,
+    "personal_attack": 1
+  },
+  "underpowered_clusters": [
+    "defense_conflict",
+    "deregulation",
+    "personal_attack"
+  ],
+  "n_events_in": 168,
+  "n_kept": 112,
+  "n_dropped_dedup": 48,
+  "n_unclustered": 8,
+  "note": "Bonferroni denominator = (clusters with >=1 kept event) x 9 (full universe, conservative). LOCKED at Phase 1 \u2014 Phase 4 reads this exact number."
+}
