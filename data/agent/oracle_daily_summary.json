@@ -1,14 +1,14 @@
 {
-  "last_updated": "2026-07-07T08:07:37.424642+00:00",
+  "last_updated": "2026-07-09T07:12:44.135505+00:00",
   "harvest": {
     "trades_closed": 0,
     "win_rate": null,
     "failure_taxonomy": {}
   },
   "reflection": {
-    "candidate_lesson": "A SHORT with 4 of 6 signal layers FAILING (\u2717 HTF bias against macro, \u2717 no OB/FVG zone entry, \u2717 no CHOCH/BOS structure shift) should be vetoed regardless of a strong rate_diff_z \u2014 the single confirmed liquidity sweep + FVG presence is not enough confluence to override structural disagreement.",
-    "mechanism": "When market_structure is BULLISH but macro says SHORT, entering short on a swept BSL means fading institutional order flow at the exact point institutions accumulate \u2014 the sweep is stop-hunt liquidity being COLLECTED to fuel continuation UP, not reversal down. Without a CHOCH/BOS confirming the reversal, the sweep is a trap on the trader shorting it.",
-    "testable_rule": "if direction contradicts market_structure_bias AND no CHOCH/BOS in trade direction AND not price_at_OB_or_FVG_zone: veto trade regardless of rate_diff_z magnitude"
+    "candidate_lesson": "A trade requiring a 56-day hold to realize its edge should be vetoed when 4 of 6 signal layers are \u2717 \u2014 the macro thesis cannot survive that many days of contradicting price structure.",
+    "mechanism": "The single closed loss shorted USDJPY on a rate_diff_z of -0.97 (weak macro) while HTF market structure was BULLISH, price was NOT at an OB/FVG zone, and there was NO CHOCH/BOS in trade direction. Institutionally, a 56-day cycle_divergence thesis needs price to eventually confirm; entering with structure actively against you means you pay carry/adverse-drift for weeks before the thesis has any chance to express \u2014 the stop gets hit first. The confluence count (\u2713 layers) is a proxy for how soon institutional flow aligns with the macro view.",
+    "testable_rule": "if entry_context['hold_days_est'] > 30 and sum(1 for layer in signal_layers_active if layer.startswith('\u2713')) < 3: return ForexVeto  # long-horizon macro needs structural confirmation now"
   },
   "validation": {
     "verdict": "REJECTED",
@@ -21,8 +21,8 @@
     "codify_error": null
   },
   "cycle": {
-    "cost_usd": 0.16671,
+    "cost_usd": 0.169095,
     "status": "COMPLETE",
-    "date": "2026-07-07"
+    "date": "2026-07-09"
   }
 }

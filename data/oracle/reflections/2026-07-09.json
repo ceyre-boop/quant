@@ -1,0 +1,26 @@
+{
+  "date": "2026-07-09",
+  "generated_at": "2026-07-09T07:12:44.056881+00:00",
+  "input_tokens": 6438,
+  "output_tokens": 967,
+  "estimated_cost_usd": 0.169095,
+  "harvest_days_read": 7,
+  "reflection": {
+    "candidate_lesson": {
+      "lesson_text": "A trade requiring a 56-day hold to realize its edge should be vetoed when 4 of 6 signal layers are \u2717 \u2014 the macro thesis cannot survive that many days of contradicting price structure.",
+      "mechanism": "The single closed loss shorted USDJPY on a rate_diff_z of -0.97 (weak macro) while HTF market structure was BULLISH, price was NOT at an OB/FVG zone, and there was NO CHOCH/BOS in trade direction. Institutionally, a 56-day cycle_divergence thesis needs price to eventually confirm; entering with structure actively against you means you pay carry/adverse-drift for weeks before the thesis has any chance to express \u2014 the stop gets hit first. The confluence count (\u2713 layers) is a proxy for how soon institutional flow aligns with the macro view.",
+      "testable_rule": "if entry_context['hold_days_est'] > 30 and sum(1 for layer in signal_layers_active if layer.startswith('\u2713')) < 3: return ForexVeto  # long-horizon macro needs structural confirmation now",
+      "expected_impact": "Filters the exact loss configuration observed (avg R=-1.002); expected avgR uplift on long-hold FOREX entries, contributing toward Sharpe by cutting negative-R tail; est +0.01\u20130.02 Sharpe if it removes 1-in-3 of these entries.",
+      "evidence_from_harvest": "Only 1 closed trade (0W/1L, avgR=-1.002); zero trades in the last 7 days. The single loss had hold_days_est=56 and a size_modifier of only 0.118 \u2014 the system itself flagged low conviction yet still entered.",
+      "evidence_from_reasoning": "The lone loss: rate_diff_z=-0.968 (|z|<1.0, weak), 4 of 6 signal_layers_active marked \u2717 (HTF bias contradicting, no OB/FVG, no CHOCH/BOS), hold_days_est=56, macro_conviction=0.405 \u2014 a low-conviction long-horizon short with price structure explicitly against it produced -1.002R.",
+      "reasoning_component_targeted": "signal_layers_active (\u2713/\u2717 confluence count) gated jointly with entry_context.hold_days_est",
+      "sample_needed": 20
+    },
+    "retirement_flag": {
+      "lesson_to_review": null,
+      "reason": null
+    },
+    "system_health_note": "System is effectively flat (0 trades in 7 days, regime UNKNOWN, forex flagged NO_TRADE_TODAY, TV internal-only at 75% sizing) with only a single closed loss on record \u2014 insufficient sample to move Sharpe yet, so priority is protecting against low-confluence long-hold entries rather than adding complexity."
+  },
+  "auto_validation": null
+}
