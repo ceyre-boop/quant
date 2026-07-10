@@ -1,0 +1,102 @@
+# Firm rulesets for the prop-funnel simulator (TICK-022).
+#
+# HONESTY FLAGS:
+#   - Every fee / payout number is UNVERIFIED_PRICING until Colin confirms against the
+#     firm's live pricing page. The simulator parameterizes; it does not assert market fact.
+#   - APEX values copied (with provenance) from config/futures_params.yml prop: block —
+#     values COPIED, never imported (isolation wall forbids the config root).
+#   - drawdown_model: static | eod_trailing | intraday_trailing
+#   - daily_loss_basis: day_open equity (FTMO-style). PropFirmRules does NOT enforce
+#     daily loss at all (verified 2026-07-10) — our engine does.
+#   - INTRADAY_TRAILING is modeled as a bracket (no MFE data): optimistic close-granular
+#     vs kappa-stressed pessimistic; verdicts use the pessimistic bound.
+
+FTMO_100K_SWING:
+  account_size: 100000
+  currency_basis: pct_of_initial
+  phases:
+    - {name: P1, profit_target: 0.10, min_trading_days: 4}
+    - {name: P2, profit_target: 0.05, min_trading_days: 4}
+  drawdown_model: static
+  max_dd: 0.10                 # static: 10% of INITIAL balance, never trails
+  daily_loss_limit: 0.05       # 5% of initial, breach = instant fail (basis: day-open equity + intraday)
+  time_limit_days: null        # no time limit; sim caps at 500 trading days -> INCOMPLETE bucket
+  sim_cap_trading_days: 500
+  fees: {challenge_fee_usd: 620, refunded_at_first_payout: true, reset_fee_usd: 620, pricing: UNVERIFIED_PRICING}
+  funded: {profit_split: 0.80, payout_period_days: 21, scaling: null, pricing: UNVERIFIED_PRICING}
+
+APEX_50K:
+  # provenance: config/futures_params.yml prop: block (APEX_50K), copied 2026-07-10
+  account_size: 50000
+  currency_basis: usd
+  phases:
+    - {name: EVAL, profit_target_usd: 3000, min_trading_days: 1}
+  drawdown_model: intraday_trailing
+  trailing_dd_usd: 2500
+  trailing_locks_at_initial_plus_usd: 100   # trail stops once locked above initial+100 (firm-style knob)
+  daily_loss_limit_usd: 1100
+  consistency_pct: 0.30        # no single day > 30% of total profit at evaluation pass
+  time_limit_days: null
+  sim_cap_trading_days: 250
+  kappa_intraday_stress: 1.25  # winners assumed to touch kappa x final unrealized before close
+  fees: {monthly_subscription_usd: 167, pa_activation_usd: 140, pricing: UNVERIFIED_PRICING}
+  funded: {profit_split: 0.90, first_tranche_full_usd: 25000, payout_period_days: 30, pricing: UNVERIFIED_PRICING}
+
+TOPSTEP_50K:
+  account_size: 50000
+  currency_basis: usd
+  phases:
+    - {name: COMBINE, profit_target_usd: 3000, min_trading_days: 2}
+  drawdown_model: eod_trailing
+  trailing_dd_usd: 2000
+  trailing_locks_at_initial: true
+  daily_loss_limit_usd: 1000
+  consistency_pct: 0.50        # applied at payout stage
+  time_limit_days: null
+  sim_cap_trading_days: 250
+  fees: {monthly_subscription_usd: 165, pricing: UNVERIFIED_PRICING}
+  funded: {profit_split: 0.90, payout_period_days: 30, pricing: UNVERIFIED_PRICING}
+
+# ── Parity presets (mirror sovereign/propfirm/rules_engine.py, values copied) ──
+LUCID_100K:
+  account_size: 100000
+  currency_basis: pct_of_initial
+  phases:
+    - {name: EVAL, profit_target: 0.08, min_trading_days: 2}
+  drawdown_model: eod_trailing
+  max_dd: 0.08
+  trailing_lock_mode: at_initial_minus_dd   # PropFirmRules-compat: floor never trails (see rulesets.py docstring)
+  daily_loss_limit: null
+  time_limit_days: 90
+  sim_cap_trading_days: 90
+  fees: {challenge_fee_usd: 350, pricing: UNVERIFIED_PRICING}
+  funded: {profit_split: 0.90, pricing: UNVERIFIED_PRICING}
+
+MFF_100K:
+  account_size: 100000
+  currency_basis: pct_of_initial
+  phases:
+    - {name: EVAL, profit_target: 0.08, min_trading_days: 2}
+  drawdown_model: eod_trailing
+  max_dd: 0.10
+  trailing_lock_mode: at_initial_minus_dd   # PropFirmRules-compat: floor never trails (see rulesets.py docstring)
+  daily_loss_limit: 0.04       # NOTE: PropFirmRules stores but never enforces this; we DO enforce it
+  time_limit_days: 90
+  sim_cap_trading_days: 90
+  fees: {challenge_fee_usd: 375, pricing: UNVERIFIED_PRICING}
+  funded: {profit_split: 0.90, pricing: UNVERIFIED_PRICING}
+
+FUNDERPRO_10K:
+  # provenance: scripts/prop_challenge_optimizer.py fee model ($99), copied 2026-07-10
+  account_size: 10000
+  currency_basis: pct_of_initial
+  phases:
+    - {name: EVAL, profit_target: 0.08, min_trading_days: 2}
+  drawdown_model: eod_trailing
+  max_dd: 0.08
+  daily_loss_limit: 0.05
+  trailing_locks_at_initial: true
+  time_limit_days: null
+  sim_cap_trading_days: 250
+  fees: {challenge_fee_usd: 99, pricing: UNVERIFIED_PRICING}
+  funded: {profit_split: 0.80, pricing: UNVERIFIED_PRICING}
