@@ -1,0 +1,4469 @@
+{
+  "env": {
+    "numpy": "2.4.4",
+    "platform": "macOS-26.3.1-arm64-arm-64bit-Mach-O",
+    "python": "3.14.4"
+  },
+  "fast": false,
+  "frontiers": [
+    {
+      "cells": [
+        {
+          "cal_days_to_pass_med": 95.6,
+          "ev_per_month": -10.0,
+          "p1_incomplete": 0.869,
+          "p_bust_funded_month": 0.0008,
+          "p_funded": 0.02125,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 0.0,
+          "trades_per_day": 0.2,
+          "vol_daily": 0.0025
+        },
+        {
+          "cal_days_to_pass_med": 205.7,
+          "ev_per_month": -9.0,
+          "p1_incomplete": 0.8708,
+          "p_bust_funded_month": 0.0005,
+          "p_funded": 0.02554,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 0.0,
+          "trades_per_day": 0.5,
+          "vol_daily": 0.0025
+        },
+        {
+          "cal_days_to_pass_med": 325.9,
+          "ev_per_month": -9.0,
+          "p1_incomplete": 0.8635,
+          "p_bust_funded_month": 0.0,
+          "p_funded": 0.02648,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 0.0,
+          "trades_per_day": 1.0,
+          "vol_daily": 0.0025
+        },
+        {
+          "cal_days_to_pass_med": 457.0,
+          "ev_per_month": -9.0,
+          "p1_incomplete": 0.8648,
+          "p_bust_funded_month": 0.0,
+          "p_funded": 0.02615,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 0.0,
+          "trades_per_day": 2.0,
+          "vol_daily": 0.0025
+        },
+        {
+          "cal_days_to_pass_med": 59.4,
+          "ev_per_month": 77.0,
+          "p1_incomplete": 0.3262,
+          "p_bust_funded_month": 0.009,
+          "p_funded": 0.17754,
+          "p_month_ge_target": 0.0005,
+          "p_pass_100": 0.0,
+          "sharpe": 0.0,
+          "trades_per_day": 0.2,
+          "vol_daily": 0.005
+        },
+        {
+          "cal_days_to_pass_med": 137.6,
+          "ev_per_month": 93.0,
+          "p1_incomplete": 0.3073,
+          "p_bust_funded_month": 0.0042,
+          "p_funded": 0.20026,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 0.0,
+          "trades_per_day": 0.5,
+          "vol_daily": 0.005
+        },
+        {
+          "cal_days_to_pass_med": 212.9,
+          "ev_per_month": 99.0,
+          "p1_incomplete": 0.3073,
+          "p_bust_funded_month": 0.0035,
+          "p_funded": 0.20415,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 0.0,
+          "trades_per_day": 1.0,
+          "vol_daily": 0.005
+        },
+        {
+          "cal_days_to_pass_med": 285.3,
+          "ev_per_month": 96.0,
+          "p1_incomplete": 0.295,
+          "p_bust_funded_month": 0.0012,
+          "p_funded": 0.20377,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 0.0,
+          "trades_per_day": 2.0,
+          "vol_daily": 0.005
+        },
+        {
+          "cal_days_to_pass_med": 23.2,
+          "ev_per_month": 259.0,
+          "p1_incomplete": 0.0053,
+          "p_bust_funded_month": 0.0833,
+          "p_funded": 0.2204,
+          "p_month_ge_target": 0.0105,
+          "p_pass_100": 0.0,
+          "sharpe": 0.0,
+          "trades_per_day": 0.2,
+          "vol_daily": 0.01
+        },
+        {
+          "cal_days_to_pass_med": 47.8,
+          "ev_per_month": 463.0,
+          "p1_incomplete": 0.005,
+          "p_bust_funded_month": 0.0573,
+          "p_funded": 0.25618,
+          "p_month_ge_target": 0.01,
+          "p_pass_100": 0.0,
+          "sharpe": 0.0,
+          "trades_per_day": 0.5,
+          "vol_daily": 0.01
+        },
+        {
+          "cal_days_to_pass_med": 73.9,
+          "ev_per_month": 563.0,
+          "p1_incomplete": 0.005,
+          "p_bust_funded_month": 0.0477,
+          "p_funded": 0.28259,
+          "p_month_ge_target": 0.0067,
+          "p_pass_100": 0.0,
+          "sharpe": 0.0,
+          "trades_per_day": 1.0,
+          "vol_daily": 0.01
+        },
+        {
+          "cal_days_to_pass_med": 102.8,
+          "ev_per_month": 650.0,
+          "p1_incomplete": 0.0055,
+          "p_bust_funded_month": 0.035,
+          "p_funded": 0.31041,
+          "p_month_ge_target": 0.0063,
+          "p_pass_100": 0.0,
+          "sharpe": 0.0,
+          "trades_per_day": 2.0,
+          "vol_daily": 0.01
+        },
+        {
+          "cal_days_to_pass_med": 8.7,
+          "ev_per_month": 103.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.3605,
+          "p_funded": 0.13235,
+          "p_month_ge_target": 0.073,
+          "p_pass_100": 0.0,
+          "sharpe": 0.0,
+          "trades_per_day": 0.2,
+          "vol_daily": 0.02
+        },
+        {
+          "cal_days_to_pass_med": 13.0,
+          "ev_per_month": 226.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.3902,
+          "p_funded": 0.18583,
+          "p_month_ge_target": 0.07,
+          "p_pass_100": 0.0,
+          "sharpe": 0.0,
+          "trades_per_day": 0.5,
+          "vol_daily": 0.02
+        },
+        {
+          "cal_days_to_pass_med": 18.8,
+          "ev_per_month": 279.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.392,
+          "p_funded": 0.20629,
+          "p_month_ge_target": 0.0665,
+          "p_pass_100": 0.0,
+          "sharpe": 0.0,
+          "trades_per_day": 1.0,
+          "vol_daily": 0.02
+        },
+        {
+          "cal_days_to_pass_med": 26.1,
+          "ev_per_month": 293.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.397,
+          "p_funded": 0.21182,
+          "p_month_ge_target": 0.072,
+          "p_pass_100": 0.0,
+          "sharpe": 0.0,
+          "trades_per_day": 2.0,
+          "vol_daily": 0.02
+        },
+        {
+          "cal_days_to_pass_med": 95.6,
+          "ev_per_month": 14.0,
+          "p1_incomplete": 0.7775,
+          "p_bust_funded_month": 0.0005,
+          "p_funded": 0.11715,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 0.5,
+          "trades_per_day": 0.2,
+          "vol_daily": 0.0025
+        },
+        {
+          "cal_days_to_pass_med": 208.6,
+          "ev_per_month": 18.0,
+          "p1_incomplete": 0.7668,
+          "p_bust_funded_month": 0.0002,
+          "p_funded": 0.12589,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 0.5,
+          "trades_per_day": 0.5,
+          "vol_daily": 0.0025
+        },
+        {
+          "cal_days_to_pass_med": 330.2,
+          "ev_per_month": 17.0,
+          "p1_incomplete": 0.7772,
+          "p_bust_funded_month": 0.0,
+          "p_funded": 0.12128,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 0.5,
+          "trades_per_day": 1.0,
+          "vol_daily": 0.0025
+        },
+        {
+          "cal_days_to_pass_med": 456.2,
+          "ev_per_month": 18.0,
+          "p1_incomplete": 0.7715,
+          "p_bust_funded_month": 0.0,
+          "p_funded": 0.12857,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 0.5,
+          "trades_per_day": 2.0,
+          "vol_daily": 0.0025
+        },
+        {
+          "cal_days_to_pass_med": 59.4,
+          "ev_per_month": 234.0,
+          "p1_incomplete": 0.242,
+          "p_bust_funded_month": 0.005,
+          "p_funded": 0.42441,
+          "p_month_ge_target": 0.0008,
+          "p_pass_100": 0.0,
+          "sharpe": 0.5,
+          "trades_per_day": 0.2,
+          "vol_daily": 0.005
+        },
+        {
+          "cal_days_to_pass_med": 126.0,
+          "ev_per_month": 256.0,
+          "p1_incomplete": 0.2385,
+          "p_bust_funded_month": 0.0058,
+          "p_funded": 0.44326,
+          "p_month_ge_target": 0.0003,
+          "p_pass_100": 0.0,
+          "sharpe": 0.5,
+          "trades_per_day": 0.5,
+          "vol_daily": 0.005
+        },
+        {
+          "cal_days_to_pass_med": 202.8,
+          "ev_per_month": 264.0,
+          "p1_incomplete": 0.2522,
+          "p_bust_funded_month": 0.0015,
+          "p_funded": 0.4576,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 0.5,
+          "trades_per_day": 1.0,
+          "vol_daily": 0.005
+        },
+        {
+          "cal_days_to_pass_med": 273.8,
+          "ev_per_month": 284.0,
+          "p1_incomplete": 0.2397,
+          "p_bust_funded_month": 0.0008,
+          "p_funded": 0.47352,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 0.5,
+          "trades_per_day": 2.0,
+          "vol_daily": 0.005
+        },
+        {
+          "cal_days_to_pass_med": 23.2,
+          "ev_per_month": 560.0,
+          "p1_incomplete": 0.0037,
+          "p_bust_funded_month": 0.0733,
+          "p_funded": 0.368,
+          "p_month_ge_target": 0.0107,
+          "p_pass_100": 0.0,
+          "sharpe": 0.5,
+          "trades_per_day": 0.2,
+          "vol_daily": 0.01
+        },
+        {
+          "cal_days_to_pass_med": 46.3,
+          "ev_per_month": 855.0,
+          "p1_incomplete": 0.0043,
+          "p_bust_funded_month": 0.047,
+          "p_funded": 0.40491,
+          "p_month_ge_target": 0.0092,
+          "p_pass_100": 0.0,
+          "sharpe": 0.5,
+          "trades_per_day": 0.5,
+          "vol_daily": 0.01
+        },
+        {
+          "cal_days_to_pass_med": 72.4,
+          "ev_per_month": 916.0,
+          "p1_incomplete": 0.0035,
+          "p_bust_funded_month": 0.0427,
+          "p_funded": 0.43055,
+          "p_month_ge_target": 0.0092,
+          "p_pass_100": 0.0,
+          "sharpe": 0.5,
+          "trades_per_day": 1.0,
+          "vol_daily": 0.01
+        },
+        {
+          "cal_days_to_pass_med": 95.6,
+          "ev_per_month": 1001.0,
+          "p1_incomplete": 0.0037,
+          "p_bust_funded_month": 0.0285,
+          "p_funded": 0.45799,
+          "p_month_ge_target": 0.01,
+          "p_pass_100": 0.0,
+          "sharpe": 0.5,
+          "trades_per_day": 2.0,
+          "vol_daily": 0.01
+        },
+        {
+          "cal_days_to_pass_med": 8.7,
+          "ev_per_month": 365.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.326,
+          "p_funded": 0.20759,
+          "p_month_ge_target": 0.0798,
+          "p_pass_100": 0.0,
+          "sharpe": 0.5,
+          "trades_per_day": 0.2,
+          "vol_daily": 0.02
+        },
+        {
+          "cal_days_to_pass_med": 13.0,
+          "ev_per_month": 520.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.3588,
+          "p_funded": 0.23983,
+          "p_month_ge_target": 0.0943,
+          "p_pass_100": 0.0,
+          "sharpe": 0.5,
+          "trades_per_day": 0.5,
+          "vol_daily": 0.02
+        },
+        {
+          "cal_days_to_pass_med": 20.3,
+          "ev_per_month": 617.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.3518,
+          "p_funded": 0.2601,
+          "p_month_ge_target": 0.0953,
+          "p_pass_100": 0.0,
+          "sharpe": 0.5,
+          "trades_per_day": 1.0,
+          "vol_daily": 0.02
+        },
+        {
+          "cal_days_to_pass_med": 26.1,
+          "ev_per_month": 659.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.3608,
+          "p_funded": 0.28458,
+          "p_month_ge_target": 0.0943,
+          "p_pass_100": 0.0,
+          "sharpe": 0.5,
+          "trades_per_day": 2.0,
+          "vol_daily": 0.02
+        },
+        {
+          "cal_days_to_pass_med": 91.2,
+          "ev_per_month": 93.0,
+          "p1_incomplete": 0.5383,
+          "p_bust_funded_month": 0.0002,
+          "p_funded": 0.36198,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 1.0,
+          "trades_per_day": 0.2,
+          "vol_daily": 0.0025
+        },
+        {
+          "cal_days_to_pass_med": 197.0,
+          "ev_per_month": 98.0,
+          "p1_incomplete": 0.5325,
+          "p_bust_funded_month": 0.0002,
+          "p_funded": 0.37774,
+          "p_month_ge_target": 0.0003,
+          "p_pass_100": 0.0,
+          "sharpe": 1.0,
+          "trades_per_day": 0.5,
+          "vol_daily": 0.0025
+        },
+        {
+          "cal_days_to_pass_med": 310.7,
+          "ev_per_month": 101.0,
+          "p1_incomplete": 0.5373,
+          "p_bust_funded_month": 0.0,
+          "p_funded": 0.37198,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 1.0,
+          "trades_per_day": 1.0,
+          "vol_daily": 0.0025
+        },
+        {
+          "cal_days_to_pass_med": 425.8,
+          "ev_per_month": 99.0,
+          "p1_incomplete": 0.5248,
+          "p_bust_funded_month": 0.0,
+          "p_funded": 0.38505,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 1.0,
+          "trades_per_day": 2.0,
+          "vol_daily": 0.0025
+        },
+        {
+          "cal_days_to_pass_med": 53.6,
+          "ev_per_month": 443.0,
+          "p1_incomplete": 0.1185,
+          "p_bust_funded_month": 0.0055,
+          "p_funded": 0.68176,
+          "p_month_ge_target": 0.001,
+          "p_pass_100": 0.0,
+          "sharpe": 1.0,
+          "trades_per_day": 0.2,
+          "vol_daily": 0.005
+        },
+        {
+          "cal_days_to_pass_med": 107.2,
+          "ev_per_month": 457.0,
+          "p1_incomplete": 0.1192,
+          "p_bust_funded_month": 0.004,
+          "p_funded": 0.72379,
+          "p_month_ge_target": 0.0005,
+          "p_pass_100": 0.0,
+          "sharpe": 1.0,
+          "trades_per_day": 0.5,
+          "vol_daily": 0.005
+        },
+        {
+          "cal_days_to_pass_med": 173.8,
+          "ev_per_month": 483.0,
+          "p1_incomplete": 0.1305,
+          "p_bust_funded_month": 0.0015,
+          "p_funded": 0.72615,
+          "p_month_ge_target": 0.0003,
+          "p_pass_100": 0.0,
+          "sharpe": 1.0,
+          "trades_per_day": 1.0,
+          "vol_daily": 0.005
+        },
+        {
+          "cal_days_to_pass_med": 240.4,
+          "ev_per_month": 494.0,
+          "p1_incomplete": 0.126,
+          "p_bust_funded_month": 0.0008,
+          "p_funded": 0.73548,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 1.0,
+          "trades_per_day": 2.0,
+          "vol_daily": 0.005
+        },
+        {
+          "cal_days_to_pass_med": 20.3,
+          "ev_per_month": 933.0,
+          "p1_incomplete": 0.001,
+          "p_bust_funded_month": 0.0647,
+          "p_funded": 0.50007,
+          "p_month_ge_target": 0.0127,
+          "p_pass_100": 0.0,
+          "sharpe": 1.0,
+          "trades_per_day": 0.2,
+          "vol_daily": 0.01
+        },
+        {
+          "cal_days_to_pass_med": 42.0,
+          "ev_per_month": 1227.0,
+          "p1_incomplete": 0.0015,
+          "p_bust_funded_month": 0.049,
+          "p_funded": 0.55171,
+          "p_month_ge_target": 0.0168,
+          "p_pass_100": 0.0,
+          "sharpe": 1.0,
+          "trades_per_day": 0.5,
+          "vol_daily": 0.01
+        },
+        {
+          "cal_days_to_pass_med": 66.6,
+          "ev_per_month": 1332.0,
+          "p1_incomplete": 0.0008,
+          "p_bust_funded_month": 0.0403,
+          "p_funded": 0.59132,
+          "p_month_ge_target": 0.0152,
+          "p_pass_100": 0.0,
+          "sharpe": 1.0,
+          "trades_per_day": 1.0,
+          "vol_daily": 0.01
+        },
+        {
+          "cal_days_to_pass_med": 95.6,
+          "ev_per_month": 1433.0,
+          "p1_incomplete": 0.0018,
+          "p_bust_funded_month": 0.0272,
+          "p_funded": 0.61754,
+          "p_month_ge_target": 0.0132,
+          "p_pass_100": 0.0,
+          "sharpe": 1.0,
+          "trades_per_day": 2.0,
+          "vol_daily": 0.01
+        },
+        {
+          "cal_days_to_pass_med": 7.2,
+          "ev_per_month": 745.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.296,
+          "p_funded": 0.27669,
+          "p_month_ge_target": 0.1128,
+          "p_pass_100": 0.0,
+          "sharpe": 1.0,
+          "trades_per_day": 0.2,
+          "vol_daily": 0.02
+        },
+        {
+          "cal_days_to_pass_med": 13.0,
+          "ev_per_month": 940.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.329,
+          "p_funded": 0.32096,
+          "p_month_ge_target": 0.118,
+          "p_pass_100": 0.0,
+          "sharpe": 1.0,
+          "trades_per_day": 0.5,
+          "vol_daily": 0.02
+        },
+        {
+          "cal_days_to_pass_med": 18.8,
+          "ev_per_month": 983.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.34,
+          "p_funded": 0.34294,
+          "p_month_ge_target": 0.1155,
+          "p_pass_100": 0.0,
+          "sharpe": 1.0,
+          "trades_per_day": 1.0,
+          "vol_daily": 0.02
+        },
+        {
+          "cal_days_to_pass_med": 24.6,
+          "ev_per_month": 1065.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.3375,
+          "p_funded": 0.35699,
+          "p_month_ge_target": 0.121,
+          "p_pass_100": 0.0,
+          "sharpe": 1.0,
+          "trades_per_day": 2.0,
+          "vol_daily": 0.02
+        },
+        {
+          "cal_days_to_pass_med": 82.6,
+          "ev_per_month": 208.0,
+          "p1_incomplete": 0.2843,
+          "p_bust_funded_month": 0.0002,
+          "p_funded": 0.66058,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 1.5,
+          "trades_per_day": 0.2,
+          "vol_daily": 0.0025
+        },
+        {
+          "cal_days_to_pass_med": 176.7,
+          "ev_per_month": 208.0,
+          "p1_incomplete": 0.2838,
+          "p_bust_funded_month": 0.0,
+          "p_funded": 0.66869,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 1.5,
+          "trades_per_day": 0.5,
+          "vol_daily": 0.0025
+        },
+        {
+          "cal_days_to_pass_med": 285.3,
+          "ev_per_month": 210.0,
+          "p1_incomplete": 0.2695,
+          "p_bust_funded_month": 0.0005,
+          "p_funded": 0.6825,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 1.5,
+          "trades_per_day": 1.0,
+          "vol_daily": 0.0025
+        },
+        {
+          "cal_days_to_pass_med": 392.5,
+          "ev_per_month": 216.0,
+          "p1_incomplete": 0.2732,
+          "p_bust_funded_month": 0.0,
+          "p_funded": 0.68534,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 1.5,
+          "trades_per_day": 2.0,
+          "vol_daily": 0.0025
+        },
+        {
+          "cal_days_to_pass_med": 44.9,
+          "ev_per_month": 653.0,
+          "p1_incomplete": 0.0345,
+          "p_bust_funded_month": 0.0055,
+          "p_funded": 0.85539,
+          "p_month_ge_target": 0.001,
+          "p_pass_100": 0.0,
+          "sharpe": 1.5,
+          "trades_per_day": 0.2,
+          "vol_daily": 0.005
+        },
+        {
+          "cal_days_to_pass_med": 94.1,
+          "ev_per_month": 703.0,
+          "p1_incomplete": 0.0478,
+          "p_bust_funded_month": 0.002,
+          "p_funded": 0.87552,
+          "p_month_ge_target": 0.0008,
+          "p_pass_100": 2e-06,
+          "sharpe": 1.5,
+          "trades_per_day": 0.5,
+          "vol_daily": 0.005
+        },
+        {
+          "cal_days_to_pass_med": 147.7,
+          "ev_per_month": 719.0,
+          "p1_incomplete": 0.043,
+          "p_bust_funded_month": 0.0015,
+          "p_funded": 0.89454,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 1.4e-05,
+          "sharpe": 1.5,
+          "trades_per_day": 1.0,
+          "vol_daily": 0.005
+        },
+        {
+          "cal_days_to_pass_med": 199.9,
+          "ev_per_month": 723.0,
+          "p1_incomplete": 0.0517,
+          "p_bust_funded_month": 0.0008,
+          "p_funded": 0.8956,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 1.6e-05,
+          "sharpe": 1.5,
+          "trades_per_day": 2.0,
+          "vol_daily": 0.005
+        },
+        {
+          "cal_days_to_pass_med": 17.4,
+          "ev_per_month": 1467.0,
+          "p1_incomplete": 0.0003,
+          "p_bust_funded_month": 0.053,
+          "p_funded": 0.61758,
+          "p_month_ge_target": 0.0253,
+          "p_pass_100": 0.0,
+          "sharpe": 1.5,
+          "trades_per_day": 0.2,
+          "vol_daily": 0.01
+        },
+        {
+          "cal_days_to_pass_med": 36.2,
+          "ev_per_month": 1672.0,
+          "p1_incomplete": 0.0003,
+          "p_bust_funded_month": 0.0453,
+          "p_funded": 0.67573,
+          "p_month_ge_target": 0.0215,
+          "p_pass_100": 0.0,
+          "sharpe": 1.5,
+          "trades_per_day": 0.5,
+          "vol_daily": 0.01
+        },
+        {
+          "cal_days_to_pass_med": 57.9,
+          "ev_per_month": 1786.0,
+          "p1_incomplete": 0.0005,
+          "p_bust_funded_month": 0.0302,
+          "p_funded": 0.72246,
+          "p_month_ge_target": 0.0187,
+          "p_pass_100": 0.0,
+          "sharpe": 1.5,
+          "trades_per_day": 1.0,
+          "vol_daily": 0.01
+        },
+        {
+          "cal_days_to_pass_med": 81.1,
+          "ev_per_month": 1753.0,
+          "p1_incomplete": 0.0005,
+          "p_bust_funded_month": 0.0238,
+          "p_funded": 0.73665,
+          "p_month_ge_target": 0.0173,
+          "p_pass_100": 0.0,
+          "sharpe": 1.5,
+          "trades_per_day": 2.0,
+          "vol_daily": 0.01
+        },
+        {
+          "cal_days_to_pass_med": 7.2,
+          "ev_per_month": 1386.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.2515,
+          "p_funded": 0.37229,
+          "p_month_ge_target": 0.1522,
+          "p_pass_100": 0.0,
+          "sharpe": 1.5,
+          "trades_per_day": 0.2,
+          "vol_daily": 0.02
+        },
+        {
+          "cal_days_to_pass_med": 11.6,
+          "ev_per_month": 1418.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.3165,
+          "p_funded": 0.38861,
+          "p_month_ge_target": 0.1432,
+          "p_pass_100": 0.0,
+          "sharpe": 1.5,
+          "trades_per_day": 0.5,
+          "vol_daily": 0.02
+        },
+        {
+          "cal_days_to_pass_med": 17.4,
+          "ev_per_month": 1569.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.3177,
+          "p_funded": 0.41268,
+          "p_month_ge_target": 0.1578,
+          "p_pass_100": 0.0,
+          "sharpe": 1.5,
+          "trades_per_day": 1.0,
+          "vol_daily": 0.02
+        },
+        {
+          "cal_days_to_pass_med": 24.6,
+          "ev_per_month": 1640.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.3108,
+          "p_funded": 0.41186,
+          "p_month_ge_target": 0.157,
+          "p_pass_100": 0.0,
+          "sharpe": 1.5,
+          "trades_per_day": 2.0,
+          "vol_daily": 0.02
+        },
+        {
+          "cal_days_to_pass_med": 72.4,
+          "ev_per_month": 320.0,
+          "p1_incomplete": 0.1015,
+          "p_bust_funded_month": 0.0002,
+          "p_funded": 0.87173,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 1e-06,
+          "sharpe": 2.0,
+          "trades_per_day": 0.2,
+          "vol_daily": 0.0025
+        },
+        {
+          "cal_days_to_pass_med": 155.0,
+          "ev_per_month": 325.0,
+          "p1_incomplete": 0.104,
+          "p_bust_funded_month": 0.0002,
+          "p_funded": 0.88023,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 3e-06,
+          "sharpe": 2.0,
+          "trades_per_day": 0.5,
+          "vol_daily": 0.0025
+        },
+        {
+          "cal_days_to_pass_med": 244.8,
+          "ev_per_month": 338.0,
+          "p1_incomplete": 0.098,
+          "p_bust_funded_month": 0.0,
+          "p_funded": 0.88488,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 5e-06,
+          "sharpe": 2.0,
+          "trades_per_day": 1.0,
+          "vol_daily": 0.0025
+        },
+        {
+          "cal_days_to_pass_med": 336.0,
+          "ev_per_month": 334.0,
+          "p1_incomplete": 0.09,
+          "p_bust_funded_month": 0.0,
+          "p_funded": 0.89722,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 1.9e-05,
+          "sharpe": 2.0,
+          "trades_per_day": 2.0,
+          "vol_daily": 0.0025
+        },
+        {
+          "cal_days_to_pass_med": 36.2,
+          "ev_per_month": 867.0,
+          "p1_incomplete": 0.0088,
+          "p_bust_funded_month": 0.0065,
+          "p_funded": 0.91655,
+          "p_month_ge_target": 0.0003,
+          "p_pass_100": 0.000164,
+          "sharpe": 2.0,
+          "trades_per_day": 0.2,
+          "vol_daily": 0.005
+        },
+        {
+          "cal_days_to_pass_med": 78.2,
+          "ev_per_month": 902.0,
+          "p1_incomplete": 0.008,
+          "p_bust_funded_month": 0.0045,
+          "p_funded": 0.95325,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.008331,
+          "sharpe": 2.0,
+          "trades_per_day": 0.5,
+          "vol_daily": 0.005
+        },
+        {
+          "cal_days_to_pass_med": 121.7,
+          "ev_per_month": 912.0,
+          "p1_incomplete": 0.0115,
+          "p_bust_funded_month": 0.0018,
+          "p_funded": 0.95956,
+          "p_month_ge_target": 0.0003,
+          "p_pass_100": 0.01611,
+          "sharpe": 2.0,
+          "trades_per_day": 1.0,
+          "vol_daily": 0.005
+        },
+        {
+          "cal_days_to_pass_med": 168.0,
+          "ev_per_month": 913.0,
+          "p1_incomplete": 0.008,
+          "p_bust_funded_month": 0.0015,
+          "p_funded": 0.97169,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.056577,
+          "sharpe": 2.0,
+          "trades_per_day": 2.0,
+          "vol_daily": 0.005
+        },
+        {
+          "cal_days_to_pass_med": 15.9,
+          "ev_per_month": 1905.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.051,
+          "p_funded": 0.69964,
+          "p_month_ge_target": 0.0318,
+          "p_pass_100": 0.0,
+          "sharpe": 2.0,
+          "trades_per_day": 0.2,
+          "vol_daily": 0.01
+        },
+        {
+          "cal_days_to_pass_med": 31.9,
+          "ev_per_month": 2189.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.041,
+          "p_funded": 0.76076,
+          "p_month_ge_target": 0.025,
+          "p_pass_100": 0.0,
+          "sharpe": 2.0,
+          "trades_per_day": 0.5,
+          "vol_daily": 0.01
+        },
+        {
+          "cal_days_to_pass_med": 52.1,
+          "ev_per_month": 2177.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.03,
+          "p_funded": 0.79832,
+          "p_month_ge_target": 0.0208,
+          "p_pass_100": 0.0,
+          "sharpe": 2.0,
+          "trades_per_day": 1.0,
+          "vol_daily": 0.01
+        },
+        {
+          "cal_days_to_pass_med": 71.0,
+          "ev_per_month": 2171.0,
+          "p1_incomplete": 0.0003,
+          "p_bust_funded_month": 0.0235,
+          "p_funded": 0.82431,
+          "p_month_ge_target": 0.025,
+          "p_pass_100": 0.0,
+          "sharpe": 2.0,
+          "trades_per_day": 2.0,
+          "vol_daily": 0.01
+        },
+        {
+          "cal_days_to_pass_med": 7.2,
+          "ev_per_month": 1914.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.238,
+          "p_funded": 0.43673,
+          "p_month_ge_target": 0.177,
+          "p_pass_100": 0.0,
+          "sharpe": 2.0,
+          "trades_per_day": 0.2,
+          "vol_daily": 0.02
+        },
+        {
+          "cal_days_to_pass_med": 11.6,
+          "ev_per_month": 2077.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.2868,
+          "p_funded": 0.47575,
+          "p_month_ge_target": 0.1777,
+          "p_pass_100": 0.0,
+          "sharpe": 2.0,
+          "trades_per_day": 0.5,
+          "vol_daily": 0.02
+        },
+        {
+          "cal_days_to_pass_med": 17.4,
+          "ev_per_month": 2229.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.2997,
+          "p_funded": 0.48079,
+          "p_month_ge_target": 0.2018,
+          "p_pass_100": 0.0,
+          "sharpe": 2.0,
+          "trades_per_day": 1.0,
+          "vol_daily": 0.02
+        },
+        {
+          "cal_days_to_pass_med": 23.2,
+          "ev_per_month": 2294.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.2848,
+          "p_funded": 0.49465,
+          "p_month_ge_target": 0.1832,
+          "p_pass_100": 0.0,
+          "sharpe": 2.0,
+          "trades_per_day": 2.0,
+          "vol_daily": 0.02
+        },
+        {
+          "cal_days_to_pass_med": 52.1,
+          "ev_per_month": 542.0,
+          "p1_incomplete": 0.0045,
+          "p_bust_funded_month": 0.0008,
+          "p_funded": 0.98676,
+          "p_month_ge_target": 0.0003,
+          "p_pass_100": 0.263787,
+          "sharpe": 3.0,
+          "trades_per_day": 0.2,
+          "vol_daily": 0.0025
+        },
+        {
+          "cal_days_to_pass_med": 110.1,
+          "ev_per_month": 540.0,
+          "p1_incomplete": 0.0035,
+          "p_bust_funded_month": 0.0002,
+          "p_funded": 0.99301,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.495723,
+          "sharpe": 3.0,
+          "trades_per_day": 0.5,
+          "vol_daily": 0.0025
+        },
+        {
+          "cal_days_to_pass_med": 176.7,
+          "ev_per_month": 543.0,
+          "p1_incomplete": 0.003,
+          "p_bust_funded_month": 0.0,
+          "p_funded": 0.99475,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.590938,
+          "sharpe": 3.0,
+          "trades_per_day": 1.0,
+          "vol_daily": 0.0025
+        },
+        {
+          "cal_days_to_pass_med": 241.9,
+          "ev_per_month": 550.0,
+          "p1_incomplete": 0.003,
+          "p_bust_funded_month": 0.0,
+          "p_funded": 0.9955,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.637205,
+          "sharpe": 3.0,
+          "trades_per_day": 2.0,
+          "vol_daily": 0.0025
+        },
+        {
+          "cal_days_to_pass_med": 26.1,
+          "ev_per_month": 1330.0,
+          "p1_incomplete": 0.0003,
+          "p_bust_funded_month": 0.0058,
+          "p_funded": 0.95815,
+          "p_month_ge_target": 0.002,
+          "p_pass_100": 0.013909,
+          "sharpe": 3.0,
+          "trades_per_day": 0.2,
+          "vol_daily": 0.005
+        },
+        {
+          "cal_days_to_pass_med": 55.0,
+          "ev_per_month": 1356.0,
+          "p1_incomplete": 0.0003,
+          "p_bust_funded_month": 0.0025,
+          "p_funded": 0.97119,
+          "p_month_ge_target": 0.0008,
+          "p_pass_100": 0.053779,
+          "sharpe": 3.0,
+          "trades_per_day": 0.5,
+          "vol_daily": 0.005
+        },
+        {
+          "cal_days_to_pass_med": 86.9,
+          "ev_per_month": 1329.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.0018,
+          "p_funded": 0.98952,
+          "p_month_ge_target": 0.0003,
+          "p_pass_100": 0.348751,
+          "sharpe": 3.0,
+          "trades_per_day": 1.0,
+          "vol_daily": 0.005
+        },
+        {
+          "cal_days_to_pass_med": 117.3,
+          "ev_per_month": 1362.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.0005,
+          "p_funded": 0.99451,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.576422,
+          "sharpe": 3.0,
+          "trades_per_day": 2.0,
+          "vol_daily": 0.005
+        },
+        {
+          "cal_days_to_pass_med": 11.6,
+          "ev_per_month": 2823.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.0493,
+          "p_funded": 0.82017,
+          "p_month_ge_target": 0.0568,
+          "p_pass_100": 0.0,
+          "sharpe": 3.0,
+          "trades_per_day": 0.2,
+          "vol_daily": 0.01
+        },
+        {
+          "cal_days_to_pass_med": 24.6,
+          "ev_per_month": 3032.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.0365,
+          "p_funded": 0.85287,
+          "p_month_ge_target": 0.048,
+          "p_pass_100": 0.0,
+          "sharpe": 3.0,
+          "trades_per_day": 0.5,
+          "vol_daily": 0.01
+        },
+        {
+          "cal_days_to_pass_med": 39.1,
+          "ev_per_month": 3045.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.0302,
+          "p_funded": 0.88617,
+          "p_month_ge_target": 0.042,
+          "p_pass_100": 6e-06,
+          "sharpe": 3.0,
+          "trades_per_day": 1.0,
+          "vol_daily": 0.01
+        },
+        {
+          "cal_days_to_pass_med": 55.0,
+          "ev_per_month": 3149.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.02,
+          "p_funded": 0.91579,
+          "p_month_ge_target": 0.0428,
+          "p_pass_100": 0.000151,
+          "sharpe": 3.0,
+          "trades_per_day": 2.0,
+          "vol_daily": 0.01
+        },
+        {
+          "cal_days_to_pass_med": 5.8,
+          "ev_per_month": 3548.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.1967,
+          "p_funded": 0.56172,
+          "p_month_ge_target": 0.2625,
+          "p_pass_100": 0.0,
+          "sharpe": 3.0,
+          "trades_per_day": 0.2,
+          "vol_daily": 0.02
+        },
+        {
+          "cal_days_to_pass_med": 10.1,
+          "ev_per_month": 3590.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.2565,
+          "p_funded": 0.57286,
+          "p_month_ge_target": 0.2745,
+          "p_pass_100": 0.0,
+          "sharpe": 3.0,
+          "trades_per_day": 0.5,
+          "vol_daily": 0.02
+        },
+        {
+          "cal_days_to_pass_med": 15.9,
+          "ev_per_month": 3685.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.2608,
+          "p_funded": 0.59862,
+          "p_month_ge_target": 0.2647,
+          "p_pass_100": 0.0,
+          "sharpe": 3.0,
+          "trades_per_day": 1.0,
+          "vol_daily": 0.02
+        },
+        {
+          "cal_days_to_pass_med": 21.7,
+          "ev_per_month": 3624.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.2742,
+          "p_funded": 0.60405,
+          "p_month_ge_target": 0.267,
+          "p_pass_100": 0.0,
+          "sharpe": 3.0,
+          "trades_per_day": 2.0,
+          "vol_daily": 0.02
+        }
+      ],
+      "firm": "FTMO_100K_SWING",
+      "freqs": [
+        0.2,
+        0.5,
+        1.0,
+        2.0
+      ],
+      "monthly_income_target_usd": 10000.0,
+      "note": "SYNTHETIC requirements map \u2014 existence of any cell's strategy is NOT claimed",
+      "sharpes": [
+        0.0,
+        0.5,
+        1.0,
+        1.5,
+        2.0,
+        3.0
+      ],
+      "vols": [
+        0.0025,
+        0.005,
+        0.01,
+        0.02
+      ]
+    },
+    {
+      "cells": [
+        {
+          "cal_days_to_pass_med": 46.3,
+          "ev_per_month": -97.0,
+          "p1_incomplete": 0.449,
+          "p_bust_funded_month": 0.018,
+          "p_funded": 0.08975,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 0.0,
+          "trades_per_day": 0.2,
+          "vol_daily": 0.0025
+        },
+        {
+          "cal_days_to_pass_med": 99.9,
+          "ev_per_month": -83.0,
+          "p1_incomplete": 0.411,
+          "p_bust_funded_month": 0.01,
+          "p_funded": 0.1105,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 0.0,
+          "trades_per_day": 0.5,
+          "vol_daily": 0.0025
+        },
+        {
+          "cal_days_to_pass_med": 153.5,
+          "ev_per_month": -81.0,
+          "p1_incomplete": 0.3882,
+          "p_bust_funded_month": 0.006,
+          "p_funded": 0.109,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 0.0,
+          "trades_per_day": 1.0,
+          "vol_daily": 0.0025
+        },
+        {
+          "cal_days_to_pass_med": 217.3,
+          "ev_per_month": -71.0,
+          "p1_incomplete": 0.3583,
+          "p_bust_funded_month": 0.0015,
+          "p_funded": 0.11825,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 0.0,
+          "trades_per_day": 2.0,
+          "vol_daily": 0.0025
+        },
+        {
+          "cal_days_to_pass_med": 23.2,
+          "ev_per_month": -18.0,
+          "p1_incomplete": 0.018,
+          "p_bust_funded_month": 0.141,
+          "p_funded": 0.20725,
+          "p_month_ge_target": 0.0003,
+          "p_pass_100": 0.0,
+          "sharpe": 0.0,
+          "trades_per_day": 0.2,
+          "vol_daily": 0.005
+        },
+        {
+          "cal_days_to_pass_med": 44.9,
+          "ev_per_month": 17.0,
+          "p1_incomplete": 0.0065,
+          "p_bust_funded_month": 0.1272,
+          "p_funded": 0.2245,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 0.0,
+          "trades_per_day": 0.5,
+          "vol_daily": 0.005
+        },
+        {
+          "cal_days_to_pass_med": 68.1,
+          "ev_per_month": 41.0,
+          "p1_incomplete": 0.0053,
+          "p_bust_funded_month": 0.1258,
+          "p_funded": 0.2395,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 0.0,
+          "trades_per_day": 1.0,
+          "vol_daily": 0.005
+        },
+        {
+          "cal_days_to_pass_med": 91.2,
+          "ev_per_month": 62.0,
+          "p1_incomplete": 0.0032,
+          "p_bust_funded_month": 0.1138,
+          "p_funded": 0.238,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 0.0,
+          "trades_per_day": 2.0,
+          "vol_daily": 0.005
+        },
+        {
+          "cal_days_to_pass_med": 10.1,
+          "ev_per_month": -15.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.4587,
+          "p_funded": 0.15325,
+          "p_month_ge_target": 0.0005,
+          "p_pass_100": 0.0,
+          "sharpe": 0.0,
+          "trades_per_day": 0.2,
+          "vol_daily": 0.01
+        },
+        {
+          "cal_days_to_pass_med": 15.9,
+          "ev_per_month": 17.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.5437,
+          "p_funded": 0.1815,
+          "p_month_ge_target": 0.0003,
+          "p_pass_100": 0.0,
+          "sharpe": 0.0,
+          "trades_per_day": 0.5,
+          "vol_daily": 0.01
+        },
+        {
+          "cal_days_to_pass_med": 21.7,
+          "ev_per_month": 17.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.5917,
+          "p_funded": 0.18775,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 0.0,
+          "trades_per_day": 1.0,
+          "vol_daily": 0.01
+        },
+        {
+          "cal_days_to_pass_med": 26.1,
+          "ev_per_month": 13.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.6318,
+          "p_funded": 0.2055,
+          "p_month_ge_target": 0.0003,
+          "p_pass_100": 0.0,
+          "sharpe": 0.0,
+          "trades_per_day": 2.0,
+          "vol_daily": 0.01
+        },
+        {
+          "cal_days_to_pass_med": 7.2,
+          "ev_per_month": -33.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.6875,
+          "p_funded": 0.103,
+          "p_month_ge_target": 0.0083,
+          "p_pass_100": 0.0,
+          "sharpe": 0.0,
+          "trades_per_day": 0.2,
+          "vol_daily": 0.02
+        },
+        {
+          "cal_days_to_pass_med": 8.7,
+          "ev_per_month": -169.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.8722,
+          "p_funded": 0.11775,
+          "p_month_ge_target": 0.0047,
+          "p_pass_100": 0.0,
+          "sharpe": 0.0,
+          "trades_per_day": 0.5,
+          "vol_daily": 0.02
+        },
+        {
+          "cal_days_to_pass_med": 8.7,
+          "ev_per_month": -259.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.9337,
+          "p_funded": 0.129,
+          "p_month_ge_target": 0.0035,
+          "p_pass_100": 0.0,
+          "sharpe": 0.0,
+          "trades_per_day": 1.0,
+          "vol_daily": 0.02
+        },
+        {
+          "cal_days_to_pass_med": 10.1,
+          "ev_per_month": -337.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.9675,
+          "p_funded": 0.13625,
+          "p_month_ge_target": 0.0018,
+          "p_pass_100": 0.0,
+          "sharpe": 0.0,
+          "trades_per_day": 2.0,
+          "vol_daily": 0.02
+        },
+        {
+          "cal_days_to_pass_med": 44.9,
+          "ev_per_month": -32.0,
+          "p1_incomplete": 0.4682,
+          "p_bust_funded_month": 0.0165,
+          "p_funded": 0.2025,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 0.5,
+          "trades_per_day": 0.2,
+          "vol_daily": 0.0025
+        },
+        {
+          "cal_days_to_pass_med": 97.0,
+          "ev_per_month": -19.0,
+          "p1_incomplete": 0.4467,
+          "p_bust_funded_month": 0.0082,
+          "p_funded": 0.22,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 0.5,
+          "trades_per_day": 0.5,
+          "vol_daily": 0.0025
+        },
+        {
+          "cal_days_to_pass_med": 152.1,
+          "ev_per_month": -16.0,
+          "p1_incomplete": 0.4223,
+          "p_bust_funded_month": 0.0038,
+          "p_funded": 0.21825,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 0.5,
+          "trades_per_day": 1.0,
+          "vol_daily": 0.0025
+        },
+        {
+          "cal_days_to_pass_med": 211.5,
+          "ev_per_month": -11.0,
+          "p1_incomplete": 0.416,
+          "p_bust_funded_month": 0.0038,
+          "p_funded": 0.234,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 0.5,
+          "trades_per_day": 2.0,
+          "vol_daily": 0.0025
+        },
+        {
+          "cal_days_to_pass_med": 23.2,
+          "ev_per_month": 64.0,
+          "p1_incomplete": 0.0155,
+          "p_bust_funded_month": 0.1258,
+          "p_funded": 0.31425,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 0.5,
+          "trades_per_day": 0.2,
+          "vol_daily": 0.005
+        },
+        {
+          "cal_days_to_pass_med": 44.9,
+          "ev_per_month": 122.0,
+          "p1_incomplete": 0.0097,
+          "p_bust_funded_month": 0.1158,
+          "p_funded": 0.34275,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 0.5,
+          "trades_per_day": 0.5,
+          "vol_daily": 0.005
+        },
+        {
+          "cal_days_to_pass_med": 66.6,
+          "ev_per_month": 155.0,
+          "p1_incomplete": 0.006,
+          "p_bust_funded_month": 0.107,
+          "p_funded": 0.34475,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 0.5,
+          "trades_per_day": 1.0,
+          "vol_daily": 0.005
+        },
+        {
+          "cal_days_to_pass_med": 86.9,
+          "ev_per_month": 163.0,
+          "p1_incomplete": 0.0022,
+          "p_bust_funded_month": 0.105,
+          "p_funded": 0.34925,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 0.5,
+          "trades_per_day": 2.0,
+          "vol_daily": 0.005
+        },
+        {
+          "cal_days_to_pass_med": 10.1,
+          "ev_per_month": 70.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.4115,
+          "p_funded": 0.19725,
+          "p_month_ge_target": 0.0013,
+          "p_pass_100": 0.0,
+          "sharpe": 0.5,
+          "trades_per_day": 0.2,
+          "vol_daily": 0.01
+        },
+        {
+          "cal_days_to_pass_med": 15.9,
+          "ev_per_month": 98.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.4972,
+          "p_funded": 0.229,
+          "p_month_ge_target": 0.0005,
+          "p_pass_100": 0.0,
+          "sharpe": 0.5,
+          "trades_per_day": 0.5,
+          "vol_daily": 0.01
+        },
+        {
+          "cal_days_to_pass_med": 20.3,
+          "ev_per_month": 88.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.5687,
+          "p_funded": 0.24325,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 0.5,
+          "trades_per_day": 1.0,
+          "vol_daily": 0.01
+        },
+        {
+          "cal_days_to_pass_med": 26.1,
+          "ev_per_month": 98.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.5952,
+          "p_funded": 0.24075,
+          "p_month_ge_target": 0.0003,
+          "p_pass_100": 0.0,
+          "sharpe": 0.5,
+          "trades_per_day": 2.0,
+          "vol_daily": 0.01
+        },
+        {
+          "cal_days_to_pass_med": 5.8,
+          "ev_per_month": 78.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.6455,
+          "p_funded": 0.14875,
+          "p_month_ge_target": 0.0125,
+          "p_pass_100": 0.0,
+          "sharpe": 0.5,
+          "trades_per_day": 0.2,
+          "vol_daily": 0.02
+        },
+        {
+          "cal_days_to_pass_med": 7.2,
+          "ev_per_month": -87.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.8472,
+          "p_funded": 0.1525,
+          "p_month_ge_target": 0.0067,
+          "p_pass_100": 0.0,
+          "sharpe": 0.5,
+          "trades_per_day": 0.5,
+          "vol_daily": 0.02
+        },
+        {
+          "cal_days_to_pass_med": 8.7,
+          "ev_per_month": -221.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.9343,
+          "p_funded": 0.153,
+          "p_month_ge_target": 0.003,
+          "p_pass_100": 0.0,
+          "sharpe": 0.5,
+          "trades_per_day": 1.0,
+          "vol_daily": 0.02
+        },
+        {
+          "cal_days_to_pass_med": 10.1,
+          "ev_per_month": -301.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.9657,
+          "p_funded": 0.15725,
+          "p_month_ge_target": 0.0025,
+          "p_pass_100": 0.0,
+          "sharpe": 0.5,
+          "trades_per_day": 2.0,
+          "vol_daily": 0.02
+        },
+        {
+          "cal_days_to_pass_med": 43.5,
+          "ev_per_month": 42.0,
+          "p1_incomplete": 0.4245,
+          "p_bust_funded_month": 0.0142,
+          "p_funded": 0.35125,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 1.0,
+          "trades_per_day": 0.2,
+          "vol_daily": 0.0025
+        },
+        {
+          "cal_days_to_pass_med": 92.7,
+          "ev_per_month": 60.0,
+          "p1_incomplete": 0.3967,
+          "p_bust_funded_month": 0.0082,
+          "p_funded": 0.3785,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 1.0,
+          "trades_per_day": 0.5,
+          "vol_daily": 0.0025
+        },
+        {
+          "cal_days_to_pass_med": 150.6,
+          "ev_per_month": 64.0,
+          "p1_incomplete": 0.3887,
+          "p_bust_funded_month": 0.0038,
+          "p_funded": 0.3965,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 1.0,
+          "trades_per_day": 1.0,
+          "vol_daily": 0.0025
+        },
+        {
+          "cal_days_to_pass_med": 202.8,
+          "ev_per_month": 63.0,
+          "p1_incomplete": 0.3645,
+          "p_bust_funded_month": 0.001,
+          "p_funded": 0.40425,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 1.0,
+          "trades_per_day": 2.0,
+          "vol_daily": 0.0025
+        },
+        {
+          "cal_days_to_pass_med": 21.7,
+          "ev_per_month": 180.0,
+          "p1_incomplete": 0.0127,
+          "p_bust_funded_month": 0.1132,
+          "p_funded": 0.42075,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 1.0,
+          "trades_per_day": 0.2,
+          "vol_daily": 0.005
+        },
+        {
+          "cal_days_to_pass_med": 42.0,
+          "ev_per_month": 251.0,
+          "p1_incomplete": 0.006,
+          "p_bust_funded_month": 0.105,
+          "p_funded": 0.47175,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 1.0,
+          "trades_per_day": 0.5,
+          "vol_daily": 0.005
+        },
+        {
+          "cal_days_to_pass_med": 65.2,
+          "ev_per_month": 272.0,
+          "p1_incomplete": 0.0043,
+          "p_bust_funded_month": 0.095,
+          "p_funded": 0.482,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 1.0,
+          "trades_per_day": 1.0,
+          "vol_daily": 0.005
+        },
+        {
+          "cal_days_to_pass_med": 85.5,
+          "ev_per_month": 279.0,
+          "p1_incomplete": 0.0032,
+          "p_bust_funded_month": 0.087,
+          "p_funded": 0.4655,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 1.0,
+          "trades_per_day": 2.0,
+          "vol_daily": 0.005
+        },
+        {
+          "cal_days_to_pass_med": 10.1,
+          "ev_per_month": 180.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.3905,
+          "p_funded": 0.29875,
+          "p_month_ge_target": 0.0008,
+          "p_pass_100": 0.0,
+          "sharpe": 1.0,
+          "trades_per_day": 0.2,
+          "vol_daily": 0.01
+        },
+        {
+          "cal_days_to_pass_med": 14.5,
+          "ev_per_month": 213.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.4672,
+          "p_funded": 0.28825,
+          "p_month_ge_target": 0.0005,
+          "p_pass_100": 0.0,
+          "sharpe": 1.0,
+          "trades_per_day": 0.5,
+          "vol_daily": 0.01
+        },
+        {
+          "cal_days_to_pass_med": 20.3,
+          "ev_per_month": 183.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.5323,
+          "p_funded": 0.282,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 1.0,
+          "trades_per_day": 1.0,
+          "vol_daily": 0.01
+        },
+        {
+          "cal_days_to_pass_med": 26.1,
+          "ev_per_month": 181.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.5633,
+          "p_funded": 0.28625,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 1.0,
+          "trades_per_day": 2.0,
+          "vol_daily": 0.01
+        },
+        {
+          "cal_days_to_pass_med": 7.2,
+          "ev_per_month": 239.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.6062,
+          "p_funded": 0.19975,
+          "p_month_ge_target": 0.0187,
+          "p_pass_100": 0.0,
+          "sharpe": 1.0,
+          "trades_per_day": 0.2,
+          "vol_daily": 0.02
+        },
+        {
+          "cal_days_to_pass_med": 8.7,
+          "ev_per_month": 33.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.8237,
+          "p_funded": 0.195,
+          "p_month_ge_target": 0.0138,
+          "p_pass_100": 0.0,
+          "sharpe": 1.0,
+          "trades_per_day": 0.5,
+          "vol_daily": 0.02
+        },
+        {
+          "cal_days_to_pass_med": 8.7,
+          "ev_per_month": -126.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.9163,
+          "p_funded": 0.18775,
+          "p_month_ge_target": 0.0085,
+          "p_pass_100": 0.0,
+          "sharpe": 1.0,
+          "trades_per_day": 1.0,
+          "vol_daily": 0.02
+        },
+        {
+          "cal_days_to_pass_med": 10.1,
+          "ev_per_month": -251.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.9615,
+          "p_funded": 0.17625,
+          "p_month_ge_target": 0.004,
+          "p_pass_100": 0.0,
+          "sharpe": 1.0,
+          "trades_per_day": 2.0,
+          "vol_daily": 0.02
+        },
+        {
+          "cal_days_to_pass_med": 42.0,
+          "ev_per_month": 133.0,
+          "p1_incomplete": 0.3065,
+          "p_bust_funded_month": 0.0135,
+          "p_funded": 0.53325,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 1.5,
+          "trades_per_day": 0.2,
+          "vol_daily": 0.0025
+        },
+        {
+          "cal_days_to_pass_med": 88.4,
+          "ev_per_month": 144.0,
+          "p1_incomplete": 0.2913,
+          "p_bust_funded_month": 0.0078,
+          "p_funded": 0.56375,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 1.5,
+          "trades_per_day": 0.5,
+          "vol_daily": 0.0025
+        },
+        {
+          "cal_days_to_pass_med": 138.3,
+          "ev_per_month": 147.0,
+          "p1_incomplete": 0.282,
+          "p_bust_funded_month": 0.004,
+          "p_funded": 0.5905,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 1.5,
+          "trades_per_day": 1.0,
+          "vol_daily": 0.0025
+        },
+        {
+          "cal_days_to_pass_med": 188.3,
+          "ev_per_month": 143.0,
+          "p1_incomplete": 0.3018,
+          "p_bust_funded_month": 0.0018,
+          "p_funded": 0.57975,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 1.5,
+          "trades_per_day": 2.0,
+          "vol_daily": 0.0025
+        },
+        {
+          "cal_days_to_pass_med": 20.3,
+          "ev_per_month": 337.0,
+          "p1_incomplete": 0.0057,
+          "p_bust_funded_month": 0.0955,
+          "p_funded": 0.56525,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 1.5,
+          "trades_per_day": 0.2,
+          "vol_daily": 0.005
+        },
+        {
+          "cal_days_to_pass_med": 39.1,
+          "ev_per_month": 325.0,
+          "p1_incomplete": 0.003,
+          "p_bust_funded_month": 0.1045,
+          "p_funded": 0.561,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 1.5,
+          "trades_per_day": 0.5,
+          "vol_daily": 0.005
+        },
+        {
+          "cal_days_to_pass_med": 59.4,
+          "ev_per_month": 384.0,
+          "p1_incomplete": 0.0022,
+          "p_bust_funded_month": 0.0915,
+          "p_funded": 0.56775,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 1.5,
+          "trades_per_day": 1.0,
+          "vol_daily": 0.005
+        },
+        {
+          "cal_days_to_pass_med": 79.7,
+          "ev_per_month": 436.0,
+          "p1_incomplete": 0.0015,
+          "p_bust_funded_month": 0.0733,
+          "p_funded": 0.583,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 1.5,
+          "trades_per_day": 2.0,
+          "vol_daily": 0.005
+        },
+        {
+          "cal_days_to_pass_med": 10.1,
+          "ev_per_month": 332.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.3453,
+          "p_funded": 0.362,
+          "p_month_ge_target": 0.0003,
+          "p_pass_100": 0.0,
+          "sharpe": 1.5,
+          "trades_per_day": 0.2,
+          "vol_daily": 0.01
+        },
+        {
+          "cal_days_to_pass_med": 15.9,
+          "ev_per_month": 307.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.4547,
+          "p_funded": 0.34425,
+          "p_month_ge_target": 0.0003,
+          "p_pass_100": 0.0,
+          "sharpe": 1.5,
+          "trades_per_day": 0.5,
+          "vol_daily": 0.01
+        },
+        {
+          "cal_days_to_pass_med": 20.3,
+          "ev_per_month": 332.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.489,
+          "p_funded": 0.354,
+          "p_month_ge_target": 0.0003,
+          "p_pass_100": 0.0,
+          "sharpe": 1.5,
+          "trades_per_day": 1.0,
+          "vol_daily": 0.01
+        },
+        {
+          "cal_days_to_pass_med": 26.1,
+          "ev_per_month": 327.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.5232,
+          "p_funded": 0.35925,
+          "p_month_ge_target": 0.0003,
+          "p_pass_100": 0.0,
+          "sharpe": 1.5,
+          "trades_per_day": 2.0,
+          "vol_daily": 0.01
+        },
+        {
+          "cal_days_to_pass_med": 5.8,
+          "ev_per_month": 366.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.5897,
+          "p_funded": 0.2625,
+          "p_month_ge_target": 0.0213,
+          "p_pass_100": 0.0,
+          "sharpe": 1.5,
+          "trades_per_day": 0.2,
+          "vol_daily": 0.02
+        },
+        {
+          "cal_days_to_pass_med": 7.2,
+          "ev_per_month": 104.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.8087,
+          "p_funded": 0.2195,
+          "p_month_ge_target": 0.0152,
+          "p_pass_100": 0.0,
+          "sharpe": 1.5,
+          "trades_per_day": 0.5,
+          "vol_daily": 0.02
+        },
+        {
+          "cal_days_to_pass_med": 8.7,
+          "ev_per_month": -55.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.9058,
+          "p_funded": 0.221,
+          "p_month_ge_target": 0.012,
+          "p_pass_100": 0.0,
+          "sharpe": 1.5,
+          "trades_per_day": 1.0,
+          "vol_daily": 0.02
+        },
+        {
+          "cal_days_to_pass_med": 10.1,
+          "ev_per_month": -195.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.955,
+          "p_funded": 0.20925,
+          "p_month_ge_target": 0.0077,
+          "p_pass_100": 0.0,
+          "sharpe": 1.5,
+          "trades_per_day": 2.0,
+          "vol_daily": 0.02
+        },
+        {
+          "cal_days_to_pass_med": 39.1,
+          "ev_per_month": 212.0,
+          "p1_incomplete": 0.1735,
+          "p_bust_funded_month": 0.0175,
+          "p_funded": 0.70525,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 2.0,
+          "trades_per_day": 0.2,
+          "vol_daily": 0.0025
+        },
+        {
+          "cal_days_to_pass_med": 79.7,
+          "ev_per_month": 214.0,
+          "p1_incomplete": 0.1802,
+          "p_bust_funded_month": 0.0055,
+          "p_funded": 0.73625,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 2.0,
+          "trades_per_day": 0.5,
+          "vol_daily": 0.0025
+        },
+        {
+          "cal_days_to_pass_med": 130.4,
+          "ev_per_month": 226.0,
+          "p1_incomplete": 0.1705,
+          "p_bust_funded_month": 0.0042,
+          "p_funded": 0.75825,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 2.0,
+          "trades_per_day": 1.0,
+          "vol_daily": 0.0025
+        },
+        {
+          "cal_days_to_pass_med": 173.8,
+          "ev_per_month": 223.0,
+          "p1_incomplete": 0.1713,
+          "p_bust_funded_month": 0.0018,
+          "p_funded": 0.76025,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 2.0,
+          "trades_per_day": 2.0,
+          "vol_daily": 0.0025
+        },
+        {
+          "cal_days_to_pass_med": 17.4,
+          "ev_per_month": 428.0,
+          "p1_incomplete": 0.003,
+          "p_bust_funded_month": 0.0988,
+          "p_funded": 0.6325,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 2.0,
+          "trades_per_day": 0.2,
+          "vol_daily": 0.005
+        },
+        {
+          "cal_days_to_pass_med": 36.2,
+          "ev_per_month": 489.0,
+          "p1_incomplete": 0.002,
+          "p_bust_funded_month": 0.085,
+          "p_funded": 0.656,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 2.0,
+          "trades_per_day": 0.5,
+          "vol_daily": 0.005
+        },
+        {
+          "cal_days_to_pass_med": 55.0,
+          "ev_per_month": 530.0,
+          "p1_incomplete": 0.001,
+          "p_bust_funded_month": 0.0753,
+          "p_funded": 0.66725,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 2.0,
+          "trades_per_day": 1.0,
+          "vol_daily": 0.005
+        },
+        {
+          "cal_days_to_pass_med": 73.9,
+          "ev_per_month": 559.0,
+          "p1_incomplete": 0.0003,
+          "p_bust_funded_month": 0.0665,
+          "p_funded": 0.675,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 2.0,
+          "trades_per_day": 2.0,
+          "vol_daily": 0.005
+        },
+        {
+          "cal_days_to_pass_med": 8.7,
+          "ev_per_month": 549.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.308,
+          "p_funded": 0.439,
+          "p_month_ge_target": 0.0018,
+          "p_pass_100": 0.0,
+          "sharpe": 2.0,
+          "trades_per_day": 0.2,
+          "vol_daily": 0.01
+        },
+        {
+          "cal_days_to_pass_med": 14.5,
+          "ev_per_month": 498.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.4115,
+          "p_funded": 0.42025,
+          "p_month_ge_target": 0.0008,
+          "p_pass_100": 0.0,
+          "sharpe": 2.0,
+          "trades_per_day": 0.5,
+          "vol_daily": 0.01
+        },
+        {
+          "cal_days_to_pass_med": 18.8,
+          "ev_per_month": 467.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.4692,
+          "p_funded": 0.43025,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 2.0,
+          "trades_per_day": 1.0,
+          "vol_daily": 0.01
+        },
+        {
+          "cal_days_to_pass_med": 23.2,
+          "ev_per_month": 409.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.5195,
+          "p_funded": 0.39925,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 2.0,
+          "trades_per_day": 2.0,
+          "vol_daily": 0.01
+        },
+        {
+          "cal_days_to_pass_med": 5.8,
+          "ev_per_month": 642.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.5367,
+          "p_funded": 0.3075,
+          "p_month_ge_target": 0.0395,
+          "p_pass_100": 0.0,
+          "sharpe": 2.0,
+          "trades_per_day": 0.2,
+          "vol_daily": 0.02
+        },
+        {
+          "cal_days_to_pass_med": 7.2,
+          "ev_per_month": 283.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.772,
+          "p_funded": 0.27575,
+          "p_month_ge_target": 0.0208,
+          "p_pass_100": 0.0,
+          "sharpe": 2.0,
+          "trades_per_day": 0.5,
+          "vol_daily": 0.02
+        },
+        {
+          "cal_days_to_pass_med": 8.7,
+          "ev_per_month": 55.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.8825,
+          "p_funded": 0.25075,
+          "p_month_ge_target": 0.017,
+          "p_pass_100": 0.0,
+          "sharpe": 2.0,
+          "trades_per_day": 1.0,
+          "vol_daily": 0.02
+        },
+        {
+          "cal_days_to_pass_med": 10.1,
+          "ev_per_month": -111.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.9383,
+          "p_funded": 0.23925,
+          "p_month_ge_target": 0.0088,
+          "p_pass_100": 0.0,
+          "sharpe": 2.0,
+          "trades_per_day": 2.0,
+          "vol_daily": 0.02
+        },
+        {
+          "cal_days_to_pass_med": 30.4,
+          "ev_per_month": 354.0,
+          "p1_incomplete": 0.034,
+          "p_bust_funded_month": 0.0115,
+          "p_funded": 0.898,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 2.1e-05,
+          "sharpe": 3.0,
+          "trades_per_day": 0.2,
+          "vol_daily": 0.0025
+        },
+        {
+          "cal_days_to_pass_med": 65.2,
+          "ev_per_month": 361.0,
+          "p1_incomplete": 0.0328,
+          "p_bust_funded_month": 0.005,
+          "p_funded": 0.919,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.000215,
+          "sharpe": 3.0,
+          "trades_per_day": 0.5,
+          "vol_daily": 0.0025
+        },
+        {
+          "cal_days_to_pass_med": 104.3,
+          "ev_per_month": 367.0,
+          "p1_incomplete": 0.0365,
+          "p_bust_funded_month": 0.0042,
+          "p_funded": 0.925,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.000411,
+          "sharpe": 3.0,
+          "trades_per_day": 1.0,
+          "vol_daily": 0.0025
+        },
+        {
+          "cal_days_to_pass_med": 141.9,
+          "ev_per_month": 355.0,
+          "p1_incomplete": 0.036,
+          "p_bust_funded_month": 0.0012,
+          "p_funded": 0.939,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.001847,
+          "sharpe": 3.0,
+          "trades_per_day": 2.0,
+          "vol_daily": 0.0025
+        },
+        {
+          "cal_days_to_pass_med": 14.5,
+          "ev_per_month": 689.0,
+          "p1_incomplete": 0.0003,
+          "p_bust_funded_month": 0.0805,
+          "p_funded": 0.77875,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 3.0,
+          "trades_per_day": 0.2,
+          "vol_daily": 0.005
+        },
+        {
+          "cal_days_to_pass_med": 29.0,
+          "ev_per_month": 758.0,
+          "p1_incomplete": 0.0003,
+          "p_bust_funded_month": 0.074,
+          "p_funded": 0.775,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 3.0,
+          "trades_per_day": 0.5,
+          "vol_daily": 0.005
+        },
+        {
+          "cal_days_to_pass_med": 43.5,
+          "ev_per_month": 835.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.0597,
+          "p_funded": 0.802,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 3.0,
+          "trades_per_day": 1.0,
+          "vol_daily": 0.005
+        },
+        {
+          "cal_days_to_pass_med": 60.8,
+          "ev_per_month": 818.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.0563,
+          "p_funded": 0.8075,
+          "p_month_ge_target": 0.0,
+          "p_pass_100": 0.0,
+          "sharpe": 3.0,
+          "trades_per_day": 2.0,
+          "vol_daily": 0.005
+        },
+        {
+          "cal_days_to_pass_med": 8.7,
+          "ev_per_month": 980.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.2557,
+          "p_funded": 0.58775,
+          "p_month_ge_target": 0.0043,
+          "p_pass_100": 0.0,
+          "sharpe": 3.0,
+          "trades_per_day": 0.2,
+          "vol_daily": 0.01
+        },
+        {
+          "cal_days_to_pass_med": 13.0,
+          "ev_per_month": 880.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.3608,
+          "p_funded": 0.54525,
+          "p_month_ge_target": 0.0008,
+          "p_pass_100": 0.0,
+          "sharpe": 3.0,
+          "trades_per_day": 0.5,
+          "vol_daily": 0.01
+        },
+        {
+          "cal_days_to_pass_med": 17.4,
+          "ev_per_month": 835.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.41,
+          "p_funded": 0.514,
+          "p_month_ge_target": 0.0008,
+          "p_pass_100": 0.0,
+          "sharpe": 3.0,
+          "trades_per_day": 1.0,
+          "vol_daily": 0.01
+        },
+        {
+          "cal_days_to_pass_med": 21.7,
+          "ev_per_month": 772.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.4443,
+          "p_funded": 0.50475,
+          "p_month_ge_target": 0.0003,
+          "p_pass_100": 0.0,
+          "sharpe": 3.0,
+          "trades_per_day": 2.0,
+          "vol_daily": 0.01
+        },
+        {
+          "cal_days_to_pass_med": 5.8,
+          "ev_per_month": 1235.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.453,
+          "p_funded": 0.4115,
+          "p_month_ge_target": 0.0622,
+          "p_pass_100": 0.0,
+          "sharpe": 3.0,
+          "trades_per_day": 0.2,
+          "vol_daily": 0.02
+        },
+        {
+          "cal_days_to_pass_med": 7.2,
+          "ev_per_month": 645.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.7365,
+          "p_funded": 0.37625,
+          "p_month_ge_target": 0.0428,
+          "p_pass_100": 0.0,
+          "sharpe": 3.0,
+          "trades_per_day": 0.5,
+          "vol_daily": 0.02
+        },
+        {
+          "cal_days_to_pass_med": 8.7,
+          "ev_per_month": 249.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.862,
+          "p_funded": 0.31625,
+          "p_month_ge_target": 0.0283,
+          "p_pass_100": 0.0,
+          "sharpe": 3.0,
+          "trades_per_day": 1.0,
+          "vol_daily": 0.02
+        },
+        {
+          "cal_days_to_pass_med": 10.1,
+          "ev_per_month": 20.0,
+          "p1_incomplete": 0.0,
+          "p_bust_funded_month": 0.9293,
+          "p_funded": 0.29575,
+          "p_month_ge_target": 0.017,
+          "p_pass_100": 0.0,
+          "sharpe": 3.0,
+          "trades_per_day": 2.0,
+          "vol_daily": 0.02
+        }
+      ],
+      "firm": "TOPSTEP_50K",
+      "freqs": [
+        0.2,
+        0.5,
+        1.0,
+        2.0
+      ],
+      "monthly_income_target_usd": 10000.0,
+      "note": "SYNTHETIC requirements map \u2014 existence of any cell's strategy is NOT claimed",
+      "sharpes": [
+        0.0,
+        0.5,
+        1.0,
+        1.5,
+        2.0,
+        3.0
+      ],
+      "vols": [
+        0.0025,
+        0.005,
+        0.01,
+        0.02
+      ]
+    }
+  ],
+  "live_sanity_pool": {
+    "by_source": {
+      "fills_backfill": 12,
+      "live": 15
+    },
+    "by_system": {
+      "FOREX": 26,
+      "ICT": 1
+    },
+    "losses": 24,
+    "n": 27,
+    "wins": 3
+  },
+  "parity": {
+    "all_exact": true,
+    "all_ok": true,
+    "env": {
+      "numpy": "2.4.4",
+      "platform": "macOS-26.3.1-arm64-arm-64bit-Mach-O",
+      "python": "3.14.4"
+    },
+    "results": [
+      {
+        "checks": [
+          {
+            "delta": 0.0,
+            "field": "pass_rate",
+            "ok": true,
+            "ours": 0.7444,
+            "recorded": 0.7444,
+            "tol": 0.0
+          },
+          {
+            "delta": 0.0,
+            "field": "bust_rate",
+            "ok": true,
+            "ours": 0.0,
+            "recorded": 0.0,
+            "tol": 0.0
+          },
+          {
+            "delta": 0.0,
+            "field": "timeout_rate",
+            "ok": true,
+            "ours": 0.2556,
+            "recorded": 0.2556,
+            "tol": 0.0
+          },
+          {
+            "delta": 0.0,
+            "field": "median_days_to_pass",
+            "ok": true,
+            "ours": 34.0,
+            "recorded": 34.0,
+            "tol": 0.0
+          },
+          {
+            "delta": 0.0,
+            "field": "p10_days_to_pass",
+            "ok": true,
+            "ours": 11.0,
+            "recorded": 11.0,
+            "tol": 0.0
+          },
+          {
+            "delta": 0.0,
+            "field": "p90_days_to_pass",
+            "ok": true,
+            "ours": 76.0,
+            "recorded": 76.0,
+            "tol": 0.0
+          }
+        ],
+        "exact": true,
+        "name": "parity_1_ict_mff",
+        "note": "recorded run labeled window='combined' but pool matches today's window_B (n==102); combined has since been regenerated to 43 trades \u2014 drift documented",
+        "ok": true
+      },
+      {
+        "checks": [
+          {
+            "delta": 0.0,
+            "field": "pass_rate_pct",
+            "ok": true,
+            "ours": 10.9,
+            "recorded": 10.9,
+            "tol": 1.221625720750836
+          },
+          {
+            "delta": 0.0,
+            "field": "bust_rate_pct",
+            "ok": true,
+            "ours": 0.3,
+            "recorded": 0.3,
+            "tol": 1.221625720750836
+          },
+          {
+            "delta": 0.0,
+            "field": "timeout_rate_pct",
+            "ok": true,
+            "ours": 88.8,
+            "recorded": 88.8,
+            "tol": 1.221625720750836
+          },
+          {
+            "delta": 0.0,
+            "field": "median_days_to_pass",
+            "ok": true,
+            "ours": 48.0,
+            "recorded": 48.0,
+            "tol": 3.0
+          }
+        ],
+        "exact": true,
+        "name": "parity_2_ftmo",
+        "note": "reproduces the RECORDED artifact under its own assumptions (trailing 10% DD + 60-day cap) \u2014 the original script does NOT model real FTMO Swing (static DD, no time limit); do not quote its pass rate as FTMO",
+        "ok": true
+      },
+      {
+        "checks": [
+          {
+            "delta": 0.0,
+            "field": "pool_size",
+            "ok": true,
+            "ours": 110,
+            "recorded": 110,
+            "tol": 0.0
+          },
+          {
+            "delta": 0.0,
+            "field": "h30.max_trades_in_window",
+            "ok": true,
+            "ours": 4,
+            "recorded": 4,
+            "tol": 0.0
+          },
+          {
+            "delta": 0.0,
+            "field": "h30.p_pass",
+            "ok": true,
+            "ours": 0.0419,
+            "recorded": 0.0419,
+            "tol": 0.007854137473306664
+          },
+          {
+            "delta": 0.0,
+            "field": "h30.p_fail",
+            "ok": true,
+            "ours": 0.0,
+            "recorded": 0.0,
+            "tol": 0.007854137473306664
+          },
+          {
+            "delta": 0.0,
+            "field": "h60.max_trades_in_window",
+            "ok": true,
+            "ours": 8,
+            "recorded": 8,
+            "tol": 0.0
+          },
+          {
+            "delta": 0.0,
+            "field": "h60.p_pass",
+            "ok": true,
+            "ours": 0.2022,
+            "recorded": 0.2022,
+            "tol": 0.015744310955465784
+          },
+          {
+            "delta": 0.0,
+            "field": "h60.p_fail",
+            "ok": true,
+            "ours": 0.0004,
+            "recorded": 0.0004,
+            "tol": 0.015744310955465784
+          },
+          {
+            "delta": 0.0,
+            "field": "h90.max_trades_in_window",
+            "ok": true,
+            "ours": 13,
+            "recorded": 13,
+            "tol": 0.0
+          },
+          {
+            "delta": 0.0,
+            "field": "h90.p_pass",
+            "ok": true,
+            "ours": 0.4343,
+            "recorded": 0.4343,
+            "tol": 0.019430056840019794
+          },
+          {
+            "delta": 0.0,
+            "field": "h90.p_fail",
+            "ok": true,
+            "ours": 0.0015,
+            "recorded": 0.0015,
+            "tol": 0.019430056840019794
+          }
+        ],
+        "exact": true,
+        "name": "parity_3_carry_bootstrap",
+        "note": "OUT monkeypatched into parity dir; live artifact untouched. Clock pinned to the recorded trades/year 53.2 \u2014 logs/forex_backtest_results.json has drifted (now implies 39.8/yr), same drift class as parity #1's pool",
+        "ok": true
+      }
+    ],
+    "ticket": "TICK-022"
+  },
+  "runtime_seconds": 74.8,
+  "seed": 7,
+  "sizing": [
+    {
+      "best": {
+        "challenge_mult": 3.0,
+        "ev_per_month": 4207.0,
+        "funded_mult": 2.0,
+        "p_funded": 0.66667,
+        "p_month_ge_target": 0.1743,
+        "p_survive_month": 0.8927
+      },
+      "cells": [
+        {
+          "challenge_mult": 0.25,
+          "ev_per_month": -61.0,
+          "funded_mult": 0.25,
+          "p_funded": 0.00667,
+          "p_month_ge_target": 0.0,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 0.25,
+          "ev_per_month": -34.0,
+          "funded_mult": 0.5,
+          "p_funded": 0.00733,
+          "p_month_ge_target": 0.0003,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 0.25,
+          "ev_per_month": -24.0,
+          "funded_mult": 0.75,
+          "p_funded": 0.006,
+          "p_month_ge_target": 0.0027,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 0.25,
+          "ev_per_month": 35.0,
+          "funded_mult": 1.0,
+          "p_funded": 0.00867,
+          "p_month_ge_target": 0.028,
+          "p_survive_month": 0.9993
+        },
+        {
+          "challenge_mult": 0.25,
+          "ev_per_month": 153.0,
+          "funded_mult": 1.5,
+          "p_funded": 0.01167,
+          "p_month_ge_target": 0.0983,
+          "p_survive_month": 0.9937
+        },
+        {
+          "challenge_mult": 0.25,
+          "ev_per_month": -9.0,
+          "funded_mult": 2.0,
+          "p_funded": 0.00633,
+          "p_month_ge_target": 0.167,
+          "p_survive_month": 0.9087
+        },
+        {
+          "challenge_mult": 0.25,
+          "ev_per_month": -49.0,
+          "funded_mult": 3.0,
+          "p_funded": 0.00867,
+          "p_month_ge_target": 0.2363,
+          "p_survive_month": 0.6783
+        },
+        {
+          "challenge_mult": 0.5,
+          "ev_per_month": 352.0,
+          "funded_mult": 0.25,
+          "p_funded": 0.25967,
+          "p_month_ge_target": 0.0,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 0.5,
+          "ev_per_month": 715.0,
+          "funded_mult": 0.5,
+          "p_funded": 0.25433,
+          "p_month_ge_target": 0.0003,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 0.5,
+          "ev_per_month": 1127.0,
+          "funded_mult": 0.75,
+          "p_funded": 0.257,
+          "p_month_ge_target": 0.0053,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 0.5,
+          "ev_per_month": 1482.0,
+          "funded_mult": 1.0,
+          "p_funded": 0.257,
+          "p_month_ge_target": 0.024,
+          "p_survive_month": 0.9997
+        },
+        {
+          "challenge_mult": 0.5,
+          "ev_per_month": 2241.0,
+          "funded_mult": 1.5,
+          "p_funded": 0.25433,
+          "p_month_ge_target": 0.0923,
+          "p_survive_month": 0.9927
+        },
+        {
+          "challenge_mult": 0.5,
+          "ev_per_month": 1801.0,
+          "funded_mult": 2.0,
+          "p_funded": 0.25133,
+          "p_month_ge_target": 0.1693,
+          "p_survive_month": 0.902
+        },
+        {
+          "challenge_mult": 0.5,
+          "ev_per_month": 863.0,
+          "funded_mult": 3.0,
+          "p_funded": 0.245,
+          "p_month_ge_target": 0.2277,
+          "p_survive_month": 0.6813
+        },
+        {
+          "challenge_mult": 0.75,
+          "ev_per_month": 479.0,
+          "funded_mult": 0.25,
+          "p_funded": 0.53067,
+          "p_month_ge_target": 0.0,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 0.75,
+          "ev_per_month": 976.0,
+          "funded_mult": 0.5,
+          "p_funded": 0.53533,
+          "p_month_ge_target": 0.0,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 0.75,
+          "ev_per_month": 1419.0,
+          "funded_mult": 0.75,
+          "p_funded": 0.51933,
+          "p_month_ge_target": 0.0053,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 0.75,
+          "ev_per_month": 2006.0,
+          "funded_mult": 1.0,
+          "p_funded": 0.54067,
+          "p_month_ge_target": 0.0203,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 0.75,
+          "ev_per_month": 2872.0,
+          "funded_mult": 1.5,
+          "p_funded": 0.50367,
+          "p_month_ge_target": 0.0907,
+          "p_survive_month": 0.9923
+        },
+        {
+          "challenge_mult": 0.75,
+          "ev_per_month": 2878.0,
+          "funded_mult": 2.0,
+          "p_funded": 0.52433,
+          "p_month_ge_target": 0.1713,
+          "p_survive_month": 0.905
+        },
+        {
+          "challenge_mult": 0.75,
+          "ev_per_month": 1969.0,
+          "funded_mult": 3.0,
+          "p_funded": 0.50933,
+          "p_month_ge_target": 0.2517,
+          "p_survive_month": 0.6973
+        },
+        {
+          "challenge_mult": 1.0,
+          "ev_per_month": 512.0,
+          "funded_mult": 0.25,
+          "p_funded": 0.67267,
+          "p_month_ge_target": 0.0,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 1.0,
+          "ev_per_month": 1075.0,
+          "funded_mult": 0.5,
+          "p_funded": 0.67933,
+          "p_month_ge_target": 0.0,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 1.0,
+          "ev_per_month": 1614.0,
+          "funded_mult": 0.75,
+          "p_funded": 0.674,
+          "p_month_ge_target": 0.005,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 1.0,
+          "ev_per_month": 2063.0,
+          "funded_mult": 1.0,
+          "p_funded": 0.66633,
+          "p_month_ge_target": 0.0227,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 1.0,
+          "ev_per_month": 3140.0,
+          "funded_mult": 1.5,
+          "p_funded": 0.669,
+          "p_month_ge_target": 0.095,
+          "p_survive_month": 0.9933
+        },
+        {
+          "challenge_mult": 1.0,
+          "ev_per_month": 3466.0,
+          "funded_mult": 2.0,
+          "p_funded": 0.66867,
+          "p_month_ge_target": 0.1683,
+          "p_survive_month": 0.9093
+        },
+        {
+          "challenge_mult": 1.0,
+          "ev_per_month": 2328.0,
+          "funded_mult": 3.0,
+          "p_funded": 0.673,
+          "p_month_ge_target": 0.2313,
+          "p_survive_month": 0.6823
+        },
+        {
+          "challenge_mult": 1.5,
+          "ev_per_month": 553.0,
+          "funded_mult": 0.25,
+          "p_funded": 0.80167,
+          "p_month_ge_target": 0.0,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 1.5,
+          "ev_per_month": 1126.0,
+          "funded_mult": 0.5,
+          "p_funded": 0.80567,
+          "p_month_ge_target": 0.0003,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 1.5,
+          "ev_per_month": 1686.0,
+          "funded_mult": 0.75,
+          "p_funded": 0.803,
+          "p_month_ge_target": 0.0037,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 1.5,
+          "ev_per_month": 2351.0,
+          "funded_mult": 1.0,
+          "p_funded": 0.811,
+          "p_month_ge_target": 0.0323,
+          "p_survive_month": 0.9997
+        },
+        {
+          "challenge_mult": 1.5,
+          "ev_per_month": 3455.0,
+          "funded_mult": 1.5,
+          "p_funded": 0.79933,
+          "p_month_ge_target": 0.099,
+          "p_survive_month": 0.9907
+        },
+        {
+          "challenge_mult": 1.5,
+          "ev_per_month": 3594.0,
+          "funded_mult": 2.0,
+          "p_funded": 0.814,
+          "p_month_ge_target": 0.1647,
+          "p_survive_month": 0.8963
+        },
+        {
+          "challenge_mult": 1.5,
+          "ev_per_month": 3011.0,
+          "funded_mult": 3.0,
+          "p_funded": 0.80233,
+          "p_month_ge_target": 0.236,
+          "p_survive_month": 0.6857
+        },
+        {
+          "challenge_mult": 2.0,
+          "ev_per_month": 566.0,
+          "funded_mult": 0.25,
+          "p_funded": 0.77767,
+          "p_month_ge_target": 0.0,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 2.0,
+          "ev_per_month": 1141.0,
+          "funded_mult": 0.5,
+          "p_funded": 0.76,
+          "p_month_ge_target": 0.0,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 2.0,
+          "ev_per_month": 1744.0,
+          "funded_mult": 0.75,
+          "p_funded": 0.77367,
+          "p_month_ge_target": 0.0043,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 2.0,
+          "ev_per_month": 2339.0,
+          "funded_mult": 1.0,
+          "p_funded": 0.77933,
+          "p_month_ge_target": 0.024,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 2.0,
+          "ev_per_month": 3484.0,
+          "funded_mult": 1.5,
+          "p_funded": 0.771,
+          "p_month_ge_target": 0.0923,
+          "p_survive_month": 0.9923
+        },
+        {
+          "challenge_mult": 2.0,
+          "ev_per_month": 4088.0,
+          "funded_mult": 2.0,
+          "p_funded": 0.75333,
+          "p_month_ge_target": 0.1693,
+          "p_survive_month": 0.9123
+        },
+        {
+          "challenge_mult": 2.0,
+          "ev_per_month": 3696.0,
+          "funded_mult": 3.0,
+          "p_funded": 0.78033,
+          "p_month_ge_target": 0.2477,
+          "p_survive_month": 0.693
+        },
+        {
+          "challenge_mult": 3.0,
+          "ev_per_month": 550.0,
+          "funded_mult": 0.25,
+          "p_funded": 0.63333,
+          "p_month_ge_target": 0.0,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 3.0,
+          "ev_per_month": 1176.0,
+          "funded_mult": 0.5,
+          "p_funded": 0.654,
+          "p_month_ge_target": 0.0,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 3.0,
+          "ev_per_month": 1774.0,
+          "funded_mult": 0.75,
+          "p_funded": 0.64267,
+          "p_month_ge_target": 0.0047,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 3.0,
+          "ev_per_month": 2311.0,
+          "funded_mult": 1.0,
+          "p_funded": 0.658,
+          "p_month_ge_target": 0.024,
+          "p_survive_month": 0.9993
+        },
+        {
+          "challenge_mult": 3.0,
+          "ev_per_month": 3591.0,
+          "funded_mult": 1.5,
+          "p_funded": 0.654,
+          "p_month_ge_target": 0.101,
+          "p_survive_month": 0.9933
+        },
+        {
+          "challenge_mult": 3.0,
+          "ev_per_month": 4207.0,
+          "funded_mult": 2.0,
+          "p_funded": 0.66667,
+          "p_month_ge_target": 0.1743,
+          "p_survive_month": 0.8927
+        },
+        {
+          "challenge_mult": 3.0,
+          "ev_per_month": 3902.0,
+          "funded_mult": 3.0,
+          "p_funded": 0.65333,
+          "p_month_ge_target": 0.24,
+          "p_survive_month": 0.682
+        }
+      ],
+      "firm": "MFF_100K",
+      "mults": [
+        0.25,
+        0.5,
+        0.75,
+        1.0,
+        1.5,
+        2.0,
+        3.0
+      ],
+      "note": "objective = program EV/month; the best cell typically sizes the CHALLENGE hot and the FUNDED account cooler \u2014 verify constraint columns before acting",
+      "stamp": "PROVEN_REGIME_FRAGILE",
+      "strategy": "carry_oos"
+    },
+    {
+      "best": {
+        "challenge_mult": 3.0,
+        "ev_per_month": 3833.0,
+        "funded_mult": 2.0,
+        "p_funded": 0.61428,
+        "p_month_ge_target": 0.146,
+        "p_survive_month": 0.974
+      },
+      "cells": [
+        {
+          "challenge_mult": 0.25,
+          "ev_per_month": 251.0,
+          "funded_mult": 0.25,
+          "p_funded": 0.89861,
+          "p_month_ge_target": 0.0,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 0.25,
+          "ev_per_month": 530.0,
+          "funded_mult": 0.5,
+          "p_funded": 0.89722,
+          "p_month_ge_target": 0.0,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 0.25,
+          "ev_per_month": 781.0,
+          "funded_mult": 0.75,
+          "p_funded": 0.89129,
+          "p_month_ge_target": 0.0017,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 0.25,
+          "ev_per_month": 1048.0,
+          "funded_mult": 1.0,
+          "p_funded": 0.89075,
+          "p_month_ge_target": 0.0113,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 0.25,
+          "ev_per_month": 1533.0,
+          "funded_mult": 1.5,
+          "p_funded": 0.8784,
+          "p_month_ge_target": 0.0677,
+          "p_survive_month": 0.9973
+        },
+        {
+          "challenge_mult": 0.25,
+          "ev_per_month": 2092.0,
+          "funded_mult": 2.0,
+          "p_funded": 0.8849,
+          "p_month_ge_target": 0.1433,
+          "p_survive_month": 0.9813
+        },
+        {
+          "challenge_mult": 0.25,
+          "ev_per_month": 1276.0,
+          "funded_mult": 3.0,
+          "p_funded": 0.89301,
+          "p_month_ge_target": 0.2497,
+          "p_survive_month": 0.857
+        },
+        {
+          "challenge_mult": 0.5,
+          "ev_per_month": 360.0,
+          "funded_mult": 0.25,
+          "p_funded": 0.996,
+          "p_month_ge_target": 0.0,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 0.5,
+          "ev_per_month": 722.0,
+          "funded_mult": 0.5,
+          "p_funded": 0.99467,
+          "p_month_ge_target": 0.0,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 0.5,
+          "ev_per_month": 1075.0,
+          "funded_mult": 0.75,
+          "p_funded": 0.99301,
+          "p_month_ge_target": 0.0027,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 0.5,
+          "ev_per_month": 1396.0,
+          "funded_mult": 1.0,
+          "p_funded": 0.99533,
+          "p_month_ge_target": 0.012,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 0.5,
+          "ev_per_month": 2275.0,
+          "funded_mult": 1.5,
+          "p_funded": 0.99134,
+          "p_month_ge_target": 0.076,
+          "p_survive_month": 0.998
+        },
+        {
+          "challenge_mult": 0.5,
+          "ev_per_month": 2878.0,
+          "funded_mult": 2.0,
+          "p_funded": 0.99533,
+          "p_month_ge_target": 0.142,
+          "p_survive_month": 0.975
+        },
+        {
+          "challenge_mult": 0.5,
+          "ev_per_month": 2073.0,
+          "funded_mult": 3.0,
+          "p_funded": 0.993,
+          "p_month_ge_target": 0.2467,
+          "p_survive_month": 0.851
+        },
+        {
+          "challenge_mult": 0.75,
+          "ev_per_month": 397.0,
+          "funded_mult": 0.25,
+          "p_funded": 0.999,
+          "p_month_ge_target": 0.0,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 0.75,
+          "ev_per_month": 790.0,
+          "funded_mult": 0.5,
+          "p_funded": 0.99867,
+          "p_month_ge_target": 0.0,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 0.75,
+          "ev_per_month": 1237.0,
+          "funded_mult": 0.75,
+          "p_funded": 0.99933,
+          "p_month_ge_target": 0.0023,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 0.75,
+          "ev_per_month": 1626.0,
+          "funded_mult": 1.0,
+          "p_funded": 0.99933,
+          "p_month_ge_target": 0.015,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 0.75,
+          "ev_per_month": 2415.0,
+          "funded_mult": 1.5,
+          "p_funded": 0.998,
+          "p_month_ge_target": 0.0693,
+          "p_survive_month": 0.9973
+        },
+        {
+          "challenge_mult": 0.75,
+          "ev_per_month": 3271.0,
+          "funded_mult": 2.0,
+          "p_funded": 0.998,
+          "p_month_ge_target": 0.141,
+          "p_survive_month": 0.982
+        },
+        {
+          "challenge_mult": 0.75,
+          "ev_per_month": 2445.0,
+          "funded_mult": 3.0,
+          "p_funded": 0.999,
+          "p_month_ge_target": 0.2397,
+          "p_survive_month": 0.8467
+        },
+        {
+          "challenge_mult": 1.0,
+          "ev_per_month": 437.0,
+          "funded_mult": 0.25,
+          "p_funded": 0.998,
+          "p_month_ge_target": 0.0,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 1.0,
+          "ev_per_month": 882.0,
+          "funded_mult": 0.5,
+          "p_funded": 0.99434,
+          "p_month_ge_target": 0.0,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 1.0,
+          "ev_per_month": 1270.0,
+          "funded_mult": 0.75,
+          "p_funded": 0.99634,
+          "p_month_ge_target": 0.0023,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 1.0,
+          "ev_per_month": 1741.0,
+          "funded_mult": 1.0,
+          "p_funded": 0.99667,
+          "p_month_ge_target": 0.017,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 1.0,
+          "ev_per_month": 2601.0,
+          "funded_mult": 1.5,
+          "p_funded": 0.99734,
+          "p_month_ge_target": 0.0693,
+          "p_survive_month": 0.9977
+        },
+        {
+          "challenge_mult": 1.0,
+          "ev_per_month": 3544.0,
+          "funded_mult": 2.0,
+          "p_funded": 0.99501,
+          "p_month_ge_target": 0.1453,
+          "p_survive_month": 0.979
+        },
+        {
+          "challenge_mult": 1.0,
+          "ev_per_month": 3087.0,
+          "funded_mult": 3.0,
+          "p_funded": 0.99634,
+          "p_month_ge_target": 0.2493,
+          "p_survive_month": 0.8597
+        },
+        {
+          "challenge_mult": 1.5,
+          "ev_per_month": 446.0,
+          "funded_mult": 0.25,
+          "p_funded": 0.96465,
+          "p_month_ge_target": 0.0,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 1.5,
+          "ev_per_month": 896.0,
+          "funded_mult": 0.5,
+          "p_funded": 0.9617,
+          "p_month_ge_target": 0.0,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 1.5,
+          "ev_per_month": 1380.0,
+          "funded_mult": 0.75,
+          "p_funded": 0.96334,
+          "p_month_ge_target": 0.003,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 1.5,
+          "ev_per_month": 1851.0,
+          "funded_mult": 1.0,
+          "p_funded": 0.95971,
+          "p_month_ge_target": 0.0137,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 1.5,
+          "ev_per_month": 2725.0,
+          "funded_mult": 1.5,
+          "p_funded": 0.96792,
+          "p_month_ge_target": 0.0683,
+          "p_survive_month": 0.9977
+        },
+        {
+          "challenge_mult": 1.5,
+          "ev_per_month": 3625.0,
+          "funded_mult": 2.0,
+          "p_funded": 0.95809,
+          "p_month_ge_target": 0.1427,
+          "p_survive_month": 0.9727
+        },
+        {
+          "challenge_mult": 1.5,
+          "ev_per_month": 3447.0,
+          "funded_mult": 3.0,
+          "p_funded": 0.96366,
+          "p_month_ge_target": 0.2477,
+          "p_survive_month": 0.8583
+        },
+        {
+          "challenge_mult": 2.0,
+          "ev_per_month": 452.0,
+          "funded_mult": 0.25,
+          "p_funded": 0.89858,
+          "p_month_ge_target": 0.0,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 2.0,
+          "ev_per_month": 942.0,
+          "funded_mult": 0.5,
+          "p_funded": 0.87782,
+          "p_month_ge_target": 0.0,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 2.0,
+          "ev_per_month": 1431.0,
+          "funded_mult": 0.75,
+          "p_funded": 0.87631,
+          "p_month_ge_target": 0.0017,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 2.0,
+          "ev_per_month": 1876.0,
+          "funded_mult": 1.0,
+          "p_funded": 0.88853,
+          "p_month_ge_target": 0.0143,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 2.0,
+          "ev_per_month": 2975.0,
+          "funded_mult": 1.5,
+          "p_funded": 0.88607,
+          "p_month_ge_target": 0.0757,
+          "p_survive_month": 0.996
+        },
+        {
+          "challenge_mult": 2.0,
+          "ev_per_month": 3821.0,
+          "funded_mult": 2.0,
+          "p_funded": 0.89234,
+          "p_month_ge_target": 0.1507,
+          "p_survive_month": 0.9787
+        },
+        {
+          "challenge_mult": 2.0,
+          "ev_per_month": 3530.0,
+          "funded_mult": 3.0,
+          "p_funded": 0.89102,
+          "p_month_ge_target": 0.2387,
+          "p_survive_month": 0.8453
+        },
+        {
+          "challenge_mult": 3.0,
+          "ev_per_month": 461.0,
+          "funded_mult": 0.25,
+          "p_funded": 0.59886,
+          "p_month_ge_target": 0.0,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 3.0,
+          "ev_per_month": 961.0,
+          "funded_mult": 0.5,
+          "p_funded": 0.60956,
+          "p_month_ge_target": 0.0003,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 3.0,
+          "ev_per_month": 1407.0,
+          "funded_mult": 0.75,
+          "p_funded": 0.59747,
+          "p_month_ge_target": 0.0013,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 3.0,
+          "ev_per_month": 1879.0,
+          "funded_mult": 1.0,
+          "p_funded": 0.59575,
+          "p_month_ge_target": 0.0117,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 3.0,
+          "ev_per_month": 2895.0,
+          "funded_mult": 1.5,
+          "p_funded": 0.5917,
+          "p_month_ge_target": 0.075,
+          "p_survive_month": 0.9967
+        },
+        {
+          "challenge_mult": 3.0,
+          "ev_per_month": 3833.0,
+          "funded_mult": 2.0,
+          "p_funded": 0.61428,
+          "p_month_ge_target": 0.146,
+          "p_survive_month": 0.974
+        },
+        {
+          "challenge_mult": 3.0,
+          "ev_per_month": 3586.0,
+          "funded_mult": 3.0,
+          "p_funded": 0.6002,
+          "p_month_ge_target": 0.246,
+          "p_survive_month": 0.853
+        }
+      ],
+      "firm": "FTMO_100K_SWING",
+      "mults": [
+        0.25,
+        0.5,
+        0.75,
+        1.0,
+        1.5,
+        2.0,
+        3.0
+      ],
+      "note": "objective = program EV/month; the best cell typically sizes the CHALLENGE hot and the FUNDED account cooler \u2014 verify constraint columns before acting",
+      "stamp": "PROVEN_REGIME_FRAGILE",
+      "strategy": "carry_oos"
+    },
+    {
+      "best": {
+        "challenge_mult": 3.0,
+        "ev_per_month": 4112.0,
+        "funded_mult": 1.5,
+        "p_funded": 0.36633,
+        "p_month_ge_target": 0.1807,
+        "p_survive_month": 0.8767
+      },
+      "cells": [
+        {
+          "challenge_mult": 0.25,
+          "ev_per_month": 134.0,
+          "funded_mult": 0.25,
+          "p_funded": 0.06233,
+          "p_month_ge_target": 0.0,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 0.25,
+          "ev_per_month": 321.0,
+          "funded_mult": 0.5,
+          "p_funded": 0.057,
+          "p_month_ge_target": 0.003,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 0.25,
+          "ev_per_month": 522.0,
+          "funded_mult": 0.75,
+          "p_funded": 0.058,
+          "p_month_ge_target": 0.03,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 0.25,
+          "ev_per_month": 732.0,
+          "funded_mult": 1.0,
+          "p_funded": 0.05867,
+          "p_month_ge_target": 0.0813,
+          "p_survive_month": 0.9887
+        },
+        {
+          "challenge_mult": 0.25,
+          "ev_per_month": 420.0,
+          "funded_mult": 1.5,
+          "p_funded": 0.064,
+          "p_month_ge_target": 0.1587,
+          "p_survive_month": 0.8817
+        },
+        {
+          "challenge_mult": 0.25,
+          "ev_per_month": 61.0,
+          "funded_mult": 2.0,
+          "p_funded": 0.054,
+          "p_month_ge_target": 0.2043,
+          "p_survive_month": 0.603
+        },
+        {
+          "challenge_mult": 0.25,
+          "ev_per_month": -52.0,
+          "funded_mult": 3.0,
+          "p_funded": 0.05733,
+          "p_month_ge_target": 0.0787,
+          "p_survive_month": 0.1297
+        },
+        {
+          "challenge_mult": 0.5,
+          "ev_per_month": 555.0,
+          "funded_mult": 0.25,
+          "p_funded": 0.39233,
+          "p_month_ge_target": 0.0,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 0.5,
+          "ev_per_month": 1111.0,
+          "funded_mult": 0.5,
+          "p_funded": 0.38667,
+          "p_month_ge_target": 0.004,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 0.5,
+          "ev_per_month": 1662.0,
+          "funded_mult": 0.75,
+          "p_funded": 0.39233,
+          "p_month_ge_target": 0.029,
+          "p_survive_month": 0.9997
+        },
+        {
+          "challenge_mult": 0.5,
+          "ev_per_month": 2208.0,
+          "funded_mult": 1.0,
+          "p_funded": 0.385,
+          "p_month_ge_target": 0.0733,
+          "p_survive_month": 0.9857
+        },
+        {
+          "challenge_mult": 0.5,
+          "ev_per_month": 2045.0,
+          "funded_mult": 1.5,
+          "p_funded": 0.383,
+          "p_month_ge_target": 0.1807,
+          "p_survive_month": 0.873
+        },
+        {
+          "challenge_mult": 0.5,
+          "ev_per_month": 946.0,
+          "funded_mult": 2.0,
+          "p_funded": 0.36933,
+          "p_month_ge_target": 0.2127,
+          "p_survive_month": 0.6023
+        },
+        {
+          "challenge_mult": 0.5,
+          "ev_per_month": 119.0,
+          "funded_mult": 3.0,
+          "p_funded": 0.38433,
+          "p_month_ge_target": 0.0697,
+          "p_survive_month": 0.1163
+        },
+        {
+          "challenge_mult": 0.75,
+          "ev_per_month": 626.0,
+          "funded_mult": 0.25,
+          "p_funded": 0.57633,
+          "p_month_ge_target": 0.0,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 0.75,
+          "ev_per_month": 1312.0,
+          "funded_mult": 0.5,
+          "p_funded": 0.57267,
+          "p_month_ge_target": 0.0023,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 0.75,
+          "ev_per_month": 1879.0,
+          "funded_mult": 0.75,
+          "p_funded": 0.57333,
+          "p_month_ge_target": 0.0287,
+          "p_survive_month": 0.9997
+        },
+        {
+          "challenge_mult": 0.75,
+          "ev_per_month": 2595.0,
+          "funded_mult": 1.0,
+          "p_funded": 0.58067,
+          "p_month_ge_target": 0.0837,
+          "p_survive_month": 0.987
+        },
+        {
+          "challenge_mult": 0.75,
+          "ev_per_month": 3038.0,
+          "funded_mult": 1.5,
+          "p_funded": 0.58767,
+          "p_month_ge_target": 0.186,
+          "p_survive_month": 0.8887
+        },
+        {
+          "challenge_mult": 0.75,
+          "ev_per_month": 1492.0,
+          "funded_mult": 2.0,
+          "p_funded": 0.565,
+          "p_month_ge_target": 0.206,
+          "p_survive_month": 0.6003
+        },
+        {
+          "challenge_mult": 0.75,
+          "ev_per_month": 275.0,
+          "funded_mult": 3.0,
+          "p_funded": 0.56933,
+          "p_month_ge_target": 0.0743,
+          "p_survive_month": 0.1073
+        },
+        {
+          "challenge_mult": 1.0,
+          "ev_per_month": 670.0,
+          "funded_mult": 0.25,
+          "p_funded": 0.66367,
+          "p_month_ge_target": 0.0,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 1.0,
+          "ev_per_month": 1345.0,
+          "funded_mult": 0.5,
+          "p_funded": 0.664,
+          "p_month_ge_target": 0.0017,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 1.0,
+          "ev_per_month": 2006.0,
+          "funded_mult": 0.75,
+          "p_funded": 0.66267,
+          "p_month_ge_target": 0.032,
+          "p_survive_month": 0.9997
+        },
+        {
+          "challenge_mult": 1.0,
+          "ev_per_month": 2705.0,
+          "funded_mult": 1.0,
+          "p_funded": 0.66533,
+          "p_month_ge_target": 0.079,
+          "p_survive_month": 0.9863
+        },
+        {
+          "challenge_mult": 1.0,
+          "ev_per_month": 3272.0,
+          "funded_mult": 1.5,
+          "p_funded": 0.672,
+          "p_month_ge_target": 0.1767,
+          "p_survive_month": 0.8787
+        },
+        {
+          "challenge_mult": 1.0,
+          "ev_per_month": 2043.0,
+          "funded_mult": 2.0,
+          "p_funded": 0.66833,
+          "p_month_ge_target": 0.206,
+          "p_survive_month": 0.6037
+        },
+        {
+          "challenge_mult": 1.0,
+          "ev_per_month": 464.0,
+          "funded_mult": 3.0,
+          "p_funded": 0.67333,
+          "p_month_ge_target": 0.076,
+          "p_survive_month": 0.126
+        },
+        {
+          "challenge_mult": 1.5,
+          "ev_per_month": 699.0,
+          "funded_mult": 0.25,
+          "p_funded": 0.667,
+          "p_month_ge_target": 0.0,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 1.5,
+          "ev_per_month": 1477.0,
+          "funded_mult": 0.5,
+          "p_funded": 0.66767,
+          "p_month_ge_target": 0.0033,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 1.5,
+          "ev_per_month": 2204.0,
+          "funded_mult": 0.75,
+          "p_funded": 0.66333,
+          "p_month_ge_target": 0.0293,
+          "p_survive_month": 0.9993
+        },
+        {
+          "challenge_mult": 1.5,
+          "ev_per_month": 2928.0,
+          "funded_mult": 1.0,
+          "p_funded": 0.66733,
+          "p_month_ge_target": 0.089,
+          "p_survive_month": 0.9887
+        },
+        {
+          "challenge_mult": 1.5,
+          "ev_per_month": 3613.0,
+          "funded_mult": 1.5,
+          "p_funded": 0.671,
+          "p_month_ge_target": 0.1747,
+          "p_survive_month": 0.8767
+        },
+        {
+          "challenge_mult": 1.5,
+          "ev_per_month": 2525.0,
+          "funded_mult": 2.0,
+          "p_funded": 0.66333,
+          "p_month_ge_target": 0.2007,
+          "p_survive_month": 0.6
+        },
+        {
+          "challenge_mult": 1.5,
+          "ev_per_month": 505.0,
+          "funded_mult": 3.0,
+          "p_funded": 0.66467,
+          "p_month_ge_target": 0.0697,
+          "p_survive_month": 0.111
+        },
+        {
+          "challenge_mult": 2.0,
+          "ev_per_month": 719.0,
+          "funded_mult": 0.25,
+          "p_funded": 0.56367,
+          "p_month_ge_target": 0.0,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 2.0,
+          "ev_per_month": 1486.0,
+          "funded_mult": 0.5,
+          "p_funded": 0.55433,
+          "p_month_ge_target": 0.002,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 2.0,
+          "ev_per_month": 2198.0,
+          "funded_mult": 0.75,
+          "p_funded": 0.55267,
+          "p_month_ge_target": 0.0313,
+          "p_survive_month": 0.9993
+        },
+        {
+          "challenge_mult": 2.0,
+          "ev_per_month": 2878.0,
+          "funded_mult": 1.0,
+          "p_funded": 0.56633,
+          "p_month_ge_target": 0.0733,
+          "p_survive_month": 0.9867
+        },
+        {
+          "challenge_mult": 2.0,
+          "ev_per_month": 3849.0,
+          "funded_mult": 1.5,
+          "p_funded": 0.559,
+          "p_month_ge_target": 0.178,
+          "p_survive_month": 0.8763
+        },
+        {
+          "challenge_mult": 2.0,
+          "ev_per_month": 2929.0,
+          "funded_mult": 2.0,
+          "p_funded": 0.54833,
+          "p_month_ge_target": 0.2027,
+          "p_survive_month": 0.6013
+        },
+        {
+          "challenge_mult": 2.0,
+          "ev_per_month": 705.0,
+          "funded_mult": 3.0,
+          "p_funded": 0.552,
+          "p_month_ge_target": 0.0747,
+          "p_survive_month": 0.1247
+        },
+        {
+          "challenge_mult": 3.0,
+          "ev_per_month": 708.0,
+          "funded_mult": 0.25,
+          "p_funded": 0.36833,
+          "p_month_ge_target": 0.0,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 3.0,
+          "ev_per_month": 1477.0,
+          "funded_mult": 0.5,
+          "p_funded": 0.356,
+          "p_month_ge_target": 0.005,
+          "p_survive_month": 1.0
+        },
+        {
+          "challenge_mult": 3.0,
+          "ev_per_month": 2301.0,
+          "funded_mult": 0.75,
+          "p_funded": 0.363,
+          "p_month_ge_target": 0.0357,
+          "p_survive_month": 0.999
+        },
+        {
+          "challenge_mult": 3.0,
+          "ev_per_month": 2983.0,
+          "funded_mult": 1.0,
+          "p_funded": 0.36533,
+          "p_month_ge_target": 0.0803,
+          "p_survive_month": 0.9843
+        },
+        {
+          "challenge_mult": 3.0,
+          "ev_per_month": 4112.0,
+          "funded_mult": 1.5,
+          "p_funded": 0.36633,
+          "p_month_ge_target": 0.1807,
+          "p_survive_month": 0.8767
+        },
+        {
+          "challenge_mult": 3.0,
+          "ev_per_month": 3254.0,
+          "funded_mult": 2.0,
+          "p_funded": 0.352,
+          "p_month_ge_target": 0.201,
+          "p_survive_month": 0.5967
+        },
+        {
+          "challenge_mult": 3.0,
+          "ev_per_month": 774.0,
+          "funded_mult": 3.0,
+          "p_funded": 0.36633,
+          "p_month_ge_target": 0.0747,
+          "p_survive_month": 0.1227
+        }
+      ],
+      "firm": "MFF_100K",
+      "mults": [
+        0.25,
+        0.5,
+        0.75,
+        1.0,
+        1.5,
+        2.0,
+        3.0
+      ],
+      "note": "objective = program EV/month; the best cell typically sizes the CHALLENGE hot and the FUNDED account cooler \u2014 verify constraint columns before acting",
+      "stamp": "UNPROVEN",
+      "strategy": "ict_window_B"
+    }
+  ],
+  "ticket": "TICK-022",
+  "verdicts": [
+    {
+      "assumptions": "iid attempts & months (reset-to-initial payouts); independence across phases; subscription fees on mean attempt duration; INCOMPLETE charged to sim cap",
+      "attempt_months_mean": 7.36,
+      "caveat": "CRITICAL: this bootstraps the 2023-2024 OOS window only \u2014 a FAVORABLE, rate-trending regime. The forex edge is REGIME-FRAGILE: rolling walk-forward was 2021 -0.13 / 2022 +0.51 / 2023 +1.26 / 2024 -0.09. In a flat/adverse regime these numbers would be materially worse. Fresh 2025-26 measured \u2248 FLAT (v015 remeasurement, 2026-06-27).",
+      "challenge_risk_mult": 1.0,
+      "challenge_risk_pct": 0.0075,
+      "e_attempts_to_funded": 1.0,
+      "fees_to_funded_usd": 622.0,
+      "firm": "FTMO_100K_SWING",
+      "funded": {
+        "e_months_funded": null,
+        "e_payout_per_month_usd": 2293.0,
+        "monthly_income_target_usd": 10000.0,
+        "p_month_ge_target": 0.0164,
+        "p_survive_12mo": 1.0,
+        "p_survive_month": 1.0,
+        "p_target_every_month_12": 0.0,
+        "payout_month_p50_usd": 1497.0
+      },
+      "funded_risk_mult": 1.0,
+      "funded_risk_pct": 0.0075,
+      "p_funded": 0.9961,
+      "p_pass_100_consecutive": 0.676785,
+      "phases": [
+        {
+          "cal_days_to_pass_med": 23.2,
+          "p_bust": 0.001,
+          "p_incomplete": 0.0005,
+          "p_pass": 0.9985,
+          "p_timeout": 0.0,
+          "phase": "P1",
+          "tdays_to_pass_med": 16.0,
+          "tdays_to_pass_p10": 7.0,
+          "tdays_to_pass_p90": 36.0
+        },
+        {
+          "cal_days_to_pass_med": 13.0,
+          "p_bust": 0.0024,
+          "p_incomplete": 0.0,
+          "p_pass": 0.9976,
+          "p_timeout": 0.0,
+          "phase": "P2",
+          "tdays_to_pass_med": 9.0,
+          "tdays_to_pass_p10": 4.0,
+          "tdays_to_pass_p90": 23.0
+        }
+      ],
+      "pool_kind": "bootstrap",
+      "pool_n": 110,
+      "pool_sharpe_ann": 2.537,
+      "pricing_flag": "UNVERIFIED_PRICING",
+      "program_ev_per_month_usd": 1753.0,
+      "stamp": "PROVEN_REGIME_FRAGILE",
+      "strategy": "carry_oos",
+      "trades_per_day": 0.2278
+    },
+    {
+      "assumptions": "iid attempts & months (reset-to-initial payouts); independence across phases; subscription fees on mean attempt duration; INCOMPLETE charged to sim cap",
+      "attempt_months_mean": 2.99,
+      "caveat": "CRITICAL: this bootstraps the 2023-2024 OOS window only \u2014 a FAVORABLE, rate-trending regime. The forex edge is REGIME-FRAGILE: rolling walk-forward was 2021 -0.13 / 2022 +0.51 / 2023 +1.26 / 2024 -0.09. In a flat/adverse regime these numbers would be materially worse. Fresh 2025-26 measured \u2248 FLAT (v015 remeasurement, 2026-06-27).",
+      "challenge_risk_mult": 1.0,
+      "challenge_risk_pct": 0.0075,
+      "e_attempts_to_funded": 1.47,
+      "fees_to_funded_usd": 551.0,
+      "firm": "MFF_100K",
+      "funded": {
+        "e_months_funded": 2500.0,
+        "e_payout_per_month_usd": 2552.0,
+        "monthly_income_target_usd": 10000.0,
+        "p_month_ge_target": 0.026,
+        "p_survive_12mo": 0.9952,
+        "p_survive_month": 0.9996,
+        "p_target_every_month_12": 0.0,
+        "payout_month_p50_usd": 1624.0
+      },
+      "funded_risk_mult": 1.0,
+      "funded_risk_pct": 0.0075,
+      "p_funded": 0.6802,
+      "p_pass_100_consecutive": 0.0,
+      "phases": [
+        {
+          "cal_days_to_pass_med": 14.5,
+          "p_bust": 0.0015,
+          "p_incomplete": 0.3183,
+          "p_pass": 0.6802,
+          "p_timeout": 0.0,
+          "phase": "EVAL",
+          "tdays_to_pass_med": 10.0,
+          "tdays_to_pass_p10": 5.0,
+          "tdays_to_pass_p90": 17.0
+        }
+      ],
+      "pool_kind": "bootstrap",
+      "pool_n": 110,
+      "pool_sharpe_ann": 2.537,
+      "pricing_flag": "UNVERIFIED_PRICING",
+      "program_ev_per_month_usd": 2138.0,
+      "stamp": "PROVEN_REGIME_FRAGILE",
+      "strategy": "carry_oos",
+      "trades_per_day": 0.2278
+    },
+    {
+      "assumptions": "iid attempts & months (reset-to-initial payouts); independence across phases; subscription fees on mean attempt duration; INCOMPLETE charged to sim cap",
+      "attempt_months_mean": 16.85,
+      "caveat": "Full-decade pool (Sharpe ~0.69): includes both paying and flat regimes.",
+      "challenge_risk_mult": 1.0,
+      "challenge_risk_pct": 0.0075,
+      "e_attempts_to_funded": 1.12,
+      "fees_to_funded_usd": 693.0,
+      "firm": "FTMO_100K_SWING",
+      "funded": {
+        "e_months_funded": null,
+        "e_payout_per_month_usd": 1128.0,
+        "monthly_income_target_usd": 10000.0,
+        "p_month_ge_target": 0.0013,
+        "p_survive_12mo": 1.0,
+        "p_survive_month": 1.0,
+        "p_target_every_month_12": 0.0,
+        "payout_month_p50_usd": 430.0
+      },
+      "funded_risk_mult": 1.0,
+      "funded_risk_pct": 0.0075,
+      "p_funded": 0.89506,
+      "p_pass_100_consecutive": 1.5e-05,
+      "phases": [
+        {
+          "cal_days_to_pass_med": 39.1,
+          "p_bust": 0.0087,
+          "p_incomplete": 0.0714,
+          "p_pass": 0.9199,
+          "p_timeout": 0.0,
+          "phase": "P1",
+          "tdays_to_pass_med": 27.0,
+          "tdays_to_pass_p10": 11.0,
+          "tdays_to_pass_p90": 55.0
+        },
+        {
+          "cal_days_to_pass_med": 20.3,
+          "p_bust": 0.0085,
+          "p_incomplete": 0.0185,
+          "p_pass": 0.973,
+          "p_timeout": 0.0,
+          "phase": "P2",
+          "tdays_to_pass_med": 14.0,
+          "tdays_to_pass_p10": 5.0,
+          "tdays_to_pass_p90": 39.0
+        }
+      ],
+      "pool_kind": "bootstrap",
+      "pool_n": 411,
+      "pool_sharpe_ann": 1.44,
+      "pricing_flag": "UNVERIFIED_PRICING",
+      "program_ev_per_month_usd": 630.0,
+      "stamp": "PROVEN_REGIME_FRAGILE",
+      "strategy": "carry_decade",
+      "trades_per_day": 0.1644
+    },
+    {
+      "assumptions": "iid attempts & months (reset-to-initial payouts); independence across phases; subscription fees on mean attempt duration; INCOMPLETE charged to sim cap",
+      "attempt_months_mean": 3.96,
+      "caveat": "Full-decade pool (Sharpe ~0.69): includes both paying and flat regimes.",
+      "challenge_risk_mult": 1.0,
+      "challenge_risk_pct": 0.0075,
+      "e_attempts_to_funded": 3.92,
+      "fees_to_funded_usd": 1471.0,
+      "firm": "MFF_100K",
+      "funded": {
+        "e_months_funded": null,
+        "e_payout_per_month_usd": 1290.0,
+        "monthly_income_target_usd": 10000.0,
+        "p_month_ge_target": 0.0033,
+        "p_survive_12mo": 1.0,
+        "p_survive_month": 1.0,
+        "p_target_every_month_12": 0.0,
+        "payout_month_p50_usd": 482.0
+      },
+      "funded_risk_mult": 1.0,
+      "funded_risk_pct": 0.0075,
+      "p_funded": 0.2549,
+      "p_pass_100_consecutive": 0.0,
+      "phases": [
+        {
+          "cal_days_to_pass_med": 14.5,
+          "p_bust": 0.001,
+          "p_incomplete": 0.7441,
+          "p_pass": 0.2549,
+          "p_timeout": 0.0,
+          "phase": "EVAL",
+          "tdays_to_pass_med": 10.0,
+          "tdays_to_pass_p10": 5.0,
+          "tdays_to_pass_p90": 15.0
+        }
+      ],
+      "pool_kind": "bootstrap",
+      "pool_n": 411,
+      "pool_sharpe_ann": 1.44,
+      "pricing_flag": "UNVERIFIED_PRICING",
+      "program_ev_per_month_usd": 746.0,
+      "stamp": "PROVEN_REGIME_FRAGILE",
+      "strategy": "carry_decade",
+      "trades_per_day": 0.1644
+    },
+    {
+      "assumptions": "iid attempts & months (reset-to-initial payouts); independence across phases; subscription fees on mean attempt duration; INCOMPLETE charged to sim cap",
+      "attempt_months_mean": 16.78,
+      "caveat": "SCENARIO: carry_oos mean-shifted from Sharpe 2.54 to 0 ('if carry forward-Sharpe were 0'). CRITICAL: this bootstraps the 2023-2024 OOS window only \u2014 a FAVORABLE, rate-trending regime. The forex edge is REGIME-FRAGILE: rolling walk-forward was 2021 -0.13 / 2022 +0.51 / 2023 +1.26 / 2024 -0.09. In a flat/adverse regime these numbers would be materially worse. Fresh 2025-26 measured \u2248 FLAT (v015 remeasurement, 2026-06-27).",
+      "challenge_risk_mult": 1.0,
+      "challenge_risk_pct": 0.0075,
+      "e_attempts_to_funded": 3.79,
+      "fees_to_funded_usd": 2350.0,
+      "firm": "FTMO_100K_SWING",
+      "funded": {
+        "e_months_funded": 2500.0,
+        "e_payout_per_month_usd": 1035.0,
+        "monthly_income_target_usd": 10000.0,
+        "p_month_ge_target": 0.0025,
+        "p_survive_12mo": 0.9952,
+        "p_survive_month": 0.9996,
+        "p_target_every_month_12": 0.0,
+        "payout_month_p50_usd": 0.0
+      },
+      "funded_risk_mult": 1.0,
+      "funded_risk_pct": 0.0075,
+      "p_funded": 0.26379,
+      "p_pass_100_consecutive": 0.0,
+      "phases": [
+        {
+          "cal_days_to_pass_med": 43.5,
+          "p_bust": 0.4812,
+          "p_incomplete": 0.0884,
+          "p_pass": 0.4304,
+          "p_timeout": 0.0,
+          "phase": "P1",
+          "tdays_to_pass_med": 30.0,
+          "tdays_to_pass_p10": 10.0,
+          "tdays_to_pass_p90": 72.0
+        },
+        {
+          "cal_days_to_pass_med": 21.7,
+          "p_bust": 0.3709,
+          "p_incomplete": 0.0162,
+          "p_pass": 0.6129,
+          "p_timeout": 0.0,
+          "phase": "P2",
+          "tdays_to_pass_med": 15.0,
+          "tdays_to_pass_p10": 4.0,
+          "tdays_to_pass_p90": 48.0
+        }
+      ],
+      "pool_kind": "bootstrap",
+      "pool_n": 110,
+      "pool_sharpe_ann": 0.0,
+      "pricing_flag": "UNVERIFIED_PRICING",
+      "program_ev_per_month_usd": 264.0,
+      "stamp": "SCENARIO",
+      "strategy": "carry_fwd_S0",
+      "trades_per_day": 0.2278
+    },
+    {
+      "assumptions": "iid attempts & months (reset-to-initial payouts); independence across phases; subscription fees on mean attempt duration; INCOMPLETE charged to sim cap",
+      "attempt_months_mean": 3.83,
+      "caveat": "SCENARIO: carry_oos mean-shifted from Sharpe 2.54 to 0 ('if carry forward-Sharpe were 0'). CRITICAL: this bootstraps the 2023-2024 OOS window only \u2014 a FAVORABLE, rate-trending regime. The forex edge is REGIME-FRAGILE: rolling walk-forward was 2021 -0.13 / 2022 +0.51 / 2023 +1.26 / 2024 -0.09. In a flat/adverse regime these numbers would be materially worse. Fresh 2025-26 measured \u2248 FLAT (v015 remeasurement, 2026-06-27).",
+      "challenge_risk_mult": 1.0,
+      "challenge_risk_pct": 0.0075,
+      "e_attempts_to_funded": 5.08,
+      "fees_to_funded_usd": 1905.0,
+      "firm": "MFF_100K",
+      "funded": {
+        "e_months_funded": 222.2,
+        "e_payout_per_month_usd": 1158.0,
+        "monthly_income_target_usd": 10000.0,
+        "p_month_ge_target": 0.0046,
+        "p_survive_12mo": 0.9473,
+        "p_survive_month": 0.9955,
+        "p_target_every_month_12": 0.0,
+        "payout_month_p50_usd": 0.0
+      },
+      "funded_risk_mult": 1.0,
+      "funded_risk_pct": 0.0075,
+      "p_funded": 0.1968,
+      "p_pass_100_consecutive": 0.0,
+      "phases": [
+        {
+          "cal_days_to_pass_med": 15.9,
+          "p_bust": 0.098,
+          "p_incomplete": 0.7052,
+          "p_pass": 0.1968,
+          "p_timeout": 0.0,
+          "phase": "EVAL",
+          "tdays_to_pass_med": 11.0,
+          "tdays_to_pass_p10": 5.0,
+          "tdays_to_pass_p90": 18.0
+        }
+      ],
+      "pool_kind": "bootstrap",
+      "pool_n": 110,
+      "pool_sharpe_ann": 0.0,
+      "pricing_flag": "UNVERIFIED_PRICING",
+      "program_ev_per_month_usd": 596.0,
+      "stamp": "SCENARIO",
+      "strategy": "carry_fwd_S0",
+      "trades_per_day": 0.2278
+    },
+    {
+      "assumptions": "iid attempts & months (reset-to-initial payouts); independence across phases; subscription fees on mean attempt duration; INCOMPLETE charged to sim cap",
+      "attempt_months_mean": 15.62,
+      "caveat": "SCENARIO: carry_oos mean-shifted from Sharpe 2.54 to 0.69 ('if carry forward-Sharpe were 0.69'). CRITICAL: this bootstraps the 2023-2024 OOS window only \u2014 a FAVORABLE, rate-trending regime. The forex edge is REGIME-FRAGILE: rolling walk-forward was 2021 -0.13 / 2022 +0.51 / 2023 +1.26 / 2024 -0.09. In a flat/adverse regime these numbers would be materially worse. Fresh 2025-26 measured \u2248 FLAT (v015 remeasurement, 2026-06-27).",
+      "challenge_risk_mult": 1.0,
+      "challenge_risk_pct": 0.0075,
+      "e_attempts_to_funded": 1.65,
+      "fees_to_funded_usd": 1020.0,
+      "firm": "FTMO_100K_SWING",
+      "funded": {
+        "e_months_funded": 1666.7,
+        "e_payout_per_month_usd": 1289.0,
+        "monthly_income_target_usd": 10000.0,
+        "p_month_ge_target": 0.0036,
+        "p_survive_12mo": 0.9928,
+        "p_survive_month": 0.9994,
+        "p_target_every_month_12": 0.0,
+        "payout_month_p50_usd": 158.0
+      },
+      "funded_risk_mult": 1.0,
+      "funded_risk_pct": 0.0075,
+      "p_funded": 0.60782,
+      "p_pass_100_consecutive": 0.0,
+      "phases": [
+        {
+          "cal_days_to_pass_med": 42.0,
+          "p_bust": 0.1891,
+          "p_incomplete": 0.077,
+          "p_pass": 0.7339,
+          "p_timeout": 0.0,
+          "phase": "P1",
+          "tdays_to_pass_med": 29.0,
+          "tdays_to_pass_p10": 10.0,
+          "tdays_to_pass_p90": 71.0
+        },
+        {
+          "cal_days_to_pass_med": 20.3,
+          "p_bust": 0.1561,
+          "p_incomplete": 0.0157,
+          "p_pass": 0.8282,
+          "p_timeout": 0.0,
+          "phase": "P2",
+          "tdays_to_pass_med": 14.0,
+          "tdays_to_pass_p10": 4.0,
+          "tdays_to_pass_p90": 48.0
+        }
+      ],
+      "pool_kind": "bootstrap",
+      "pool_n": 110,
+      "pool_sharpe_ann": 0.69,
+      "pricing_flag": "UNVERIFIED_PRICING",
+      "program_ev_per_month_usd": 614.0,
+      "stamp": "SCENARIO",
+      "strategy": "carry_fwd_S0.69",
+      "trades_per_day": 0.2278
+    },
+    {
+      "assumptions": "iid attempts & months (reset-to-initial payouts); independence across phases; subscription fees on mean attempt duration; INCOMPLETE charged to sim cap",
+      "attempt_months_mean": 3.68,
+      "caveat": "SCENARIO: carry_oos mean-shifted from Sharpe 2.54 to 0.69 ('if carry forward-Sharpe were 0.69'). CRITICAL: this bootstraps the 2023-2024 OOS window only \u2014 a FAVORABLE, rate-trending regime. The forex edge is REGIME-FRAGILE: rolling walk-forward was 2021 -0.13 / 2022 +0.51 / 2023 +1.26 / 2024 -0.09. In a flat/adverse regime these numbers would be materially worse. Fresh 2025-26 measured \u2248 FLAT (v015 remeasurement, 2026-06-27).",
+      "challenge_risk_mult": 1.0,
+      "challenge_risk_pct": 0.0075,
+      "e_attempts_to_funded": 3.25,
+      "fees_to_funded_usd": 1217.0,
+      "firm": "MFF_100K",
+      "funded": {
+        "e_months_funded": 333.3,
+        "e_payout_per_month_usd": 1498.0,
+        "monthly_income_target_usd": 10000.0,
+        "p_month_ge_target": 0.0075,
+        "p_survive_12mo": 0.9646,
+        "p_survive_month": 0.997,
+        "p_target_every_month_12": 0.0,
+        "payout_month_p50_usd": 253.0
+      },
+      "funded_risk_mult": 1.0,
+      "funded_risk_pct": 0.0075,
+      "p_funded": 0.3081,
+      "p_pass_100_consecutive": 0.0,
+      "phases": [
+        {
+          "cal_days_to_pass_med": 14.5,
+          "p_bust": 0.0469,
+          "p_incomplete": 0.645,
+          "p_pass": 0.3081,
+          "p_timeout": 0.0,
+          "phase": "EVAL",
+          "tdays_to_pass_med": 10.0,
+          "tdays_to_pass_p10": 5.0,
+          "tdays_to_pass_p90": 18.0
+        }
+      ],
+      "pool_kind": "bootstrap",
+      "pool_n": 110,
+      "pool_sharpe_ann": 0.69,
+      "pricing_flag": "UNVERIFIED_PRICING",
+      "program_ev_per_month_usd": 966.0,
+      "stamp": "SCENARIO",
+      "strategy": "carry_fwd_S0.69",
+      "trades_per_day": 0.2278
+    },
+    {
+      "assumptions": "iid attempts & months (reset-to-initial payouts); independence across phases; subscription fees on mean attempt duration; INCOMPLETE charged to sim cap",
+      "attempt_months_mean": 12.8,
+      "caveat": "SCENARIO: carry_oos mean-shifted from Sharpe 2.54 to 1.25 ('if carry forward-Sharpe were 1.25'). CRITICAL: this bootstraps the 2023-2024 OOS window only \u2014 a FAVORABLE, rate-trending regime. The forex edge is REGIME-FRAGILE: rolling walk-forward was 2021 -0.13 / 2022 +0.51 / 2023 +1.26 / 2024 -0.09. In a flat/adverse regime these numbers would be materially worse. Fresh 2025-26 measured \u2248 FLAT (v015 remeasurement, 2026-06-27).",
+      "challenge_risk_mult": 1.0,
+      "challenge_risk_pct": 0.0075,
+      "e_attempts_to_funded": 1.18,
+      "fees_to_funded_usd": 731.0,
+      "firm": "FTMO_100K_SWING",
+      "funded": {
+        "e_months_funded": 2500.0,
+        "e_payout_per_month_usd": 1596.0,
+        "monthly_income_target_usd": 10000.0,
+        "p_month_ge_target": 0.0066,
+        "p_survive_12mo": 0.9952,
+        "p_survive_month": 0.9996,
+        "p_target_every_month_12": 0.0,
+        "payout_month_p50_usd": 605.0
+      },
+      "funded_risk_mult": 1.0,
+      "funded_risk_pct": 0.0075,
+      "p_funded": 0.84835,
+      "p_pass_100_consecutive": 0.0,
+      "phases": [
+        {
+          "cal_days_to_pass_med": 37.7,
+          "p_bust": 0.0651,
+          "p_incomplete": 0.0325,
+          "p_pass": 0.9024,
+          "p_timeout": 0.0,
+          "phase": "P1",
+          "tdays_to_pass_med": 26.0,
+          "tdays_to_pass_p10": 9.0,
+          "tdays_to_pass_p90": 64.0
+        },
+        {
+          "cal_days_to_pass_med": 18.8,
+          "p_bust": 0.0541,
+          "p_incomplete": 0.0058,
+          "p_pass": 0.9401,
+          "p_timeout": 0.0,
+          "phase": "P2",
+          "tdays_to_pass_med": 13.0,
+          "tdays_to_pass_p10": 4.0,
+          "tdays_to_pass_p90": 40.0
+        }
+      ],
+      "pool_kind": "bootstrap",
+      "pool_n": 110,
+      "pool_sharpe_ann": 1.25,
+      "pricing_flag": "UNVERIFIED_PRICING",
+      "program_ev_per_month_usd": 977.0,
+      "stamp": "SCENARIO",
+      "strategy": "carry_fwd_S1.25",
+      "trades_per_day": 0.2278
+    },
+    {
+      "assumptions": "iid attempts & months (reset-to-initial payouts); independence across phases; subscription fees on mean attempt duration; INCOMPLETE charged to sim cap",
+      "attempt_months_mean": 3.53,
+      "caveat": "SCENARIO: carry_oos mean-shifted from Sharpe 2.54 to 1.25 ('if carry forward-Sharpe were 1.25'). CRITICAL: this bootstraps the 2023-2024 OOS window only \u2014 a FAVORABLE, rate-trending regime. The forex edge is REGIME-FRAGILE: rolling walk-forward was 2021 -0.13 / 2022 +0.51 / 2023 +1.26 / 2024 -0.09. In a flat/adverse regime these numbers would be materially worse. Fresh 2025-26 measured \u2248 FLAT (v015 remeasurement, 2026-06-27).",
+      "challenge_risk_mult": 1.0,
+      "challenge_risk_pct": 0.0075,
+      "e_attempts_to_funded": 2.43,
+      "fees_to_funded_usd": 910.0,
+      "firm": "MFF_100K",
+      "funded": {
+        "e_months_funded": 714.3,
+        "e_payout_per_month_usd": 1741.0,
+        "monthly_income_target_usd": 10000.0,
+        "p_month_ge_target": 0.0115,
+        "p_survive_12mo": 0.9833,
+        "p_survive_month": 0.9986,
+        "p_target_every_month_12": 0.0,
+        "payout_month_p50_usd": 608.0
+      },
+      "funded_risk_mult": 1.0,
+      "funded_risk_pct": 0.0075,
+      "p_funded": 0.4121,
+      "p_pass_100_consecutive": 0.0,
+      "phases": [
+        {
+          "cal_days_to_pass_med": 15.9,
+          "p_bust": 0.0181,
+          "p_incomplete": 0.5698,
+          "p_pass": 0.4121,
+          "p_timeout": 0.0,
+          "phase": "EVAL",
+          "tdays_to_pass_med": 11.0,
+          "tdays_to_pass_p10": 5.0,
+          "tdays_to_pass_p90": 18.0
+        }
+      ],
+      "pool_kind": "bootstrap",
+      "pool_n": 110,
+      "pool_sharpe_ann": 1.25,
+      "pricing_flag": "UNVERIFIED_PRICING",
+      "program_ev_per_month_usd": 1255.0,
+      "stamp": "SCENARIO",
+      "strategy": "carry_fwd_S1.25",
+      "trades_per_day": 0.2278
+    },
+    {
+      "firm": "FTMO_100K_SWING",
+      "note": "pool n=28 < 30 \u2014 refusing to Monte-Carlo; ICT edge UNPROVEN: permutation p=0.52, fails BH (2026-06-30 audit). Backtest pools only.",
+      "stamp": "UNPROVEN",
+      "strategy": "ict_london_a",
+      "verdict": "INSUFFICIENT_DATA"
+    },
+    {
+      "firm": "MFF_100K",
+      "note": "pool n=28 < 30 \u2014 refusing to Monte-Carlo; ICT edge UNPROVEN: permutation p=0.52, fails BH (2026-06-30 audit). Backtest pools only.",
+      "stamp": "UNPROVEN",
+      "strategy": "ict_london_a",
+      "verdict": "INSUFFICIENT_DATA"
+    },
+    {
+      "assumptions": "iid attempts & months (reset-to-initial payouts); independence across phases; subscription fees on mean attempt duration; INCOMPLETE charged to sim cap",
+      "attempt_months_mean": 5.19,
+      "caveat": "ICT edge UNPROVEN: permutation p=0.52, fails BH (2026-06-30 audit). Backtest pools only.",
+      "challenge_risk_mult": 1.0,
+      "challenge_risk_pct": 0.0075,
+      "e_attempts_to_funded": 1.57,
+      "fees_to_funded_usd": 974.0,
+      "firm": "FTMO_100K_SWING",
+      "funded": {
+        "e_months_funded": 73.5,
+        "e_payout_per_month_usd": 2838.0,
+        "monthly_income_target_usd": 10000.0,
+        "p_month_ge_target": 0.0622,
+        "p_survive_12mo": 0.8485,
+        "p_survive_month": 0.9864,
+        "p_target_every_month_12": 0.0,
+        "payout_month_p50_usd": 1197.0
+      },
+      "funded_risk_mult": 1.0,
+      "funded_risk_pct": 0.0075,
+      "p_funded": 0.63684,
+      "p_pass_100_consecutive": 0.0,
+      "phases": [
+        {
+          "cal_days_to_pass_med": 39.1,
+          "p_bust": 0.2302,
+          "p_incomplete": 0.0002,
+          "p_pass": 0.7696,
+          "p_timeout": 0.0,
+          "phase": "P1",
+          "tdays_to_pass_med": 27.0,
+          "tdays_to_pass_p10": 8.0,
+          "tdays_to_pass_p90": 76.5
+        },
+        {
+          "cal_days_to_pass_med": 17.4,
+          "p_bust": 0.1725,
+          "p_incomplete": 0.0,
+          "p_pass": 0.8275,
+          "p_timeout": 0.0,
+          "phase": "P2",
+          "tdays_to_pass_med": 12.0,
+          "tdays_to_pass_p10": 4.0,
+          "tdays_to_pass_p90": 45.0
+        }
+      ],
+      "pool_kind": "bootstrap",
+      "pool_n": 102,
+      "pool_sharpe_ann": 1.163,
+      "pricing_flag": "UNVERIFIED_PRICING",
+      "program_ev_per_month_usd": 2108.0,
+      "stamp": "UNPROVEN",
+      "strategy": "ict_window_B",
+      "trades_per_day": 0.8
+    },
+    {
+      "assumptions": "iid attempts & months (reset-to-initial payouts); independence across phases; subscription fees on mean attempt duration; INCOMPLETE charged to sim cap",
+      "attempt_months_mean": 2.28,
+      "caveat": "ICT edge UNPROVEN: permutation p=0.52, fails BH (2026-06-30 audit). Backtest pools only.",
+      "challenge_risk_mult": 1.0,
+      "challenge_risk_pct": 0.0075,
+      "e_attempts_to_funded": 1.52,
+      "fees_to_funded_usd": 569.0,
+      "firm": "MFF_100K",
+      "funded": {
+        "e_months_funded": 63.7,
+        "e_payout_per_month_usd": 3144.0,
+        "monthly_income_target_usd": 10000.0,
+        "p_month_ge_target": 0.0795,
+        "p_survive_12mo": 0.827,
+        "p_survive_month": 0.9843,
+        "p_target_every_month_12": 0.0,
+        "payout_month_p50_usd": 1481.0
+      },
+      "funded_risk_mult": 1.0,
+      "funded_risk_pct": 0.0075,
+      "p_funded": 0.6595,
+      "p_pass_100_consecutive": 0.0,
+      "phases": [
+        {
+          "cal_days_to_pass_med": 24.6,
+          "p_bust": 0.1568,
+          "p_incomplete": 0.1837,
+          "p_pass": 0.6595,
+          "p_timeout": 0.0,
+          "phase": "EVAL",
+          "tdays_to_pass_med": 17.0,
+          "tdays_to_pass_p10": 5.0,
+          "tdays_to_pass_p90": 39.0
+        }
+      ],
+      "pool_kind": "bootstrap",
+      "pool_n": 102,
+      "pool_sharpe_ann": 1.163,
+      "pricing_flag": "UNVERIFIED_PRICING",
+      "program_ev_per_month_usd": 2728.0,
+      "stamp": "UNPROVEN",
+      "strategy": "ict_window_B",
+      "trades_per_day": 0.8
+    },
+    {
+      "firm": "TOPSTEP_50K",
+      "note": "pool n=2 < 30 \u2014 refusing to Monte-Carlo; UNVALIDATED: n_real=0 live (futures_validation.json passed:false); replay pool is in-sample and tiny. Regenerate via Phase R (operator-gated) before trusting.",
+      "stamp": "UNVALIDATED",
+      "strategy": "futures_orb",
+      "verdict": "INSUFFICIENT_DATA"
+    },
+    {
+      "firm": "APEX_50K",
+      "note": "pool n=2 < 30 \u2014 refusing to Monte-Carlo; UNVALIDATED: n_real=0 live (futures_validation.json passed:false); replay pool is in-sample and tiny. Regenerate via Phase R (operator-gated) before trusting.",
+      "stamp": "UNVALIDATED",
+      "strategy": "futures_orb",
+      "verdict": "INSUFFICIENT_DATA"
+    }
+  ]
+}

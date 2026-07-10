@@ -6,6 +6,48 @@ Standing constraints live in `CLAUDE.md` — not restated here.
 
 ---
 
+## 2026-07-10 · PROP-FUNNEL EV SIMULATOR (TICK-022): BUILT, PARITY-EXACT, RUN — THE "$10k/MONTH" QUESTION ANSWERED WITH NUMBERS
+
+**Context:** Colin asked for "a strategy that passes a sim prop test 100 times and makes $10k/month
+consistently by spamming the same method — find what works, why later." Plan-mode approved
+(Plans/glistening-juggling-clover.md). Built the MEASUREMENT instrument instead of re-mining
+settled-dead data: `research/prop_funnel/` — every strategy family through realistic prop rulesets.
+
+**Shipped (one [RESEARCH] commit per phase, P0 03b8093 → P6):** parity harness (3 recorded MC
+artifacts reproduced EXACT; two drift classes found+pinned: window_B pool, trades/yr clock),
+ChallengeEngine (static/EOD-trail/intraday-trail DD, daily-loss actually enforced — PropFirmRules
+stores but never enforces it; its `dd_trail_stops_at_starting` makes its "trailing" effectively
+STATIC — divergence documented, not fixed), vectorized simulator (EXACT vs scalar on 6 rule
+variants), feeds with evidence stamps (carry PROVEN_REGIME_FRAGILE n=110/411; ICT UNPROVEN;
+**live closed outcomes n=27 = 3W/24L, WR 11% vs backtest 63.6%** — surfaced; futures ORB n=2
+INSUFFICIENT), funnel chain (phases→funded→fees→program EV), sizing grids, synthetic frontier
+(96 cells × 2 firms), 10 charts + verdict_table + summary_report under `data/research/prop_funnel/`.
+38/38 module tests green; cross-process deterministic (found+fixed a hash()-salt seed bug).
+
+**VERDICTS (seed 7, 10k trials; ALL pricing UNVERIFIED; iid-attempts caveat applies):**
+- **P($10k every month ×12) = 0.0 on EVERY strategy × firm row.** The literal ask does not exist
+  at $100k account scale with any edge this firm has. $10k/mo = 10%/mo ≈ Calmar 6.
+- **"Pass 100×":** only carry_oos×FTMO comes close — P(funded)=0.996/attempt → p^100=0.68 — and
+  that's the FAVORABLE-window (2023-24) pool; the honest full-decade pool gives p^100 = 1.5e-05.
+- **Best PROVEN row:** carry_oos×MFF ≈ $2.1k/mo program EV; honest decade pool ≈ $630-750/mo;
+  S0 scenario (carry dead forward) ≈ $260-600/mo — that residual is model-optimistic option value
+  (reset-payout simplification), NOT free money.
+- **Sizing optimizer's own discovery:** hot challenge / cooler funded (3.0x/2.0x) ≈ $4.2k/mo EV
+  on carry_oos×MFF — a real, decision-grade lever, pending pricing verification.
+- **Tension chart (the answer):** pass-90% and $10k-months contours sit on OPPOSITE sides of the
+  ruin line until TRUE Sharpe ≳ 2-3. The frontier tells any future candidate what it must be.
+
+**⏳ Colin queue:** (1) verify firm pricing (all EV rankings provisional); (2) return-scale
+convention ruling (monte_carlo_prop default used, disclosed); (3) Phase R go/no-go (futures ORB
+replay regen — operator-gated, never writes data/futures/); (4) Phase B new-edge hunts (HYP-089
+options footprint) — the frontier now defines the bar they must clear.
+
+**Refused/held:** no live changes, no gate loosening, no hypothesis-ledger writes (decision
+analysis, not edge validation), no re-mining of settled-dead daily-bar data, futures replay not
+regenerated without operator gate. rules_engine.py byte-identical.
+
+---
+
 ## 2026-07-08 · POLITICAL-ALPHA (HYP-085 / TICK-020): BUILT, RUN, ADJUDICATED — H0 NOT REJECTED
 
 **Pushed:** 5b5534b (P0 prereg) → 49b21c4 (P1 catalog) → 095bbdc (P2 abnormal returns) →

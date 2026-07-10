@@ -1,0 +1,196 @@
+{
+  "all_exact": true,
+  "all_ok": true,
+  "env": {
+    "numpy": "2.4.4",
+    "platform": "macOS-26.3.1-arm64-arm-64bit-Mach-O",
+    "python": "3.14.4"
+  },
+  "results": [
+    {
+      "checks": [
+        {
+          "delta": 0.0,
+          "field": "pass_rate",
+          "ok": true,
+          "ours": 0.7444,
+          "recorded": 0.7444,
+          "tol": 0.0
+        },
+        {
+          "delta": 0.0,
+          "field": "bust_rate",
+          "ok": true,
+          "ours": 0.0,
+          "recorded": 0.0,
+          "tol": 0.0
+        },
+        {
+          "delta": 0.0,
+          "field": "timeout_rate",
+          "ok": true,
+          "ours": 0.2556,
+          "recorded": 0.2556,
+          "tol": 0.0
+        },
+        {
+          "delta": 0.0,
+          "field": "median_days_to_pass",
+          "ok": true,
+          "ours": 34.0,
+          "recorded": 34.0,
+          "tol": 0.0
+        },
+        {
+          "delta": 0.0,
+          "field": "p10_days_to_pass",
+          "ok": true,
+          "ours": 11.0,
+          "recorded": 11.0,
+          "tol": 0.0
+        },
+        {
+          "delta": 0.0,
+          "field": "p90_days_to_pass",
+          "ok": true,
+          "ours": 76.0,
+          "recorded": 76.0,
+          "tol": 0.0
+        }
+      ],
+      "exact": true,
+      "name": "parity_1_ict_mff",
+      "note": "recorded run labeled window='combined' but pool matches today's window_B (n==102); combined has since been regenerated to 43 trades \u2014 drift documented",
+      "ok": true
+    },
+    {
+      "checks": [
+        {
+          "delta": 0.0,
+          "field": "pass_rate_pct",
+          "ok": true,
+          "ours": 10.9,
+          "recorded": 10.9,
+          "tol": 1.221625720750836
+        },
+        {
+          "delta": 0.0,
+          "field": "bust_rate_pct",
+          "ok": true,
+          "ours": 0.3,
+          "recorded": 0.3,
+          "tol": 1.221625720750836
+        },
+        {
+          "delta": 0.0,
+          "field": "timeout_rate_pct",
+          "ok": true,
+          "ours": 88.8,
+          "recorded": 88.8,
+          "tol": 1.221625720750836
+        },
+        {
+          "delta": 0.0,
+          "field": "median_days_to_pass",
+          "ok": true,
+          "ours": 48.0,
+          "recorded": 48.0,
+          "tol": 3.0
+        }
+      ],
+      "exact": true,
+      "name": "parity_2_ftmo",
+      "note": "reproduces the RECORDED artifact under its own assumptions (trailing 10% DD + 60-day cap) \u2014 the original script does NOT model real FTMO Swing (static DD, no time limit); do not quote its pass rate as FTMO",
+      "ok": true
+    },
+    {
+      "checks": [
+        {
+          "delta": 0.0,
+          "field": "pool_size",
+          "ok": true,
+          "ours": 110,
+          "recorded": 110,
+          "tol": 0.0
+        },
+        {
+          "delta": 0.0,
+          "field": "h30.max_trades_in_window",
+          "ok": true,
+          "ours": 4,
+          "recorded": 4,
+          "tol": 0.0
+        },
+        {
+          "delta": 0.0,
+          "field": "h30.p_pass",
+          "ok": true,
+          "ours": 0.0419,
+          "recorded": 0.0419,
+          "tol": 0.007854137473306664
+        },
+        {
+          "delta": 0.0,
+          "field": "h30.p_fail",
+          "ok": true,
+          "ours": 0.0,
+          "recorded": 0.0,
+          "tol": 0.007854137473306664
+        },
+        {
+          "delta": 0.0,
+          "field": "h60.max_trades_in_window",
+          "ok": true,
+          "ours": 8,
+          "recorded": 8,
+          "tol": 0.0
+        },
+        {
+          "delta": 0.0,
+          "field": "h60.p_pass",
+          "ok": true,
+          "ours": 0.2022,
+          "recorded": 0.2022,
+          "tol": 0.015744310955465784
+        },
+        {
+          "delta": 0.0,
+          "field": "h60.p_fail",
+          "ok": true,
+          "ours": 0.0004,
+          "recorded": 0.0004,
+          "tol": 0.015744310955465784
+        },
+        {
+          "delta": 0.0,
+          "field": "h90.max_trades_in_window",
+          "ok": true,
+          "ours": 13,
+          "recorded": 13,
+          "tol": 0.0
+        },
+        {
+          "delta": 0.0,
+          "field": "h90.p_pass",
+          "ok": true,
+          "ours": 0.4343,
+          "recorded": 0.4343,
+          "tol": 0.019430056840019794
+        },
+        {
+          "delta": 0.0,
+          "field": "h90.p_fail",
+          "ok": true,
+          "ours": 0.0015,
+          "recorded": 0.0015,
+          "tol": 0.019430056840019794
+        }
+      ],
+      "exact": true,
+      "name": "parity_3_carry_bootstrap",
+      "note": "OUT monkeypatched into parity dir; live artifact untouched. Clock pinned to the recorded trades/year 53.2 \u2014 logs/forex_backtest_results.json has drifted (now implies 39.8/yr), same drift class as parity #1's pool",
+      "ok": true
+    }
+  ],
+  "ticket": "TICK-022"
+}

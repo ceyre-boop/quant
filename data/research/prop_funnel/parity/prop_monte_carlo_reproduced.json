@@ -1,0 +1,350 @@
+{
+  "generated_at": "2026-07-10T22:09:39.869847+00:00",
+  "question": "P(reach +8% before breaching -8%) for the real v015 4-pair forex edge",
+  "pool_size": 110,
+  "pool_per_pair": {
+    "EURUSD=X": 30,
+    "GBPUSD=X": 29,
+    "USDJPY=X": 25,
+    "AUDUSD=X": 26
+  },
+  "pool_window": "OOS 2023-2024 (held-out; window enforced at load)",
+  "low_confidence": false,
+  "calibration_note": "Bootstrap of n=110 real trades. n>=50 so the resample is reasonably conditioned, but the pool is still only ~2 years of OOS trades \u2014 the probabilities carry their own uncertainty (see *_ci95). Treat point estimates as directional, not precise.",
+  "regime_caveat": "CRITICAL: this bootstraps the 2023-2024 OOS window only \u2014 a FAVORABLE, rate-trending regime (mean +0.50%/trade, positive skew). The forex edge is REGIME-FRAGILE: rolling walk-forward was 2021 -0.13 / 2022 +0.51 / 2023 +1.26 / 2024 -0.09. In a flat/adverse regime, P(fail) would be materially higher and P(pass) lower than shown here. These numbers assume the future resembles 2023-2024; it may not.",
+  "account": 100000.0,
+  "floor": 92000.0,
+  "target": 108000.0,
+  "floor_pct": 0.08,
+  "target_pct": 0.08,
+  "n_sims": 10000,
+  "portfolio_trades_per_year": 53.2,
+  "days_per_trade": 6.86,
+  "return_distribution": {
+    "mean": 0.004988,
+    "std": 0.015004,
+    "skew": 1.161,
+    "excess_kurtosis": 1.762,
+    "min": -0.02323,
+    "max": 0.05894
+  },
+  "method": "bootstrap resample of real per-trade pnl_pct (sizing already embedded; forex is not graded). GBM shown only as a normality-assumption comparison.",
+  "horizons": {
+    "30": {
+      "max_trades_in_window": 4,
+      "p_pass": 0.0419,
+      "p_pass_ci95": [
+        0.038,
+        0.0458
+      ],
+      "p_fail": 0.0,
+      "p_fail_ci95": [
+        0.0,
+        0.0
+      ],
+      "p_incomplete": 0.9581,
+      "max_drawdown": {
+        "mean": -0.0106,
+        "median": -0.01,
+        "p95_worst": -0.029,
+        "worst": -0.0674
+      },
+      "terminal_equity_pctiles": {
+        "p5": 97646.61,
+        "p25": 99823.39,
+        "p50": 101655.91,
+        "p75": 103880.85,
+        "p95": 107612.9
+      },
+      "trades_to_pass": {
+        "median": 4.0,
+        "iqr": [
+          3.0,
+          4.0
+        ],
+        "n": 419
+      },
+      "days_to_pass": {
+        "median": 27.44,
+        "iqr": [
+          20.58,
+          27.44
+        ],
+        "n": 419
+      },
+      "gbm_p_fail": 0.0003,
+      "gbm_understates_fail_by": -0.0003,
+      "equity_curve_bands": {
+        "p5": [
+          100000.0,
+          98550.83,
+          98044.82,
+          97784.8,
+          97646.61
+        ],
+        "p25": [
+          100000.0,
+          99607.86,
+          99546.04,
+          99638.68,
+          99823.39
+        ],
+        "p50": [
+          100000.0,
+          100061.01,
+          100639.9,
+          101127.73,
+          101655.91
+        ],
+        "p75": [
+          100000.0,
+          101085.76,
+          102067.37,
+          103007.05,
+          103880.85
+        ],
+        "p95": [
+          100000.0,
+          103491.05,
+          105161.68,
+          106259.28,
+          107612.9
+        ]
+      }
+    },
+    "60": {
+      "max_trades_in_window": 8,
+      "p_pass": 0.2022,
+      "p_pass_ci95": [
+        0.1943,
+        0.2101
+      ],
+      "p_fail": 0.0004,
+      "p_fail_ci95": [
+        0.0,
+        0.0008
+      ],
+      "p_incomplete": 0.7974,
+      "max_drawdown": {
+        "mean": -0.0171,
+        "median": -0.0151,
+        "p95_worst": -0.0407,
+        "worst": -0.0895
+      },
+      "terminal_equity_pctiles": {
+        "p5": 97542.96,
+        "p25": 100859.65,
+        "p50": 103613.07,
+        "p75": 106875.62,
+        "p95": 110114.15
+      },
+      "trades_to_pass": {
+        "median": 6.0,
+        "iqr": [
+          5.0,
+          7.0
+        ],
+        "n": 2022
+      },
+      "days_to_pass": {
+        "median": 41.17,
+        "iqr": [
+          34.3,
+          48.03
+        ],
+        "n": 2022
+      },
+      "gbm_p_fail": 0.0031,
+      "gbm_understates_fail_by": -0.0027,
+      "equity_curve_bands": {
+        "p5": [
+          100000.0,
+          98550.83,
+          98086.83,
+          97764.42,
+          97653.14,
+          97557.91,
+          97561.16,
+          97524.33,
+          97542.96
+        ],
+        "p25": [
+          100000.0,
+          99581.48,
+          99519.52,
+          99648.05,
+          99791.58,
+          99990.2,
+          100291.45,
+          100542.48,
+          100859.65
+        ],
+        "p50": [
+          100000.0,
+          100061.01,
+          100646.0,
+          101096.82,
+          101575.48,
+          102057.28,
+          102565.01,
+          103084.98,
+          103613.07
+        ],
+        "p75": [
+          100000.0,
+          101085.76,
+          102080.06,
+          102994.42,
+          103736.84,
+          104585.26,
+          105284.66,
+          106009.77,
+          106875.62
+        ],
+        "p95": [
+          100000.0,
+          103491.05,
+          105175.23,
+          106352.12,
+          107676.53,
+          108545.74,
+          109150.04,
+          109717.91,
+          110114.15
+        ]
+      }
+    },
+    "90": {
+      "max_trades_in_window": 13,
+      "p_pass": 0.4343,
+      "p_pass_ci95": [
+        0.4246,
+        0.444
+      ],
+      "p_fail": 0.0015,
+      "p_fail_ci95": [
+        0.0007,
+        0.0023
+      ],
+      "p_incomplete": 0.5642,
+      "max_drawdown": {
+        "mean": -0.0208,
+        "median": -0.0181,
+        "p95_worst": -0.0487,
+        "worst": -0.0981
+      },
+      "terminal_equity_pctiles": {
+        "p5": 98012.54,
+        "p25": 102602.14,
+        "p50": 106520.07,
+        "p75": 108828.02,
+        "p95": 111050.82
+      },
+      "trades_to_pass": {
+        "median": 9.0,
+        "iqr": [
+          6.0,
+          11.0
+        ],
+        "n": 4343
+      },
+      "days_to_pass": {
+        "median": 61.75,
+        "iqr": [
+          41.17,
+          75.47
+        ],
+        "n": 4343
+      },
+      "gbm_p_fail": 0.0093,
+      "gbm_understates_fail_by": -0.0078,
+      "equity_curve_bands": {
+        "p5": [
+          100000.0,
+          98550.83,
+          98109.48,
+          97810.89,
+          97715.21,
+          97539.29,
+          97490.86,
+          97530.22,
+          97570.04,
+          97551.23,
+          97672.02,
+          97802.02,
+          97822.41,
+          98012.54
+        ],
+        "p25": [
+          100000.0,
+          99712.74,
+          99549.64,
+          99649.18,
+          99843.82,
+          100116.43,
+          100375.27,
+          100585.44,
+          100946.36,
+          101218.26,
+          101539.77,
+          101913.47,
+          102278.4,
+          102602.14
+        ],
+        "p50": [
+          100000.0,
+          100107.45,
+          100675.86,
+          101167.09,
+          101679.67,
+          102130.9,
+          102608.12,
+          103105.27,
+          103650.69,
+          104137.96,
+          104665.25,
+          105260.52,
+          105860.37,
+          106520.07
+        ],
+        "p75": [
+          100000.0,
+          101195.3,
+          102113.68,
+          103052.71,
+          103836.86,
+          104676.81,
+          105334.95,
+          106080.0,
+          106871.78,
+          108002.59,
+          108270.28,
+          108500.09,
+          108667.17,
+          108828.02
+        ],
+        "p95": [
+          100000.0,
+          103491.05,
+          105187.97,
+          106307.82,
+          107610.49,
+          108536.21,
+          109157.42,
+          109590.04,
+          109959.53,
+          110317.95,
+          110552.24,
+          110676.35,
+          110862.61,
+          111050.82
+        ]
+      }
+    }
+  },
+  "provenance": {
+    "source": "data/risk/oos_trades_2023_2024.json",
+    "verified": true,
+    "note": "Real held-out OOS (2023-2024) trade returns \u2014 window enforced at load, frozen pool (regen: scripts/generate_oos_pool.py). NOT in-sample, NOT assumed."
+  }
+}
