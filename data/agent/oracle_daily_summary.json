@@ -1,14 +1,14 @@
 {
-  "last_updated": "2026-07-09T07:12:44.135505+00:00",
+  "last_updated": "2026-07-10T09:33:41.258944+00:00",
   "harvest": {
     "trades_closed": 0,
     "win_rate": null,
     "failure_taxonomy": {}
   },
   "reflection": {
-    "candidate_lesson": "A trade requiring a 56-day hold to realize its edge should be vetoed when 4 of 6 signal layers are \u2717 \u2014 the macro thesis cannot survive that many days of contradicting price structure.",
-    "mechanism": "The single closed loss shorted USDJPY on a rate_diff_z of -0.97 (weak macro) while HTF market structure was BULLISH, price was NOT at an OB/FVG zone, and there was NO CHOCH/BOS in trade direction. Institutionally, a 56-day cycle_divergence thesis needs price to eventually confirm; entering with structure actively against you means you pay carry/adverse-drift for weeks before the thesis has any chance to express \u2014 the stop gets hit first. The confluence count (\u2713 layers) is a proxy for how soon institutional flow aligns with the macro view.",
-    "testable_rule": "if entry_context['hold_days_est'] > 30 and sum(1 for layer in signal_layers_active if layer.startswith('\u2713')) < 3: return ForexVeto  # long-horizon macro needs structural confirmation now"
+    "candidate_lesson": "A rate-divergence SHORT that fires while HTF market structure is BULLISH and no CHOCH/BOS confirms the trade direction is a counter-structure macro bet that loses even with a valid FVG and liquidity sweep.",
+    "mechanism": "Institutional order flow does not reverse on a single BSL sweep \u2014 when HTF structure is still bullish, the sweep is a stop-run inside continuation, not a distribution top. A macro rate-diff z of only -0.97 (sub-1.0 magnitude) lacks the conviction to overpower an intact bullish delivery, so the short is entered into the very liquidity institutions are using to continue upward. Structure must confirm (BOS/CHOCH in trade direction) before macro direction can be trusted.",
+    "testable_rule": "if signal_direction != htf_structure_direction and not structure_shift_confirmed and abs(rate_diff_z) < 1.2: veto_trade()"
   },
   "validation": {
     "verdict": "REJECTED",
@@ -21,8 +21,8 @@
     "codify_error": null
   },
   "cycle": {
-    "cost_usd": 0.169095,
+    "cost_usd": 0.16077,
     "status": "COMPLETE",
-    "date": "2026-07-09"
+    "date": "2026-07-10"
   }
 }

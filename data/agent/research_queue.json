@@ -553,8 +553,9 @@
       "added": "2026-06-16T01:16:17Z",
       "source": "REST_MODE_FINDING_016b",
       "is_code_change": true,
-      "updated_at": "2026-06-26T01:15:00Z",
-      "last_result": "ESCALATED by REST-025: cb_calendar.CB_MEETINGS currently holds only ONE date (2026-04-24). This is the single prerequisite unblocking BOTH RQ-REST-015 (HYP-061 CB-blackout wiring) and a correct cb_decisions.json rebuild (RQ-REST-017). Needs Colin to approve a manual real-meeting-date list (BOE/FED at minimum, 2023-2026)."
+      "updated_at": "2026-07-11T01:20:00+00:00",
+      "last_result": "REST-037: dates PREPARED + VALIDATED (2025 overlap vs live cb_calendar.py = exact match, HYP-061 window fully covered). Ready-to-apply patch at Plans/RQ-REST-016_cb_calendar_backextension_proposal.md. Status stays QUEUED \u2014 code change awaits Colin approval + param_change_log (NN#4).",
+      "rest_prepared": true
     },
     {
       "id": "RQ-REST-017",

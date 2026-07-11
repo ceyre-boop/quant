@@ -1,6 +1,51 @@
 {
   "messages": [
     {
+      "id": "pulse-20260710T1833",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] REST_MODE_EXPIRED: HYP-063 () validated and unimplemented for 18 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
+      "timestamp": "2026-07-10T18:33:36+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260710T1833",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] OUTCOME_LOOP_STALL: 23 closed OANDA trades but 0 matched to open decisions \u2014 the win/loss loop is not closing (CLAUDE.md NON-NEGOTIABLE #2). Oracle is learning from nothing. Check pair/timestamp/system matching in decision_logger.update_outcome.",
+      "timestamp": "2026-07-10T18:33:34+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "invariant-2026-07-10-fills_stale",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "[INVARIANT] FILLS_STALE: all fills ledgers stale (data/ledger/oanda_fills.jsonl, data/execution/fills.jsonl) \u2014 recent writes unverifiable (2026-07-10)",
+      "timestamp": "2026-07-10T13:29:40.467412+00:00",
+      "read": false,
+      "source": "invariant_guard"
+    },
+    {
+      "id": "audit-2026-07-10-price_source_drift",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "[AUDIT] PRICE_SOURCE_DRIFT: AUD_NZD median |\u0394close|/close 0.00227 (2026-07-10)",
+      "timestamp": "2026-07-10T13:12:57.968039+00:00",
+      "read": false,
+      "source": "shadow_audit"
+    },
+    {
+      "id": "audit-2026-07-10-l1_determinism_fail",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[AUDIT] L1_DETERMINISM_FAIL: 1 record(s) not reproducible (2026-07-10)",
+      "timestamp": "2026-07-10T13:12:57.968009+00:00",
+      "read": false,
+      "source": "shadow_audit"
+    },
+    {
       "id": "pulse-20260710T0147",
       "priority": "URGENT",
       "emoji": "\ud83d\udd34",
@@ -406,50 +451,12 @@
       "source": "shadow_audit"
     },
     {
-      "id": "pulse-20260707T0823",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[PULSE] REST_MODE_EXPIRED: HYP-063 () validated and unimplemented for 15 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
-      "timestamp": "2026-07-07T08:23:50+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "pulse-20260707T0823",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[PULSE] OUTCOME_LOOP_STALL: 22 closed OANDA trades but 0 matched to open decisions \u2014 the win/loss loop is not closing (CLAUDE.md NON-NEGOTIABLE #2). Oracle is learning from nothing. Check pair/timestamp/system matching in decision_logger.update_outcome.",
-      "timestamp": "2026-07-07T08:23:48+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "pulse-20260707T0000",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[PULSE] REST_MODE_EXPIRED: HYP-063 () validated and unimplemented for 15 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
-      "timestamp": "2026-07-07T00:00:50+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "pulse-20260706T2200",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[PULSE] REST_MODE_EXPIRED: HYP-063 () validated and unimplemented for 14 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
-      "timestamp": "2026-07-06T22:00:39+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "audit-2026-07-06-price_source_drift",
+      "id": "rest-037-2026-07-10-cb-calendar-ready",
+      "date": "2026-07-11T01:20:00+00:00",
       "priority": "IMPORTANT",
-      "emoji": "\ud83d\udfe1",
-      "text": "[AUDIT] PRICE_SOURCE_DRIFT: AUD_NZD median |\u0394close|/close 0.00227 (2026-07-06)",
-      "timestamp": "2026-07-06T13:10:03.033986+00:00",
       "read": false,
-      "source": "shadow_audit"
+      "message": "REST-037: RQ-REST-016 is now a ONE-STEP approval. I validated the FED+BOE 2023-2024 decision dates (2025 overlap matches live cb_calendar.py exactly, full HYP-061 window covered) and wrote a ready-to-apply patch + param_change_log rationale to Plans/RQ-REST-016_cb_calendar_backextension_proposal.md. I did NOT edit cb_calendar.py (NON-NEGOTIABLE #4). Approving + applying this unblocks priority-1 RQ-REST-015 (HYP-061 CB-blackout wiring) and RQ-REST-017. SEPARATE HEALTH FLAG: no 2026-07-10 entry in the live decision log (execute_daily skipped today's 09:35 ET session? 2nd occurrence since 07-06) \u2014 but equity curve / harvester / retrain / oracle_pulse are all live as of 18:33Z, so it's a logging/session gap, not a dead system. Worth a look at execute_daily's 07-10 run."
     }
   ],
-  "last_updated": "2026-07-10T01:47:41+00:00"
+  "last_updated": "2026-07-10T18:33:36+00:00"
 }

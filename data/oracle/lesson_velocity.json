@@ -1,18 +1,21 @@
 {
-  "generated_at": "2026-07-09T07:12:44.135130+00:00",
-  "as_of_date": "2026-07-09",
+  "generated_at": "2026-07-10T09:33:41.258456+00:00",
+  "as_of_date": "2026-07-10",
   "current_lesson": {
     "components": [
       "active",
       "against",
+      "agreement",
       "bias",
       "block",
       "config",
       "confluence",
       "conviction",
       "days",
+      "differential",
       "est",
       "fields",
+      "flag",
       "flags",
       "fvg",
       "gated",
@@ -28,20 +31,25 @@
       "shift",
       "structure",
       "with",
-      "zone"
+      "zone",
+      "zscore"
     ],
-    "component_label": "signal_layers_active (\u2713/\u2717 confluence count) gated jointly with entry_context.hold_days_est",
-    "first_seen": "2026-06-02",
-    "last_seen": "2026-07-09",
-    "days_forming": 37,
-    "n_revisions": 29,
-    "n_days_appeared": 29,
+    "component_label": "rate_differential_zscore (gated jointly with HTF-structure agreement and structure_shift flag)",
+    "first_seen": "2026-05-29",
+    "last_seen": "2026-07-10",
+    "days_forming": 42,
+    "n_revisions": 31,
+    "n_days_appeared": 31,
     "stable_days": 1,
     "status": "forming",
     "time_to_converge_days": null,
-    "latest_lesson_text": "A trade requiring a 56-day hold to realize its edge should be vetoed when 4 of 6 signal layers are \u2717 \u2014 the macro thesis cannot survive that many days of contradicting price structure.",
-    "latest_rule": "if entry_context['hold_days_est'] > 30 and sum(1 for layer in signal_layers_active if layer.startswith('\u2713')) < 3: return ForexVeto  # long-horizon macro needs structural confirmation now",
+    "latest_lesson_text": "A rate-divergence SHORT that fires while HTF market structure is BULLISH and no CHOCH/BOS confirms the trade direction is a counter-structure macro bet that loses even with a valid FVG and liquidity sweep.",
+    "latest_rule": "if signal_direction != htf_structure_direction and not structure_shift_confirmed and abs(rate_diff_z) < 1.2: veto_trade()",
     "history": [
+      {
+        "date": "2026-05-29",
+        "rule": "if commitment_score >= 0.90 and rate_differential_zscore is None: return ICTVeto  # require non-null macro confirmation when price-action is maximal"
+      },
       {
         "date": "2026-06-02",
         "rule": "if consensus_conviction >= 0.90 and green_matches == 0 and hist_hr == 0.0: size_multiplier *= 0.5 (treat as unconfirmed; require library_match before full size)"
@@ -157,6 +165,10 @@
       {
         "date": "2026-07-09",
         "rule": "if entry_context['hold_days_est'] > 30 and sum(1 for layer in signal_layers_active if layer.startswith('\u2713')) < 3: return ForexVeto  # long-horizon macro needs structural confirmation now"
+      },
+      {
+        "date": "2026-07-10",
+        "rule": "if signal_direction != htf_structure_direction and not structure_shift_confirmed and abs(rate_diff_z) < 1.2: veto_trade()"
       }
     ]
   },
@@ -165,14 +177,17 @@
       "components": [
         "active",
         "against",
+        "agreement",
         "bias",
         "block",
         "config",
         "confluence",
         "conviction",
         "days",
+        "differential",
         "est",
         "fields",
+        "flag",
         "flags",
         "fvg",
         "gated",
@@ -188,20 +203,25 @@
         "shift",
         "structure",
         "with",
-        "zone"
+        "zone",
+        "zscore"
       ],
-      "component_label": "signal_layers_active (\u2713/\u2717 confluence count) gated jointly with entry_context.hold_days_est",
-      "first_seen": "2026-06-02",
-      "last_seen": "2026-07-09",
-      "days_forming": 37,
-      "n_revisions": 29,
-      "n_days_appeared": 29,
+      "component_label": "rate_differential_zscore (gated jointly with HTF-structure agreement and structure_shift flag)",
+      "first_seen": "2026-05-29",
+      "last_seen": "2026-07-10",
+      "days_forming": 42,
+      "n_revisions": 31,
+      "n_days_appeared": 31,
       "stable_days": 1,
       "status": "forming",
       "time_to_converge_days": null,
-      "latest_lesson_text": "A trade requiring a 56-day hold to realize its edge should be vetoed when 4 of 6 signal layers are \u2717 \u2014 the macro thesis cannot survive that many days of contradicting price structure.",
-      "latest_rule": "if entry_context['hold_days_est'] > 30 and sum(1 for layer in signal_layers_active if layer.startswith('\u2713')) < 3: return ForexVeto  # long-horizon macro needs structural confirmation now",
+      "latest_lesson_text": "A rate-divergence SHORT that fires while HTF market structure is BULLISH and no CHOCH/BOS confirms the trade direction is a counter-structure macro bet that loses even with a valid FVG and liquidity sweep.",
+      "latest_rule": "if signal_direction != htf_structure_direction and not structure_shift_confirmed and abs(rate_diff_z) < 1.2: veto_trade()",
       "history": [
+        {
+          "date": "2026-05-29",
+          "rule": "if commitment_score >= 0.90 and rate_differential_zscore is None: return ICTVeto  # require non-null macro confirmation when price-action is maximal"
+        },
         {
           "date": "2026-06-02",
           "rule": "if consensus_conviction >= 0.90 and green_matches == 0 and hist_hr == 0.0: size_multiplier *= 0.5 (treat as unconfirmed; require library_match before full size)"
@@ -317,6 +337,10 @@
         {
           "date": "2026-07-09",
           "rule": "if entry_context['hold_days_est'] > 30 and sum(1 for layer in signal_layers_active if layer.startswith('\u2713')) < 3: return ForexVeto  # long-horizon macro needs structural confirmation now"
+        },
+        {
+          "date": "2026-07-10",
+          "rule": "if signal_direction != htf_structure_direction and not structure_shift_confirmed and abs(rate_diff_z) < 1.2: veto_trade()"
         }
       ]
     },
@@ -331,7 +355,7 @@
       "component_label": "regime_confirmation.sizing_multiplier",
       "first_seen": "2026-06-15",
       "last_seen": "2026-07-06",
-      "days_forming": 24,
+      "days_forming": 25,
       "n_revisions": 3,
       "n_days_appeared": 3,
       "stable_days": 1,
@@ -439,7 +463,7 @@
     }
   ],
   "velocity": {
-    "n_themes_tracked": 6,
+    "n_themes_tracked": 5,
     "n_themes_forming": 2,
     "n_themes_converged": 0,
     "n_codified": 9,
@@ -448,7 +472,7 @@
     "median_days_to_codify": 0,
     "mean_days_to_codify": 0.4,
     "codified_per_week": 7.0,
-    "themes_formed_per_week": 1.75
+    "themes_formed_per_week": 1.46
   },
   "config": {
     "converge_n_days": 3,

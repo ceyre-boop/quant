@@ -8,28 +8,28 @@
   },
   "week": {
     "start_date": "2026-07-04",
-    "weekly_used": 22000,
-    "weekly_remaining": 178000,
+    "weekly_used": 25000,
+    "weekly_remaining": 175000,
     "last_synced": null,
-    "note": "Weekly RESET Saturday 2026-07-04. REST-033 ~5.5k + REST-034 ~9k + REST-035 ~4.5k + REST-036 ~3k (read-only integrity+health) = ~22k running est of 200k. STILL awaiting manual sync. Weekly buffer huge (~178k)."
+    "note": "Weekly RESET Saturday 2026-07-04 (next reset Sat 2026-07-11). Running est ~25k of 200k after REST-037 (~3k, read-only). Huge weekly buffer (~175k). STILL awaiting manual sync."
   },
   "today": {
-    "date": "2026-07-08",
+    "date": "2026-07-10",
     "human_used": 0,
-    "agent_used": 7500,
+    "agent_used": 3000,
     "daily_agent_budget": 8571,
     "agent_allowed_today": 8571,
-    "note": "REST-036 (UTC 2026-07-09 ~01:15Z, ET Wed 21:15 -> Colin offline). Read-only: no live code/config/network. Resolved RQ-REST-035 via additive ledger id_disambiguation (HYP-046/051/052, backup .bak-rest036, no status changes). Health: phantom emitter 5d dormant; live decision log 2d stale vs current research loops. 1 finding, 1 IMPORTANT Colin msg, queue annotated. ~7.5k of 8.5k daily used -> ~1k daily buffer left; stopping to preserve Colin's next-session capacity."
+    "note": "REST-037 (ET Fri 2026-07-10 ~21:20, Colin offline; weekly reset tomorrow so capacity ample). Read-only: no live code/config/network writes. Prepared+validated RQ-REST-016 cb_calendar 2023-24 back-extension (patch in Plans/, unblocks RQ-REST-015 + RQ-REST-017 pending Colin). Health: live decision log missing 07-10 session (2nd since 07-06) but equity/harvester/retrain/oracle_pulse live @18:33Z; phantom emitter latent. ~3k of 8.5k daily used -> ~5.5k buffer left; stopping to preserve Colin's next session."
   },
   "session": {
-    "started": "2026-07-09T01:15:00+00:00",
-    "ended": "2026-07-09T01:15:00+00:00",
+    "started": "2026-07-11T01:15:00+00:00",
+    "ended": "2026-07-11T01:22:00+00:00",
     "mode": "REST_MODE",
     "tasks_completed": [
-      "RQ-REST-035 integrity: added non-destructive id_disambiguation fields to ledger HYP-046, HYP-051, HYP-052; backup + JSON round-trip validated; no verdict/status changed",
-      "Health validation: confirmed phantom USD_CAD units=1 emitter dormant 5d (last tid 217 2026-07-03); 8 phantom fills still unquarantined",
-      "Health validation: research loops current (panel 2026-07-08, harvester/retrain PIDs live, political-alpha commits today) but live decision log stale since 2026-07-06 -> flagged 2d execute_daily gap to Colin",
-      "Wrote FIND-REST-036-a, 1 IMPORTANT Colin message, annotated RQ-REST-035 -> DIAGNOSED, updated usage"
+      "RQ-REST-016 PREP: validated FED+BOE 2023-2024 decision dates vs live cb_calendar.py (2025 overlap exact, HYP-061 window covered); wrote ready-to-apply patch + param_change_log rationale to Plans/RQ-REST-016_cb_calendar_backextension_proposal.md (no code touched)",
+      "Health validation: live decision log stale at 07-09 (no 07-10 09:35 ET session) but equity_curve/harvester(74467)/retrain(74468)/oracle_pulse all live @2026-07-10T18:33Z; flagged execute_daily gap to Colin",
+      "Health validation: phantom USD_CAD units=1 emitter LATENT (8 fills, no 9th since tid pre-07-03)",
+      "Wrote FIND-REST-037-a/b, 1 IMPORTANT Colin message, annotated RQ-REST-016, updated usage"
     ]
   },
   "mode": "REST_MODE",

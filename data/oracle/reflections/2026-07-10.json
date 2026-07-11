@@ -1,0 +1,26 @@
+{
+  "date": "2026-07-10",
+  "generated_at": "2026-07-10T09:33:41.199476+00:00",
+  "input_tokens": 6438,
+  "output_tokens": 856,
+  "estimated_cost_usd": 0.16077,
+  "harvest_days_read": 7,
+  "reflection": {
+    "candidate_lesson": {
+      "lesson_text": "A rate-divergence SHORT that fires while HTF market structure is BULLISH and no CHOCH/BOS confirms the trade direction is a counter-structure macro bet that loses even with a valid FVG and liquidity sweep.",
+      "mechanism": "Institutional order flow does not reverse on a single BSL sweep \u2014 when HTF structure is still bullish, the sweep is a stop-run inside continuation, not a distribution top. A macro rate-diff z of only -0.97 (sub-1.0 magnitude) lacks the conviction to overpower an intact bullish delivery, so the short is entered into the very liquidity institutions are using to continue upward. Structure must confirm (BOS/CHOCH in trade direction) before macro direction can be trusted.",
+      "testable_rule": "if signal_direction != htf_structure_direction and not structure_shift_confirmed and abs(rate_diff_z) < 1.2: veto_trade()",
+      "expected_impact": "Removes counter-structure low-conviction macro entries; targets win-rate lift and drawdown reduction, supporting +0.02-0.03 Sharpe toward the v014 gap by cutting -1.0R losers.",
+      "evidence_from_harvest": "The single closed trade (USDJPY SHORT, R=-1.002) is the only sample: it combined a bullish-vs-macro-short structure conflict AND no CHOCH/BOS, and lost a full R.",
+      "evidence_from_reasoning": "The one decision log entry shows rate_diff_z=-0.968 (|z|<1.2), '\u2717 HTF bias: market structure BULLISH vs macro SHORT', and '\u2717 No structure shift (CHOCH/BOS) in trade direction' \u2014 three failing layers coincided with the -1.002R outcome; the two passing layers (FVG, BSL sweep) were insufficient.",
+      "reasoning_component_targeted": "rate_differential_zscore (gated jointly with HTF-structure agreement and structure_shift flag)",
+      "sample_needed": 20
+    },
+    "retirement_flag": {
+      "lesson_to_review": null,
+      "reason": null
+    },
+    "system_health_note": "System is effectively flat (0 trades in 7 days, regime UNKNOWN, forex NO_TRADE_TODAY) with only 1 closed trade to learn from \u2014 insufficient sample for any high-confidence lesson, so gate proposals should await 20+ trades before implementation."
+  },
+  "auto_validation": null
+}
