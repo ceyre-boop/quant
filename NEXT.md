@@ -6,6 +6,52 @@ Standing constraints live in `CLAUDE.md` — not restated here.
 
 ---
 
+## 2026-07-12 (later) · YIELD FRONTIER M-PHASE (TICK-030): 809 CONFIGS MINED ACROSS 3 UNIVERSES — THE FRONTIER IS GAPPER TAILS, AND IT'S CAPACITY-BOUND
+
+**Context:** Colin asked to "look at EVERYTHING... find a method... 2%+ daily... try it with
+look back, then test the right way." Plan approved (Plans/immutable-wondering-alpaca.md,
+force-added): MINING pass (dirty, stamped, counted) → G-phase gauntlet on untouched holdouts.
+Universes he picked: equities gappers, NQ intraday, SPY options. Crypto declined.
+
+**Shipped (2e9a7a9 → this):** `research/yield_frontier/` — holdout fences AT THE LOADER
+(equities holdout year physically absent from disk; NQ rows >2024-06-30 truncated; chains
+>2023-09-30 filtered), append-only `mined_n.json` (809 — feeds gauntlet DSR n_trials),
+coarse frictions (HTB tiers/locate haircuts/halt gap-through stops/NQ ticks/options
+k×half-spread), 16 families, 11 gate tests + look-ahead canary green, main-suite isolation
+law green. Board: `data/research/yield_frontier/yield_board.{csv,md}` (508 ranked rows),
+opens with the 2%/day arithmetic statement.
+
+**THE FRONTIER (all MINING, not evidence):**
+- **Equities gapper tails own it**: F-EQ2 parabolic-fade short (≥50% by 10:30, +30% stop,
+  hold to close, M&A excluded) **+3.8%/day net, MEDIAN +5.6%/event, n=651** at 75% locate,
+  p5 −30.5%, capacity ~$0.9M; F-EQ1 overnight weak-close short +3.5%/day (n=237); the
+  +8.9%/day overnight-long cell is a tail/illiquidity illusion (lowest-vol tercile, cap $126k).
+- **NQ over 6.5 years: ceiling +0.24%/day of notional** (high-VIX prior-day-down → long
+  open-to-close, 1 neg yr of 7); ORB/day-trade families don't crack the top ten at honest costs.
+- **Options: every measurable premium cell NET-NEGATIVE** (best −0.32%/day of collateral) —
+  spreads eat the premium at mid±0.5×hs fills on real 2022-23 chains. Cache truth found:
+  VRP-era chains are ~30-DTE monthlies only; delta/iv columns never backfilled; the modern
+  spot cache is DIVIDEND-ADJUSTED (5%+ off actual — poisoned settlement until parity-spot fix).
+- **2%/day sustained: not found, and the arithmetic says it cannot be** — but a confirmed
+  capacity-bound 1-3%/day gapper edge would be the perfect prop-funnel vehicle (their capital,
+  our %). That connection is the strategic payload.
+
+**Traps hit + fixed:** Path.stem-on-.json.gz (also silently degraded sealed HYP-092's
+robustness dedup — fixed, rerun p=0.612 vs 0.634, verdict unchanged, ledger annotated);
+adjusted-spot settlement; empty chain files; OP3/OP4/OP5 unmineable on this cache (disclosed,
+still counted in mined-N).
+
+**⏳ Colin (G-phase gate):** pick ≤3 board rows for HYP-093/094/095 preregs. Recommended:
+F-EQ2 thr0.5|stop0.3|close|mna_excl · F-EQ1 g30-50|locT1|volT2|short|next_close ·
+F-NQ5 vixT2|prior_dn|long. Then G0 preregs → G1 holdout fetch → G2 verdicts (TICK-031).
+
+**Refused/held:** no VRP-001-v2 execution; no live wiring; no ledger writes from M-phase
+(annotation was the HYP-092 correction, backed up); mining stamped on every artifact.
+
+**Push:** ✅ this batch to origin/sovereign-v2.
+
+---
+
 ## 2026-07-12 · HYP-092 GAPPER-CONTINUATION READ (TICK-029): PRE-REGISTERED, RUN, ADJUDICATED — NOT_SIGNIFICANT, WELL-POWERED
 
 **Context:** Colin's equities idea from the vault decision card (Gapper-Continuation-Decision-Card.md):
