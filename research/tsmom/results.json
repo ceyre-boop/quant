@@ -1,0 +1,153 @@
+{
+  "hypothesis": "HYP-089",
+  "title": "Time-Series Momentum (TSMOM) on 4 v015 FX pairs",
+  "run_utc": "2026-07-12T17:00:39.219662+00:00",
+  "prereg": "HYP-089-TSMOM-Prereg-2026-07-12.md",
+  "config": {
+    "pairs": [
+      "EURUSD=X",
+      "GBPUSD=X",
+      "USDJPY=X",
+      "AUDUSD=X"
+    ],
+    "lookback_days": 252,
+    "vol_window": 60,
+    "target_vol": 0.1,
+    "max_leverage": 3.0,
+    "eval_start": "2015-01-01",
+    "eval_end": "2024-12-31",
+    "warmup_start": "2013-06-01",
+    "rebalance": "daily",
+    "portfolio": "equal-weighted mean of 4 pairs",
+    "round_trip_pips_net_only": 0.3
+  },
+  "data_provenance": {
+    "EURUSD=X": {
+      "degraded": false,
+      "reasons": [],
+      "rows_total": 3018,
+      "rows_eval": 2606,
+      "first": "2013-06-03",
+      "last": "2024-12-31"
+    },
+    "GBPUSD=X": {
+      "degraded": false,
+      "reasons": [],
+      "rows_total": 3018,
+      "rows_eval": 2606,
+      "first": "2013-06-03",
+      "last": "2024-12-31"
+    },
+    "USDJPY=X": {
+      "degraded": false,
+      "reasons": [],
+      "rows_total": 3018,
+      "rows_eval": 2606,
+      "first": "2013-06-03",
+      "last": "2024-12-31"
+    },
+    "AUDUSD=X": {
+      "degraded": false,
+      "reasons": [],
+      "rows_total": 3018,
+      "rows_eval": 2606,
+      "first": "2013-06-03",
+      "last": "2024-12-31"
+    }
+  },
+  "any_degraded": false,
+  "performance": {
+    "sharpe_gross": 0.2773,
+    "sharpe_net": 0.2724,
+    "sortino_gross": 0.4213,
+    "n_days": 2606,
+    "ann_return_gross": 0.0184,
+    "ann_vol_gross": 0.0664
+  },
+  "equity_curve": {
+    "start": 1.0,
+    "peak": 1.2766,
+    "trough": 0.9244,
+    "end_2024": 1.1825,
+    "max_drawdown": -0.152
+  },
+  "subperiods": {
+    "2015": {
+      "sharpe": 0.9144,
+      "positive": true,
+      "n_days": 261
+    },
+    "2016": {
+      "sharpe": -1.2369,
+      "positive": false,
+      "n_days": 261
+    },
+    "2017": {
+      "sharpe": 0.2872,
+      "positive": true,
+      "n_days": 258
+    },
+    "2018": {
+      "sharpe": -1.0086,
+      "positive": false,
+      "n_days": 261
+    },
+    "2019": {
+      "sharpe": 0.5098,
+      "positive": true,
+      "n_days": 260
+    },
+    "2020": {
+      "sharpe": 1.2715,
+      "positive": true,
+      "n_days": 262
+    },
+    "2021": {
+      "sharpe": -0.2883,
+      "positive": false,
+      "n_days": 261
+    },
+    "2022": {
+      "sharpe": 1.4993,
+      "positive": true,
+      "n_days": 260
+    },
+    "2023": {
+      "sharpe": -0.0399,
+      "positive": false,
+      "n_days": 260
+    },
+    "2024": {
+      "sharpe": 0.0005,
+      "positive": true,
+      "n_days": 262
+    }
+  },
+  "n_positive_years": 6,
+  "carry_correlation": {
+    "method": "FRED policy-rate differential sign (long higher-yielder)",
+    "fred_available": true,
+    "pearson_r": -0.1556,
+    "p_value": "1.34e-15",
+    "per_pair_signal_corr": {
+      "EURUSD=X": null,
+      "GBPUSD=X": -0.4071,
+      "USDJPY=X": null,
+      "AUDUSD=X": 0.254
+    }
+  },
+  "hutchinson_check": {
+    "note": "Backtest window is 2015-2024 \u2014 entirely POST-2012 and post-publication. A true pre-2012 vs post-2012 split is not possible with this data. Early(2015-19) vs late(2020-24) in-sample Sharpes are shown as a directional decay proxy only.",
+    "sharpe_2015_2019": -0.0789,
+    "sharpe_2020_2024": 0.605
+  },
+  "verdict": {
+    "verdict": "NOT_SIGNIFICANT",
+    "gate_sharpe_gt_0.3": false,
+    "gate_corr_lt_0.7": true,
+    "gate_6of10_positive": true,
+    "failed_gates": [
+      "Sharpe gate: gross Sharpe 0.2773 <= 0.3"
+    ]
+  }
+}
