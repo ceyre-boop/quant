@@ -6,6 +6,44 @@ Standing constraints live in `CLAUDE.md` — not restated here.
 
 ---
 
+## 2026-07-12 · HYP-092 GAPPER-CONTINUATION READ (TICK-029): PRE-REGISTERED, RUN, ADJUDICATED — NOT_SIGNIFICANT, WELL-POWERED
+
+**Context:** Colin's equities idea from the vault decision card (Gapper-Continuation-Decision-Card.md):
+filter stocks already +30% by 10:30 ET (≥$2, ≥500K vol), read CONTINUING vs EXHAUSTED, "no look
+ahead... very simple very rugged... focus on %." Built + ran the full year in one session as the
+shop's first equities intraday study.
+
+**Shipped (98ddd67 prereg → pipeline → seal):** `research/gapper_continuation/` — prereg
+hash-locked 3e07c6a4 + ledger PREREGISTERED BEFORE any outcome data; Polygon grouped-daily
+discovery (survivorship-free incl. delisted, buffered +20% superset per advisor review); ALL
+analysis inputs from Alpaca SIP `adjustment=split` (probe-verified: delisted names serve bars —
+MSW/TBH/LIXT; AAPL 4:1 split ratio exact); card checklist frozen into deterministic CONT/EX/UNC
+votes (VWAP, higher-lows, up/down volume, range position, lower-highs, climax-fade, rejection
+wick); read inputs strictly bars ≤10:25 ET, outcome = 10:30-bar OPEN → last RTH close (no shared
+bar). 251 trading days, 11,396 candidates → 1,475 qualifying; coverage 11,395/11,396. 9/9 module
+tests; deterministic rerun byte-identical; ICT isolation law green.
+
+**VERDICT (sealed): NOT_SIGNIFICANT** — MWU one-tailed CONT>EX p=0.594 (n=558/391, unique
+tickers 439/326), run-deduped robustness p=0.634. CONT median **−2.34%** vs EX **−1.81%** —
+the mechanized read carries no information about the close. The real map: the filter's base
+rate is a fade (ALL median −2.21%, 48% reverse >3%, 31% continue >3%); CONT mean +1.15% is
+pure tail skew the read does not time (post-hoc note, not evidence); the 344 halt-excluded
+names (unreadable at 10:30 by prereg rule) had descriptive median **+16.5%** — the violent
+continuations were the unreadable ones. Full report: `data/research/gapper/report.md`.
+
+**What survives:** the card's LIVE logging study still tests what the mechanization can't —
+Colin's discretionary residual (catalyst, float, level, tape). If live reads separate where
+the checklist didn't, the edge is the eyes, not the structure. Tail-capture mechanics
+(stops + skew-riding) = NEW hypothesis, new prereg, if pursued.
+
+**Refused/held:** no test switch after seeing tail-driven means (MWU was registered, MWU
+decided); no threshold tweaks post-data (hash verified pre/post seal); no live wiring; no
+short-side EV claims (borrow costs unmodeled); execution path untouched.
+
+**Push:** ✅ this batch to origin/sovereign-v2.
+
+---
+
 ## 2026-07-12 · TICK-026 — CLOSED / STALE (import was never broken)
 
 **Verdict:** stale premise, no code change. The ticket claimed `data.forex_factory_scraper`

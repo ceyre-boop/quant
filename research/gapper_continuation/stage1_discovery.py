@@ -69,11 +69,13 @@ def fetch_day(day: date, key: str) -> dict:
     raise RuntimeError(f"gave up on {day}")
 
 
-def run_fetch() -> None:
+def run_fetch(max_dates: int | None = None) -> None:
     key = load_env_key("POLYGON_API_KEY")
     CACHE.mkdir(parents=True, exist_ok=True)
     days = list(weekdays(WINDOW_START, WINDOW_END))
     todo = [d for d in days if not (CACHE / f"{d.isoformat()}.json.gz").exists()]
+    if max_dates is not None:
+        todo = todo[:max_dates]  # chunked runs: session law, no >10-min gambles
     print(f"[stage1] {len(days)} weekdays in window, {len(todo)} to fetch", flush=True)
     for i, d in enumerate(todo):
         payload = fetch_day(d, key)
@@ -133,5 +135,14 @@ def run_scan() -> None:
 
 if __name__ == "__main__":
     if "--scan-only" not in sys.argv:
-        run_fetch()
+        n = None
+        if "--max-dates" in sys.argv:
+            n = int(sys.argv[sys.argv.index("--max-dates") + 1])
+        run_fetch(n)
+        if n is not None:
+            remaining = sum(1 for d in weekdays(WINDOW_START, WINDOW_END)
+                            if not (CACHE / f"{d.isoformat()}.json.gz").exists())
+            if remaining:
+                print(f"[stage1] chunk done, {remaining} dates remain", flush=True)
+                sys.exit(0)
     run_scan()

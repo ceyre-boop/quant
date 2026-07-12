@@ -328,5 +328,5 @@ Schema per ticket:
 - [ ] All read/filter inputs from bars start<=10:25 ET; outcome origin = 10:30 bar open (no shared bar); guards counted (sparse/halt, IPO, split-mismatch)
 - [ ] MWU primary + run-deduped robustness reported; UNC + sparse outcome distributions disclosed; verdict sealed to ledger with hash verified pre/post
 - [ ] Deterministic reruns; no sovereign/ict imports; nothing written outside data/research/gapper/ + prereg; execution path untouched
-**status:** in_progress (2026-07-12)
+**status:** done (2026-07-12 — ADJUDICATED **NOT_SIGNIFICANT** well-powered: MWU CONT>EX p=0.594 (n=558/391), robustness p=0.634; CONT median -2.34% vs EX -1.81%; filter base rate -2.21% median / 48% reverse >3%; halt-excluded set median +16.5% descriptive. Report: data/research/gapper/report.md)
 **pre_approved:** true (direct operator build request in-session 2026-07-12)

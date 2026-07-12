@@ -1957,12 +1957,16 @@
   {
     "id": "HYP-092",
     "name": "Gapper continuation/exhaustion read separates post-read returns (decision-card mechanization)",
-    "status": "PREREGISTERED",
+    "status": "ADJUDICATED",
     "date_registered": "2026-07-12",
     "prereg_file": "data/research/preregister/HYP-092_gapper_continuation.json",
     "prereg_sha256": "3e07c6a48e8aa81c1aa1598ff4b85d47c755b2a976ee49b612b1a4ae83fb51f4",
     "ticket": "TICK-029",
     "registered_prior": "UNKNOWN \u2014 first equities intraday test in the shop; no directional prior registered",
-    "methodology_note": "One-year no-look-ahead replay of the vault Gapper-Continuation card; MWU one-tailed CONT>EX alpha=.05 n>=30/bucket; run-deduped robustness; outcomes raw % (cost-free)."
+    "methodology_note": "One-year no-look-ahead replay of the vault Gapper-Continuation card; MWU one-tailed CONT>EX alpha=.05 n>=30/bucket; run-deduped robustness; outcomes raw % (cost-free).",
+    "verdict": "NOT_SIGNIFICANT",
+    "date_tested": "2026-07-12",
+    "p_value": 0.594141,
+    "result": "Well-powered null: mechanized card checklist does not separate post-read returns. Primary MWU p=0.594 (n=558 CONT / 391 EX; unique tickers 439/326); run-deduped robustness p=0.634. CONT median -2.34% vs EX -1.81%; ALL-candidate base rate median -2.21%, 48% reverse >3%. CONT mean +1.15% is tail-skew, not read information (post-hoc, not evidence). Halt-excluded set (n=331, conservative) median +16.5% descriptive. Report: data/research/gapper/report.md"
   }
 ]
