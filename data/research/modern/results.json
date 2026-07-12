@@ -1,0 +1,286 @@
+{
+  "adjudication": {
+    "a0_per_year": {
+      "2017": 1.932,
+      "2018": 0.307,
+      "2019": 0.441,
+      "2020": 0.66,
+      "2021": 0.718,
+      "2022": 1.291,
+      "2023": 2.362,
+      "2024": 1.27,
+      "2025": 0.397
+    },
+    "a0_sharpe": 0.9478,
+    "best_run": "A2_W365",
+    "primary_p_min": 0.9774022597740226,
+    "reconcile_in_band": true,
+    "verdict": "NOT_SIGNIFICANT"
+  },
+  "env": {
+    "numpy": "2.4.4",
+    "platform": "macOS-26.3.1-arm64-arm-64bit-Mach-O",
+    "python": "3.14.4"
+  },
+  "hyp": "HYP-090",
+  "n_boot": 10000,
+  "n_placebo": 500,
+  "placebo_sharpe_mean": {
+    "180": 0.5741061321106185,
+    "365": 0.5746102375948713,
+    "90": 0.5928304526722431
+  },
+  "placebo_sharpe_p95": {
+    "180": 0.9130432599490041,
+    "365": 0.9114877748241413,
+    "90": 0.9250845965757942
+  },
+  "prereg_hash": "6dd9cc8565cf59c81a832b1b4b7aca43f2a3580e94a241f32592273be730a2dd",
+  "reconcile": {
+    "generated_at": "2026-07-12T00:47:12.488360+00:00",
+    "in_band": true,
+    "per_pair": [
+      {
+        "pair": "EURUSD=X",
+        "sharpe": 0.611,
+        "trades": 102
+      },
+      {
+        "pair": "GBPUSD=X",
+        "sharpe": 0.869,
+        "trades": 105
+      },
+      {
+        "pair": "USDJPY=X",
+        "sharpe": 0.728,
+        "trades": 96
+      },
+      {
+        "pair": "AUDUSD=X",
+        "sharpe": 0.549,
+        "trades": 108
+      }
+    ],
+    "target": 0.6886,
+    "tol": 0.01,
+    "weighted_portfolio_sharpe": 0.6886,
+    "window": "2015-01-01..2024-12-31"
+  },
+  "rows": [
+    {
+      "a0_sharpe": 0.9478,
+      "all_pass": false,
+      "arm": "A1",
+      "c1": false,
+      "c1_bh_survives": false,
+      "c1_p_lt_05": false,
+      "c2_beats_placebo": false,
+      "c3_dsr_positive": true,
+      "c4_per_year_nondegrade": false,
+      "c5_costed_beats_a0": false,
+      "dsr": 1.5561,
+      "dsr_secondary": {
+        "17325": 1.4743,
+        "6": 2.3078
+      },
+      "n_switches": 584,
+      "p_vs_a0": 0.9987001299870013,
+      "per_year": {
+        "2017": 1.596,
+        "2018": -1.121,
+        "2019": 0.025,
+        "2020": 0.319,
+        "2021": 0.643,
+        "2022": -0.009,
+        "2023": 1.134,
+        "2024": 1.13,
+        "2025": -1.048
+      },
+      "placebo_p95": 0.9251,
+      "run": "A1_W90",
+      "sharpe": 0.1672,
+      "sharpe_costed": 0.0509,
+      "window": 90
+    },
+    {
+      "a0_sharpe": 0.9478,
+      "all_pass": false,
+      "arm": "A1",
+      "c1": false,
+      "c1_bh_survives": false,
+      "c1_p_lt_05": false,
+      "c2_beats_placebo": false,
+      "c3_dsr_positive": true,
+      "c4_per_year_nondegrade": false,
+      "c5_costed_beats_a0": false,
+      "dsr": 2.9496,
+      "dsr_secondary": {
+        "17325": 2.8678,
+        "6": 3.7014
+      },
+      "n_switches": 535,
+      "p_vs_a0": 0.9968003199680032,
+      "per_year": {
+        "2017": 2.09,
+        "2018": -0.377,
+        "2019": 0.01,
+        "2020": 0.067,
+        "2021": 0.937,
+        "2022": 0.415,
+        "2023": 1.644,
+        "2024": 0.463,
+        "2025": -0.78
+      },
+      "placebo_p95": 0.913,
+      "run": "A1_W180",
+      "sharpe": 0.255,
+      "sharpe_costed": 0.17,
+      "window": 180
+    },
+    {
+      "a0_sharpe": 0.9478,
+      "all_pass": false,
+      "arm": "A1",
+      "c1": false,
+      "c1_bh_survives": false,
+      "c1_p_lt_05": false,
+      "c2_beats_placebo": false,
+      "c3_dsr_positive": true,
+      "c4_per_year_nondegrade": false,
+      "c5_costed_beats_a0": false,
+      "dsr": 3.3349,
+      "dsr_secondary": {
+        "17325": 3.2531,
+        "6": 4.0866
+      },
+      "n_switches": 349,
+      "p_vs_a0": 0.9937006299370063,
+      "per_year": {
+        "2017": 0.916,
+        "2018": 0.234,
+        "2019": 0.975,
+        "2020": 0.374,
+        "2021": -0.716,
+        "2022": 0.734,
+        "2023": 0.594,
+        "2024": 0.463,
+        "2025": -0.122
+      },
+      "placebo_p95": 0.9115,
+      "run": "A1_W365",
+      "sharpe": 0.2792,
+      "sharpe_costed": 0.2158,
+      "window": 365
+    },
+    {
+      "a0_sharpe": 0.9478,
+      "all_pass": false,
+      "arm": "A2",
+      "c1": false,
+      "c1_bh_survives": false,
+      "c1_p_lt_05": false,
+      "c2_beats_placebo": false,
+      "c3_dsr_positive": true,
+      "c4_per_year_nondegrade": false,
+      "c5_costed_beats_a0": false,
+      "dsr": 2.5687,
+      "dsr_secondary": {
+        "17325": 2.4869,
+        "6": 3.3205
+      },
+      "n_switches": 588,
+      "p_vs_a0": 0.9982001799820018,
+      "per_year": {
+        "2017": 1.822,
+        "2018": 0.124,
+        "2019": 1.279,
+        "2020": 0.045,
+        "2021": 0.871,
+        "2022": -0.194,
+        "2023": 0.347,
+        "2024": -0.145,
+        "2025": 0.36
+      },
+      "placebo_p95": 0.9251,
+      "run": "A2_W90",
+      "sharpe": 0.231,
+      "sharpe_costed": 0.1925,
+      "window": 90
+    },
+    {
+      "a0_sharpe": 0.9478,
+      "all_pass": false,
+      "arm": "A2",
+      "c1": false,
+      "c1_bh_survives": false,
+      "c1_p_lt_05": false,
+      "c2_beats_placebo": false,
+      "c3_dsr_positive": true,
+      "c4_per_year_nondegrade": false,
+      "c5_costed_beats_a0": false,
+      "dsr": 4.9516,
+      "dsr_secondary": {
+        "17325": 4.8698,
+        "6": 5.7034
+      },
+      "n_switches": 417,
+      "p_vs_a0": 0.9854014598540146,
+      "per_year": {
+        "2017": 1.813,
+        "2018": 0.302,
+        "2019": 0.75,
+        "2020": -1.029,
+        "2021": 1.344,
+        "2022": 0.577,
+        "2023": 1.639,
+        "2024": 0.241,
+        "2025": -0.221
+      },
+      "placebo_p95": 0.913,
+      "run": "A2_W180",
+      "sharpe": 0.3811,
+      "sharpe_costed": 0.3576,
+      "window": 180
+    },
+    {
+      "a0_sharpe": 0.9478,
+      "all_pass": false,
+      "arm": "A2",
+      "c1": false,
+      "c1_bh_survives": false,
+      "c1_p_lt_05": false,
+      "c2_beats_placebo": false,
+      "c3_dsr_positive": true,
+      "c4_per_year_nondegrade": false,
+      "c5_costed_beats_a0": false,
+      "dsr": 5.7967,
+      "dsr_secondary": {
+        "17325": 5.7149,
+        "6": 6.5484
+      },
+      "n_switches": 248,
+      "p_vs_a0": 0.9774022597740226,
+      "per_year": {
+        "2017": 0.939,
+        "2018": 0.007,
+        "2019": 0.891,
+        "2020": 0.188,
+        "2021": -0.167,
+        "2022": 1.207,
+        "2023": 1.006,
+        "2024": 0.055,
+        "2025": -0.041
+      },
+      "placebo_p95": 0.9115,
+      "run": "A2_W365",
+      "sharpe": 0.4343,
+      "sharpe_costed": 0.4193,
+      "window": 365
+    }
+  ],
+  "runtime_seconds": 61.8,
+  "seed": 42,
+  "smoke": false,
+  "ticket": "TICK-023",
+  "verdict": "NOT_SIGNIFICANT"
+}

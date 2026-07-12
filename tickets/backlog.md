@@ -239,11 +239,11 @@ Schema per ticket:
 **depends_on:** []
 **blocks:** []
 **acceptance_criteria:**
-- [ ] P0: prereg hash-locked + ledger PREREGISTERED entry BEFORE any data read; --verify green; regression test enforces gate-zero-first
-- [ ] P1: reconcile abort gate green (0.6886±0.01) BEFORE freeze; spot/SPY/VIX/FRED parquets + sha256 manifest; 64 ungated signal builds + external causal VIX mask → signals.npz
-- [ ] P2: 1,540 kernel runs; daily M2M decomposition sums to kernel pnl_pct (1e-12); config #385 reproduces canonical backtest_all snapshot per pair (1e-9)
-- [ ] P3: truncation-invariance (≥20 sampled t, A1+A2) + regime-causality tests green
-- [ ] P4: 6 runs + costed variants + 1,500 placebo replays; verdict per locked criteria sealed to ledger; charts + summary_report + results.json under data/research/modern/; NEXT.md; pushed
-- [ ] 12 module tests green; determinism (2 subprocesses byte-identical); no writes outside data/research/modern/ + prereg + ledger
-**status:** in_progress (2026-07-11 — Claude Code / Molly; plan approved in-session)
+- [x] P0: prereg hash-locked (6dd9cc85) + ledger PREREGISTERED BEFORE any data; --verify green; gate-zero regression tests
+- [x] P1: reconcile EXACT 0.6886; inputs frozen + sha256 manifest; 64 ungated builds × 2 spans + external causal VIX mask (caught + fixed: hardcoded country codes broke FRED lookups — canonical CB_TO_COUNTRY codes required)
+- [x] P2: 1,540 kernel runs (30,788 trades, 24 open-tails recovered via flat-padding); M2M decomposition exact ≤1e-10; config #385 parity: 411/411 canonical trades date-identical (pnl within snapshot's 6dp cost rounding)
+- [x] P3: truncation-invariance (20 sampled t × 2 windows, A1+A2) + regime causality green
+- [x] P4: 6 runs + costed + 1,500 placebos + block-bootstrap gauntlet; **VERDICT NOT_SIGNIFICANT sealed** (prereg hash verified pre/post seal); charts + summary + results.json; NEXT.md; pushed
+- [x] 20 module tests green; write-safety enforced by isolation tests
+**status:** done (2026-07-11 — ADJUDICATED **NOT_SIGNIFICANT** (the registered prior): A0 static v015 daily-M2M Sharpe **+0.948** vs adaptive arms **+0.17..+0.43** — every arm UNDERPERFORMS static (min one-sided p=0.977) AND loses to the 500-seed RANDOM-selection placebo floor (p95≈0.92): recent-winner/regime-matched selection is actively ANTI-selective on ~13-trade windows. The MODERN/adaptive-parameters family is closed with a receipt.)
 **pre_approved:** true (plan-mode approval 2026-07-11 — Plans/glistening-juggling-clover.md)

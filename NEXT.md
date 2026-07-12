@@ -6,6 +6,49 @@ Standing constraints live in `CLAUDE.md` — not restated here.
 
 ---
 
+## 2026-07-11 · HYP-090 "MODERN" (TICK-023): PRE-REGISTERED, RUN, ADJUDICATED — NOT_SIGNIFICANT SEALED
+
+**Context:** Colin's recurring adaptive-parameters idea (3rd arrival, dispatch named it "MODERN":
+daily trailing-window param sweeps + regime map). Pieces were killed before (HYP-065/066/067,
+exit sweep, regime router) but the FULL daily-adaptive protocol had never run end-to-end — so it
+kept coming back. Route A (Colin's pick, full surface incl. pair selection): test the maximal
+version once under the real gauntlet and seal the family. Plan approved in-session
+(plans/TICK-023.md). **Registered prior: NOT_ROBUST.**
+
+**Shipped (one [RESEARCH] commit per phase, 0b0e73d→…):** `research/modern/` — prereg
+hash-locked 6dd9cc85 + ledger PREREGISTERED **BEFORE any data** (gate-zero first-call, tested);
+reconcile abort gate hit **0.6886 EXACT**; all inputs frozen (sha256 manifest); 64 ungated signal
+builds ×2 spans + external causal VIX mask; 1,540 kernel runs (385 configs incl. #385=v015-exact
+× 4 pairs; 30,788 trades; open tails recovered via flat-padding); exact daily M2M decomposition
+(causal costs: spread@entry, swap daily); **config-385 parity: 411/411 canonical trades
+date-identical** — the independent signal path provably equals backtest_all; A1 recent-winner /
+A2 regime-kNN / A3 placebo engines with truncation-invariance PROVEN (20 sampled t × 2 windows);
+block-bootstrap (L=5) + BH m=6 + DSR@5,775 + placebo envelope + per-year gauntlet. 20 tests green.
+Full run 62s, seed 42, deterministic.
+
+**VERDICT: NOT_SIGNIFICANT (the registered prior), and more decisive than predicted:**
+- A0 static v015 daily-M2M Sharpe on 2016-07→2026-06: **+0.948**.
+- ALL SIX adaptive runs: **+0.167 … +0.434** — every arm UNDERPERFORMS static (min one-sided
+  p = 0.977; the direction is the reverse of H1).
+- The killer detail: adaptive selection also loses to the **500-seed RANDOM-selection placebo**
+  (p95 ≈ 0.92, i.e., even random daily config-hopping beats recent-winner chasing) —
+  **the selection mechanism is actively ANTI-selective at ~13 trades per 90d window.** The map
+  doesn't learn regimes; it buys noise peaks right before they mean-revert.
+- Per-year non-degrade failed everywhere; regime-kNN (A2) was consistently better than pure
+  recent-winner (A1) but still far below static — matching HYP-066/067's regime conclusions.
+- Verdict sealed to hypothesis_ledger (backup kept), prereg hash verified pre/post seal.
+
+**Standing instruction earned by receipt: the adaptive-parameters family on daily forex is
+CLOSED.** Any future "adapt the parameters daily / regime map" idea at daily resolution
+re-litigates HYP-090 and needs NEW DATA (intraday = Route B, a separate funded decision), not
+new cleverness. v015's static config has now survived: 180-config sweep, GA search (10,100),
+regime keying ×3, and full daily-adaptive selection over 5,775 variants.
+
+**Refused/held:** no live wiring, no parameters.yml writes (monthly_reopt anti-pattern named in
+the isolation tests), no band re-tuning, ledger sealed only through the locked criteria.
+
+---
+
 ## 2026-07-10 · PROP-FUNNEL EV SIMULATOR (TICK-022): BUILT, PARITY-EXACT, RUN — THE "$10k/MONTH" QUESTION ANSWERED WITH NUMBERS
 
 **Context:** Colin asked for "a strategy that passes a sim prop test 100 times and makes $10k/month

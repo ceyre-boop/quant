@@ -1938,13 +1938,20 @@
     "mechanism": "if parameter-level regime structure exists, recently-best / regime-matched parameters should outperform the static incumbent out-of-sample; prior kills (HYP-065/066/067, exit sweep, regime router) say it does not at daily resolution",
     "methodology_note": "self-contained walk-forward replay in research/modern/ per plans/TICK-023.md; precompute-then-replay over 5,775 variants; placebo selection floor + DSR at search size; TICK-023",
     "prior_expectation": "NOT_ROBUST",
-    "result": null,
-    "p_value": null,
-    "bh_survives": null,
+    "result": "NOT_SIGNIFICANT",
+    "p_value": 0.9774022597740226,
+    "bh_survives": false,
     "oos_sharpe": null,
     "is_sharpe": null,
     "standalone": true,
     "auto_generated": false,
-    "source": "manual"
+    "source": "manual",
+    "verdict": "NOT_SIGNIFICANT",
+    "annotations": [
+      {
+        "date": "20260712",
+        "note": "HYP-090 adjudicated NOT_SIGNIFICANT: best run A2_W365 Sharpe 0.4343 vs A0 0.9478; min p=0.9774; criteria per locked prereg 6dd9cc85"
+      }
+    ]
   }
 ]

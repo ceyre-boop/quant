@@ -51,16 +51,40 @@ def env_record() -> dict:
 
 def write_json(path: Path, obj: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(obj, indent=2, sort_keys=True, default=str))
+    path.write_text(json.dumps(canonical_all_types(obj), indent=2, sort_keys=True, default=str))
+
+
+def canonical_all_types(obj: Any) -> Any:
+    """numpy-safe deep conversion WITHOUT dropping volatile keys (for raw writes)."""
+    if isinstance(obj, dict):
+        return {str(k): canonical_all_types(v) for k, v in obj.items()}
+    if isinstance(obj, (list, tuple)):
+        return [canonical_all_types(v) for v in obj]
+    if isinstance(obj, (bool, np.bool_)):
+        return bool(obj)
+    if isinstance(obj, (int, np.integer)):
+        return int(obj)
+    if isinstance(obj, (float, np.floating)):
+        return float(obj)
+    if isinstance(obj, np.ndarray):
+        return [canonical_all_types(v) for v in obj.tolist()]
+    return obj
 
 
 def canonical(obj: Any) -> Any:
     if isinstance(obj, dict):
-        return {k: canonical(v) for k, v in sorted(obj.items()) if k not in VOLATILE_KEYS}
-    if isinstance(obj, list):
+        return {str(k): canonical(v) for k, v in sorted(obj.items(), key=lambda kv: str(kv[0]))
+                if k not in VOLATILE_KEYS}
+    if isinstance(obj, (list, tuple)):
         return [canonical(v) for v in obj]
-    if isinstance(obj, float):
-        return round(obj, 12)
+    if isinstance(obj, (bool, np.bool_)):
+        return bool(obj)
+    if isinstance(obj, (int, np.integer)):
+        return int(obj)
+    if isinstance(obj, (float, np.floating)):
+        return round(float(obj), 12)
+    if isinstance(obj, np.ndarray):
+        return [canonical(v) for v in obj.tolist()]
     return obj
 
 
