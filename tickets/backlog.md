@@ -330,3 +330,28 @@ Schema per ticket:
 - [ ] Deterministic reruns; no sovereign/ict imports; nothing written outside data/research/gapper/ + prereg; execution path untouched
 **status:** done (2026-07-12 — ADJUDICATED **NOT_SIGNIFICANT** well-powered: MWU CONT>EX p=0.594 (n=558/391), robustness p=0.634; CONT median -2.34% vs EX -1.81%; filter base rate -2.21% median / 48% reverse >3%; halt-excluded set median +16.5% descriptive. Report: data/research/gapper/report.md)
 **pre_approved:** true (direct operator build request in-session 2026-07-12)
+
+## TICK-030
+**title:** Yield Frontier M-phase — research/yield_frontier/ mining pass (equities gappers + NQ intraday + SPY options) → ranked yield board
+**description:** Approved plan Plans/immutable-wondering-alpaca.md. MINING pass (look-back allowed, every output stamped MINING — not evidence): ~800-850 configs across 16 families — M1 equities (overnight continuation 108, parabolic-fade stop-grid 96, halt-runner re-entry 36, no-news recipe 16, catalyst-conditioned 16), M2 NQ 2018-01→2024-06 (ORB 162, first-hour 36, overnight-gap 60, time-of-day 60, VIX-regime 18, Globex 12), M3 SPY options 2022-01→2023-09 (put spreads 81, condors 54, strangles 12, VIX overlay 30, lottery 8). Holdouts fenced at loaders (equities 2024-07→2025-06 NOT on disk; NQ 2024-07→2026-06; options 2023-10→2024-06); append-only mined_n.json feeds gauntlet DSR n_trials; coarse frictions (HTB tiers, locate haircut, halt gap-through stops, NQ ticks+commission, options k×half-spread) with pessimistic headline; yield board ranks net %/day at stated capacity with tail_p5/p1 + ruin fraction mandatory. Zero network calls in M-phase. Report opens with the 2%/day arithmetic statement.
+**depends_on:** []
+**blocks:** [TICK-031]
+**acceptance_criteria:**
+- [ ] M0 scaffold + 7 test files green (isolation AST, holdout fences, frictions known-values, look-ahead canary, VRP-collision, determinism, mined-N monotonic)
+- [ ] M1/M2/M3 miners run deterministic (two runs byte-identical board CSV); every row stamped MINING
+- [ ] Yield board synthesized with settled-family context rows + arithmetic statement; n>=40 rank filter
+- [ ] Main-suite failure count unchanged; ICT isolation law green; NEXT.md + push per session
+**status:** in_progress (2026-07-12)
+**pre_approved:** true (plan-mode approval 2026-07-12 — Plans/immutable-wondering-alpaca.md)
+
+## TICK-031
+**title:** Yield Frontier G-phase — preregister top 2-3 board rows (HYP-093/094/095) and gauntlet them on untouched holdouts
+**description:** Blocked on TICK-030 board + Colin's candidate pick. G0 hash-locked preregs + PREREGISTERED ledger entries (n_trials = mined_n.json total; tail condition locked) BEFORE any holdout data touched; G1 sanctioned equities holdout fetch 2024-07→2025-06 (gate-zero: refuses unless prereg hash verifies; chunked --max-dates); G2 verdicts via existing machinery (>=10k permutations, DSR at honest n_trials, BH across runs, block bootstrap, per-year non-degrade, tail band) → ledger with backup + hash verified pre/post.
+**depends_on:** [TICK-030]
+**blocks:** []
+**acceptance_criteria:**
+- [ ] Preregs hash-locked + ledger PREREGISTERED before holdout unfenced (manifest timestamps postdate lock)
+- [ ] Gauntlet verdicts sealed with honest n_trials; UNDERPOWERED/DATA_INSUFFICIENT honored (options holdout thin)
+- [ ] No VRP-001-v2 execution; execution path untouched
+**status:** backlog
+**pre_approved:** true (plan-mode approval 2026-07-12 — Plans/immutable-wondering-alpaca.md)

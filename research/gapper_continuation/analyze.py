@@ -25,7 +25,7 @@ def trading_day_index() -> dict:
     for fp in sorted(GROUPED.glob("*.json.gz")):
         with gzip.open(fp, "rt") as f:
             if json.load(f)["n"] > 0:
-                days.append(fp.stem)
+                days.append(fp.name.split(".")[0])  # .stem leaves ".json" on .json.gz
     return {d: i for i, d in enumerate(days)}
 
 

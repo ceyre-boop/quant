@@ -1967,7 +1967,8 @@
     "verdict": "NOT_SIGNIFICANT",
     "date_tested": "2026-07-12",
     "p_value": 0.594141,
-    "result": "Well-powered null: mechanized card checklist does not separate post-read returns. Primary MWU p=0.594 (n=558 CONT / 391 EX; unique tickers 439/326); run-deduped robustness p=0.634. CONT median -2.34% vs EX -1.81%; ALL-candidate base rate median -2.21%, 48% reverse >3%. CONT mean +1.15% is tail-skew, not read information (post-hoc, not evidence). Halt-excluded set (n=331, conservative) median +16.5% descriptive. Report: data/research/gapper/report.md"
+    "result": "Well-powered null: mechanized card checklist does not separate post-read returns. Primary MWU p=0.594 (n=558 CONT / 391 EX; unique tickers 439/326); run-deduped robustness p=0.634. CONT median -2.34% vs EX -1.81%; ALL-candidate base rate median -2.21%, 48% reverse >3%. CONT mean +1.15% is tail-skew, not read information (post-hoc, not evidence). Halt-excluded set (n=331, conservative) median +16.5% descriptive. Report: data/research/gapper/report.md",
+    "correction_2026-07-12": "Path.stem bug in analyze.py trading-day index made the robustness dedup first-per-ticker (stricter than prereg) instead of 10-trading-day. Fixed + rerun: robustness MWU p=0.612 (n=457/340) vs sealed 0.634. Verdict UNCHANGED (primary p=0.594 was the decider). Original results preserved in git history."
   },
   {
     "id": "HYP-091",

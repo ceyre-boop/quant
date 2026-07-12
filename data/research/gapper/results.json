@@ -8,12 +8,12 @@
     "p": 0.594141
   },
   "robustness_mwu": {
-    "n_cont": 347,
-    "n_ex": 255,
-    "U": 43522.0,
-    "p": 0.633797
+    "n_cont": 457,
+    "n_ex": 340,
+    "U": 76773.0,
+    "p": 0.612342
   },
-  "robustness_sample_n": 930,
+  "robustness_sample_n": 1251,
   "bucket_stats_primary": {
     "CONT": {
       "n": 558,
@@ -54,40 +54,40 @@
   },
   "bucket_stats_robustness": {
     "CONT": {
-      "n": 347,
-      "unique_tickers": 347,
-      "median_pct": -0.0173,
-      "mean_pct": -0.021,
-      "continued_gt3": 0.3228,
-      "reversed_lt3": 0.4496,
-      "stagnated": 0.2277
+      "n": 457,
+      "unique_tickers": 400,
+      "median_pct": -0.0192,
+      "mean_pct": 0.0051,
+      "continued_gt3": 0.3282,
+      "reversed_lt3": 0.4595,
+      "stagnated": 0.2123
     },
     "EX": {
-      "n": 255,
-      "unique_tickers": 255,
-      "median_pct": -0.0126,
-      "mean_pct": -0.0121,
-      "continued_gt3": 0.3373,
-      "reversed_lt3": 0.4431,
-      "stagnated": 0.2196
+      "n": 340,
+      "unique_tickers": 304,
+      "median_pct": -0.0154,
+      "mean_pct": -0.0085,
+      "continued_gt3": 0.3353,
+      "reversed_lt3": 0.45,
+      "stagnated": 0.2147
     },
     "UNC": {
-      "n": 328,
-      "unique_tickers": 328,
-      "median_pct": -0.0137,
-      "mean_pct": -0.02,
-      "continued_gt3": 0.2744,
-      "reversed_lt3": 0.4543,
-      "stagnated": 0.2713
+      "n": 454,
+      "unique_tickers": 398,
+      "median_pct": -0.0198,
+      "mean_pct": -0.0182,
+      "continued_gt3": 0.2952,
+      "reversed_lt3": 0.4736,
+      "stagnated": 0.2313
     },
     "ALL": {
-      "n": 930,
+      "n": 1251,
       "unique_tickers": 930,
-      "median_pct": -0.0143,
-      "mean_pct": -0.0182,
-      "continued_gt3": 0.3097,
-      "reversed_lt3": 0.4495,
-      "stagnated": 0.2409
+      "median_pct": -0.017,
+      "mean_pct": -0.0071,
+      "continued_gt3": 0.3181,
+      "reversed_lt3": 0.462,
+      "stagnated": 0.2198
     }
   },
   "monthly_candidate_counts": {
