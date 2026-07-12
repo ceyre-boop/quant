@@ -774,3 +774,52 @@ imports nothing from `sovereign/` except the read-only DEGRADED sentinel (never 
 - **Commit/Push:** ✅ `658733f` on `origin/sovereign-v2` (`59f0b1c..658733f`). Ledger updated in Obsidian
   `Hypothesis-Status-2026-07-05.md`.
 - v015 carry code, `_apply_costs`, swap table, sealed studies, shadow/exit path — all untouched. No OANDA writes.
+
+
+---
+
+## 2026-07-12 — TICK-027 (HYP-091 TSMOM) + TICK-028 (ICT 90d projection)
+
+Two research tasks handed together ("literature summary -> HYP-089 TSMOM backtest + ICT trade-count
+projection"). Both READ-ONLY; shadow/exit path untouched, no unlock.
+
+**Concurrency reality (documented so the next session doesn't repeat it):** multiple parallel Claude
+sessions share this working tree and commit to sovereign-v2. Since the scouts ran, parallel sessions
+took HYP-090 (MODERN adaptive), HYP-092 (gapper), and TICK-023..026/029. My plan's HYP-090/TICK-023-24
+were stale -> re-derived to **HYP-091 / TICK-027 / TICK-028**. A parallel session had also already built
++ committed an **HYP-089** TSMOM quick-look (658733f, NOT_SIGNIFICANT) in `research/tsmom/` — I did NOT
+touch that dir; built the corrected study in `research/tsmom_hyp091/`. (My TICK-027/028 got swept into a
+parallel session's commit 74f25f9 — benign.)
+
+**TICK-027 / HYP-091 — TSMOM diversification of the v015 carry book -> NOT_SIGNIFICANT.**
+- Phase 0 hash-locked prereg (`data/research/preregister/HYP-091_tsmom_carry_diversification.json`,
+  hash c1a47738) + ledger PREREGISTERED, committed `d2caebb` BEFORE any price data. Hash-lock verified
+  intact after adjudication.
+- Corrected instrument vs the parallel HYP-089 quick-look (which used a carry-SIGN PROXY, NO financing,
+  DAILY rebalance): monthly (Moskowitz) rebalance, correlation vs the **ACTUAL v015 returns**, and
+  **correct rate-differential-derived financing** (operator decision) — NOT the Colin-gated
+  SWAP_RATES_ANNUAL (TICK-024 proves it ~10x too small + one sign flip). Financing = anchored
+  differential-tracking model reproducing the 2026 OANDA snapshot + trade-227 anchor, varying by the
+  FRED rate-differential across 2015-2024 (captures the 2022 USDJPY carry blowout).
+- VERDICT NOT_SIGNIFICANT, sealed on null leg (a): **OOS(2023-24) Sharpe = -0.349 <= 0**. Corroborated:
+  permutation p=0.140 (>0.05), deflated-Sharpe prob 0.753 (<0.95). Correct financing makes it WORSE than
+  price-only (it pays the real carry costs the broken model understated). Correlation vs actual v015 is
+  LOW (rho -0.128 primary / -0.136 broken apples-to-apples) — TSMOM IS uncorrelated but too weak: 50/50
+  equal-vol blend Sharpe 1.064 < v015 1.166 (lift -0.102). 2022 (+1.27) dominates the per-year table.
+- Loader sanity: v015 per-pair-weighted Sharpe 0.7209 reproduces the 0.6886 decade headline (yfinance drift).
+- Isolation 3/3; NN#1 ICT-isolation still green. Commits `d2caebb` (P0) + `34244c3` (P1-4). Ledger
+  HYP-091 -> NOT_SIGNIFICANT. Research pass only; deployment OUT OF SCOPE (Art. 6).
+
+**TICK-028 — 90-day ICT taken-trade projection -> fill rate is the bottleneck, not vetoes.** (`30b3770`)
+- Read-only; dedup per-scan re-emission **13.7x** (4051 raw veto records -> 296 unique setups). Live veto
+  rates recomputed: **ADR 45.3%, weekly-trend 6.8%** (memory's 55%/31% was STALE — update noted).
+- Two-basis 90d projection (bootstrap-over-days, N=10000 seed 42): LOGGED/committed setups ~**94**
+  (95% [72,118]) -> ABOVE the ~30 band, so signal/veto frequency is NOT the constraint. ACTUALLY FILLED
+  ~**2.1** -> FAR BELOW 30: **~98% of ICT decisions are EXPIRED unfilled limit orders.** For a ~30-trade
+  prop challenge the binding constraint is the FILL/EXPIRY rate, not the ADR/weekly vetoes. (Confirms the
+  "grade-A signals are LIMIT orders" memory.) Shadow-freeze compliant; deterministic; guard 3/3.
+
+**Refused to shortcut:** (1) did not reuse the parallel HYP-089 result or its research/tsmom/ dir; built a
+canonically pre-registered corrected study instead. (2) did not use the known-broken SWAP_RATES_ANNUAL for
+the primary financing (per operator decision) despite it being the easy path. (3) pre-registered + committed
+BEFORE observing price data. (4) did not touch the execution/exit path or any live parameter.
