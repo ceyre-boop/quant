@@ -12,7 +12,7 @@
     "AUDUSD_differentials.parquet": {
       "pair": "AUDUSD=X",
       "rows": 3160,
-      "sha256": "ada6746392cdafab11cd69463cb83904777fa3ea0bb089eb2a6a99292fdc2f9d",
+      "sha256": "06cbf34406dba053bd0c87708d6207726314626563a0b0a41869932accaa3597",
       "span": [
         "2014-06-02",
         "2026-07-10"
@@ -30,7 +30,7 @@
     "EURUSD_differentials.parquet": {
       "pair": "EURUSD=X",
       "rows": 3160,
-      "sha256": "ada6746392cdafab11cd69463cb83904777fa3ea0bb089eb2a6a99292fdc2f9d",
+      "sha256": "1dc4e166b7570ef639f6f60080a84f67db335b5e4d68c2388760679dfcca041f",
       "span": [
         "2014-06-02",
         "2026-07-10"
@@ -48,7 +48,7 @@
     "GBPUSD_differentials.parquet": {
       "pair": "GBPUSD=X",
       "rows": 3160,
-      "sha256": "ada6746392cdafab11cd69463cb83904777fa3ea0bb089eb2a6a99292fdc2f9d",
+      "sha256": "d384e91d457635b62f7f1743e8fe2d9f03dc9242ec908b4158b043440c372e1a",
       "span": [
         "2014-06-02",
         "2026-07-10"
@@ -56,7 +56,7 @@
     },
     "SPY.parquet": {
       "rows": 3037,
-      "sha256": "0618d2bd5505c9a6c2d92e2e0ad72b477a93a73a53fda5524fb6c5932adfaf29",
+      "sha256": "332bebd57102a1a60bea0d7da2cd372315246c3532274dd8b28b9e124f36da98",
       "span": [
         "2014-06-02",
         "2026-06-29"
@@ -75,7 +75,7 @@
     "USDJPY_differentials.parquet": {
       "pair": "USDJPY=X",
       "rows": 3160,
-      "sha256": "ada6746392cdafab11cd69463cb83904777fa3ea0bb089eb2a6a99292fdc2f9d",
+      "sha256": "7a7b9869f4190eb82d4f2d4e29e4d6bda40206779b95c2954b36c15b5e6680e6",
       "span": [
         "2014-06-02",
         "2026-07-10"
@@ -93,6 +93,6 @@
   },
   "freeze_end": "2026-06-30",
   "freeze_start": "2014-06-01",
-  "frozen_at": "2026-07-12T00:47:27.151036+00:00",
+  "frozen_at": "2026-07-12T00:53:03.031849+00:00",
   "note": "study inputs frozen; every downstream step reads ONLY these parquets. Reconcile (canonical, unfrozen) runs separately by design \u2014 it measures whether the canonical harness still reproduces 0.6886 on live data."
 }

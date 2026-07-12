@@ -29,12 +29,19 @@ FREEZE_START = "2014-06-01"          # margin for 200d SMA / 252d percentiles
 FREEZE_END = "2026-06-30"
 MANIFEST = CACHE_DIR / "freeze_manifest.json"
 
-PAIR_COUNTRIES = {                    # mirrors PAIR_CONFIG/CB_TO_COUNTRY resolution
-    "EURUSD=X": ("euro_area", "united_states"),
-    "GBPUSD=X": ("united_kingdom", "united_states"),
-    "USDJPY=X": ("united_states", "japan"),
-    "AUDUSD=X": ("australia", "united_states"),
-}
+def _pair_countries() -> dict:
+    """Canonical (base, quote) country codes — derived from PAIR_CONFIG/CB_TO_COUNTRY
+    exactly like backtest_all does (hardcoding these broke the FRED lookups: the
+    canonical codes are short forms like 'EU'/'US', not long names)."""
+    from sovereign.forex.forex_backtester import CB_TO_COUNTRY, PAIR_CONFIG
+    out = {}
+    for pair in PAIRS:
+        cfg = PAIR_CONFIG[pair]
+        out[pair] = (CB_TO_COUNTRY[cfg.base_central_bank], CB_TO_COUNTRY[cfg.quote_central_bank])
+    return out
+
+
+PAIR_COUNTRIES = _pair_countries()
 
 
 def _dl(symbol: str) -> pd.DataFrame:

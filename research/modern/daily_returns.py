@@ -62,7 +62,8 @@ def build(trades_file: str = "trades.parquet", signals_file: str = "signals.npz"
         key = pair.replace("=X", "")
         closes[pair] = npz[f"{key}__close"]
         opens[pair] = npz[f"{key}__open"]
-        indices[pair] = pd.DatetimeIndex(npz[f"{key}__index"].astype("datetime64[ns]"))
+        from research.modern._lib import to_dtindex
+        indices[pair] = to_dtindex(npz[f"{key}__index"])
 
     union = indices[PAIRS[0]]
     for pair in PAIRS[1:]:
@@ -73,6 +74,7 @@ def build(trades_file: str = "trades.parquet", signals_file: str = "signals.npz"
     n_cfg = int(trades["config_id"].max()) + 1
     raw = np.zeros((n_cfg, len(PAIRS), n_days), dtype=np.float64)
     costed = np.zeros_like(raw)
+    position = np.zeros((n_cfg, len(PAIRS), n_days), dtype=np.int8)   # direction while in trade
     open_mask = np.zeros((n_cfg, len(PAIRS)), dtype=bool)
     cost_meta = {}
 
@@ -92,6 +94,7 @@ def build(trades_file: str = "trades.parquet", signals_file: str = "signals.npz"
             costed[cid, pi, u[e]] += d * (c[e] - o[e]) / entry - cost_price / entry
             side = "LONG" if d >= 0 else "SHORT"
             daily_swap = (swap_tbl[side] / 365.0) * SWAP_UPLIFT
+            position[cid, pi, u[e]:u[x] + 1] = d
             for s in range(e + 1, x + 1):
                 r = d * (c[s] - c[s - 1]) / entry
                 raw[cid, pi, u[s]] += r
@@ -100,9 +103,14 @@ def build(trades_file: str = "trades.parquet", signals_file: str = "signals.npz"
     out = OUT_DIR / out_file
     np.savez_compressed(
         out,
-        costed=costed.astype(np.float32), raw=raw.astype(np.float32),
+        costed=costed, raw=raw,   # float64 — the 1e-12 decomposition lock forbids float32 truncation
+        position=position,
         open_mask=open_mask, union_index=union.astype("int64").to_numpy(),
         pairs=np.array([p.encode() for p in PAIRS]),
+        close_by_pair=np.stack([
+            pd.Series(closes[p], index=indices[p]).reindex(union).ffill().to_numpy()
+            for p in PAIRS
+        ]),
     )
     write_json(OUT_DIR / (out_file + ".meta.json"), {
         "sha256": sha256_file(out), "shape": list(costed.shape),

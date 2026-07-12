@@ -1,0 +1,41 @@
+{
+  "cost_constants": {
+    "AUDUSD=X": {
+      "cost_price": 0.00023999999999999998,
+      "swap_annual": {
+        "LONG": -0.0008,
+        "SHORT": -0.0012
+      }
+    },
+    "EURUSD=X": {
+      "cost_price": 0.0002,
+      "swap_annual": {
+        "LONG": -0.0015,
+        "SHORT": -0.001
+      }
+    },
+    "GBPUSD=X": {
+      "cost_price": 0.00022,
+      "swap_annual": {
+        "LONG": -0.0012,
+        "SHORT": -0.0008
+      }
+    },
+    "USDJPY=X": {
+      "cost_price": 0.0121,
+      "swap_annual": {
+        "LONG": 0.002,
+        "SHORT": -0.0035
+      }
+    }
+  },
+  "n_open_tail": 24,
+  "sha256": "c5d3d66f78b4e8f5232969dc74f6c9610461734fab987b4ecfc47bf52a4424e7",
+  "shape": [
+    385,
+    4,
+    2990
+  ],
+  "swap_uplift": 1.4,
+  "trades_file": "trades.parquet"
+}

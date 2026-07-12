@@ -80,6 +80,16 @@ def sha256_file(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def to_dtindex(int_arr) -> "pd.DatetimeIndex":
+    """Rebuild a DatetimeIndex from stored int64 epochs, unit-safe: parquet
+    round-trips can yield ms-resolution indices (astype int64 -> ms), while
+    native pandas gives ns. Detect by magnitude (ns since 1970 > 1e16)."""
+    import pandas as pd
+    a = np.asarray(int_arr, dtype="int64")
+    unit = "ns" if (a.size and int(a.max()) > int(1e16)) else "ms"
+    return pd.DatetimeIndex(a.astype(f"datetime64[{unit}]").astype("datetime64[ns]"))
+
+
 def gate_zero() -> dict:
     """Verify the prereg hash-lock AND the ledger PREREGISTERED entry BEFORE any
     data is read (run_positioning_family.gate_zero pattern). SystemExit on any
