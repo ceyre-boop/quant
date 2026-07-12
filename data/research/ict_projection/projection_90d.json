@@ -1,0 +1,131 @@
+{
+  "caveats": [
+    "Only ~3 months of data (veto ledger starts 2026-05-24); a 45-day base is short and regime-specific.",
+    "Assumes the pipeline stays frozen at current signal/veto/order config -- valid under the active shadow-freeze, but any gate change invalidates the projection.",
+    "Selection gap #1: not every setup that passes vetoes becomes a logged decision.",
+    "Selection gap #2 (dominant): only ~2.0% of committed ICT setups FILL in this window (the rest EXPIRE unfilled) -- 'committed setup' massively overstates 'executed trade'.",
+    "FX weekend/non-business setups (5 in this window) are excluded from the trading-day base rate; they inflate Estimate B slightly vs Estimate A."
+  ],
+  "dedup": {
+    "dedup_factor_all_shards": 13.605,
+    "dedup_factor_window": 13.686,
+    "dedup_note": "Collapsed on (date, pair, direction, veto_class). Dedup factor ~13x confirms the scanner re-emits a full universe sweep every cycle.",
+    "raw_veto_records_all_shards": 4408,
+    "raw_veto_records_window": 4051,
+    "unique_veto_setups_all_shards": 324,
+    "unique_veto_setups_per_trading_day": 9.548,
+    "unique_veto_setups_window": 296
+  },
+  "fill_gap": {
+    "fill_rate_window": 0.02,
+    "mean_daily_filled": 0.03226,
+    "note": "EXPIRED = limit order placed at entry_level but never filled (r_realized=0). Nearly all committed ICT setups expire unfilled; only filled trades count toward a prop challenge.",
+    "outcome_distribution_window": {
+      "EXPIRED": 221,
+      "LOSS": 1
+    },
+    "unique_filled_setups_window": 1
+  },
+  "meta": {
+    "bootstrap_n": 10000,
+    "data_root": "/Users/taboost/quant",
+    "output_root": "/Users/taboost/quant",
+    "read_only": true,
+    "seed": 42,
+    "ticket": "TICK-028"
+  },
+  "near_30": {
+    "basis_filled_trades": {
+      "classification": "BELOW_RANGE",
+      "near_30": false,
+      "point": 2.097
+    },
+    "basis_logged_setups": {
+      "classification": "ABOVE_RANGE",
+      "near_30": false,
+      "point": 94.355
+    },
+    "range_hi": 45,
+    "range_lo": 20
+  },
+  "projection_90d": {
+    "calendar_to_trading_day_factor": 0.722222,
+    "filled_trades": {
+      "note": "Near-zero given the observed fill rate; the binding prop-challenge constraint.",
+      "point_estimate": 2.097
+    },
+    "logged_setups": {
+      "bootstrap_ci": {
+        "mean": 94.451,
+        "median": 94.0,
+        "p10": 80.0,
+        "p2_5": 72.0,
+        "p90": 110.0,
+        "p97_5": 118.0
+      },
+      "point_estimate": 94.355,
+      "sensitivity_band_pm30pct": {
+        "minus_30pct": 66.048,
+        "plus_30pct": 122.661,
+        "point": 94.355
+      }
+    },
+    "projection_calendar_days": 90,
+    "trading_days_90": 65
+  },
+  "taken_base_rate": {
+    "estimate_A_direct_per_day": 1.4516,
+    "estimate_B_veto_implied_per_day": 1.6129,
+    "mean_daily_taken_setups": 1.4516,
+    "p_vetoed_setup_level": 0.8555,
+    "raw_taken_records_window": 222,
+    "reconciliation_note": "Estimate B = (total unique setups/day) x (1 - P(vetoed)), total = vetoed + taken. A and B nearly coincide (~1.5/day). They differ only because B's taken numerator counts all 50 unique setups while A's trading-day base rate uses the 45 on business days (the 5 weekend/non-business setups are excluded), both over 31 trading days. Since vetoed and taken setups partition the observed universe, B cannot diverge from A beyond this day-basis difference -- the real independent uncertainty is the FILL gap, not the veto split.",
+    "total_unique_setups_window": 346,
+    "unique_taken_setups_window_pair_dir": 50,
+    "unique_taken_setups_window_pair_dir_level": 66,
+    "weekend_setups_excluded_from_rate": 5
+  },
+  "verdict": "ICT GENERATES enough setups (~94 logged/committed over 90 days, above the 20-45 band), so signal/veto frequency is NOT the bottleneck. But ~98.0% of committed setups EXPIRE unfilled: only ~2.1 trades would actually FILL over 90 days. As a source of ~30 EXECUTED prop-challenge trades, ICT is FAR BELOW unless the fill/expiry problem is fixed.",
+  "veto_rates_live": {
+    "adr_share": 0.452703,
+    "class_breakdown": {
+      "ADR": {
+        "share": 0.452703,
+        "unique_setups": 134
+      },
+      "DISP_GATE": {
+        "share": 0.216216,
+        "unique_setups": 64
+      },
+      "OTHER": {
+        "share": 0.097973,
+        "unique_setups": 29
+      },
+      "SCORE": {
+        "share": 0.121622,
+        "unique_setups": 36
+      },
+      "SESSION": {
+        "share": 0.016892,
+        "unique_setups": 5
+      },
+      "TIMING": {
+        "share": 0.027027,
+        "unique_setups": 8
+      },
+      "WEEKLY_TREND": {
+        "share": 0.067568,
+        "unique_setups": 20
+      }
+    },
+    "note": "Recomputed live from deduped trailing-45d setups. Prior memory (55% ADR / 31% weekly) is STALE.",
+    "weekly_trend_share": 0.067568
+  },
+  "window": {
+    "analysis_anchor_date": "2026-07-12",
+    "trading_days_in_window": 31,
+    "trailing_calendar_days": 45,
+    "window_end_inclusive": "2026-07-12",
+    "window_start_exclusive": "2026-05-28"
+  }
+}
