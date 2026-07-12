@@ -1,14 +1,14 @@
 {
-  "last_updated": "2026-07-10T09:33:41.258944+00:00",
+  "last_updated": "2026-07-11T06:31:01.326613+00:00",
   "harvest": {
     "trades_closed": 0,
     "win_rate": null,
     "failure_taxonomy": {}
   },
   "reflection": {
-    "candidate_lesson": "A rate-divergence SHORT that fires while HTF market structure is BULLISH and no CHOCH/BOS confirms the trade direction is a counter-structure macro bet that loses even with a valid FVG and liquidity sweep.",
-    "mechanism": "Institutional order flow does not reverse on a single BSL sweep \u2014 when HTF structure is still bullish, the sweep is a stop-run inside continuation, not a distribution top. A macro rate-diff z of only -0.97 (sub-1.0 magnitude) lacks the conviction to overpower an intact bullish delivery, so the short is entered into the very liquidity institutions are using to continue upward. Structure must confirm (BOS/CHOCH in trade direction) before macro direction can be trusted.",
-    "testable_rule": "if signal_direction != htf_structure_direction and not structure_shift_confirmed and abs(rate_diff_z) < 1.2: veto_trade()"
+    "candidate_lesson": "When the 30-indicator consensus shows high conviction but green_matches=0 and hist_hr=0%, treat the directional call as UNPROVEN and refuse to size up \u2014 conviction without any historical analog match is untested pattern space.",
+    "mechanism": "green_matches counts how many times the current live indicator configuration matched a historically profitable memory state. When it is 0, the conviction number is measuring internal agreement among indicators, NOT evidence that this specific configuration has ever paid off. AUDNZD showing conv=100% with green_matches=0 and hist_hr=0% is a crowded indicator config that has never been validated against realized outcomes \u2014 high agreement in untested space is how systems walk confidently into novel losing regimes.",
+    "testable_rule": "if consensus_conviction >= 0.60 and green_matches == 0 and hist_hr == 0.0: size_multiplier *= 0.5  # freeze up-sizing until a historical analog confirms"
   },
   "validation": {
     "verdict": "REJECTED",
@@ -21,8 +21,8 @@
     "codify_error": null
   },
   "cycle": {
-    "cost_usd": 0.16077,
+    "cost_usd": 0.146325,
     "status": "COMPLETE",
-    "date": "2026-07-10"
+    "date": "2026-07-11"
   }
 }

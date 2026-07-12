@@ -1,0 +1,9 @@
+{
+  "date": "2026-07-11",
+  "generated_at": "2026-07-11T06:31:01.309357+00:00",
+  "candidate_lesson": "When the 30-indicator consensus shows high conviction but green_matches=0 and hist_hr=0%, treat the directional call as UNPROVEN and refuse to size up \u2014 conviction without any historical analog match is untested pattern space.",
+  "testable_rule": "if consensus_conviction >= 0.60 and green_matches == 0 and hist_hr == 0.0: size_multiplier *= 0.5  # freeze up-sizing until a historical analog confirms",
+  "verdict": "REJECTED",
+  "reason": "Rule filters only 0 trades \u2014 insufficient sample",
+  "trades_available": 1160
+}

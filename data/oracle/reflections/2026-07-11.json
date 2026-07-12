@@ -1,0 +1,26 @@
+{
+  "date": "2026-07-11",
+  "generated_at": "2026-07-11T06:31:01.293399+00:00",
+  "input_tokens": 5710,
+  "output_tokens": 809,
+  "estimated_cost_usd": 0.146325,
+  "harvest_days_read": 7,
+  "reflection": {
+    "candidate_lesson": {
+      "lesson_text": "When the 30-indicator consensus shows high conviction but green_matches=0 and hist_hr=0%, treat the directional call as UNPROVEN and refuse to size up \u2014 conviction without any historical analog match is untested pattern space.",
+      "mechanism": "green_matches counts how many times the current live indicator configuration matched a historically profitable memory state. When it is 0, the conviction number is measuring internal agreement among indicators, NOT evidence that this specific configuration has ever paid off. AUDNZD showing conv=100% with green_matches=0 and hist_hr=0% is a crowded indicator config that has never been validated against realized outcomes \u2014 high agreement in untested space is how systems walk confidently into novel losing regimes.",
+      "testable_rule": "if consensus_conviction >= 0.60 and green_matches == 0 and hist_hr == 0.0: size_multiplier *= 0.5  # freeze up-sizing until a historical analog confirms",
+      "expected_impact": "Reduces drawdown variance and protects Sharpe by preventing full-size entries on untested high-conviction configs; expected +0.02 to +0.03 Sharpe via variance reduction rather than added return.",
+      "evidence_from_harvest": "Live consensus shows AUDNZD dir=SHORT conv=100% green_matches=0 hist_hr=0%, GBPUSD dir=LONG conv=67% green_matches=0 hist_hr=0%, USDJPY dir=LONG conv=42% green_matches=0 hist_hr=0% \u2014 three high/medium conviction calls all with zero historical validation, while the only config WITH a green_match (EURUSD, green_matches=1) shows hist_hr=73% despite low conv=8%.",
+      "evidence_from_reasoning": null,
+      "reasoning_component_targeted": "green_matches / hist_hr (consensus historical-analog fields)",
+      "sample_needed": 40
+    },
+    "retirement_flag": {
+      "lesson_to_review": null,
+      "reason": null
+    },
+    "system_health_note": "Zero trades in the last 7 days with regime=UNKNOWN and forex flagged NO_TRADE_TODAY \u2014 the system is correctly frozen, so any Sharpe-gap closure this cycle must come from gating rules and sizing discipline rather than new entries."
+  },
+  "auto_validation": null
+}

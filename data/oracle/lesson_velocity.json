@@ -1,11 +1,12 @@
 {
-  "generated_at": "2026-07-10T09:33:41.258456+00:00",
-  "as_of_date": "2026-07-10",
+  "generated_at": "2026-07-11T06:31:01.326036+00:00",
+  "as_of_date": "2026-07-11",
   "current_lesson": {
     "components": [
       "active",
       "against",
       "agreement",
+      "analog",
       "bias",
       "block",
       "config",
@@ -34,17 +35,17 @@
       "zone",
       "zscore"
     ],
-    "component_label": "rate_differential_zscore (gated jointly with HTF-structure agreement and structure_shift flag)",
+    "component_label": "green_matches / hist_hr (consensus historical-analog fields)",
     "first_seen": "2026-05-29",
-    "last_seen": "2026-07-10",
-    "days_forming": 42,
-    "n_revisions": 31,
-    "n_days_appeared": 31,
+    "last_seen": "2026-07-11",
+    "days_forming": 43,
+    "n_revisions": 32,
+    "n_days_appeared": 32,
     "stable_days": 1,
     "status": "forming",
     "time_to_converge_days": null,
-    "latest_lesson_text": "A rate-divergence SHORT that fires while HTF market structure is BULLISH and no CHOCH/BOS confirms the trade direction is a counter-structure macro bet that loses even with a valid FVG and liquidity sweep.",
-    "latest_rule": "if signal_direction != htf_structure_direction and not structure_shift_confirmed and abs(rate_diff_z) < 1.2: veto_trade()",
+    "latest_lesson_text": "When the 30-indicator consensus shows high conviction but green_matches=0 and hist_hr=0%, treat the directional call as UNPROVEN and refuse to size up \u2014 conviction without any historical analog match is untested pattern space.",
+    "latest_rule": "if consensus_conviction >= 0.60 and green_matches == 0 and hist_hr == 0.0: size_multiplier *= 0.5  # freeze up-sizing until a historical analog confirms",
     "history": [
       {
         "date": "2026-05-29",
@@ -169,6 +170,10 @@
       {
         "date": "2026-07-10",
         "rule": "if signal_direction != htf_structure_direction and not structure_shift_confirmed and abs(rate_diff_z) < 1.2: veto_trade()"
+      },
+      {
+        "date": "2026-07-11",
+        "rule": "if consensus_conviction >= 0.60 and green_matches == 0 and hist_hr == 0.0: size_multiplier *= 0.5  # freeze up-sizing until a historical analog confirms"
       }
     ]
   },
@@ -178,6 +183,7 @@
         "active",
         "against",
         "agreement",
+        "analog",
         "bias",
         "block",
         "config",
@@ -206,17 +212,17 @@
         "zone",
         "zscore"
       ],
-      "component_label": "rate_differential_zscore (gated jointly with HTF-structure agreement and structure_shift flag)",
+      "component_label": "green_matches / hist_hr (consensus historical-analog fields)",
       "first_seen": "2026-05-29",
-      "last_seen": "2026-07-10",
-      "days_forming": 42,
-      "n_revisions": 31,
-      "n_days_appeared": 31,
+      "last_seen": "2026-07-11",
+      "days_forming": 43,
+      "n_revisions": 32,
+      "n_days_appeared": 32,
       "stable_days": 1,
       "status": "forming",
       "time_to_converge_days": null,
-      "latest_lesson_text": "A rate-divergence SHORT that fires while HTF market structure is BULLISH and no CHOCH/BOS confirms the trade direction is a counter-structure macro bet that loses even with a valid FVG and liquidity sweep.",
-      "latest_rule": "if signal_direction != htf_structure_direction and not structure_shift_confirmed and abs(rate_diff_z) < 1.2: veto_trade()",
+      "latest_lesson_text": "When the 30-indicator consensus shows high conviction but green_matches=0 and hist_hr=0%, treat the directional call as UNPROVEN and refuse to size up \u2014 conviction without any historical analog match is untested pattern space.",
+      "latest_rule": "if consensus_conviction >= 0.60 and green_matches == 0 and hist_hr == 0.0: size_multiplier *= 0.5  # freeze up-sizing until a historical analog confirms",
       "history": [
         {
           "date": "2026-05-29",
@@ -341,6 +347,10 @@
         {
           "date": "2026-07-10",
           "rule": "if signal_direction != htf_structure_direction and not structure_shift_confirmed and abs(rate_diff_z) < 1.2: veto_trade()"
+        },
+        {
+          "date": "2026-07-11",
+          "rule": "if consensus_conviction >= 0.60 and green_matches == 0 and hist_hr == 0.0: size_multiplier *= 0.5  # freeze up-sizing until a historical analog confirms"
         }
       ]
     },
@@ -355,7 +365,7 @@
       "component_label": "regime_confirmation.sizing_multiplier",
       "first_seen": "2026-06-15",
       "last_seen": "2026-07-06",
-      "days_forming": 25,
+      "days_forming": 26,
       "n_revisions": 3,
       "n_days_appeared": 3,
       "stable_days": 1,

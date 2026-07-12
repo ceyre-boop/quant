@@ -7,29 +7,28 @@
     "agent_share": 0.3
   },
   "week": {
-    "start_date": "2026-07-04",
-    "weekly_used": 25000,
-    "weekly_remaining": 175000,
+    "start_date": "2026-07-11",
+    "weekly_used": 3000,
+    "weekly_remaining": 197000,
     "last_synced": null,
-    "note": "Weekly RESET Saturday 2026-07-04 (next reset Sat 2026-07-11). Running est ~25k of 200k after REST-037 (~3k, read-only). Huge weekly buffer (~175k). STILL awaiting manual sync."
+    "note": "Weekly RESET Saturday 2026-07-11 (next reset Sat 2026-07-18). New week; running est ~3k of 200k after REST-038 (read-only). Huge buffer. STILL awaiting manual sync from claude.ai/settings."
   },
   "today": {
-    "date": "2026-07-10",
+    "date": "2026-07-11",
     "human_used": 0,
     "agent_used": 3000,
     "daily_agent_budget": 8571,
     "agent_allowed_today": 8571,
-    "note": "REST-037 (ET Fri 2026-07-10 ~21:20, Colin offline; weekly reset tomorrow so capacity ample). Read-only: no live code/config/network writes. Prepared+validated RQ-REST-016 cb_calendar 2023-24 back-extension (patch in Plans/, unblocks RQ-REST-015 + RQ-REST-017 pending Colin). Health: live decision log missing 07-10 session (2nd since 07-06) but equity/harvester/retrain/oracle_pulse live @18:33Z; phantom emitter latent. ~3k of 8.5k daily used -> ~5.5k buffer left; stopping to preserve Colin's next session."
+    "note": "REST-038 (ET Sat 2026-07-11 ~21:15, Colin offline; HYP-090 P4 session committed 21:03 then idle; weekly reset today so capacity ample). Read-only: no code/config/ledger/network writes. Key result: OUTCOME_LOOP_STALL pulse identified as a FALSE POSITIVE (detector re-counts resolved historical OANDA closes) \u2014 real loop verified functioning (2 matched July closes, 1 legit open). Health green: 7 loops alive, phantom emitter 9d dormant, decision-log gap benign. ~3k of 8.5k daily used -> ~5.5k buffer; stopping to preserve Colin's next session."
   },
   "session": {
-    "started": "2026-07-11T01:15:00+00:00",
-    "ended": "2026-07-11T01:22:00+00:00",
+    "started": "2026-07-12T01:07:00+00:00",
+    "ended": "2026-07-12T01:16:00+00:00",
     "mode": "REST_MODE",
     "tasks_completed": [
-      "RQ-REST-016 PREP: validated FED+BOE 2023-2024 decision dates vs live cb_calendar.py (2025 overlap exact, HYP-061 window covered); wrote ready-to-apply patch + param_change_log rationale to Plans/RQ-REST-016_cb_calendar_backextension_proposal.md (no code touched)",
-      "Health validation: live decision log stale at 07-09 (no 07-10 09:35 ET session) but equity_curve/harvester(74467)/retrain(74468)/oracle_pulse all live @2026-07-10T18:33Z; flagged execute_daily gap to Colin",
-      "Health validation: phantom USD_CAD units=1 emitter LATENT (8 fills, no 9th since tid pre-07-03)",
-      "Wrote FIND-REST-037-a/b, 1 IMPORTANT Colin message, annotated RQ-REST-016, updated usage"
+      "NN#2 audit: traced OUTCOME_LOOP_STALL to a state-independent false positive in pulse_check.backfill_closed_outcomes (re-counts already-resolved/decisionless closes; update_outcome correct). Verified loop works: 2 matched July FOREX closes, 1 legit open trade. Recommended scoping fix (Colin-gated).",
+      "Health validation: 7 loops alive, equity/pulse/proof_of_life current to 07-11T16:45Z, phantom USD_CAD emitter 9d dormant, 07-10/11 decision-log gap explained as benign NO_TRADE/weekend quiet.",
+      "Wrote FIND-REST-038-a/b, 1 IMPORTANT Colin message (downgrading the false alarm), updated usage. No ledger write (session touched it 21:02 ET)."
     ]
   },
   "mode": "REST_MODE",
