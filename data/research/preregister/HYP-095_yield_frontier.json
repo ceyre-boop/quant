@@ -1,0 +1,41 @@
+{
+  "id": "HYP-095",
+  "name": "NQ high-VIX prior-day-down session long \u2014 mined board row 3",
+  "registered": "2026-07-12",
+  "ticket": "TICK-031",
+  "mined_source": "F-NQ5_vixregime vixT2|prior_dn|long (net/day +0.24% of notional MINED, n=265, 1 neg yr of 7)",
+  "holdout_window": {
+    "start": "2024-07-01",
+    "end": "2026-06-09 (end of on-disk NQ data)"
+  },
+  "signal": "non-roll RTH session with prior-day VIX close >= 21.4079 (mining tercile-2 boundary, FROZEN) AND prior session rth open->close return < -0.002",
+  "execution": {
+    "entry": "long at session rth_open",
+    "exit": "session rth_close",
+    "event_return": "(rth_close/rth_open - 1) - 0.625/rth_open  [NQ mini: 1 tick/side + $2.50 RT]",
+    "data": "nq_daily.parquet rows > 2024-06-30 (unfenced ONLY by gauntlet_run after gate-zero)"
+  },
+  "sizing_constitutional": {
+    "rider": "R2",
+    "art1_worst_case_per_trade": 0.0075,
+    "declared_worst_case": "intraday index long, no stop in mined config: worst-case = 10% adverse session (2x worst mining-window session)",
+    "notional_per_event": 0.075,
+    "daily_net": "event_return*0.075 on signal days; 0 otherwise"
+  },
+  "thresholds": {
+    "rider": "R3",
+    "primary": "stationary-block-bootstrap one-sided p(mean of DAILY constitutional net series > 0), L=5, 10000 draws, seed 42 (research.modern._lib.block_bootstrap_sharpe_diff_p vs zero arm)",
+    "dsr": "deflated_sharpe_ratio(daily Sharpe, n_trials=MINED_N) must be >= 0.95 (sovereign.discovery.gate)",
+    "family": "Benjamini-Hochberg across HYP-093/094/095 primary p-values, alpha=0.05, m=3",
+    "mined_n": 809,
+    "daily_series": "net constitutional return for EVERY trading day in the holdout window (0.0 on no-event days) \u2014 the %/day claim is over calendar of opportunity, not event days only",
+    "constitutional_floor_pct_day": 0.0002,
+    "tail_condition": "no single session worse than -10% open->close (sizing premise)"
+  },
+  "abort": [
+    "fewer than 40 signal sessions in holdout -> DATA_INSUFFICIENT"
+  ],
+  "verdict_ladder": "CONFIRMED (all: primary p<0.05, BH survivor, DSR>=0.95, constitutional floor met, tail condition met) / VALID_BUT_BELOW_FLOOR (significance yes, floor no) / NOT_ROBUST (tail/sizing premise violated) / NOT_SIGNIFICANT / DATA_INSUFFICIENT (coverage/abort conditions)",
+  "prior_materials": "Mining board NON-EVIDENTIARY. Registered prior: NOT_SIGNIFICANT.",
+  "hash_lock": "959372e93d84a77b0ce3b9a5e6407ded6a74147dd91969ace06b99b719b42da2"
+}

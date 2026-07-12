@@ -355,3 +355,14 @@ Schema per ticket:
 - [ ] No VRP-001-v2 execution; execution path untouched
 **status:** backlog
 **pre_approved:** true (plan-mode approval 2026-07-12 — Plans/immutable-wondering-alpaca.md)
+
+## TICK-032
+**title:** Funding-vehicle reality check for single-name HTB equity shorts (rider 4, non-gating)
+**description:** Colin's rider on the yield-frontier gauntlet: the TICK-022 funnel firms (FTMO/Topstep/APEX class) are forex/futures — they CANNOT trade single-name smallcap shorts. Before the "capacity-bound gapper edge -> funded accounts" thesis carries ANY EV weight: name a real funding vehicle for equities intraday shorting of HTB smallcaps (candidates to research: equities prop shops — e.g. bright/T3/SMB-style firm structures vs retail eval shops with equities support), its locate rules, borrow pass-through pricing, and payout terms. Web research + documented sources; no account opened. Does NOT gate TICK-031.
+**depends_on:** []
+**blocks:** []
+**acceptance_criteria:**
+- [ ] >=2 concrete named firms/structures evaluated with locate + pricing terms cited
+- [ ] Explicit verdict: funnel-monetization thesis VIABLE / NOT VIABLE for HYP-093/094-class edges
+**status:** backlog
+**pre_approved:** true (operator rider 2026-07-12)

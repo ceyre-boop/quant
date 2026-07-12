@@ -1,0 +1,65 @@
+{
+  "id": "HYP-094",
+  "name": "Overnight short of weak-closing moderate gappers \u2014 mined board row 2",
+  "registered": "2026-07-12",
+  "ticket": "TICK-031",
+  "mined_source": "F-EQ1_overnight g30-50|locT1|volT2|short|next_close (net/day +3.53% MINED, n=237)",
+  "pipeline": {
+    "holdout_window": {
+      "start": "2024-07-01",
+      "end": "2025-06-30"
+    },
+    "stage1": "Polygon grouped daily adjusted=true; ticker alpha len<=5 not 5-letter-WRU; prev close >=0.75; day high >= 1.20*prev close; day volume >= 500000",
+    "stage2": "Alpaca SIP 5Min+1Day adjustment=split; slice = bars ET start in [09:30,10:25]; readable = >=8 bars AND last >=10:15; P=last slice close; qualifying = P>=1.30*prev_close AND P>=2.00 AND slice volume >= 500000",
+    "fetch_rule": "G1 fetch runs ONLY after this prereg's hash is locked and its ledger entry is PREREGISTERED (gate-zero enforced in code)"
+  },
+  "signal": {
+    "universe": "stage-1 candidate ticker-days (intraday qualification NOT required \u2014 mined family used grouped daily only)",
+    "close_gain": "[0.30, 0.50) vs prev grouped close",
+    "close_location": "(c-l)/(h-l) <= 0.53275 (mining T1 boundary, FROZEN)",
+    "dollar_volume": "c*v in (48388364.31, 207261118.35] (mining T2 boundaries, FROZEN)"
+  },
+  "execution": {
+    "entry": "short at day-D grouped close",
+    "exit": "day-D+1 grouped close",
+    "event_return": "(c_D - c_D1)/c_D - 2*0.005 - 2*APR(0.4)/365  [gap tier 0.3-0.5 -> APR 1.00]",
+    "absent_next_day": "excluded and counted; absent rate > 5% of signals -> DATA_INSUFFICIENT"
+  },
+  "costs": {
+    "borrow_apr_schedule_pessimistic": {
+      "gap_0.3_0.5": 1.0,
+      "gap_0.5_1.0": 2.0,
+      "gap_1.0_1.5": 4.0,
+      "gap_1.5_plus": 6.0
+    },
+    "borrow_charge": "intraday short pays 1 day of schedule (covers locate fees); overnight short pays 2 days",
+    "locate_availability": 0.5,
+    "locate_model": "deterministic expectation: event weight x0.5; assumed random subset (undetectable selection disclosed)",
+    "slippage_per_side": 0.005,
+    "rider": "R1 \u2014 no verdict valid under default cost assumptions"
+  },
+  "sizing_constitutional": {
+    "rider": "R2",
+    "art1_worst_case_per_trade": 0.0075,
+    "declared_worst_case": "overnight gapper short has no functioning stop: worst-case = 100% adverse",
+    "notional_per_event": 0.0075,
+    "locate_weight": 0.5,
+    "daily_net": "sum(event_returns)*0.0075*0.50 per day; 0 on no-event days"
+  },
+  "thresholds": {
+    "rider": "R3",
+    "primary": "stationary-block-bootstrap one-sided p(mean of DAILY constitutional net series > 0), L=5, 10000 draws, seed 42 (research.modern._lib.block_bootstrap_sharpe_diff_p vs zero arm)",
+    "dsr": "deflated_sharpe_ratio(daily Sharpe, n_trials=MINED_N) must be >= 0.95 (sovereign.discovery.gate)",
+    "family": "Benjamini-Hochberg across HYP-093/094/095 primary p-values, alpha=0.05, m=3",
+    "mined_n": 809,
+    "daily_series": "net constitutional return for EVERY trading day in the holdout window (0.0 on no-event days) \u2014 the %/day claim is over calendar of opportunity, not event days only",
+    "constitutional_floor_pct_day": 0.0003,
+    "tail_condition": "no single event worse than -1.00 (sizing premise) AND event p5 >= -0.50"
+  },
+  "abort": [
+    "same as HYP-093"
+  ],
+  "verdict_ladder": "CONFIRMED (all: primary p<0.05, BH survivor, DSR>=0.95, constitutional floor met, tail condition met) / VALID_BUT_BELOW_FLOOR (significance yes, floor no) / NOT_ROBUST (tail/sizing premise violated) / NOT_SIGNIFICANT / DATA_INSUFFICIENT (coverage/abort conditions)",
+  "prior_materials": "Mining board NON-EVIDENTIARY. Registered prior: NOT_SIGNIFICANT.",
+  "hash_lock": "3e874fde789ec9823b29f3a0b4de116f4ebc440f391cf1a8b7147e38ac627610"
+}

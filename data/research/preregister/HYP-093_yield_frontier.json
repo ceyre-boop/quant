@@ -1,0 +1,61 @@
+{
+  "id": "HYP-093",
+  "name": "Parabolic gapper fade (intraday short, +30% stop) \u2014 mined board row 1",
+  "registered": "2026-07-12",
+  "ticket": "TICK-031",
+  "mined_source": "F-EQ2_fade_short thr0.5|stop0.3|close|mna_excl=True (net/day +3.78% MINED, median +5.6%/event, n=651)",
+  "pipeline": {
+    "holdout_window": {
+      "start": "2024-07-01",
+      "end": "2025-06-30"
+    },
+    "stage1": "Polygon grouped daily adjusted=true; ticker alpha len<=5 not 5-letter-WRU; prev close >=0.75; day high >= 1.20*prev close; day volume >= 500000",
+    "stage2": "Alpaca SIP 5Min+1Day adjustment=split; slice = bars ET start in [09:30,10:25]; readable = >=8 bars AND last >=10:15; P=last slice close; qualifying = P>=1.30*prev_close AND P>=2.00 AND slice volume >= 500000",
+    "fetch_rule": "G1 fetch runs ONLY after this prereg's hash is locked and its ledger entry is PREREGISTERED (gate-zero enforced in code)"
+  },
+  "signal": "qualifying ticker-day AND gain_1030 >= 0.50 AND catalyst != MERGER_ACQ (Alpaca news [prev day 16:00 ET, day 10:30 ET], posthoc_scan keyword classifier verbatim)",
+  "execution": {
+    "entry": "short at open of first bar with ET start in [10:30,11:00)",
+    "stop": "stop_px = entry*1.30; walk post bars: bar.o>=stop -> fill bar.o (gap-through); bar.h>=stop -> fill stop_px",
+    "exit": "close of last bar ET start < 16:00 if not stopped",
+    "event_return": "(entry - exit)/entry - 2*0.005 - APR(gain_1030)/365"
+  },
+  "costs": {
+    "borrow_apr_schedule_pessimistic": {
+      "gap_0.3_0.5": 1.0,
+      "gap_0.5_1.0": 2.0,
+      "gap_1.0_1.5": 4.0,
+      "gap_1.5_plus": 6.0
+    },
+    "borrow_charge": "intraday short pays 1 day of schedule (covers locate fees); overnight short pays 2 days",
+    "locate_availability": 0.5,
+    "locate_model": "deterministic expectation: event weight x0.5; assumed random subset (undetectable selection disclosed)",
+    "slippage_per_side": 0.005,
+    "rider": "R1 \u2014 no verdict valid under default cost assumptions"
+  },
+  "sizing_constitutional": {
+    "rider": "R2",
+    "art1_worst_case_per_trade": 0.0075,
+    "declared_worst_case": "2x stop distance = 60% adverse (halt gap-through multiplier)",
+    "notional_per_event": 0.0125,
+    "locate_weight": 0.5,
+    "daily_net": "sum(event_returns)*0.0125*0.50 per day; 0 on no-event days"
+  },
+  "thresholds": {
+    "rider": "R3",
+    "primary": "stationary-block-bootstrap one-sided p(mean of DAILY constitutional net series > 0), L=5, 10000 draws, seed 42 (research.modern._lib.block_bootstrap_sharpe_diff_p vs zero arm)",
+    "dsr": "deflated_sharpe_ratio(daily Sharpe, n_trials=MINED_N) must be >= 0.95 (sovereign.discovery.gate)",
+    "family": "Benjamini-Hochberg across HYP-093/094/095 primary p-values, alpha=0.05, m=3",
+    "mined_n": 809,
+    "daily_series": "net constitutional return for EVERY trading day in the holdout window (0.0 on no-event days) \u2014 the %/day claim is over calendar of opportunity, not event days only",
+    "constitutional_floor_pct_day": 0.0005,
+    "tail_condition": "event p5 >= -0.60 AND no single event worse than -0.60 (else sizing premise broken -> NOT_ROBUST)"
+  },
+  "abort": [
+    "stage-1 holdout cache incomplete -> partial-window truthfully or DATA_INSUFFICIENT",
+    "stage-2 usable coverage < 60% of candidates -> DATA_INSUFFICIENT"
+  ],
+  "verdict_ladder": "CONFIRMED (all: primary p<0.05, BH survivor, DSR>=0.95, constitutional floor met, tail condition met) / VALID_BUT_BELOW_FLOOR (significance yes, floor no) / NOT_ROBUST (tail/sizing premise violated) / NOT_SIGNIFICANT / DATA_INSUFFICIENT (coverage/abort conditions)",
+  "prior_materials": "Mining board is NON-EVIDENTIARY. Registered prior: NOT_SIGNIFICANT (operator's stated guess).",
+  "hash_lock": "c5b10616fc77b1e9b60573577a239a8ae4fc52fb4d730c7b46a6eff94fa7ce9a"
+}
