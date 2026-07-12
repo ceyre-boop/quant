@@ -1968,5 +1968,29 @@
     "date_tested": "2026-07-12",
     "p_value": 0.594141,
     "result": "Well-powered null: mechanized card checklist does not separate post-read returns. Primary MWU p=0.594 (n=558 CONT / 391 EX; unique tickers 439/326); run-deduped robustness p=0.634. CONT median -2.34% vs EX -1.81%; ALL-candidate base rate median -2.21%, 48% reverse >3%. CONT mean +1.15% is tail-skew, not read information (post-hoc, not evidence). Halt-excluded set (n=331, conservative) median +16.5% descriptive. Report: data/research/gapper/report.md"
+  },
+  {
+    "id": "HYP-091",
+    "name": "TSMOM diversification: does 12-month time-series momentum add a real diversifier to the v015 carry book?",
+    "status": "PREREGISTERED",
+    "date_registered": "2026-07-12",
+    "family": "NONE",
+    "hash_lock": "c1a47738cbb3f17fa3d4101b0a2063ab062aba50dcc7d10258458a848cc7a2b1",
+    "prereg_file": "data/research/preregister/HYP-091_tsmom_carry_diversification.json",
+    "mechanism": "time-series momentum (sign of trailing 12-month return, inverse-vol sized, monthly rebalance) as a potential diversifier of the v015 carry book; near-zero carry/momentum correlation is the documented property that would make combining them rational (Moskowitz 2012, Koijen 2018)",
+    "methodology_note": "isolated study research/tsmom_hyp091/; corrects the parallel HYP-089 quick-look (proxy corr + no financing + daily rebalance) with monthly rebalance, correlation vs ACTUAL v015 returns, and correct rate-differential financing; TICK-027",
+    "relationship_to_prior": {
+      "prior_id": "HYP-089 (parallel session, committed 658733f, NOT_SIGNIFICANT, NOT ledger-registered)",
+      "why_not_a_re_test": "HYP-089 measured a different, weaker instrument: carry proxied by the FRED rate-diff SIGN (not actual v015 returns), zero financing (spread-only), daily rebalance, 3x cap. HYP-091 corrects all three axes that determine the diversification answer. Fixing an invalid measurement is not parameter-fishing; the two are declared here for full transparency."
+    },
+    "prior_expectation": "NOT_SIGNIFICANT",
+    "result": null,
+    "p_value": null,
+    "bh_survives": null,
+    "oos_sharpe": null,
+    "is_sharpe": null,
+    "standalone": true,
+    "auto_generated": false,
+    "source": "manual"
   }
 ]
