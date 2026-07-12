@@ -285,15 +285,20 @@ class CarryEngine:
     @staticmethod
     def _fetch_prices(ticker: str):
         """Fetch recent OHLCV for ATR computation.  Returns None on failure."""
+        from sovereign.forex.degraded_sentinel import flag_degraded
         try:
             import yfinance as yf
             df = yf.download(ticker, period='30d', progress=False, auto_adjust=True)
             if df is None or df.empty:
+                # No data → ATR silently falls back to 0.001 (stop/sizing degraded).
+                # Flag it fail-loud (TICK-025).
+                flag_degraded(ticker, "yfinance returned an empty OHLCV frame; ATR falls back to 0.001")
                 return None
             if hasattr(df.columns, 'get_level_values'):
                 df.columns = df.columns.get_level_values(0)
             return df
-        except Exception:
+        except Exception as e:
+            flag_degraded(ticker, f"yfinance download failed: {type(e).__name__}: {e}; ATR falls back to 0.001")
             return None
 
     @staticmethod

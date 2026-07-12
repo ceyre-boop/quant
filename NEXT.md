@@ -6,6 +6,41 @@ Standing constraints live in `CLAUDE.md` — not restated here.
 
 ---
 
+## 2026-07-12 · TICK-025 — fail-loud DEGRADED sentinel for the yfinance OHLCV fallback (IN_PROGRESS)
+
+**Context:** dispatched autonomously, diagnostic-and-fix only, explicitly scoped to *just* the
+fail-loud flag — not the full backlog TICK-025 (proof_of_life/health/last_fill propagation stays
+deferred). The live risk: the daily scan silently drops a pair (or stubs ATR to 0.001) when
+yfinance can't return OHLCV for USDJPY=X / AUDUSD=X, so Oracle conviction rests on partial inputs
+with the evidence buried in `logs/forex_scan.err`.
+
+**Diagnosis (read before touching):** the fallback fires at two live-only points, neither imported
+by `forex_backtester` (confirmed) → the 0.6886 reconcile anchor is untouched:
+- `sovereign/forex/macro_engine.py::_get_price_history` — yfinance empty/exception → returns None →
+  `score_pair` drops the pair (this is the Oracle-conviction path).
+- `sovereign/forex/carry_engine.py::_fetch_prices` — yfinance empty/exception → ATR falls to 0.001.
+
+**Shipped:**
+- New `sovereign/forex/degraded_sentinel.py` — `flag_degraded(pair, reason, source)`: writes
+  `sentinel/DEGRADED_<source>_<pair>.txt` (timestamp/pair/source/reason) + logs WARNING.
+  Observability-only, exception-safe (never raises), cwd-independent path, imports nothing from ict.
+- Wired both fallback points to call it. **Behavior unchanged** — both still return None; the flag is
+  a pure side-effect (verified via mocked empty-frame + exception: None preserved, sentinel written).
+- `sentinel/` created (`.gitkeep` tracked; `DEGRADED_*.txt` gitignored via `/sentinel/*` + negation).
+
+**Verify:** helper + both instrumented paths unit-exercised green; `tests/unit/test_forex_macro_engine.py`
++ `test_forex_batch_backtester.py` = 18/18 relevant pass. One PRE-EXISTING failure noted, NOT mine:
+`test_scan_all_pairs_returns_top3` hardcodes `ALL_PAIRS[4]` (stale 5-pair assumption; universe is the
+4-pair HYP-045 set) — fails identically with my edits stashed. Flagged as a separate task, left alone
+to keep commit hygiene.
+
+**Refused/held:** did not touch signal logic, gates, sizing, params, `_apply_costs`, or any backtest
+path; did not implement the broader proof_of_life/health/last_fill propagation (out of dispatched scope).
+
+**Push:** see commit `fix(data): TICK-025 yfinance degraded sentinel`.
+
+---
+
 ## 2026-07-11 (later) · LIVE-POSITION TRIAGE: financing ✓, no silent failure ✓, shadow agrees ✓ — AND the swap cost model is ~10× off
 
 **Context:** dispatch flagged three checks on the live short EUR_USD (#227, opened 07-03,

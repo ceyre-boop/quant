@@ -106,6 +106,10 @@ data/exec/
 # Sentiment board-state pipeline DuckDB (runtime data, rebuilt from sources) — never commit
 data/sentiment.db
 data/sentiment/
+
+# TICK-025: runtime DEGRADED sentinels (fail-loud yfinance/data-fetch fallback flags) — never commit
+/sentinel/*
+!/sentinel/.gitkeep
 .env
 .env
 .env

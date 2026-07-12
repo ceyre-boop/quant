@@ -25,6 +25,7 @@ from sovereign.forex.data_fetcher import ForexDataFetcher
 from sovereign.forex.fair_value import FairValueModel
 from sovereign.forex.cycle_detector import CycleDetector
 from sovereign.forex.risk_sentiment import RiskSentimentEngine
+from sovereign.forex.degraded_sentinel import flag_degraded
 from sovereign.forex.strategy import (
     CONVICTION_NEUTRAL_THRESHOLD,
     CONVICTION_FULL_SIZE,
@@ -336,6 +337,9 @@ class ForexMacroEngine:
                 progress=False, auto_adjust=True
             )
             if df.empty:
+                # yfinance produced no data — pair is silently dropped downstream
+                # (score_pair returns None). Flag it fail-loud (TICK-025).
+                flag_degraded(pair, "yfinance returned an empty OHLCV frame")
                 return None
             if isinstance(df.columns, pd.MultiIndex):
                 df.columns = df.columns.get_level_values(0)
@@ -344,6 +348,7 @@ class ForexMacroEngine:
             self._price_cache[pair] = s
             return s
         except Exception as e:
+            flag_degraded(pair, f"yfinance download failed: {type(e).__name__}: {e}")
             logger.warning(f"Price download failed for {pair}: {e}")
             return None
 

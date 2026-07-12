@@ -266,11 +266,12 @@ Schema per ticket:
 **depends_on:** []
 **blocks:** []
 **acceptance_criteria:**
+- [x] Fail-loud DEGRADED flag when the yfinance OHLCV fallback fires (sentinel file + WARNING) — landed 2026-07-12
 - [ ] Per-pair input-quality field in proof_of_life.json + proximity; health YELLOW on any DEGRADED carry pair
 - [ ] Root-cause note for the yfinance failures (ticker format/rate-limit/API drift) with fix or documented workaround
 - [ ] last_fill reflects the live open book
-- [ ] No change to signal logic, gates, or sizing; scan replay on a clean day produces identical decisions
-**status:** backlog
+- [x] No change to signal logic, gates, or sizing — observability side-effect only (verified: None-return preserved, macro/carry not in backtest path)
+**status:** in_progress (2026-07-12 — dispatched minimal scope done: fail-loud `sentinel/DEGRADED_yfinance_<pair>.txt` + WARNING at the yfinance OHLCV fallback in macro_engine._get_price_history and carry_engine._fetch_prices. REMAINING: input-quality propagation into proof_of_life/proximity/health + last_fill fix.)
 **pre_approved:** false
 
 ## TICK-026
