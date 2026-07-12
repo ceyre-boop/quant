@@ -1,0 +1,98 @@
+{
+  "files": {
+    "AUDUSD.parquet": {
+      "rows": 3143,
+      "sha256": "2f2fe4b78550bcaa33be3cbbcd5bbe3a4589157ddfc899b06bfa7b23dfb663fc",
+      "span": [
+        "2014-06-02",
+        "2026-06-29"
+      ],
+      "symbol": "AUDUSD=X"
+    },
+    "AUDUSD_differentials.parquet": {
+      "pair": "AUDUSD=X",
+      "rows": 3160,
+      "sha256": "ada6746392cdafab11cd69463cb83904777fa3ea0bb089eb2a6a99292fdc2f9d",
+      "span": [
+        "2014-06-02",
+        "2026-07-10"
+      ]
+    },
+    "EURUSD.parquet": {
+      "rows": 3143,
+      "sha256": "77632becb5c34343d15849fda79cc1d3a79db632f20a0eca8cc5212243664e42",
+      "span": [
+        "2014-06-02",
+        "2026-06-29"
+      ],
+      "symbol": "EURUSD=X"
+    },
+    "EURUSD_differentials.parquet": {
+      "pair": "EURUSD=X",
+      "rows": 3160,
+      "sha256": "ada6746392cdafab11cd69463cb83904777fa3ea0bb089eb2a6a99292fdc2f9d",
+      "span": [
+        "2014-06-02",
+        "2026-07-10"
+      ]
+    },
+    "GBPUSD.parquet": {
+      "rows": 3143,
+      "sha256": "98d697facbdd78d025a650f6b94a293f421df1e4664d01f563c0b2e4a5d1ecdf",
+      "span": [
+        "2014-06-02",
+        "2026-06-29"
+      ],
+      "symbol": "GBPUSD=X"
+    },
+    "GBPUSD_differentials.parquet": {
+      "pair": "GBPUSD=X",
+      "rows": 3160,
+      "sha256": "ada6746392cdafab11cd69463cb83904777fa3ea0bb089eb2a6a99292fdc2f9d",
+      "span": [
+        "2014-06-02",
+        "2026-07-10"
+      ]
+    },
+    "SPY.parquet": {
+      "rows": 3037,
+      "sha256": "0618d2bd5505c9a6c2d92e2e0ad72b477a93a73a53fda5524fb6c5932adfaf29",
+      "span": [
+        "2014-06-02",
+        "2026-06-29"
+      ],
+      "symbol": "SPY"
+    },
+    "USDJPY.parquet": {
+      "rows": 3143,
+      "sha256": "b5f1356facf993874ba1643aedf88e0500ec3796f2bbf7320e1c525bffcf1ea8",
+      "span": [
+        "2014-06-02",
+        "2026-06-29"
+      ],
+      "symbol": "USDJPY=X"
+    },
+    "USDJPY_differentials.parquet": {
+      "pair": "USDJPY=X",
+      "rows": 3160,
+      "sha256": "ada6746392cdafab11cd69463cb83904777fa3ea0bb089eb2a6a99292fdc2f9d",
+      "span": [
+        "2014-06-02",
+        "2026-07-10"
+      ]
+    },
+    "VIX.parquet": {
+      "rows": 3038,
+      "sha256": "df07a50ead9e2cdc53e5ba0d1c41625c5324216ecde4921351238e7373016443",
+      "span": [
+        "2014-06-02",
+        "2026-06-29"
+      ],
+      "symbol": "^VIX"
+    }
+  },
+  "freeze_end": "2026-06-30",
+  "freeze_start": "2014-06-01",
+  "frozen_at": "2026-07-12T00:47:27.151036+00:00",
+  "note": "study inputs frozen; every downstream step reads ONLY these parquets. Reconcile (canonical, unfrozen) runs separately by design \u2014 it measures whether the canonical harness still reproduces 0.6886 on live data."
+}
