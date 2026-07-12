@@ -362,7 +362,7 @@ Schema per ticket:
 **depends_on:** []
 **blocks:** []
 **acceptance_criteria:**
-- [ ] >=2 concrete named firms/structures evaluated with locate + pricing terms cited
-- [ ] Explicit verdict: funnel-monetization thesis VIABLE / NOT VIABLE for HYP-093/094-class edges
-**status:** backlog
+- [x] 6 firms/structures evaluated with cited terms (TTP, Zimtra, T3, Bright, SMB, Funder)
+- [x] Explicit verdict: **NOT VIABLE** as true funded vehicle; first-loss-only paths; US-resident wall at the one purpose-built shop
+**status:** done (2026-07-12 — data/research/yield_frontier/tick032/funding_vehicle_verdict.md)
 **pre_approved:** true (operator rider 2026-07-12)
