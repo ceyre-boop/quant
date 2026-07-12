@@ -1833,14 +1833,6 @@
     ]
   },
   {
-    "id": "BENCH-THROUGHPUT",
-    "name": "Backtest throughput benchmark (measured, replaces the 148k claim)",
-    "status": "MEASURED",
-    "date_tested": "2026-07-05",
-    "result": "single-core(90bar)=21,585/s \u00b7 12-core ceiling=13,955/s \u00b7 best bar-evals=5,484,788/s \u00b7 legacy claim 148,193 (NOT beaten; numba INACTIVE on py3.14.4 \u2192 pure-Python fallback)",
-    "methodology_note": "arm, 12 physical cores, numba INACTIVE on py3.14.4 \u2192 pure-Python fallback. Time-boxed. FastBacktestEngine vs pure-Python forex kernel across 90bar/daily/5min/1min, single vs all-cores. See backtest_benchmark JSON."
-  },
-  {
     "id": "HYP-082",
     "name": "Log-corridor deviation beyond carry (geometry family)",
     "status": "PREREGISTERED",
@@ -1953,5 +1945,24 @@
         "note": "HYP-090 adjudicated NOT_SIGNIFICANT: best run A2_W365 Sharpe 0.4343 vs A0 0.9478; min p=0.9774; criteria per locked prereg 6dd9cc85"
       }
     ]
+  },
+  {
+    "id": "BENCH-THROUGHPUT",
+    "name": "Backtest throughput benchmark (measured, replaces the 148k claim)",
+    "status": "MEASURED",
+    "date_tested": "2026-07-12",
+    "result": "single-core(90bar)=21,692/s \u00b7 12-core ceiling=116,650/s \u00b7 best bar-evals=15,699,027/s \u00b7 legacy claim 148,193 (NOT beaten; numba INACTIVE on py3.14.4 \u2192 pure-Python fallback)",
+    "methodology_note": "arm, 12 physical cores, numba INACTIVE on py3.14.4 \u2192 pure-Python fallback. Time-boxed. FastBacktestEngine vs pure-Python forex kernel across 90bar/daily/5min/1min, single vs all-cores. See backtest_benchmark JSON."
+  },
+  {
+    "id": "HYP-092",
+    "name": "Gapper continuation/exhaustion read separates post-read returns (decision-card mechanization)",
+    "status": "PREREGISTERED",
+    "date_registered": "2026-07-12",
+    "prereg_file": "data/research/preregister/HYP-092_gapper_continuation.json",
+    "prereg_sha256": "3e07c6a48e8aa81c1aa1598ff4b85d47c755b2a976ee49b612b1a4ae83fb51f4",
+    "ticket": "TICK-029",
+    "registered_prior": "UNKNOWN \u2014 first equities intraday test in the shop; no directional prior registered",
+    "methodology_note": "One-year no-look-ahead replay of the vault Gapper-Continuation card; MWU one-tailed CONT>EX alpha=.05 n>=30/bucket; run-deduped robustness; outcomes raw % (cost-free)."
   }
 ]

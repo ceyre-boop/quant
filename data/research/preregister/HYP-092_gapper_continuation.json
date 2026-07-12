@@ -1,0 +1,67 @@
+{
+  "id": "HYP-092",
+  "name": "Gapper continuation/exhaustion read separates post-read returns (decision-card mechanization)",
+  "registered": "2026-07-12",
+  "source_card": "Obsidian Trading/Research/Gapper-Continuation-Decision-Card.md",
+  "ticket": "TICK-029",
+  "window": {"start": "2025-07-01", "end": "2026-06-30"},
+  "universe": {
+    "discovery_source": "Polygon v2 grouped daily, adjusted=true (survivorship-free: includes delisted)",
+    "ticker_exclusions": "non-alphabetic or len>5; 5-letter tickers ending in W/R/U (warrant/right/unit convention); disclosed as approximate",
+    "stage1_candidate": "prev grouped close exists (no IPO day) AND prev close >= 0.75 USD AND day high >= 1.20 * prev close (BUFFERED superset of the 1.30 stage-2 filter, per advisor: absorbs cross-source basis noise) AND day volume >= 500000 (superset of by-10:30 volume)",
+    "boundary_leak_metric": "count of final candidates whose Polygon-basis high-gain fell in [1.20,1.35) reported"
+  },
+  "stage2": {
+    "source": "Alpaca v2 stocks bars, feed=sip (consolidated tape), adjustment=split for BOTH daily and 5Min (probe verified: AAPL 2020-07-10 raw 380.84 vs split 95.21 = 4:1); delisted coverage probe verified (MSW, TBH, LIXT return bars)",
+    "prev_close": "last daily bar close strictly before gap day within prior 10 trading days, same source+adjustment",
+    "read_slice": "5-min bars with America/New_York start time in [09:30, 10:25] inclusive (bar starting 10:25 completes at 10:30; zoneinfo per-date handles DST)",
+    "readability_rule": "slice must have >= 8 bars AND last slice bar start >= 10:15 ET, else ticker-day excluded as UNREADABLE (halt/sparse); count reported and descriptive outcomes of excluded set disclosed where computable",
+    "filters_at_read": {
+      "pct_up": "P >= 1.30 * prev_close where P = close of last slice bar",
+      "min_price": "P >= 2.00",
+      "min_cum_volume": "sum(slice volume) >= 500000 (consolidated SIP)"
+    },
+    "entry_origin": "OPEN of first bar with ET start in [10:30, 11:00); if absent, excluded as UNREADABLE_AT_ENTRY (counted). Origin bar is disjoint from read-input bars (advisor item 5).",
+    "outcome_end": "close of last bar with ET start < 16:00 (naturally handles half-days and halts-into-close)",
+    "outcome_pct": "outcome_end / entry_origin - 1"
+  },
+  "read_rules": {
+    "definitions": "VWAP = sum(vw*v)/sum(v) over slice; OR = slice bars with start <= 09:55; LH = slice bars with start >= 10:00; up bar: close>open; down bar: close<open; P, H, L = last close / max high / min low of slice",
+    "CONT_signals": {
+      "C1": "P >= VWAP",
+      "C2": "min(low of LH) >= min(low of OR)  [higher lows intact]",
+      "C3": "sum(volume of up bars) > sum(volume of down bars)",
+      "C4": "P >= L + 0.5*(H-L)  [upper half of morning range]"
+    },
+    "EX_signals": {
+      "E1": "P < VWAP",
+      "E2": "max(high of LH) < max(high of OR)  [lower highs]",
+      "E3": "argmax-volume bar start <= 10:10 AND mean(volume of last 3 slice bars) < 0.5 * max bar volume  [climax then fade]",
+      "E4": "on the bar containing H: (high - max(open,close)) / (high - low) > 0.6 with range > 0  [rejection wick]"
+    },
+    "vote": "CONT if sum(C)>=3 and sum(E)<=1; EX if sum(E)>=3 and sum(C)<=1; else UNC (no call, excluded from test per card)",
+    "provenance": "Frozen mechanization of the card's checklist items computable from bars, locked BEFORE any outcome observed. SPY-relative-strength, key-level, float and catalyst items omitted (no historical source wired) - disclosed."
+  },
+  "hypothesis": {
+    "H0": "CONT-read candidates' post-read % move distribution is not greater than EX-read candidates'",
+    "H1": "CONT post-read % > EX post-read % (one-tailed)",
+    "test": "Mann-Whitney U, one-tailed, alpha = 0.05",
+    "min_n": "n >= 30 in both CONT and EX, else verdict = UNDERPOWERED",
+    "primary_sample": "all qualifying ticker-days",
+    "robustness_sample": "run-deduped: drop candidate if same ticker had a qualifying candidate within prior 10 trading days (ticker-day non-independence mitigation; advisor item 3)",
+    "verdict_rule": "VALID_SEPARATION if primary p < 0.05 AND robustness p < 0.10 with same direction; NOT_SIGNIFICANT otherwise; UNDERPOWERED if min_n unmet",
+    "secondary_descriptive_only": ["CONTINUED/REVERSED/STAGNATED rates at +/-3% per card", "bucket medians/means incl. UNC and ALL-candidates baseline", "monthly counts", "cost-free cumulative % paths long-CONT and short-EX", "unique-ticker vs ticker-day counts"]
+  },
+  "disclosures": [
+    "Outcomes are raw % moves: no commissions, slippage, borrow cost/availability, or fill modeling. Short-side EX numbers especially optimistic (hard-to-borrow names).",
+    "Read is a mechanized proxy of a discretionary process; card items requiring news/level/float context are absent.",
+    "Stage-2 coverage may be partial for the most degenerate delisted names despite the delisted probe passing; coverage reported split by active-proxy (ticker still trading in final 10 window days).",
+    "Ticker-days are not independent (runners repeat); MWU p-values on the primary sample are anti-conservative - the run-deduped robustness sample is the honest check.",
+    "Polygon free-tier discovery uses adjusted daily bars; the +20% buffer absorbs basis noise at the boundary.",
+    "No criteria, thresholds, or vote rules may change after outcomes are computed; any post-hoc analysis is labeled post-hoc."
+  ],
+  "abort_conditions": [
+    "Stage-1 cache incomplete for the window -> report partial-window truthfully, never extrapolate",
+    "Stage-2 usable coverage < 60% of candidates -> verdict capped at DATA_INSUFFICIENT"
+  ]
+}

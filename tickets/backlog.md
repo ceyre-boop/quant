@@ -286,3 +286,47 @@ Schema per ticket:
 **status:** closed/stale (2026-07-12 — STALE PREMISE. `data/calendar_fetcher.py:8` and `ict/daily_bias.py:102` import `data.forex_factory_scraper`; that module EXISTS and is git-tracked (added 541b47b 2026-05-27, never removed — the "deleted 07-02" claim was wrong). Verified `python3 -c "import data.calendar_fetcher; import data.forex_factory_scraper"` → BOTH IMPORT OK. Nothing to restore or amputate.)
 **pre_approved:** false
 **pre_approved:** true (plan-mode approval 2026-07-11 — Plans/glistening-juggling-clover.md)
+
+
+## TICK-027
+**title:** HYP-091 TSMOM diversification study — research/tsmom/ (does time-series momentum add a real diversifier to the v015 carry book?)
+**description:** Pre-registered backtest of 12-month time-series momentum (Moskowitz/Ooi/Pedersen) on the 4 v015 pairs (EURUSD/GBPUSD/USDJPY/AUDUSD), 2015-2024, inverse-vol sized (ex-ante vol via ewm com=60, target_vol 10%, leverage cap 2.0), monthly rebalance, net of CORRECT rate-differential-derived financing — NOT the broken Colin-gated SWAP_RATES_ANNUAL (TICK-024 proves it ~10x too small + one sign flip). Financing = anchored differential-tracking model: financing_side(t)=oanda_side_now + sign*(diff(t)-diff_now), diff from data_fetcher.get_pair_differentials, oanda_side_now from data/research/swap_calibration.json (TICK-024 output). Pre-registered null: standalone OOS (2023-24) Sharpe <= 0 OR monthly correlation with v015 carry > 0.5 -> diversification thesis fails. Deliverables: per-calendar-year Sharpe breakdown, monthly corr vs v015 + 50/50 combined-portfolio Sharpe, directional-permutation + Deflated-Sharpe + BH + holdout gauntlet -> VALID_EDGE/NOT_SIGNIFICANT. Isolated package (mirror research/prop_funnel/): reads sovereign read-only, writes only data/research/tsmom/ + hash-locked prereg + 2 ledger touches. Research pass only — deployment/live-capital OUT OF SCOPE (RISK_CONSTITUTION Art. 6). Plan: Plans/here-s-what-the-literature-sleepy-tarjan.md.
+**depends_on:** []  (reads TICK-024's data/research/swap_calibration.json; does NOT require the gated live-table fix)
+**blocks:** []
+**acceptance_criteria:**
+- [ ] Phase 0 hash-locked prereg (data/research/preregister/HYP-091_tsmom.json) + PREREGISTERED ledger entry, verify() PASS, committed BEFORE any price data observed
+- [ ] Reconstructed v015 monthly carry series reproduces the decade Sharpe ~0.69 (loader sanity) before any correlation is trusted
+- [ ] Per-calendar-year Sharpe table (2016-2024) + IS/OOS split reported
+- [ ] Monthly corr vs v015 + combined-portfolio Sharpe + robustness cost legs (broken-model + price-only)
+- [ ] Directional-permutation p (>=10k) + DSR + BH + holdout>0 -> verdict to ledger (backup first, hash_lock preserved)
+- [ ] Isolation test green; full suite + ICT isolation test unaffected; no execution-path / live-param changes
+**status:** backlog
+**pre_approved:** true (plan-mode approval 2026-07-12 — Plans/here-s-what-the-literature-sleepy-tarjan.md)
+
+## TICK-028
+**title:** 90-day ICT taken-trade projection — research/ict_projection/ (is ICT still the right prop-challenge vehicle at current signal frequency?)
+**description:** Read-only projection of how many ICT trades the system will realistically TAKE over the next 90 days at current signal/veto frequency, to sanity-check the ~30-trade prop-challenge timeline. Reads data/ledger/ict_veto_ledger_2026_{05,06,07}.jsonl (writer ict/ict_veto_ledger.py:79) + data/decision_logs/decisions_2026_{05,06,07}.jsonl. CRITICAL: dedup per-scan re-emission — raw ~95 veto records/day collapse to ~7 unique (day,pair,direction,reason) setups/day; skipping inflates the count ~13x. Recompute ADR-veto and weekly-trend-veto rates LIVE (memory's 55%/31% is stale; live ~51%/~9%, plus new HYP046_DISP_GATE/TIMING_GATE classes). Project taken count over ~62 trading days with a bootstrap-over-days CI + rate-sensitivity band; report whether it lands near 30. Committed reproducible script + short markdown report; writes only data/research/ict_projection/projection_90d.json. Shadow-freeze compliant: never import/touch ict/pipeline.py, ict/orchestrator.py, or the exit path. Plan: Plans/here-s-what-the-literature-sleepy-tarjan.md.
+**depends_on:** []
+**blocks:** []
+**acceptance_criteria:**
+- [ ] Dedup factor (~13x) computed and reported; projection uses unique setups, not raw records
+- [ ] ADR + weekly-trend veto rates recomputed live from the ledger (not memory)
+- [ ] 90-day taken-trade point estimate + bootstrap CI + rate-sensitivity band
+- [ ] Deterministic: two runs produce identical projection_90d.json
+- [ ] Read-only: no imports of ict/pipeline.py/orchestrator.py/exit path; nothing written outside data/research/ict_projection/
+**status:** backlog
+**pre_approved:** true (plan-mode approval 2026-07-12 — Plans/here-s-what-the-literature-sleepy-tarjan.md)
+
+## TICK-029
+**title:** HYP-092 Gapper-continuation read backtest — research/gapper_continuation/ (does the decision card's CONT/EX read separate post-read returns?)
+**description:** One-year (2025-07-01→2026-06-30) no-look-ahead replay of the vault Gapper-Continuation-Decision-Card: survivorship-free discovery via Polygon grouped daily (buffered +20% high-vs-prev-close superset filter, day vol >=500K), verification + read + outcomes entirely from Alpaca SIP 5-min bars adjustment=split (filters at 10:30 ET: price>=1.30x prev close, >=$2, cum vol >=500K on bars start<=10:25 only); frozen mechanization of the card's checklist (VWAP, higher-lows, up/down volume, range position, lower-highs, climax-fade, rejection wick) votes CONT/EX/UNC; outcome = % from 10:30-bar OPEN to last RTH bar close. Pre-registered null per the card: MWU one-tailed CONT>EX alpha=.05, n>=30/bucket; robustness = 10-trading-day run-dedup per ticker; ticker-day non-independence disclosed. Prereg data/research/preregister/HYP-092_gapper_continuation.json hash-locked + ledger PREREGISTERED BEFORE outcome analysis. Isolated: no sovereign/ or ict/ imports; writes only data/research/gapper/. Probes done: Alpaca SIP serves delisted tickers (MSW/TBH/LIXT) + intraday adjustment=split verified (AAPL 4:1). Direct build request from Colin 2026-07-12 ("put together a simple test ... back test it ... no look ahead").
+**depends_on:** []
+**blocks:** []
+**acceptance_criteria:**
+- [ ] Prereg hash-locked + ledger PREREGISTERED before outcome analysis (commit order proves)
+- [ ] Stage-1 cache covers all trading days in window; stage-2 coverage % reported split by active-proxy (delisted-vs-active)
+- [ ] All read/filter inputs from bars start<=10:25 ET; outcome origin = 10:30 bar open (no shared bar); guards counted (sparse/halt, IPO, split-mismatch)
+- [ ] MWU primary + run-deduped robustness reported; UNC + sparse outcome distributions disclosed; verdict sealed to ledger with hash verified pre/post
+- [ ] Deterministic reruns; no sovereign/ict imports; nothing written outside data/research/gapper/ + prereg; execution path untouched
+**status:** in_progress (2026-07-12)
+**pre_approved:** true (direct operator build request in-session 2026-07-12)
