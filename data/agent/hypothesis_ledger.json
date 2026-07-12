@@ -1926,5 +1926,25 @@
         "note": "ADJUDICATED per prereg (hash 58e725ed\u2026 verified at run): single pre-stated bootstrap primary. Catalog 168 events/223 rows (gate PASS, >=30). p=0.3637 >= 0.05 -> NOT_SIGNIFICANT (the prior). Descriptives: aligned pre-window skew +1.54 (no significance machinery by design); 13 manipulation-signal flags of 179 positioning-evaluable rows. Artifacts: research/political_alpha/output/. TICK-020."
       }
     ]
+  },
+  {
+    "id": "HYP-090",
+    "name": "MODERN: daily adaptive parameter selection (trailing-window ranking + regime matching, full surface incl. pair selection) vs static v015",
+    "status": "PREREGISTERED",
+    "date_registered": "2026-07-11",
+    "family": "MODERN-ADAPTIVE (BH m=6 declared runs)",
+    "hash_lock": "6dd9cc8565cf59c81a832b1b4b7aca43f2a3580e94a241f32592273be730a2dd",
+    "prereg_file": "data/research/preregister/HYP-090_modern_adaptive_params.json",
+    "mechanism": "if parameter-level regime structure exists, recently-best / regime-matched parameters should outperform the static incumbent out-of-sample; prior kills (HYP-065/066/067, exit sweep, regime router) say it does not at daily resolution",
+    "methodology_note": "self-contained walk-forward replay in research/modern/ per plans/TICK-023.md; precompute-then-replay over 5,775 variants; placebo selection floor + DSR at search size; TICK-023",
+    "prior_expectation": "NOT_ROBUST",
+    "result": null,
+    "p_value": null,
+    "bh_survives": null,
+    "oos_sharpe": null,
+    "is_sharpe": null,
+    "standalone": true,
+    "auto_generated": false,
+    "source": "manual"
   }
 ]

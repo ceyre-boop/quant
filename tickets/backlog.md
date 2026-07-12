@@ -232,3 +232,18 @@ Schema per ticket:
 - [x] One [RESEARCH] commit per phase (P0 03b8093, P1 4f41853, P2 c3719e3, P3 d4e50dd, P4 7f9ca98, P5+P6 follow); NEXT.md updated; pushed
 **status:** done (2026-07-10 — full 10k run seed 7, 75s. HEADLINE: P($10k every month ×12) = 0.0 on EVERY strategy×firm row at current account sizes; only carry_oos(favorable-window)×FTMO approaches "pass 100×" (p^100=0.68; honest decade pool: 1.5e-05). Phase R (futures replay regen) NOT run — operator-gated)
 **pre_approved:** true (plan-mode approval 2026-07-10 — Plans/glistening-juggling-clover.md)
+
+## TICK-023
+**title:** HYP-090 "MODERN" — pre-registered adaptive walk-forward study (research/modern/)
+**description:** Colin's recurring adaptive-parameters idea, tested end-to-end ONCE under the full gauntlet to seal the family. Daily adaptive parameter selection over trailing {90,180,365}cal-day windows: A1 recent-winner argmax + A2 regime-matched k-NN (k=25, expanding-standardized trailing regime vector) + A3 placebo floor (500 crc32 seeds) vs A0 static v015, on 2015→2026 daily forex. FULL surface: 385 configs (θ×hold×stop×trail×gate grid + config #385 = v015-exact incumbent w/ per-pair trailing) × 15 pair subsets = 5,775 variants × 3 windows = 17,325 cells. Architecture: precompute-then-replay (1,540 decade kernel runs via fast_backtester.simulate_forex_trades_arrays → per-day M2M series with CAUSAL costs [spread@entry, swap daily] + open-tail rows; daily loop = rolling stats, no re-backtesting). Prereg data/research/preregister/HYP-090_modern_adaptive_params.json hash-locked + ledger PREREGISTERED BEFORE any data (gate_zero enforced first-call in run_all + regression test). Gauntlet: stationary-block-bootstrap (L=5, 10k, seed 42) arm-vs-A0 one-sided p + BH m=6; DSR n_trials=5,775 primary (6 / 17,325 disclosed); A3 envelope; per-year non-degrade 2017–2025 (tol 0.05); switching-costed variant is verdict criterion 5. ABORT (never re-tune): reconcile weighted_portfolio_sharpe(2015-2024) ∉ 0.6886±0.01. Prior kills disclosed: HYP-065/066/067, 180-config exit sweep, regime router. **Registered prior: NOT_ROBUST.** Isolation whitelist sovereign.forex.{fast_backtester,forex_backtester,exit_machine,data_fetcher,signal_engine}+discovery+reporting; NO config/parameters.yml writes (never resemble monthly_reopt.py); outputs only data/research/modern/. Plan: plans/TICK-023.md (approved 2026-07-11; master Plans/glistening-juggling-clover.md).
+**depends_on:** []
+**blocks:** []
+**acceptance_criteria:**
+- [ ] P0: prereg hash-locked + ledger PREREGISTERED entry BEFORE any data read; --verify green; regression test enforces gate-zero-first
+- [ ] P1: reconcile abort gate green (0.6886±0.01) BEFORE freeze; spot/SPY/VIX/FRED parquets + sha256 manifest; 64 ungated signal builds + external causal VIX mask → signals.npz
+- [ ] P2: 1,540 kernel runs; daily M2M decomposition sums to kernel pnl_pct (1e-12); config #385 reproduces canonical backtest_all snapshot per pair (1e-9)
+- [ ] P3: truncation-invariance (≥20 sampled t, A1+A2) + regime-causality tests green
+- [ ] P4: 6 runs + costed variants + 1,500 placebo replays; verdict per locked criteria sealed to ledger; charts + summary_report + results.json under data/research/modern/; NEXT.md; pushed
+- [ ] 12 module tests green; determinism (2 subprocesses byte-identical); no writes outside data/research/modern/ + prereg + ledger
+**status:** in_progress (2026-07-11 — Claude Code / Molly; plan approved in-session)
+**pre_approved:** true (plan-mode approval 2026-07-11 — Plans/glistening-juggling-clover.md)
