@@ -246,4 +246,42 @@ Schema per ticket:
 - [x] P4: 6 runs + costed + 1,500 placebos + block-bootstrap gauntlet; **VERDICT NOT_SIGNIFICANT sealed** (prereg hash verified pre/post seal); charts + summary + results.json; NEXT.md; pushed
 - [x] 20 module tests green; write-safety enforced by isolation tests
 **status:** done (2026-07-11 — ADJUDICATED **NOT_SIGNIFICANT** (the registered prior): A0 static v015 daily-M2M Sharpe **+0.948** vs adaptive arms **+0.17..+0.43** — every arm UNDERPERFORMS static (min one-sided p=0.977) AND loses to the 500-seed RANDOM-selection placebo floor (p95≈0.92): recent-winner/regime-matched selection is actively ANTI-selective on ~13-trade windows. The MODERN/adaptive-parameters family is closed with a receipt.)
+
+## TICK-024
+**title:** Recalibrate SWAP_RATES_ANNUAL — the swap cost model is ~10x too small (one sign flip)
+**description:** 2026-07-11 live triage + `research/swap_calibration.py` (read-only, OANDA v3 instruments financing rates vs the model; `data/research/swap_calibration.json`): model swap magnitudes are an order of magnitude below broker reality on ALL 4 pairs (worst: USDJPY SHORT actual −3.82%/yr vs modeled −0.35%; EURUSD LONG −2.45% vs −0.15%), plus one SIGN flip (EURUSD SHORT actually EARNS +0.42%/yr vs modeled −0.10% — confirmed empirically by trade #227's +1.1122 USD of daily credits). At ~7-day mean holds this is up to ~0.07% of notional per trade of mis-modeled cost — material vs ~0.5%/trade typical pnl; direction of aggregate historical bias unknown until re-run (USDJPY shorts likely OVERSTATED in backtests). DESIGN CONSTRAINT: today's OANDA rates must NOT be pasted over 2015-2024 history — financing follows the rate differential over time; the honest fix derives swap from the rate-differential series the system already tracks (data_fetcher.get_pair_differentials) with a calibrated broker spread, validated against the current OANDA rates + trade-227 empirical anchor. GATED HARD: SWAP_RATES_ANNUAL feeds _apply_costs → every backtest → the canonical 0.6886 reconcile anchor used by every study's gate. Requires: param_change_log rationale, full re-reconcile, an explicit re-anchoring decision for RECON_TARGET/bands, and a re-read of which sealed verdicts are cost-sensitive. Colin sign-off required before ANY table change.
+**depends_on:** []
+**blocks:** []
+**acceptance_criteria:**
+- [ ] Historical swap model designed (rate-differential-derived + broker spread), validated vs current OANDA rates (4 pairs × 2 sides) and the trade-227 anchor
+- [ ] Impact study BEFORE any live table change: canonical decade + OOS re-run with the new model, per-pair deltas reported; list of cost-sensitive sealed verdicts
+- [ ] param_change_log rationale + Colin sign-off; RECON_TARGET re-anchoring decision recorded
+- [ ] No execution-path change until all above land
+**status:** backlog
+**pre_approved:** false
+
+## TICK-025
+**title:** Surface live-scan input degradation as a first-class DEGRADED flag (fail-loud)
+**description:** The daily carry scan (com.alta.forex.scan) has been running DEGRADED with the evidence visible only in logs/forex_scan.err: yfinance failures for USDJPY=X / AUDUSD=X ("possibly delisted; no price data found", "Insufficient price history"), ForexDataFetcher falling back to SYNTHETIC macro state for AU/EU. The per-pair NO_TRADE convictions therefore rest on partial/synthetic inputs — a real signal could be missed with zero surface indication ("the system is wrong when it silently succeeds"). Fix: propagate a per-pair input-quality status (OK / DEGRADED_PRICES / SYNTHETIC_MACRO) from the fetch layer into proof_of_life.json, forex_proximity.json and the health check; overall health goes YELLOW when any carry pair is degraded. Also fix the stale proof_of_life.last_fill pointer (points at the closed USD_JPY leg instead of the open book). Touches live-scan-adjacent code → plan-first; scan logic/gates themselves unchanged.
+**depends_on:** []
+**blocks:** []
+**acceptance_criteria:**
+- [ ] Per-pair input-quality field in proof_of_life.json + proximity; health YELLOW on any DEGRADED carry pair
+- [ ] Root-cause note for the yfinance failures (ticker format/rate-limit/API drift) with fix or documented workaround
+- [ ] last_fill reflects the live open book
+- [ ] No change to signal logic, gates, or sizing; scan replay on a clean day produces identical decisions
+**status:** backlog
+**pre_approved:** false
+
+## TICK-026
+**title:** data.forex_factory_scraper is imported but no longer exists — restore or amputate
+**description:** logs/launchd_err.log shows a scheduled job repeatedly dying on `ModuleNotFoundError: No module named 'data.forex_factory_scraper'` — a live specimen of the silent-failure class (job "runs", produces nothing, no surface alarm). `data/calendar_fetcher.py:8` imports it and `ict/daily_bias.py` references it, but the module file is GONE from the working tree (created 541b47b 2026-05-27; likely removed in the 2026-07-02 attic/subtraction pass while consumers still import it). Decide: restore from git history, or amputate the import chain (calendar_fetcher fallback path) and identify/retire the erroring job. Also add the exit-code watchdog lesson: a repeated import-error job should page, not whisper in launchd_err.
+**depends_on:** []
+**blocks:** []
+**acceptance_criteria:**
+- [ ] The erroring plist/job identified by name; decision restore-vs-amputate logged
+- [ ] Next scheduled run exits 0 (or job retired with rationale)
+- [ ] launchd_err.log stops accumulating this traceback
+**status:** backlog
+**pre_approved:** false
 **pre_approved:** true (plan-mode approval 2026-07-11 — Plans/glistening-juggling-clover.md)

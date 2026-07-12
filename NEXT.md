@@ -6,6 +6,44 @@ Standing constraints live in `CLAUDE.md` — not restated here.
 
 ---
 
+## 2026-07-11 (later) · LIVE-POSITION TRIAGE: financing ✓, no silent failure ✓, shadow agrees ✓ — AND the swap cost model is ~10× off
+
+**Context:** dispatch flagged three checks on the live short EUR_USD (#227, opened 07-03,
+−10k @ 1.14395, +$23.70). All three answered read-only (OANDA GET-only + logs), then one
+approved read-only calibration script. NO live-path changes.
+
+**Answers:**
+1. **Financing: OANDA is PAYING the carry — +$1.1122 over the trade's life, every day a credit**
+   (+$0.13-0.14/day, Wed triple +$0.4273; ≈ +0.42%/yr). The "$23.46 vs $23.70 gap" premise was
+   wrong (unrealizedPL is exactly +23.70; financing is a separate field). The carry thesis is
+   working in reality.
+2. **No silent failure.** com.alta.forex.scan loaded, fired every weekday, explicit per-pair
+   NO_TRADE with convictions (USDJPY .42 / GBPUSD .385 / AUDUSD .312 / EURUSD .023) through
+   07-10; Saturday staleness = schedule. "5 pairs" premise stale: AUDNZD excluded by HYP-045 —
+   4 pairs is by design. BUT: the scan runs **DEGRADED daily** (yfinance failures USDJPY/AUDUSD,
+   synthetic AU/EU macro) visible only in forex_scan.err → TICK-025; and a calendar job dies
+   repeatedly on `ModuleNotFoundError: data.forex_factory_scraper` (module atticked while still
+   imported — a real silent-failure specimen) → TICK-026.
+3. **Shadow exit machine: HOLD on every evaluated bar of #227, trailing stop ratcheted
+   1.15739→1.14798 (+35 pips locked), zero unexplained (C5) divergences, no missed weekday.**
+   Stockfish agrees with the account so far; July-28 checkpoint on track.
+
+**THE FINDING (research/swap_calibration.py → data/research/swap_calibration.json):** the
+model's swap table is an order of magnitude too small on ALL 4 pairs, with one sign flip:
+EURUSD SHORT actually EARNS +0.42%/yr (model: pays −0.10%); USDJPY SHORT actually COSTS
+−3.82%/yr (model: −0.35%); EURUSD LONG −2.45% vs −0.15%. At ~7d holds ≈ up to 0.07% notional
+per trade mis-modeled — material vs ~0.5%/trade typical pnl; USDJPY-short-heavy periods in the
+backtests are likely OVERSTATED. → **TICK-024** (gated hard: touches _apply_costs → every
+backtest → the 0.6886 anchor; historical fix must derive from the rate-differential series, not
+today's rates; impact study + param_change_log + Colin sign-off before any table change).
+
+**⏳ Colin queue:** TICK-024 go/no-go (the important one) · TICK-025/026 priority · nothing
+else needs you — the live position and its shadow are healthy.
+
+**Refused/held:** no SWAP table edit, no scan/exit-manager changes, no live params; freeze intact.
+
+---
+
 ## 2026-07-11 · HYP-090 "MODERN" (TICK-023): PRE-REGISTERED, RUN, ADJUDICATED — NOT_SIGNIFICANT SEALED
 
 **Context:** Colin's recurring adaptive-parameters idea (3rd arrival, dispatch named it "MODERN":

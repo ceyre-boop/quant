@@ -1,0 +1,68 @@
+{
+  "generated_at": "2026-07-12T02:21:04.504755+00:00",
+  "source": "OANDA v3 /accounts/{id}/instruments financing.longRate/shortRate (practice)",
+  "empirical_anchor": "trade #227 short EUR_USD earned +1.1122 USD financing over 2026-07-03..07-11 (~+0.42%/yr on notional) \u2014 every day a credit",
+  "model_source": "sovereign/forex/forex_backtester.py SWAP_RATES_ANNUAL",
+  "pairs": {
+    "EURUSD=X": {
+      "LONG": {
+        "oanda_annual": -0.0245,
+        "model_annual": -0.0015,
+        "delta_annual": -0.023,
+        "sign_mismatch": false
+      },
+      "SHORT": {
+        "oanda_annual": 0.0042,
+        "model_annual": -0.001,
+        "delta_annual": 0.0052,
+        "sign_mismatch": true
+      }
+    },
+    "GBPUSD=X": {
+      "LONG": {
+        "oanda_annual": -0.0099,
+        "model_annual": -0.0012,
+        "delta_annual": -0.0087,
+        "sign_mismatch": false
+      },
+      "SHORT": {
+        "oanda_annual": -0.0104,
+        "model_annual": -0.0008,
+        "delta_annual": -0.0096,
+        "sign_mismatch": false
+      }
+    },
+    "USDJPY=X": {
+      "LONG": {
+        "oanda_annual": 0.0179,
+        "model_annual": 0.002,
+        "delta_annual": 0.0159,
+        "sign_mismatch": false
+      },
+      "SHORT": {
+        "oanda_annual": -0.0382,
+        "model_annual": -0.0035,
+        "delta_annual": -0.0347,
+        "sign_mismatch": false
+      }
+    },
+    "AUDUSD=X": {
+      "LONG": {
+        "oanda_annual": -0.0047,
+        "model_annual": -0.0008,
+        "delta_annual": -0.0039,
+        "sign_mismatch": false
+      },
+      "SHORT": {
+        "oanda_annual": -0.016,
+        "model_annual": -0.0012,
+        "delta_annual": -0.0148,
+        "sign_mismatch": false
+      }
+    }
+  },
+  "sign_mismatches": [
+    "EURUSD=X SHORT: oanda +0.0042 vs model -0.0010"
+  ],
+  "note": "CALIBRATION ONLY \u2014 updating SWAP_RATES_ANNUAL is TICK-024 (gated: feeds _apply_costs -> every backtest -> the 0.6886 reconcile anchor; needs param_change_log rationale + full re-reconcile + band re-anchoring decision)"
+}
