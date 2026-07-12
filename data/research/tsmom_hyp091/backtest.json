@@ -1,0 +1,88 @@
+{
+  "per_year_ratediff": [
+    {
+      "n": 11,
+      "sharpe": 0.332,
+      "year": 2015
+    },
+    {
+      "n": 12,
+      "sharpe": 0.392,
+      "year": 2016
+    },
+    {
+      "n": 12,
+      "sharpe": -0.416,
+      "year": 2017
+    },
+    {
+      "n": 12,
+      "sharpe": -0.022,
+      "year": 2018
+    },
+    {
+      "n": 12,
+      "sharpe": 0.245,
+      "year": 2019
+    },
+    {
+      "n": 12,
+      "sharpe": 0.614,
+      "year": 2020
+    },
+    {
+      "n": 12,
+      "sharpe": -1.279,
+      "year": 2021
+    },
+    {
+      "n": 12,
+      "sharpe": 1.265,
+      "year": 2022
+    },
+    {
+      "n": 12,
+      "sharpe": 0.033,
+      "year": 2023
+    },
+    {
+      "n": 12,
+      "sharpe": -0.589,
+      "year": 2024
+    }
+  ],
+  "positive_years": 6,
+  "sharpe_by_mode": {
+    "broken": {
+      "full": 0.31,
+      "is": 0.458,
+      "mean_monthly": 0.001771,
+      "n": 119,
+      "oos": -0.336
+    },
+    "none": {
+      "full": 0.325,
+      "is": 0.473,
+      "mean_monthly": 0.001855,
+      "n": 119,
+      "oos": -0.324
+    },
+    "ratediff": {
+      "full": 0.206,
+      "is": 0.333,
+      "mean_monthly": 0.001181,
+      "n": 119,
+      "oos": -0.349
+    }
+  },
+  "total_years": 10,
+  "v015_loader_sanity": {
+    "per_pair_weighted_sharpe": 0.7209,
+    "target_decade": 0.6886
+  },
+  "window": {
+    "first_month": "2015-02-27",
+    "last_month": "2024-12-31",
+    "n_months": 119
+  }
+}

@@ -1,0 +1,158 @@
+{
+  "backtest": {
+    "per_year_ratediff": [
+      {
+        "n": 11,
+        "sharpe": 0.332,
+        "year": 2015
+      },
+      {
+        "n": 12,
+        "sharpe": 0.392,
+        "year": 2016
+      },
+      {
+        "n": 12,
+        "sharpe": -0.416,
+        "year": 2017
+      },
+      {
+        "n": 12,
+        "sharpe": -0.022,
+        "year": 2018
+      },
+      {
+        "n": 12,
+        "sharpe": 0.245,
+        "year": 2019
+      },
+      {
+        "n": 12,
+        "sharpe": 0.614,
+        "year": 2020
+      },
+      {
+        "n": 12,
+        "sharpe": -1.279,
+        "year": 2021
+      },
+      {
+        "n": 12,
+        "sharpe": 1.265,
+        "year": 2022
+      },
+      {
+        "n": 12,
+        "sharpe": 0.033,
+        "year": 2023
+      },
+      {
+        "n": 12,
+        "sharpe": -0.589,
+        "year": 2024
+      }
+    ],
+    "positive_years": 6,
+    "sharpe_by_mode": {
+      "broken": {
+        "full": 0.31,
+        "is": 0.458,
+        "mean_monthly": 0.001771,
+        "n": 119,
+        "oos": -0.336
+      },
+      "none": {
+        "full": 0.325,
+        "is": 0.473,
+        "mean_monthly": 0.001855,
+        "n": 119,
+        "oos": -0.324
+      },
+      "ratediff": {
+        "full": 0.206,
+        "is": 0.333,
+        "mean_monthly": 0.001181,
+        "n": 119,
+        "oos": -0.349
+      }
+    },
+    "total_years": 10,
+    "v015_loader_sanity": {
+      "per_pair_weighted_sharpe": 0.7209,
+      "target_decade": 0.6886
+    },
+    "window": {
+      "first_month": "2015-02-27",
+      "last_month": "2024-12-31",
+      "n_months": 119
+    }
+  },
+  "correlation": {
+    "primary": {
+      "corr_2022": -0.21303306260757277,
+      "corr_SE_approx": 0.0995,
+      "corr_full": -0.12797066517534111,
+      "corr_full_abs": 0.12797066517534111,
+      "corr_rolling12_last": -0.2931563879994877,
+      "corr_rolling12_mean": -0.0744848884099983,
+      "diversification_lift": -0.10199999999999987,
+      "label": "primary_ratediff",
+      "n_overlap_months": 101,
+      "null_corr_triggered": false,
+      "sharpe_5050_blend": 1.064,
+      "sharpe_tsmom_overlap": 0.239,
+      "sharpe_v015_overlap": 1.166
+    },
+    "robustness_broken_model": {
+      "corr_2022": -0.21700188216279678,
+      "corr_SE_approx": 0.0995,
+      "corr_full": -0.1362162224868953,
+      "corr_full_abs": 0.1362162224868953,
+      "corr_rolling12_last": -0.3254832343413167,
+      "corr_rolling12_mean": -0.07615336365254673,
+      "diversification_lift": -0.03400000000000003,
+      "label": "robustness_broken",
+      "n_overlap_months": 101,
+      "null_corr_triggered": false,
+      "sharpe_5050_blend": 1.132,
+      "sharpe_tsmom_overlap": 0.321,
+      "sharpe_v015_overlap": 1.166
+    }
+  },
+  "env": {
+    "numpy": "2.4.4",
+    "platform": "macOS-26.3.1-arm64-arm-64bit-Mach-O",
+    "python": "3.14.4"
+  },
+  "gauntlet": {
+    "bh_survives": false,
+    "deflated_sharpe": 0.2053,
+    "deflated_sharpe_prob": 0.7531,
+    "full_sharpe": 0.206,
+    "is_sharpe": 0.333,
+    "n_oos_months": 24,
+    "n_perm": 10000,
+    "null_corr_leg": false,
+    "null_sharpe_leg": true,
+    "null_triggered": true,
+    "oos_sharpe": -0.349,
+    "permutation_p": 0.13959,
+    "sharpe_permonth": 0.05926,
+    "verdict": "NOT_SIGNIFICANT",
+    "verdict_reasons": [
+      "OOS Sharpe -0.349 <= 0 (null condition a)"
+    ]
+  },
+  "hypothesis": "HYP-091",
+  "null": "OOS(2023-24) Sharpe <= 0 OR monthly |corr| with v015 > 0.5",
+  "prereg": "data/research/preregister/HYP-091_tsmom_carry_diversification.json",
+  "prior_expectation": "NOT_SIGNIFICANT",
+  "relationship_to_HYP089": "Corrected instrument vs the parallel HYP-089 quick-look (proxy corr + no financing + daily rebalance): monthly rebalance, correlation vs ACTUAL v015 returns, correct rate-differential financing. Reaches NOT_SIGNIFICANT on the OOS-Sharpe leg with real financing (a cleaner kill than HYP-089's boundary-close 0.277-vs-0.30).",
+  "run_utc": "2026-07-12T22:27:43.777907+00:00",
+  "ticket": "TICK-027",
+  "title": "TSMOM diversification of the v015 carry book",
+  "verdict": "NOT_SIGNIFICANT",
+  "verdict_reasons": [
+    "OOS Sharpe -0.349 <= 0 (null condition a)"
+  ]
+}

@@ -1972,7 +1972,7 @@
   {
     "id": "HYP-091",
     "name": "TSMOM diversification: does 12-month time-series momentum add a real diversifier to the v015 carry book?",
-    "status": "PREREGISTERED",
+    "status": "NOT_SIGNIFICANT",
     "date_registered": "2026-07-12",
     "family": "NONE",
     "hash_lock": "c1a47738cbb3f17fa3d4101b0a2063ab062aba50dcc7d10258458a848cc7a2b1",
@@ -1984,13 +1984,22 @@
       "why_not_a_re_test": "HYP-089 measured a different, weaker instrument: carry proxied by the FRED rate-diff SIGN (not actual v015 returns), zero financing (spread-only), daily rebalance, 3x cap. HYP-091 corrects all three axes that determine the diversification answer. Fixing an invalid measurement is not parameter-fishing; the two are declared here for full transparency."
     },
     "prior_expectation": "NOT_SIGNIFICANT",
-    "result": null,
-    "p_value": null,
-    "bh_survives": null,
-    "oos_sharpe": null,
-    "is_sharpe": null,
+    "result": [
+      "OOS Sharpe -0.349 <= 0 (null condition a)"
+    ],
+    "p_value": 0.13959,
+    "bh_survives": false,
+    "oos_sharpe": -0.349,
+    "is_sharpe": 0.333,
     "standalone": true,
     "auto_generated": false,
-    "source": "manual"
+    "source": "manual",
+    "verdict": "NOT_SIGNIFICANT",
+    "date_tested": "20260712",
+    "pvalue_source": "directional_sign_permutation",
+    "full_sharpe": 0.206,
+    "carry_corr_monthly": -0.12797066517534111,
+    "null_triggered": true,
+    "deployment": "OUT_OF_SCOPE (research pass; RISK_CONSTITUTION Art. 6)"
   }
 ]
