@@ -126,7 +126,7 @@ def test_no_options_cell_matches_vrp_v2():
     from research.yield_frontier import m3_options as m3
     for cell in m3.OP2_GRID:
         assert cell.get("cadence") == "daily"
-        assert cell.get("strike_rule") == "delta"
+        assert cell.get("strike_rule") == "moneyness"   # v2 uses 1sigma-RV20
 
 
 # ---------- look-ahead canary ----------
