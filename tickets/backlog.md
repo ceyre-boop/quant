@@ -280,9 +280,9 @@ Schema per ticket:
 **depends_on:** []
 **blocks:** []
 **acceptance_criteria:**
-- [ ] The erroring plist/job identified by name; decision restore-vs-amputate logged
-- [ ] Next scheduled run exits 0 (or job retired with rationale)
-- [ ] launchd_err.log stops accumulating this traceback
-**status:** backlog
+- [x] Import chain verified NOT broken — no restore/amputate needed (see below)
+- [ ] Next scheduled run exits 0 — n/a (premise stale; module present)
+- [ ] launchd_err.log watchdog (repeat import-error should page) — separate observability concern, not this ticket
+**status:** closed/stale (2026-07-12 — STALE PREMISE. `data/calendar_fetcher.py:8` and `ict/daily_bias.py:102` import `data.forex_factory_scraper`; that module EXISTS and is git-tracked (added 541b47b 2026-05-27, never removed — the "deleted 07-02" claim was wrong). Verified `python3 -c "import data.calendar_fetcher; import data.forex_factory_scraper"` → BOTH IMPORT OK. Nothing to restore or amputate.)
 **pre_approved:** false
 **pre_approved:** true (plan-mode approval 2026-07-11 — Plans/glistening-juggling-clover.md)

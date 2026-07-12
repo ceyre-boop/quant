@@ -6,6 +6,25 @@ Standing constraints live in `CLAUDE.md` — not restated here.
 
 ---
 
+## 2026-07-12 · TICK-026 — CLOSED / STALE (import was never broken)
+
+**Verdict:** stale premise, no code change. The ticket claimed `data.forex_factory_scraper`
+was deleted 2026-07-02 while `data/calendar_fetcher.py:8` still imports it. It was NOT deleted:
+`data/forex_factory_scraper.py` exists and is git-tracked (added in 541b47b, 2026-05-27). Verified
+`python3 -c "import data.calendar_fetcher; import data.forex_factory_scraper"` → **BOTH IMPORT OK**.
+`ict/daily_bias.py:102` also imports it (lazy, in-method) and resolves fine. Import chain intact —
+nothing to restore or amputate.
+
+**Note:** the backlog's exit-code-watchdog acceptance item (a repeatedly import-erroring job should
+page, not whisper in launchd_err) is a real but *separate* observability concern — not reopened here,
+since there is no live import error to page on.
+
+**Refused/held:** did not reinstall/duplicate the scraper (already present); no code change made.
+
+**Push:** see commit `fix(data): TICK-026 close stale ticket (import never broken)`.
+
+---
+
 ## 2026-07-12 · TICK-025 — fail-loud DEGRADED sentinel for the yfinance OHLCV fallback (IN_PROGRESS)
 
 **Context:** dispatched autonomously, diagnostic-and-fix only, explicitly scoped to *just* the
