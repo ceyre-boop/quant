@@ -42,6 +42,16 @@ short-side EV claims (borrow costs unmodeled); execution path untouched.
 
 **Push:** ✅ this batch to origin/sovereign-v2.
 
+**Post-hoc addendum (same day, quick scan, DESCRIPTIVE ONLY — ~30 uncorrected cuts):** catalyst
+labels via Alpaca news (pre-10:30 only) + cached-bar features crossed vs continuation. The
+mechanism-backed standouts: **M&A gappers are PINNED** (16.7% continue, only 31% reverse,
+median −0.15% — arbs cap them; watchlist exclusion candidate); **parabolic ≥100%-by-10:30 fade
+brutally** (22% continue, 66% reverse, median **−12.5%**, n=255); **no-news runners continue
+more** (36.9%; recipe 30-50% extension + no-news → 40.5% cont, median +0.5%, n=185 — flips the
+base-rate median positive). Chart-structure features stayed flat (consistent with the sealed
+null). Files: posthoc_scan.py/.json, per_candidate_enriched.csv. Any of these → NEW prereg
+(HYP-093+) on fresh data (2024-07→2025-06 is in Polygon's 2-yr window = clean holdout).
+
 ---
 
 ## 2026-07-12 · TICK-026 — CLOSED / STALE (import was never broken)
