@@ -702,3 +702,27 @@ Applied the pre-registered Blue fix above. Commit `78c8c0b` on `sovereign-v2`.
   Detail: Obsidian `Trading/Ops/Oracle-Fix-Verification-2026-07-03.md`.
 - **Push:** ✅ `origin/sovereign-v2` — remote SHA `78c8c0b` verified == local HEAD.
 - Shadow/exit path untouched. No unlock. No live parameter changes.
+
+---
+
+## 2026-07-12 — HYP-089 TSMOM backtest → NOT_SIGNIFICANT / SEALED
+
+Ran the locked HYP-089 pre-reg ([[HYP-089-TSMOM-Prereg-2026-07-12]]): 12-month (252d) TSMOM,
+sign signal, inverse-vol scaling (10% target / 60d vol), 3× cap, 4 v015 pairs equal-weighted,
+daily rebalance, 2015–2024. Zero parameter search. Fully isolated new codebase in `research/tsmom/` —
+imports nothing from `sovereign/` except the read-only DEGRADED sentinel (never fired; no pair degraded).
+
+- **Verdict: NOT_SIGNIFICANT.** Conjunction fails on the Sharpe gate alone:
+  - Gross Sharpe **0.2773** — FAILS >0.3 (and economically negligible: 1.8%/yr gross, $1→$1.18, maxDD −15.2%).
+  - Carry Pearson **r = −0.156** (p≈1.3e-15) — PASSES <0.7 (near-orthogonal → real diversification, but moot).
+  - **6/10** positive years — PASSES ≥6, but marginal (2024 Sharpe ≈ +0.0005, effectively flat).
+- Matches the Hutchinson et al. (2022) post-publication FX-momentum decay prior exactly. Sealed
+  permanently alongside HYP-090; **not** re-tested with alternative lookbacks (that would be data mining).
+- Carry-direction series for the correlation = sign of FRED policy-rate differential (long the
+  higher-yielder), mirroring the v015 `high_yield_side` logic — documented proxy, no v015 path touched.
+- **Reproducibility:** data vintage pinned to `research/tsmom/prices_cache.parquet`; re-runs are
+  deterministic (verified: cache path reproduces 0.2773 exactly). Artifacts: `backtest.py`,
+  `results.json`, `summary_report.md`, `equity_curve.csv`.
+- **Commit/Push:** ✅ `658733f` on `origin/sovereign-v2` (`59f0b1c..658733f`). Ledger updated in Obsidian
+  `Hypothesis-Status-2026-07-05.md`.
+- v015 carry code, `_apply_costs`, swap table, sealed studies, shadow/exit path — all untouched. No OANDA writes.
