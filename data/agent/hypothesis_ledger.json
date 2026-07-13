@@ -2051,12 +2051,22 @@
   {
     "id": "HYP-097",
     "name": "Evidence-based worst-case gap-through replaces the declared 2x-stop sizing premise",
-    "status": "PREREGISTERED",
+    "status": "ADJUDICATED",
     "date_registered": "2026-07-13",
     "prereg_file": "data/research/preregister/HYP-097_gapthrough_sizing.json",
     "hash_lock": "99e94408a2f13c64fa5d5719e1f5f3736d246559d3141cd6076faf1f20808e6d",
     "ticket": "TICK-033",
     "prior_expectation": "operator SIZING_CLEARED / analyst NOT_CLEARED \u2014 both recorded pre-lock",
-    "methodology_note": "W* = 1.25 x max(LULD structural bound [T10 .5015 / T20 .638], realized max overshoot) per tier; deterministic re-weighting of the sealed HYP-093 stream; floor 0.05%/day unchanged."
+    "methodology_note": "W* = 1.25 x max(LULD structural bound [T10 .5015 / T20 .638], realized max overshoot) per tier; deterministic re-weighting of the sealed HYP-093 stream; floor 0.05%/day unchanged.",
+    "verdict": "NOT_CLEARED",
+    "date_tested": "2026-07-13",
+    "result": "W* T10=0.627 / T20=0.798 (LULD structural floor dominated; empirical 2yr max overshoot 0.477/0.404 from 289 stopped events). Constitutional yield FELL to 0.0166%/day vs 0.023% at the blanket 60% and 0.05% floor. Operator ~30% thesis REFUTED by collar physics; sub-$3 tier worse than assumed. Remaining honest paths to the floor: distribution-based sizing (RCK, W6) and edge concentration (catalyst split, TICK-034). Details data/research/yield_frontier/hyp097/results.json"
+  },
+  {
+    "id": "HYP-096",
+    "name": "Options-wrapper expression of the gapper fade (puts / short call verticals)",
+    "status": "WITHDRAWN_BY_OPERATOR",
+    "date_registered": "2026-07-13",
+    "result": "Never preregistered; closed on operator priority grounds 2026-07-13 informed by W2 physics (parity re-prices borrow into premium) and an UNVERIFIED chat-session wrapper scan (its claimed hash-locked k*r_net>=0.1776 rule does not exist in this repo \u2014 filesystem-verified). Reopen condition: a MEASURED variance premium in gapper chains (requires ThetaTerminal, kept down by operator)."
   }
 ]

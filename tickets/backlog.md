@@ -379,3 +379,15 @@ Schema per ticket:
 - [ ] No signal-parameter re-tuning anywhere (charter weld #1 enforced by review)
 **status:** in_progress (2026-07-13 — W1-W5 agents dispatched)
 **pre_approved:** true (direct operator request 2026-07-13)
+
+## TICK-034
+**title:** Catalyst-reliability split of the frozen fade signal (W1's load-bearing prediction)
+**description:** W1 mechanism brief: the fade should concentrate in no-news/soft-news movers and weaken/flip on hard catalysts (earnings/FDA) — the overreaction-vs-lottery adjudicator and the one genuinely falsifiable descendant of the agent wave. Prereg on MINING-year events + forward shadow accumulation ONLY (2024-25 holdout is consumed — reuse forbidden). If the no-news subset concentrates the edge, constitutional yield can clear the floor at UNCHANGED sizing (HYP-097 closed the sizing route: W* T10 .627/T20 .798, yield 0.0166%/day). Null fully live.
+**depends_on:** []
+**blocks:** []
+**acceptance_criteria:**
+- [ ] Prereg hash-locked (HYP-098) with catalyst taxonomy frozen before any outcome split is computed
+- [ ] Mining-year adjudication + forward-shadow accumulation plan; holdout untouched
+- [ ] Constitutional yield re-derivation under the surviving subset, floors unchanged
+**status:** backlog
+**pre_approved:** false

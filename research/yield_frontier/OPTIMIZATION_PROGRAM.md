@@ -27,7 +27,7 @@ re-tuning the signal itself.
 | WS | Question | Method | Status |
 |---|---|---|---|
 | W1 Mechanism & literature | LANDED: attention-overpricing stack; edge survives via short constraints; catalyst-reliability split = highest-value next test; T+1 break to check | W1_mechanism_brief.md | landed |
-| W2 Defined-risk instrument | LANDED 2026-07-13: naive long puts NO-GO (~0.10 prior — parity re-prices the borrow into premium + 200-600% IV + 20-50% spreads + 20-35% coverage). HYP-096 REDIRECTED to short call verticals (collects the IV, defined risk), gated on a ThetaData chain-feasibility measurement of our actual signal sample | W2_options_brief.md | landed |
+| W2 Defined-risk instrument | CLOSED_BY_OPERATOR 2026-07-13 (HYP-096 WITHDRAWN, never prereg-ed): W2 physics + priority call — the gap-through path dominated. Reopen condition: measured variance premium in gapper chains. ThetaTerminal stays down. | W2_options_brief.md | closed |
 | W3 Short-side plumbing | LANDED: SSR deterministic from our tape; LULD collar math bounds gap-throughs; locate re-entry fees; adverse-selection flag (frictions bind hardest on best events) | W3_plumbing_brief.md | landed |
 | W4 Sizing under jump risk | LANDED: RCK (Busseti-Boyd) x per-day CVaR heat recommended; current size ~1/30-1/60 Kelly; disaster-mixture + GPD stop-gap loss model mandatory in W6 | W4_sizing_brief.md | landed |
 | W5 Data for millions of trials | LANDED: shoestring $142/mo (10yr minute+spine) vs serious $860/mo (+Ortex borrow backfill); two $0 forward-fill jobs (IBKR FTP borrow, halt scraper) actionable now | W5_data_procurement.md | landed |
@@ -39,3 +39,20 @@ re-tuning the signal itself.
 A single operations card: instrument, size formula, stop, overlap cap, locate budget,
 entry/exit clock times, halt protocol — each line traceable to a workstream result and
 the whole card CONFIRMED as one prereg before a dollar moves.
+
+
+## THE RESEARCH METHOD (program meta-process — operator-confirmed 2026-07-13)
+1. Lookahead scan to find candidates (any data, any lookahead; 50-100+ green possibilities — generation, not proof).
+2. Find what survivors have in common (structure, catalysts, conditions — extract the method from the pattern).
+3. Pre-register before touching holdout (null, exact test, operational definitions, verdict rule; hash it; nothing moves after).
+4. Test on untouched data, zero lookahead, family-wise corrected. Seal the verdict.
+5. What survives is the innovation.
+This IS the M→G architecture that produced HYP-093. Every future study in this program follows it.
+
+## Sizing route status (2026-07-13)
+HYP-097 sealed NOT_CLEARED: LULD collar physics puts W* at 0.627 (T10) / 0.798 (T20) — the fixed-fractional
+constitutional yield FALLS to 0.0166%/day. The 60% assumption was not conservatism; sub-$3 names are worse.
+Remaining honest paths to the 0.05% floor: (a) distribution-based sizing — W4's Risk-Constrained Kelly with
+per-day heat, W6 simulator adjudicates; (b) edge concentration — TICK-034 catalyst split at unchanged sizing;
+(c) tier restriction — T10-only trading raises the per-event weight 27% (0.0075/0.627 vs blanket 0.60) but
+drops throughput; W6 grids it. W4's "30x Kelly headroom" stands REFRAMED: margin of safety, not free money.
