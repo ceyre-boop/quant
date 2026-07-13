@@ -6,6 +6,36 @@ Standing constraints live in `CLAUDE.md` — not restated here.
 
 ---
 
+## 2026-07-13 (afternoon) · HYP-097 GAP-THROUGH SEALED NOT_CLEARED — THE PHYSICS REFUTED THE SIZING HOPE; PLISTS LIVE; OPTIONS BRANCH WITHDRAWN
+
+**Verification first:** Colin relayed a chat-session analysis claiming a hash-locked "HYP-096
+k*r_net>=0.1776 viability rule sealed two sessions ago" + wrapper_scan.py. **Neither exists in this
+repo** (no prereg file, no ledger entry, no 0.1776 anywhere, no wrapper_scan.py) — filesystem-checked
+before acting. Options branch therefore closed as HYP-096 **WITHDRAWN_BY_OPERATOR** (priority
+grounds + W2 physics; reopen condition = measured variance premium), NOT as a test verdict.
+
+**HYP-097 (prereg 99e94408, BOTH priors recorded pre-lock, measurement after):** W* = 1.25 x
+max(LULD collar bound, empirical max overshoot) per tier. Result: structural physics DOMINATED —
+W* T10 0.627 / T20 0.798 (empirical 2yr max overshoot 0.477/0.404, n=289 stopped events).
+Constitutional yield FELL to 0.0166%/day (vs 0.023% at the blanket 60%; floor 0.05%). **Colin's
+~30% thesis refuted; sub-$3 names are WORSE than assumed. Sealed NOT_CLEARED.** The income gap is
+physical (halt-cascade mechanics), not conservatism. Remaining honest routes: RCK distribution
+sizing (W6), catalyst-split edge concentration (TICK-034, prereg on mining year + forward shadow
+only), T10-only restriction (W6 grids it).
+
+**Ops:** 3 plists LOADED (operator "yes, today, no discussion") — gapper_shadow scan/close +
+market_snapshots live; today's signals AGEN/QTTB close at 16:20 ET automatically. Data budget =
+shoestring-minus (no purchases; pessimistic-assumption borrow — 300% APR sensitivity barely moves
+the yield: 0.0174%/day). ThetaTerminal stays down. RESEARCH METHOD codified in the charter +
+feedback memory.
+
+**Refused/held:** did not seal "NOT_VIABLE" from unverified external math; did not soften the
+HYP-097 structural floor to rescue the thesis; holdout untouched by TICK-034 design.
+
+**Push:** ✅ e3ee0ef + this entry.
+
+---
+
 ## 2026-07-13 (Monday pre-open) · "TRADE LIVE MONDAY" → LIVE SHADOW ARMED; REAL DOLLARS REFUSED UNDER STANDING LAW
 
 Colin: "make sure this trades live monday morning!" Real-money live REFUSED — four locks, all his
