@@ -27,7 +27,7 @@ re-tuning the signal itself.
 | WS | Question | Method | Status |
 |---|---|---|---|
 | W1 Mechanism & literature | Why does the fade exist; who is on the other side; known decay | specialist agent (academic lit) | dispatched 2026-07-13 |
-| W2 Defined-risk instrument | Are same-day puts on these names buyable at spreads that preserve the edge → HYP-096 spec | specialist agent (options microstructure) + ThetaData probe later | dispatched |
+| W2 Defined-risk instrument | LANDED 2026-07-13: naive long puts NO-GO (~0.10 prior — parity re-prices the borrow into premium + 200-600% IV + 20-50% spreads + 20-35% coverage). HYP-096 REDIRECTED to short call verticals (collects the IV, defined risk), gated on a ThetaData chain-feasibility measurement of our actual signal sample | W2_options_brief.md | landed |
 | W3 Short-side plumbing | Locate mechanics, SSR/Reg-SHO 201, LULD reopen behavior, broker landscape for execution (not funding) | specialist agent | dispatched |
 | W4 Sizing under jump risk | Kelly/drawdown-constrained sizing with −60% tails; overlap heat math | specialist agent | dispatched |
 | W5 Data for millions of trials | Deeper history (paid Polygon/Databento equities), historical borrow rates, halt records — cost & coverage | specialist agent | dispatched |
