@@ -26,11 +26,11 @@ re-tuning the signal itself.
 
 | WS | Question | Method | Status |
 |---|---|---|---|
-| W1 Mechanism & literature | Why does the fade exist; who is on the other side; known decay | specialist agent (academic lit) | dispatched 2026-07-13 |
+| W1 Mechanism & literature | LANDED: attention-overpricing stack; edge survives via short constraints; catalyst-reliability split = highest-value next test; T+1 break to check | W1_mechanism_brief.md | landed |
 | W2 Defined-risk instrument | LANDED 2026-07-13: naive long puts NO-GO (~0.10 prior — parity re-prices the borrow into premium + 200-600% IV + 20-50% spreads + 20-35% coverage). HYP-096 REDIRECTED to short call verticals (collects the IV, defined risk), gated on a ThetaData chain-feasibility measurement of our actual signal sample | W2_options_brief.md | landed |
-| W3 Short-side plumbing | Locate mechanics, SSR/Reg-SHO 201, LULD reopen behavior, broker landscape for execution (not funding) | specialist agent | dispatched |
-| W4 Sizing under jump risk | Kelly/drawdown-constrained sizing with −60% tails; overlap heat math | specialist agent | dispatched |
-| W5 Data for millions of trials | Deeper history (paid Polygon/Databento equities), historical borrow rates, halt records — cost & coverage | specialist agent | dispatched |
+| W3 Short-side plumbing | LANDED: SSR deterministic from our tape; LULD collar math bounds gap-throughs; locate re-entry fees; adverse-selection flag (frictions bind hardest on best events) | W3_plumbing_brief.md | landed |
+| W4 Sizing under jump risk | LANDED: RCK (Busseti-Boyd) x per-day CVaR heat recommended; current size ~1/30-1/60 Kelly; disaster-mixture + GPD stop-gap loss model mandatory in W6 | W4_sizing_brief.md | landed |
+| W5 Data for millions of trials | LANDED: shoestring $142/mo (10yr minute+spine) vs serious $860/mo (+Ortex borrow backfill); two $0 forward-fill jobs (IBKR FTP borrow, halt scraper) actionable now | W5_data_procurement.md | landed |
 | W6 Policy simulator | Event-bootstrap Monte Carlo over the sealed event pool: policy grid × 10^6+ resampled years; outputs distribution of %/day, drawdown, ruin per policy | spec-first, then build (spec: `optimization/W6_SPEC.md`, to be written before code) |
 | W7 Fresh-data replay | Walk the frozen signal forward (2026-07→) as pure shadow observation — the only new signal data that costs nothing | joins the daily-jobs family after W6 |
 

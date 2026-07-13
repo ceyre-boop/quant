@@ -6,6 +6,24 @@ Standing constraints live in `CLAUDE.md` — not restated here.
 
 ---
 
+## 2026-07-13 (later) · TICK-033 W-WAVE LANDED: all five specialist briefs in, HYP-096 redirected
+
+W1-W5 agents complete → data/research/yield_frontier/optimization/ (charter table synced).
+Load-bearing: **W2 kills naive long puts** (parity re-prices the borrow into premium; IV 200-600%;
+chains exist for only 20-35% of signals) → **HYP-096 = short call verticals**, gated on a ThetaData
+chain-feasibility measurement (terminal currently DOWN — needs restart). W1: mechanism = attention
+overpricing; edge survives BECAUSE shorting is constrained; catalyst-reliability split named the
+highest-value future prereg. W3: SSR is DETERMINISTIC from our own tape (compute per-event, not a
+probability); LULD collar math bounds stop gap-throughs; frictions adversely selected vs the best
+events — W6 must model that correlation. W4: Risk-Constrained Kelly × per-day CVaR heat; current
+sizing ~1/30-1/60 Kelly; disaster mixture mandatory in W6. W5: shoestring data stack $142/mo;
+borrow-history is the market gap; **two $0 forward-fill jobs should start now** (daily IBKR FTP
+borrow snapshot + halt-list scraper — unsnapshotted days are lost forever) → plists to draft,
+operator promotes. ⏳ Colin: data budget (a: $142/mo / b: $860/mo) · forward-fill job promotion ·
+HYP-096 short-call-vertical ack · ThetaTerminal restart.
+
+---
+
 ## 2026-07-13 · YIELD FRONTIER G-PHASE (TICK-031): GAUNTLET RUN AND SEALED — THE SHOP'S FIRST REAL SHORT-HORIZON EDGE, AND IT'S BELOW THE CONSTITUTIONAL FLOOR
 
 **Verdicts (preregs c5b10616/3e874fde/959372e9, riders R1-R3 enforced, hashes verified
