@@ -63,11 +63,14 @@ def gapper_grouped_files() -> list[Path]:
 
 
 def assert_no_equities_holdout_on_disk() -> None:
-    """The strongest fence: the equities holdout year must not exist locally
-    during M-phase (G1 fetches it into data/research/yield_frontier/holdout_equities/)."""
+    """M-phase fence: the equities holdout year must not exist locally UNLESS the
+    G1 sanctioned fetch ran (evidenced by its manifest, which g1 writes only after
+    gate-zero verified the prereg hash locks)."""
     hd = REPO / "data/research/yield_frontier/holdout_equities"
-    assert not any(hd.glob("**/*.json.gz")) if hd.exists() else True, \
-        "equities holdout present on disk during mining phase"
+    sanctioned = (hd / "manifest.json").exists()
+    if not sanctioned:
+        assert not any(hd.glob("**/*.json.gz")) if hd.exists() else True, \
+            "equities holdout present on disk without G1 gate-zero manifest"
     for fp in (GAPPER_DIR / "cache/grouped").glob("*.json.gz"):
         assert not (EQUITIES_HOLDOUT[0] <= fp.name.split(".")[0] <= EQUITIES_HOLDOUT[1]), \
             f"holdout-year file leaked into gapper cache: {fp.name}"
