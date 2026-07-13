@@ -1,0 +1,105 @@
+{
+  "HYP-093": {
+    "n_days": 242,
+    "n_events": 559,
+    "mean_pct_day_constitutional": 0.00023,
+    "boot_p": 0.031196880311968805,
+    "boot_detail": {
+      "d_obs": 1.632681,
+      "p_one_sided": 0.031196880311968805,
+      "boot_mean": 1.630302,
+      "boot_p5": 0.18729,
+      "n_boot": 10000,
+      "mean_block": 5,
+      "seed": 42
+    },
+    "sharpe_daily": 0.1028,
+    "dsr_prob": 0.9865,
+    "event_mean": 0.01596,
+    "event_median": 0.04874,
+    "event_p5": -0.32644,
+    "worst_event": -0.49784,
+    "floor": 0.0005,
+    "floor_met": false,
+    "tail_ok": true,
+    "guards": {
+      "sparse": 251,
+      "mna_excluded": 44,
+      "no_data": 10
+    },
+    "bh_survivor": true,
+    "verdict": "VALID_BUT_BELOW_FLOOR"
+  },
+  "HYP-094": {
+    "n_days": 242,
+    "n_events": 162,
+    "mean_pct_day_constitutional": 5.6e-05,
+    "boot_p": 0.101989801019898,
+    "boot_detail": {
+      "d_obs": 1.412723,
+      "p_one_sided": 0.101989801019898,
+      "boot_mean": 1.451932,
+      "boot_p5": -0.427069,
+      "n_boot": 10000,
+      "mean_block": 5,
+      "seed": 42
+    },
+    "sharpe_daily": 0.089,
+    "dsr_prob": 0.9324,
+    "event_mean": 0.02234,
+    "event_median": 0.05873,
+    "event_p5": -0.31384,
+    "worst_event": -0.73139,
+    "floor": 0.0003,
+    "floor_met": false,
+    "tail_ok": true,
+    "guards": {
+      "signals": 162,
+      "absent_next_day": 0,
+      "absent_rate": 0.0
+    },
+    "bh_survivor": false,
+    "verdict": "NOT_SIGNIFICANT"
+  },
+  "HYP-095": {
+    "n_days": 493,
+    "n_events": 40,
+    "mean_pct_day_constitutional": 4.2e-05,
+    "boot_p": 0.013098690130986902,
+    "boot_detail": {
+      "d_obs": 1.314904,
+      "p_one_sided": 0.013098690130986902,
+      "boot_mean": 1.363464,
+      "boot_p5": 0.462695,
+      "n_boot": 10000,
+      "mean_block": 5,
+      "seed": 42
+    },
+    "sharpe_daily": 0.0828,
+    "dsr_prob": 0.9987,
+    "event_mean": 0.00683,
+    "event_median": 0.00419,
+    "event_p5": -0.01593,
+    "worst_event": -0.03417,
+    "floor": 0.0002,
+    "floor_met": false,
+    "tail_ok": true,
+    "guards": {
+      "holdout_sessions": 493,
+      "signal_sessions": 40
+    },
+    "bh_survivor": true,
+    "verdict": "VALID_BUT_BELOW_FLOOR"
+  },
+  "_meta": {
+    "run": "2026-07-13T02:44:24.974581+00:00",
+    "denied_403_days": 9,
+    "partial_window": "2024-07-14..2025-06-30 effective (free-tier 2y lookback)",
+    "bh_alpha": 0.05,
+    "family_p": [
+      0.031196880311968805,
+      0.101989801019898,
+      0.013098690130986902
+    ]
+  }
+}

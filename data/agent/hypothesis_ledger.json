@@ -2006,34 +2006,46 @@
   {
     "id": "HYP-093",
     "name": "Parabolic gapper fade (intraday short, +30% stop) \u2014 mined board row 1",
-    "status": "PREREGISTERED",
+    "status": "ADJUDICATED",
     "date_registered": "2026-07-12",
     "prereg_file": "data/research/preregister/HYP-093_yield_frontier.json",
     "hash_lock": "c5b10616fc77b1e9b60573577a239a8ae4fc52fb4d730c7b46a6eff94fa7ce9a",
     "ticket": "TICK-031",
     "prior_expectation": "NOT_SIGNIFICANT",
-    "methodology_note": "Yield-frontier gauntlet; riders R1-R3 locked; DSR n_trials=809"
+    "methodology_note": "Yield-frontier gauntlet; riders R1-R3 locked; DSR n_trials=809",
+    "verdict": "VALID_BUT_BELOW_FLOOR",
+    "date_tested": "2026-07-13",
+    "p_value": 0.031196880311968805,
+    "result": "boot_p=0.0312, dsr=0.987, constitutional %/day=+0.00023 (floor 0.0005), events=559, event_median=0.04874, verdict=VALID_BUT_BELOW_FLOOR. Details data/research/yield_frontier/gauntlet/verdicts.json"
   },
   {
     "id": "HYP-094",
     "name": "Overnight short of weak-closing moderate gappers \u2014 mined board row 2",
-    "status": "PREREGISTERED",
+    "status": "ADJUDICATED",
     "date_registered": "2026-07-12",
     "prereg_file": "data/research/preregister/HYP-094_yield_frontier.json",
     "hash_lock": "3e874fde789ec9823b29f3a0b4de116f4ebc440f391cf1a8b7147e38ac627610",
     "ticket": "TICK-031",
     "prior_expectation": "NOT_SIGNIFICANT",
-    "methodology_note": "Yield-frontier gauntlet; riders R1-R3 locked; DSR n_trials=809"
+    "methodology_note": "Yield-frontier gauntlet; riders R1-R3 locked; DSR n_trials=809",
+    "verdict": "NOT_SIGNIFICANT",
+    "date_tested": "2026-07-13",
+    "p_value": 0.101989801019898,
+    "result": "boot_p=0.1020, dsr=0.932, constitutional %/day=+0.00006 (floor 0.0003), events=162, event_median=0.05873, verdict=NOT_SIGNIFICANT. Details data/research/yield_frontier/gauntlet/verdicts.json"
   },
   {
     "id": "HYP-095",
     "name": "NQ high-VIX prior-day-down session long \u2014 mined board row 3",
-    "status": "PREREGISTERED",
+    "status": "ADJUDICATED",
     "date_registered": "2026-07-12",
     "prereg_file": "data/research/preregister/HYP-095_yield_frontier.json",
     "hash_lock": "959372e93d84a77b0ce3b9a5e6407ded6a74147dd91969ace06b99b719b42da2",
     "ticket": "TICK-031",
     "prior_expectation": "NOT_SIGNIFICANT",
-    "methodology_note": "Yield-frontier gauntlet; riders R1-R3 locked; DSR n_trials=809"
+    "methodology_note": "Yield-frontier gauntlet; riders R1-R3 locked; DSR n_trials=809",
+    "verdict": "VALID_BUT_BELOW_FLOOR",
+    "date_tested": "2026-07-13",
+    "p_value": 0.013098690130986902,
+    "result": "boot_p=0.0131, dsr=0.999, constitutional %/day=+0.00004 (floor 0.0002), events=40, event_median=0.00419, verdict=VALID_BUT_BELOW_FLOOR. Details data/research/yield_frontier/gauntlet/verdicts.json"
   }
 ]

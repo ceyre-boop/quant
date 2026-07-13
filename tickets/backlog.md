@@ -350,10 +350,10 @@ Schema per ticket:
 **depends_on:** [TICK-030]
 **blocks:** []
 **acceptance_criteria:**
-- [ ] Preregs hash-locked + ledger PREREGISTERED before holdout unfenced (manifest timestamps postdate lock)
-- [ ] Gauntlet verdicts sealed with honest n_trials; UNDERPOWERED/DATA_INSUFFICIENT honored (options holdout thin)
-- [ ] No VRP-001-v2 execution; execution path untouched
-**status:** backlog
+- [x] Preregs hash-locked + ledger PREREGISTERED before holdout unfenced (gate-zero enforced; manifest postdates lock)
+- [x] Verdicts sealed at n_trials=809: HYP-093 VALID_BUT_BELOW_FLOOR (p=.031, DSR .987) / HYP-094 NOT_SIGNIFICANT (p=.102) / HYP-095 VALID_BUT_BELOW_FLOOR (p=.013, DSR .999)
+- [x] No VRP-001-v2 execution; execution path untouched
+**status:** done (2026-07-13 — data/research/yield_frontier/gauntlet/report.md)
 **pre_approved:** true (plan-mode approval 2026-07-12 — Plans/immutable-wondering-alpaca.md)
 
 ## TICK-032

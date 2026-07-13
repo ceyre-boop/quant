@@ -6,6 +6,39 @@ Standing constraints live in `CLAUDE.md` — not restated here.
 
 ---
 
+## 2026-07-13 · YIELD FRONTIER G-PHASE (TICK-031): GAUNTLET RUN AND SEALED — THE SHOP'S FIRST REAL SHORT-HORIZON EDGE, AND IT'S BELOW THE CONSTITUTIONAL FLOOR
+
+**Verdicts (preregs c5b10616/3e874fde/959372e9, riders R1-R3 enforced, hashes verified
+pre/post):** HYP-093 parabolic-fade short **VALID_BUT_BELOW_FLOOR** (boot p=0.031, BH
+survivor, DSR@809=0.987, 559 events on untouched 2024-25; gross +6.5% median/event, net
++4.9% after pessimistic costs; constitutional +0.023%/day vs 0.05% floor) · HYP-094
+overnight weak-close short **NOT_SIGNIFICANT** (p=0.102) · HYP-095 NQ high-VIX dip long
+**VALID_BUT_BELOW_FLOOR** (p=0.013, DSR 0.999, 40 events = min-n; +0.004%/day vs 0.02%).
+
+**Meaning:** the first pre-registered short-horizon edge in shop history to survive
+significance + an 809-trial deflation on unseen data — and the R2 sizing rider (worst-case
+beyond the stop, validated by the holdout's own −32.6% p5 gap-throughs) correctly reduces
+it below income relevance. Signal real; monetization absent AT THIS DESIGN. TICK-032
+(rider 4): NO funded vehicle exists for HTB smallcap shorts (TTP bans the shape by rule,
+Zimtra excludes US, T3/Bright = first-loss) — funnel thesis zero EV weight.
+
+**Post-hoc (stamped, non-evidence):** binding constraint is sizing, not signal — even
+friendly locate/worst-case bounds top at 0.046%/day. Doors opened as NEW preregs only:
+HYP-096 defined-risk redesign (puts on parabolic gappers — collapses R2 worst-case;
+dies or lives on option spreads), HYP-097 stop-defined 095 variant.
+
+**Ops notes:** Polygon 2-yr lookback denied 9 holdout dates (partial-window clause invoked,
+disclosed in verdicts); external kill hit one long background chunk again — foreground
+<10-min chunks remain the law; holdout manifest 744 files, fetched only after gate-zero.
+
+**Refused/held:** sealed verdicts final — no reinterpretation under the "find a loophole"
+instruction (the honest loophole was already in the ladder: VALID_BUT_BELOW_FLOOR);
+no new variants evaluated on holdout data; TICK-024 unchanged; execution path untouched.
+
+**Push:** ✅ this batch to origin/sovereign-v2.
+
+---
+
 ## 2026-07-12 (later) · YIELD FRONTIER M-PHASE (TICK-030): 809 CONFIGS MINED ACROSS 3 UNIVERSES — THE FRONTIER IS GAPPER TAILS, AND IT'S CAPACITY-BOUND
 
 **Context:** Colin asked to "look at EVERYTHING... find a method... 2%+ daily... try it with
