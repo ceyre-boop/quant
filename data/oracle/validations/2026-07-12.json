@@ -1,0 +1,9 @@
+{
+  "date": "2026-07-12",
+  "generated_at": "2026-07-12T06:32:26.817671+00:00",
+  "candidate_lesson": "When the 30-indicator consensus shows high conviction (>=90%) but green_matches=0 and hist_hr=0%, the current setup has no historical analog and should be sized down or vetoed regardless of conviction strength.",
+  "testable_rule": "if consensus_conviction >= 0.90 and green_matches == 0 and hist_hr == 0.0: size *= 0.5 (or veto if session != London Grade A)",
+  "verdict": "REJECTED",
+  "reason": "Rule filters only 0 trades \u2014 insufficient sample",
+  "trades_available": 1160
+}

@@ -1,0 +1,26 @@
+{
+  "date": "2026-07-12",
+  "generated_at": "2026-07-12T06:32:26.801165+00:00",
+  "input_tokens": 5710,
+  "output_tokens": 739,
+  "estimated_cost_usd": 0.141075,
+  "harvest_days_read": 7,
+  "reflection": {
+    "candidate_lesson": {
+      "lesson_text": "When the 30-indicator consensus shows high conviction (>=90%) but green_matches=0 and hist_hr=0%, the current setup has no historical analog and should be sized down or vetoed regardless of conviction strength.",
+      "mechanism": "Conviction measures live indicator agreement, but green_matches/hist_hr measure whether this configuration has EVER worked before. AUDNZD shows conv=100% with 13/30 bear but green_matches=0 and hist_hr=0% \u2014 this is a novel configuration the institutional flow has never rewarded. High live agreement on an unprecedented pattern is crowd consensus, not edge; it tends to mean-revert against the herd.",
+      "testable_rule": "if consensus_conviction >= 0.90 and green_matches == 0 and hist_hr == 0.0: size *= 0.5 (or veto if session != London Grade A)",
+      "expected_impact": "Reduces variance from false-high-conviction entries; improves Sharpe by ~0.02-0.03 via avoided large-size losers on unvalidated configs.",
+      "evidence_from_harvest": "AUDNZD: conv=100%, 13/30 bear, dir=SHORT, but green_matches=0 and hist_hr=0%. GBPUSD and USDJPY similarly show LONG dir with conv 42-50% but hist_hr=0%. Only EURUSD (conv=8%, green_matches=1, hist_hr=73%) has a validated historical analog \u2014 and it reads FLAT.",
+      "evidence_from_reasoning": null,
+      "reasoning_component_targeted": "consensus_conviction + green_matches + hist_hr (conviction-vs-historical-analog gate)",
+      "sample_needed": 40
+    },
+    "retirement_flag": {
+      "lesson_to_review": null,
+      "reason": null
+    },
+    "system_health_note": "Zero trades in 7 days with Regime=UNKNOWN and Forex NO_TRADE_TODAY \u2014 the system is correctly in a hold state, but with no decision log entries all lessons must be harvest/consensus-derived until flow resumes."
+  },
+  "auto_validation": null
+}
