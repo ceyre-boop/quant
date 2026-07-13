@@ -1,0 +1,37 @@
+{
+  "id": "HYP-097",
+  "name": "Evidence-based worst-case gap-through replaces the declared 2x-stop sizing premise",
+  "registered": "2026-07-13",
+  "ticket": "TICK-033",
+  "not_holdout_reuse": "Significance (HYP-093 p=0.031) sealed and untouched; only the sizing premise (a mechanics assumption) is re-derived; event returns re-weighted by arithmetic, never re-tested.",
+  "event_population": "All signal events per the frozen HYP-093 spec, reconstructed identically from mining-year AND holdout-year caches (same code path as the sealed runs).",
+  "tiers": {
+    "T10": "prev_close >= 3.00 (LULD 10% bands)",
+    "T20": "0.75 <= prev_close < 3.00 (LULD 20% bands)"
+  },
+  "structural_total_adverse": {
+    "T10": 0.5015,
+    "T20": 0.638
+  },
+  "structural_scenario": "single limit-up halt crossing the stop, reopen at collar with one 5% extension; DERA reversion-is-the-norm justifies one extension as the tail scenario; deeper cascades covered by safety_mult",
+  "empirical_component": "max realized total adverse move from entry among STOPPED events per tier across both years: max(exit_px/entry - 1)",
+  "derivation_locked": "W*_tier = min(1.25 * max(structural_total_adverse_tier, empirical_max_tier), 1.00)",
+  "safety_mult": 1.25,
+  "re_derivation": "constitutional daily yield = per-day sum of sealed event returns * (0.0075 / W*_tier(event)) * locate 0.50 over the holdout trading-day calendar (verdict basis); mining calendar reported as disclosure",
+  "sensitivities_non_verdict": [
+    "borrow at flat 300% APR replacing tiered schedule",
+    "risk budget 0.82%"
+  ],
+  "verdict_rule": "holdout-calendar yield >= 0.0005/day at the 0.75% budget -> SIZING_CLEARED; else NOT_CLEARED",
+  "priors_recorded": {
+    "operator": "SIZING_CLEARED (~30% worst-case thesis)",
+    "analyst_pre_lock": "NOT_CLEARED live \u2014 LULD collar math yields structural floors of 50-64% before safety"
+  },
+  "disclosures": [
+    "5-min bar resolution: within-bar sequencing approximated by the sealed fill rule (open-through, then high-touch).",
+    "Broker risk-desk discretionary liquidation remains unmodeled tail (W3/W4).",
+    "SSR entry effects unmodeled here, as in HYP-093 (bind on entries, not stops).",
+    "Fixed-fractional Art.1 framework only; RCK/heat-budget sizing is W6's question, not this one."
+  ],
+  "hash_lock": "99e94408a2f13c64fa5d5719e1f5f3736d246559d3141cd6076faf1f20808e6d"
+}

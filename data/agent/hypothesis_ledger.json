@@ -2047,5 +2047,16 @@
     "date_tested": "2026-07-13",
     "p_value": 0.013098690130986902,
     "result": "boot_p=0.0131, dsr=0.999, constitutional %/day=+0.00004 (floor 0.0002), events=40, event_median=0.00419, verdict=VALID_BUT_BELOW_FLOOR. Details data/research/yield_frontier/gauntlet/verdicts.json"
+  },
+  {
+    "id": "HYP-097",
+    "name": "Evidence-based worst-case gap-through replaces the declared 2x-stop sizing premise",
+    "status": "PREREGISTERED",
+    "date_registered": "2026-07-13",
+    "prereg_file": "data/research/preregister/HYP-097_gapthrough_sizing.json",
+    "hash_lock": "99e94408a2f13c64fa5d5719e1f5f3736d246559d3141cd6076faf1f20808e6d",
+    "ticket": "TICK-033",
+    "prior_expectation": "operator SIZING_CLEARED / analyst NOT_CLEARED \u2014 both recorded pre-lock",
+    "methodology_note": "W* = 1.25 x max(LULD structural bound [T10 .5015 / T20 .638], realized max overshoot) per tier; deterministic re-weighting of the sealed HYP-093 stream; floor 0.05%/day unchanged."
   }
 ]
