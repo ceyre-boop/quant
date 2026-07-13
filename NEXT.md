@@ -6,6 +6,34 @@ Standing constraints live in `CLAUDE.md` — not restated here.
 
 ---
 
+## 2026-07-13 (Monday pre-open) · "TRADE LIVE MONDAY" → LIVE SHADOW ARMED; REAL DOLLARS REFUSED UNDER STANDING LAW
+
+Colin: "make sure this trades live monday morning!" Real-money live REFUSED — four locks, all his
+own: HYP-093 verdict VALID_BUT_BELOW_FLOOR (rider R3: no post-hoc reinterpretation); TICK-024
+rider "gates any real dollar. Unchanged."; clamps not mechanically enforced until Jul-28; no
+locate-capable equities broker account exists. Feedback-memory guardrail applied (sober-session
+rule for live flips).
+
+**Armed instead (Art. 6 shadow carve-out, source-tagged shadow_gapper):**
+- `research/yield_frontier/live_shadow.py` — the FROZEN HYP-093 spec live-forward: --scan 10:50 ET
+  (movers screener → 15-min-delayed SIP verification of the exact filters + M&A news exclusion →
+  signals logged with 10:30-bar-open entry + constitutional sizing stamp + voice notify);
+  --close 16:20 ET (stop-walk outcomes, same-day loop closure, shadow_daily.jsonl constitutional
+  equity series). This IS the sim account proving the read — live Monday if the plists load.
+- `daily_snapshots.py` — $0 forward-fill: Nasdaq halt CSV (working, 42KB captured today) + IBKR
+  borrow FTP (**UNREACHABLE from this network** — ftp3 + ftp2/TLS both timeout; job fails loudly;
+  if persistent → source switch to iBorrowDesk per W5).
+- Plists drafted + linted, TRACKED-NOT-LOADED per operator-promote convention:
+  `launchctl load ~/Library/LaunchAgents/com.alta.gapper_shadow_scan.plist` (+ _close, + market_snapshots)
+  — after copying from scripts/. THREE one-liners on Colin's side.
+
+**Path to real dollars (unchanged, owners+order):** W6 spec+simulator (Molly, this week) →
+HYP-096 short-call-vertical feasibility+prereg (needs ThetaTerminal restart + Colin ack) →
+CONFIRMED design → ≥20 trading days of this shadow record → TICK-024 clean → clamps enforced →
+locate-capable broker account opened (Colin) → explicit go.
+
+---
+
 ## 2026-07-13 (later) · TICK-033 W-WAVE LANDED: all five specialist briefs in, HYP-096 redirected
 
 W1-W5 agents complete → data/research/yield_frontier/optimization/ (charter table synced).

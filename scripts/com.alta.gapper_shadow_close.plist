@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.alta.gapper_shadow_close</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/zsh</string><string>-lc</string>
+    <string>cd /Users/taboost/quant &amp;&amp; /usr/bin/env python3 -m research.yield_frontier.live_shadow --close >> logs/gapper_shadow.log 2>> logs/gapper_shadow.err</string>
+  </array>
+  <key>StartCalendarInterval</key>
+  <array>
+    <dict><key>Hour</key><integer>13</integer><key>Minute</key><integer>20</integer><key>Weekday</key><integer>1</integer></dict>
+    <dict><key>Hour</key><integer>13</integer><key>Minute</key><integer>20</integer><key>Weekday</key><integer>2</integer></dict>
+    <dict><key>Hour</key><integer>13</integer><key>Minute</key><integer>20</integer><key>Weekday</key><integer>3</integer></dict>
+    <dict><key>Hour</key><integer>13</integer><key>Minute</key><integer>20</integer><key>Weekday</key><integer>4</integer></dict>
+    <dict><key>Hour</key><integer>13</integer><key>Minute</key><integer>20</integer><key>Weekday</key><integer>5</integer></dict>
+  </array>
+</dict>
+</plist>
