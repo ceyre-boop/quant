@@ -72,6 +72,8 @@ def bars_for(sym, day, kid, sec, tf="5Min", days_back=0):
     s = datetime.combine(day - timedelta(days=days_back), dtime(0, 1) if days_back
                          else dtime(9, 30), tzinfo=ET).astimezone(UTC)
     e = datetime.combine(day, dtime(16, 10), tzinfo=ET).astimezone(UTC)
+    # free-tier SIP cannot serve the most recent 15 min — cap the window
+    e = min(e, datetime.now(UTC) - timedelta(minutes=16))
     q = urllib.parse.urlencode({"symbols": sym, "timeframe": tf,
                                 "start": s.strftime("%Y-%m-%dT%H:%M:%SZ"),
                                 "end": e.strftime("%Y-%m-%dT%H:%M:%SZ"),
