@@ -366,3 +366,16 @@ Schema per ticket:
 - [x] Explicit verdict: **NOT VIABLE** as true funded vehicle; first-loss-only paths; US-resident wall at the one purpose-built shop
 **status:** done (2026-07-12 — data/research/yield_frontier/tick032/funding_vehicle_verdict.md)
 **pre_approved:** true (operator rider 2026-07-12)
+
+## TICK-033
+**title:** Execution-engineering program for the gapper-fade signal (charter: research/yield_frontier/OPTIMIZATION_PROGRAM.md)
+**description:** New research field per Colin 2026-07-13: optimize the exact daily operation of the SEALED HYP-093 signal ("post these findings everywhere. set off agents... i want to use THIS to trade live but not until we know the exact precise best way to run it every day, research on possibly millions of trials"). Charter welds: signal FROZEN (re-tuning = HYP-090 tombstone, BANNED); optimization touches only the execution wrapper (instrument/stop/sizing/overlap/locate/timing); every simulated policy counted in an append-only trials ledger; any live-candidate policy needs its own hash-locked prereg + floor on non-optimized data. Workstreams: W1 mechanism lit, W2 options microstructure (→HYP-096), W3 short-side plumbing/regulation, W4 sizing under jump risk, W5 data procurement (all five dispatched as background agents 2026-07-13); W6 policy Monte-Carlo simulator (SPEC-FIRST — optimization/W6_SPEC.md before any code); W7 forward shadow replay. Live gating ladder: design CONFIRMED under own prereg → sim/paper period → TICK-024 clean → clamps enforced (Jul-28) → Colin's explicit go.
+**depends_on:** [TICK-031 (done)]
+**blocks:** []
+**acceptance_criteria:**
+- [ ] W1-W5 agent briefs saved under data/research/yield_frontier/optimization/ and synthesized
+- [ ] W6 spec written and hash-noted BEFORE simulator code; trials ledger wired
+- [ ] HYP-096 (defined-risk) prereg drafted from W2 numbers for Colin's ack
+- [ ] No signal-parameter re-tuning anywhere (charter weld #1 enforced by review)
+**status:** in_progress (2026-07-13 — W1-W5 agents dispatched)
+**pre_approved:** true (direct operator request 2026-07-13)
