@@ -3,9 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%230a0a0a'/><circle cx='8' cy='8' r='3.5' fill='%2300c896'/></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%23ffffff'/><circle cx='8' cy='8' r='3.5' fill='%233b82f6'/></svg>">
 <title>SOVEREIGN // ICT Oracle</title>
 <style>
+/* DARK THEME (rollback) */
+/*
 :root {
   --bg:     #0a0a0a;
   --bg2:    #111111;
@@ -22,6 +24,25 @@
   --accent: #00c896;
   --font:   'SF Mono','Fira Code','Courier New',monospace;
 }
+*/
+:root {
+  --bg:     #ffffff;
+  --bg2:    #f6faff;
+  --bg3:    #eef5fd;
+  --border: #dbe7f5;
+  --text:   #0f172a;
+  --muted:  #475569;
+  --dim:    #94a3b8;
+  --green:  #067647;
+  --yellow: #b45309;
+  --red:    #b42318;
+  --blue:   #2563eb;
+  --orange: #c2410c;
+  --accent: #2563eb;
+  --font:   'SF Mono','Fira Code','Courier New',monospace;
+}
+/* light-theme depth */
+.panel,.state-card,.ict-stat,#oracle-hero,#feed{box-shadow:0 1px 2px rgba(15,23,42,.05),0 2px 6px rgba(15,23,42,.04)}
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13px;line-height:1.6;min-height:100vh;display:flex;flex-direction:column}
 
@@ -50,7 +71,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
 #reload-btn:hover{border-color:var(--accent);color:var(--accent)}
 
 /* ── BRIDGE ALERT BANNER ── */
-#bridge-banner{background:rgba(224,82,82,.08);border-bottom:2px solid var(--red);padding:7px 24px;display:flex;align-items:center;gap:16px;font-size:11px}
+#bridge-banner{background:rgba(180,35,24,.08);border-bottom:2px solid var(--red);padding:7px 24px;display:flex;align-items:center;gap:16px;font-size:11px}
 #bridge-banner.clear{display:none}
 .bb-icon{font-size:14px}
 .bb-mode{color:var(--red);font-weight:700;letter-spacing:1px}
@@ -75,9 +96,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
 /* ── SYSTEM STATE CARDS ── */
 #state-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
 .state-card{background:var(--bg2);border:1px solid var(--border);padding:12px 14px}
-.state-card.alert{border-color:var(--red);background:rgba(224,82,82,.04)}
-.state-card.warn{border-color:var(--yellow);background:rgba(245,197,24,.04)}
-.state-card.ok{border-color:var(--green);background:rgba(0,200,150,.04)}
+.state-card.alert{border-color:var(--red);background:rgba(180,35,24,.04)}
+.state-card.warn{border-color:var(--yellow);background:rgba(180,83,9,.04)}
+.state-card.ok{border-color:var(--green);background:rgba(6,118,71,.04)}
 .sc-label{font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px}
 .sc-value{font-size:18px;font-weight:700}
 .sc-sub{font-size:10px;color:var(--muted);margin-top:3px}
@@ -185,7 +206,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
   <div class="bb-icon">🔴</div>
   <div>
     <div class="bb-mode" id="bb-mode">ICT: FOUNDATION</div>
-    <div class="bb-detail" id="bb-detail">ICT status: UNPROVEN (perm p=0.52 · live closed 3W/24L) — protective gates stand. Its FVG research seeded <a href="../" style="color:#f5c542;font-weight:700">ICARUS →</a></div>
+    <div class="bb-detail" id="bb-detail">ICT status: UNPROVEN (perm p=0.52 · live closed 3W/24L) — protective gates stand. Its FVG research seeded <a href="../" style="color:#b8860b;font-weight:700">ICARUS →</a></div>
   </div>
   <div class="bb-threat">
     <span style="font-size:10px;color:var(--muted)">THREAT</span>
@@ -276,7 +297,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
       <div class="gate-row"><div class="gate-light">🟡</div><div class="gate-label">G3 WR Alignment<span class="gate-sub">collecting (need 10+)</span></div></div>
       <div class="gate-row"><div class="gate-light" id="g4-light">🔴</div><div class="gate-label">G4 Bridge Threat<span class="gate-sub" id="g4-sub">1.00 HALT_NEW</span></div></div>
       <div class="gate-row"><div class="gate-light">🟡</div><div class="gate-label">G5 Non-Bust Days<span class="gate-sub">collecting</span></div></div>
-      <div id="wait-banner" style="margin-top:10px;padding:8px 10px;background:rgba(224,82,82,.06);border:1px solid var(--red);font-size:11px;color:var(--red)">
+      <div id="wait-banner" style="margin-top:10px;padding:8px 10px;background:rgba(180,35,24,.06);border:1px solid var(--red);font-size:11px;color:var(--red)">
         ⏸ WAIT — buy when G2a + G2b + G4 flip GREEN
       </div>
     </div>
@@ -430,12 +451,12 @@ function updateWaitBanner() {
     }
   });
   if (!pending.length) {
-    banner.style.background = 'rgba(0,200,150,.06)';
+    banner.style.background = 'rgba(6,118,71,.06)';
     banner.style.borderColor = 'var(--green)';
     banner.style.color = 'var(--green)';
     banner.textContent = '✅ READY — all gates green';
   } else {
-    banner.style.background = 'rgba(224,82,82,.06)';
+    banner.style.background = 'rgba(180,35,24,.06)';
     banner.style.borderColor = 'var(--red)';
     banner.style.color = 'var(--red)';
     banner.textContent = '⏸ WAIT — pending: ' + pending.join(' + ');

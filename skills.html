@@ -1,0 +1,653 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Skills Arsenal — Sovereign // Quant</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --card: #f6faff;
+    --accent: #3b82f6;
+    --accent-dark: #2563eb;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --border: #dbe7f5;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+    padding: 0 0 64px 0;
+  }
+
+  code, .mono, .cmd-box {
+    font-family: "SF Mono", "Menlo", "Consolas", "Monaco", monospace;
+  }
+
+  header.top {
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    padding: 22px 32px;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  header.top h1 {
+    font-size: 1.35rem;
+    margin: 0;
+    letter-spacing: 0.02em;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  header.top a.back-link {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.92rem;
+    border: 1px solid var(--border);
+    background: var(--card);
+    padding: 8px 14px;
+    border-radius: 8px;
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+
+  header.top a.back-link:hover {
+    background: #eaf2fd;
+    border-color: var(--accent);
+  }
+
+  main {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 28px 24px 0 24px;
+  }
+
+  .search-wrap {
+    position: sticky;
+    top: 73px;
+    z-index: 15;
+    background: var(--bg);
+    padding: 4px 0 20px 0;
+  }
+
+  #search {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 0.98rem;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--card);
+    color: var(--text-primary);
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  #search:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+  }
+
+  #search::placeholder {
+    color: #94a3b8;
+  }
+
+  .match-count {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-top: 6px;
+    padding-left: 2px;
+  }
+
+  section.group {
+    margin-bottom: 40px;
+  }
+
+  section.group h2 {
+    font-size: 0.82rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent-dark);
+    font-weight: 700;
+    margin: 0 0 14px 0;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--border);
+  }
+
+  .cards {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+    transition: border-color 0.15s ease, transform 0.1s ease;
+  }
+
+  .card:hover {
+    border-color: var(--accent);
+  }
+
+  .card.hidden {
+    display: none;
+  }
+
+  .cmd-row {
+    display: flex;
+    align-items: stretch;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .cmd-box {
+    flex: 1 1 auto;
+    min-width: 200px;
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 0.88rem;
+    color: var(--accent-dark);
+    font-weight: 600;
+    overflow-x: auto;
+    white-space: pre;
+  }
+
+  .copy-btn {
+    flex: 0 0 auto;
+    background: var(--accent);
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    transition: background 0.15s ease;
+    min-width: 96px;
+  }
+
+  .copy-btn:hover {
+    background: var(--accent-dark);
+  }
+
+  .copy-btn.copied {
+    background: #16a34a;
+  }
+
+  .desc {
+    margin: 12px 0 4px 0;
+    color: var(--text-primary);
+    font-size: 0.94rem;
+  }
+
+  .when {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.82rem;
+    font-style: italic;
+  }
+
+  .when b {
+    font-style: normal;
+    color: var(--text-secondary);
+    font-weight: 700;
+  }
+
+  /* Research Method card */
+  .method-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 20px;
+  }
+
+  .method-card ol {
+    margin: 10px 0 16px 0;
+    padding-left: 22px;
+    color: var(--text-primary);
+    font-size: 0.94rem;
+  }
+
+  .method-card li {
+    margin-bottom: 6px;
+  }
+
+  .method-card .method-label {
+    font-size: 0.82rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--accent-dark);
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  /* Plugins table */
+  .plugins-table-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--card);
+  }
+
+  table.plugins {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+  }
+
+  table.plugins th {
+    text-align: left;
+    background: #eaf2fd;
+    color: var(--text-primary);
+    padding: 10px 14px;
+    font-weight: 700;
+    border-bottom: 1px solid var(--border);
+  }
+
+  table.plugins td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-secondary);
+  }
+
+  table.plugins tr:last-child td {
+    border-bottom: none;
+  }
+
+  table.plugins td.count {
+    color: var(--accent-dark);
+    font-weight: 700;
+    font-family: monospace;
+  }
+
+  .plugins-note {
+    margin-top: 10px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-style: italic;
+  }
+
+  footer.bottom {
+    max-width: 980px;
+    margin: 40px auto 0 auto;
+    padding: 20px 24px;
+    text-align: center;
+    color: #94a3b8;
+    font-size: 0.8rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .no-results {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    padding: 20px 4px;
+    display: none;
+  }
+
+  @media (min-width: 720px) {
+    .cards { grid-template-columns: 1fr 1fr; }
+    section.group.full .cards { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <h1>⚡ SKILLS ARSENAL — SOVEREIGN // QUANT</h1>
+  <a class="back-link" href="./">← Dashboard</a>
+</header>
+
+<main>
+  <div class="search-wrap">
+    <input id="search" type="text" placeholder="Filter commands… (e.g. 'research', 'ship', 'plan')" autocomplete="off" />
+    <div class="match-count" id="matchCount"></div>
+  </div>
+
+  <div class="no-results" id="noResults">No commands match your search.</div>
+
+  <section class="group" data-group="daily">
+    <h2>Daily Trading &amp; Research</h2>
+    <div class="cards">
+
+      <div class="card">
+        <div class="cmd-row">
+          <div class="cmd-box">/cs &lt;topic&gt;</div>
+          <button class="copy-btn" data-copy="/cs <topic>">COPY</button>
+        </div>
+        <p class="desc">Search all prior sessions/work for context on a topic.</p>
+        <p class="when"><b>When:</b> "what did we do about X?"</p>
+      </div>
+
+      <div class="card">
+        <div class="cmd-row">
+          <div class="cmd-box">/quant-review</div>
+          <button class="copy-btn" data-copy="/quant-review">COPY</button>
+        </div>
+        <p class="desc">Code review specialized for the trading system's correctness rules.</p>
+        <p class="when"><b>When:</b> after any strategy code change.</p>
+      </div>
+
+      <div class="card">
+        <div class="cmd-row">
+          <div class="cmd-box">/forensics &lt;question&gt;</div>
+          <button class="copy-btn" data-copy="/forensics <question>">COPY</button>
+        </div>
+        <p class="desc">Deep root-cause investigation mode.</p>
+        <p class="when"><b>When:</b> something looks wrong and you want the real cause.</p>
+      </div>
+
+      <div class="card">
+        <div class="cmd-row">
+          <div class="cmd-box">/ultraplan &lt;task&gt;</div>
+          <button class="copy-btn" data-copy="/ultraplan <task>">COPY</button>
+        </div>
+        <p class="desc">Maximum-depth planning before a big build.</p>
+        <p class="when"><b>When:</b> starting anything multi-day.</p>
+      </div>
+
+      <div class="card">
+        <div class="cmd-row">
+          <div class="cmd-box">/deep-research &lt;question&gt;</div>
+          <button class="copy-btn" data-copy="/deep-research <question>">COPY</button>
+        </div>
+        <p class="desc">Multi-source fact-checked research report with citations.</p>
+        <p class="when"><b>When:</b> market structure/vendor/mechanism questions.</p>
+      </div>
+
+      <div class="card">
+        <div class="cmd-row">
+          <div class="cmd-box">/code-review</div>
+          <button class="copy-btn" data-copy="/code-review">COPY</button>
+        </div>
+        <p class="desc">Review the current diff for bugs before committing.</p>
+        <p class="when"><b>When:</b> before any push you care about.</p>
+      </div>
+
+      <div class="card">
+        <div class="cmd-row">
+          <div class="cmd-box">/loop &lt;interval&gt; &lt;command&gt;</div>
+          <button class="copy-btn" data-copy="/loop <interval> <command>">COPY</button>
+        </div>
+        <p class="desc">Run a prompt/skill repeatedly on a schedule in-session.</p>
+        <p class="when"><b>When:</b> monitoring something live.</p>
+      </div>
+
+      <div class="card">
+        <div class="cmd-row">
+          <div class="cmd-box">/schedule</div>
+          <button class="copy-btn" data-copy="/schedule">COPY</button>
+        </div>
+        <p class="desc">Create recurring cloud agents (cron).</p>
+        <p class="when"><b>When:</b> daily jobs you want without your laptop.</p>
+      </div>
+
+      <div class="card">
+        <div class="cmd-row">
+          <div class="cmd-box">Skill: Research</div>
+          <button class="copy-btn" data-copy="research X deeply">COPY</button>
+        </div>
+        <p class="desc">Say "research X deeply" — fan-out web research agents.</p>
+        <p class="when"><b>When:</b> need broad multi-agent web coverage.</p>
+      </div>
+
+      <div class="card">
+        <div class="cmd-row">
+          <div class="cmd-box">Skill: ContextSearch</div>
+          <button class="copy-btn" data-copy="find prior work on X">COPY</button>
+        </div>
+        <p class="desc">Say "find prior work on X" — instant cold-start recovery.</p>
+        <p class="when"><b>When:</b> picking up a thread from a past session.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="group" data-group="building">
+    <h2>Building</h2>
+    <div class="cards">
+
+      <div class="card">
+        <div class="cmd-row">
+          <div class="cmd-box">/ship &lt;feature&gt;</div>
+          <button class="copy-btn" data-copy="/ship <feature>">COPY</button>
+        </div>
+        <p class="desc">Build and ship a feature end-to-end.</p>
+        <p class="when"><b>When:</b> you know what you want built.</p>
+      </div>
+
+      <div class="card">
+        <div class="cmd-row">
+          <div class="cmd-box">/scout &lt;area&gt;</div>
+          <button class="copy-btn" data-copy="/scout <area>">COPY</button>
+        </div>
+        <p class="desc">Read-only reconnaissance of a codebase area.</p>
+        <p class="when"><b>When:</b> before deciding anything.</p>
+      </div>
+
+      <div class="card">
+        <div class="cmd-row">
+          <div class="cmd-box">/verify</div>
+          <button class="copy-btn" data-copy="/verify">COPY</button>
+        </div>
+        <p class="desc">Drive the affected flow end-to-end to prove a change works.</p>
+        <p class="when"><b>When:</b> after any nontrivial change.</p>
+      </div>
+
+      <div class="card">
+        <div class="cmd-row">
+          <div class="cmd-box">/simplify</div>
+          <button class="copy-btn" data-copy="/simplify">COPY</button>
+        </div>
+        <p class="desc">Clean up recently changed code without behavior change.</p>
+        <p class="when"><b>When:</b> after a heavy build session.</p>
+      </div>
+
+      <div class="card">
+        <div class="cmd-row">
+          <div class="cmd-box">claude --plan</div>
+          <button class="copy-btn" data-copy="claude --plan">COPY</button>
+        </div>
+        <p class="desc">Research + plan without touching anything; approve before build.</p>
+        <p class="when"><b>When:</b> risky or ambiguous work.</p>
+      </div>
+
+      <div class="card">
+        <div class="cmd-row">
+          <div class="cmd-box">git worktree</div>
+          <button class="copy-btn" data-copy="work in a worktree">COPY</button>
+        </div>
+        <p class="desc">Say "work in a worktree" — isolates parallel work; repo law for concurrent sessions.</p>
+        <p class="when"><b>When:</b> anything running parallel to a live/shadow job.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="group full" data-group="method">
+    <h2>The Research Method (the shop's meta-process)</h2>
+    <div class="cards">
+      <div class="method-card card">
+        <div class="method-label">The 5 steps</div>
+        <ol>
+          <li>Lookahead scan for candidates (mining, not proof)</li>
+          <li>Extract what survivors share</li>
+          <li>Pre-register + hash before touching holdout</li>
+          <li>Test on untouched data, zero lookahead, family-corrected</li>
+          <li>What survives is the innovation</li>
+        </ol>
+        <div class="cmd-row">
+          <div class="cmd-box">Run THE RESEARCH METHOD (see research/yield_frontier/OPTIMIZATION_PROGRAM.md) on: &lt;idea&gt;</div>
+          <button class="copy-btn" data-copy="Run THE RESEARCH METHOD (see research/yield_frontier/OPTIMIZATION_PROGRAM.md) on: <idea>">COPY</button>
+        </div>
+        <p class="when" style="margin-top:10px;"><b>When:</b> pasting the meta-process onto any new idea before it touches holdout data.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="group" data-group="content">
+    <h2>Content &amp; Comms</h2>
+    <div class="cards">
+
+      <div class="card">
+        <div class="cmd-row">
+          <div class="cmd-box">Skill: Art</div>
+          <button class="copy-btn" data-copy="make a diagram of X">COPY</button>
+        </div>
+        <p class="desc">Say "make a diagram of X" — technical diagrams, charts, visuals.</p>
+        <p class="when"><b>When:</b> explaining architecture or a system visually.</p>
+      </div>
+
+      <div class="card">
+        <div class="cmd-row">
+          <div class="cmd-box">Skill: Interceptor</div>
+          <button class="copy-btn" data-copy="verify <url> in the browser">COPY</button>
+        </div>
+        <p class="desc">Say "verify &lt;url&gt; in the browser" — real-Chrome verification of any web deploy.</p>
+        <p class="when"><b>When:</b> confirming a UI or dashboard change actually works.</p>
+      </div>
+
+      <div class="card">
+        <div class="cmd-row">
+          <div class="cmd-box">Artifact</div>
+          <button class="copy-btn" data-copy="publish this as an artifact">COPY</button>
+        </div>
+        <p class="desc">Say "publish this as an artifact" — shareable web page of any report.</p>
+        <p class="when"><b>When:</b> a report or page needs a link to share.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="group full" data-group="plugins">
+    <h2>Plugins (these live in the claude.ai chat app, not this CLI)</h2>
+    <div class="cards">
+      <div class="card">
+        <div class="plugins-table-wrap">
+          <table class="plugins">
+            <thead>
+              <tr><th>Plugin</th><th>Skills</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Design</td><td class="count">7</td></tr>
+              <tr><td>Marketing</td><td class="count">8</td></tr>
+              <tr><td>Data</td><td class="count">10</td></tr>
+              <tr><td>Finance</td><td class="count">8</td></tr>
+              <tr><td>Earnings Reviewer (FSI)</td><td class="count">6</td></tr>
+              <tr><td>Equity Research (FSI)</td><td class="count">15</td></tr>
+              <tr><td>Financial Analysis (FSI)</td><td class="count">18</td></tr>
+              <tr><td>Bigdata.com (RavenPack)</td><td class="count">28</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="plugins-note">Use these in chat for company/earnings/market analysis; ask Claude Code to fold their outputs into the repo.</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="bottom">
+  Generated by the night shift · 2026-07-14
+</footer>
+
+<script>
+(function () {
+  var searchInput = document.getElementById('search');
+  var cards = Array.prototype.slice.call(document.querySelectorAll('.card'));
+  var groups = Array.prototype.slice.call(document.querySelectorAll('section.group'));
+  var matchCount = document.getElementById('matchCount');
+  var noResults = document.getElementById('noResults');
+
+  function filterCards() {
+    var q = searchInput.value.trim().toLowerCase();
+    var visibleTotal = 0;
+
+    groups.forEach(function (group) {
+      var groupCards = Array.prototype.slice.call(group.querySelectorAll('.card'));
+      var visibleInGroup = 0;
+
+      groupCards.forEach(function (card) {
+        var text = card.textContent.toLowerCase();
+        var match = q === '' || text.indexOf(q) !== -1;
+        card.classList.toggle('hidden', !match);
+        if (match) visibleInGroup++;
+      });
+
+      group.style.display = visibleInGroup === 0 ? 'none' : '';
+      visibleTotal += visibleInGroup;
+    });
+
+    if (q === '') {
+      matchCount.textContent = '';
+    } else {
+      matchCount.textContent = visibleTotal + ' command' + (visibleTotal === 1 ? '' : 's') + ' match';
+    }
+
+    noResults.style.display = visibleTotal === 0 ? 'block' : 'none';
+  }
+
+  searchInput.addEventListener('input', filterCards);
+
+  document.querySelectorAll('.copy-btn').forEach(function (btn) {
+    var originalLabel = btn.textContent;
+    btn.addEventListener('click', function () {
+      var text = btn.getAttribute('data-copy');
+      var reset = function () {
+        setTimeout(function () {
+          btn.textContent = originalLabel;
+          btn.classList.remove('copied');
+        }, 1400);
+      };
+
+      function fallbackCopy(str) {
+        var ta = document.createElement('textarea');
+        ta.value = str;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        try { document.execCommand('copy'); } catch (e) {}
+        document.body.removeChild(ta);
+      }
+
+      var markCopied = function () {
+        btn.textContent = '✓ Copied';
+        btn.classList.add('copied');
+        reset();
+      };
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(markCopied, function () {
+          fallbackCopy(text);
+          markCopied();
+        });
+      } else {
+        fallbackCopy(text);
+        markCopied();
+      }
+    });
+  });
+})();
+</script>
+
+</body>
+</html>
