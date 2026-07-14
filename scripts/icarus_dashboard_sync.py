@@ -83,10 +83,14 @@ def push_master():
     dest = MASTER_WT / "data/icarus_status.json"
     dest.parent.mkdir(exist_ok=True)
     dest.write_text(OUT.read_text())
+    digest = REPO / "data/oracle/daily_digest.json"
+    if digest.exists():
+        (MASTER_WT / "data/oracle").mkdir(parents=True, exist_ok=True)
+        (MASTER_WT / "data/oracle/daily_digest.json").write_text(digest.read_text())
     def g(*args):
         return subprocess.run(["git", "-C", str(MASTER_WT), *args],
                               capture_output=True, text=True)
-    g("add", "data/icarus_status.json")
+    g("add", "data/icarus_status.json", "data/oracle/daily_digest.json")
     r = g("commit", "-m", "[AUTO] ICARUS shadow daily sync", "--no-verify")
     if "nothing to commit" in (r.stdout + r.stderr):
         print("[icarus-sync] master: no change")

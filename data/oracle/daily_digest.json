@@ -1,0 +1,52 @@
+{
+  "headline": "Dashboard live with ICARUS method (p=.031, Sharpe 1.25); FVG\u00d7corridor round 1 yielded no tradeable candidate; four hypotheses adjudicated below floor.",
+  "what_happened": [
+    "Sharpe corrected from 1.08 to 1.25 (provisional, pending TICK-024); dashboard merges ICARUS shadow P&L calendar live with 16:20 auto-sync.",
+    "ICARUS (HYP-093) sealed: +0.023%/day constitutional yield, p=.031, DSR 0.987, but below your 0.05%/day floor; 3W/24L live, gates stand.",
+    "TICK-035 R1: 720 FVG\u00d7corridor cells mined 2018\u2013Jun2024 (MNQ notional costs every fill); best cell +0.025%/day, negative median event, no preregister-worthy candidate.",
+    "HYP-097 refuted: W* collar physics dominate sub-$3 tier; constitutional yield fell to 0.0166%/day vs your 0.023% assumption; distribution sizing and edge concentration remain honest paths.",
+    "HYP-091, -094, -095 all not significant or below floor; HYP-096 withdrawn (unverified rule, no filesystem evidence)."
+  ],
+  "what_it_means": "You have a statistically sound fade method (ICARUS, p=.031) now live and feeding the dashboard daily, but its yield is ~2.3\u00d7 below your 0.05%/day constitutional floor\u2014same problem across the four adjudicated hypotheses. The FVG\u00d7corridor structure hunt yielded nothing; your sizing and concentration hypotheses are the remaining honest levers to reach the floor. The holdout (2024\u201326) stays virgin and your trial count stands.",
+  "todays_one_thing": "Review TICK-035 R2 candidate structures (HTF FVGs, corridor-break events, gap clusters, overnight sessions) and lock in your pick; parallel: run a distribution-based sizing test (RCK or W6) on ICARUS to see if position scaling alone can close the yield gap to 0.05%/day.",
+  "progression": [
+    {
+      "gate": "G1",
+      "label": "30 clean shadow days (ICARUS)",
+      "state": "IN_PROGRESS",
+      "pct": 3,
+      "detail": "1/30 days recorded \u00b7 1 green"
+    },
+    {
+      "gate": "G2",
+      "label": "1-day funded-account simulation pass",
+      "state": "LOCKED",
+      "pct": 0,
+      "detail": "unlocks at G1"
+    },
+    {
+      "gate": "G3",
+      "label": "TICK-024 swap cascade + clamps enforced (Jul 28)",
+      "state": "PENDING_OPERATOR",
+      "pct": 0,
+      "detail": "gates any real dollar \u2014 unchanged"
+    },
+    {
+      "gate": "G4",
+      "label": "Broker account + live pass/fail",
+      "state": "LOCKED",
+      "pct": 0,
+      "detail": "needs G1-G3 + explicit go"
+    },
+    {
+      "gate": "G5",
+      "label": "Earn -> compound via research + wisdom",
+      "state": "LOCKED",
+      "pct": 0,
+      "detail": "the actual goal"
+    }
+  ],
+  "source": "oracle-llm",
+  "model": "claude-haiku-4-5-20251001",
+  "generated_at": "2026-07-14T05:29:55.985711+00:00"
+}
