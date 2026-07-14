@@ -6,6 +6,22 @@ Standing constraints live in `CLAUDE.md` — not restated here.
 
 ---
 
+## 2026-07-14 (pre-dawn) · DASHBOARD CORRECTIONS SHIPPED + VERIFIED LIVE (~105s)
+
+Colin's screenshot review, all three fixed on master b4d6db6 / sovereign-v2 3d7a950: (1) stale
+Sharpe 1.08 -> **1.25** in all six spots (2026-06-07 re-measure; caption carries "provisional
+pending TICK-024 swap re-verify"); (2) SHARPE PROGRESS chart gains the **v015 = 1.25** point
+(v014 de-flagged, Current/Gap auto-update from the cur entry, title -> v015); (3) **main
+Calendar tab now merges ICARUS shadow days** into day cells, weekly TOTAL column and month
+total at the $100k reference basis (gold ◆ tag + legend; icarusMergeCal() folds
+data/icarus_status.json into both the live-server and snapshot render paths — stays current
+via the existing 16:20 auto-sync; ICARUS strip mini-calendar kept). Live-verified over the
+wire: zero '1.08 OOS' strings remain, chart point + merge code + legend all serving. Out of
+scope (named): prop-panel "as of 2026-06-09" is its own MC job; ICT proxy figures already carry
+the honest banner.
+
+---
+
 ## 2026-07-13 (late) · THE METHOD IS NAMED: ICARUS — DASHBOARD FLAGSHIP LIVE
 
 HYP-093's fade is now **ICARUS** ("flew too high by 10:30; we sell the fall"). Dashboard revamp
