@@ -1010,3 +1010,33 @@ parallel session's commit 74f25f9 — benign.)
 canonically pre-registered corrected study instead. (2) did not use the known-broken SWAP_RATES_ANNUAL for
 the primary financing (per operator decision) despite it being the easy path. (3) pre-registered + committed
 BEFORE observing price data. (4) did not touch the execution/exit path or any live parameter.
+
+---
+
+## Session 2026-07-13 (EOD) — TICK-033 W6: shadow-outcome seal + friction-simulator spec (`09463d1`, pushed)
+
+**Task 1 — sealed 07-13 shadow gapper-fade shorts** → `data/research/gapper/signals_2026-07-13.json` (new).
+Closes pulled from yfinance daily bars (2026-07-13, auto_adjust=False):
+- **AGEN**: entry $7.72, stop $25.10, close **$6.12** (day high 8.70). Short return **+20.73%** → **WIN**,
+  stop not hit. (Earlier mark was $6.78; closed even lower — fade completed.)
+- **QTTB**: entry $19.31, stop $25.10, close **$21.38** (day high 22.50). Short return **−10.72%** → **LOSS**,
+  stop not hit. (Earlier mark $21.30; closed above entry — reversal against the short.)
+- Net shadow day: 1W / 1L, neither stop hit. Both closes clean from yfinance (no halt/delist → no UNKNOWN).
+
+**Task 2 — W6 friction simulator SPEC (spec-first, no code)** → `research/gapper/W6-friction-simulator-spec.md`
+(new). Pre-registration law honored: spec committed before any simulator code. Models the six frictions as
+**adversely selected** (correlated with signal quality via gap magnitude), per the W3 load-bearing flag —
+not flat costs: locate `P(locate|gap)` gate, deterministic SSR boolean from tape, gap-conditioned borrow
+regime, 10:30 market-impact slippage, LULD limit-up gap-through (corrected direction — for a short the
+adverse halt is limit-UP, ties to W5 two-cycle +30% stop-run), recall-timer forced early cover. Loss model =
+W4 disaster mixture (0.1–0.5%/event of −100..−200%) + GPD stop-gap (stops don't truncate). Output = per-event
+friction-adjusted **distribution** (median net, 5/95, %WIN→LOSS flipped, %unavailable, annual P&L @1.25%).
+Validation = run on 559 events, within 20% of W3 empirical estimates. Constants sourced from W3/W4/W5 briefs.
+
+**Flagged, not silently resolved:** `OPTIMIZATION_PROGRAM.md` (W6 row) earmarks a *different* path
+`optimization/W6_SPEC.md` for the **sizing-policy** simulator. This friction spec is the return-generating
+engine that FEEDS that sizing grid — composed, not duplicate. Cross-reference written into both the spec
+header and this log so the two W6 docs don't drift. Requested path (`research/gapper/...`) honored as the
+explicit instruction.
+
+**Did not:** touch execution/exit path, change any live parameter, or write simulator code (spec-first).
