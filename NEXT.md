@@ -6,6 +6,23 @@ Standing constraints live in `CLAUDE.md` — not restated here.
 
 ---
 
+## 2026-07-13 (night) · TICK-035 ROUND 1 EXECUTED (self, per Colin): FVG x CORRIDOR MINED OUT — HOLDOUT PRESERVED
+
+Colin clarified the handoff was for me. P0: charter + fenced loader + causal engines (Pine
+pvts() port with explicit confirmation delay; truncation-equivalence causality test — the
+strongest form — green, 6/6 rails). P1: 720 cells mined 2018-01→2024-06 (3 entry families x
+5 corridor conditions x 4 killzones x 6 managements x 2 FVG sizes), MNQ costs on every fill.
+**Result: no prereg-worthy candidate.** Best cell +0.025%/day of NOTIONAL with negative median
+event and 2/7 negative years — at/below the sealed benchmark BEFORE out-of-sample shrinkage,
+against a now-1,529-trial deflation hurdle. Step-2 checkpoint honored: the 2024-26 holdout
+stays VIRGIN; trials counted; bar unmoved. Structure notes (real but thin): gap-FILL fade >
+retest; targets hurt; wide stop + session-flat; corridor-inside adds a sliver; NY_PM tilts F2.
+Round 2 (new structure, not re-tuning): HTF FVGs / corridor-BREAK events / gap clusters /
+overnight sessions — next session, operator may pick. Report:
+data/research/yield_frontier/fvg_corridor_m1/ROUND1_REPORT.md.
+
+---
+
 ## 2026-07-13 (evening) · TICK-035 RESERVED: FVG x FRACTAL-CORRIDOR NQ STUDY HANDED OFF (HYP-098 namespace)
 
 Colin directed THE RESEARCH METHOD at the ICT/FVG + Fractal Corridors pairing "with tools laying
