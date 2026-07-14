@@ -1,0 +1,58 @@
+{
+  "name": "ICARUS",
+  "tagline": "The parabolic fade \u2014 flew too high by 10:30; we sell the fall.",
+  "sealed": {
+    "hypothesis": "HYP-093",
+    "verdict": "VALID_BUT_BELOW_FLOOR",
+    "p_value": 0.031,
+    "dsr_at_809_trials": 0.987,
+    "holdout_events": 559,
+    "event_median_net": 0.049,
+    "event_mean_net": 0.016,
+    "constitutional_floor_pct_day": 0.05,
+    "status_line": "signal REAL (first to survive full-penalty significance on unseen data) \u00b7 income gated below the constitutional floor \u00b7 SHADOW ONLY \u2014 no live capital (Art. 6 source-tagged)"
+  },
+  "shadow": {
+    "mode": "SHADOW (sim) \u2014 Art. 6 source-tagged, zero live capital",
+    "days": 1,
+    "cum_return": 0.000456,
+    "mean_pct_day": 0.000456,
+    "green_days": 1,
+    "red_days": 0,
+    "daily": [
+      {
+        "date": "2026-07-13",
+        "ret": 0.000456,
+        "n": 2,
+        "trades": [
+          {
+            "ticker": "AGEN",
+            "gain_1030": 1.2985,
+            "entry": 7.72,
+            "exit": 6.54,
+            "ret": 0.13189,
+            "stopped": false
+          },
+          {
+            "ticker": "QTTB",
+            "gain_1030": 0.7217,
+            "entry": 19.305,
+            "exit": 20.1439,
+            "ret": -0.05893,
+            "stopped": false
+          }
+        ]
+      }
+    ]
+  },
+  "next_gates": [
+    "W6 RCK sizing simulator",
+    "TICK-034 catalyst split",
+    ">=20 shadow days",
+    "TICK-024 cascade",
+    "clamps enforced (Jul 28)",
+    "broker account",
+    "operator go"
+  ],
+  "updated_at": "2026-07-14T03:18:59.418677+00:00"
+}
