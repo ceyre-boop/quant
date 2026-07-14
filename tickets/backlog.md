@@ -391,3 +391,16 @@ Schema per ticket:
 - [ ] Constitutional yield re-derivation under the surviving subset, floors unchanged
 **status:** backlog
 **pre_approved:** false
+
+## TICK-035
+**title:** HYP-098 FVG x Fractal-Corridor intraday study on NQ — THE RESEARCH METHOD round 1 (HANDOFF to a parallel session)
+**description:** Colin's directive 2026-07-13: run THE RESEARCH METHOD on the ICT/FVG insight paired with the Fractal Corridors Pine indicator (repo root, Pine v6 — port to Python, model pivot confirmation delay), on NQ 1-min 2018-2026 (his pick; no intraday FX exists on disk; ThetaData = option.value.monthly $40/mo EOD-chains-only per invoice read 2026-07-13, renews Jul 16 — NOT usable for intraday bars, terminal stays down). Mining window 2018-01→2024-06 (fenced loader); holdout 2024-07→2026-06 (HYP-095's single daily test on the span disclosed in family accounting); benchmarks named: constitutional >0.023%/day + Sharpe vs carry 1.25 context. Route B framing — sealed daily nulls (HYP-082/083, ICT p=.52, HYP-090) not re-litigated. "Don't stop until you find something" = iterate NEW families with counted trials at a never-lowering bar; exhausting the space honestly is a valid deliverable. Full prompt: research/yield_frontier/HANDOFF_HYP098_fvg_corridor.md. HYP-098+ namespace reserved for the handoff session; it must verify numbers free before claiming (concurrency law).
+**depends_on:** []
+**blocks:** []
+**acceptance_criteria:**
+- [ ] Handoff session works in a worktree; charter written; fenced loader + AST isolation + look-ahead canary tests green before mining
+- [ ] Mining stamped + trials counted; prereg hash-locked with BOTH priors before holdout touched
+- [ ] Verdicts sealed with DSR at full mined-N; per-year non-degrade + tail condition + constitutional sizing per Art. 1
+- [ ] Main suite baseline + ICT isolation law untouched; push per batch; NEXT.md per session
+**status:** backlog (reserved for handoff session)
+**pre_approved:** true (plan-mode approval 2026-07-13 — Plans/immutable-wondering-alpaca.md)

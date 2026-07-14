@@ -6,6 +6,21 @@ Standing constraints live in `CLAUDE.md` — not restated here.
 
 ---
 
+## 2026-07-13 (evening) · TICK-035 RESERVED: FVG x FRACTAL-CORRIDOR NQ STUDY HANDED OFF (HYP-098 namespace)
+
+Colin directed THE RESEARCH METHOD at the ICT/FVG + Fractal Corridors pairing "with tools laying
+around." Scouting: the Pine v6 indicator EXISTS at repo root; intraday FVG detectors exist
+(sovereign/forex/ict_engine.py; ict/fvg_detector.py has a documented ATR-leak the study must fix);
+NO intraday FX on disk (docs/intraday_fx_acquisition.md); **ThetaData invoice read directly:
+option.value.monthly $40/mo = EOD chains only, renews Jul 16 (Colin decision) — cannot power an
+intraday study; terminal stays down.** Colin chose NQ-first (8.5yr 1-min on disk). Handoff prompt
+(worktree law, fenced mining 2018-01→2024-06, holdout 2024-07→2026-06 w/ HYP-095 disclosure,
+counted trials, both-priors prereg, benchmarks 0.023%/day + carry-1.25 context, "don't stop" =
+new families at a never-lowering bar): research/yield_frontier/HANDOFF_HYP098_fvg_corridor.md.
+Parallel session executes; this session stays owner of TICK-033 (W6 spec next).
+
+---
+
 ## 2026-07-13 (afternoon) · HYP-097 GAP-THROUGH SEALED NOT_CLEARED — THE PHYSICS REFUTED THE SIZING HOPE; PLISTS LIVE; OPTIONS BRANCH WITHDRAWN
 
 **Verification first:** Colin relayed a chat-session analysis claiming a hash-locked "HYP-096
