@@ -6,6 +6,20 @@ Standing constraints live in `CLAUDE.md` — not restated here.
 
 ---
 
+## 2026-07-13 (late) · THE METHOD IS NAMED: ICARUS — DASHBOARD FLAGSHIP LIVE
+
+HYP-093's fade is now **ICARUS** ("flew too high by 10:30; we sell the fall"). Dashboard revamp
+shipped and VERIFIED LIVE on Render (~90s post-push): flagship strip above the tabs — sealed
+verdict stats (p=.031, DSR .987), **shadow P&L calendar** (green/red day grid w/ per-trade
+tooltips), latest closed trades, gate ladder to live. Data: `data/icarus_status.json`, generated
+by `scripts/icarus_dashboard_sync.py`, WIRED into the shadow 16:20 close pass with an automatic
+data-only worktree push to master (814d1e2 pattern) — results now flow to the dashboard daily,
+zero hands. ICT page: hardcoded threat-1.00 placeholder RETIRED; honest banner (UNPROVEN p=.52,
+live 3W/24L, gates stand) + "its FVG research seeded ICARUS →" pointer. master e917981 ·
+sovereign-v2 dc183f3. Day-1 calendar cell: 2026-07-13 green, +0.046%.
+
+---
+
 ## 2026-07-13 (night) · TICK-035 ROUND 1 EXECUTED (self, per Colin): FVG x CORRIDOR MINED OUT — HOLDOUT PRESERVED
 
 Colin clarified the handoff was for me. P0: charter + fenced loader + causal engines (Pine
