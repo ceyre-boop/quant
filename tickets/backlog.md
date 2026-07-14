@@ -402,5 +402,5 @@ Schema per ticket:
 - [ ] Mining stamped + trials counted; prereg hash-locked with BOTH priors before holdout touched
 - [ ] Verdicts sealed with DSR at full mined-N; per-year non-degrade + tail condition + constitutional sizing per Art. 1
 - [ ] Main suite baseline + ICT isolation law untouched; push per batch; NEXT.md per session
-**status:** backlog (reserved for handoff session)
+**status:** in_progress (2026-07-13 — self-executed by this session per Colin)
 **pre_approved:** true (plan-mode approval 2026-07-13 — Plans/immutable-wondering-alpaca.md)
