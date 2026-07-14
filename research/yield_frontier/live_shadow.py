@@ -199,6 +199,10 @@ def close():
           f"constitutional day ret {day_ret:+.5f}", flush=True)
     notify(f"Gapper shadow closed the day at "
            f"{day_ret * 100:+.3f} basis-adjusted percent.")
+    # ICARUS dashboard sync (data-only worktree push to master, 814d1e2 pattern)
+    import subprocess
+    subprocess.run([sys.executable, str(REPO / "scripts/icarus_dashboard_sync.py"),
+                    "--push"], timeout=120)
 
 
 if __name__ == "__main__":

@@ -665,6 +665,74 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
   </div>
 </div>
 
+<!-- ══════════ ICARUS — flagship (HYP-093 parabolic fade) ══════════ -->
+<style>
+#icarus{margin:10px 16px;border:1px solid #2b3a55;border-radius:10px;background:linear-gradient(135deg,#0b1220,#101a2e);padding:14px 18px;font-family:inherit}
+#icarus .ic-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+#icarus .ic-name{font-size:20px;font-weight:800;letter-spacing:3px;color:#f5c542}
+#icarus .ic-tag{font-size:12px;color:#8fa3c0;font-style:italic}
+#icarus .ic-mode{margin-left:auto;font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px;background:#1d2a44;color:#7fd1ff;letter-spacing:1px}
+#icarus .ic-stats{display:flex;gap:22px;flex-wrap:wrap;margin:10px 0 4px}
+#icarus .ic-stat b{display:block;font-size:16px;color:#e8eefc}
+#icarus .ic-stat span{font-size:10px;color:#8fa3c0;text-transform:uppercase;letter-spacing:1px}
+#icarus .ic-body{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start}
+#icarus .ic-cal{display:grid;grid-template-columns:repeat(7,26px);gap:3px;margin-top:6px}
+#icarus .ic-cal .dhead{font-size:8px;color:#5d7290;text-align:center}
+#icarus .ic-day{width:26px;height:26px;border-radius:4px;background:#16233c;font-size:8px;color:#5d7290;display:flex;align-items:center;justify-content:center;position:relative;cursor:default}
+#icarus .ic-day.g{background:#123f2a;color:#5ee39a;font-weight:700}
+#icarus .ic-day.r{background:#461d24;color:#ff8f9a;font-weight:700}
+#icarus .ic-day[data-tip]:hover::after{content:attr(data-tip);position:absolute;bottom:30px;left:50%;transform:translateX(-50%);background:#0b1220;border:1px solid #2b3a55;padding:6px 8px;font-size:10px;color:#e8eefc;border-radius:6px;white-space:pre;z-index:50}
+#icarus .ic-trades{font-size:11px;color:#b9c7dd;min-width:230px}
+#icarus .ic-trades td{padding:2px 8px 2px 0}
+#icarus .ic-foot{font-size:10px;color:#5d7290;margin-top:8px}
+#icarus .ic-caltitle{font-size:11px;color:#8fa3c0;font-weight:700;margin-top:2px}
+</style>
+<div id="icarus">
+  <div class="ic-head">
+    <div class="ic-name">ICARUS</div>
+    <div class="ic-tag" id="ic-tag">The parabolic fade — flew too high by 10:30; we sell the fall.</div>
+    <div class="ic-mode" id="ic-mode">SHADOW</div>
+  </div>
+  <div class="ic-stats" id="ic-stats"></div>
+  <div class="ic-body">
+    <div><div class="ic-caltitle" id="ic-caltitle">SHADOW CALENDAR</div><div class="ic-cal" id="ic-cal"></div></div>
+    <div class="ic-trades"><div class="ic-caltitle">LATEST CLOSED TRADES</div><table id="ic-trades"></table></div>
+  </div>
+  <div class="ic-foot" id="ic-foot"></div>
+</div>
+<script>
+(function(){
+  function pct(x,d){return (x>=0?'+':'')+(100*x).toFixed(d===undefined?2:d)+'%';}
+  fetch('data/icarus_status.json?t='+Date.now()).then(r=>r.json()).then(d=>{
+    var sh=d.shadow||{},se=d.sealed||{};
+    document.getElementById('ic-tag').textContent=d.tagline||'';
+    var stats=[['sealed verdict',(se.verdict||'').replace(/_/g,' ')],['significance','p='+se.p_value+' · DSR '+se.dsr_at_809_trials],
+      ['event median (net)',pct(se.event_median_net,1)],['shadow days',sh.days+' ('+sh.green_days+'▲ '+sh.red_days+'▼)'],
+      ['shadow cum (constitutional)',pct(sh.cum_return,3)],['floor to beat',se.constitutional_floor_pct_day+'%/day']];
+    document.getElementById('ic-stats').innerHTML=stats.map(function(s){return '<div class="ic-stat"><b>'+s[1]+'</b><span>'+s[0]+'</span></div>';}).join('');
+    var days={}; (sh.daily||[]).forEach(function(x){days[x.date]=x;});
+    var now=new Date(), y=now.getFullYear(), m=now.getMonth();
+    document.getElementById('ic-caltitle').textContent='SHADOW CALENDAR — '+now.toLocaleString('en-US',{month:'long',year:'numeric'}).toUpperCase();
+    var cal=document.getElementById('ic-cal'), dows=['S','M','T','W','T','F','S'], html='';
+    dows.forEach(function(x){html+='<div class="dhead">'+x+'</div>';});
+    var first=new Date(y,m,1).getDay(), nd=new Date(y,m+1,0).getDate();
+    for(var i=0;i<first;i++)html+='<div></div>';
+    for(var dd=1;dd<=nd;dd++){
+      var key=y+'-'+String(m+1).padStart(2,'0')+'-'+String(dd).padStart(2,'0'),e=days[key],cls='',tip='';
+      if(e){cls=e.ret>0?' g':(e.ret<0?' r':'');
+        tip=key+'  '+pct(e.ret,3)+'\n'+(e.trades||[]).map(function(t){return t.ticker+' '+pct(t.ret,1);}).join('\n');}
+      html+='<div class="ic-day'+cls+'"'+(tip?' data-tip="'+tip+'"':'')+'>'+dd+'</div>';
+    }
+    cal.innerHTML=html;
+    var tr=[]; (sh.daily||[]).slice(-5).reverse().forEach(function(x){(x.trades||[]).forEach(function(t){
+      tr.push('<tr><td>'+x.date.slice(5)+'</td><td><b>'+t.ticker+'</b></td><td>+'+Math.round(100*t.gain_1030)+'% by 10:30</td><td style="color:'+(t.ret>0?'#5ee39a':'#ff8f9a')+'">'+pct(t.ret,1)+'</td></tr>');});});
+    document.getElementById('ic-trades').innerHTML=tr.join('')||'<tr><td>no closed trades yet</td></tr>';
+    document.getElementById('ic-foot').textContent=(se.status_line||'')+' · gates: '+(d.next_gates||[]).join(' → ')+' · updated '+(d.updated_at||'').slice(0,16)+'Z';
+  }).catch(function(){document.getElementById('icarus').style.display='none';});
+})();
+</script>
+<!-- ══════════ /ICARUS ══════════ -->
+
 <div id="tabs">
 
   <!-- ══ TAB 1: TRADE ══ -->
