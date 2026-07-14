@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-12T06:32:26.826793+00:00",
-  "as_of_date": "2026-07-12",
+  "generated_at": "2026-07-13T06:31:06.135358+00:00",
+  "as_of_date": "2026-07-13",
   "current_lesson": {
     "components": [
       "active",
@@ -36,17 +36,17 @@
       "zone",
       "zscore"
     ],
-    "component_label": "consensus_conviction + green_matches + hist_hr (conviction-vs-historical-analog gate)",
+    "component_label": "consensus_conviction / green_matches / hist_hr",
     "first_seen": "2026-05-29",
-    "last_seen": "2026-07-12",
-    "days_forming": 44,
-    "n_revisions": 33,
-    "n_days_appeared": 33,
+    "last_seen": "2026-07-13",
+    "days_forming": 45,
+    "n_revisions": 34,
+    "n_days_appeared": 34,
     "stable_days": 1,
     "status": "forming",
     "time_to_converge_days": null,
-    "latest_lesson_text": "When the 30-indicator consensus shows high conviction (>=90%) but green_matches=0 and hist_hr=0%, the current setup has no historical analog and should be sized down or vetoed regardless of conviction strength.",
-    "latest_rule": "if consensus_conviction >= 0.90 and green_matches == 0 and hist_hr == 0.0: size *= 0.5 (or veto if session != London Grade A)",
+    "latest_lesson_text": "When the 30-indicator consensus shows high conviction (>90%) but green_matches=0 and hist_hr=0%, treat the signal as untested rather than strong \u2014 conviction without historical confirmation is a size-down condition, not a trade trigger.",
+    "latest_rule": "if consensus_conviction > 0.85 and green_matches == 0 and hist_hr == 0.0: size_multiplier = 0.5  # untested-config penalty until >=1 historical match exists",
     "history": [
       {
         "date": "2026-05-29",
@@ -179,6 +179,10 @@
       {
         "date": "2026-07-12",
         "rule": "if consensus_conviction >= 0.90 and green_matches == 0 and hist_hr == 0.0: size *= 0.5 (or veto if session != London Grade A)"
+      },
+      {
+        "date": "2026-07-13",
+        "rule": "if consensus_conviction > 0.85 and green_matches == 0 and hist_hr == 0.0: size_multiplier = 0.5  # untested-config penalty until >=1 historical match exists"
       }
     ]
   },
@@ -218,17 +222,17 @@
         "zone",
         "zscore"
       ],
-      "component_label": "consensus_conviction + green_matches + hist_hr (conviction-vs-historical-analog gate)",
+      "component_label": "consensus_conviction / green_matches / hist_hr",
       "first_seen": "2026-05-29",
-      "last_seen": "2026-07-12",
-      "days_forming": 44,
-      "n_revisions": 33,
-      "n_days_appeared": 33,
+      "last_seen": "2026-07-13",
+      "days_forming": 45,
+      "n_revisions": 34,
+      "n_days_appeared": 34,
       "stable_days": 1,
       "status": "forming",
       "time_to_converge_days": null,
-      "latest_lesson_text": "When the 30-indicator consensus shows high conviction (>=90%) but green_matches=0 and hist_hr=0%, the current setup has no historical analog and should be sized down or vetoed regardless of conviction strength.",
-      "latest_rule": "if consensus_conviction >= 0.90 and green_matches == 0 and hist_hr == 0.0: size *= 0.5 (or veto if session != London Grade A)",
+      "latest_lesson_text": "When the 30-indicator consensus shows high conviction (>90%) but green_matches=0 and hist_hr=0%, treat the signal as untested rather than strong \u2014 conviction without historical confirmation is a size-down condition, not a trade trigger.",
+      "latest_rule": "if consensus_conviction > 0.85 and green_matches == 0 and hist_hr == 0.0: size_multiplier = 0.5  # untested-config penalty until >=1 historical match exists",
       "history": [
         {
           "date": "2026-05-29",
@@ -361,6 +365,10 @@
         {
           "date": "2026-07-12",
           "rule": "if consensus_conviction >= 0.90 and green_matches == 0 and hist_hr == 0.0: size *= 0.5 (or veto if session != London Grade A)"
+        },
+        {
+          "date": "2026-07-13",
+          "rule": "if consensus_conviction > 0.85 and green_matches == 0 and hist_hr == 0.0: size_multiplier = 0.5  # untested-config penalty until >=1 historical match exists"
         }
       ]
     },
@@ -375,7 +383,7 @@
       "component_label": "regime_confirmation.sizing_multiplier",
       "first_seen": "2026-06-15",
       "last_seen": "2026-07-06",
-      "days_forming": 27,
+      "days_forming": 28,
       "n_revisions": 3,
       "n_days_appeared": 3,
       "stable_days": 1,
