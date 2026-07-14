@@ -685,6 +685,7 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
 #icarus .ic-trades{font-size:11px;color:#b9c7dd;min-width:230px}
 #icarus .ic-trades td{padding:2px 8px 2px 0}
 #icarus .ic-foot{font-size:10px;color:#5d7290;margin-top:8px}
+.cal-src.icarus{background:#f5c542!important}
 #icarus .ic-caltitle{font-size:11px;color:#8fa3c0;font-weight:700;margin-top:2px}
 </style>
 <div id="icarus">
@@ -790,7 +791,7 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
         <div class="ss-row"><span class="ss-key">ICT Session</span><span class="ss-val val-green">London UTC 03:xx</span></div>
         <div class="ss-row"><span class="ss-key">Equity System</span><span class="ss-val val-green">LIVE paper</span></div>
         <div class="ss-row"><span class="ss-key">Forex Version</span><span class="ss-val val-green">v015</span></div>
-        <div class="ss-row"><span class="ss-key">Forex Sharpe</span><span class="ss-val val-green">1.08 OOS ★</span></div>
+        <div class="ss-row"><span class="ss-key">Forex Sharpe</span><span class="ss-val val-green">1.25 OOS ★</span></div>
         <div class="ss-row"><span class="ss-key">Backtest Speed</span><span class="ss-val">148k/sec</span></div>
         <div style="margin-top:auto;padding-top:12px;border-top:1px solid var(--border)">
           <a href="ict/" class="link-btn">→ ICT Oracle</a>
@@ -799,7 +800,7 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
 
       <!-- Forex Pairs -->
       <div class="forex-section">
-        <div class="section-label">Forex Portfolio — v015 · 4 pairs · OOS Sharpe 1.08 (costed)</div>
+        <div class="section-label">Forex Portfolio — v015 · 4 pairs · OOS Sharpe 1.25 (costed)</div>
         <div class="forex-grid forex-grid-4" id="forex-grid">
           <!-- Live-signal cards. AUDNZD excluded (HYP-045 — both legs RBA-driven, no independent edge). -->
           <div class="forex-card inst">
@@ -952,7 +953,7 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
         <div class="sharpe-header">
           <div>
             <div class="section-label" style="margin-bottom:4px">Forex System — Sharpe (costed, OOS)</div>
-            <div style="font-size:11px;color:var(--muted)">v015 current · OOS costed 1.08 (CI 0.84–1.32) · 1.5 target</div>
+            <div style="font-size:11px;color:var(--muted)">v015 current · OOS costed 1.25 (re-measured 2026-06-07) · 1.5 target · provisional pending TICK-024 swap re-verify</div>
           </div>
           <div class="sharpe-achieved">
             <span class="sharpe-badge">✓ EDGE PROVEN · permutation p&lt;0.001</span>
@@ -1192,7 +1193,7 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
       </div>
       <div id="cal-legend">
         <span class="cal-leg"><span class="dot logged"></span>logged paper trade</span>
-        <span class="cal-leg"><span class="dot engine"></span>engine result (auto-fills until live logging runs)</span>
+        <span class="cal-leg"><span class="dot engine"></span>engine result (auto-fills until live logging runs)</span> <span style="color:#f5c542">◆ ICARUS shadow (sim, $100k basis)</span>
       </div>
       <div id="cal-grid"><div style="padding:40px;text-align:center;color:var(--muted)">Loading…</div></div>
     </div>
@@ -1201,7 +1202,7 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
   <!-- ══ TAB 4: CHAT ══ -->
   <div class="tab-panel" id="tab-chat">
     <div id="chat-panel">
-      <div id="chat-ctx">Context: SOVEREIGN v015 · Forex OOS Sharpe 1.08 (costed) · ICT London+A Sharpe 2.093 · Bridge: NORMAL (threat 0.00) · Prop: ACTIVE Day 0</div>
+      <div id="chat-ctx">Context: SOVEREIGN v015 · Forex OOS Sharpe 1.25 (costed) · ICT London+A Sharpe 2.093 · Bridge: NORMAL (threat 0.00) · Prop: ACTIVE Day 0</div>
       <div id="chat-msgs">
         <div class="cb assistant">
           <div class="cb-inner">SOVEREIGN online. Ask me about signals, hypothesis status, system health, or trading decisions.</div>
@@ -1368,7 +1369,7 @@ setTimeout(function(){const st=_loadState(); if(st.tab && st.tab!=='trade'){cons
 (function(){
   const vers=[
     {l:'v010',s:1.4396,leg:true},{l:'v013',s:1.8552,leg:true},
-    {l:'v014',s:0.76},{l:'v015',s:1.08,cur:true},
+    {l:'v014',s:0.76},{l:'v015',s:1.25,cur:true},
   ];
   const inst=1.5,maxS=1.9052*1.03;
   const note='<div style="font-size:10px;color:var(--dim);margin-bottom:8px">'
@@ -1561,7 +1562,7 @@ async function updateBridgeState(){
   const ctxEl=document.getElementById('chat-ctx');
   if(ctxEl){
     const topSig=_best?`${_best.label} ${_best.signal>0?'LONG':'SHORT'}`:'no active signal';
-    ctxEl.textContent=`SOVEREIGN v015 · Forex OOS Sharpe 1.08 (costed) · Best: ${topSig} · Bridge: ${mode} (threat ${threat.toFixed(2)}) · Prop: ACTIVE`;
+    ctxEl.textContent=`SOVEREIGN v015 · Forex OOS Sharpe 1.25 (costed) · Best: ${topSig} · Bridge: ${mode} (threat ${threat.toFixed(2)}) · Prop: ACTIVE`;
   }
 }
 
@@ -1909,6 +1910,24 @@ function _rpShowSummary(){
 }
 
 // ══ CALENDAR ══
+
+// ── ICARUS shadow merge: fold sim results into the main calendar ($100k reference basis) ──
+async function icarusMergeCal(d){
+  try{
+    const r=await fetch(API_BASE+'/data/icarus_status.json?t='+Date.now(),{signal:AbortSignal.timeout(6000)});
+    if(!r.ok) return;
+    const ic=await r.json();
+    d.days=d.days||{}; d.month_total=d.month_total||{pnl:0,n:0};
+    (ic.shadow&&ic.shadow.daily||[]).forEach(e=>{
+      if(!e.date.startsWith(d.month)) return;
+      const pnl=(e.ret||0)*100000, n=e.n||0, wins=(e.trades||[]).filter(t=>t.ret>0).length;
+      const cur=d.days[e.date];
+      if(cur){cur.pnl+=pnl; cur.n+=n; cur.wins=(cur.wins||0)+wins; cur.closed=(cur.closed||0)+n;}
+      else d.days[e.date]={closed:n,pnl:pnl,n:n,wins:wins,src:'icarus'};
+      d.month_total.pnl=(d.month_total.pnl||0)+pnl; d.month_total.n=(d.month_total.n||0)+n;
+    });
+  }catch(e){}
+}
 let _calMonth=null;
 async function calLoad(){
   const grid=document.getElementById('cal-grid');
@@ -1919,6 +1938,7 @@ async function calLoad(){
     const r=await fetch(API_BASE+'/calendar?month='+_calMonth,{signal:AbortSignal.timeout(NET_T)});
     const d=await r.json();
     if(d.error){grid.innerHTML='<div style="padding:40px;text-align:center;color:var(--muted)">Unavailable</div>';return;}
+    await icarusMergeCal(d);
     calRender(d);
   }catch(e){
     if(IS_REMOTE && !calLoad._retried){calLoad._retried=true; grid.innerHTML='<div style="padding:40px;text-align:center;color:var(--muted)">⏳ waking the live server (~30s)…</div>'; setTimeout(()=>calLoad(),9000);}
@@ -2896,7 +2916,7 @@ const RES_VERSIONS=[
   {l:'v001',s:.1785},{l:'v002',s:.3551},{l:'v002.5',s:.38},{l:'v003',s:.4523},
   {l:'v004',s:.626},{l:'v005',s:.8843},{l:'v006',s:1.0547},{l:'v007',s:1.0713},
   {l:'v008',s:1.1955},{l:'v009',s:1.2864},{l:'v010',s:1.4396},
-  {l:'v011',s:1.6476},{l:'v012',s:1.7176},{l:'v013',s:1.8552},{l:'v014',s:0.76,cur:true},
+  {l:'v011',s:1.6476},{l:'v012',s:1.7176},{l:'v013',s:1.8552},{l:'v014',s:0.76},{l:'v015',s:1.25,cur:true},
 ];
 const RES_TARGET=2.1470;
 
