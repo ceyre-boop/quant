@@ -6,6 +6,29 @@ Standing constraints live in `CLAUDE.md` — not restated here.
 
 ---
 
+## 2026-07-14 (night shift, operator asleep) · FULL DASHBOARD REBUILD SHIPPED + VERIFIED LIVE
+
+Colin's overnight mandate executed (plan Plans/immutable-wondering-alpaca.md, 2 worktree agents
++ inline core, no swarms): **(N1) white/light-blue professional reskin** of index.html +
+ict/index.html — 182 palette replacements + ~30 inline fixes + TradingView theme->light, ZERO
+JS/feature changes, dark :root preserved as labeled rollback comment, all semantic colors
+>=4.5:1 contrast (caveat: lightweight-charts panes stay dark — flipping needs JS, forbidden by
+the do-not-break rule). **(N2) skills.html** — copy-paste Claude Code arsenal (searchable,
+grouped, RESEARCH METHOD card, plugins table), linked ⚡SKILLS in the header. **(N3) Oracle
+daily brief**: sovereign/oracle/daily_digest.py (haiku-tier, cost-capped, template fallback,
+READ-ONLY) -> data/oracle/daily_digest.json -> "🔮 ORACLE — DAILY BRIEF + PROGRESSION" panel
+under the ICARUS strip with Colin's own ladder (30 shadow days -> funded-sim day -> broker
+pass/fail -> earn -> compound; G1 currently 1/30). New plist com.alta.oracle_daily_digest
+LOADED (06:15 PT daily: digest + master sync — disclosed; read-only job under the night
+mandate). icarus sync extended to carry the digest. **(N4)** live-verified over the wire:
+light tokens serving, obrief panel present, skills.html 200, digest JSON 200, ict light.
+master a10ae2f · sovereign-v2 861ffb9. First Oracle brief already generated (real LLM call):
+headline + "today's one thing" = pick TICK-035 round-2 structure + W6 sizing question.
+RAG/doc-index named as the next Oracle step (curated-context digest shipped instead — honest
+overnight scope). Plugins documented on skills.html (chat-side; no automation built).
+
+---
+
 ## 2026-07-14 (pre-dawn) · DASHBOARD CORRECTIONS SHIPPED + VERIFIED LIVE (~105s)
 
 Colin's screenshot review, all three fixed on master b4d6db6 / sovereign-v2 3d7a950: (1) stale
