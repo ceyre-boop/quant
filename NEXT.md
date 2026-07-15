@@ -6,6 +6,19 @@ Standing constraints live in `CLAUDE.md` — not restated here.
 
 ---
 
+## 2026-07-15 · TICK-036 TOP-3 MOVERS STUDY (MINING) — PREDICTABILITY CONFIRMED AT 13x, SERIAL RUNNERS FOUND
+
+Colin's ask, run as Steps 1-2: 492 days (the 2 on-disk full-market years; 5yr needs the $79/mo
+word), survivorship-free, test-symbols excluded after first-pass contamination catch. **A fixed
+UNFITTED 20-name watchlist catches >=1 of the day's top-3 on 26.8% of days vs 2.0% random.**
+Median top-3: +90% at $3.80. The ex-ante tell is IDENTITY (runner within 5d: 29% vs 15%;
+y-top50: 12% vs 2%), not prior-day price drift (flat). Blue moon = 15 serial tickers filling
+~6% of all slots (BNAI 8x). VIX regime: no magnitude effect. 14 lens-cuts counted into
+mined_n. News pass + fitted-score prereg (HYP-099 candidates) = next rounds. Report:
+data/research/movers_study/report.md.
+
+---
+
 ## 2026-07-14 (night shift, operator asleep) · FULL DASHBOARD REBUILD SHIPPED + VERIFIED LIVE
 
 Colin's overnight mandate executed (plan Plans/immutable-wondering-alpaca.md, 2 worktree agents
