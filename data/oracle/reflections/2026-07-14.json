@@ -1,0 +1,26 @@
+{
+  "date": "2026-07-14",
+  "generated_at": "2026-07-14T06:43:45.264029+00:00",
+  "input_tokens": 5734,
+  "output_tokens": 849,
+  "estimated_cost_usd": 0.149685,
+  "harvest_days_read": 7,
+  "reflection": {
+    "candidate_lesson": {
+      "lesson_text": "When internal regime is MOMENTUM but TradingView shows 0 confirming signals (confidence <= 65%), the 30-indicator single-pair conviction must clear 100% before that pair is tradable at full internal size.",
+      "mechanism": "Internal-only regime detection with no external corroboration is prone to labeling range noise as momentum; institutional flow that produces a durable trend leaves footprints across multiple venues, so a signal invisible to a second independent data source (TV) is disproportionately likely to be a fakeout being sized on stale internal state.",
+      "testable_rule": "if regime_confirmation.tv_signals == 0 and regime_confirmation.confidence <= 0.65 and consensus.conviction < 1.00: size_multiplier *= 0.5  # only AUDNZD (100% conv, SHORT) survives full sizing today",
+      "expected_impact": "Sharpe +0.02 to +0.04 by suppressing low-conviction MOMENTUM entries that add variance without directional edge; reduces drawdown contribution from unconfirmed regime whipsaws.",
+      "evidence_from_harvest": "Current state shows Internal=MOMENTUM but TV=UNKNOWN (0 signals) at 75% sizing, while consensus is FLAT on GBPUSD (conv 0%), NEUTRAL on AUDUSD (conv 17%), and only AUDNZD reaches 100% SHORT \u2014 three of five pairs would be traded on internal-only conviction with no external backing.",
+      "evidence_from_reasoning": null,
+      "reasoning_component_targeted": "regime_confirmation.confidence",
+      "sample_needed": 30
+    },
+    "retirement_flag": {
+      "lesson_to_review": "L9",
+      "reason": "L9 mandates CONFIRMED hypotheses get an implementation commit or REJECTED status with an expiry \u2014 with 0 trades in 7 days and RQ-006 blocked until 30+ trades, several validated lessons risk drifting past their expiry unverified; L9 itself needs a freshness audit."
+    },
+    "system_health_note": "Zero trades for 7 consecutive days with regime=UNKNOWN and internal/external regime disagreement resolved only at 65% confidence \u2014 the system is correctly conservative but is accumulating no fresh evidence, so all reasoning-grounded lessons remain harvest-only until the paper-trade counter unblocks RQ-006."
+  },
+  "auto_validation": null
+}
