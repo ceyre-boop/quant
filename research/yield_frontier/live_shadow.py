@@ -62,6 +62,9 @@ def get(url, kid, sec):
             if e.code == 429:
                 time.sleep(10)
                 continue
+            if e.code == 403:          # free-tier recency window — wait it out
+                time.sleep(65)
+                continue
             raise
         except Exception:
             time.sleep(5)
@@ -73,7 +76,7 @@ def bars_for(sym, day, kid, sec, tf="5Min", days_back=0):
                          else dtime(9, 30), tzinfo=ET).astimezone(UTC)
     e = datetime.combine(day, dtime(16, 10), tzinfo=ET).astimezone(UTC)
     # free-tier SIP cannot serve the most recent 15 min — cap the window
-    e = min(e, datetime.now(UTC) - timedelta(minutes=16))
+    e = min(e, datetime.now(UTC) - timedelta(minutes=17))
     q = urllib.parse.urlencode({"symbols": sym, "timeframe": tf,
                                 "start": s.strftime("%Y-%m-%dT%H:%M:%SZ"),
                                 "end": e.strftime("%Y-%m-%dT%H:%M:%SZ"),
@@ -163,8 +166,10 @@ def close():
     today = datetime.now(ET).date()
     fp = OUT / f"signals_{today}.json"
     if not fp.exists():
-        print(f"[shadow] no signal file for {today}")
-        return
+        fp.write_text(json.dumps({"source": SOURCE_TAG, "signals": [],
+                                  "movers_checked": 0,
+                                  "note": "no scan output — recorded as 0-signal day"}))
+        print(f"[shadow] no signal file for {today} — recording 0-signal day")
     doc = json.loads(fp.read_text())
     day_ret = 0.0
     for s in doc["signals"]:
