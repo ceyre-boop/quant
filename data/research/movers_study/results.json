@@ -1,0 +1,87 @@
+{
+  "stamp": "MINING \u2014 lookahead allowed; characterization only; NOT evidence",
+  "days": 492,
+  "top3_rows": 1476,
+  "anatomy": {
+    "gain_p50": 0.9,
+    "gain_p90": 2.346,
+    "price_p50": 3.8,
+    "gap_led_share": 0.538,
+    "dow_counts": [
+      285,
+      309,
+      300,
+      288,
+      294
+    ]
+  },
+  "exante_lifts_top3_vs_controls": {
+    "runner_5d": {
+      "top3": 0.286,
+      "controls": 0.149
+    },
+    "runner_20d": {
+      "top3": 0.44,
+      "controls": 0.354
+    },
+    "in_y_top3": {
+      "top3": 0.028,
+      "controls": 0.001
+    },
+    "in_y_top50": {
+      "top3": 0.119,
+      "controls": 0.019
+    },
+    "prior_1d": {
+      "top3_p50": -0.003,
+      "controls_p50": 0.0
+    },
+    "prior_5d": {
+      "top3_p50": -0.002,
+      "controls_p50": 0.002
+    },
+    "vol_ratio_prev": {
+      "top3_p50": 1.252,
+      "controls_p50": 0.912
+    },
+    "price": {
+      "top3_p50": 3.8,
+      "controls_p50": 10.03
+    }
+  },
+  "persistence": {
+    "P_top3_was_y_top3": 0.028,
+    "P_top3_was_y_top50": 0.119,
+    "repeat_offenders_5plus": {
+      "BNAI": 8,
+      "HCWB": 7,
+      "SGBX": 7,
+      "PRTG": 6,
+      "ASST": 6,
+      "AEHL": 6,
+      "RGC": 6,
+      "SDOT": 6,
+      "VRAX": 5,
+      "MNTS": 5,
+      "ATPC": 5,
+      "ATNF": 5,
+      "SOPA": 5,
+      "BIAF": 5,
+      "EPSM": 5
+    },
+    "unique_tickers": 946
+  },
+  "regime": {
+    "top1_gain_by_vix_tercile": {
+      "low": 1.552,
+      "mid": 1.559,
+      "high": 1.359
+    }
+  },
+  "watchlist_K20": {
+    "P_hit_at_least_1_of_top3": 0.268,
+    "random_K20_baseline": 0.02,
+    "days": 492,
+    "score": "FIXED a-priori: 2*runner5d + runner20d + 2*(volx>5) + 2*(prior1d>15%) + y_top50"
+  }
+}

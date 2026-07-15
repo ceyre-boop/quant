@@ -404,3 +404,9 @@ Schema per ticket:
 - [ ] Main suite baseline + ICT isolation law untouched; push per batch; NEXT.md per session
 **status:** in_progress (2026-07-13 — self-executed by this session per Colin)
 **pre_approved:** true (plan-mode approval 2026-07-13 — Plans/immutable-wondering-alpaca.md)
+
+## TICK-036
+**title:** Top-3 movers study — commonalities + ex-ante predictability under 7 lenses (MINING, Steps 1-2)
+**description:** Colin 2026-07-14: top 3 movers/day, find commonalities + anything predictive (incl. rare blue-moon setups), many lenses, lookahead allowed. Window = the 2 on-disk full-market years (2024-07→2026-06, survivorship-free; 5-10yr extension = Polygon Developer $79/mo, operator's word). Anatomy / ex-ante tape features vs matched controls / persistence + repeat offenders / regime (VIX) / catalysts (Alpaca news, posthoc taxonomy) / blue-moon conditional scans / ex-ante watchlist scored P(>=1 of top-3) vs random. All MINING-stamped; candidate rules counted into mined_n.json; no prereg/holdout this ticket. Plan: Plans/immutable-wondering-alpaca.md.
+**status:** in_progress (2026-07-15)
+**pre_approved:** true (plan-mode approval 2026-07-15)
