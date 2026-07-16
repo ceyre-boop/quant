@@ -1106,3 +1106,11 @@ header and this log so the two W6 docs don't drift. Requested path (`research/ga
 explicit instruction.
 
 **Did not:** touch execution/exit path, change any live parameter, or write simulator code (spec-first).
+
+## 2026-07-16 — HYP-099 regime study + HYP-093 forward-year sim (autonomous session)
+- **Shipped:** 5-step method run end-to-end. Step 1 scan (117 events 2025-H2, 63 combos, 24 green) → Step 3 prereg hashed 2bcf4b9f… committed a7148f3 BEFORE holdout touch → Step 4 sealed: **HYP-099 NOT_SIGNIFICANT** (V1 Δ+0.97% p=0.226; V2 sign-flipped). Ledger entry 81. Regime conditioning on the gapper fade is a mined mirage; do not revive intraday_push/overnight_gap without new data.
+- **Session goal met via collateral:** sealed HYP-093 rule forward-simmed on fully unseen post-seal year (2025-07→2026-06, 234 events, zero lookahead, mandate spec 2% notional / 25% post-entry stop on SIP minute highs): **+24.4% yr, maxDD 4.0%, Sharpe 3.4, win 57.7%**, robust across 20–40% stop levels. Key mechanism: the stop caps the −937% tail; 2026-H1 unstopped mean is ~0 — the stop IS the strategy's survival.
+- Files: research/gapper/regime-study-{prereg,results}-HYP099.md, regime_holdout_HYP099.json, sim_annual_HYP093_forward.{csv,py}, data/research/gapper/event_post1030_highs.json.
+- **Pushed:** a7148f3, 608bbb4 → origin/sovereign-v2.
+- **Refused shortcuts:** first sim run used daily highs → 60% false stop rate (−30% yr artifact); refetched post-10:30 minute-bar highs instead of shipping the conservative wrong number. Holdout never touched pre-hash.
+- **Blockers/next:** locate/borrow availability still the real-world bind (linear scaling is paper-only); HYP-100 entry-timing study pre-declared as next candidate if wanted; stop overlay was mandate-specified, not in original HYP-093 prereg — a formal HYP-100 prereg of "HYP-093 + 25% stop" on NEW forward data (live shadow) would fully regularize it.
