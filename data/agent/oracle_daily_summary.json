@@ -1,14 +1,14 @@
 {
-  "last_updated": "2026-07-14T06:43:45.296020+00:00",
+  "last_updated": "2026-07-15T06:41:34.787406+00:00",
   "harvest": {
     "trades_closed": 0,
     "win_rate": null,
     "failure_taxonomy": {}
   },
   "reflection": {
-    "candidate_lesson": "When internal regime is MOMENTUM but TradingView shows 0 confirming signals (confidence <= 65%), the 30-indicator single-pair conviction must clear 100% before that pair is tradable at full internal size.",
-    "mechanism": "Internal-only regime detection with no external corroboration is prone to labeling range noise as momentum; institutional flow that produces a durable trend leaves footprints across multiple venues, so a signal invisible to a second independent data source (TV) is disproportionately likely to be a fakeout being sized on stale internal state.",
-    "testable_rule": "if regime_confirmation.tv_signals == 0 and regime_confirmation.confidence <= 0.65 and consensus.conviction < 1.00: size_multiplier *= 0.5  # only AUDNZD (100% conv, SHORT) survives full sizing today"
+    "candidate_lesson": "When internal regime is MOMENTUM but TradingView returns zero confirming signals, treat the 75% sizing multiplier as a hard ceiling AND require the 30-indicator conviction to exceed 55% before entry \u2014 internal-only MOMENTUM below that conviction is the weakest configuration in the confirmation stack.",
+    "mechanism": "A MOMENTUM regime call with no external confirmation means only the internal ensemble sees the move; institutionally, durable momentum leaves a footprint across multiple venues/timeframes, so the absence of TV agreement signals the move is being carried by a single crowded flow that reverts once that flow exhausts. Low internal conviction (<55%) on top of that means even the internal ensemble is split \u2014 you are sizing into noise dressed as trend.",
+    "testable_rule": "if internal_regime == 'MOMENTUM' and tv_signal_count == 0 and consensus_conviction < 0.55: veto_entry() else if internal_regime == 'MOMENTUM' and tv_signal_count == 0: size *= 0.75"
   },
   "validation": {
     "verdict": "REJECTED",
@@ -21,8 +21,8 @@
     "codify_error": null
   },
   "cycle": {
-    "cost_usd": 0.149685,
+    "cost_usd": 0.157065,
     "status": "COMPLETE",
-    "date": "2026-07-14"
+    "date": "2026-07-15"
   }
 }

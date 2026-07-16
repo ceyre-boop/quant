@@ -1,6 +1,105 @@
 {
   "messages": [
     {
+      "id": "pulse-20260716T0101",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] REST_MODE_EXPIRED: HYP-063 () validated and unimplemented for 24 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
+      "timestamp": "2026-07-16T01:01:48+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260716T0101",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] OUTCOME_LOOP_STALL: 23 closed OANDA trades but 0 matched to open decisions \u2014 the win/loss loop is not closing (CLAUDE.md NON-NEGOTIABLE #2). Oracle is learning from nothing. Check pair/timestamp/system matching in decision_logger.update_outcome.",
+      "timestamp": "2026-07-16T01:01:46+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260715T2145",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] REST_MODE_EXPIRED: HYP-063 () validated and unimplemented for 23 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
+      "timestamp": "2026-07-15T21:45:48+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260715T2145",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] OUTCOME_LOOP_STALL: 23 closed OANDA trades but 0 matched to open decisions \u2014 the win/loss loop is not closing (CLAUDE.md NON-NEGOTIABLE #2). Oracle is learning from nothing. Check pair/timestamp/system matching in decision_logger.update_outcome.",
+      "timestamp": "2026-07-15T21:45:45+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260715T1413",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] REST_MODE_EXPIRED: HYP-063 () validated and unimplemented for 23 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
+      "timestamp": "2026-07-15T14:13:04+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260715T1413",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] OUTCOME_LOOP_STALL: 23 closed OANDA trades but 0 matched to open decisions \u2014 the win/loss loop is not closing (CLAUDE.md NON-NEGOTIABLE #2). Oracle is learning from nothing. Check pair/timestamp/system matching in decision_logger.update_outcome.",
+      "timestamp": "2026-07-15T14:13:02+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "invariant-2026-07-15-fills_stale",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "[INVARIANT] FILLS_STALE: all fills ledgers stale (data/ledger/oanda_fills.jsonl, data/execution/fills.jsonl) \u2014 recent writes unverifiable (2026-07-15)",
+      "timestamp": "2026-07-15T13:28:12.502816+00:00",
+      "read": false,
+      "source": "invariant_guard"
+    },
+    {
+      "id": "audit-2026-07-15-price_source_drift",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "[AUDIT] PRICE_SOURCE_DRIFT: AUD_NZD median |\u0394close|/close 0.00227 (2026-07-15)",
+      "timestamp": "2026-07-15T13:11:10.662646+00:00",
+      "read": false,
+      "source": "shadow_audit"
+    },
+    {
+      "id": "audit-2026-07-15-l1_determinism_fail",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[AUDIT] L1_DETERMINISM_FAIL: 1 record(s) not reproducible (2026-07-15)",
+      "timestamp": "2026-07-15T13:11:10.662616+00:00",
+      "read": false,
+      "source": "shadow_audit"
+    },
+    {
+      "id": "pulse-20260715T0220",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] REST_MODE_EXPIRED: HYP-063 () validated and unimplemented for 23 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
+      "timestamp": "2026-07-15T02:20:22+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260715T0220",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] OUTCOME_LOOP_STALL: 23 closed OANDA trades but 0 matched to open decisions \u2014 the win/loss loop is not closing (CLAUDE.md NON-NEGOTIABLE #2). Oracle is learning from nothing. Check pair/timestamp/system matching in decision_logger.update_outcome.",
+      "timestamp": "2026-07-15T02:20:19+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
       "id": "pulse-20260715T0020",
       "priority": "URGENT",
       "emoji": "\ud83d\udd34",
@@ -350,106 +449,7 @@
       "timestamp": "2026-07-13T14:22:07+00:00",
       "read": false,
       "source": "oracle_pulse"
-    },
-    {
-      "id": "invariant-2026-07-13-fills_stale",
-      "priority": "IMPORTANT",
-      "emoji": "\ud83d\udfe1",
-      "text": "[INVARIANT] FILLS_STALE: all fills ledgers stale (data/ledger/oanda_fills.jsonl, data/execution/fills.jsonl) \u2014 recent writes unverifiable (2026-07-13)",
-      "timestamp": "2026-07-13T13:20:04.383628+00:00",
-      "read": false,
-      "source": "invariant_guard"
-    },
-    {
-      "id": "audit-2026-07-13-price_source_drift",
-      "priority": "IMPORTANT",
-      "emoji": "\ud83d\udfe1",
-      "text": "[AUDIT] PRICE_SOURCE_DRIFT: AUD_NZD median |\u0394close|/close 0.00227 (2026-07-13)",
-      "timestamp": "2026-07-13T13:05:06.403479+00:00",
-      "read": false,
-      "source": "shadow_audit"
-    },
-    {
-      "id": "audit-2026-07-13-l1_determinism_fail",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[AUDIT] L1_DETERMINISM_FAIL: 1 record(s) not reproducible (2026-07-13)",
-      "timestamp": "2026-07-13T13:05:06.403449+00:00",
-      "read": false,
-      "source": "shadow_audit"
-    },
-    {
-      "id": "pulse-20260713T1222",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[PULSE] REST_MODE_EXPIRED: HYP-063 () validated and unimplemented for 21 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
-      "timestamp": "2026-07-13T12:22:02+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "pulse-20260713T1222",
-      "priority": "FYI",
-      "emoji": "\ud83d\udfe2",
-      "text": "[PULSE] STALE_ENTRY: 1 entries with bars_since_signal > 5 \u2014 entries may be chasing stale FVGs",
-      "timestamp": "2026-07-13T12:22:02+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "pulse-20260713T1222",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[PULSE] OUTCOME_LOOP_STALL: 23 closed OANDA trades but 0 matched to open decisions \u2014 the win/loss loop is not closing (CLAUDE.md NON-NEGOTIABLE #2). Oracle is learning from nothing. Check pair/timestamp/system matching in decision_logger.update_outcome.",
-      "timestamp": "2026-07-13T12:22:01+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "pulse-20260713T1021",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[PULSE] REST_MODE_EXPIRED: HYP-063 () validated and unimplemented for 21 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
-      "timestamp": "2026-07-13T10:21:56+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "pulse-20260713T1021",
-      "priority": "FYI",
-      "emoji": "\ud83d\udfe2",
-      "text": "[PULSE] STALE_ENTRY: 1 entries with bars_since_signal > 5 \u2014 entries may be chasing stale FVGs",
-      "timestamp": "2026-07-13T10:21:56+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "pulse-20260713T1021",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[PULSE] OUTCOME_LOOP_STALL: 23 closed OANDA trades but 0 matched to open decisions \u2014 the win/loss loop is not closing (CLAUDE.md NON-NEGOTIABLE #2). Oracle is learning from nothing. Check pair/timestamp/system matching in decision_logger.update_outcome.",
-      "timestamp": "2026-07-13T10:21:55+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "pulse-20260713T0821",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[PULSE] REST_MODE_EXPIRED: HYP-063 () validated and unimplemented for 21 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
-      "timestamp": "2026-07-13T08:21:50+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "pulse-20260713T0821",
-      "priority": "FYI",
-      "emoji": "\ud83d\udfe2",
-      "text": "[PULSE] STALE_ENTRY: 1 entries with bars_since_signal > 5 \u2014 entries may be chasing stale FVGs",
-      "timestamp": "2026-07-13T08:21:50+00:00",
-      "read": false,
-      "source": "oracle_pulse"
     }
   ],
-  "last_updated": "2026-07-15T00:20:13+00:00"
+  "last_updated": "2026-07-16T01:01:48+00:00"
 }

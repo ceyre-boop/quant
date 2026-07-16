@@ -1,20 +1,20 @@
 {
-  "headline": "Dashboard live with ICARUS method named and verified; three hypotheses adjudicated below yield floor; HYP-097 refutes your 30% thesis on sub-$3 collar sizing.",
+  "headline": "Dashboard live with ICARUS method named and tracked; Sharpe corrected to 1.25; three hypotheses below floor, one structurally refuted.",
   "what_happened": [
-    "ICARUS (HYP-093) shipped live: p=0.031, DSR 0.987, but constitutional yield +0.00023%/day falls short of 0.0005 floor\u2014valid signal, insufficient edge.",
-    "Dashboard rebuild complete: Sharpe updated to 1.25 (provisional pending TICK-024), shadow P&L calendar merged, Oracle daily brief panel live, skills arsenal indexed.",
-    "HYP-097 (collar physics on sub-$3 tier) empirically refutes your ~30% thesis: W* overshoot caps at 0.627/0.798 vs assumed; yield collapsed to 0.0166%/day from 0.05% floor.",
-    "HYP-094 and HYP-095 also adjudicated below floor; HYP-091 not significant; HYP-096 operator-withdrawn (unverified rule claim)."
+    "ICARUS (HYP-093: fade-sell at 10:30) shipped live with p=.031, DSR .987, but constitutional yield +0.00023%/day falls short of 0.0005 floor\u2014valid signal, insufficient edge.",
+    "Sharpe refreshed to 1.25 (from stale 1.08) across all six dashboard spots; ICARUS shadow calendar now merges into main Calendar tab with weekly/monthly totals at $100k basis.",
+    "HYP-097 (W* collar, sub-$3 tier) structurally refuted: empirical T10/T20 overshoot dominated by LULD floor; constitutional yield collapsed to 0.0166%/day vs 0.023% assumed.",
+    "HYP-094 and HYP-095 both NOT_SIGNIFICANT; HYP-091 out-of-sample. Oracle daily brief automation live (read-only, cost-capped)\u20141/30 shadow days logged."
   ],
-  "what_it_means": "You have one named, live method (ICARUS) with statistical teeth but insufficient yield to compound toward the funded-sim gate (you're at day 1/30 shadow). The collar strategy you believed could scale sub-$3 is physically constrained tighter than your model predicted\u2014distribution sizing (RCK, W6) and catalyst-split concentration are the honest next paths. The dashboard now surfaces daily progression and method performance transparently; use it to decide whether to iterate ICARUS or pivot to RCK/W6 before day 30 elapses.",
-  "todays_one_thing": "Run a measured variance-premium scan on gapper chains (you noted ThetaTerminal cost as the blocker) to validate HYP-096's reopen condition, or commit to distributional sizing (RCK, W6) on ICARUS by EOD to break the yield floor before the next shadow cycle closes.",
+  "what_it_means": "You have a named, audited method (ICARUS) with honest edge, but it's 4\u20135x below the floor you need. The three dead hypotheses (HYP-093, 094, 095, 097) confirm the yield frontier is narrower than your 30-day-to-funded timeline assumes\u2014you're validating, not enriching. The dashboard now truthfully tracks shadow P&L; use it to hunt the gap between 0.0005 and real edge.",
+  "todays_one_thing": "Measure variance premium in gapper chains (the honest path HYP-097 opened): if real, it compounds ICARUS; if not, you've closed the last structural escape route and must pivot to distribution-based sizing (RCK, W6) or catalyst edge concentration (TICK-034).",
   "progression": [
     {
       "gate": "G1",
       "label": "30 clean shadow days (ICARUS)",
       "state": "IN_PROGRESS",
-      "pct": 3,
-      "detail": "1/30 days recorded \u00b7 1 green"
+      "pct": 7,
+      "detail": "2/30 days recorded \u00b7 2 green"
     },
     {
       "gate": "G2",
@@ -47,5 +47,5 @@
   ],
   "source": "oracle-llm",
   "model": "claude-haiku-4-5-20251001",
-  "generated_at": "2026-07-14T10:15:10.909025+00:00"
+  "generated_at": "2026-07-15T10:30:23.270161+00:00"
 }

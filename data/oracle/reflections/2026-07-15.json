@@ -1,0 +1,26 @@
+{
+  "date": "2026-07-15",
+  "generated_at": "2026-07-15T06:41:34.759039+00:00",
+  "input_tokens": 5711,
+  "output_tokens": 952,
+  "estimated_cost_usd": 0.157065,
+  "harvest_days_read": 7,
+  "reflection": {
+    "candidate_lesson": {
+      "lesson_text": "When internal regime is MOMENTUM but TradingView returns zero confirming signals, treat the 75% sizing multiplier as a hard ceiling AND require the 30-indicator conviction to exceed 55% before entry \u2014 internal-only MOMENTUM below that conviction is the weakest configuration in the confirmation stack.",
+      "mechanism": "A MOMENTUM regime call with no external confirmation means only the internal ensemble sees the move; institutionally, durable momentum leaves a footprint across multiple venues/timeframes, so the absence of TV agreement signals the move is being carried by a single crowded flow that reverts once that flow exhausts. Low internal conviction (<55%) on top of that means even the internal ensemble is split \u2014 you are sizing into noise dressed as trend.",
+      "testable_rule": "if internal_regime == 'MOMENTUM' and tv_signal_count == 0 and consensus_conviction < 0.55: veto_entry() else if internal_regime == 'MOMENTUM' and tv_signal_count == 0: size *= 0.75",
+      "expected_impact": "Filters the lowest-quality MOMENTUM entries (EURUSD conv=8%, GBPUSD/USDJPY conv=50% currently sit below the 55% gate); expected Sharpe +0.02 to +0.03 via variance reduction on unconfirmed regime trades.",
+      "evidence_from_harvest": "External regime block shows Internal=MOMENTUM vs TradingView=UNKNOWN (0 signals), sizing already auto-cut to 75% at 65% confidence; simultaneously EURUSD conv=8%, GBPUSD conv=50%, USDJPY conv=50% all sit below a 55% bar while only AUDUSD (58%, hist_hr=68%) clears it \u2014 the system is already flagging these as marginal.",
+      "evidence_from_reasoning": null,
+      "reasoning_component_targeted": "consensus_conviction (30-indicator) gated jointly with tv_signal_count and internal_regime",
+      "sample_needed": 40
+    },
+    "retirement_flag": {
+      "lesson_to_review": "L9",
+      "reason": "L9 mandates that CONFIRMED hypotheses expire without an implementation commit \u2014 with 0 trades over the last 7 days and 11 pending research items, several codified lessons (esp. session/VIX gates) may be running past their validation window with no fresh out-of-sample confirmation."
+    },
+    "system_health_note": "Zero trades in 7 days with Regime=UNKNOWN and no closed decision logs means the system is currently starved of fresh evidence \u2014 lessons must be harvest/config-derived until the paper-trade counter accumulates enough to unblock RQ-006."
+  },
+  "auto_validation": null
+}
