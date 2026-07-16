@@ -1,0 +1,47 @@
+{
+ "hyp": "HYP-099",
+ "holdout": [
+  "2026-01-01",
+  "2026-06-30"
+ ],
+ "n_events": 117,
+ "n_event_days": 71,
+ "variants": {
+  "V1": {
+   "n_in": 51,
+   "n_out": 66,
+   "median_in": 0.1428,
+   "median_out": 0.1331,
+   "mean_in": -0.0462,
+   "p_one_sided": 0.22572,
+   "bh_pass": false,
+   "delta_median": 0.0097,
+   "verdict_conditions": {
+    "n_in_ge_15": true,
+    "bh_p_lt_05": false,
+    "delta_ge_3pct": false
+   },
+   "confirmed": false,
+   "mean_pct_day_constitutional": -0.000415
+  },
+  "V2": {
+   "n_in": 38,
+   "n_out": 79,
+   "median_in": 0.1277,
+   "median_out": 0.1558,
+   "mean_in": -0.1444,
+   "p_one_sided": 0.68134,
+   "bh_pass": false,
+   "delta_median": -0.0281,
+   "verdict_conditions": {
+    "n_in_ge_15": true,
+    "bh_p_lt_05": false,
+    "delta_ge_3pct": false
+   },
+   "confirmed": false,
+   "mean_pct_day_constitutional": -0.000966
+  }
+ },
+ "survivor": null,
+ "verdict": "NOT_SIGNIFICANT"
+}
