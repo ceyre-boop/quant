@@ -1114,3 +1114,9 @@ explicit instruction.
 - **Pushed:** a7148f3, 608bbb4 → origin/sovereign-v2.
 - **Refused shortcuts:** first sim run used daily highs → 60% false stop rate (−30% yr artifact); refetched post-10:30 minute-bar highs instead of shipping the conservative wrong number. Holdout never touched pre-hash.
 - **Blockers/next:** locate/borrow availability still the real-world bind (linear scaling is paper-only); HYP-100 entry-timing study pre-declared as next candidate if wanted; stop overlay was mandate-specified, not in original HYP-093 prereg — a formal HYP-100 prereg of "HYP-093 + 25% stop" on NEW forward data (live shadow) would fully regularize it.
+
+## 2026-07-16 (later) — HYP-100 prereg + borrow capacity measurement
+- HYP-100 preregistered (hash a44998f6…, commit ceeb54f): 25% stop overlay sealed against FORWARD shadow data only (events ≥2026-07-16; eval at N≥40 or 2027-01-16). Closes the stop-overlay loop.
+- ThetaTerminal v3 restarted (was down since 07-02 cred warn; launched with .env key via homebrew openjdk, Options: VALUE live :25503).
+- **Capacity measurement (the truck-size answer): of 234 forward-year events — 169 (72%) NO_OPTIONS, 34 no live expiry, 15 no two-sided ATM quote at 10:30 → only 16 (6.8%) parity-measurable.** Of those 16: median implied borrow 46%/yr, p75 146%, p90 203% (n small, micro-cap spreads noisy). Implications: (1) long-put/HYP-096 options bypass reaches ≤7% of signals — cannot carry the strategy; (2) 93% of the universe is optionless HTB micro-cap — locate via broker is the ONLY scaling channel; (3) modeled 200–600% APR tiers are conservative vs the measured median on the measurable slice. $10k–$50k rows real; $500k theoretical, unchanged.
+- Files: research/gapper/borrow_measurement.py, data/research/gapper/implied_borrow_234.json. Pushed ceeb54f + this commit.
