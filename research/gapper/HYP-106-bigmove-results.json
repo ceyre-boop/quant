@@ -1,0 +1,31 @@
+{
+  "hyp": "HYP-106",
+  "holdout": [
+    "2026-04-08",
+    "2026-06-30"
+  ],
+  "filtered": {
+    "n": 22,
+    "mean": 0.8411,
+    "median": 0.6767,
+    "tail_ratio": 10.52,
+    "p_win": 0.864,
+    "p_ret_gt20": 0.773,
+    "max_win": 3.382,
+    "sharpe": 4.491
+  },
+  "unfiltered_baseline": {
+    "n": 71,
+    "mean": 0.2848,
+    "median": 0.0794,
+    "tail_ratio": 3.951,
+    "p_win": 0.563,
+    "p_ret_gt20": 0.38,
+    "max_win": 3.382,
+    "sharpe": 3.626
+  },
+  "n_filtered": 22,
+  "perm_p": 0.0005,
+  "verdict": "CONFIRMED",
+  "beats_tail": true
+}

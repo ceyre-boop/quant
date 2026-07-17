@@ -2107,5 +2107,15 @@
   "date_adjudicated": "2026-07-17",
   "prereg": "research/gapper/HYP-105-long-momentum-prereg.md sha256 334c373dad9162a1caa6979ed4f6ba2c4b074ee2fc3d50de9e9944e19b15f499 (commit 4d5c387)",
   "result": "CONFIRMED on untouched holdout (71 events 2026-04-08..06-30): Sharpe 3.63, mean +28.5%/event, median +7.9%, win 56.3%, sign-flip perm p=0.0005. In-sample (163 ev) Sharpe 5.07. Mirror of HYP-093: ride the morning ramp LONG from 9:31 before the 10:30 fade. **Long side => NO borrow/locate wall (sidesteps TICK-032).** CAVEATS: (1) mean is fat-right-tail-driven (few monster gappers; median far lower); (2) short 2.7mo holdout, n=71; (3) 9:31 microcap slippage understated by entry-bar spread proxy \u2014 live worse; (4) NOT independent of HYP-093 (same events); (5) Phase-3 ML 92% CV acc is LOOK-AHEAD LEAKAGE (intraday_push/overnight_gap measured through holding window) \u2014 not usable, flagged. First new confirmed edge of the session; needs forward shadow + leak-free features + realistic fill model before sizing. 0/360 configs survived in-sample Bonferroni (holdout is the arbiter). backtester/hyp105_long_scan.py."
+ },
+ {
+  "id": "HYP-106",
+  "name": "Leak-free runner filter (moderate gap + low first-min volume) on long gapper momentum",
+  "status": "ADJUDICATED",
+  "verdict": "CONFIRMED",
+  "date_registered": "2026-07-17",
+  "date_adjudicated": "2026-07-17",
+  "prereg": "research/gapper/HYP-106-bigmove-prereg.md sha256 9d1c3937e262558fd43bdcec607bdc529817744e042657abc824421c7c6a1fe1 (commit 422687d)",
+  "result": "CONFIRMED on untouched holdout (22 filtered of 71 events): filter (overnight_gap<=1.24 AND log10(first-min vol)<=5.43, both LEAK-FREE from the 09:30 bar) improves EVERY skew metric vs unfiltered HYP-105 long \u2014 median +7.9%->+67.7%, tail_ratio 3.95->10.5, win 56%->86%, P(ret>20%) 38%->77%, Sharpe 3.63->4.49, perm p=0.0005. MECHANISM (leak-free, coherent): among >=100% gappers the runners are MODERATE-overnight-gap + LOW-first-minute-volume names (still building), not the extreme-gap climax blow-offs (exhausted = HYP-093 short targets). Leak-free RF CV 81% in-sample (vs HYP-105's rejected 92% leak). **DIRECTION/SIGNAL real & OOS-confirmed. MAGNITUDE NOT tradeable as-is**: median +67%/hr assumes 09:31 fills on >=100% microcaps with only entry-bar-spread cost \u2014 ignores LULD halts, 5-20% real spreads, and size limits. Live magnitude far lower. Caveats: n=22, 2.7mo, fat-tail-driven (max_win +338%), not independent of HYP-093/105 (same events). Long => no borrow wall. NEXT: forward shadow @09:31, realistic halt/spread fill model, size-capacity study. backtester/hyp106_skew.py."
  }
 ]

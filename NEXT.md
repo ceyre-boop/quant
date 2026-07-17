@@ -1176,3 +1176,10 @@ explicit instruction.
 - **Phase 4 HOLDOUT CONFIRMED (ledger 84): Sharpe 3.63, mean +28.5%/ev, median +7.9%, win 56.3%, perm p=0.0005, n=71.** First OOS-confirmed NEW edge this session — and it's LONG → **no borrow/locate wall (sidesteps TICK-032)**.
 - Caveats (heavy): mean is fat-tail-driven (median +7.9% is the honest expectancy); 2.7mo/71-event window; 9:31 microcap slippage understated; NOT independent of HYP-093 (same events, ramp-then-fade halves). Phase-3 ML 92% CV = LOOK-AHEAD LEAK (intraday_push/overnight_gap measured through holding window) — rejected, not predictive.
 - Next: forward shadow @09:31, leak-free pre-entry features, realistic first-minute fill model before sizing. Report research/gapper/HYP-105-long-momentum-scan.md.
+
+## 2026-07-17 (cont) — HYP-106 CONFIRMED: leak-free filter catches the big-% runners
+- Answered "find the method in the madness": which ≥100% gappers RUN long, predicted from PRE-09:31 info only (09:30 first-min bar + prev_close; every *_1030 feature banned as leak — that's what faked HYP-105's 92% ML).
+- **Discovery (leak-free, MW p~0, RF CV 81%): runners = MODERATE overnight gap (+60% vs +163%) + LOW first-minute volume + TIGHT first-min range.** Mechanism: still-building vs exhausted climax (the exhausted ones are HYP-093 short targets). Coherent.
+- **HOLDOUT CONFIRMED (ledger 85, prereg 9d1c3937 → 422687d before touch): filter (22 of 71 events) vs unfiltered — median +7.9%→+67.7%, tail_ratio 3.95→10.5, win 56%→86%, P(ret>20%) 38%→77%, Sharpe 4.49, perm p=0.0005.** Survived where HYP-104 collapsed. Positive-skew as requested (10:1). Long → no borrow wall.
+- **MAGNITUDE NOT TRADEABLE AS-IS** (flagged hard): +67%/hr median assumes 09:31 microcap fills w/ only entry-bar spread — ignores LULD halts, 5-20% real spreads, size limits. Signal real; live returns a fraction. n=22, fat-tail, not independent of HYP-093/105.
+- NEXT: forward shadow @09:31, realistic halt/spread fill model, capacity study before any sizing. Report research/gapper/HYP-106-bigmove-scan.md.
