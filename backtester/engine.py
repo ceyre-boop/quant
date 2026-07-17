@@ -77,9 +77,15 @@ def _simulate_event(bars: pd.DataFrame, cfg: dict, gain: float) -> dict:
     spread_cost = ((eb_high - eb_low) / entry_price * 0.5) if entry_price else 0.0
 
     post = bars.iloc[ei + 1:]
-    ex_i = _first_at_or_after(bars, cfg["exit_time"])
-    if ex_i is None or ex_i <= ei:
-        ex_i = len(bars) - 1
+    # exit_time may be a clock "10:30" OR a duration "+30" (minutes/bars after
+    # entry). Duration assumes 1-min bars (ei + N).
+    et = str(cfg["exit_time"])
+    if et.startswith("+"):
+        ex_i = min(ei + int(et[1:]), len(bars) - 1)
+    else:
+        ex_i = _first_at_or_after(bars, et)
+        if ex_i is None or ex_i <= ei:
+            ex_i = len(bars) - 1
     exit_price = float(bars.at[ex_i, "close"])
 
     stop_hit = False
@@ -101,13 +107,26 @@ def _simulate_event(bars: pd.DataFrame, cfg: dict, gain: float) -> dict:
         else:
             gross = (entry_price - exit_price) / entry_price
     else:  # long
+        trail = cfg.get("trail_pct")
         trigger = entry_price * (1 - stop_pct)
-        breach = post.index[post["low"] <= trigger]
-        if len(breach):
-            bi = int(breach[0])
-            bar_open = float(bars.at[bi, "open"])
-            stop_fill_price = bar_open if bar_open <= trigger else trigger
-            filled_at_trigger = not (bar_open <= trigger)
+        # Walk bars from entry+1 to the time-exit; whichever of hard stop or
+        # trailing stop triggers first wins. Trailing peak = running max high.
+        window = bars.iloc[ei + 1:ex_i + 1]
+        peak = entry_price
+        fired_i = None
+        fired_trig = None
+        for j in window.index:
+            hard = trigger
+            tstop = peak * (1 - trail) if trail else -1e18
+            lvl = max(hard, tstop)
+            if float(bars.at[j, "low"]) <= lvl:
+                fired_i, fired_trig = int(j), lvl
+                break
+            peak = max(peak, float(bars.at[j, "high"]))
+        if fired_i is not None:
+            bar_open = float(bars.at[fired_i, "open"])
+            stop_fill_price = bar_open if bar_open <= fired_trig else fired_trig
+            filled_at_trigger = not (bar_open <= fired_trig)
             gross = (stop_fill_price - entry_price) / entry_price
             stop_hit = True
         else:
