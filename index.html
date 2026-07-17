@@ -695,6 +695,19 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
 #icarus .ic-foot{font-size:10px;color:#94a3b8;margin-top:8px}
 .cal-src.icarus{background:#b8860b!important}
 #icarus .ic-caltitle{font-size:11px;color:#64748b;font-weight:700;margin-top:2px}
+#icarus .ic-edge{margin-top:12px;border-top:1px dashed #dbe7f5;padding-top:10px}
+#icarus .ic-edge-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+#icarus .ic-edge-title{font-size:12px;font-weight:800;letter-spacing:1.5px;color:#0f172a}
+#icarus .ic-badge{font-size:9px;font-weight:800;letter-spacing:1px;padding:3px 8px;border-radius:4px;background:#e6f7ee;color:#067647;border:1px solid #a6e3c4}
+#icarus .ic-edge-grid{display:flex;gap:22px;flex-wrap:wrap;margin:8px 0 4px}
+#icarus .ic-edge-grid .ic-stat b{font-size:15px}
+#icarus .ic-tables{display:flex;gap:26px;flex-wrap:wrap;margin-top:6px}
+#icarus .ic-mini{font-size:11px;color:#334155;border-collapse:collapse}
+#icarus .ic-mini th{font-size:9px;color:#64748b;text-transform:uppercase;letter-spacing:1px;text-align:left;padding:2px 10px 2px 0;font-weight:700}
+#icarus .ic-mini td{padding:2px 10px 2px 0}
+#icarus .ic-mini .pos{color:#067647;font-weight:700}
+#icarus .ic-caveat{font-size:10px;color:#92400e;background:#fffbeb;border:1px solid #fde68a;border-radius:6px;padding:6px 10px;margin-top:8px;line-height:1.5}
+#icarus .ic-hyp100{font-size:11px;color:#1d4ed8;margin-top:8px;font-weight:600}
 </style>
 <div id="icarus">
   <div class="ic-head">
@@ -706,6 +719,29 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
   <div class="ic-body">
     <div><div class="ic-caltitle" id="ic-caltitle">SHADOW CALENDAR</div><div class="ic-cal" id="ic-cal"></div></div>
     <div class="ic-trades"><div class="ic-caltitle">LATEST CLOSED TRADES</div><table id="ic-trades"></table></div>
+  </div>
+  <div class="ic-edge">
+    <div class="ic-edge-head">
+      <span class="ic-edge-title">PARABOLIC GAPPER FADE (HYP-093) — FORWARD-YEAR SIM</span>
+      <span class="ic-badge">CONFIRMED EDGE — FORWARD ACCUMULATION</span>
+    </div>
+    <div class="ic-edge-grid">
+      <div class="ic-stat"><b class="pos">+24.4%</b><span>annual (unseen yr)</span></div>
+      <div class="ic-stat"><b>3.4</b><span>sharpe</span></div>
+      <div class="ic-stat"><b>4.0%</b><span>max drawdown</span></div>
+      <div class="ic-stat"><b>57.7%</b><span>win rate</span></div>
+      <div class="ic-stat"><b>234</b><span>events 2025-07→2026-06</span></div>
+    </div>
+    <div class="ic-tables">
+      <table class="ic-mini"><tr><th colspan="4">STOP ROBUSTNESS (annual @2% notional)</th></tr>
+        <tr><td>20% → <b class="pos">+17.4%</b></td><td>25% → <b class="pos">+24.4%</b></td><td>30% → <b class="pos">+28.4%</b></td><td>40% → <b class="pos">+26.3%</b></td></tr></table>
+      <table class="ic-mini"><tr><th colspan="4">SCALING (paper-linear)</th></tr>
+        <tr><td>$10k → <b class="pos">+$2.4k</b></td><td>$50k → <b class="pos">+$12.2k</b></td><td>$100k → <b class="pos">+$24.4k</b></td><td>$500k → <b>+$122k*</b></td></tr></table>
+      <table class="ic-mini" id="ic-mc" style="display:none"><tr><th colspan="4">PROP CHALLENGE MC — $100k, ±8% (assumes locate on every signal)</th></tr>
+        <tbody id="ic-mc-body"></tbody></table>
+    </div>
+    <div class="ic-hyp100" id="ic-hyp100">HYP-100 forward status: Accumulating — 3 shadow days, 37 events to N≥40 gate</div>
+    <div class="ic-caveat">* Borrow caveat: hard-to-borrow micro-caps. Only 16/234 events (6.8%) had a measurable options market (median implied borrow 46%/yr); 72% have no options at all. Locate availability is unmodeled — $10k–$50k rows are executable today, the $500k row is theoretical until broker locate is proven. MC pass probabilities assume locate on every signal; real P(PASS) is materially lower.</div>
   </div>
   <div class="ic-foot" id="ic-foot"></div>
 </div>
@@ -737,7 +773,14 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
       tr.push('<tr><td>'+x.date.slice(5)+'</td><td><b>'+t.ticker+'</b></td><td>+'+Math.round(100*t.gain_1030)+'% by 10:30</td><td style="color:'+(t.ret>0?'#067647':'#b42318')+'">'+pct(t.ret,1)+'</td></tr>');});});
     document.getElementById('ic-trades').innerHTML=tr.join('')||'<tr><td>no closed trades yet</td></tr>';
     document.getElementById('ic-foot').textContent=(se.status_line||'')+' · gates: '+(d.next_gates||[]).join(' → ')+' · updated '+(d.updated_at||'').slice(0,16)+'Z';
+    var nev=0;(sh.daily||[]).forEach(function(x){nev+=(x.trades||[]).length;});
+    document.getElementById('ic-hyp100').textContent='HYP-100 forward status: Accumulating — '+(sh.days||0)+' shadow days, '+nev+' events logged, '+Math.max(0,40-nev)+' to N≥40 gate (prereg a44998f6)';
   }).catch(function(){document.getElementById('icarus').style.display='none';});
+  fetch('data/gapper_mc.json?t='+Date.now()).then(r=>r.json()).then(function(mc){
+    var rows='';(mc.windows||[]).forEach(function(w){
+      rows+='<tr><td><b>'+w.days+'d</b></td><td>PASS <b class="pos">'+(100*w.p_pass).toFixed(1)+'%</b></td><td>BUST '+(100*w.p_bust).toFixed(1)+'%</td><td>TIME '+(100*w.p_time).toFixed(1)+'%</td></tr>';});
+    if(rows){document.getElementById('ic-mc-body').innerHTML=rows;document.getElementById('ic-mc').style.display='';}
+  }).catch(function(){});
 })();
 </script>
 <!-- ══════════ /ICARUS ══════════ -->
