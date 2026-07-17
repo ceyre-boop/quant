@@ -2087,5 +2087,15 @@
   "date_registered": "2026-07-17",
   "prereg": "research/gapper/HYP-103-optimal-challenge-prereg.md sha256 996a1c475ccaca7bd3f6399b2e6debf88b097ef2569d869a819959af1a122751 (commit 30dbe3f)",
   "result": "PENDING \u2014 evaluates once on live shadow at N>=40 events or 2027-01-16. Null: EV_year1 <= $5,000. Derived from mined 240-cell grid (not evidence). Companion clock to HYP-100."
+ },
+ {
+  "id": "HYP-104",
+  "name": "Down-gap continuation short (liquid equities/ETFs, ex-leveraged) \u2014 megascan survivor",
+  "status": "ADJUDICATED",
+  "verdict": "NOT_CONFIRMED",
+  "date_registered": "2026-07-17",
+  "date_adjudicated": "2026-07-17",
+  "prereg": "research/hyp_104_downgap_short_prereg.md sha256 a984372183d7b7d3affa7a04415dcfabc095ccdc993a7a36c717356cb8f18dbf (commit 045bb03)",
+  "result": "Best of 77,016-hypothesis megascan (largest repo scan; 0 survived Bonferroni on dirty). Down-gap>=5% short next-open hold 2d stop 15%: dirty 2014-2025 annual +21.0%/Sharpe 2.32/DD 7.7% (ex-leveraged, genuine not vol-decay), but HOLDOUT 2025-07..2026-07 collapsed to annual +2.5%/Sharpe 0.36/p=0.35, n=105. Overfit; NOT_CONFIRMED. Nothing in the scan beats the gapper-fade benchmark (+18%/Sharpe 2) out of sample. Reusable daily-bar engine backtester/daily_engine.py + megascan.py."
  }
 ]
