@@ -2079,5 +2079,13 @@
   "prereg": "research/gapper/regime-study-prereg-HYP099.md sha256 2bcf4b9f50b7376f15732bdbc7a9d85b884cf18ba4e69c1e00b7880be0516b13 (commit a7148f3, before holdout touch)",
   "result": "Scan half (117 events 2025-H2) showed intraday_push>median delta +6.9% p=0.050; both preregistered variants FAILED the 2026-H1 holdout (117 events): V1 delta +0.97% p=0.226, V2 delta -2.81% p=0.681 (sign flip). BH k=2, 0 survivors. The intraday-built-gap regime story is a mined mirage; overfit armor worked. Do not revive intraday_push/overnight_gap conditioning without new data.",
   "collateral": "Forward-tracking byproduct (NOT a new hypothesis; sealed HYP-093 rule on post-seal unseen year 2025-07-02..2026-06-30, 234 events): with the mandate-specified 25% post-entry stop at 2% notional, total +24.4%, maxDD 4.0%, Sharpe 3.4, win 57.7%; robust across 20/25/30/40% stop levels (+17.4/+24.4/+28.4/+26.3%). Stop evaluation on Alpaca SIP post-10:30 minute-bar highs (data/research/gapper/event_post1030_highs.json). Sim: research/gapper/sim_annual_HYP093_forward.csv."
+ },
+ {
+  "id": "HYP-103",
+  "name": "EV-optimal prop-challenge operating config (10:45 entry / 25% stop / 3.5% / $200k / unlimited)",
+  "status": "REGISTERED",
+  "date_registered": "2026-07-17",
+  "prereg": "research/gapper/HYP-103-optimal-challenge-prereg.md sha256 996a1c475ccaca7bd3f6399b2e6debf88b097ef2569d869a819959af1a122751 (commit 30dbe3f)",
+  "result": "PENDING \u2014 evaluates once on live shadow at N>=40 events or 2027-01-16. Null: EV_year1 <= $5,000. Derived from mined 240-cell grid (not evidence). Companion clock to HYP-100."
  }
 ]

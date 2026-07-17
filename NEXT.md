@@ -1143,3 +1143,10 @@ explicit instruction.
 - **Unlimited-time MC (100k paths):** deadline removal flips the sizing logic — bust becomes the only failure mode, so LOWER sizing wins: 3% → 99.2% pass / 0.8% bust (10% DD line; median 51 trading days to +8%, p90 124); 3.5% → 98.5%/1.5%. Colin's 3.5% recommendation is optimal for fixed 90d windows; under no-deadline, 3% dominates.
 - **Combined HYP-093+095 MC (sealed rules only, zero new mining):** HYP-095 event dist regenerated exactly (40 events, mean +0.68% ✓). 90d window: adds only ~2-4pp (3.5%+NQ25%: 85.7%/2.4% — NQ leg too infrequent (8%/sessions) and too small to fill enough days). Unlimited: 3%+NQ25% → **99.4% pass / 0.6% bust**. Verdict: the structural fix is the deadline, not the second signal; HYP-095 helps at the margin.
 - Files: monte_carlo_unlimited_time.json, hyp095_event_dist.json, monte_carlo_prop_HYP102.json.
+
+## 2026-07-17 — HYP-103: EV-optimal challenge config (scan + prereg, pending shadow verdict)
+- 240-cell mined grid (stop×sizing×entry, minute-slice re-pricing for 5 entry times; new cache data/research/gapper/event_minute_slices.json; anchor cell reproduces sealed sim within 1pp price-source drift). FunderPro 2026 fees confirmed: 25k/$250, 50k/$300, 100k/$550, 200k/$995, fee refunded on pass, 80% split, no time limit.
+- Top-20 pattern: sizing at grid max (edge artifact — flagged), $200k always, unlimited ≥ 90d everywhere, entry 10:30/10:45 only, stop 20–35 plateau. Survival-adjusted EV (funded-year 10%-DD death MC) confirms ordering; p(survive) 96–99.9%.
+- **PREREGISTERED SPEC (996a1c47…, 30dbe3f): 10:45 entry / 25% stop / 3.5% notional / $200k / unlimited.** Dirty estimates: annual +63.7%, P(pass) 0.995, P(bust) 0.005, EV_y1 ~$103k. Chose 3.5% over EV-max 5% (grid edge + locate footprint). Null: shadow EV_y1 ≤ $5k; eval at N≥40 or 2027-01-16. Ledger entry 82 (REGISTERED).
+- 90d-vs-unlimited: unlimited wins every paired cell. Best fee-to-profit: $200k (fee 0.5% of account vs 1% at 25k).
+- Caveats stamped: mined grid ≠ evidence; locate assumption; TICK-032 instrument wall (FunderPro CFD list unverified for US micro-caps — operator to verify before paying any fee).
