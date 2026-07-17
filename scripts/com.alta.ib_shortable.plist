@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.alta.ib_shortable</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/opt/homebrew/bin/python3</string>
+    <string>/Users/taboost/quant/scripts/ib_shortable_snapshot.py</string>
+  </array>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+  </dict>
+  <key>WorkingDirectory</key>
+  <string>/Users/taboost/quant</string>
+  <key>Nice</key>
+  <integer>5</integer>
+  <key>StandardOutPath</key>
+  <string>/Users/taboost/quant/logs/ib_shortable.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/taboost/quant/logs/ib_shortable.err</string>
+  <!-- TICK-037. Daily 07:00 ET, pre-market, before the 10:50 gapper shadow scan.
+       Fires all 7 days (weekend snapshots harmless, keeps series gap-free).
+       TRACKED-NOT-LOADED: Colin loads manually (operator-promotes pattern):
+       launchctl load ~/Library/LaunchAgents/com.alta.ib_shortable.plist -->
+  <key>StartCalendarInterval</key>
+  <dict>
+    <key>Hour</key><integer>7</integer>
+    <key>Minute</key><integer>0</integer>
+  </dict>
+</dict>
+</plist>
