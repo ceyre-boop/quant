@@ -1,0 +1,75 @@
+{
+ "baseline_93_only_3pct_90d": {
+  "p_pass": 0.7853,
+  "p_bust": 0.0158
+ },
+ "signals": "HYP-093 (25% stop, forward-year dist) + HYP-095 (sealed NQ high-VIX dip long, 40 events/493 sessions)",
+ "independence": "different instruments; simulated independent (measured event overlap not modeled)",
+ "results": [
+  {
+   "gapper_pct": 3.0,
+   "nq_notional_pct": 7.5,
+   "window": 90,
+   "p_pass": 0.7984,
+   "p_bust": 0.014,
+   "p_time": 0.1876
+  },
+  {
+   "gapper_pct": 3.0,
+   "nq_notional_pct": 15.0,
+   "window": 90,
+   "p_pass": 0.8072,
+   "p_bust": 0.0134,
+   "p_time": 0.1794
+  },
+  {
+   "gapper_pct": 3.0,
+   "nq_notional_pct": 25.0,
+   "window": 90,
+   "p_pass": 0.8243,
+   "p_bust": 0.0126,
+   "p_time": 0.163
+  },
+  {
+   "gapper_pct": 3.5000000000000004,
+   "nq_notional_pct": 7.5,
+   "window": 90,
+   "p_pass": 0.837,
+   "p_bust": 0.0279,
+   "p_time": 0.1351
+  },
+  {
+   "gapper_pct": 3.5000000000000004,
+   "nq_notional_pct": 15.0,
+   "window": 90,
+   "p_pass": 0.8459,
+   "p_bust": 0.0258,
+   "p_time": 0.1283
+  },
+  {
+   "gapper_pct": 3.5000000000000004,
+   "nq_notional_pct": 25.0,
+   "window": 90,
+   "p_pass": 0.857,
+   "p_bust": 0.0236,
+   "p_time": 0.1194
+  },
+  {
+   "gapper_pct": 3.0,
+   "nq_notional_pct": 25.0,
+   "window": "unlimited",
+   "p_pass": 0.994,
+   "p_bust": 0.006,
+   "p_time": 0.0
+  },
+  {
+   "gapper_pct": 3.5000000000000004,
+   "nq_notional_pct": 25.0,
+   "window": "unlimited",
+   "p_pass": 0.9887,
+   "p_bust": 0.0113,
+   "p_time": 0.0
+  }
+ ],
+ "CAVEAT": "gapper locate caveat unchanged; HYP-095 constitutional notional is 7.5% (prereg) \u2014 higher NQ rows are stress levels, index capacity is not the binder"
+}
