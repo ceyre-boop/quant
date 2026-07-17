@@ -1,0 +1,63 @@
+{
+ "source_sim": "sim_annual_HYP093_forward.csv (234 events, 147 event days)",
+ "n_paths": 100000,
+ "seed": 42,
+ "account": 100000.0,
+ "pass_threshold": 0.08,
+ "bust_threshold": -0.08,
+ "p_event_day": 0.5833,
+ "windows": [
+  {
+   "days": 30,
+   "notional": 0.02,
+   "p_pass": 0.0594,
+   "p_bust": 0.0001,
+   "p_time": 0.9405
+  },
+  {
+   "days": 60,
+   "notional": 0.02,
+   "p_pass": 0.3324,
+   "p_bust": 0.0008,
+   "p_time": 0.6668
+  },
+  {
+   "days": 90,
+   "notional": 0.02,
+   "p_pass": 0.5842,
+   "p_bust": 0.0014,
+   "p_time": 0.4144
+  }
+ ],
+ "sensitivity_p_pass_90d_by_notional": [
+  {
+   "days": 90,
+   "notional": 0.01,
+   "p_pass": 0.0906,
+   "p_bust": 0.0,
+   "p_time": 0.9094
+  },
+  {
+   "days": 90,
+   "notional": 0.02,
+   "p_pass": 0.5856,
+   "p_bust": 0.0015,
+   "p_time": 0.4129
+  },
+  {
+   "days": 90,
+   "notional": 0.03,
+   "p_pass": 0.7859,
+   "p_bust": 0.0155,
+   "p_time": 0.1986
+  },
+  {
+   "days": 90,
+   "notional": 0.04,
+   "p_pass": 0.855,
+   "p_bust": 0.0459,
+   "p_time": 0.099
+  }
+ ],
+ "CAVEAT": "Assumes locate available on EVERY signal. Only 16/234 events (6.8%) had a measurable options market; locate on the rest is unproven. Real P(PASS) is materially lower."
+}
