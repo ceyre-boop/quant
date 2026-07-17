@@ -6,16 +6,18 @@ ev_scan_hyp103.py, the MC files), each hard-coding the gapper fill model. It is
 not a general engine and it carries at least one large optimistic bias. Findings
 ranked by materiality.
 
-## 1. CRITICAL — stop fills are assumed exact (optimistic ~19 pts/yr)
-Every stopped short is booked at exactly `entry × 1.25`. But of the 81/234
-stopped events, **65% had an intraday high >40% above entry; the worst spiked
-+2382%.** A real stop on a parabolic micro-cap gaps THROUGH the trigger — you
-fill far worse than −25%.
-Re-pricing stops at just +10% past the trigger (still generous):
-- Annual return: **+24.4% → +5.6%** (−18.8 pts)
-- Max drawdown: 4.0% → 7.6%
-This single assumption is the difference between "elite Sharpe" and "marginal
-edge." Every downstream number (MC P(PASS), EV scan, prop tables) inherits it.
+## 1. CORRECTED 2026-07-17 — stop-fill bias is SMALL; cost + IID were the real biases
+Initial estimate here (−19 pts, +5.6%) was WRONG — it used a crude proxy that
+penalised all 81 stops. The bias-free engine on **1-minute bars** shows only
+**5 of 79 stops truly gap through** the trigger; the other 74 fill at −25%, so
+the exact-trigger assumption is worth ~1–2 pts, not 19. See
+`HYP093_corrected_results.md` for the real decomposition. The genuine biases:
+- **Transaction cost omitted** (the big one): charging a realistic micro-cap
+  entry spread drops annual +25.5% → +9.8% (full) / +18.2% (~1% spread), Sharpe
+  3.5 → 1.5–2.6.
+- **IID bootstrap** (finding #3): block bootstrap roughly halves prop P(PASS)
+  (78.5% → 64.7% at 90d) and multiplies bust risk (1.6% → 12.7%).
+Net honest read: **~+10–18% / Sharpe ~2 / ~10–13% bust**, not +24.4%/3.4/~0.
 
 ## 2. HIGH — locate/borrow availability not modeled
 Backtest fills a short on 100% of signals. Measured reality (ThetaData parity):

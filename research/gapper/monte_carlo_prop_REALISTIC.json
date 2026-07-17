@@ -1,0 +1,48 @@
+{
+  "note": "Block-bootstrap MC on bias-free engine (1-min bars, full entry-bar spread, gap-through stop fills), 3% sizing.",
+  "90d_pm8": {
+    "n_paths": 100001,
+    "block_size": 5,
+    "p_pass": 0.6474,
+    "p_bust": 0.1272,
+    "p_time": 0.2255,
+    "final_equity_percentiles": {
+      "p5": 0.915,
+      "p25": 1.0161,
+      "p50": 1.0822,
+      "p75": 1.0872,
+      "p95": 1.0965
+    },
+    "expected_paths_to_pass": 1.54,
+    "challenge": {
+      "pass_pct": 0.08,
+      "bust_pct": -0.08,
+      "time_limit_days": 90
+    }
+  },
+  "unlimited_pm10": {
+    "n_paths": 100001,
+    "block_size": 5,
+    "p_pass": 0.8887,
+    "p_bust": 0.1113,
+    "p_time": 0.0,
+    "final_equity_percentiles": {
+      "p5": 0.8957,
+      "p25": 1.0814,
+      "p50": 1.0846,
+      "p75": 1.0893,
+      "p95": 1.0981
+    },
+    "expected_paths_to_pass": 1.13,
+    "challenge": {
+      "pass_pct": 0.08,
+      "bust_pct": -0.1,
+      "time_limit_days": null
+    }
+  },
+  "vs_biased_IID": {
+    "90d_pass_was": 0.785,
+    "90d_bust_was": 0.016,
+    "unlimited_pass_was": 0.992
+  }
+}
