@@ -193,9 +193,9 @@ def run(events_df: pd.DataFrame, strategy_config: dict,
     dates = sorted(daily)
     equity, curve, peak, maxdd = 1.0, [], 1.0, 0.0
     for d in dates:
-        equity *= (1 + daily[d])
+        equity = max(equity * (1 + max(daily[d], -1.0)), 0.0)  # ruin absorbing
         peak = max(peak, equity)
-        maxdd = max(maxdd, 1 - equity / peak)
+        maxdd = max(maxdd, 1 - equity / peak) if peak > 0 else 1.0
         curve.append({"date": d, "day_return": daily[d], "equity": equity})
 
     day_series = [daily[d] for d in dates]
