@@ -1,0 +1,64 @@
+{
+  "optimistic": {
+    "n": 70,
+    "mean": 0.6868,
+    "median": 0.5669,
+    "tail_ratio": 11.93,
+    "p_win": 0.9,
+    "p_gt20": 0.729,
+    "sharpe": 8.58,
+    "n_unfillable": 0
+  },
+  "base": {
+    "n": 70,
+    "mean": 0.6464,
+    "median": 0.5179,
+    "tail_ratio": 8.13,
+    "p_win": 0.886,
+    "p_gt20": 0.714,
+    "sharpe": 8.09,
+    "n_unfillable": 0
+  },
+  "pessimistic": {
+    "n": 70,
+    "mean": 0.5876,
+    "median": 0.4504,
+    "tail_ratio": 5.87,
+    "p_win": 0.857,
+    "p_gt20": 0.686,
+    "sharpe": 7.36,
+    "n_unfillable": 0
+  },
+  "holdout": {
+    "optimistic": {
+      "n": 22,
+      "mean": 0.8408,
+      "median": 0.6677,
+      "tail_ratio": 13.52,
+      "p_win": 0.864,
+      "p_gt20": 0.773,
+      "sharpe": 4.58,
+      "n_unfillable": 0
+    },
+    "base": {
+      "n": 22,
+      "mean": 0.7975,
+      "median": 0.6182,
+      "tail_ratio": 8.12,
+      "p_win": 0.864,
+      "p_gt20": 0.727,
+      "sharpe": 4.34,
+      "n_unfillable": 0
+    },
+    "pessimistic": {
+      "n": 22,
+      "mean": 0.7356,
+      "median": 0.5512,
+      "tail_ratio": 6.65,
+      "p_win": 0.818,
+      "p_gt20": 0.727,
+      "sharpe": 3.99,
+      "n_unfillable": 0
+    }
+  }
+}
