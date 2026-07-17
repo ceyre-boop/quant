@@ -2097,5 +2097,15 @@
   "date_adjudicated": "2026-07-17",
   "prereg": "research/hyp_104_downgap_short_prereg.md sha256 a984372183d7b7d3affa7a04415dcfabc095ccdc993a7a36c717356cb8f18dbf (commit 045bb03)",
   "result": "Best of 77,016-hypothesis megascan (largest repo scan; 0 survived Bonferroni on dirty). Down-gap>=5% short next-open hold 2d stop 15%: dirty 2014-2025 annual +21.0%/Sharpe 2.32/DD 7.7% (ex-leveraged, genuine not vol-decay), but HOLDOUT 2025-07..2026-07 collapsed to annual +2.5%/Sharpe 0.36/p=0.35, n=105. Overfit; NOT_CONFIRMED. Nothing in the scan beats the gapper-fade benchmark (+18%/Sharpe 2) out of sample. Reusable daily-bar engine backtester/daily_engine.py + megascan.py."
+ },
+ {
+  "id": "HYP-105",
+  "name": "Long-side momentum on parabolic gappers (09:31->10:30, 25% stop)",
+  "status": "ADJUDICATED",
+  "verdict": "CONFIRMED",
+  "date_registered": "2026-07-17",
+  "date_adjudicated": "2026-07-17",
+  "prereg": "research/gapper/HYP-105-long-momentum-prereg.md sha256 334c373dad9162a1caa6979ed4f6ba2c4b074ee2fc3d50de9e9944e19b15f499 (commit 4d5c387)",
+  "result": "CONFIRMED on untouched holdout (71 events 2026-04-08..06-30): Sharpe 3.63, mean +28.5%/event, median +7.9%, win 56.3%, sign-flip perm p=0.0005. In-sample (163 ev) Sharpe 5.07. Mirror of HYP-093: ride the morning ramp LONG from 9:31 before the 10:30 fade. **Long side => NO borrow/locate wall (sidesteps TICK-032).** CAVEATS: (1) mean is fat-right-tail-driven (few monster gappers; median far lower); (2) short 2.7mo holdout, n=71; (3) 9:31 microcap slippage understated by entry-bar spread proxy \u2014 live worse; (4) NOT independent of HYP-093 (same events); (5) Phase-3 ML 92% CV acc is LOOK-AHEAD LEAKAGE (intraday_push/overnight_gap measured through holding window) \u2014 not usable, flagged. First new confirmed edge of the session; needs forward shadow + leak-free features + realistic fill model before sizing. 0/360 configs survived in-sample Bonferroni (holdout is the arbiter). backtester/hyp105_long_scan.py."
  }
 ]

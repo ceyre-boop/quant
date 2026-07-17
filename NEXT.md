@@ -1169,3 +1169,10 @@ explicit instruction.
 - **0 candidates clear raw Sharpe>1.5 + n≥30/yr.** Only Sharpe>1.5 hit = BOIL dip n=11/decade (noise). Per-family: **ORB DEAD** (best Sharpe 0.21, liquid ETFs/megacaps); gap-reversal on 10-50% gaps weak (confirms HYP-101 needs ≥100%); leveraged-ETF reversion + crypto-long real but sub-benchmark beta/regime artifacts; biotech nothing.
 - No prereg (bar unmet — mandate's fallback branch). Report research/MEGASCAN_V2_2026-07-17_REPORT.md with top-5 raw + why-they-won't-generalize.
 - **Cumulative: 84,236 hypotheses across two megascans, nothing beats the gapper fade OOS.** It stays the only holdout-surviving edge. Note: macOS fork+numpy Pool deadlocks — megascan_v2 runs serially (MEGASCAN_SERIAL=1). No live touches.
+
+## 2026-07-17 (cont) — HYP-105 long-side gapper momentum: CONFIRMED (first new edge of session)
+- Tested the MIRROR of HYP-093: ride ≥100% gappers LONG 09:31→10:30 before the fade. 234 minute-ready events, 70/30 date split. Engine extended with trailing-stop + duration exits (7/7 tests still green).
+- Phase 2 in-sample: best 09:31/10:30/25%-stop Sharpe 5.07, +64% annual; 0/360 survived Bonferroni (holdout = arbiter). Prereg 334c373d, commit 4d5c387 before holdout.
+- **Phase 4 HOLDOUT CONFIRMED (ledger 84): Sharpe 3.63, mean +28.5%/ev, median +7.9%, win 56.3%, perm p=0.0005, n=71.** First OOS-confirmed NEW edge this session — and it's LONG → **no borrow/locate wall (sidesteps TICK-032)**.
+- Caveats (heavy): mean is fat-tail-driven (median +7.9% is the honest expectancy); 2.7mo/71-event window; 9:31 microcap slippage understated; NOT independent of HYP-093 (same events, ramp-then-fade halves). Phase-3 ML 92% CV = LOOK-AHEAD LEAK (intraday_push/overnight_gap measured through holding window) — rejected, not predictive.
+- Next: forward shadow @09:31, leak-free pre-entry features, realistic first-minute fill model before sizing. Report research/gapper/HYP-105-long-momentum-scan.md.
