@@ -1183,3 +1183,9 @@ explicit instruction.
 - **HOLDOUT CONFIRMED (ledger 85, prereg 9d1c3937 → 422687d before touch): filter (22 of 71 events) vs unfiltered — median +7.9%→+67.7%, tail_ratio 3.95→10.5, win 56%→86%, P(ret>20%) 38%→77%, Sharpe 4.49, perm p=0.0005.** Survived where HYP-104 collapsed. Positive-skew as requested (10:1). Long → no borrow wall.
 - **MAGNITUDE NOT TRADEABLE AS-IS** (flagged hard): +67%/hr median assumes 09:31 microcap fills w/ only entry-bar spread — ignores LULD halts, 5-20% real spreads, size limits. Signal real; live returns a fraction. n=22, fat-tail, not independent of HYP-093/105.
 - NEXT: forward shadow @09:31, realistic halt/spread fill model, capacity study before any sizing. Report research/gapper/HYP-106-bigmove-scan.md.
+
+## 2026-07-17 (cont) — HYP-106 realistic fill model + 1/5/10yr answer
+- Built backtester/realistic_fills.py: LULD halts (timestamp-gap + >10%/min band detection; entry-halted events SKIPPED as un-enterable), round-trip quoted spread (vol+illiquidity scaled, 3/8/15% scenario caps), size/impact (≤10% of entry-minute volume).
+- **HYP-106 SURVIVES all frictions**: full-year base median +51.8% tail 8.1 win 89% Sharpe 8.1; pessimistic +45%; $100k size +44%; skip-entry-halted (31% skipped) still +50.8%/tail 8.9. Holdout base +61.8%, skip-halted +60.7%. Spread/halt dwarfed by +50% moves.
+- **Honest ceiling**: printed-OHLC can't prove you get filled at the 09:31 print on a screaming halted thin microcap — only a LIVE FORWARD SHADOW resolves it. +50% = backtest ceiling not expected live number.
+- **1yr DONE** (the 234-event year = full minute dataset). **5/10yr IMPOSSIBLE**: minute cache reaches only 2024-01-03 (Alpaca free = 2yr); no 2015-2023 intraday + no gapper universe for those years. Needs paid Polygon/ThetaData minute history + universe rebuild; pipeline (daily_engine + realistic_fills) ready to consume it. Report: research/gapper/HYP-106-realistic-fills-ADDENDUM.md.
