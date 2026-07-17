@@ -1,0 +1,62 @@
+{
+ "edge": ">=100% confirmed HYP-093 only (no relaxed threshold survived Step 1)",
+ "n_paths": 100000,
+ "seed": 42,
+ "window_days": 90,
+ "account": 100000.0,
+ "pass_threshold": 0.08,
+ "bust_threshold": -0.08,
+ "sweep": [
+  {
+   "notional_pct": 1.0,
+   "p_pass": 0.092,
+   "p_bust": 0.0,
+   "p_time": 0.908,
+   "meets_95_5": false
+  },
+  {
+   "notional_pct": 1.5,
+   "p_pass": 0.3721,
+   "p_bust": 0.0001,
+   "p_time": 0.6277,
+   "meets_95_5": false
+  },
+  {
+   "notional_pct": 2.0,
+   "p_pass": 0.5875,
+   "p_bust": 0.0017,
+   "p_time": 0.4107,
+   "meets_95_5": false
+  },
+  {
+   "notional_pct": 2.5,
+   "p_pass": 0.7102,
+   "p_bust": 0.0072,
+   "p_time": 0.2826,
+   "meets_95_5": false
+  },
+  {
+   "notional_pct": 3.0,
+   "p_pass": 0.7853,
+   "p_bust": 0.0158,
+   "p_time": 0.1989,
+   "meets_95_5": false
+  },
+  {
+   "notional_pct": 3.5000000000000004,
+   "p_pass": 0.8293,
+   "p_bust": 0.0295,
+   "p_time": 0.1411,
+   "meets_95_5": false
+  },
+  {
+   "notional_pct": 4.0,
+   "p_pass": 0.8539,
+   "p_bust": 0.0446,
+   "p_time": 0.1014,
+   "meets_95_5": false
+  }
+ ],
+ "lowest_sizing_meeting_95_5": null,
+ "CAVEAT": "Assumes locate available on EVERY signal. Only 16/234 events (6.8%) had a measurable options market; IB locate series (TICK-037) just started. Real P(PASS) is lower."
+}
