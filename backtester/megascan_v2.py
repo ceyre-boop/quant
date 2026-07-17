@@ -287,16 +287,24 @@ def main():
     t0 = time.time()
     tasks = build_tasks()
     print(f"tasks: {len(tasks)} ticker-family units", flush=True)
-    cores = max(1, (os.cpu_count() or 2) - 1)
     all_rows = []
-    with _CTX.Pool(cores) as pool:
-        last = time.time()
-        for i, rows in enumerate(pool.imap_unordered(_dispatch, tasks)):
-            all_rows.extend(rows)
-            if time.time() - last >= 60:
-                print(f"[{time.time()-t0:.0f}s] {i+1}/{len(tasks)} units, "
-                      f"{len(all_rows)} configs so far", flush=True)
-                last = time.time()
+    last = time.time()
+    serial = os.environ.get("MEGASCAN_SERIAL")
+    if serial:
+        it = (_dispatch(t) for t in tasks)
+    else:
+        cores = max(1, (os.cpu_count() or 2) - 1)
+        # limit BLAS threads pre-fork to avoid macOS fork+numpy deadlock
+        pool = _CTX.Pool(cores)
+        it = pool.imap_unordered(_dispatch, tasks)
+    for i, rows in enumerate(it):
+        all_rows.extend(rows)
+        if time.time() - last >= 60:
+            print(f"[{time.time()-t0:.0f}s] {i+1}/{len(tasks)} units, "
+                  f"{len(all_rows)} configs so far", flush=True)
+            last = time.time()
+    if not serial:
+        pool.close(); pool.join()
 
     df = pd.DataFrame(all_rows)
     n_tested = len(df)

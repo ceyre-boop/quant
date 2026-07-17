@@ -1163,3 +1163,9 @@ explicit instruction.
 - **0/77k survived Bonferroni on dirty.** 6 beat raw benchmark: NVDA breakout (single-name artifact, rejected) + 5 down-gap-short variants (coherent, survived ex-leveraged → genuine not vol-decay). Prereg'd the best as **HYP-104** (hash a9843721, commit 045bb03).
 - **HYP-104 NOT_CONFIRMED on holdout** (ledger 83): dirty +21.0%/Sharpe 2.32 → holdout +2.5%/Sharpe 0.36/p=0.35, n=105. Textbook overfit collapse, exactly as 0/77k Bonferroni warned.
 - **Conclusion: nothing beats the gapper fade (~+10-18%/Sharpe~2 post-bias-correction) out of sample.** It remains the only edge in this repo to survive a real holdout. Next gains are execution (borrow/locate TICK-037), not new daily-resolution signals. Report: research/MEGASCAN_2026-07-17_REPORT.md.
+
+## 2026-07-17 (cont) — MEGASCAN v2: intraday/multi-asset, nothing clears the bar
+- 5 families, **7,220 configs in 159s** real compute (+~13min fetch: 11,854 Alpaca minute day-files, 2yr hourly BTC/ETH, leveraged+biotech daily). Bias-free minute fills. RAW + FWER reported separately. Added data.get_minute_range paginated bulk fetcher.
+- **0 candidates clear raw Sharpe>1.5 + n≥30/yr.** Only Sharpe>1.5 hit = BOIL dip n=11/decade (noise). Per-family: **ORB DEAD** (best Sharpe 0.21, liquid ETFs/megacaps); gap-reversal on 10-50% gaps weak (confirms HYP-101 needs ≥100%); leveraged-ETF reversion + crypto-long real but sub-benchmark beta/regime artifacts; biotech nothing.
+- No prereg (bar unmet — mandate's fallback branch). Report research/MEGASCAN_V2_2026-07-17_REPORT.md with top-5 raw + why-they-won't-generalize.
+- **Cumulative: 84,236 hypotheses across two megascans, nothing beats the gapper fade OOS.** It stays the only holdout-surviving edge. Note: macOS fork+numpy Pool deadlocks — megascan_v2 runs serially (MEGASCAN_SERIAL=1). No live touches.
