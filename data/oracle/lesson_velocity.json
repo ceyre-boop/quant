@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-15T06:41:34.786965+00:00",
-  "as_of_date": "2026-07-15",
+  "generated_at": "2026-07-16T06:32:39.213180+00:00",
+  "as_of_date": "2026-07-16",
   "current_lesson": {
     "components": [
       "active",
@@ -37,17 +37,17 @@
       "zone",
       "zscore"
     ],
-    "component_label": "consensus_conviction (30-indicator) gated jointly with tv_signal_count and internal_regime",
+    "component_label": "green_matches",
     "first_seen": "2026-05-29",
-    "last_seen": "2026-07-15",
-    "days_forming": 47,
-    "n_revisions": 35,
-    "n_days_appeared": 35,
+    "last_seen": "2026-07-16",
+    "days_forming": 48,
+    "n_revisions": 36,
+    "n_days_appeared": 36,
     "stable_days": 1,
     "status": "forming",
     "time_to_converge_days": null,
-    "latest_lesson_text": "When internal regime is MOMENTUM but TradingView returns zero confirming signals, treat the 75% sizing multiplier as a hard ceiling AND require the 30-indicator conviction to exceed 55% before entry \u2014 internal-only MOMENTUM below that conviction is the weakest configuration in the confirmation stack.",
-    "latest_rule": "if internal_regime == 'MOMENTUM' and tv_signal_count == 0 and consensus_conviction < 0.55: veto_entry() else if internal_regime == 'MOMENTUM' and tv_signal_count == 0: size *= 0.75",
+    "latest_lesson_text": "When the 30-indicator consensus shows high conviction but green_matches=0 and hist_hr=0%, the live signal has no historical analog and must be sized down or vetoed regardless of conviction.",
+    "latest_rule": "if consensus_conviction >= 0.90 and green_matches == 0: size *= 0.0  # veto; elif green_matches == 0 and hist_hr == 0: size *= 0.5",
     "history": [
       {
         "date": "2026-05-29",
@@ -188,6 +188,10 @@
       {
         "date": "2026-07-15",
         "rule": "if internal_regime == 'MOMENTUM' and tv_signal_count == 0 and consensus_conviction < 0.55: veto_entry() else if internal_regime == 'MOMENTUM' and tv_signal_count == 0: size *= 0.75"
+      },
+      {
+        "date": "2026-07-16",
+        "rule": "if consensus_conviction >= 0.90 and green_matches == 0: size *= 0.0  # veto; elif green_matches == 0 and hist_hr == 0: size *= 0.5"
       }
     ]
   },
@@ -228,17 +232,17 @@
         "zone",
         "zscore"
       ],
-      "component_label": "consensus_conviction (30-indicator) gated jointly with tv_signal_count and internal_regime",
+      "component_label": "green_matches",
       "first_seen": "2026-05-29",
-      "last_seen": "2026-07-15",
-      "days_forming": 47,
-      "n_revisions": 35,
-      "n_days_appeared": 35,
+      "last_seen": "2026-07-16",
+      "days_forming": 48,
+      "n_revisions": 36,
+      "n_days_appeared": 36,
       "stable_days": 1,
       "status": "forming",
       "time_to_converge_days": null,
-      "latest_lesson_text": "When internal regime is MOMENTUM but TradingView returns zero confirming signals, treat the 75% sizing multiplier as a hard ceiling AND require the 30-indicator conviction to exceed 55% before entry \u2014 internal-only MOMENTUM below that conviction is the weakest configuration in the confirmation stack.",
-      "latest_rule": "if internal_regime == 'MOMENTUM' and tv_signal_count == 0 and consensus_conviction < 0.55: veto_entry() else if internal_regime == 'MOMENTUM' and tv_signal_count == 0: size *= 0.75",
+      "latest_lesson_text": "When the 30-indicator consensus shows high conviction but green_matches=0 and hist_hr=0%, the live signal has no historical analog and must be sized down or vetoed regardless of conviction.",
+      "latest_rule": "if consensus_conviction >= 0.90 and green_matches == 0: size *= 0.0  # veto; elif green_matches == 0 and hist_hr == 0: size *= 0.5",
       "history": [
         {
           "date": "2026-05-29",
@@ -379,6 +383,10 @@
         {
           "date": "2026-07-15",
           "rule": "if internal_regime == 'MOMENTUM' and tv_signal_count == 0 and consensus_conviction < 0.55: veto_entry() else if internal_regime == 'MOMENTUM' and tv_signal_count == 0: size *= 0.75"
+        },
+        {
+          "date": "2026-07-16",
+          "rule": "if consensus_conviction >= 0.90 and green_matches == 0: size *= 0.0  # veto; elif green_matches == 0 and hist_hr == 0: size *= 0.5"
         }
       ]
     },
@@ -394,7 +402,7 @@
       "component_label": "regime_confirmation.confidence",
       "first_seen": "2026-06-15",
       "last_seen": "2026-07-14",
-      "days_forming": 30,
+      "days_forming": 31,
       "n_revisions": 4,
       "n_days_appeared": 4,
       "stable_days": 1,

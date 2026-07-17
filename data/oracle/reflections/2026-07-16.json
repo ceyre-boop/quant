@@ -1,0 +1,26 @@
+{
+  "date": "2026-07-16",
+  "generated_at": "2026-07-16T06:32:39.175187+00:00",
+  "input_tokens": 5739,
+  "output_tokens": 861,
+  "estimated_cost_usd": 0.15066,
+  "harvest_days_read": 7,
+  "reflection": {
+    "candidate_lesson": {
+      "lesson_text": "When the 30-indicator consensus shows high conviction but green_matches=0 and hist_hr=0%, the live signal has no historical analog and must be sized down or vetoed regardless of conviction.",
+      "mechanism": "Conviction measures live indicator agreement, but green_matches counts how many times a similar indicator configuration existed in the historical memory bank and made money. When green_matches=0 the current setup is a novel configuration with no proven institutional follow-through \u2014 high conviction on an unprecedented pattern is overfitting to present noise, not detecting a repeatable flow regime. AUDNZD SHORT (conv=100%, green_matches=0, hist_hr=0%) and USDJPY LONG (conv=50%, green_matches=0, hist_hr=0%) are exactly these traps.",
+      "testable_rule": "if consensus_conviction >= 0.90 and green_matches == 0: size *= 0.0  # veto; elif green_matches == 0 and hist_hr == 0: size *= 0.5",
+      "expected_impact": "Removes zero-analog trades that dilute win rate; expected Sharpe +0.02 to +0.03 by cutting variance from unprecedented-config entries.",
+      "evidence_from_harvest": "Live consensus shows AUDNZD conv=100% but green_matches=0/hist_hr=0%, and USDJPY conv=50% green_matches=0/hist_hr=0% \u2014 both high/moderate conviction with no historical winning analog, while GBPUSD (green_matches=2, hist_hr=66%) and AUDUSD (green_matches=3, hist_hr=68%) show conviction backed by proven analogs.",
+      "evidence_from_reasoning": null,
+      "reasoning_component_targeted": "green_matches",
+      "sample_needed": 40
+    },
+    "retirement_flag": {
+      "lesson_to_review": "L8",
+      "reason": "VIX is 16.5 and falling (contango, not rising) \u2014 L8's 'tighten gate when VIX rising' condition is currently inactive, so it is not gating anything in this regime; monitor whether it still fires when VIX crosses 13 to confirm it hasn't become dormant."
+    },
+    "system_health_note": "Zero trades in 7 days with regime=UNKNOWN and TradingView showing 0 signals means the system is in a low-conviction observation window \u2014 sizing at 75% is appropriate, but the empty decision log means all lessons remain harvest-only until execution resumes."
+  },
+  "auto_validation": null
+}

@@ -1,14 +1,14 @@
 {
-  "last_updated": "2026-07-15T06:41:34.787406+00:00",
+  "last_updated": "2026-07-16T06:32:39.213578+00:00",
   "harvest": {
     "trades_closed": 0,
     "win_rate": null,
     "failure_taxonomy": {}
   },
   "reflection": {
-    "candidate_lesson": "When internal regime is MOMENTUM but TradingView returns zero confirming signals, treat the 75% sizing multiplier as a hard ceiling AND require the 30-indicator conviction to exceed 55% before entry \u2014 internal-only MOMENTUM below that conviction is the weakest configuration in the confirmation stack.",
-    "mechanism": "A MOMENTUM regime call with no external confirmation means only the internal ensemble sees the move; institutionally, durable momentum leaves a footprint across multiple venues/timeframes, so the absence of TV agreement signals the move is being carried by a single crowded flow that reverts once that flow exhausts. Low internal conviction (<55%) on top of that means even the internal ensemble is split \u2014 you are sizing into noise dressed as trend.",
-    "testable_rule": "if internal_regime == 'MOMENTUM' and tv_signal_count == 0 and consensus_conviction < 0.55: veto_entry() else if internal_regime == 'MOMENTUM' and tv_signal_count == 0: size *= 0.75"
+    "candidate_lesson": "When the 30-indicator consensus shows high conviction but green_matches=0 and hist_hr=0%, the live signal has no historical analog and must be sized down or vetoed regardless of conviction.",
+    "mechanism": "Conviction measures live indicator agreement, but green_matches counts how many times a similar indicator configuration existed in the historical memory bank and made money. When green_matches=0 the current setup is a novel configuration with no proven institutional follow-through \u2014 high conviction on an unprecedented pattern is overfitting to present noise, not detecting a repeatable flow regime. AUDNZD SHORT (conv=100%, green_matches=0, hist_hr=0%) and USDJPY LONG (conv=50%, green_matches=0, hist_hr=0%) are exactly these traps.",
+    "testable_rule": "if consensus_conviction >= 0.90 and green_matches == 0: size *= 0.0  # veto; elif green_matches == 0 and hist_hr == 0: size *= 0.5"
   },
   "validation": {
     "verdict": "REJECTED",
@@ -21,8 +21,8 @@
     "codify_error": null
   },
   "cycle": {
-    "cost_usd": 0.157065,
+    "cost_usd": 0.15066,
     "status": "COMPLETE",
-    "date": "2026-07-15"
+    "date": "2026-07-16"
   }
 }

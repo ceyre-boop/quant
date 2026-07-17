@@ -1,45 +1,45 @@
 {
-  "as_of": "2026-07-15T12:27:44.223446+00:00",
+  "as_of": "2026-07-16T12:19:39.667705+00:00",
   "instruments": {
     "ES=F": {
       "symbol": "ES=F",
-      "as_of": "2026-07-15T12:27:44.269629+00:00",
+      "as_of": "2026-07-16T12:19:39.709658+00:00",
       "days": 5,
       "bins": 40,
-      "poc": 7590.82,
-      "value_area_low": 7565.08,
-      "value_area_high": 7602.52,
+      "poc": 7603.32,
+      "value_area_low": 7563.08,
+      "value_area_high": 7615.15,
       "high_volume_nodes": [
-        7590.82,
-        7593.16,
-        7588.48,
-        7597.84,
-        7595.5
+        7603.32,
+        7589.12,
+        7593.85,
+        7591.48,
+        7596.22
       ],
       "price_range": [
         7533.5,
-        7627.08
+        7628.17
       ],
       "limitation": "Volume profile = WHERE volume traded (volume-at-price). NOT order-flow delta (buy/sell aggression). True delta needs a CME order-flow feed (Databento/CQG)."
     },
     "NQ=F": {
       "symbol": "NQ=F",
-      "as_of": "2026-07-15T12:27:44.307589+00:00",
+      "as_of": "2026-07-16T12:19:39.748464+00:00",
       "days": 5,
       "bins": 40,
-      "poc": 29833.73,
-      "value_area_low": 29480.69,
-      "value_area_high": 30056.71,
+      "poc": 29693.93,
+      "value_area_low": 29476.65,
+      "value_area_high": 29856.88,
       "high_volume_nodes": [
-        29833.73,
-        29870.9,
-        29796.57,
-        29777.99,
-        29815.15
+        29693.93,
+        29621.5,
+        29603.4,
+        29585.29,
+        29802.57
       ],
       "price_range": [
         29322.75,
-        30066.0
+        30047.0
       ],
       "limitation": "Volume profile = WHERE volume traded (volume-at-price). NOT order-flow delta (buy/sell aggression). True delta needs a CME order-flow feed (Databento/CQG)."
     }
