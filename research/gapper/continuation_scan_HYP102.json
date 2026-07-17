@@ -1,0 +1,104 @@
+{
+ "step": "1-dirty-scan",
+ "hyp": "HYP-102",
+ "scan_window": [
+  "2025-07-02",
+  "2025-12-31"
+ ],
+ "n_events": 117,
+ "n_faders": 89,
+ "n_continuers": 28,
+ "continuer_median_long_ret": 0.1877,
+ "features": [
+  {
+   "feature": "rvol_1030",
+   "median_fader": 36.0,
+   "median_continuer": 80.3,
+   "effect_rel_to_fader_median": 1.231,
+   "p_mw": 0.11756,
+   "clears_effect_bar": true
+  },
+  {
+   "feature": "intraday_push",
+   "median_fader": 0.2091,
+   "median_continuer": 0.0544,
+   "effect_rel_to_fader_median": -0.74,
+   "p_mw": 0.17564,
+   "clears_effect_bar": true
+  },
+  {
+   "feature": "overnight_gap",
+   "median_fader": 1.1479,
+   "median_continuer": 1.718,
+   "effect_rel_to_fader_median": 0.497,
+   "p_mw": 0.05779,
+   "clears_effect_bar": true
+  },
+  {
+   "feature": "vwap_dist",
+   "median_fader": 0.0413,
+   "median_continuer": 0.0235,
+   "effect_rel_to_fader_median": -0.431,
+   "p_mw": 0.54393,
+   "clears_effect_bar": true
+  },
+  {
+   "feature": "mins_to_high",
+   "median_fader": 35.0,
+   "median_continuer": 20.0,
+   "effect_rel_to_fader_median": -0.429,
+   "p_mw": 0.39731,
+   "clears_effect_bar": true
+  },
+  {
+   "feature": "spy_am",
+   "median_fader": 0.0004,
+   "median_continuer": 0.0003,
+   "effect_rel_to_fader_median": -0.284,
+   "p_mw": 0.2188,
+   "clears_effect_bar": true
+  },
+  {
+   "feature": "dollar_vol_m",
+   "median_fader": 176.1,
+   "median_continuer": 213.0,
+   "effect_rel_to_fader_median": 0.21,
+   "p_mw": 0.23983,
+   "clears_effect_bar": true
+  },
+  {
+   "feature": "spread_1030bar",
+   "median_fader": 0.0987,
+   "median_continuer": 0.0915,
+   "effect_rel_to_fader_median": -0.073,
+   "p_mw": 0.89328,
+   "clears_effect_bar": false
+  },
+  {
+   "feature": "gain_1030",
+   "median_fader": 1.4708,
+   "median_continuer": 1.4796,
+   "effect_rel_to_fader_median": 0.006,
+   "p_mw": 0.73975,
+   "clears_effect_bar": false
+  }
+ ],
+ "catalyst_mix_faders": {
+  "FDA_CLINICAL": 0.472,
+  "EARNINGS": 0.258,
+  "OTHER_NEWS": 0.191,
+  "NO_NEWS_PRE1030": 0.045,
+  "OFFERING": 0.022,
+  "CONTRACT_PARTNER": 0.011
+ },
+ "catalyst_mix_continuers": {
+  "FDA_CLINICAL": 0.464,
+  "OTHER_NEWS": 0.214,
+  "EARNINGS": 0.179,
+  "CRYPTO": 0.036,
+  "AI": 0.036,
+  "OFFERING": 0.036,
+  "CONTRACT_PARTNER": 0.036
+ },
+ "note": "sector unavailable in dataset; catalyst class reported instead"
+}
