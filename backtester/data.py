@@ -130,6 +130,58 @@ def get_minute_bars(ticker: str, date: str, source: str = "auto") -> pd.DataFram
     return pd.DataFrame(columns=_BAR_COLS)
 
 
+def get_minute_range(ticker: str, start: str, end: str) -> dict:
+    """Bulk-fetch 1-min bars for [start, end] (dates), paginated, and cache each
+    day to parquet. Returns {date: DataFrame}. Days already cached are skipped;
+    only the missing span is pulled from Alpaca. One request covers many days.
+    """
+    import pandas as _pd
+    from datetime import datetime as _dt
+    kid, sec = _env("ALPACA_API_KEY"), _env("ALPACA_SECRET_KEY")
+    out: dict[str, pd.DataFrame] = {}
+    if not kid or not sec:
+        return out
+    s_utc = datetime.fromisoformat(f"{start}T09:30:00").replace(tzinfo=ET) \
+        .astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    e_utc = datetime.fromisoformat(f"{end}T16:00:00").replace(tzinfo=ET) \
+        .astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    token = None
+    recs: list[dict] = []
+    for _ in range(500):  # page cap
+        params = {"symbols": ticker, "timeframe": "1Min", "start": s_utc,
+                  "end": e_utc, "adjustment": "all", "feed": "sip",
+                  "limit": 10000}
+        if token:
+            params["page_token"] = token
+        req = urllib.request.Request(
+            f"https://data.alpaca.markets/v2/stocks/bars?"
+            f"{urllib.parse.urlencode(params)}",
+            headers={"APCA-API-KEY-ID": kid, "APCA-API-SECRET-KEY": sec})
+        try:
+            with urllib.request.urlopen(req, timeout=60) as r:
+                payload = json.loads(r.read())
+        except Exception:
+            time.sleep(1.0)
+            continue
+        recs.extend((payload.get("bars") or {}).get(ticker) or [])
+        token = payload.get("next_page_token")
+        if not token:
+            break
+    if not recs:
+        return out
+    # group by ET date, normalise, cache per day
+    by_day: dict[str, list] = {}
+    for b in recs:
+        t_et = datetime.fromisoformat(b["t"].replace("Z", "+00:00")).astimezone(ET)
+        by_day.setdefault(t_et.strftime("%Y-%m-%d"), []).append(b)
+    for d, day_recs in by_day.items():
+        df = _bars_from_alpaca_records(day_recs)
+        if len(df):
+            df.to_parquet(_parquet_path(ticker, d))
+            out[d] = df
+    return out
+
+
 def get_daily_bars(ticker: str, start: str, end: str,
                    source: str = "auto") -> pd.DataFrame:
     """Daily OHLCV via yfinance (daily history is not 7-day-capped)."""
