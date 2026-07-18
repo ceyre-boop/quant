@@ -1,0 +1,26 @@
+{
+  "date": "2026-07-17",
+  "generated_at": "2026-07-17T07:45:47.488428+00:00",
+  "input_tokens": 5723,
+  "output_tokens": 967,
+  "estimated_cost_usd": 0.15837,
+  "harvest_days_read": 7,
+  "reflection": {
+    "candidate_lesson": {
+      "lesson_text": "When internal MOMENTUM regime lacks external TradingView confirmation (0 TV signals), only take the highest-conviction consensus pairs (conv >= 83% AND green_matches >= 2 AND hist_hr > 60%) and skip everything else \u2014 the 75% sizing multiplier already signals the system distrusts itself.",
+      "mechanism": "Institutional flow that produces durable momentum leaves footprints across venues; when only one venue (internal) sees it, the move is likely retail-driven noise or a stale internal signal. Requiring cross-confirmation via both consensus conviction AND historical hit-rate memory filters out single-venue false positives \u2014 the exact regime where uncommitted price action decays fastest.",
+      "testable_rule": "if tv_confirmation == 'UNKNOWN' and tv_signal_count == 0: require (consensus_conv >= 0.83 and green_matches >= 2 and hist_hr > 0.60) else veto",
+      "expected_impact": "Win rate +3-5% and Sharpe +0.02-0.04 by removing low-hist_hr entries (EURUSD conv=8% hist_hr=0%, USDJPY hist_hr=0%, AUDNZD hist_hr=0%) that trade on internal-only signals with no memory validation.",
+      "evidence_from_harvest": "Current state shows TV=UNKNOWN with 0 signals forcing 75% sizing; of 5 pairs, only GBPUSD (conv=83%, green=2, hist_hr=66%) and AUDUSD (conv=83%, green=3, hist_hr=68%) meet the joint gate \u2014 the other three have hist_hr=0% meaning no historical analog supports the current direction.",
+      "evidence_from_reasoning": null,
+      "reasoning_component_targeted": "external_regime_confirmation / tv_signal_count + consensus green_matches",
+      "sample_needed": 40
+    },
+    "retirement_flag": {
+      "lesson_to_review": "L9",
+      "reason": "L9 (validated knowledge expires) is meta and cannot decay, but with 7 consecutive days of 0 trades, ALL lessons are currently untested against fresh data \u2014 the real risk is that L1's 'exact setup' gate is now so narrow it produces zero fills, which is itself a form of expiry that L9 warns about but nothing is enforcing."
+    },
+    "system_health_note": "System is in a 7-day no-trade drought with UNKNOWN regime and internal-only MOMENTUM at 75% sizing \u2014 the decision logger has zero closed entries, so all lessons this cycle are necessarily harvest/state-based rather than reasoning-grounded, and the priority is confirming the entry gate isn't pathologically over-tight before chasing the +0.05 Sharpe gap."
+  },
+  "auto_validation": null
+}

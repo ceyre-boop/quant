@@ -1,14 +1,14 @@
 {
-  "last_updated": "2026-07-16T06:32:39.213578+00:00",
+  "last_updated": "2026-07-17T07:45:47.533723+00:00",
   "harvest": {
     "trades_closed": 0,
     "win_rate": null,
     "failure_taxonomy": {}
   },
   "reflection": {
-    "candidate_lesson": "When the 30-indicator consensus shows high conviction but green_matches=0 and hist_hr=0%, the live signal has no historical analog and must be sized down or vetoed regardless of conviction.",
-    "mechanism": "Conviction measures live indicator agreement, but green_matches counts how many times a similar indicator configuration existed in the historical memory bank and made money. When green_matches=0 the current setup is a novel configuration with no proven institutional follow-through \u2014 high conviction on an unprecedented pattern is overfitting to present noise, not detecting a repeatable flow regime. AUDNZD SHORT (conv=100%, green_matches=0, hist_hr=0%) and USDJPY LONG (conv=50%, green_matches=0, hist_hr=0%) are exactly these traps.",
-    "testable_rule": "if consensus_conviction >= 0.90 and green_matches == 0: size *= 0.0  # veto; elif green_matches == 0 and hist_hr == 0: size *= 0.5"
+    "candidate_lesson": "When internal MOMENTUM regime lacks external TradingView confirmation (0 TV signals), only take the highest-conviction consensus pairs (conv >= 83% AND green_matches >= 2 AND hist_hr > 60%) and skip everything else \u2014 the 75% sizing multiplier already signals the system distrusts itself.",
+    "mechanism": "Institutional flow that produces durable momentum leaves footprints across venues; when only one venue (internal) sees it, the move is likely retail-driven noise or a stale internal signal. Requiring cross-confirmation via both consensus conviction AND historical hit-rate memory filters out single-venue false positives \u2014 the exact regime where uncommitted price action decays fastest.",
+    "testable_rule": "if tv_confirmation == 'UNKNOWN' and tv_signal_count == 0: require (consensus_conv >= 0.83 and green_matches >= 2 and hist_hr > 0.60) else veto"
   },
   "validation": {
     "verdict": "REJECTED",
@@ -21,8 +21,8 @@
     "codify_error": null
   },
   "cycle": {
-    "cost_usd": 0.15066,
+    "cost_usd": 0.15837,
     "status": "COMPLETE",
-    "date": "2026-07-16"
+    "date": "2026-07-17"
   }
 }

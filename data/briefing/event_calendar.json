@@ -1,5 +1,5 @@
 {
-  "as_of": "2026-07-16T12:19:40.042353+00:00",
+  "as_of": "2026-07-17T12:22:09.743536+00:00",
   "horizon_days": 21,
   "events": [
     {
@@ -7,24 +7,32 @@
       "date": "2026-07-29",
       "source": "seed",
       "action": "reduce size / widen stops into the window",
-      "days_until": 13,
-      "note": "in 13d \u2014 reduce size / widen stops into the window"
+      "days_until": 12,
+      "note": "in 12d \u2014 reduce size / widen stops into the window"
     },
     {
       "event": "PCE (Fed's preferred inflation)",
       "date": "2026-07-31",
       "source": "cadence_estimate",
       "action": "8:30 ET \u2014 reduce size into window",
-      "days_until": 15,
-      "note": "in 15d \u2014 8:30 ET \u2014 reduce size into window"
+      "days_until": 14,
+      "note": "in 14d \u2014 8:30 ET \u2014 reduce size into window"
     },
     {
       "event": "ISM Manufacturing PMI",
       "date": "2026-08-03",
       "source": "cadence_estimate",
       "action": "reduce size into the 10:00 ET print",
-      "days_until": 18,
-      "note": "in 18d \u2014 reduce size into the 10:00 ET print"
+      "days_until": 17,
+      "note": "in 17d \u2014 reduce size into the 10:00 ET print"
+    },
+    {
+      "event": "Nonfarm Payrolls",
+      "date": "2026-08-07",
+      "source": "cadence_estimate",
+      "action": "high-impact 8:30 ET \u2014 widen stops / size down",
+      "days_until": 21,
+      "note": "in 21d \u2014 high-impact 8:30 ET \u2014 widen stops / size down"
     }
   ],
   "provenance_note": "FOMC dates are a maintained seed (verify vs Fed calendar); CPI/PCE/NFP/ISM are cadence ESTIMATES, not verified release dates."

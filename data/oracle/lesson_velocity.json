@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-16T06:32:39.213180+00:00",
-  "as_of_date": "2026-07-16",
+  "generated_at": "2026-07-17T07:45:47.532975+00:00",
+  "as_of_date": "2026-07-17",
   "current_lesson": {
     "components": [
       "active",
@@ -9,12 +9,15 @@
       "analog",
       "bias",
       "block",
+      "confidence",
       "config",
+      "confirmation",
       "confluence",
       "conviction",
       "days",
       "differential",
       "est",
+      "external",
       "fields",
       "flag",
       "flags",
@@ -29,25 +32,28 @@
       "jointly",
       "layers",
       "matches",
+      "multiplier",
       "paired",
       "reliability",
       "shift",
+      "signals",
+      "sizing",
       "structure",
       "with",
       "zone",
       "zscore"
     ],
-    "component_label": "green_matches",
+    "component_label": "external_regime_confirmation / tv_signal_count + consensus green_matches",
     "first_seen": "2026-05-29",
-    "last_seen": "2026-07-16",
-    "days_forming": 48,
-    "n_revisions": 36,
-    "n_days_appeared": 36,
+    "last_seen": "2026-07-17",
+    "days_forming": 49,
+    "n_revisions": 41,
+    "n_days_appeared": 41,
     "stable_days": 1,
     "status": "forming",
     "time_to_converge_days": null,
-    "latest_lesson_text": "When the 30-indicator consensus shows high conviction but green_matches=0 and hist_hr=0%, the live signal has no historical analog and must be sized down or vetoed regardless of conviction.",
-    "latest_rule": "if consensus_conviction >= 0.90 and green_matches == 0: size *= 0.0  # veto; elif green_matches == 0 and hist_hr == 0: size *= 0.5",
+    "latest_lesson_text": "When internal MOMENTUM regime lacks external TradingView confirmation (0 TV signals), only take the highest-conviction consensus pairs (conv >= 83% AND green_matches >= 2 AND hist_hr > 60%) and skip everything else \u2014 the 75% sizing multiplier already signals the system distrusts itself.",
+    "latest_rule": "if tv_confirmation == 'UNKNOWN' and tv_signal_count == 0: require (consensus_conv >= 0.83 and green_matches >= 2 and hist_hr > 0.60) else veto",
     "history": [
       {
         "date": "2026-05-29",
@@ -106,6 +112,10 @@
         "rule": "if consensus_dir in ('SHORT','LONG') and green_matches == 0 and hist_hr < 0.50: size_multiplier *= 0.0  # veto. elif green_matches == 0 and hist_hr >= 0.55: size_multiplier *= 0.75  # novel config but historical edge holds"
       },
       {
+        "date": "2026-06-15",
+        "rule": "if internal_regime == 'MOMENTUM' and tv_signal_count_2h == 0: sizing_multiplier = min(sizing_multiplier, 0.50)"
+      },
+      {
         "date": "2026-06-16",
         "rule": "if consensus.green_matches == 0 and consensus.hist_hr == 0.0: return RegimeFreeze(pair)  # even if conv >= 0.50"
       },
@@ -162,6 +172,14 @@
         "rule": "if consensus_dir != 'NEUTRAL' and green_matches == 0 and hist_hr == 0.0: return ConsensusVeto()  # require green_matches >= 1 before sizing on 30-indicator direction"
       },
       {
+        "date": "2026-07-05",
+        "rule": "if external_confirmation.tv_signals == 0 and regime == 'MOMENTUM' and pair_consensus_conv < 0.50: veto_trade() else if sizing_multiplier <= 0.75: proceed_at_reduced_size()"
+      },
+      {
+        "date": "2026-07-06",
+        "rule": "if regime_confirmation.source == 'internal_only' and regime_confirmation.confidence <= 0.65: sizing_multiplier = min(sizing_multiplier, 0.60)"
+      },
+      {
         "date": "2026-07-07",
         "rule": "if direction contradicts market_structure_bias AND no CHOCH/BOS in trade direction AND not price_at_OB_or_FVG_zone: veto trade regardless of rate_diff_z magnitude"
       },
@@ -186,12 +204,20 @@
         "rule": "if consensus_conviction > 0.85 and green_matches == 0 and hist_hr == 0.0: size_multiplier = 0.5  # untested-config penalty until >=1 historical match exists"
       },
       {
+        "date": "2026-07-14",
+        "rule": "if regime_confirmation.tv_signals == 0 and regime_confirmation.confidence <= 0.65 and consensus.conviction < 1.00: size_multiplier *= 0.5  # only AUDNZD (100% conv, SHORT) survives full sizing today"
+      },
+      {
         "date": "2026-07-15",
         "rule": "if internal_regime == 'MOMENTUM' and tv_signal_count == 0 and consensus_conviction < 0.55: veto_entry() else if internal_regime == 'MOMENTUM' and tv_signal_count == 0: size *= 0.75"
       },
       {
         "date": "2026-07-16",
         "rule": "if consensus_conviction >= 0.90 and green_matches == 0: size *= 0.0  # veto; elif green_matches == 0 and hist_hr == 0: size *= 0.5"
+      },
+      {
+        "date": "2026-07-17",
+        "rule": "if tv_confirmation == 'UNKNOWN' and tv_signal_count == 0: require (consensus_conv >= 0.83 and green_matches >= 2 and hist_hr > 0.60) else veto"
       }
     ]
   },
@@ -204,12 +230,15 @@
         "analog",
         "bias",
         "block",
+        "confidence",
         "config",
+        "confirmation",
         "confluence",
         "conviction",
         "days",
         "differential",
         "est",
+        "external",
         "fields",
         "flag",
         "flags",
@@ -224,25 +253,28 @@
         "jointly",
         "layers",
         "matches",
+        "multiplier",
         "paired",
         "reliability",
         "shift",
+        "signals",
+        "sizing",
         "structure",
         "with",
         "zone",
         "zscore"
       ],
-      "component_label": "green_matches",
+      "component_label": "external_regime_confirmation / tv_signal_count + consensus green_matches",
       "first_seen": "2026-05-29",
-      "last_seen": "2026-07-16",
-      "days_forming": 48,
-      "n_revisions": 36,
-      "n_days_appeared": 36,
+      "last_seen": "2026-07-17",
+      "days_forming": 49,
+      "n_revisions": 41,
+      "n_days_appeared": 41,
       "stable_days": 1,
       "status": "forming",
       "time_to_converge_days": null,
-      "latest_lesson_text": "When the 30-indicator consensus shows high conviction but green_matches=0 and hist_hr=0%, the live signal has no historical analog and must be sized down or vetoed regardless of conviction.",
-      "latest_rule": "if consensus_conviction >= 0.90 and green_matches == 0: size *= 0.0  # veto; elif green_matches == 0 and hist_hr == 0: size *= 0.5",
+      "latest_lesson_text": "When internal MOMENTUM regime lacks external TradingView confirmation (0 TV signals), only take the highest-conviction consensus pairs (conv >= 83% AND green_matches >= 2 AND hist_hr > 60%) and skip everything else \u2014 the 75% sizing multiplier already signals the system distrusts itself.",
+      "latest_rule": "if tv_confirmation == 'UNKNOWN' and tv_signal_count == 0: require (consensus_conv >= 0.83 and green_matches >= 2 and hist_hr > 0.60) else veto",
       "history": [
         {
           "date": "2026-05-29",
@@ -301,6 +333,10 @@
           "rule": "if consensus_dir in ('SHORT','LONG') and green_matches == 0 and hist_hr < 0.50: size_multiplier *= 0.0  # veto. elif green_matches == 0 and hist_hr >= 0.55: size_multiplier *= 0.75  # novel config but historical edge holds"
         },
         {
+          "date": "2026-06-15",
+          "rule": "if internal_regime == 'MOMENTUM' and tv_signal_count_2h == 0: sizing_multiplier = min(sizing_multiplier, 0.50)"
+        },
+        {
           "date": "2026-06-16",
           "rule": "if consensus.green_matches == 0 and consensus.hist_hr == 0.0: return RegimeFreeze(pair)  # even if conv >= 0.50"
         },
@@ -357,6 +393,14 @@
           "rule": "if consensus_dir != 'NEUTRAL' and green_matches == 0 and hist_hr == 0.0: return ConsensusVeto()  # require green_matches >= 1 before sizing on 30-indicator direction"
         },
         {
+          "date": "2026-07-05",
+          "rule": "if external_confirmation.tv_signals == 0 and regime == 'MOMENTUM' and pair_consensus_conv < 0.50: veto_trade() else if sizing_multiplier <= 0.75: proceed_at_reduced_size()"
+        },
+        {
+          "date": "2026-07-06",
+          "rule": "if regime_confirmation.source == 'internal_only' and regime_confirmation.confidence <= 0.65: sizing_multiplier = min(sizing_multiplier, 0.60)"
+        },
+        {
           "date": "2026-07-07",
           "rule": "if direction contradicts market_structure_bias AND no CHOCH/BOS in trade direction AND not price_at_OB_or_FVG_zone: veto trade regardless of rate_diff_z magnitude"
         },
@@ -381,51 +425,20 @@
           "rule": "if consensus_conviction > 0.85 and green_matches == 0 and hist_hr == 0.0: size_multiplier = 0.5  # untested-config penalty until >=1 historical match exists"
         },
         {
+          "date": "2026-07-14",
+          "rule": "if regime_confirmation.tv_signals == 0 and regime_confirmation.confidence <= 0.65 and consensus.conviction < 1.00: size_multiplier *= 0.5  # only AUDNZD (100% conv, SHORT) survives full sizing today"
+        },
+        {
           "date": "2026-07-15",
           "rule": "if internal_regime == 'MOMENTUM' and tv_signal_count == 0 and consensus_conviction < 0.55: veto_entry() else if internal_regime == 'MOMENTUM' and tv_signal_count == 0: size *= 0.75"
         },
         {
           "date": "2026-07-16",
           "rule": "if consensus_conviction >= 0.90 and green_matches == 0: size *= 0.0  # veto; elif green_matches == 0 and hist_hr == 0: size *= 0.5"
-        }
-      ]
-    },
-    {
-      "components": [
-        "confidence",
-        "confirmation",
-        "external",
-        "multiplier",
-        "signals",
-        "sizing"
-      ],
-      "component_label": "regime_confirmation.confidence",
-      "first_seen": "2026-06-15",
-      "last_seen": "2026-07-14",
-      "days_forming": 31,
-      "n_revisions": 4,
-      "n_days_appeared": 4,
-      "stable_days": 1,
-      "status": "forming",
-      "time_to_converge_days": null,
-      "latest_lesson_text": "When internal regime is MOMENTUM but TradingView shows 0 confirming signals (confidence <= 65%), the 30-indicator single-pair conviction must clear 100% before that pair is tradable at full internal size.",
-      "latest_rule": "if regime_confirmation.tv_signals == 0 and regime_confirmation.confidence <= 0.65 and consensus.conviction < 1.00: size_multiplier *= 0.5  # only AUDNZD (100% conv, SHORT) survives full sizing today",
-      "history": [
-        {
-          "date": "2026-06-15",
-          "rule": "if internal_regime == 'MOMENTUM' and tv_signal_count_2h == 0: sizing_multiplier = min(sizing_multiplier, 0.50)"
         },
         {
-          "date": "2026-07-05",
-          "rule": "if external_confirmation.tv_signals == 0 and regime == 'MOMENTUM' and pair_consensus_conv < 0.50: veto_trade() else if sizing_multiplier <= 0.75: proceed_at_reduced_size()"
-        },
-        {
-          "date": "2026-07-06",
-          "rule": "if regime_confirmation.source == 'internal_only' and regime_confirmation.confidence <= 0.65: sizing_multiplier = min(sizing_multiplier, 0.60)"
-        },
-        {
-          "date": "2026-07-14",
-          "rule": "if regime_confirmation.tv_signals == 0 and regime_confirmation.confidence <= 0.65 and consensus.conviction < 1.00: size_multiplier *= 0.5  # only AUDNZD (100% conv, SHORT) survives full sizing today"
+          "date": "2026-07-17",
+          "rule": "if tv_confirmation == 'UNKNOWN' and tv_signal_count == 0: require (consensus_conv >= 0.83 and green_matches >= 2 and hist_hr > 0.60) else veto"
         }
       ]
     }
@@ -514,8 +527,8 @@
     }
   ],
   "velocity": {
-    "n_themes_tracked": 5,
-    "n_themes_forming": 2,
+    "n_themes_tracked": 4,
+    "n_themes_forming": 1,
     "n_themes_converged": 0,
     "n_codified": 9,
     "median_days_to_converge": null,
@@ -523,7 +536,7 @@
     "median_days_to_codify": 0,
     "mean_days_to_codify": 0.4,
     "codified_per_week": 7.0,
-    "themes_formed_per_week": 1.46
+    "themes_formed_per_week": 1.17
   },
   "config": {
     "converge_n_days": 3,
