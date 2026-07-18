@@ -1,0 +1,2441 @@
+{
+ "summary": {
+  "n_events": 234,
+  "status_counts": {
+   "NO_OPTIONS": 169,
+   "NOT_TRADEABLE": 8,
+   "TRADEABLE": 5,
+   "NO_LIVE_EXPIRY": 34,
+   "NO_QUOTE_0931": 18
+  },
+  "pct_tradeable_overall": 0.021,
+  "by_price_tier": {
+   "<$1": {
+    "n": 1,
+    "tradeable": 0,
+    "pct_tradeable": 0.0
+   },
+   "$1-5": {
+    "n": 81,
+    "tradeable": 0,
+    "pct_tradeable": 0.0
+   },
+   "$5-20": {
+    "n": 106,
+    "tradeable": 5,
+    "pct_tradeable": 0.047
+   },
+   "$20+": {
+    "n": 46,
+    "tradeable": 0,
+    "pct_tradeable": 0.0
+   }
+  },
+  "spread_cap": 0.2,
+  "door": "CLOSED"
+ },
+ "events": [
+  {
+   "date": "2025-07-02",
+   "ticker": "DAIC",
+   "underlying_0931": 211.69,
+   "price_tier": "$20+",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-07-02",
+   "ticker": "MOGO",
+   "underlying_0931": 3.405,
+   "price_tier": "$1-5",
+   "status": "NOT_TRADEABLE",
+   "spread_pct": 0.2857,
+   "oi": null,
+   "volume": null,
+   "strike": 2.5,
+   "expiry": "2025-07-18"
+  },
+  {
+   "date": "2025-07-03",
+   "ticker": "GITS",
+   "underlying_0931": 4.2497,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-07-03",
+   "ticker": "RGC",
+   "underlying_0931": 11.35,
+   "price_tier": "$5-20",
+   "status": "TRADEABLE",
+   "spread_pct": 0.1408,
+   "oi": null,
+   "volume": null,
+   "strike": 12.5,
+   "expiry": "2025-07-18"
+  },
+  {
+   "date": "2025-07-07",
+   "ticker": "MBIO",
+   "underlying_0931": 3.98,
+   "price_tier": "$1-5",
+   "status": "NO_LIVE_EXPIRY",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-07-08",
+   "ticker": "NDRA",
+   "underlying_0931": 10.54,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-07-09",
+   "ticker": "CLDI",
+   "underlying_0931": 11.04,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-07-09",
+   "ticker": "EVOK",
+   "underlying_0931": 8.975,
+   "price_tier": "$5-20",
+   "status": "NO_LIVE_EXPIRY",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-07-09",
+   "ticker": "SUGP",
+   "underlying_0931": 8.91,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-07-10",
+   "ticker": "BTCM",
+   "underlying_0931": 6.8,
+   "price_tier": "$5-20",
+   "status": "NO_QUOTE_0931",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null,
+   "strike": 7.0,
+   "expiry": "2025-07-18"
+  },
+  {
+   "date": "2025-07-11",
+   "ticker": "ABVE",
+   "underlying_0931": 3.77,
+   "price_tier": "$1-5",
+   "status": "NO_QUOTE_0931",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null,
+   "strike": 5.0,
+   "expiry": "2025-11-21"
+  },
+  {
+   "date": "2025-07-11",
+   "ticker": "INKT",
+   "underlying_0931": 21.0,
+   "price_tier": "$20+",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-07-14",
+   "ticker": "DARE",
+   "underlying_0931": 8.4355,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-07-14",
+   "ticker": "SDST",
+   "underlying_0931": 4.882,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-07-14",
+   "ticker": "SONN",
+   "underlying_0931": 16.91,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-07-14",
+   "ticker": "SQFT",
+   "underlying_0931": 10.53,
+   "price_tier": "$5-20",
+   "status": "NO_QUOTE_0931",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null,
+   "strike": 7.5,
+   "expiry": "2025-07-18"
+  },
+  {
+   "date": "2025-07-15",
+   "ticker": "CYCC",
+   "underlying_0931": 5.14,
+   "price_tier": "$5-20",
+   "status": "NO_LIVE_EXPIRY",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-07-21",
+   "ticker": "AIRE",
+   "underlying_0931": 6.405,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-07-21",
+   "ticker": "PMN",
+   "underlying_0931": 34.0,
+   "price_tier": "$20+",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-07-22",
+   "ticker": "DFLI",
+   "underlying_0931": 4.4,
+   "price_tier": "$1-5",
+   "status": "NO_QUOTE_0931",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null,
+   "strike": 3.5,
+   "expiry": "2026-01-16"
+  },
+  {
+   "date": "2025-07-22",
+   "ticker": "HTOO",
+   "underlying_0931": 9.9501,
+   "price_tier": "$5-20",
+   "status": "NO_QUOTE_0931",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null,
+   "strike": 7.5,
+   "expiry": "2025-08-15"
+  },
+  {
+   "date": "2025-07-23",
+   "ticker": "ABVX",
+   "underlying_0931": 63.7,
+   "price_tier": "$20+",
+   "status": "NO_QUOTE_0931",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null,
+   "strike": 65.0,
+   "expiry": "2025-10-17"
+  },
+  {
+   "date": "2025-07-24",
+   "ticker": "LIDR",
+   "underlying_0931": 4.74,
+   "price_tier": "$1-5",
+   "status": "NO_LIVE_EXPIRY",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-07-28",
+   "ticker": "CELC",
+   "underlying_0931": 43.99,
+   "price_tier": "$20+",
+   "status": "NO_QUOTE_0931",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null,
+   "strike": 45.0,
+   "expiry": "2025-08-15"
+  },
+  {
+   "date": "2025-07-28",
+   "ticker": "VAPE",
+   "underlying_0931": 55.58,
+   "price_tier": "$20+",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-07-28",
+   "ticker": "VWAV",
+   "underlying_0931": 4.1388,
+   "price_tier": "$1-5",
+   "status": "NO_QUOTE_0931",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null,
+   "strike": 5.0,
+   "expiry": "2025-09-19"
+  },
+  {
+   "date": "2025-07-29",
+   "ticker": "SLRX",
+   "underlying_0931": 24.6,
+   "price_tier": "$20+",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-07-29",
+   "ticker": "STAI",
+   "underlying_0931": 19.39,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-08-04",
+   "ticker": "BTBD",
+   "underlying_0931": 2.14,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-08-05",
+   "ticker": "CWD",
+   "underlying_0931": 2.62,
+   "price_tier": "$1-5",
+   "status": "NO_LIVE_EXPIRY",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-08-06",
+   "ticker": "SGBX",
+   "underlying_0931": 30.53,
+   "price_tier": "$20+",
+   "status": "NO_LIVE_EXPIRY",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-08-07",
+   "ticker": "IMG",
+   "underlying_0931": 10.09,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-08-13",
+   "ticker": "BSLK",
+   "underlying_0931": 3.38,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-08-14",
+   "ticker": "TRIB",
+   "underlying_0931": 2.021,
+   "price_tier": "$1-5",
+   "status": "NOT_TRADEABLE",
+   "spread_pct": 0.2222,
+   "oi": null,
+   "volume": null,
+   "strike": 2.5,
+   "expiry": "2025-08-15"
+  },
+  {
+   "date": "2025-08-14",
+   "ticker": "XPON",
+   "underlying_0931": 3.95,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-08-15",
+   "ticker": "SRXH",
+   "underlying_0931": 21.86,
+   "price_tier": "$20+",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-08-18",
+   "ticker": "PPCB",
+   "underlying_0931": 157.03,
+   "price_tier": "$20+",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-08-19",
+   "ticker": "GXAI",
+   "underlying_0931": 1.76,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-08-21",
+   "ticker": "APM",
+   "underlying_0931": 2.7732,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-08-21",
+   "ticker": "PTIX",
+   "underlying_0931": 3.7599,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-08-22",
+   "ticker": "EEIQ",
+   "underlying_0931": 23.02,
+   "price_tier": "$20+",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-08-26",
+   "ticker": "ALLR",
+   "underlying_0931": 1.98,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-08-26",
+   "ticker": "HKPD",
+   "underlying_0931": 1.215,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-08-27",
+   "ticker": "WAI",
+   "underlying_0931": 2.933,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-08-29",
+   "ticker": "IPDN",
+   "underlying_0931": 2.8863,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-09-02",
+   "ticker": "HWH",
+   "underlying_0931": 2.44,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-09-03",
+   "ticker": "AIHS",
+   "underlying_0931": 3.6,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-09-04",
+   "ticker": "CIGL",
+   "underlying_0931": 3.725,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-09-04",
+   "ticker": "ZNB",
+   "underlying_0931": 234.0,
+   "price_tier": "$20+",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-09-05",
+   "ticker": "HOUR",
+   "underlying_0931": 2.875,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-09-08",
+   "ticker": "OCTO",
+   "underlying_0931": 21.68,
+   "price_tier": "$20+",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-09-08",
+   "ticker": "RAPP",
+   "underlying_0931": 41.62,
+   "price_tier": "$20+",
+   "status": "NOT_TRADEABLE",
+   "spread_pct": 1.0204,
+   "oi": null,
+   "volume": null,
+   "strike": 40.0,
+   "expiry": "2025-09-19"
+  },
+  {
+   "date": "2025-09-09",
+   "ticker": "CWD",
+   "underlying_0931": 44.12,
+   "price_tier": "$20+",
+   "status": "NO_LIVE_EXPIRY",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-09-09",
+   "ticker": "MMA",
+   "underlying_0931": 1.51,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-09-10",
+   "ticker": "CUPR",
+   "underlying_0931": 15.04,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-09-10",
+   "ticker": "EDHL",
+   "underlying_0931": 10.25,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-09-10",
+   "ticker": "WLDS",
+   "underlying_0931": 66.6,
+   "price_tier": "$20+",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-09-15",
+   "ticker": "HSDT",
+   "underlying_0931": 22.85,
+   "price_tier": "$20+",
+   "status": "NO_QUOTE_0931",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null,
+   "strike": 22.5,
+   "expiry": "2025-10-17"
+  },
+  {
+   "date": "2025-09-15",
+   "ticker": "NAOV",
+   "underlying_0931": 9.4,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-09-16",
+   "ticker": "BREA",
+   "underlying_0931": 7.34,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-09-16",
+   "ticker": "FGI",
+   "underlying_0931": 10.1,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-09-16",
+   "ticker": "TURB",
+   "underlying_0931": 6.88,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-09-17",
+   "ticker": "SPRC",
+   "underlying_0931": 35.54,
+   "price_tier": "$20+",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-09-19",
+   "ticker": "AGMH",
+   "underlying_0931": 6.63,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-09-22",
+   "ticker": "AGRI",
+   "underlying_0931": 7.24,
+   "price_tier": "$5-20",
+   "status": "NO_LIVE_EXPIRY",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-09-22",
+   "ticker": "BOXL",
+   "underlying_0931": 233.57,
+   "price_tier": "$20+",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-09-22",
+   "ticker": "MBX",
+   "underlying_0931": 22.84,
+   "price_tier": "$20+",
+   "status": "NOT_TRADEABLE",
+   "spread_pct": 1.1655,
+   "oi": null,
+   "volume": null,
+   "strike": 22.5,
+   "expiry": "2025-10-17"
+  },
+  {
+   "date": "2025-09-22",
+   "ticker": "QLGN",
+   "underlying_0931": 8.28,
+   "price_tier": "$5-20",
+   "status": "NO_LIVE_EXPIRY",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-09-23",
+   "ticker": "SLE",
+   "underlying_0931": 95.4,
+   "price_tier": "$20+",
+   "status": "NO_LIVE_EXPIRY",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-09-24",
+   "ticker": "QURE",
+   "underlying_0931": 40.7,
+   "price_tier": "$20+",
+   "status": "NO_QUOTE_0931",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null,
+   "strike": 41.0,
+   "expiry": "2025-10-17"
+  },
+  {
+   "date": "2025-09-24",
+   "ticker": "SHFS",
+   "underlying_0931": 8.633,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-09-25",
+   "ticker": "SPRC",
+   "underlying_0931": 53.19,
+   "price_tier": "$20+",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-09-26",
+   "ticker": "MRM",
+   "underlying_0931": 4.06,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-09-29",
+   "ticker": "MSS",
+   "underlying_0931": 35.5,
+   "price_tier": "$20+",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-10-06",
+   "ticker": "SPRB",
+   "underlying_0931": 32.78,
+   "price_tier": "$20+",
+   "status": "NO_QUOTE_0931",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null,
+   "strike": 7.5,
+   "expiry": "2025-12-19"
+  },
+  {
+   "date": "2025-10-07",
+   "ticker": "GLTO",
+   "underlying_0931": 22.88,
+   "price_tier": "$20+",
+   "status": "NO_LIVE_EXPIRY",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-10-07",
+   "ticker": "TMQ",
+   "underlying_0931": 7.4201,
+   "price_tier": "$5-20",
+   "status": "TRADEABLE",
+   "spread_pct": 0.0317,
+   "oi": null,
+   "volume": null,
+   "strike": 7.5,
+   "expiry": "2025-10-17"
+  },
+  {
+   "date": "2025-10-08",
+   "ticker": "XBIO",
+   "underlying_0931": 11.79,
+   "price_tier": "$5-20",
+   "status": "NO_LIVE_EXPIRY",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-10-09",
+   "ticker": "TTRX",
+   "underlying_0931": 24.28,
+   "price_tier": "$20+",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-10-10",
+   "ticker": "QNRX",
+   "underlying_0931": 14.95,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-10-10",
+   "ticker": "SGBX",
+   "underlying_0931": 5.63,
+   "price_tier": "$5-20",
+   "status": "NO_LIVE_EXPIRY",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-10-13",
+   "ticker": "ELBM",
+   "underlying_0931": 3.5009,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-10-13",
+   "ticker": "STI",
+   "underlying_0931": 12.5,
+   "price_tier": "$5-20",
+   "status": "NO_LIVE_EXPIRY",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-10-14",
+   "ticker": "GWAV",
+   "underlying_0931": 17.43,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-10-15",
+   "ticker": "COOT",
+   "underlying_0931": 3.9301,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-10-15",
+   "ticker": "GNPX",
+   "underlying_0931": 550.0,
+   "price_tier": "$20+",
+   "status": "NO_LIVE_EXPIRY",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-10-16",
+   "ticker": "PRAX",
+   "underlying_0931": 160.0,
+   "price_tier": "$20+",
+   "status": "NO_QUOTE_0931",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null,
+   "strike": 160.0,
+   "expiry": "2025-10-17"
+  },
+  {
+   "date": "2025-10-20",
+   "ticker": "GSIT",
+   "underlying_0931": 8.3,
+   "price_tier": "$5-20",
+   "status": "TRADEABLE",
+   "spread_pct": 0.1633,
+   "oi": null,
+   "volume": null,
+   "strike": 7.5,
+   "expiry": "2025-11-21"
+  },
+  {
+   "date": "2025-10-21",
+   "ticker": "NERV",
+   "underlying_0931": 7.13,
+   "price_tier": "$5-20",
+   "status": "NO_LIVE_EXPIRY",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-10-22",
+   "ticker": "BENF",
+   "underlying_0931": 6.606,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-10-22",
+   "ticker": "BYND",
+   "underlying_0931": 5.915,
+   "price_tier": "$5-20",
+   "status": "TRADEABLE",
+   "spread_pct": 0.125,
+   "oi": null,
+   "volume": null,
+   "strike": 6.0,
+   "expiry": "2025-10-24"
+  },
+  {
+   "date": "2025-10-24",
+   "ticker": "GNTA",
+   "underlying_0931": 9.76,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-10-24",
+   "ticker": "WGRX",
+   "underlying_0931": 46.36,
+   "price_tier": "$20+",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-10-27",
+   "ticker": "DZZ",
+   "underlying_0931": 4.85,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-10-27",
+   "ticker": "SOHO",
+   "underlying_0931": 2.13,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-10-28",
+   "ticker": "XHLD",
+   "underlying_0931": 7.401,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-10-30",
+   "ticker": "CMBM",
+   "underlying_0931": 5.4003,
+   "price_tier": "$5-20",
+   "status": "TRADEABLE",
+   "spread_pct": 0.087,
+   "oi": null,
+   "volume": null,
+   "strike": 5.0,
+   "expiry": "2025-11-21"
+  },
+  {
+   "date": "2025-10-30",
+   "ticker": "INTS",
+   "underlying_0931": 19.41,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-10-31",
+   "ticker": "HKD",
+   "underlying_0931": 2.88,
+   "price_tier": "$1-5",
+   "status": "NO_LIVE_EXPIRY",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-11-06",
+   "ticker": "WORX",
+   "underlying_0931": 5.156,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-11-10",
+   "ticker": "COGT",
+   "underlying_0931": 32.51,
+   "price_tier": "$20+",
+   "status": "NOT_TRADEABLE",
+   "spread_pct": 1.6667,
+   "oi": null,
+   "volume": null,
+   "strike": 33.0,
+   "expiry": "2025-11-21"
+  },
+  {
+   "date": "2025-11-10",
+   "ticker": "GLTO",
+   "underlying_0931": 19.43,
+   "price_tier": "$5-20",
+   "status": "NO_LIVE_EXPIRY",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-11-18",
+   "ticker": "OLMA",
+   "underlying_0931": 25.42,
+   "price_tier": "$20+",
+   "status": "NO_QUOTE_0931",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null,
+   "strike": 25.0,
+   "expiry": "2025-11-21"
+  },
+  {
+   "date": "2025-12-01",
+   "ticker": "AHMA",
+   "underlying_0931": 11.06,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-12-01",
+   "ticker": "QTTB",
+   "underlying_0931": 4.2458,
+   "price_tier": "$1-5",
+   "status": "NO_QUOTE_0931",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null,
+   "strike": 5.0,
+   "expiry": "2026-07-17"
+  },
+  {
+   "date": "2025-12-03",
+   "ticker": "CAPR",
+   "underlying_0931": 34.0,
+   "price_tier": "$20+",
+   "status": "NO_QUOTE_0931",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null,
+   "strike": 34.0,
+   "expiry": "2025-12-19"
+  },
+  {
+   "date": "2025-12-04",
+   "ticker": "PLRZ",
+   "underlying_0931": 16.315,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-12-08",
+   "ticker": "GPCR",
+   "underlying_0931": 46.92,
+   "price_tier": "$20+",
+   "status": "NOT_TRADEABLE",
+   "spread_pct": 1.2208,
+   "oi": null,
+   "volume": null,
+   "strike": 47.5,
+   "expiry": "2025-12-19"
+  },
+  {
+   "date": "2025-12-08",
+   "ticker": "WVE",
+   "underlying_0931": 13.09,
+   "price_tier": "$5-20",
+   "status": "NOT_TRADEABLE",
+   "spread_pct": 1.4545,
+   "oi": null,
+   "volume": null,
+   "strike": 13.0,
+   "expiry": "2025-12-19"
+  },
+  {
+   "date": "2025-12-10",
+   "ticker": "BBGI",
+   "underlying_0931": 6.1073,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-12-10",
+   "ticker": "ENVB",
+   "underlying_0931": 12.051,
+   "price_tier": "$5-20",
+   "status": "NO_LIVE_EXPIRY",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-12-11",
+   "ticker": "BTTC",
+   "underlying_0931": 8.96,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-12-15",
+   "ticker": "AMCI",
+   "underlying_0931": 3.73,
+   "price_tier": "$1-5",
+   "status": "NO_LIVE_EXPIRY",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-12-15",
+   "ticker": "RADX",
+   "underlying_0931": 13.8499,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-12-17",
+   "ticker": "PCSA",
+   "underlying_0931": 3.72,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2025-12-22",
+   "ticker": "SIDU",
+   "underlying_0931": 1.98,
+   "price_tier": "$1-5",
+   "status": "NO_QUOTE_0931",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null,
+   "strike": 2.0,
+   "expiry": "2026-01-16"
+  },
+  {
+   "date": "2025-12-24",
+   "ticker": "SOBR",
+   "underlying_0931": 2.1787,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-01-06",
+   "ticker": "ALMS",
+   "underlying_0931": 20.91,
+   "price_tier": "$20+",
+   "status": "NOT_TRADEABLE",
+   "spread_pct": 0.2114,
+   "oi": null,
+   "volume": null,
+   "strike": 21.0,
+   "expiry": "2026-01-16"
+  },
+  {
+   "date": "2026-01-08",
+   "ticker": "FLYX",
+   "underlying_0931": 5.835,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-01-13",
+   "ticker": "AHMA",
+   "underlying_0931": 10.9018,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-01-14",
+   "ticker": "ROLR",
+   "underlying_0931": 16.22,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-01-15",
+   "ticker": "AUID",
+   "underlying_0931": 2.07,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-01-15",
+   "ticker": "CJMB",
+   "underlying_0931": 2.78,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-01-15",
+   "ticker": "SPHL",
+   "underlying_0931": 7.64,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-01-16",
+   "ticker": "VERO",
+   "underlying_0931": 5.84,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-01-20",
+   "ticker": "IVF",
+   "underlying_0931": 18.47,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-01-20",
+   "ticker": "SHPH",
+   "underlying_0931": 42.19,
+   "price_tier": "$20+",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-01-21",
+   "ticker": "GITS",
+   "underlying_0931": 0.92,
+   "price_tier": "<$1",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-01-21",
+   "ticker": "PAVM",
+   "underlying_0931": 18.78,
+   "price_tier": "$5-20",
+   "status": "NO_QUOTE_0931",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null,
+   "strike": 7.5,
+   "expiry": "2026-02-20"
+  },
+  {
+   "date": "2026-01-21",
+   "ticker": "SLGB",
+   "underlying_0931": 3.795,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-01-22",
+   "ticker": "SXTP",
+   "underlying_0931": 6.53,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-01-23",
+   "ticker": "MOVE",
+   "underlying_0931": 15.96,
+   "price_tier": "$5-20",
+   "status": "NO_LIVE_EXPIRY",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-01-26",
+   "ticker": "BATL",
+   "underlying_0931": 6.27,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-01-26",
+   "ticker": "BNAI",
+   "underlying_0931": 46.5,
+   "price_tier": "$20+",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-01-27",
+   "ticker": "GITS",
+   "underlying_0931": 2.0812,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-01-28",
+   "ticker": "TIRX",
+   "underlying_0931": 30.29,
+   "price_tier": "$20+",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-02-02",
+   "ticker": "DKI",
+   "underlying_0931": 16.64,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-02-02",
+   "ticker": "ROMA",
+   "underlying_0931": 2.18,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-02-03",
+   "ticker": "TIRX",
+   "underlying_0931": 7.4,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-02-09",
+   "ticker": "UOKA",
+   "underlying_0931": 82.6,
+   "price_tier": "$20+",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-02-11",
+   "ticker": "QVCGP",
+   "underlying_0931": 2.5055,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-02-11",
+   "ticker": "RENX",
+   "underlying_0931": 5.908,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-02-19",
+   "ticker": "KNRX",
+   "underlying_0931": 2.0,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-02-23",
+   "ticker": "TIRX",
+   "underlying_0931": 5.415,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-03-02",
+   "ticker": "TMDE",
+   "underlying_0931": 2.8,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-03-03",
+   "ticker": "BATL",
+   "underlying_0931": 22.7,
+   "price_tier": "$20+",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-03-03",
+   "ticker": "MOBX",
+   "underlying_0931": 4.932,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-03-04",
+   "ticker": "DXST",
+   "underlying_0931": 2.888,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-03-09",
+   "ticker": "AZI",
+   "underlying_0931": 5.5,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-03-09",
+   "ticker": "DTCK",
+   "underlying_0931": 1.46,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-03-13",
+   "ticker": "BIAF",
+   "underlying_0931": 1.88,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-03-16",
+   "ticker": "ULY",
+   "underlying_0931": 5.3145,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-03-17",
+   "ticker": "LNAI",
+   "underlying_0931": 4.763,
+   "price_tier": "$1-5",
+   "status": "NO_QUOTE_0931",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null,
+   "strike": 5.0,
+   "expiry": "2026-03-20"
+  },
+  {
+   "date": "2026-03-17",
+   "ticker": "UCAR",
+   "underlying_0931": 6.921,
+   "price_tier": "$5-20",
+   "status": "NO_LIVE_EXPIRY",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-03-18",
+   "ticker": "LBGJ",
+   "underlying_0931": 7.65,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-03-26",
+   "ticker": "EEIQ",
+   "underlying_0931": 5.18,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-03-27",
+   "ticker": "ARTL",
+   "underlying_0931": 7.82,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-03-30",
+   "ticker": "ELAB",
+   "underlying_0931": 4.17,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-03-31",
+   "ticker": "MASK",
+   "underlying_0931": 1.62,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-04-06",
+   "ticker": "FCUV",
+   "underlying_0931": 29.2,
+   "price_tier": "$20+",
+   "status": "NO_LIVE_EXPIRY",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-04-06",
+   "ticker": "PFSA",
+   "underlying_0931": 47.36,
+   "price_tier": "$20+",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-04-07",
+   "ticker": "HCAI",
+   "underlying_0931": 14.37,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-04-07",
+   "ticker": "RDGT",
+   "underlying_0931": 4.965,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-04-08",
+   "ticker": "INHD",
+   "underlying_0931": 7.786,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-04-10",
+   "ticker": "CREG",
+   "underlying_0931": 4.686,
+   "price_tier": "$1-5",
+   "status": "NO_LIVE_EXPIRY",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-04-14",
+   "ticker": "SNAL",
+   "underlying_0931": 4.004,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-04-15",
+   "ticker": "BIRD",
+   "underlying_0931": 6.82,
+   "price_tier": "$5-20",
+   "status": "NO_LIVE_EXPIRY",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-04-15",
+   "ticker": "NCI",
+   "underlying_0931": 5.599,
+   "price_tier": "$5-20",
+   "status": "NO_LIVE_EXPIRY",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-04-16",
+   "ticker": "MYSE",
+   "underlying_0931": 5.48,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-04-16",
+   "ticker": "WSHP",
+   "underlying_0931": 28.02,
+   "price_tier": "$20+",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-04-17",
+   "ticker": "EFOI",
+   "underlying_0931": 5.55,
+   "price_tier": "$5-20",
+   "status": "NO_LIVE_EXPIRY",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-04-20",
+   "ticker": "ENVB",
+   "underlying_0931": 4.545,
+   "price_tier": "$1-5",
+   "status": "NO_LIVE_EXPIRY",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-04-20",
+   "ticker": "FCHL",
+   "underlying_0931": 13.53,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-04-27",
+   "ticker": "HTCO",
+   "underlying_0931": 12.9,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-04-30",
+   "ticker": "HCAI",
+   "underlying_0931": 10.5552,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-05-04",
+   "ticker": "CNSP",
+   "underlying_0931": 9.7066,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-05-05",
+   "ticker": "SDOT",
+   "underlying_0931": 11.5,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-05-08",
+   "ticker": "YMAT",
+   "underlying_0931": 1.265,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-05-14",
+   "ticker": "QUCY",
+   "underlying_0931": 2.03,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-05-14",
+   "ticker": "SNAL",
+   "underlying_0931": 6.703,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-05-15",
+   "ticker": "HCWB",
+   "underlying_0931": 6.96,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-05-15",
+   "ticker": "PIII",
+   "underlying_0931": 5.1999,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-05-18",
+   "ticker": "GOVX",
+   "underlying_0931": 2.96,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-05-18",
+   "ticker": "SBFM",
+   "underlying_0931": 19.7,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-05-18",
+   "ticker": "VRAX",
+   "underlying_0931": 7.868,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-05-19",
+   "ticker": "AMST",
+   "underlying_0931": 2.345,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-05-19",
+   "ticker": "WNW",
+   "underlying_0931": 3.9203,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-05-20",
+   "ticker": "HCWB",
+   "underlying_0931": 6.779,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-05-22",
+   "ticker": "PCLA",
+   "underlying_0931": 6.37,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-05-26",
+   "ticker": "YMAT",
+   "underlying_0931": 7.55,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-05-27",
+   "ticker": "ASTC",
+   "underlying_0931": 7.4304,
+   "price_tier": "$5-20",
+   "status": "NO_LIVE_EXPIRY",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-05-28",
+   "ticker": "ATPC",
+   "underlying_0931": 6.085,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-05-28",
+   "ticker": "SPRC",
+   "underlying_0931": 11.9,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-05-29",
+   "ticker": "HUBC",
+   "underlying_0931": 7.298,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-05-29",
+   "ticker": "NEXR",
+   "underlying_0931": 1.645,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-05-29",
+   "ticker": "OLOX",
+   "underlying_0931": 10.25,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-05-29",
+   "ticker": "PRFX",
+   "underlying_0931": 5.0395,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-06-02",
+   "ticker": "BJDX",
+   "underlying_0931": 6.47,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-06-02",
+   "ticker": "DXST",
+   "underlying_0931": 3.1001,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-06-03",
+   "ticker": "WCT",
+   "underlying_0931": 1.505,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-06-03",
+   "ticker": "XOS",
+   "underlying_0931": 6.35,
+   "price_tier": "$5-20",
+   "status": "NO_LIVE_EXPIRY",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-06-04",
+   "ticker": "FOXX",
+   "underlying_0931": 5.37,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-06-04",
+   "ticker": "STI",
+   "underlying_0931": 26.7,
+   "price_tier": "$20+",
+   "status": "NO_LIVE_EXPIRY",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-06-05",
+   "ticker": "RMSG",
+   "underlying_0931": 3.5701,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-06-08",
+   "ticker": "INHD",
+   "underlying_0931": 1.13,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-06-08",
+   "ticker": "SUNE",
+   "underlying_0931": 2.925,
+   "price_tier": "$1-5",
+   "status": "NO_LIVE_EXPIRY",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-06-09",
+   "ticker": "AZI",
+   "underlying_0931": 3.58,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-06-09",
+   "ticker": "CHAI",
+   "underlying_0931": 3.46,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-06-09",
+   "ticker": "GMM",
+   "underlying_0931": 11.28,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-06-09",
+   "ticker": "PAVS",
+   "underlying_0931": 164.8,
+   "price_tier": "$20+",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-06-09",
+   "ticker": "RGNT",
+   "underlying_0931": 2.435,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-06-10",
+   "ticker": "CIIT",
+   "underlying_0931": 2.68,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-06-10",
+   "ticker": "DSY",
+   "underlying_0931": 7.65,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-06-10",
+   "ticker": "VSME",
+   "underlying_0931": 3.33,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-06-11",
+   "ticker": "EDHL",
+   "underlying_0931": 14.8,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-06-11",
+   "ticker": "GLXG",
+   "underlying_0931": 2.62,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-06-11",
+   "ticker": "PPCB",
+   "underlying_0931": 3.53,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-06-11",
+   "ticker": "QH",
+   "underlying_0931": 6.64,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-06-12",
+   "ticker": "BYAH",
+   "underlying_0931": 2.8,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-06-12",
+   "ticker": "CUPR",
+   "underlying_0931": 3.93,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-06-15",
+   "ticker": "CAST",
+   "underlying_0931": 4.805,
+   "price_tier": "$1-5",
+   "status": "NO_LIVE_EXPIRY",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-06-15",
+   "ticker": "CUPR",
+   "underlying_0931": 11.2,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-06-15",
+   "ticker": "RGNT",
+   "underlying_0931": 1.6855,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-06-16",
+   "ticker": "SLBT",
+   "underlying_0931": 12.4015,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-06-17",
+   "ticker": "EHGO",
+   "underlying_0931": 5.3998,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-06-17",
+   "ticker": "ICCM",
+   "underlying_0931": 4.22,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-06-17",
+   "ticker": "YMAT",
+   "underlying_0931": 3.247,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-06-22",
+   "ticker": "EHGO",
+   "underlying_0931": 2.7,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-06-22",
+   "ticker": "NXTS",
+   "underlying_0931": 12.69,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-06-24",
+   "ticker": "PLSM",
+   "underlying_0931": 11.45,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-06-29",
+   "ticker": "DCOY",
+   "underlying_0931": 12.77,
+   "price_tier": "$5-20",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-06-29",
+   "ticker": "UPC",
+   "underlying_0931": 14.09,
+   "price_tier": "$5-20",
+   "status": "NO_LIVE_EXPIRY",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-06-30",
+   "ticker": "CELZ",
+   "underlying_0931": 3.1034,
+   "price_tier": "$1-5",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  },
+  {
+   "date": "2026-06-30",
+   "ticker": "JEM",
+   "underlying_0931": 53.28,
+   "price_tier": "$20+",
+   "status": "NO_OPTIONS",
+   "spread_pct": null,
+   "oi": null,
+   "volume": null
+  }
+ ]
+}
