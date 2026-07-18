@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.alta.hyp107_shadow</string>
+  <!-- Two passes/day: 10:50 ET scan, 16:20 ET close. launchd runs a wrapper
+       that dispatches by clock. TRACKED-NOT-LOADED: operator promotes with
+       launchctl load ~/Library/LaunchAgents/com.alta.hyp107_shadow.plist
+       (same pattern as com.alta.gapper_shadow / com.alta.ib_shortable). -->
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/zsh</string>
+    <string>-c</string>
+    <string>H=$(TZ=America/New_York date +%H); if [ "$H" -lt 13 ]; then P=--scan; else P=--close; fi; /opt/homebrew/bin/python3 /Users/taboost/quant/research/gapper/hyp107_shadow.py $P</string>
+  </array>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+  </dict>
+  <key>WorkingDirectory</key>
+  <string>/Users/taboost/quant</string>
+  <key>StandardOutPath</key>
+  <string>/Users/taboost/quant/logs/hyp107_shadow.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/taboost/quant/logs/hyp107_shadow.err</string>
+  <key>StartCalendarInterval</key>
+  <array>
+    <dict><key>Hour</key><integer>10</integer><key>Minute</key><integer>50</integer></dict>
+    <dict><key>Hour</key><integer>16</integer><key>Minute</key><integer>20</integer></dict>
+  </array>
+</dict>
+</plist>
