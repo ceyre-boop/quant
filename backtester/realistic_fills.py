@@ -21,13 +21,17 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
+from backtester.luld import halt_flags as _tiered_halt_flags
+
 # spread scenarios: (vol_coef on bar-range, inverse-$vol coef, floor, cap)
 SCENARIOS = {
     "optimistic": dict(k_range=0.15, k_illiq=0.02, floor=0.003, cap=0.03),
     "base":       dict(k_range=0.30, k_illiq=0.05, floor=0.005, cap=0.08),
     "pessimistic":dict(k_range=0.50, k_illiq=0.10, floor=0.010, cap=0.15),
 }
-LULD_BAND = 0.10          # single-minute move beyond this ⇒ treat as halt
+LULD_BAND = 0.10          # DEPRECATED — see backtester/luld.py. Retained only so
+                          # external importers do not break at import time. The
+                          # flat band is NO LONGER USED by _halt_flags().
 HALT_RESUME_SLIP = 0.02   # extra adverse slip filling on a halt-resume bar
 MAX_VOL_FRAC = 0.10       # can fill ≤10% of the entry minute's share volume
 
@@ -37,15 +41,20 @@ def _idx_at(bars, hhmm):
     return int(w[0]) if len(w) else None
 
 
-def _halt_flags(bars):
-    """Per-bar: True if this bar is a halt-resume (gap before it) or a >band jump."""
-    t = pd.to_datetime(bars["time"], format="%H:%M")
-    gap_before = t.diff().dt.total_seconds().div(60).fillna(1).to_numpy() > 1.5
-    o = bars["open"].to_numpy(); c = bars["close"].to_numpy()
-    prev_c = np.concatenate([[c[0]], c[:-1]])
-    jump = np.abs(o / prev_c - 1) > LULD_BAND
-    intrabar = np.abs(c / o - 1) > LULD_BAND
-    return gap_before | jump | intrabar
+def _halt_flags(bars, tier: int = 2):
+    """Per-bar: True if this bar is a halt-resume.
+
+    Delegates to the tiered LULD implementation. The previous flat 10% band
+    flagged some microcap opening minutes as halts and charged HALT_RESUME_SLIP
+    against them, biasing backtests PESSIMISTIC.
+
+    Measured magnitude: ~0.071% per trade at the 09:31 entry bar (old 3.6% of
+    events flagged vs 0.0% under the tiered rule, n=56), and no measurable effect
+    at 10:30 (n=59). Real, small, and directionally optimistic when corrected —
+    not a result-changing fix. See backtester/luld.py for the rule and
+    data/agent/param_change_log.jsonl for the rationale.
+    """
+    return _tiered_halt_flags(bars, tier=tier)
 
 
 def _half_spread(price, bar_range_pct, minute_dollar_vol, sc):

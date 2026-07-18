@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Execution harness — measurement only. Places no orders, moves no capital.
+
+  TRACKED-NOT-LOADED. This file is authored, plutil-linted and committed; the
+  OPERATOR installs it. Do not `launchctl load` from an agent session (see
+  NEXT.md:836 — that was refused before and the refusal was correct).
+
+  Promotion sequence (operator's hand):
+    cp scripts/com.alta.execution_harness.plist ~/Library/LaunchAgents/
+    launchctl load ~/Library/LaunchAgents/com.alta.execution_harness.plist
+    python3 scripts/plist_watchdog.py --rebaseline "loaded execution_harness"
+
+  The rebaseline is easy to forget and skipping it leaves a standing RED that
+  looks like an intrusion.
+
+  SCHEDULE: 16:05 ET Mon-Fri. launchd fires in the machine's LOCAL timezone,
+  which is America/New_York, so this time IS ET and DST is handled for free.
+
+  WHY 16:05 AND NOT 09:25: this account's SIP entitlement 403s inside a
+  15-minute recency window (measured 2026-07-18). The harness therefore captures
+  real bid/ask on a DEFERRED pass, after the session's quotes have aged past the
+  boundary. A 09:25 start would only be able to read stale-or-forbidden quotes.
+  Running once after the close prices both legs' entries and exits in one pass.
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.alta.execution_harness</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/opt/homebrew/bin/python3</string>
+    <string>-m</string>
+    <string>execution.harness</string>
+    <string>--live</string>
+  </array>
+
+  <key>WorkingDirectory</key>
+  <string>/Users/taboost/quant</string>
+
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+    <key>PYTHONPATH</key>
+    <string>/Users/taboost/quant</string>
+  </dict>
+
+  <key>StandardOutPath</key>
+  <string>/Users/taboost/quant/logs/harness.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/taboost/quant/logs/harness.err</string>
+
+  <key>Nice</key>
+  <integer>5</integer>
+
+  <key>RunAtLoad</key>
+  <false/>
+
+  <key>StartCalendarInterval</key>
+  <array>
+    <dict><key>Hour</key><integer>16</integer><key>Minute</key><integer>5</integer><key>Weekday</key><integer>1</integer></dict>
+    <dict><key>Hour</key><integer>16</integer><key>Minute</key><integer>5</integer><key>Weekday</key><integer>2</integer></dict>
+    <dict><key>Hour</key><integer>16</integer><key>Minute</key><integer>5</integer><key>Weekday</key><integer>3</integer></dict>
+    <dict><key>Hour</key><integer>16</integer><key>Minute</key><integer>5</integer><key>Weekday</key><integer>4</integer></dict>
+    <dict><key>Hour</key><integer>16</integer><key>Minute</key><integer>5</integer><key>Weekday</key><integer>5</integer></dict>
+  </array>
+</dict>
+</plist>

@@ -410,3 +410,20 @@ Schema per ticket:
 **description:** Colin 2026-07-14: top 3 movers/day, find commonalities + anything predictive (incl. rare blue-moon setups), many lenses, lookahead allowed. Window = the 2 on-disk full-market years (2024-07→2026-06, survivorship-free; 5-10yr extension = Polygon Developer $79/mo, operator's word). Anatomy / ex-ante tape features vs matched controls / persistence + repeat offenders / regime (VIX) / catalysts (Alpaca news, posthoc taxonomy) / blue-moon conditional scans / ex-ante watchlist scored P(>=1 of top-3) vs random. All MINING-stamped; candidate rules counted into mined_n.json; no prereg/holdout this ticket. Plan: Plans/immutable-wondering-alpaca.md.
 **status:** in_progress (2026-07-15)
 **pre_approved:** true (plan-mode approval 2026-07-15)
+
+## TICK-038
+**title:** Execution harness — real-quote fill measurement, unifying the two gapper shadows
+**description:** Built `execution/harness.py` as a single measurement instrument replacing the forked `live_shadow.py` (HYP-093) and `hyp107_shadow.py` (HYP-107). Captures REAL SIP bid/ask at the frozen entry/exit instants (long fills at ask, short at bid), costs fills through the same `realistic_fills` module the backtests call, and emits fill_log.jsonl + daily_summary.csv. NO readiness/funding column by design. Deferred T+16min capture because this account's SIP entitlement 403s inside a 15-minute recency window (measured); real-time IEX is permitted but quotes ~10% spreads on ~2% of volume and is unusable. Also fixed the flat-10% LULD band (`backtester/luld.py`, tiered Reg NMS, doubled at open/close) — measured impact only ~7bp at the 09:31 entry bar, logged honestly. KEY FINDING: real median quoted spread on 59 archived gapper events is **0.61%**, vs the 1-15% assumed in realistic_fills, which saturates its 8% round-trip cap — every gapper backtest is biased pessimistic by several pp/trade. See data/execution/BACKFILL_NOTE_2026-07-18.md.
+**depends_on:** []
+**blocks:** [TICK-039 (recalibrate realistic_fills spread model against measured spreads)]
+**acceptance_criteria:**
+- [x] Frozen thresholds single-sourced + sha256-locked; drift fails startup
+- [x] Real bid/ask capture (first in repo); gross - net == spread_cost asserted to 1bp
+- [x] Same `realistic_long_return` call as the backtests, so vs_backtest_delta is meaningful
+- [x] Kill switch honored despite paper-only; heartbeat before the check
+- [x] 118 new tests green; full suite unchanged at 40 failed / +118 passed
+- [x] plist authored + plutil OK + TRACKED-NOT-LOADED (operator installs, rebaselines watchdog)
+- [ ] Operator: install plist and run `plist_watchdog.py --rebaseline`
+- [ ] Re-run the SEALED HYP-107 holdout (not a random archive draw) with a recalibrated cost model
+**status:** done (2026-07-18) — operator promotion pending
+**pre_approved:** true (plan-mode approval 2026-07-18 — Plans/concurrent-petting-blossom.md)

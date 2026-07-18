@@ -6,6 +6,59 @@ Standing constraints live in `CLAUDE.md` — not restated here.
 
 ---
 
+## 2026-07-18 · TICK-038 EXECUTION HARNESS — THE SPREAD ASSUMPTION WAS WRONG BY ~10x
+
+Built `execution/harness.py`: one measurement instrument replacing the two forked shadows
+(`live_shadow.py` HYP-093, `hyp107_shadow.py` HYP-107 — both still running, Phase 1 of a
+3-phase migration; historical logs untouched as the reconciliation control group).
+
+**THE FINDING.** First real bid/ask capture in this repo. On 59 archived gapper events the
+**median quoted spread is 0.6113%**. `backtester/realistic_fills.py` assumes 1-15% and its
+`_half_spread()` saturates at an 8% round-trip cap on gapper opens. Same events, same module:
+model says median -3.49%, real quotes say median net **+1.02%** — a **+4.51pp** gap that is
+model error, not edge. Every gapper backtest carrying that charge is biased PESSIMISTIC by
+several pp/trade. Hand-checked example: TGHL 2026-07-16 09:30:59, bid 1.37 / ask 1.38 = 0.73%.
+Artifacts + full caveats: `data/execution/BACKFILL_NOTE_2026-07-18.md`.
+
+**WHAT THIS IS NOT.** The 59 events are a RANDOM ARCHIVE DRAW overlapping the mining window,
+NOT the sealed n=57 holdout. Gross on this sample is +1.55% / win 55.9% vs the holdout's +5.4%
+/ 70% — materially weaker, different sample, neither refutes the other. **HYP-107 stays
+`REAL_BUT_MARGINAL_EXECUTION_UNRESOLVED`.** Nothing here adjudicates the edge and nothing here
+touches funding (TICK-022 EV still 0.0; HYP-093 still below half its floor). The daily summary
+carries NO readiness column by design.
+
+**Corrections made to my own claims mid-build, both from measuring instead of asserting:**
+- The flat-10% LULD bug is REAL but SMALL: 0.071%/trade at the 09:31 entry bar (old flagged
+  2/56 events, new 0/56), ~0 at 10:30. I had drafted "nearly every opening minute" and "~2%
+  per trade" — both wrong. Corrected in docstrings + `param_change_log.jsonl` (direction of the
+  correction is UPWARD, logged before regenerating numbers).
+- The brief specified HYP-093 as ">=100% above prior close". The sealed prereg (c5b10616) is
+  `gain_min=0.50` / `qual_gain=1.30`. Used the prereg; test guards it.
+
+**Architecture deviation from the brief, forced by measurement:** real-time is impossible.
+This account 403s on SIP quotes inside a 15-minute window (probed: -13min 403, -16min 200);
+real-time IEX is allowed but quotes AAPL at bid 314.75 / ask 347.97 (~10% spread, ~2% of
+volume) and is unusable for cost measurement. Harness therefore does DEFERRED T+16min capture
+and the plist runs 16:05 ET, not 09:25.
+
+**Bugs found by running it:** (1) replay silently used the LIVE movers screener for past dates —
+`alpaca.movers()` has no historical mode, so a replay scored today's movers against a past
+session. Now sources from the archive and REFUSES to fall back. (2) exit quote was taken at the
+bar OPEN; frozen specs exit at `b1030["c"]`, i.e. bar close = 10:31:00. (3) `/quotes` 400s when
+symbol is passed as both path and query — surfaced only because the new client stopped swallowing
+exceptions (the old `except Exception: sleep(5)` + `raise RuntimeError(url[:110])` destroyed it).
+
+118 new tests green. Full suite 40 failed / 1368 passed — same 40 as baseline, +118 mine.
+`data/execution/fills.jsonl` (Jun 30, unrelated system) untouched. Kill switch honored despite
+paper-only; freeze/thaw dry-run passed, system verified 🟢 RUNNING after.
+
+**BLOCKED ON OPERATOR:** plist is TRACKED-NOT-LOADED per convention (NEXT.md:836). Install and
+`plist_watchdog.py --rebaseline` — skipping the rebaseline leaves a standing RED.
+**NEXT (TICK-039):** recalibrate `SCENARIOS`/`_half_spread` against measured spreads, then re-run
+the SEALED holdout with the corrected cost model before any HYP-107 viability claim.
+
+---
+
 ## 2026-07-15 · TICK-036 TOP-3 MOVERS STUDY (MINING) — PREDICTABILITY CONFIRMED AT 13x, SERIAL RUNNERS FOUND
 
 Colin's ask, run as Steps 1-2: 492 days (the 2 on-disk full-market years; 5yr needs the $79/mo
