@@ -155,13 +155,33 @@ def load_sentiment_board() -> Field_:
         if not n:
             return Field_("sentiment_board", None, Status.SILENT_NULL, str(p),
                           _age(p), "board table empty")
-        age_s = None
+
+        # FRESHNESS IS REBUILD TIME, NOT MAX DATA DATE.
+        # The board's latest row is bounded by the MARKET CALENDAR, not by pipeline
+        # health: a Tuesday rebuild yields Monday's date (~32h old at 08:00) and a
+        # Monday rebuild yields Friday's (~56h). Judging staleness by data date
+        # would therefore report STALE on every healthy run — a permanent false
+        # alarm. What matters is whether the pipeline ran, so age comes from the
+        # DB mtime; data coverage is reported alongside as a separate fact.
+        rebuild_age = _age(p)
+        detail = f"rebuilt {rebuild_age/3600:.1f}h ago, data through {maxd}"
+
+        # Data coverage IS still checked — a board that rebuilds daily but stops
+        # advancing its data is a real failure, just a different one.
+        stale_data = False
         if maxd:
-            age_s = (datetime.now(UTC)
-                     - datetime.combine(maxd, datetime.min.time(), tzinfo=UTC)).total_seconds()
-        return Field_("sentiment_board", {"rows": n, "latest_date": str(maxd)},
-                      _status_for("sentiment_board", age_s), str(p), age_s,
-                      f"latest board row {maxd}")
+            data_age_days = (datetime.now(UTC).date() - maxd).days
+            if data_age_days > 5:          # beyond a long weekend + a holiday
+                stale_data = True
+                detail += f" — DATA STALLED {data_age_days}d despite rebuilds"
+
+        status = _status_for("sentiment_board", rebuild_age)
+        if stale_data:
+            status = Status.STALE
+        return Field_("sentiment_board",
+                      {"rows": n, "latest_date": str(maxd),
+                       "rebuild_age_hours": round(rebuild_age / 3600, 2)},
+                      status, str(p), rebuild_age, detail)
     except Exception as e:                                   # noqa: BLE001
         return _error("sentiment_board", str(p), e)
 

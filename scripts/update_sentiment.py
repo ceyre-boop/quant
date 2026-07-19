@@ -15,6 +15,7 @@ from __future__ import annotations
 import argparse
 import logging
 import sys
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -32,6 +33,69 @@ from sovereign.sentiment import (
 
 HEARTBEAT = ROOT / "logs" / ".heartbeat_sentiment"
 
+# ── Per-feed timeout ─────────────────────────────────────────────────────────
+# WHY: this job hung indefinitely and starved the thing it exists to produce.
+# Measured 2026-07-18 with the DB lock free:
+#     news 5.8s · macro 3.0s · vix 0.6s · surprise 5.3s · cot 4.0s   (~19s total)
+#     gdelt >90s · vrp >90s · surface >90s                            (unbounded)
+# One observed run survived 1h47m still holding an EXCLUSIVE DuckDB write lock,
+# which also blocks every reader of sentiment.db for the whole session.
+#
+# The three hangers are known-degraded upstream, not transient: gdelt has ingested
+# ZERO rows in its lifetime (burst-throttled free tier) and vrp/surface both need
+# a ThetaTerminal that is down. Their absence is already modelled downstream — the
+# board carries NULL vrp_*/rr25/bf25 and says so in the coverage report.
+#
+# So each feed gets a hard wall-clock budget. A feed that exceeds it is abandoned,
+# logged loudly, and the pipeline CONTINUES — because board_state.rebuild() at the
+# end is the output the 08:00 scan actually reads, and a fresh board missing three
+# degraded features beats no board at all. Feeds are idempotent delete-then-insert
+# upserts, so an interrupted feed is repaired by the next run rather than corrupting.
+FEED_TIMEOUT_S = 60
+
+
+class FeedTimeout(BaseException):
+    """A feed exceeded its wall-clock budget and was abandoned.
+
+    Inherits BaseException, NOT Exception, and that is load-bearing.
+
+    `sovereign/sentiment/gdelt_feed.py:58` retries inside `except Exception as exc:`.
+    A timeout raised as an Exception is caught by that handler and the retry loop
+    simply continues — which is exactly what happened on the first attempt at this
+    fix: the alarm fired, the feed swallowed it, and the job still ran past 9
+    minutes. Subclassing BaseException makes the timeout uncatchable by ordinary
+    handlers, the same reason KeyboardInterrupt and SystemExit do it.
+    """
+
+
+def _run_feed(name: str, fn, timeout_s: int = FEED_TIMEOUT_S):
+    """Run one feed under a hard timeout. Never propagates — returns {} on failure.
+
+    Returns (coverage, status) where status is "ok" | "timeout" | "error".
+    """
+    import signal
+
+    def _alarm(signum, frame):
+        raise FeedTimeout(f"{name} exceeded {timeout_s}s")
+
+    prev = signal.signal(signal.SIGALRM, _alarm)
+    signal.alarm(timeout_s)
+    t0 = time.time()
+    try:
+        cov = fn()
+        return (cov if cov is not None else {}), "ok"
+    except FeedTimeout:   # BaseException — deliberately not catchable by the feeds
+        print(f"[sentiment] ⚠️  {name}: ABANDONED after {timeout_s}s — feed is "
+              f"unbounded, continuing so the board still rebuilds", flush=True)
+        return {}, "timeout"
+    except Exception as exc:                                 # noqa: BLE001
+        print(f"[sentiment] ⚠️  {name}: FAILED after {time.time()-t0:.1f}s — "
+              f"{type(exc).__name__}: {str(exc)[:120]}", flush=True)
+        return {}, "error"
+    finally:
+        signal.alarm(0)
+        signal.signal(signal.SIGALRM, prev)
+
 
 def main() -> dict:
     ap = argparse.ArgumentParser(description="Sentiment board-state daily updater")
@@ -47,16 +111,36 @@ def main() -> dict:
     start = params["sentiment"].get("macro_start", "2015-01-01")
     con = store.connect()
     try:
-        print(f"[sentiment] updating  (backfill={args.backfill}, macro_start={start})")
-        news_cov = news_feed.update(con=con)
-        gdelt_cov = gdelt_feed.update(con=con)            # GDELT texture (5s-rate-limited; ~2017+)
-        macro_cov = macro_feed.update(con=con, start=start)
-        vix_cov = vix_feed.update(con=con, start=start)
-        surprise_cov = surprise_feed.update(con=con, start=start)  # release-innovation spine
-        cot_cov = cot_feed.update(con=con)                         # CFTC COT positioning (Friday-published)
-        vrp_cov = vrp_feed.update(con=con)                         # VRP feature (ThetaData FX-ETF options)
-        surf_cov = options_surface_feed.update(con=con, fixture=args.fixture)  # RR25/BF25/term structure
+        print(f"[sentiment] updating  (backfill={args.backfill}, macro_start={start}, "
+              f"feed_timeout={FEED_TIMEOUT_S}s)")
+        t_start = time.time()
+        feed_status: dict[str, str] = {}
+
+        news_cov, feed_status["news"] = _run_feed(
+            "news", lambda: news_feed.update(con=con))
+        gdelt_cov, feed_status["gdelt"] = _run_feed(
+            "gdelt", lambda: gdelt_feed.update(con=con))
+        macro_cov, feed_status["macro"] = _run_feed(
+            "macro", lambda: macro_feed.update(con=con, start=start))
+        vix_cov, feed_status["vix"] = _run_feed(
+            "vix", lambda: vix_feed.update(con=con, start=start))
+        surprise_cov, feed_status["surprise"] = _run_feed(
+            "surprise", lambda: surprise_feed.update(con=con, start=start))
+        cot_cov, feed_status["cot"] = _run_feed(
+            "cot", lambda: cot_feed.update(con=con))
+        vrp_cov, feed_status["vrp"] = _run_feed(
+            "vrp", lambda: vrp_feed.update(con=con))
+        surf_cov, feed_status["surface"] = _run_feed(
+            "surface", lambda: options_surface_feed.update(con=con, fixture=args.fixture))
+
+        # ALWAYS rebuild — this is the artifact the 08:00 forex scan reads, and it
+        # must not be hostage to a degraded optional feed.
         board_rows = board_state.rebuild(con=con)
+        elapsed = time.time() - t_start
+        degraded = [k for k, v in feed_status.items() if v != "ok"]
+        print(f"[sentiment] feeds complete in {elapsed:.1f}s — "
+              f"{len(feed_status) - len(degraded)}/{len(feed_status)} ok"
+              + (f", DEGRADED: {', '.join(degraded)}" if degraded else ""))
 
         # ── coverage report (required deliverable) ──
         news_probe = news_feed.earliest_article_date()

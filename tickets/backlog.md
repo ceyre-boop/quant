@@ -463,3 +463,17 @@ Schema per ticket:
 - [ ] Remaining: bias scoring wired into EOD; post-mortem log (deferred to next pass)
 **status:** in_progress (2026-07-18)
 **pre_approved:** true (plan-mode approval 2026-07-18)
+
+## TICK-042
+**title:** Sentiment pipeline: per-feed timeout, then install (11-day dark board fixed)
+**description:** The sentiment job could not be scheduled as-is: it ran unbounded. One observed run survived 1h47m still holding an EXCLUSIVE DuckDB write lock (blocking every reader of sentiment.db) and never reached board_state.rebuild() — the artifact the 08:00 forex scan reads. Measured with the lock free: news 5.8s / macro 3.0s / vix 0.6s / surprise 5.3s / cot 4.0s (~19s), vs gdelt / vrp / surface unbounded (>90s each). Added FEED_TIMEOUT_S=60 per feed; abandoned feeds are logged loudly and the pipeline CONTINUES so the board always rebuilds. FeedTimeout inherits BaseException, not Exception — the first attempt failed because gdelt_feed.py:58 retries inside `except Exception` and swallowed the alarm. Result: exit 0 in 200s, board 07-06 → 07-17, look-ahead audit 0 violations / 165,385 rows. Also fixed a Layer-1 bug: sentiment_board freshness was measured from max DATA date, which is bounded by the market calendar and would read STALE on every healthy run; now measured from rebuild time with data-stall checked separately.
+**depends_on:** [TICK-040]
+**blocks:** []
+**acceptance_criteria:**
+- [x] Job completes bounded (200s) and always rebuilds the board
+- [x] Degraded feeds abandoned + logged, not fatal
+- [x] Look-ahead sentinel still fires (0 violations, 165,385 rows)
+- [x] Board freshness measured correctly (rebuild time, not data date)
+- [x] Installed, loaded, plist_watchdog rebaselined GREEN 27/27
+**status:** done (2026-07-19)
+**pre_approved:** true (operator instruction to install)

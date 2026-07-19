@@ -1,6 +1,6 @@
 {
-  "date": "2026-07-18",
-  "generated_at": "2026-07-19T03:59:37+00:00",
+  "date": "2026-07-19",
+  "generated_at": "2026-07-19T04:00:09+00:00",
   "fields": {
     "fred_macro": {
       "name": "fred_macro",
@@ -155,19 +155,20 @@
       },
       "status": "FRESH",
       "source": "/Users/taboost/quant/data/macro/fred_economic_latest.json",
-      "age_seconds": 77328.303931,
+      "age_seconds": 77360.496075,
       "detail": "16 series"
     },
     "sentiment_board": {
       "name": "sentiment_board",
       "value": {
         "rows": 11612,
-        "latest_date": "2026-07-17"
+        "latest_date": "2026-07-17",
+        "rebuild_age_hours": 0.01
       },
-      "status": "STALE",
+      "status": "FRESH",
       "source": "/Users/taboost/quant/data/sentiment.db",
-      "age_seconds": 187177.492161,
-      "detail": "latest board row 2026-07-17"
+      "age_seconds": 45.594565,
+      "detail": "rebuilt 0.0h ago, data through 2026-07-17"
     },
     "gdelt": {
       "name": "gdelt",
@@ -182,7 +183,7 @@
       "value": null,
       "status": "SILENT_NULL",
       "source": "/Users/taboost/quant/data/cache/reddit_sentiment.json",
-      "age_seconds": 2158.531183,
+      "age_seconds": 2190.788126,
       "detail": "job succeeded but posts_scanned=0 (credentials likely absent)"
     },
     "briefing": {
@@ -231,25 +232,16 @@
       },
       "status": "STALE",
       "source": "/Users/taboost/quant/data/oracle/market_briefings/latest.json",
-      "age_seconds": 142614.593971,
+      "age_seconds": 142646.850923,
       "detail": "briefing for 2026-07-17"
     },
     "daily_panel": {
       "name": "daily_panel",
-      "value": {
-        "keys": [
-          "date",
-          "generated_at",
-          "provenance",
-          "sources",
-          "sources_null",
-          "sources_ok"
-        ]
-      },
-      "status": "FRESH",
-      "source": "/Users/taboost/quant/data/research/panel/2026-07-18.json",
-      "age_seconds": 77327.141592,
-      "detail": "6 sections"
+      "value": null,
+      "status": "UNAVAILABLE",
+      "source": "/Users/taboost/quant/data/research/panel/2026-07-19.json",
+      "age_seconds": null,
+      "detail": "no panel for 2026-07-19"
     },
     "calendar": {
       "name": "calendar",
@@ -267,18 +259,18 @@
     "by_status": {
       "FRESH": [
         "fred_macro",
-        "daily_panel"
-      ],
-      "STALE": [
-        "sentiment_board",
-        "briefing"
+        "sentiment_board"
       ],
       "UNAVAILABLE": [
         "gdelt",
+        "daily_panel",
         "calendar"
       ],
       "SILENT_NULL": [
         "reddit"
+      ],
+      "STALE": [
+        "briefing"
       ]
     }
   },
