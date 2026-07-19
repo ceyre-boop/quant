@@ -1,56 +1,56 @@
 {
-  "checked_at": "2026-07-18T00:58:09.040659+00:00",
+  "checked_at": "2026-07-19T00:22:52.305376+00:00",
   "market_hours": false,
   "frozen": null,
   "down": [],
   "loops": {
     "ict_scanner": {
       "status": "ALIVE",
-      "last": "2026-07-18T00:54:38.658441+00:00",
-      "silence_hours": 0.1,
+      "last": "2026-07-18T22:02:24.208324+00:00",
+      "silence_hours": 2.3,
       "threshold": 0.5,
       "kind": "periodic"
     },
     "forex_scan": {
       "status": "ALIVE",
       "last": "2026-07-17T12:05:10.143026+00:00",
-      "silence_hours": 12.9,
+      "silence_hours": 36.3,
       "threshold": 30,
       "kind": "periodic",
       "effective_silence_hours": 11.9
     },
     "pulse_check": {
       "status": "ALIVE",
-      "last": "2026-07-18T00:58:09+00:00",
+      "last": "2026-07-19T00:22:52+00:00",
       "silence_hours": 0.0,
       "threshold": 3,
       "kind": "periodic"
     },
     "decision_backfill": {
       "status": "ALIVE",
-      "last": "2026-07-18T00:58:09+00:00",
+      "last": "2026-07-19T00:22:52+00:00",
       "silence_hours": 0.0,
       "threshold": 3,
       "kind": "periodic"
     },
     "big_move": {
       "status": "ALIVE",
-      "last": "2026-07-18T00:58:09+00:00",
+      "last": "2026-07-19T00:22:52+00:00",
       "silence_hours": 0.0,
       "threshold": 3,
       "kind": "periodic"
     },
     "oracle_reflection": {
       "status": "ALIVE",
-      "last": "2026-07-17T06:35:11.154744+00:00",
-      "silence_hours": 18.4,
+      "last": "2026-07-18T06:30:04.494680+00:00",
+      "silence_hours": 17.9,
       "threshold": 26,
       "kind": "periodic"
     },
     "morning_briefing": {
       "status": "ALIVE",
       "last": "2026-07-17T12:22:42.903597+00:00",
-      "silence_hours": 12.6,
+      "silence_hours": 36.0,
       "threshold": 26,
       "kind": "periodic",
       "effective_silence_hours": 11.6

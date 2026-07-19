@@ -1,0 +1,26 @@
+{
+  "date": "2026-07-18",
+  "generated_at": "2026-07-18T06:31:06.785147+00:00",
+  "input_tokens": 5744,
+  "output_tokens": 953,
+  "estimated_cost_usd": 0.157635,
+  "harvest_days_read": 7,
+  "reflection": {
+    "candidate_lesson": {
+      "lesson_text": "When the 30-indicator consensus shows conviction but green_matches=0 (no historical analog), treat the signal as UNRELIABLE regardless of live bull/bear tally \u2014 historical hit-rate of 0% is a hard veto, not a soft discount.",
+      "mechanism": "The consensus conviction score measures agreement among live indicators, but green_matches counts how many times this exact indicator configuration produced a win historically. A config with 0 historical matches (USDJPY 8/30 bull, conv=67%, green_matches=0, hist_hr=0%; AUDNZD conv=100%, green_matches=0, hist_hr=0%) is an out-of-sample regime the system has never profited from. Institutional flow that drove past instances of this indicator pattern is absent or inverted \u2014 high live conviction on a novel config is confirmation bias, not edge.",
+      "testable_rule": "if consensus.green_matches == 0 and consensus.conviction >= 0.60: veto_signal()  # only trade when green_matches >= 1 AND hist_hr > 0.50",
+      "expected_impact": "Removes zero-analog trades (USDJPY, AUDNZD, EURUSD today) that carry no proven edge; expected win-rate lift by pruning ~40% of false-conviction entries, contributing +0.02-0.03 Sharpe by cutting variance drag from untested configs.",
+      "evidence_from_harvest": "Live consensus shows two high-conviction signals (USDJPY conv=67%, AUDNZD conv=100%) with green_matches=0 and hist_hr=0%, versus GBPUSD (green_matches=1, hist_hr=66%) and AUDUSD (green_matches=3, hist_hr=68%) which have proven historical support. Conviction alone does not correlate with historical profitability.",
+      "evidence_from_reasoning": null,
+      "reasoning_component_targeted": "consensus.green_matches",
+      "sample_needed": 30
+    },
+    "retirement_flag": {
+      "lesson_to_review": "L8",
+      "reason": "L8 tightened USDJPY/AUDNZD VIX gate to 13 in a bull market; current regime is UNKNOWN with VIX rising 15.67\u219216.73 and ROTATION_WARN \u2014 the bull-market premise underpinning the gate may no longer hold, so the 13 threshold needs re-validation under a rotation/risk-off regime."
+    },
+    "system_health_note": "Zero trades in last 7 days with regime=UNKNOWN and external TradingView showing 0 signals \u2014 the system is in a low-confidence CALIBRATING state where consensus conviction is high but historically unvalidated, so gating on green_matches now protects the Sharpe target from untested-regime drawdown."
+  },
+  "auto_validation": null
+}

@@ -1,14 +1,14 @@
 {
-  "last_updated": "2026-07-17T07:45:47.533723+00:00",
+  "last_updated": "2026-07-18T06:31:06.820819+00:00",
   "harvest": {
     "trades_closed": 0,
     "win_rate": null,
     "failure_taxonomy": {}
   },
   "reflection": {
-    "candidate_lesson": "When internal MOMENTUM regime lacks external TradingView confirmation (0 TV signals), only take the highest-conviction consensus pairs (conv >= 83% AND green_matches >= 2 AND hist_hr > 60%) and skip everything else \u2014 the 75% sizing multiplier already signals the system distrusts itself.",
-    "mechanism": "Institutional flow that produces durable momentum leaves footprints across venues; when only one venue (internal) sees it, the move is likely retail-driven noise or a stale internal signal. Requiring cross-confirmation via both consensus conviction AND historical hit-rate memory filters out single-venue false positives \u2014 the exact regime where uncommitted price action decays fastest.",
-    "testable_rule": "if tv_confirmation == 'UNKNOWN' and tv_signal_count == 0: require (consensus_conv >= 0.83 and green_matches >= 2 and hist_hr > 0.60) else veto"
+    "candidate_lesson": "When the 30-indicator consensus shows conviction but green_matches=0 (no historical analog), treat the signal as UNRELIABLE regardless of live bull/bear tally \u2014 historical hit-rate of 0% is a hard veto, not a soft discount.",
+    "mechanism": "The consensus conviction score measures agreement among live indicators, but green_matches counts how many times this exact indicator configuration produced a win historically. A config with 0 historical matches (USDJPY 8/30 bull, conv=67%, green_matches=0, hist_hr=0%; AUDNZD conv=100%, green_matches=0, hist_hr=0%) is an out-of-sample regime the system has never profited from. Institutional flow that drove past instances of this indicator pattern is absent or inverted \u2014 high live conviction on a novel config is confirmation bias, not edge.",
+    "testable_rule": "if consensus.green_matches == 0 and consensus.conviction >= 0.60: veto_signal()  # only trade when green_matches >= 1 AND hist_hr > 0.50"
   },
   "validation": {
     "verdict": "REJECTED",
@@ -21,8 +21,8 @@
     "codify_error": null
   },
   "cycle": {
-    "cost_usd": 0.15837,
+    "cost_usd": 0.157635,
     "status": "COMPLETE",
-    "date": "2026-07-17"
+    "date": "2026-07-18"
   }
 }

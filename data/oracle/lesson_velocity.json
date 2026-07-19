@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-17T07:45:47.532975+00:00",
-  "as_of_date": "2026-07-17",
+  "generated_at": "2026-07-18T06:31:06.820337+00:00",
+  "as_of_date": "2026-07-18",
   "current_lesson": {
     "components": [
       "active",
@@ -43,17 +43,17 @@
       "zone",
       "zscore"
     ],
-    "component_label": "external_regime_confirmation / tv_signal_count + consensus green_matches",
+    "component_label": "consensus.green_matches",
     "first_seen": "2026-05-29",
-    "last_seen": "2026-07-17",
-    "days_forming": 49,
-    "n_revisions": 41,
-    "n_days_appeared": 41,
+    "last_seen": "2026-07-18",
+    "days_forming": 50,
+    "n_revisions": 42,
+    "n_days_appeared": 42,
     "stable_days": 1,
     "status": "forming",
     "time_to_converge_days": null,
-    "latest_lesson_text": "When internal MOMENTUM regime lacks external TradingView confirmation (0 TV signals), only take the highest-conviction consensus pairs (conv >= 83% AND green_matches >= 2 AND hist_hr > 60%) and skip everything else \u2014 the 75% sizing multiplier already signals the system distrusts itself.",
-    "latest_rule": "if tv_confirmation == 'UNKNOWN' and tv_signal_count == 0: require (consensus_conv >= 0.83 and green_matches >= 2 and hist_hr > 0.60) else veto",
+    "latest_lesson_text": "When the 30-indicator consensus shows conviction but green_matches=0 (no historical analog), treat the signal as UNRELIABLE regardless of live bull/bear tally \u2014 historical hit-rate of 0% is a hard veto, not a soft discount.",
+    "latest_rule": "if consensus.green_matches == 0 and consensus.conviction >= 0.60: veto_signal()  # only trade when green_matches >= 1 AND hist_hr > 0.50",
     "history": [
       {
         "date": "2026-05-29",
@@ -218,6 +218,10 @@
       {
         "date": "2026-07-17",
         "rule": "if tv_confirmation == 'UNKNOWN' and tv_signal_count == 0: require (consensus_conv >= 0.83 and green_matches >= 2 and hist_hr > 0.60) else veto"
+      },
+      {
+        "date": "2026-07-18",
+        "rule": "if consensus.green_matches == 0 and consensus.conviction >= 0.60: veto_signal()  # only trade when green_matches >= 1 AND hist_hr > 0.50"
       }
     ]
   },
@@ -264,17 +268,17 @@
         "zone",
         "zscore"
       ],
-      "component_label": "external_regime_confirmation / tv_signal_count + consensus green_matches",
+      "component_label": "consensus.green_matches",
       "first_seen": "2026-05-29",
-      "last_seen": "2026-07-17",
-      "days_forming": 49,
-      "n_revisions": 41,
-      "n_days_appeared": 41,
+      "last_seen": "2026-07-18",
+      "days_forming": 50,
+      "n_revisions": 42,
+      "n_days_appeared": 42,
       "stable_days": 1,
       "status": "forming",
       "time_to_converge_days": null,
-      "latest_lesson_text": "When internal MOMENTUM regime lacks external TradingView confirmation (0 TV signals), only take the highest-conviction consensus pairs (conv >= 83% AND green_matches >= 2 AND hist_hr > 60%) and skip everything else \u2014 the 75% sizing multiplier already signals the system distrusts itself.",
-      "latest_rule": "if tv_confirmation == 'UNKNOWN' and tv_signal_count == 0: require (consensus_conv >= 0.83 and green_matches >= 2 and hist_hr > 0.60) else veto",
+      "latest_lesson_text": "When the 30-indicator consensus shows conviction but green_matches=0 (no historical analog), treat the signal as UNRELIABLE regardless of live bull/bear tally \u2014 historical hit-rate of 0% is a hard veto, not a soft discount.",
+      "latest_rule": "if consensus.green_matches == 0 and consensus.conviction >= 0.60: veto_signal()  # only trade when green_matches >= 1 AND hist_hr > 0.50",
       "history": [
         {
           "date": "2026-05-29",
@@ -439,6 +443,10 @@
         {
           "date": "2026-07-17",
           "rule": "if tv_confirmation == 'UNKNOWN' and tv_signal_count == 0: require (consensus_conv >= 0.83 and green_matches >= 2 and hist_hr > 0.60) else veto"
+        },
+        {
+          "date": "2026-07-18",
+          "rule": "if consensus.green_matches == 0 and consensus.conviction >= 0.60: veto_signal()  # only trade when green_matches >= 1 AND hist_hr > 0.50"
         }
       ]
     }
