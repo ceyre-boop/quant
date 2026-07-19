@@ -1,14 +1,14 @@
 {
-  "headline": "Movers watchlist confirmed 13x vs random; HYP-105/106 long-gapper edges real but magnitude underestimated\u2014shadow test needed before sizing.",
+  "headline": "Spread model was 10x too pessimistic; HYP-105/106 retracted for lookahead leakage; HYP-107 real but execution unresolved at ~5% gross.",
   "what_happened": [
-    "TICK-036 mining: unfitted 20-name watchlist catches \u22651 of day's top-3 movers on 26.8% of days vs 2.0% random; median top-3 return +90%; serial runners (BNAI 8x) fill ~6% of slots.",
-    "HYP-105 confirmed on 71-event holdout (2026-04-08..06-30): Sharpe 3.63, mean +28.5%/event, median +7.9%, win 56.3%, but lookahead leakage flagged\u2014intraday_push/overnight_gap measured through holding window, not usable.",
-    "HYP-106 leak-free filter (overnight_gap\u22641.24 AND log10(first-min vol)\u22645.43) improves HYP-105 skew on n=22: median +7.9%\u2192+67.7%, win 56%\u219286%, but magnitude assumes unrealistic 09:31 fills on microcaps; real spreads 5-20% + LULD halts unresolved.",
-    "HYP-107 honest reconstruction: filter (overnight_gap\u22640.577 AND log10 first-min vol\u22645.854) on n=57 holdout yields gross median +5.4%, mean +15.3%, win 70%\u2014real signal, ~10x smaller than look-ahead-inflated HYP-106; execution cost unresolved.",
-    "Shadow 2026-07-13/14: 3 total signals, constitutional day returns +0.0456% and +0.0042%; 2026-07-15..17: zero signals."
+    "Execution harness measured real bid/ask on 59 gapper events: median 0.61% spread vs. model's 8% cap. Backtester charge was -3.49% vs. reality +1.02% \u2014 a +4.51pp pessimistic bias, not edge.",
+    "HYP-105 (long ramp 9:31\u201310:30 fade) and HYP-106 (filtered skew) both confirmed OOS then REFUTED: Phase-3 ML leaked intraday push data through the holding window. Signals are real but features aren't forward-tradeable.",
+    "HYP-107 reconstructed honestly: 57-event untouched holdout shows gross median +5.4% / 70% win on moderate-gap quiet-opens, but 09:31 microcap spreads (1\u201315%) + LULD halts likely consume most. Live shadow required to resolve.",
+    "Shadow gapper live returned 2 signals on 2026-07-13 (+0.0456%), 1 on 2026-07-14 (+0.0042%), zero the last 3 days. Constitutional day returns negligible; not live edge yet.",
+    "Dashboard rebuilt (light theme, skills.html, oracle brief panel live); oracle daily digest JSON 200 / plist loaded."
   ],
-  "what_it_means": "The movers watchlist is a concrete non-random scanner; use it. The long-gapper edges (HYP-105/107) are directionally real and out-of-sample confirmed, but the reported magnitudes are inflated by lookahead leakage and overstated fill assumptions. Gross edge at 09:31 entry on moderate-gap quiet-open runners is ~+5% before slippage\u2014execution costs (1\u201315% spreads, LULD halts, size limits) will dominate. You need live shadow at 09:31 with realistic halt/spread modeling to know if this is tradeable or academic.",
-  "todays_one_thing": "Run a forward shadow on HYP-107 filter at 09:31 entry with realistic LULD halt detection and per-tick spread capture; size capacity study on first-minute volume constraint to establish true expected net return and position limits before live sizing.",
+  "what_it_means": "The backtest bias was systematic pessimism, not discovery of real edge\u2014all historical gapper results improve by 4\u20135pp once realistic spreads are used. HYP-105/106 were inflated by lookahead; HYP-107's real signal (moderate-gap runners) is raw +5% gross but eaten by execution friction and halts in real microcap conditions. You need live 09:31 shadow data with true fills before sizing anything; shadow returns so far are noise.",
+  "todays_one_thing": "Deploy live 09:31 shadow with execution harness (bid/ask + halt detector + realistic fill model) on HYP-107's leak-free filter (overnight_gap \u22640.577 AND log10 first-min vol \u22645.854) to measure whether the +5.4% holdout signal survives real spreads and halts. This is the gate to the funded-sim day (G1 1/30).",
   "progression": [
     {
       "gate": "G1",
@@ -48,5 +48,5 @@
   ],
   "source": "oracle-llm",
   "model": "claude-haiku-4-5-20251001",
-  "generated_at": "2026-07-18T10:27:33.803178+00:00"
+  "generated_at": "2026-07-19T10:15:17.777305+00:00"
 }
