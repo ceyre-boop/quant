@@ -132,6 +132,46 @@ def derive_bias(ctx: dict) -> Bias:
     )
 
 
+#: Broad-market proxy the bias is scored against. The bias is a market-direction
+#: call, so it must be scored against the market — not against whether the day's
+#: gapper trades happened to win, which would conflate direction with execution.
+REALISED_PROXY = "SPY"
+
+#: Daily move smaller than this counts as NEUTRAL rather than a direction.
+#: DEFINITIONAL, NOT FITTED. 0.25% is roughly a quiet SPY session; it was chosen
+#: before any scoring was run and must not be tuned afterwards to improve the hit
+#: rate. Changing it invalidates every prior score, so it is asserted in a test.
+NEUTRAL_BAND = 0.0025
+
+
+def realised_direction(day: date, *, proxy: str = REALISED_PROXY) -> tuple[str, dict]:
+    """What the market actually did on `day`, as BULLISH / BEARISH / NEUTRAL.
+
+    Returns (direction, detail). Direction is "UNKNOWN" when the proxy bar is
+    unavailable — an unscoreable day must never be silently recorded as NEUTRAL,
+    because NEUTRAL is a real answer and UNKNOWN is the absence of one.
+    """
+    from execution import alpaca
+    try:
+        alpaca.load_env()
+        prev_close = alpaca.daily_prev_close(proxy, day)
+        bars = alpaca.minute_bars(proxy, day)
+        if not bars or not prev_close:
+            return "UNKNOWN", {"reason": "no proxy bars", "proxy": proxy}
+        close = float(bars[-1]["c"])
+        ret = close / float(prev_close) - 1.0
+    except Exception as e:                                   # noqa: BLE001
+        return "UNKNOWN", {"reason": f"{type(e).__name__}: {e}", "proxy": proxy}
+
+    if abs(ret) < NEUTRAL_BAND:
+        direction = "NEUTRAL"
+    else:
+        direction = "BULLISH" if ret > 0 else "BEARISH"
+    return direction, {"proxy": proxy, "return": round(ret, 6),
+                       "neutral_band": NEUTRAL_BAND, "close": close,
+                       "prev_close": float(prev_close)}
+
+
 def bias_path(day: date | str, out_dir: Path | None = None) -> Path:
     return (out_dir or OUT_DIR) / f"bias_{day}.json"
 

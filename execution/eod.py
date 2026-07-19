@@ -133,6 +133,7 @@ def reconcile(day: date | str, *, fill_dir: Path | None = None,
         "bias": ({"direction": b.direction, "confidence": b.confidence,
                   "context_fraction_fresh": b.context_fraction_fresh,
                   "realised": b.realised} if b else None),
+        "bias_track_record": bias_mod.track_record(bias_dir),
         "context_health": (ctx or {}).get("health"),
     }
 
@@ -201,6 +202,19 @@ def render(rec: dict) -> str:
     else:
         L.append("No bias recorded.")
 
+    tr = rec.get("bias_track_record") or {}
+    if tr.get("n_total"):
+        L.append("")
+        L.append(f"**Track record:** {tr['n_scored']} scored of {tr['n_total']} "
+                 f"recorded ({tr.get('n_directional', 0)} directional)")
+        if tr.get("hit_rate") is not None:
+            L.append(f"- Hit rate **{tr['hit_rate']:.1%}** on n={tr['n_scored']}")
+        else:
+            L.append("- Hit rate: not yet computable (no scored directional calls)")
+        if tr["n_scored"] < 30:
+            L.append(f"> n={tr['n_scored']} is far below the ~30 needed for this "
+                     f"number to mean anything. It is a counter, not a result.")
+
     L += ["", "## Information health", ""]
     h = rec["context_health"]
     if h:
@@ -234,8 +248,23 @@ def main(argv=None) -> int:
 
     day = date.fromisoformat(args.day) if args.day else datetime.now(UTC).date()
 
+    # Score the day's bias against what the market actually did. This is the loop
+    # that makes the bias a record rather than an opinion; without it, score_bias()
+    # and track_record() existed with nothing ever calling them.
     if args.score_bias:
-        bias_mod.score_bias(day, args.score_bias.upper())
+        direction, detail = args.score_bias.upper(), {"source": "manual override"}
+    else:
+        direction, detail = bias_mod.realised_direction(day)
+
+    if direction == "UNKNOWN":
+        print(f"[eod] bias not scored for {day}: {detail.get('reason')}")
+    else:
+        scored = bias_mod.score_bias(day, direction, realised_detail=detail)
+        if scored is None:
+            print(f"[eod] no bias recorded for {day} to score")
+        else:
+            print(f"[eod] bias {scored.direction} vs realised {direction} "
+                  f"-> correct={scored.realised.get('correct')}")
 
     rec = reconcile(day,
                     fill_dir=Path(args.fills) if args.fills else None,
