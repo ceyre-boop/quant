@@ -1,0 +1,286 @@
+{
+  "date": "2026-07-18",
+  "generated_at": "2026-07-19T01:18:02+00:00",
+  "fields": {
+    "fred_macro": {
+      "name": "fred_macro",
+      "value": {
+        "metrics": {
+          "A191RL1Q225SBEA": {
+            "date": "2026-01-01",
+            "value": 2.1,
+            "y1": 4.4,
+            "y2": 3.3,
+            "y5": 3.3,
+            "y10": 2.9
+          },
+          "CPIAUCSL": {
+            "date": "2026-06-01",
+            "value": 332.568,
+            "y1": 322.169,
+            "y2": 313.569,
+            "y5": 271.903,
+            "y10": 240.101,
+            "yoy_pct": 3.23
+          },
+          "CPILFESL": {
+            "date": "2026-06-01",
+            "value": 336.065,
+            "y1": 328.682,
+            "y2": 318.94,
+            "y5": 278.648,
+            "y10": 247.829,
+            "yoy_pct": 2.25
+          },
+          "PCEPILFE": {
+            "date": "2026-05-01",
+            "value": 130.082,
+            "y1": 126.43,
+            "y2": 122.911,
+            "y5": 109.058,
+            "y10": 98.529,
+            "yoy_pct": 2.89
+          },
+          "UNRATE": {
+            "date": "2026-06-01",
+            "value": 4.2,
+            "y1": 4.3,
+            "y2": 4.2,
+            "y5": 5.4,
+            "y10": 4.8
+          },
+          "PAYEMS": {
+            "date": "2026-06-01",
+            "value": 158984.0,
+            "y1": 158542.0,
+            "y2": 157748.0,
+            "y5": 146762.0,
+            "y10": 144520.0
+          },
+          "ICSA": {
+            "date": "2026-07-11",
+            "value": 208000.0,
+            "y1": 221000.0,
+            "y2": 241000.0,
+            "y5": 387000.0,
+            "y10": 260000.0
+          },
+          "FEDFUNDS": {
+            "date": "2026-06-01",
+            "value": 3.63,
+            "y1": 4.33,
+            "y2": 5.33,
+            "y5": 0.1,
+            "y10": 0.39
+          },
+          "DGS10": {
+            "date": "2026-07-16",
+            "value": 4.57,
+            "y1": 4.44,
+            "y2": 4.2,
+            "y5": 1.31,
+            "y10": 1.59
+          },
+          "DGS2": {
+            "date": "2026-07-16",
+            "value": 4.16,
+            "y1": 3.88,
+            "y2": 4.46,
+            "y5": 0.25,
+            "y10": 0.68
+          },
+          "T10Y2Y": {
+            "date": "2026-07-17",
+            "value": 0.37,
+            "y1": 0.56,
+            "y2": -0.26,
+            "y5": 1.06,
+            "y10": 0.91
+          },
+          "MORTGAGE30US": {
+            "date": "2026-07-16",
+            "value": 6.55,
+            "y1": 6.75,
+            "y2": 6.77,
+            "y5": 2.88,
+            "y10": 3.42
+          },
+          "RSAFS": {
+            "date": "2026-06-01",
+            "value": 768553.0,
+            "y1": 727727.0,
+            "y2": 698835.0,
+            "y5": 601817.0,
+            "y10": 449789.0
+          },
+          "UMCSENT": {
+            "date": "2026-05-01",
+            "value": 44.8,
+            "y1": 61.7,
+            "y2": 66.4,
+            "y5": 81.2,
+            "y10": 90.0
+          },
+          "DTWEXBGS": {
+            "date": "2026-07-10",
+            "value": 120.5046,
+            "y1": 120.356,
+            "y2": 122.7909,
+            "y5": 113.0428,
+            "y10": 112.2463
+          },
+          "VIXCLS": {
+            "date": "2026-07-16",
+            "value": 16.73,
+            "y1": 16.41,
+            "y2": 15.93,
+            "y5": 18.45,
+            "y10": 12.44
+          }
+        },
+        "summary": {
+          "gdp_growth_pct": 2.1,
+          "cpi_yoy_pct": 3.23,
+          "core_cpi_yoy_pct": 2.25,
+          "core_pce_yoy_pct": 2.89,
+          "unemployment_pct": 4.2,
+          "fed_funds_pct": 3.63,
+          "ten_year_pct": 4.57,
+          "yield_curve_10y2y": 0.37,
+          "yield_curve_state": "NORMAL",
+          "consumer_sentiment": 44.8,
+          "vix": 16.73
+        },
+        "date": "2026-07-18"
+      },
+      "status": "FRESH",
+      "source": "/Users/taboost/quant/data/macro/fred_economic_latest.json",
+      "age_seconds": 67632.920856,
+      "detail": "16 series"
+    },
+    "sentiment_board": {
+      "name": "sentiment_board",
+      "value": {
+        "rows": 11576,
+        "latest_date": "2026-07-06"
+      },
+      "status": "STALE",
+      "source": "/Users/taboost/quant/data/sentiment.db",
+      "age_seconds": 1127882.184594,
+      "detail": "latest board row 2026-07-06"
+    },
+    "gdelt": {
+      "name": "gdelt",
+      "value": null,
+      "status": "UNAVAILABLE",
+      "source": "/Users/taboost/quant/data/sentiment.db",
+      "age_seconds": null,
+      "detail": "0 rows \u2014 never ingested (burst-throttled free tier)"
+    },
+    "reddit": {
+      "name": "reddit",
+      "value": null,
+      "status": "SILENT_NULL",
+      "source": "/Users/taboost/quant/data/cache/reddit_sentiment.json",
+      "age_seconds": 3295.120918,
+      "detail": "job succeeded but posts_scanned=0 (credentials likely absent)"
+    },
+    "briefing": {
+      "name": "briefing",
+      "value": {
+        "date": "2026-07-17",
+        "regime_read": "NQ weak vs ES \u2014 rotation OUT of tech. A breadth/rotation warning; tech-led longs are suspect.",
+        "narrative": "Macro backdrop \u2014\n[2026-07-17] US economic state (FRED):\n  Growth: real GDP 2.1% (q/q ann)\n  Inflation: CPI 3.23% YoY | core CPI 2.25% | core PCE n/a (Fed target 2%)\n  Labor: unemployment 4.2%\n  Rates: fed funds 3.63% | 10Y 4.55% | 10Y-2Y 0.41% (NORMAL)\n  Consumer: UMich sentiment 44.8 | VIX 15.67\n\n---\nPRE-US-OPEN BRIEFING \u2014 ES/NQ (research only; no execution path, CME futures vs OANDA forex). Scorecard caveat up front: n=13 dir-calls, hit rate 0.769 but regime accuracy only 0.258 \u2014 this system is still CALIBRATING. Treat everything below as intelligence, not a validated edge.\n\n1) RECENT MOVE-BY-MOVE READ. Both indices are red and NQ is leading the weakness. ES is -0.9% on the day / -1.45% on the week; NQ is -1.88% on the day / -4.51% on the week. That asymmetry is the whole story this morning: tech is bleeding roughly 2x the broad index. The likely catalyst is right there in the tape \u2014 headlines flag 'US stock futures mixed as chip weakness weighs' and a Microsoft/OpenAI/Google AI-arms-race story, i.e. semis and mega-cap AI names taking the hit. Layered underneath is a geopolitical risk premium: Iran/Houthis threatening the Red Sea (Bab al-Mandeb), a drone hitting a tanker at Basra, and produce-price/inflation chatter. None of that is directly bullish for high-multiple tech, and it keeps a bid under an energy/inflation narrative that hurts NQ more than ES. ES sitting almost exactly on its session VWAP (last 7509.75 vs VWAP 7510.43) says the broad tape is balanced/indecisive; NQ trading below its VWAP (28677 vs 28732) confirms tech is the underperformer intraday.\n\n2) VOLUME-PROFILE READ (WHERE volume traded \u2014 this is volume-at-price, NOT order-flow delta; true buy/sell aggression needs a CME feed). ES: 5-day POC 7589.55, value area 7569.4\u20137616.41, high-volume nodes clustered 7586\u20137607. Price at 7509.75 is trading BELOW the entire value area and below the low end of the accepted range \u2014 ES has fallen out of the week's balance zone and is probing the lower edge of the 5-day range (7493.83). The line in the sand for ES bulls is reclaiming ~7569 (VAL); until then, prior acceptance sits overhead as resistance. NQ: POC 29623.8, value area 29403\u201329844.6, nodes 29477\u201329734. NQ at 28677 is FAR below its value area \u2014 it has completely vacated the week's fair-value zone and is near the bottom of its 5-day range (28575). That's a distribution/breakdown look, not accumulation. Overhead supply is thick from 29400 up. Bottom line: both are below value, NQ dramatically so \u2014 sellers are in control of the recent structure.\n\n3) NQ/ES LEAD-LAG REGIME. Classified ROTATION_WARN. Contemporaneous correlation is high (0.926), so these still move together, but the return spread is negative across every window (1d -0.98%, 5d -0.62%, 20d -0.22%, cumulative -4.4%) \u2014 NQ is persistently WEAKER than ES. The lead-lag cross-correlation shows no clean leader (best lag corr only -0.102, leader=NONE), so there's no reliable timing edge from one leading the other. The read: this is rotation OUT of tech / a breadth-vs-concentration warning. Implication \u2014 tech-led LONGS are suspect and should be sized down. It does NOT confirm a clean directional short edge either, because the lead-lag matrix is noisy. So: trust reduced, size reduced, and I lean with the weaker horse (NQ) rather than fighting it.\n\n4) EVENT-CALENDAR AWARENESS. FOMC in 12 days (2026-07-29, maintained seed \u2014 verify). PCE in ~14 days (7/31, cadence estimate). ISM Manufacturing ~17 days (8/3). NFP ~21 days (8/7). Nothing is imminent enough to freeze positioning this morning, but we are inside the pre-FOMC drift window \u2014 start biasing toward smaller size / wider stops as we approach the 29th. The PCE/ISM/NFP dates are cadence ESTIMATES, not confirmed prints, so don't hard-anchor to them. Net: no calendar reason to be aggressive today, and one growing reason (FOMC approaching) to keep risk modest.\n\n5) SYNTHESIS \u2014 META-REGIME + NARROWED BIAS. Meta-regime: risk-off, tech-underperformance rotation with a geopolitical/inflation risk premium and no clean lead-lag timing signal. The pieces that ARE aligned: NQ well below value, weakest across all spread windows, chip-weakness catalyst in the news, and price under VWAP. The pieces that keep confidence CAPPED: lead-lag has no true leader (noisy), ES is balanced on VWAP (not confirming a broad-market cascade), the driving news is thematic rather than a hard scheduled catalyst, and our own regime-accuracy scorecard is poor (0.258). So this is a mixed-but-tilted-down picture, not a high-conviction setup.\n\nBIAS: SHORT/fade-the-bounce on NQ relative weakness, ~42% conviction. Prefer selling rallies back toward the vacated value area / VWAP zone (28732 and up toward the 29400 supply shelf) rather than chasing the low. INVALIDATION: a reclaim and hold back above the prior-week/prior-day pivot low of 29078.5 (NQ) neutralizes the breakdown thesis \u2014 above that, the short edge is gone and this reverts to NEUTRAL. Deeper invalidation of any bearish idea would be NQ pushing back into its value area above ~29403. Given the noisy lead-lag and calibrating scorecard, keep size small and treat this as a lean, not a mandate.",
+        "directional_bias": "SHORT",
+        "confidence": 42,
+        "news_count": 13,
+        "event_calendar": [
+          {
+            "event": "FOMC meeting",
+            "date": "2026-07-29",
+            "source": "seed",
+            "action": "reduce size / widen stops into the window",
+            "days_until": 12,
+            "note": "in 12d \u2014 reduce size / widen stops into the window"
+          },
+          {
+            "event": "PCE (Fed's preferred inflation)",
+            "date": "2026-07-31",
+            "source": "cadence_estimate",
+            "action": "8:30 ET \u2014 reduce size into window",
+            "days_until": 14,
+            "note": "in 14d \u2014 8:30 ET \u2014 reduce size into window"
+          },
+          {
+            "event": "ISM Manufacturing PMI",
+            "date": "2026-08-03",
+            "source": "cadence_estimate",
+            "action": "reduce size into the 10:00 ET print",
+            "days_until": 17,
+            "note": "in 17d \u2014 reduce size into the 10:00 ET print"
+          },
+          {
+            "event": "Nonfarm Payrolls",
+            "date": "2026-08-07",
+            "source": "cadence_estimate",
+            "action": "high-impact 8:30 ET \u2014 widen stops / size down",
+            "days_until": 21,
+            "note": "in 21d \u2014 high-impact 8:30 ET \u2014 widen stops / size down"
+          }
+        ]
+      },
+      "status": "STALE",
+      "source": "/Users/taboost/quant/data/oracle/market_briefings/latest.json",
+      "age_seconds": 132919.286457,
+      "detail": "briefing for 2026-07-17"
+    },
+    "daily_panel": {
+      "name": "daily_panel",
+      "value": {
+        "keys": [
+          "date",
+          "generated_at",
+          "provenance",
+          "sources",
+          "sources_null",
+          "sources_ok"
+        ]
+      },
+      "status": "FRESH",
+      "source": "/Users/taboost/quant/data/research/panel/2026-07-18.json",
+      "age_seconds": 67631.833869,
+      "detail": "6 sections"
+    },
+    "calendar": {
+      "name": "calendar",
+      "value": null,
+      "status": "UNAVAILABLE",
+      "source": "/Users/taboost/quant/data/cache/forex_factory_calendar.json",
+      "age_seconds": null,
+      "detail": "ForexFactory 403 Forbidden \u2014 no cached calendar"
+    }
+  },
+  "health": {
+    "n_sources": 7,
+    "n_fresh": 2,
+    "fraction_fresh": 0.286,
+    "by_status": {
+      "FRESH": [
+        "fred_macro",
+        "daily_panel"
+      ],
+      "STALE": [
+        "sentiment_board",
+        "briefing"
+      ],
+      "UNAVAILABLE": [
+        "gdelt",
+        "calendar"
+      ],
+      "SILENT_NULL": [
+        "reddit"
+      ]
+    }
+  },
+  "note": "Every field carries an explicit status. SILENT_NULL means the source succeeded but returned nothing \u2014 treat it as absent data, never as a zero reading."
+}
