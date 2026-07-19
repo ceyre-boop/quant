@@ -85,9 +85,16 @@ Latest `execution/context.py` run: **2 of 7 sources FRESH (29%)**.
 
 ## 4. Known-broken, not fixed by this work
 
-- **Outcome loop 0/23.** `pulse.err`: "23 closed OANDA trades, 0 matched to
-  decisions." NON-NEGOTIABLE #2 violated in production; the Oracle learns from
-  an empty channel.
+- ~~**Outcome loop 0/23.** NON-NEGOTIABLE #2 violated in production.~~
+  **CORRECTED 2026-07-18 — this claim was wrong and I propagated it.** The alarm
+  was a false positive by construction: `pulse_check.py` counted every closed
+  OANDA trade as "attempted" on every 2-hourly pulse, including ones matched weeks
+  earlier, while `update_outcome` correctly refused to re-close them. The count
+  grew 9 → 23 over weeks *while the loop was healthy*. Fixed in `51b6f9a`
+  (already-matched sidecar; alarm now fires only on genuine same-run failures).
+  Two real defects were hiding behind it: day-boundary match failures (~3 of 23,
+  fixed) and `backfill_decision_records.py` unscheduled since 2026-07-01 (plist
+  authored, pending install).
 - **OANDA 401** at session close — end-of-day position truth missing.
 - **Scheduled agent sandbox** — 8 consecutive blocked runs; cannot self-heal.
 - **Daily-loss contradiction** — `gates.py` 5% vs `prop_risk_manager.py:49` 2%,

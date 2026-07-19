@@ -131,7 +131,10 @@ python3 scripts/run_replay_validation.py
 
 - Imperative mood, present tense: "Add commitment gate to ICT pipeline"
 - Prefix with system: `[ICT]`, `[FOREX]`, `[ORACLE]`, `[RISK]`, `[INFRA]`
-- Reference hypothesis when applicable: "[FOREX] Wire HYP-044 VIX gate for USDJPY/AUDNZD"
+- Reference hypothesis when applicable: "[FOREX] Wire HYP-045 pair exclusion for AUDNZD"
+  (this line is a FORMATTING example only — it is not a work item. It previously used
+  HYP-044's VIX gate, which was rolled back as REJECTED_OOS (p=0.50); the example was
+  repeatedly mistaken for an instruction and the gate was re-proposed three times.)
 
 ---
 

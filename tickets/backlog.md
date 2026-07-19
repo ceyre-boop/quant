@@ -445,3 +445,21 @@ Schema per ticket:
 - [ ] Operator: rule on proposed Articles 7-9
 **status:** done (2026-07-18) — operator promotion pending
 **pre_approved:** true (plan-mode approval 2026-07-18 — Plans/concurrent-petting-blossom.md)
+
+## TICK-041
+**title:** Learning-loop prerequisites — fix the label channel, refuse the learners
+**description:** Six self-improvement upgrades proposed; three built in non-adaptive form, three refused with evidence. KEY CORRECTION: the "outcome loop 0/23" claim (which I made and propagated into SYSTEM_STATUS.md) was WRONG — pulse_check counted already-matched trades as attempts on every 2h pulse, so the alarm fired permanently while the loop was healthy (count grew 9→23). Fixed with an already-matched sidecar. Two real defects were hiding behind it: day-boundary match failures (~3/23, fixed with an asymmetric ±36h window + adjacent-month lookup) and backfill_decision_records.py unscheduled since 2026-07-01 (plist authored). Also built: drift tripwire (alert-only, reports both n=84 threshold-crossing and n≈177 80%-power sample sizes). REFUSED: source auto-weighting, Bayesian threshold updates, VIX gate (3rd recurrence — root cause CLAUDE.md:134 formatting example, now fixed), XGBoost on 50 EOD rows, real-time paper orders (SIP bars 15-min delayed → 09:31 signal unreadable until 09:47). GOVERNING FACT: <34 feature-complete live labels exist; 3,460 ICT records are backtest replay.
+**depends_on:** [TICK-040]
+**blocks:** []
+**acceptance_criteria:**
+- [x] Outcome alarm no longer false-positives; emits matched/attempted/already_known/unmatchable
+- [x] Day-boundary matching fixed, asymmetric (no look-ahead), adjacent-month aware
+- [x] backfill_decision_records.py scheduled (plist tracked-not-loaded)
+- [x] Drift tripwire alert-only, power honestly reported
+- [x] Refusals documented with evidence in docs/learning_loop_prerequisites.md
+- [x] CLAUDE.md:134 VIX example fixed at root cause
+- [x] SYSTEM_STATUS.md 0/23 claim corrected
+- [ ] Operator: install decision_backfill, system_morning, system_eod plists
+- [ ] Remaining: bias scoring wired into EOD; post-mortem log (deferred to next pass)
+**status:** in_progress (2026-07-18)
+**pre_approved:** true (plan-mode approval 2026-07-18)
