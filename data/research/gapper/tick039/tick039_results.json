@@ -1,0 +1,77 @@
+{
+  "spread_model": {
+    "ok": true,
+    "n": 313,
+    "coef": {
+      "intercept": 0.324468,
+      "log_price": 0.193418,
+      "log_dollar_vol": -0.383361,
+      "log_bar_range": 0.368907
+    },
+    "r2_log": 0.4041,
+    "residual_sd_log": 0.878,
+    "half_spread_floor": 8.5e-05,
+    "half_spread_p50": 0.002755,
+    "half_spread_p95": 0.015957,
+    "half_spread_cap": 0.027073
+  },
+  "results": {
+    "GROSS (mid-to-mid)": {
+      "label": "GROSS (mid-to-mid)",
+      "n": 97,
+      "median": 0.030445,
+      "mean": 0.091915,
+      "win_rate": 0.6392,
+      "tail_ratio": 3.19,
+      "per_trade_sharpe": 0.4217
+    },
+    "NET \u2014 measured spreads (PRIMARY)": {
+      "label": "NET \u2014 measured spreads (PRIMARY)",
+      "n": 97,
+      "median": 0.022624,
+      "mean": 0.083663,
+      "win_rate": 0.6186,
+      "tail_ratio": 2.938,
+      "per_trade_sharpe": 0.3853
+    },
+    "NET \u2014 fitted model (mining-fit)": {
+      "label": "NET \u2014 fitted model (mining-fit)",
+      "n": 97,
+      "median": 0.024475,
+      "mean": 0.085474,
+      "win_rate": 0.6082,
+      "tail_ratio": 3.222,
+      "per_trade_sharpe": 0.3922
+    },
+    "NET \u2014 legacy model (old, for A/B)": {
+      "label": "NET \u2014 legacy model (old, for A/B)",
+      "n": 97,
+      "median": -0.018953,
+      "mean": 0.027929,
+      "win_rate": 0.4227,
+      "tail_ratio": 2.128,
+      "per_trade_sharpe": 0.1283
+    },
+    "_constitutional": {
+      "span_days": 75,
+      "n_trades": 97,
+      "trades_per_day": 1.29333,
+      "unsized_yield_pct_per_day": 2.926037,
+      "floor_pct_per_day": 0.05
+    }
+  },
+  "reconstruction": {
+    "gapups_n": 284,
+    "filtered_n": 98,
+    "published": {
+      "all_gapups_n": 269,
+      "all_gapups_median": -0.002,
+      "all_gapups_win": 0.47,
+      "filtered_n": 57,
+      "filtered_median": 0.054,
+      "filtered_mean": 0.153,
+      "filtered_win": 0.7,
+      "filtered_tail": 4.4
+    }
+  }
+}

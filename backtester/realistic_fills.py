@@ -6,9 +6,13 @@ microcap gappers three real frictions dominate and were NOT modelled:
      bar (missing RTH minutes) or (b) a single-minute move beyond the LULD band.
      You cannot trade during a halt; you fill at the RESUME bar, which for a long
      entry is adverse (reopen pops) and for an exit is adverse (reopen dumps).
-  2. Quoted spread — real bid/ask on these names is 1–15%, not the tight prints.
-     Charged ROUND-TRIP (entry + exit), scaled to bar volatility + inverse to
-     minute $-volume, capped per scenario (optimistic/base/pessimistic).
+  2. Quoted spread — charged ROUND-TRIP (entry + exit).
+     CORRECTED 2026-07-18 (TICK-039). This docstring previously asserted "real
+     bid/ask on these names is 1–15%". That was never measured and is wrong.
+     313 real NBBO observations at the 09:31 entry instant give p10 0.13% /
+     median 0.55% / p90 2.06% / p99 5.01%. The old scenario model charged a
+     median 6.21% round-trip against a measured 0.55% — an 11.3x overcharge that
+     biased every gapper backtest PESSIMISTIC. See MEASURED_SPREAD below.
   3. Size/impact — you can fill at most a fraction of the entry minute's volume;
      beyond that, market impact walks the book.
 
@@ -57,10 +61,66 @@ def _halt_flags(bars, tier: int = 2):
     return _tiered_halt_flags(bars, tier=tier)
 
 
-def _half_spread(price, bar_range_pct, minute_dollar_vol, sc):
+# ── Measured spread model (TICK-039) ──────────────────────────────────────────
+# Fitted on 313 REAL NBBO observations at the 09:31 entry instant, drawn from
+# MINING-period gapper events only (holdout untouched). Harness commit 36b3902;
+# collection research/gapper/tick039_collect.py, fit research/gapper/tick039_fit.py.
+#
+#   log(half_spread) = a + b*log(price) + c*log(minute_$vol) + d*log(bar_range)
+#   R^2(log) = 0.404, residual sd(log) = 0.878
+#
+# Calibration at the entry leg (mining sample, n=313):
+#   measured median round-trip   0.5510%
+#   this model                   0.5099%
+#   LEGACY SCENARIOS model       6.2060%   <-- 11.3x overcharge
+#
+# The legacy model assumed "1-15%" quoted spreads (see module docstring) and
+# saturated its 8% round-trip cap on gapper opens. Real quoted spreads on these
+# names are p10 0.13% / median 0.55% / p90 2.06% / p99 5.01%.
+#
+# Caps are OBSERVED percentiles, not hand-picked: floor = p1, cap = p99. The
+# model is therefore not uniformly optimistic — genuinely wide events still get
+# charged up to 5.4% round-trip.
+MEASURED_SPREAD = {
+    "intercept": 0.324468,
+    "log_price": 0.193418,
+    "log_dollar_vol": -0.383361,
+    "log_bar_range": 0.368907,
+    "floor": 0.00009,      # p1 half-spread
+    "cap": 0.02707,        # p99 half-spread (5.41% round-trip)
+    "n_obs": 313,
+    "r2_log": 0.404,
+    "source": "TICK-039 / harness 36b3902",
+}
+
+
+def _half_spread_measured(price, bar_range_pct, minute_dollar_vol):
+    """Half-spread from the fitted measured-quote model. See MEASURED_SPREAD."""
+    m = MEASURED_SPREAD
+    lv = (m["intercept"]
+          + m["log_price"] * np.log(max(float(price), 1e-6))
+          + m["log_dollar_vol"] * np.log(max(float(minute_dollar_vol), 1e3))
+          + m["log_bar_range"] * np.log(max(float(bar_range_pct), 1e-4)))
+    return float(np.clip(np.exp(lv), m["floor"], m["cap"]))
+
+
+def _half_spread_legacy(price, bar_range_pct, minute_dollar_vol, sc):
+    """The pre-TICK-039 scenario model. Retained for A/B only — it overcharges
+    by ~11x against measured quotes. Do not use for new work."""
     illiq = sc["k_illiq"] / np.sqrt(max(minute_dollar_vol, 1e4) / 1e6)
     s = sc["k_range"] * bar_range_pct + illiq
     return float(np.clip(s, sc["floor"], sc["cap"]) / 2.0)
+
+
+def _half_spread(price, bar_range_pct, minute_dollar_vol, sc, measured=True):
+    """Half-spread charged per leg.
+
+    Defaults to the measured model. Pass measured=False for the legacy scenario
+    model when reproducing a pre-TICK-039 number.
+    """
+    if measured:
+        return _half_spread_measured(price, bar_range_pct, minute_dollar_vol)
+    return _half_spread_legacy(price, bar_range_pct, minute_dollar_vol, sc)
 
 
 def realistic_long_return(bars, entry_time, exit_time, stop_pct,
