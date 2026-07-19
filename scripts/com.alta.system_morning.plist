@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  System morning pass — Layers 1 and 2.
+    08:00 ET  build the consolidated morning context, then derive + record the
+              daily bias and append it to Trading/Oracle-Log/{date}.md
+
+  Reads only. Places no orders. The bias gates nothing (ARCHITECTURE.md L1/L2).
+
+  08:00 sits after the 02:30 oracle cycle (FRED, daily panel) and before the
+  09:30 open. It does NOT wait for the 08:15 session-open briefing: that ordering
+  is deliberate, because a briefing that has not run yet shows up honestly as
+  STALE rather than blocking the whole context build.
+
+  TRACKED-NOT-LOADED. Operator installs:
+    cp scripts/com.alta.system_morning.plist ~/Library/LaunchAgents/
+    launchctl load ~/Library/LaunchAgents/com.alta.system_morning.plist
+    python3 scripts/plist_watchdog.py --rebaseline "loaded system_morning"
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.alta.system_morning</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/sh</string><string>-c</string>
+    <string>/opt/homebrew/bin/python3 -m execution.context --print &amp;&amp; /opt/homebrew/bin/python3 -m execution.bias</string>
+  </array>
+  <key>WorkingDirectory</key><string>/Users/taboost/quant</string>
+  <key>EnvironmentVariables</key><dict>
+    <key>PATH</key><string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+    <key>PYTHONPATH</key><string>/Users/taboost/quant</string>
+  </dict>
+  <key>StandardOutPath</key><string>/Users/taboost/quant/logs/system_morning.log</string>
+  <key>StandardErrorPath</key><string>/Users/taboost/quant/logs/system_morning.err</string>
+  <key>Nice</key><integer>5</integer>
+  <key>RunAtLoad</key><false/>
+  <key>StartCalendarInterval</key>
+  <array>
+    <dict><key>Hour</key><integer>8</integer><key>Minute</key><integer>0</integer><key>Weekday</key><integer>1</integer></dict>
+    <dict><key>Hour</key><integer>8</integer><key>Minute</key><integer>0</integer><key>Weekday</key><integer>2</integer></dict>
+    <dict><key>Hour</key><integer>8</integer><key>Minute</key><integer>0</integer><key>Weekday</key><integer>3</integer></dict>
+    <dict><key>Hour</key><integer>8</integer><key>Minute</key><integer>0</integer><key>Weekday</key><integer>4</integer></dict>
+    <dict><key>Hour</key><integer>8</integer><key>Minute</key><integer>0</integer><key>Weekday</key><integer>5</integer></dict>
+  </array>
+</dict>
+</plist>

@@ -427,3 +427,21 @@ Schema per ticket:
 - [ ] Re-run the SEALED HYP-107 holdout (not a random archive draw) with a recalibrated cost model
 **status:** done (2026-07-18) — operator promotion pending
 **pre_approved:** true (plan-mode approval 2026-07-18 — Plans/concurrent-petting-blossom.md)
+
+## TICK-040
+**title:** Six-layer system assembly — information edge through execution
+**description:** Wired every existing component into one automated daily system. L1 execution/context.py (consolidated morning context, degrade-never-fabricate with FRESH/STALE/SILENT_NULL/UNAVAILABLE per source) + scripts/plist_manifest.py (authored-vs-installed reconciler). L2 execution/bias.py (recorded + scored, NEVER gating — AST tripwire enforces the ARCHITECTURE.md L1/L2 wall) + execution/obsidian.py (the vault writer Oracle-Sync-Spec specified and never built). L3 execution/signals.py (ranked GO/NO-GO, NO_GO retained with reasons). L4 harness --signals + risk routing. L5 execution/risk.py (ratified five only; daily-loss/consecutive-loss/VIX REFUSED for lack of constitutional authority → docs/proposed_amendment_art7-9.md). L6 execution/eod.py (conversion-led reconciliation → Trading/Ops/). Two plists tracked-not-loaded. SYSTEM_STATUS.md at root.
+**depends_on:** [TICK-038, TICK-039]
+**blocks:** []
+**acceptance_criteria:**
+- [x] Single consolidated morning context exists (none did — two chains never exchanged data)
+- [x] Bias recorded and scored, gates nothing; wall enforced by AST test not convention
+- [x] Ranked GO/NO-GO with every rejection reasoned
+- [x] Fills reference signal_id and carry risk decisions
+- [x] Constitutional 3.5/5/6.5 ladder implemented (was implemented NOWHERE; effective flatten was 7.5%)
+- [x] EOD reconciliation written to Obsidian, conversion-led
+- [x] 88 new tests; full suite unchanged at 40 pre-existing failures
+- [ ] Operator: install com.alta.sentiment_update (highest value), system_morning, system_eod
+- [ ] Operator: rule on proposed Articles 7-9
+**status:** done (2026-07-18) — operator promotion pending
+**pre_approved:** true (plan-mode approval 2026-07-18 — Plans/concurrent-petting-blossom.md)
