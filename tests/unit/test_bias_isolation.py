@@ -20,6 +20,7 @@ has 23+ clean nulls and has not earned gating authority.
 Pattern borrowed from tests/unit/test_es_nq_isolation.py:14-36 (source-inspection
 import guard) and tests/test_pipeline_does_not_import_sovereign.
 """
+import ast
 import inspect
 
 import pytest
@@ -28,9 +29,41 @@ import pytest
 #: Modules that decide WHETHER TO TRADE. None may consult a predictor.
 SIGNAL_LAYER_MODULES = ["execution.scan", "execution.signals"]
 
-#: Import strings that would indicate the wall has been breached.
-FORBIDDEN = ["execution.bias", "from execution import bias", "import bias",
-             "derive_bias", "load_bias", "directional_bias"]
+
+def _imported_modules(mod) -> set[str]:
+    """Every module name this module actually imports, via AST.
+
+    Deliberately NOT a substring scan of the source. The first version of this
+    test substring-matched 'execution.bias' and failed on signals.py's own
+    docstring saying it must not import execution.bias — a mention is not a
+    reference. Parsing imports makes the guard both correct and stricter:
+    documentation can name the wall freely, while a real import cannot hide
+    behind an alias or an odd import form.
+    """
+    tree = ast.parse(inspect.getsource(mod))
+    names: set[str] = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            names.update(a.name for a in node.names)
+        elif isinstance(node, ast.ImportFrom):
+            base = node.module or ""
+            names.add(base)
+            names.update(f"{base}.{a.name}" for a in node.names)
+    return names
+
+
+def _called_names(mod) -> set[str]:
+    """Function/attribute names actually invoked (catches a lazy import)."""
+    tree = ast.parse(inspect.getsource(mod))
+    out: set[str] = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Call):
+            f = node.func
+            if isinstance(f, ast.Name):
+                out.add(f.id)
+            elif isinstance(f, ast.Attribute):
+                out.add(f.attr)
+    return out
 
 
 @pytest.mark.parametrize("modname", SIGNAL_LAYER_MODULES)
@@ -40,31 +73,38 @@ def test_signal_modules_do_not_import_bias(modname):
         mod = __import__(modname, fromlist=["*"])
     except ImportError:
         pytest.skip(f"{modname} not present yet")
-    src = inspect.getsource(mod)
-    for token in FORBIDDEN:
-        assert token not in src, (
-            f"{modname} references {token!r}. This breaches the L1/L2 wall "
-            f"(ARCHITECTURE.md:284-286). Do not relax this test — routing a "
-            f"predictor with 23+ clean nulls into the signal path is a design "
-            f"change that requires a prereg, not an import."
-        )
+
+    imports = _imported_modules(mod)
+    offending = {n for n in imports if n.split(".")[-1] == "bias" or "bias" in n.split(".")}
+    assert not offending, (
+        f"{modname} imports {offending}. This breaches the L1/L2 wall "
+        f"(ARCHITECTURE.md:284-286). Do not relax this test — routing a predictor "
+        f"with 23+ clean nulls into the signal path is a design change requiring a "
+        f"prereg, not an import."
+    )
+
+    calls = _called_names(mod)
+    for banned in ("derive_bias", "load_bias", "score_bias"):
+        assert banned not in calls, f"{modname} calls {banned}() — wall breached"
 
 
 def test_bias_module_does_not_import_signal_modules():
     """Nothing crosses L2 -> L1 either: 'the evaluator never tells the predictor
     what to think' (ARCHITECTURE.md:286)."""
     from execution import bias
-    src = inspect.getsource(bias)
-    for token in ["execution.signals", "passes_hyp107", "passes_hyp093"]:
-        assert token not in src, f"bias.py references {token!r} — reverse leak"
+    imports = _imported_modules(bias)
+    assert "execution.signals" not in imports, "bias.py imports signals — reverse leak"
+    calls = _called_names(bias)
+    for banned in ("passes_hyp107", "passes_hyp093", "build_signals"):
+        assert banned not in calls, f"bias.py calls {banned}() — reverse leak"
 
 
 def test_harness_does_not_gate_on_bias():
     """The execution layer may record a bias but must never filter on it."""
     from execution import harness
-    src = inspect.getsource(harness)
-    assert "execution.bias" not in src and "derive_bias" not in src, (
-        "harness must not consult the bias when deciding fills")
+    imports = _imported_modules(harness)
+    assert not any(n.split(".")[-1] == "bias" for n in imports), (
+        "harness imports bias — it must not consult a predictor when deciding fills")
 
 
 def test_bias_is_scored_not_just_recorded():
