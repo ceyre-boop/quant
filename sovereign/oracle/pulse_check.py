@@ -578,12 +578,51 @@ def _snapshot_live_nav() -> bool:
         return False
 
 
+#: Trade IDs whose outcome has already been matched into a decision record, plus
+#: ones we have given up on. Without this the stall alarm is a FALSE POSITIVE BY
+#: CONSTRUCTION: OANDA's get_closed_trades(limit=100) returns the same historical
+#: trades on every 2-hourly pulse forever, update_outcome correctly refuses to
+#: re-close an already-closed record (`outcome is None` guard,
+#: decision_logger.py:363), so n_backfilled is legitimately 0 and the alarm
+#: screams permanently. It grew 9 -> 23 over weeks while the loop was healthy,
+#: and masked the two genuine defects underneath.
+MATCHED_PATH = ROOT / "data" / "oracle" / ".outcome_matched.json"
+
+#: A trade that has failed to match for this long is almost certainly unmatchable
+#: (e.g. placed by a path that never called log_forex_decision). It is recorded
+#: with its reason and stops alarming, so a permanent false alarm cannot simply
+#: reappear in a new form. It stays visible in the counts.
+UNMATCHABLE_AFTER_DAYS = 7
+
+
+def _load_matched() -> dict:
+    if not MATCHED_PATH.exists():
+        return {}
+    try:
+        d = json.loads(MATCHED_PATH.read_text())
+        return d if isinstance(d, dict) else {}
+    except Exception:                                        # noqa: BLE001
+        log.warning("backfill: matched sidecar unreadable; treating as empty")
+        return {}
+
+
+def _save_matched(state: dict) -> None:
+    MATCHED_PATH.parent.mkdir(parents=True, exist_ok=True)
+    tmp = MATCHED_PATH.with_suffix(".tmp")
+    tmp.write_text(json.dumps(state, indent=2, sort_keys=True))
+    tmp.replace(MATCHED_PATH)
+
+
 def _backfill_decision_outcomes() -> int:
     """Match closed OANDA trades to OPEN decision records and back-fill outcomes.
 
     R-multiple is computed from entry/close/stop. Trades without a sane stop
     (e.g. test fills) are skipped rather than recorded with a fabricated R —
     the Oracle must not learn from garbage. Returns count back-filled.
+
+    Idempotent across pulses: trades already matched on a previous run are counted
+    as `already_known` and never re-attempted, so the stall alarm reflects genuine
+    failures this run rather than the size of the historical backlog.
     """
     try:
         from sovereign.execution.oanda_bridge import OandaBridge
@@ -594,11 +633,24 @@ def _backfill_decision_outcomes() -> int:
         return 0
 
     fills_by_id = {str(f.get("trade_id", "")): f for f in _load_fills()}
+    matched = _load_matched()
+    now = datetime.now(timezone.utc)
+
     n_backfilled = 0
-    n_attempted = 0  # closed OANDA trades with a sane stop we tried to match to a decision
+    n_attempted = 0        # tried to match THIS run
+    n_already = 0          # matched on a previous run — not a failure
+    n_unmatchable = 0      # given up on, with a recorded reason
+    failures: list[str] = []
 
     for trade in closed:
         try:
+            tid = str(trade.get("id", ""))
+            prior = matched.get(tid)
+            if prior and prior.get("state") in ("matched", "unmatchable"):
+                n_already += 1 if prior["state"] == "matched" else 0
+                n_unmatchable += 1 if prior["state"] == "unmatchable" else 0
+                continue
+
             pair = str(trade.get("instrument", "")).replace("_", "")
             if not pair:
                 continue
@@ -628,19 +680,51 @@ def _backfill_decision_outcomes() -> int:
                               r_realized=r_realized,
                               exit_timestamp=trade.get("closeTime"), system="FOREX"):
                 n_backfilled += 1
+                matched[tid] = {"state": "matched", "pair": pair, "outcome": outcome,
+                                "r_realized": r_realized,
+                                "matched_at": now.isoformat()}
                 log.info("backfill: %s %s r=%+.2f", pair, outcome, r_realized)
+            else:
+                failures.append(f"{pair}@{open_time}")
+                first_seen = (prior or {}).get("first_seen") or now.isoformat()
+                age_days = (now - datetime.fromisoformat(first_seen)).days
+                if age_days >= UNMATCHABLE_AFTER_DAYS:
+                    matched[tid] = {
+                        "state": "unmatchable", "pair": pair,
+                        "first_seen": first_seen, "gave_up_at": now.isoformat(),
+                        "reason": (f"no matching decision record after "
+                                   f"{UNMATCHABLE_AFTER_DAYS}d — the entry path "
+                                   f"likely never called log_forex_decision()"),
+                    }
+                    n_unmatchable += 1
+                else:
+                    matched[tid] = {"state": "pending", "pair": pair,
+                                    "first_seen": first_seen}
         except Exception as exc:
             log.warning("backfill: trade %s failed: %s", trade.get("id"), exc)
 
-    # Stall alarm: closed trades exist but none matched → the win/loss loop is broken again.
-    if n_attempted > 0 and n_backfilled == 0:
-        log.error("OUTCOME_LOOP_STALL: %d closed OANDA trades, 0 matched to decisions", n_attempted)
+    _save_matched(matched)
+
+    # Always emit the real metric — a bare "0 matched" said nothing about whether
+    # that was healthy (nothing new to match) or broken (everything failed).
+    log.info("OUTCOME_LOOP: matched=%d attempted=%d already_known=%d unmatchable=%d",
+             n_backfilled, n_attempted, n_already, n_unmatchable)
+
+    # Alarm ONLY on trades that genuinely failed to match on this run. A backlog
+    # matched weeks ago is not a stall.
+    n_failed = n_attempted - n_backfilled
+    if n_failed > 0:
+        log.error("OUTCOME_LOOP_STALL: %d of %d closed trades failed to match this run "
+                  "(%d already known, %d unmatchable): %s",
+                  n_failed, n_attempted, n_already, n_unmatchable,
+                  ", ".join(failures[:5]))
         _write_messages([{
             "type": "OUTCOME_LOOP_STALL",
             "priority": "URGENT",
             "message": (
-                f"{n_attempted} closed OANDA trades but 0 matched to open decisions — the win/loss "
-                "loop is not closing (CLAUDE.md NON-NEGOTIABLE #2). Oracle is learning from nothing. "
+                f"{n_failed} of {n_attempted} closed OANDA trades failed to match an open "
+                f"decision this run ({n_already} already matched previously). "
+                f"First failures: {', '.join(failures[:5])}. "
                 "Check pair/timestamp/system matching in decision_logger.update_outcome."
             ),
         }])

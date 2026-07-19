@@ -13,7 +13,7 @@ from __future__ import annotations
 import json
 import logging
 from dataclasses import asdict, dataclass, field
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Optional
 
@@ -303,6 +303,16 @@ def log_forex_decision(
 
 # ─── Outcome updater (called by forensic engine on trade close) ───────────────
 
+#: How long before its fill a signal may have been logged. A forex signal fires at
+#: signal time and can fill hours later, or the next session; 36h spans a weekend
+#: boundary without reaching a second trading day for the same pair.
+MAX_SIGNAL_LEAD = timedelta(hours=36)
+
+#: How far AFTER the fill a signal timestamp may sit. Small, and only for clock or
+#: rounding skew — a signal genuinely later than its own fill is a look-ahead match.
+MAX_CLOCK_SKEW = timedelta(hours=2)
+
+
 def _outcome_entry_match(stored_ts: str, incoming_ts: str) -> bool:
     """Match a closing trade's entry timestamp to a stored decision's entry timestamp.
 
@@ -314,16 +324,39 @@ def _outcome_entry_match(stored_ts: str, incoming_ts: str) -> bool:
     the unit tests (which reuse identical/same-hour timestamps) stayed green.
 
     Tier 1: existing strict behaviour (exact / date+hour / forensic date-only) — unchanged.
-    Tier 2: same-UTC-date fallback. Safe because forex fires ≤~1 trade per pair per day
-    and the caller already constrains the match to a same-pair record that is still OPEN
-    (outcome is None); the scan picks the oldest open record, so concurrent same-day
-    signals close FIFO. Does not loosen the ICT/forensic paths (they resolve in Tier 1).
+    Tier 2: bounded time WINDOW, replacing the previous same-UTC-date string compare.
+
+    Why the date compare was wrong: `s[:10] == i[:10]` fails the moment a signal and
+    its fill straddle midnight UTC. Observed live (logs/pulse.err:5971-5976):
+
+        NO match for AUDUSD @ 2026-06-15T12:00:15 — ts=2026-06-16T12:01:37 !~ ...
+
+    The record existed and was open; it was one calendar day away. Three of the
+    23 reported failures were this, and no amount of same-day logic can catch them.
+
+    THE WINDOW IS DELIBERATELY ASYMMETRIC. A fill cannot close a signal that has not
+    happened yet, so the signal must precede the fill (up to `MAX_SIGNAL_LEAD`), with
+    only a small allowance after it (`MAX_CLOCK_SKEW`) for clock/rounding skew. A
+    symmetric window would let a Monday fill close a Tuesday signal — a look-ahead
+    match, which is the same class of error that killed HYP-105/106.
+
+    Safe to widen because the caller already constrains to a same-pair record that is
+    still OPEN, and the scan takes them in file order (chronological), so the oldest
+    open record closes first — sequential trades pair FIFO.
     """
     if timestamps_match(stored_ts, incoming_ts):
         return True
     s = normalize_timestamp(str(stored_ts).strip())
     i = normalize_timestamp(str(incoming_ts).strip())
-    return bool(s and i and s[:10] == i[:10])
+    if not (s and i):
+        return False
+    try:
+        s_dt = datetime.fromisoformat(s)
+        i_dt = datetime.fromisoformat(i)
+    except ValueError:
+        return s[:10] == i[:10]          # unparseable — fall back to the old rule
+    lead = i_dt - s_dt                   # positive when the signal preceded the fill
+    return -MAX_CLOCK_SKEW <= lead <= MAX_SIGNAL_LEAD
 
 
 def update_outcome(
@@ -343,14 +376,40 @@ def update_outcome(
     (handles forensic engine passing truncated dates like "2026-05-26 03:45").
     Only updates records still OPEN (outcome is None).
     """
-    # Derive month key from the timestamp so we open the right file
+    # Derive month key from the timestamp so we open the right file.
+    # The match window (MAX_SIGNAL_LEAD) can reach into the PREVIOUS month — a fill
+    # on the 1st can close a signal from the 30th — so try that file too. Without
+    # this, widening the time window alone would still miss month-boundary pairs.
     from sovereign.utils.timestamps import normalize_timestamp
     normalized = normalize_timestamp(entry_timestamp)
     try:
-        month = datetime.fromisoformat(normalized).strftime("%Y_%m")
+        anchor = datetime.fromisoformat(normalized)
     except Exception:
-        month = datetime.now(timezone.utc).strftime("%Y_%m")
+        anchor = datetime.now(timezone.utc)
 
+    candidates = [anchor.strftime("%Y_%m"),
+                  (anchor - MAX_SIGNAL_LEAD).strftime("%Y_%m")]
+    seen_months: list[str] = []
+    for m in candidates:
+        if m not in seen_months:
+            seen_months.append(m)
+
+    for month in seen_months:
+        if (LOG_DIR / f"decisions_{month}.jsonl").exists():
+            if _update_outcome_in_month(
+                    month=month, pair=pair, entry_timestamp=entry_timestamp,
+                    outcome=outcome, r_realized=r_realized,
+                    exit_timestamp=exit_timestamp, system=system):
+                return True
+    return False
+
+
+def _update_outcome_in_month(
+    *, month: str, pair: str, entry_timestamp: str, outcome: str,
+    r_realized: float, exit_timestamp: Optional[str] = None,
+    system: Optional[str] = None,
+) -> bool:
+    """Attempt the outcome match within a single monthly log file."""
     log_path = LOG_DIR / f"decisions_{month}.jsonl"
     if not log_path.exists():
         return False
