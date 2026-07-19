@@ -55,7 +55,7 @@ from typing import Any, Iterable
 import pandas as pd
 
 from backtester.realistic_fills import realistic_long_return
-from execution import alpaca, borrow, halts, quotes, scan
+from execution import alpaca, borrow, halts, quotes, risk, scan, signals as signals_mod
 from execution.config import frozen, verify_frozen_hash, FROZEN_HASH
 from sovereign.autonomous._common import append_jsonl, make_logger
 from sovereign.utils import kill_switch
@@ -103,6 +103,13 @@ class FillRecord:
     # non-breaking additions
     hypothesis: str = ""
     reason: str = ""
+    # Layer 3/5 wiring: which signal produced this fill, and what risk said
+    signal_id: str = ""
+    signal_rank: int | None = None
+    risk_action: str = ""
+    risk_allowed: bool | None = None
+    risk_breached: list[str] = field(default_factory=list)
+    risk_size_mult: float | None = None
     wide_quote: bool = False
     luld_band_used: float | None = None
     scenario: str = "base"
@@ -121,6 +128,26 @@ class FillRecord:
 
 def is_skip(signal_type: str) -> bool:
     return signal_type.startswith("SKIP_")
+
+
+def apply_risk(rec: FillRecord, state: "risk.AccountState",
+               risk_fraction: float) -> FillRecord:
+    """Route a prospective fill through the ratified risk gates (Layer 5).
+
+    A blocked fill is recorded as SKIP_RISK with the breached articles attached —
+    never silently dropped. A risk gate that discards its own refusals leaves no
+    evidence that it fired, which is the failure mode the whole feedback layer
+    exists to prevent.
+    """
+    d = risk.check(symbol=rec.ticker, risk_fraction=risk_fraction, state=state)
+    rec.risk_action = d.action.value
+    rec.risk_allowed = d.allowed
+    rec.risk_breached = list(d.breached)
+    rec.risk_size_mult = d.size_mult
+    if not d.allowed:
+        rec.signal_type = "SKIP_RISK"
+        rec.reason = d.reason
+    return rec
 
 
 # ── Output ────────────────────────────────────────────────────────────────────
@@ -289,9 +316,18 @@ def price_leg(symbol: str, day: date, *, side: str, hypothesis: str,
 
 # ── Session ───────────────────────────────────────────────────────────────────
 
+def _signal_index(day: date, signals_dir: Path | None) -> dict[tuple[str, str], dict]:
+    """(ticker, hypothesis) -> GO signal, from the Layer 3 output if present."""
+    if signals_dir is None:
+        return {}
+    return {(s["ticker"], s["hypothesis"]): s
+            for s in signals_mod.go_list(day, signals_dir)}
+
+
 def run_session(day: date, *, out_dir: Path | None = None,
                 check_news: bool = True, scenario: str = "base",
-                replay: bool = False) -> list[FillRecord]:
+                replay: bool = False, signals_dir: Path | None = None,
+                account: "risk.AccountState | None" = None) -> list[FillRecord]:
     """Score both legs for one ET session date. Pure measurement.
 
     `replay=True` sources the universe from the historical archive instead of the
@@ -304,6 +340,13 @@ def run_session(day: date, *, out_dir: Path | None = None,
 
     seen = _existing_keys(out_dir, day)
     locate = borrow.load_locate(day)
+    sig_index = _signal_index(day, signals_dir)
+    if signals_dir is not None:
+        _log(f"{day}: Layer 3 signal file supplies {len(sig_index)} GO signal(s)")
+    # Flat account state unless supplied. With no live equity feed the honest
+    # default is zero drawdown, which means the Art. 3 ladder cannot fire — that
+    # is recorded per fill via risk_action so it is visible, not assumed.
+    acct = account or risk.AccountState(equity=100_000.0, peak_equity=100_000.0)
 
     symbols = None
     if replay:
@@ -325,11 +368,17 @@ def run_session(day: date, *, out_dir: Path | None = None,
         ok, reason = scan.passes_hyp107(c)
         if not ok:
             continue
+        if sig_index and (c.symbol, "HYP-107") not in sig_index:
+            continue                      # Layer 3 is authoritative when present
         if (str(day), c.symbol, "LONG") in seen:
             continue
         rec = price_leg(c.symbol, day, side="LONG", hypothesis="HYP-107",
                         entry_et=c107["entry_bar_et"], exit_et=c107["exit_bar_et"],
                         bars=c.bars, stop_pct=c107["stop_pct"], scenario=scenario)
+        sig = sig_index.get((c.symbol, "HYP-107"))
+        if sig:
+            rec.signal_id, rec.signal_rank = sig["signal_id"], sig.get("rank")
+        rec = apply_risk(rec, acct, c107["stop_pct"] * 0.03)
         record_fill(rec, out_dir)
         records.append(rec)
 
@@ -347,10 +396,16 @@ def run_session(day: date, *, out_dir: Path | None = None,
             record_fill(rec, out_dir)
             records.append(rec)
             continue
+        if sig_index and (c.symbol, "HYP-093") not in sig_index:
+            continue
         rec = price_leg(c.symbol, day, side="SHORT", hypothesis="HYP-093",
                         entry_et=c093["entry_bar_et"], exit_et=c093["exit_bar_et"],
                         bars=c.bars, stop_pct=c093["stop_mult"] - 1.0,
                         scenario=scenario)
+        sig = sig_index.get((c.symbol, "HYP-093"))
+        if sig:
+            rec.signal_id, rec.signal_rank = sig["signal_id"], sig.get("rank")
+        rec = apply_risk(rec, acct, c093["notional_w"] * c093["locate_w"])
         record_fill(rec, out_dir)
         records.append(rec)
 
@@ -425,6 +480,8 @@ def main(argv=None) -> int:
                     choices=["optimistic", "base", "pessimistic"])
     ap.add_argument("--no-news", action="store_true",
                     help="skip the M&A headline check (offline/replay use)")
+    ap.add_argument("--signals", metavar="DIR", default=None,
+                    help="Layer 3 signal directory; when given, only GO signals fill")
     args = ap.parse_args(argv)
 
     out_dir = Path(args.out) if args.out else OUT_DIR
@@ -448,7 +505,8 @@ def main(argv=None) -> int:
 
     day = date.fromisoformat(args.replay) if args.replay else datetime.now(ET).date()
     run_session(day, out_dir=out_dir, check_news=not args.no_news,
-                scenario=args.scenario, replay=bool(args.replay))
+                scenario=args.scenario, replay=bool(args.replay),
+                signals_dir=Path(args.signals) if args.signals else None)
     return 0
 
 
