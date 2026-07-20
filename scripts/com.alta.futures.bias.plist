@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key><string>com.alta.futures.bias</string>
+    <!-- Pre-market ES + NQ bias generation. Runs futures_bias.py for both instruments at
+         6:00 AM PT (9:00 AM ET) Mon-Fri — 30 min before market open — so the monitor finds
+         a directional lean when the RTH session starts at 9:30 ET. Without this, the monitor
+         defaults to NEUTRAL and silently disables all signal detection (the June 8-13 outage).
+         launchd StartCalendarInterval fires in machine local timezone (America/Los_Angeles).
+         Weekday: 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri. -->
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string><string>-c</string>
+        <string>cd /Users/taboost/quant &amp;&amp; /opt/homebrew/bin/python3 scripts/futures_bias.py &amp;&amp; /opt/homebrew/bin/python3 scripts/futures_bias.py --instrument NQ</string>
+    </array>
+    <key>WorkingDirectory</key><string>/Users/taboost/quant</string>
+    <key>StartCalendarInterval</key>
+    <array>
+        <dict><key>Weekday</key><integer>1</integer><key>Hour</key><integer>6</integer><key>Minute</key><integer>0</integer></dict>
+        <dict><key>Weekday</key><integer>2</integer><key>Hour</key><integer>6</integer><key>Minute</key><integer>0</integer></dict>
+        <dict><key>Weekday</key><integer>3</integer><key>Hour</key><integer>6</integer><key>Minute</key><integer>0</integer></dict>
+        <dict><key>Weekday</key><integer>4</integer><key>Hour</key><integer>6</integer><key>Minute</key><integer>0</integer></dict>
+        <dict><key>Weekday</key><integer>5</integer><key>Hour</key><integer>6</integer><key>Minute</key><integer>0</integer></dict>
+    </array>
+    <key>StandardOutPath</key><string>/Users/taboost/quant/logs/futures_bias.log</string>
+    <key>StandardErrorPath</key><string>/Users/taboost/quant/logs/futures_bias.err</string>
+    <key>EnvironmentVariables</key><dict><key>PATH</key><string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string></dict>
+</dict>
+</plist>
