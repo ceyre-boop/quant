@@ -14,6 +14,32 @@ import numpy as np
 import pytest
 
 
+@pytest.fixture(autouse=True)
+def _isolate_ml_checkpoints(tmp_path, monkeypatch):
+    """
+    Redirect every risk-layer model checkpoint to a per-test temp path.
+
+    These estimators load a persisted checkpoint in __init__ and re-save it
+    periodically. Without isolation the tests would (a) inherit accumulated
+    state from prior runs — e.g. a non-zero kalman_t or a trained TradeMDP —
+    and (b) mutate the shared models/*.pkl files. Pointing each module's
+    _CHECKPOINT at a fresh temp file makes every test start cold and hermetic.
+    """
+    for mod, attr in (
+        ("sovereign.risk.kalman_regime",        "_CHECKPOINT"),
+        ("sovereign.risk.trade_mdp",            "_CHECKPOINT"),
+        ("sovereign.risk.pegasus_policy_search", "_CHECKPOINT"),
+        ("sovereign.risk.ica_factor_separator", "_CHECKPOINT"),
+    ):
+        import importlib
+        try:
+            m = importlib.import_module(mod)
+        except Exception:
+            continue
+        monkeypatch.setattr(m, attr, tmp_path / f"{mod.rsplit('.', 1)[-1]}.pkl",
+                            raising=False)
+
+
 # ── PCA Compressor (CS229 L14-15) ────────────────────────────────────────── #
 
 @pytest.mark.skip(
@@ -183,7 +209,11 @@ class TestTradeMDP:
         import random; rng = random.Random(1)
         for i in range(30):
             regime = 'MOMENTUM'
-            pnl = -0.01  # always lose → should learn to reduce size
+            # Always lose a full R → the reward signal is genuinely bad, so the
+            # MDP should learn to reduce size. (A trivial -0.01R "loss" is ~break
+            # -even on the R-multiple reward scale and legitimately does not
+            # trigger size-down — see OPEN_ITEMS if that scale is revisited.)
+            pnl = -1.0
             mdp.record_transition(
                 regime, 3, 0.04, 0.4,
                 regime, 3, 0.04, 0.4,
