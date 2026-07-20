@@ -24,7 +24,7 @@
   <array>
     <string>/bin/sh</string>
     <string>-c</string>
-    <string>set -a; . /Users/taboost/quant/.env; set +a; /usr/local/bin/claude --print "Read ~/quant/AGENT_DIRECTIVE.md and execute the 16:05 EOD routine" --allowedTools "Bash,Read,Write,Edit,Glob,Grep" 2>&amp;1</string>
+    <string>set -a; . /Users/taboost/quant/.env; set +a; /Users/taboost/.local/bin/claude --print "Read ~/quant/AGENT_DIRECTIVE.md and execute the 16:05 EOD routine" --allowedTools "Bash,Read,Write,Edit,Glob,Grep" 2>&amp;1</string>
   </array>
 
   <key>WorkingDirectory</key>

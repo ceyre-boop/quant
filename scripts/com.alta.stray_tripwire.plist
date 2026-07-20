@@ -19,6 +19,10 @@
     <key>WatchPaths</key>
     <array><string>/Users/taboost/quant</string></array>
     <key>RunAtLoad</key><true/>
+    <!-- WatchPaths only fires on direct-child changes of the repo root, so the
+         tripwire could go weeks without running (last fire 2026-06-16). Hourly
+         floor guarantees stray-job detection independent of file activity. -->
+    <key>StartInterval</key><integer>3600</integer>
     <key>StandardOutPath</key><string>/Users/taboost/quant/logs/stray_tripwire.launchd.log</string>
     <key>StandardErrorPath</key><string>/Users/taboost/quant/logs/stray_tripwire.launchd.err</string>
     <key>EnvironmentVariables</key><dict><key>PATH</key><string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string></dict>

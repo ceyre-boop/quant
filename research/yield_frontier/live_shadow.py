@@ -71,6 +71,20 @@ def get(url, kid, sec):
     raise RuntimeError(url[:110])
 
 
+def get_or_none(url, kid, sec):
+    """get() but a single exhausted endpoint degrades that symbol, not the run.
+
+    The scan leg fans out over ~50 movers; one delisted/halted ticker used to
+    raise out of bars_for and kill the whole morning scan (com.alta.gapper_shadow_scan
+    exited 1 for days). Failures are logged, never swallowed silently.
+    """
+    try:
+        return get(url, kid, sec)
+    except Exception as exc:
+        print(f"[shadow] FETCH_FAILED {url[:110]} — {exc}", file=sys.stderr)
+        return None
+
+
 def bars_for(sym, day, kid, sec, tf="5Min", days_back=0):
     s = datetime.combine(day - timedelta(days=days_back), dtime(0, 1) if days_back
                          else dtime(9, 30), tzinfo=ET).astimezone(UTC)
@@ -81,8 +95,10 @@ def bars_for(sym, day, kid, sec, tf="5Min", days_back=0):
                                 "start": s.strftime("%Y-%m-%dT%H:%M:%SZ"),
                                 "end": e.strftime("%Y-%m-%dT%H:%M:%SZ"),
                                 "feed": "sip", "adjustment": "split", "limit": "10000"})
-    return (get(f"https://data.alpaca.markets/v2/stocks/bars?{q}", kid, sec)
-            .get("bars") or {}).get(sym, [])
+    resp = get_or_none(f"https://data.alpaca.markets/v2/stocks/bars?{q}", kid, sec)
+    if resp is None:
+        return []
+    return (resp.get("bars") or {}).get(sym, [])
 
 
 def et_t(bar):

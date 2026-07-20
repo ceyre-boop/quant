@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key><string>com.alta.forensics</string>
+
+    <!-- Trade forensics engine. Writes data/forensics/{trade_forensics.jsonl,
+         veto_health.json,auto_hypotheses.json}, which sovereign/oracle/validation_cycle.py
+         (_load_all_forensics) and harvest_cycle.py read during the Oracle reflect pass.
+
+         Installed 2026-07-20 by the functionality audit: the engine was only ever a
+         manual CLI, so those three files had been frozen at 2026-05-19 while
+         com.alta.oracle.reflect ran nightly — Oracle was reflecting on two-month-old
+         forensics. Fires 02:00 ET, i.e. BEFORE oracle.reflect at 02:30 ET, so each
+         reflect pass reads same-night forensics. Keep that ordering if either moves. -->
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string><string>-c</string>
+        <string>cd /Users/taboost/quant &amp;&amp; PYTHONPATH=/Users/taboost/quant /opt/homebrew/bin/python3 sovereign/forensics/trade_forensic_engine.py</string>
+    </array>
+    <key>WorkingDirectory</key><string>/Users/taboost/quant</string>
+    <key>StartCalendarInterval</key>
+    <dict><key>Hour</key><integer>2</integer><key>Minute</key><integer>0</integer></dict>
+    <key>StandardOutPath</key><string>/Users/taboost/quant/logs/forensics.log</string>
+    <key>StandardErrorPath</key><string>/Users/taboost/quant/logs/forensics.err</string>
+    <key>EnvironmentVariables</key>
+    <dict><key>PATH</key><string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string></dict>
+</dict>
+</plist>
