@@ -1359,3 +1359,60 @@ Full writeup: `~/Obsidian/Obsidian/System/overfitting_safeguards.md`
 - **12 files flagged** `# TODO: migrate to MarketDataAdapter (TICK-043)`; all 12 re-parsed clean. ThetaData / FRED / Alpha Vantage / databento deliberately left out — different auth and shape, `get_bars` is the wrong interface for them.
 - **Step 6 of the request NOT executed — reported instead of performed.** The ask was to unify backtest and live fill pricing and note the resulting baseline shift. Declined on evidence: `execution/quotes.py` (captured bid/ask) and `backtester/realistic_fills.py` (model) are two independent pricing paths *by design*, and their difference is the `vs_backtest_delta` the harness exists to measure (harness.py:19-28, and the exit-bar comment at :265 explicitly warns that mispricing one side makes the delta meaningless). Unifying them drives that delta to zero by construction — it deletes the measurement rather than improving it — while re-baselining the v015 0.6886 anchor that 15 confirmed / 27 killed hypotheses are keyed to (the TICK-024 failure mode). **No baseline shift occurred and none should be recorded.** If a pricing-consistency change is genuinely wanted it needs its own ticket, a `param_change_log.jsonl` rationale (NN#4), and a re-verdict pass over the affected ledger entries — not a side effect of a transport migration.
 - Doc: `~/Obsidian/Obsidian/System/data_sources.md` (vendors, rate limits — Polygon free 5/min and Alpha Vantage free 25/day are the binding ones — key names, cache rules, un-migrated surface, and the pricing-path boundary).
+
+## 2026-07-20 — Full functionality audit (what's built but not doing anything)
+
+Audited 37 installed LaunchAgents, 28 `sovereign/` subpackages, 30 top-level dirs against
+four tests: scheduled? produces output? wired to a live decision? output non-trivial?
+Commit `ac0a99e`, pushed to `origin/sovereign-v2`.
+
+**Headline** — the scheduler layer is healthy (34/37 plists fire on time, exit 0, and every
+installed plist is byte-identical to its `scripts/` copy). The losses are in wiring, not
+scheduling. Biggest systemic risk found: several jobs **exit 0 while silently degrading** —
+`forex.scan` falls back to the degraded sentinel on an empty yfinance frame, `cache.refresh`
+reports success while Reddit 403s to 0 posts every run. Exit code is not a health signal here.
+
+**Fixed + verified**
+- **The autonomous Claude-agent stack had never executed once.** `morning_agent`, `eod_agent`,
+  `research_agent` all pointed at `/usr/local/bin/claude`, which does not exist on this machine;
+  `morning_agent` had been returning **exit 127 every weekday**. Repointed to
+  `~/.local/bin/claude` and confirmed the binary resolves under the plists' own restricted PATH.
+- **Oracle was reflecting on two-month-old forensics.** `trade_forensic_engine.py` was only ever
+  a manual CLI — never scheduled — so the three files `validation_cycle._load_all_forensics()`
+  reads were frozen at 05-19 while `oracle.reflect` ran nightly against them. New
+  `com.alta.forensics` at 02:00 ET, deliberately ahead of reflect at 02:30 so each pass reads
+  same-night data. Verified by `launchctl kickstart`: exit 0, all three outputs now 07-20.
+- **`gapper_shadow_scan` was exiting 1.** One exhausted Alpaca fetch raised out of `bars_for`
+  and killed the whole 50-symbol scan. Added `get_or_none` so a dead ticker degrades that symbol
+  only, printing `FETCH_FAILED` to stderr rather than swallowing. Both call sites already handled
+  empty results, so behaviour-preserving. Verified live: 1 signal from 7 verified movers.
+- **Borrow feed restored** — installed `com.alta.ib_shortable`, which was written but never
+  installed; its ftp2+ftplib path works where `daily_snapshots.py`'s ftp3+urlopen leg has failed
+  5 days running. 750 EASY / 32 HARD written.
+- **`stray_tripwire`** given an hourly `StartInterval`; `WatchPaths`-only meant no fire since 06-16.
+
+**Blocker for Colin — credential, not code**
+- `oracle.session_close` gets **OANDA 401 Insufficient authorization**. This is the Oracle
+  *outcome* channel (NN#2): the close pass cannot read positions, so trades can close without
+  `update_outcome()`. The practice token in `.env` looks rotated/expired. I did not touch it.
+
+**Refused to shortcut** — did NOT fix the two most tempting items. `forex.scan`'s `GBPUSD=X`
+yfinance degradation (fix = repoint to the OANDA candle fetcher) and the four null fields in live
+ICT decision records (`vix_at_entry`, `rate_differential_zscore`, `cot_percentile`, `library_match`
+— all null despite fresh COT and VIX data) are both **decision/data-path edits under the
+shadow-execution freeze**. Each wants its own ticket and unlock, not a drive-by during an audit.
+
+**Other open findings** — `data/risk/risk_decisions.jsonl` has zero readers repo-wide;
+`propfirm/active_challenge.json` is 05-18 but `allocation_engine.py` reads it on the live path;
+`data/execution/fills.jsonl` (06-30) vs `oanda_fills.json` (07-20) are two fill paths and one is
+dead; `clawd.ny_am_scanner` has 0-byte logs since 05-30 and no heartbeat, so it cannot be
+confirmed to do any work; `evening_prep`'s health check dies on a `TypeError` because live code
+imports from `archive/`. `sovereign/orchestrator.py` is the sole importer of five subpackages
+(`router`, `specialists`, `kimi`, `prediction`, `strategies`) and **no plist invokes it**.
+
+**Attic candidate, deliberately not executed** — ~13 dirs of Mar–May v4/clawd-era code form one
+self-referential cluster. Must move as a unit: `layer1/`, `layer2/`, `contracts/` are hard-imported
+at module top level by `sovereign/specialists/base_specialist.py` and `sovereign/risk/kelly_engine.py`,
+so atticking them piecemeal breaks `sovereign/orchestrator.py` at import. Wants its own ticket.
+
+Full table + evidence: `~/Obsidian/Obsidian/System/full_functionality_audit.md`
