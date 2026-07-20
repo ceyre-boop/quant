@@ -169,7 +169,12 @@ class OandaBridge:
             )
 
         # Practice-only safety: only allow live if OANDA_LIVE=1 is explicitly set.
-        environment = 'live' if os.environ.get('OANDA_LIVE') == '1' else 'practice'
+        trading_mode = os.environ.get('OANDA_LIVE', '0')
+        if trading_mode == '1' and not os.environ.get('LIVE_TRADING_CONFIRMED'):
+            raise RuntimeError(
+                "Set LIVE_TRADING_CONFIRMED=1 explicitly before firing live orders."
+            )
+        environment = 'live' if trading_mode == '1' else 'practice'
         if environment == 'live':
             logger.warning("[OandaBridge] ⚠  LIVE MODE — real money at risk")
 

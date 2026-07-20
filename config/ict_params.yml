@@ -63,7 +63,7 @@ micro_risk:
   # Max concurrent ICT positions
   max_positions: 3
   # Daily loss limit — halt trading for the day if breached
-  max_daily_loss_pct: 0.05          # 5 %
+  max_daily_loss_pct: 0.02          # RISK_FRAMEWORK.md ratified 2026-07-20, 2% overrides gates.py 5%
   # Default leverage cap (broker max may be higher; we enforce this ceiling)
   max_leverage: 30
   # R:R minimum to take a trade (1 : N where N >= this)

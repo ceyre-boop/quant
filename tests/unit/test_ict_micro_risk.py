@@ -109,13 +109,13 @@ class TestDailyLossLimit:
         self.engine = MicroRiskEngine()
 
     def test_blocks_when_daily_loss_reached(self):
-        acc = _fresh_account(daily_loss=0.06)  # 6 % > 5 % limit
+        acc = _fresh_account(daily_loss=0.06)  # 6 % > 2 % limit
         result = self.engine.size("LONG", 1.0850, 1.0820, atr=0.0030, params=acc)
         assert isinstance(result, RiskVeto)
         assert result.reason == "DAILY_LOSS_LIMIT"
 
     def test_passes_below_daily_loss_limit(self):
-        acc = _fresh_account(daily_loss=0.03)  # 3 % < 5 % limit
+        acc = _fresh_account(daily_loss=0.01)  # 1 % < 2 % limit (RISK_FRAMEWORK.md ratified 2026-07-20)
         result = self.engine.size("LONG", 1.0850, 1.0820, atr=0.0030, params=acc)
         assert isinstance(result, PositionSizing)
 

@@ -32,13 +32,17 @@ def test_clean_state_passes():
 
 
 def test_daily_loss_gate():
-    d = decide(SIG, _state(daily_realized_pnl=-5_100), CFG)   # -5.1% > 5% limit
+    d = decide(SIG, _state(daily_realized_pnl=-5_100), CFG)   # -5.1% > 2% limit
     assert d.halt and d.final_size == 0 and "daily_loss_limit" in d.halt_reason
 
 
 def test_internal_guard_daily_gate():
-    d = decide(SIG, _state(daily_realized_pnl=-2_100), CFG)   # -2.1% > 2% internal guard
-    assert d.halt and "internal_guard_daily" in d.halt_reason
+    # RISK_FRAMEWORK.md (ratified 2026-07-20) tightened the outer daily gate to 2%,
+    # so it now fires at the same level as the internal guard and shadows it. Either
+    # reason is a correct halt; what matters is that -2.1% stops trading.
+    d = decide(SIG, _state(daily_realized_pnl=-2_100), CFG)   # -2.1% > 2% limit
+    assert d.halt and d.final_size == 0
+    assert "daily_loss_limit" in d.halt_reason or "internal_guard_daily" in d.halt_reason
 
 
 def test_internal_guard_trailing_dd_gate():

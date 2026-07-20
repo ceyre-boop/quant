@@ -12,7 +12,8 @@ base:
 
 # ── Layer 0: hard gates (force final_risk = 0)
 gates:
-  daily_loss_limit_pct: 0.05     # daily realized+open <= -(this * starting_balance) -> halt
+  # RISK_FRAMEWORK.md ratified 2026-07-20, 2% overrides gates.py 5%
+  daily_loss_limit_pct: 0.02     # daily realized+open <= -(this * starting_balance) -> halt
   max_dd_floor_pct: 0.08         # trailing drawdown floor
   max_dd_buffer_pct: 0.005       # halt if within this of the floor
   threat_critical: 0.82          # AlexandrianLibrary threat_score >= this -> halt

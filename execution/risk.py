@@ -62,6 +62,17 @@ DD_HALVE = 0.035            # Art. 3  :34
 DD_HALT = 0.050             # Art. 3  :35
 DD_FLATTEN = 0.065          # Art. 3  :35
 
+# ── Framework layer (RISK_FRAMEWORK.md, ratified 2026-07-20). ────────────────
+# These are NOT constitutional amendments — they are strictly-tighter overlays,
+# so Article 5 is not engaged and `constants()` (the drift twin) is unchanged.
+# RISK_FRAMEWORK.md ratified 2026-07-20, 2% overrides gates.py 5%
+DAILY_LOSS_HALT = 0.02          # daily P&L <= -2% of session start -> halt for the day
+CONSEC_LOSS_HALVE = 3           # 3 consecutive losses -> size 50%
+CONSEC_LOSS_HALT = 5            # 5 consecutive losses -> halt for the day
+MAX_SINGLE_POSITION = 0.10      # notional cap, fraction of account
+DEFAULT_RISK_PER_TRADE = 0.02   # R = (entry - stop) x shares; Art.1 0.75% still binds live
+PROP_EVAL_RISK_CAP = 0.01       # during a prop evaluation, 1% per trade max
+
 #: The external prop line the ladder is anchored beneath. Rationale only —
 #: deliberately unbolded in the constitution (`:36-37`), not a binding cap here.
 PROP_TRAILING_REFERENCE = 0.08
@@ -86,6 +97,11 @@ class AccountState:
     peak_equity: float
     open_carry_risk: float = 0.0      # fraction of equity at risk in carry pairs
     open_positions: int = 0
+    # RISK_FRAMEWORK.md overlay. Defaults are the no-op values, so every existing
+    # caller keeps its current behaviour until it supplies real session state.
+    daily_pnl_frac: float = 0.0       # today's realized+open P&L / session-start equity (negative = loss)
+    consecutive_losses: int = 0
+    prop_evaluation: bool = False
 
     @property
     def drawdown(self) -> float:
@@ -149,7 +165,26 @@ def check(*, symbol: str, risk_fraction: float, state: AccountState) -> RiskDeci
     elif action is Action.FLATTEN:
         breached.append(f"ART3_FLATTEN dd={dd:.4f}>={DD_FLATTEN}")
 
+    # ── RISK_FRAMEWORK.md overlay, evaluated before the ratified caps so that a
+    # framework halt cannot be softened by a passing Article check.
+    framework_halt = False
+    if state.daily_pnl_frac <= -DAILY_LOSS_HALT:
+        breached.append(f"FW_DAILY_LOSS {state.daily_pnl_frac:.4f}<=-{DAILY_LOSS_HALT}")
+        framework_halt = True
+    if state.consecutive_losses >= CONSEC_LOSS_HALT:
+        breached.append(f"FW_CONSEC_HALT {state.consecutive_losses}>={CONSEC_LOSS_HALT}")
+        framework_halt = True
+    elif state.consecutive_losses >= CONSEC_LOSS_HALVE:
+        breached.append(f"FW_CONSEC_HALVE {state.consecutive_losses}>={CONSEC_LOSS_HALVE}")
+        mult = min(mult, 0.5)
+    if framework_halt:
+        action, mult = Action.BLOCK, 0.0
+
     effective = risk_fraction * mult
+
+    # Prop evaluation caps per-trade risk tighter than Article 1.
+    if state.prop_evaluation and effective > PROP_EVAL_RISK_CAP:
+        breached.append(f"FW_PROP_EVAL {effective:.5f}>{PROP_EVAL_RISK_CAP}")
 
     # Art. 1 — the cap applies to the size that would actually be taken.
     if effective > PER_TRADE_CAP:
@@ -166,10 +201,17 @@ def check(*, symbol: str, risk_fraction: float, state: AccountState) -> RiskDeci
 
     art1_breach = any(b.startswith("ART1") for b in breached)
     art2_breach = any(b.startswith("ART2") for b in breached)
-    allowed = action in (Action.ALLOW, Action.HALVE) and not art1_breach and not art2_breach
+    fw_breach = any(b.startswith("FW_") for b in breached)
+    allowed = (action in (Action.ALLOW, Action.HALVE)
+               and not art1_breach and not art2_breach and not framework_halt
+               and not any(b.startswith("FW_PROP_EVAL") for b in breached))
 
     if not breached:
         reason = "within all ratified limits"
+    elif framework_halt:
+        reason = "RISK_FRAMEWORK.md halt — daily loss or consecutive-loss limit"
+    elif fw_breach and not (art1_breach or art2_breach) and action is Action.ALLOW:
+        reason = "RISK_FRAMEWORK.md overlay in force"
     elif action is Action.FLATTEN:
         reason = "Article 3 flatten — predictive layer flattened"
     elif action is Action.BLOCK:
