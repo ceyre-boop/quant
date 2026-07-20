@@ -1,5 +1,13 @@
 # SYSTEM STATUS
 
+**Generated 2026-07-19 · Autonomous agent setup · branch `sovereign-v2`**
+
+## Autonomous operation — what runs without you
+
+Three Claude agent plists were authored 2026-07-19 and are ready to install (see below). Once installed, the system runs three autonomous Claude sessions daily with no manual intervention: a morning agent at 07:55 ET (Mon–Fri) that pulls the information layer, generates Oracle bias, scans gapper candidates through the frozen HYP-107/HYP-093 filters, and updates the prop sim dashboard; an EOD agent at 16:00 ET (Mon–Fri) that coordinates post-harness fill reconciliation, runs `execution.eod`, updates the dashboard, and writes the Obsidian session note; and a research agent at 21:00 ET (Sun–Thu) that pulls recent mover data, runs micro-backtests, appends to `research/weekly_pattern_update.md`, and pre-registers any pattern that survives a first-pass screen. All three agents read `AGENT_DIRECTIVE.md` as their standing order, commit after every pass, and push to `sovereign-v2`. The sole action required of you: run `bash ~/quant/scripts/install_agent_plists.sh` in your terminal once, then run the test command in that file's header comment to verify the loop fires correctly.
+
+---
+
 **Generated 2026-07-18 · TICK-040 · branch `sovereign-v2`**
 
 Six layers assembled and wired. Read the two tables together — **layer health and

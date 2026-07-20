@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Autonomous off-hours research agent — Claude reads AGENT_DIRECTIVE.md and
+  executes the 21:00 ET routine: pull recent movers, run micro-backtests,
+  update research/weekly_pattern_update.md, pre-register surviving hypotheses.
+
+  Fires 21:00 ET Sun–Thu (Weekday 0–4 in launchd where 0=Sunday, to avoid
+  running after the Friday/Saturday market closure with no new data).
+
+  INSTALL (operator hand):
+    cp scripts/com.alta.research_agent.plist ~/Library/LaunchAgents/
+    launchctl load ~/Library/LaunchAgents/com.alta.research_agent.plist
+    python3 scripts/plist_watchdog.py --rebaseline "loaded research_agent"
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.alta.research_agent</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/sh</string>
+    <string>-c</string>
+    <string>set -a; . /Users/taboost/quant/.env; set +a; /usr/local/bin/claude --print "Read ~/quant/AGENT_DIRECTIVE.md and execute the 21:00 research routine" --allowedTools "Bash,Read,Write,Edit,Glob,Grep" 2>&amp;1</string>
+  </array>
+
+  <key>WorkingDirectory</key>
+  <string>/Users/taboost/quant</string>
+
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>/usr/local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+    <key>PYTHONPATH</key>
+    <string>/Users/taboost/quant</string>
+    <key>HOME</key>
+    <string>/Users/taboost</string>
+  </dict>
+
+  <key>StandardOutPath</key>
+  <string>/Users/taboost/quant/logs/research_agent.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/taboost/quant/logs/research_agent.log</string>
+
+  <key>Nice</key>
+  <integer>5</integer>
+
+  <key>RunAtLoad</key>
+  <false/>
+
+  <key>StartCalendarInterval</key>
+  <array>
+    <dict><key>Hour</key><integer>21</integer><key>Minute</key><integer>0</integer><key>Weekday</key><integer>0</integer></dict>
+    <dict><key>Hour</key><integer>21</integer><key>Minute</key><integer>0</integer><key>Weekday</key><integer>1</integer></dict>
+    <dict><key>Hour</key><integer>21</integer><key>Minute</key><integer>0</integer><key>Weekday</key><integer>2</integer></dict>
+    <dict><key>Hour</key><integer>21</integer><key>Minute</key><integer>0</integer><key>Weekday</key><integer>3</integer></dict>
+    <dict><key>Hour</key><integer>21</integer><key>Minute</key><integer>0</integer><key>Weekday</key><integer>4</integer></dict>
+  </array>
+</dict>
+</plist>

@@ -6,6 +6,42 @@ Standing constraints live in `CLAUDE.md` — not restated here.
 
 ---
 
+## 2026-07-19 · Autonomous agent setup — AGENT_DIRECTIVE + 3 launchd plists
+
+**What shipped:**
+- `AGENT_DIRECTIVE.md` (repo root) — standing order for every autonomous Claude session.
+  Covers four routines: 08:00 morning (info + bias + scan + dashboard), 09:30 signal
+  scoring (GO/NO-GO via frozen HYP-107/HYP-093), 16:05 EOD (fills + reconcile + Obsidian),
+  21:00 research (movers + micro-backtest + weekly_pattern_update.md). Eight standing rules
+  including hash-freeze guard, holdout protection, and commit-on-every-pass.
+- `scripts/com.alta.morning_agent.plist` — fires 07:55 ET Mon–Fri via launchd.
+- `scripts/com.alta.eod_agent.plist` — fires 16:00 ET Mon–Fri via launchd.
+- `scripts/com.alta.research_agent.plist` — fires 21:00 ET Sun–Thu via launchd.
+- `scripts/install_agent_plists.sh` — one-shot installer; copies plists + loads + rebaselines.
+- `research/weekly_pattern_update.md` — stub file for the research agent to append to.
+- `logs/autonomous_test_2026-07-19.log` — placeholder; overwrite with live test run.
+- `SYSTEM_STATUS.md` — updated with autonomous operation section.
+
+**Push status:** PENDING (operator must run 2 commands — see below).
+
+**OPERATOR ACTIONS REQUIRED (2):**
+1. Install plists:
+   ```bash
+   bash ~/quant/scripts/install_agent_plists.sh
+   ```
+2. Run test loop:
+   ```bash
+   claude --print "Read ~/quant/AGENT_DIRECTIVE.md and execute the 08:00 morning routine" \
+     --allowedTools "Bash,Read,Write,Edit,Glob,Grep" \
+     2>&1 | tee ~/quant/logs/autonomous_test_2026-07-19.log
+   git add logs/autonomous_test_2026-07-19.log && git commit -m "[AGENT] Autonomous test loop 2026-07-19" && git push
+   ```
+
+**Refusals:** sandbox cannot reach api.anthropic.com → test loop must run on Mac host.
+No changes to execution path, frozen configs, or holdout data. Shadow freeze honored.
+
+---
+
 ## 2026-07-18 · TICK-038 EXECUTION HARNESS — THE SPREAD ASSUMPTION WAS WRONG BY ~10x
 
 Built `execution/harness.py`: one measurement instrument replacing the two forked shadows

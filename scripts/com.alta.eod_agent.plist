@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Autonomous EOD agent — Claude reads AGENT_DIRECTIVE.md and executes
+  the 16:05 ET routine: collect fills, EOD reconciliation, dashboard update,
+  Obsidian session note, NEXT.md entry, commit + push.
+
+  Fires 16:00 ET Mon–Fri (5 min before the EOD routine's 16:05 window opens,
+  to allow time for harness output to arrive before coordination begins).
+  com.alta.execution_harness (Python, 16:05 ET) runs concurrently and captures
+  the actual bid/ask fills — this agent waits for that output, then reconciles.
+
+  INSTALL (operator hand):
+    cp scripts/com.alta.eod_agent.plist ~/Library/LaunchAgents/
+    launchctl load ~/Library/LaunchAgents/com.alta.eod_agent.plist
+    python3 scripts/plist_watchdog.py --rebaseline "loaded eod_agent"
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.alta.eod_agent</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/sh</string>
+    <string>-c</string>
+    <string>set -a; . /Users/taboost/quant/.env; set +a; /usr/local/bin/claude --print "Read ~/quant/AGENT_DIRECTIVE.md and execute the 16:05 EOD routine" --allowedTools "Bash,Read,Write,Edit,Glob,Grep" 2>&amp;1</string>
+  </array>
+
+  <key>WorkingDirectory</key>
+  <string>/Users/taboost/quant</string>
+
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>/usr/local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+    <key>PYTHONPATH</key>
+    <string>/Users/taboost/quant</string>
+    <key>HOME</key>
+    <string>/Users/taboost</string>
+  </dict>
+
+  <key>StandardOutPath</key>
+  <string>/Users/taboost/quant/logs/eod_agent.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/taboost/quant/logs/eod_agent.log</string>
+
+  <key>Nice</key>
+  <integer>5</integer>
+
+  <key>RunAtLoad</key>
+  <false/>
+
+  <key>StartCalendarInterval</key>
+  <array>
+    <dict><key>Hour</key><integer>16</integer><key>Minute</key><integer>0</integer><key>Weekday</key><integer>1</integer></dict>
+    <dict><key>Hour</key><integer>16</integer><key>Minute</key><integer>0</integer><key>Weekday</key><integer>2</integer></dict>
+    <dict><key>Hour</key><integer>16</integer><key>Minute</key><integer>0</integer><key>Weekday</key><integer>3</integer></dict>
+    <dict><key>Hour</key><integer>16</integer><key>Minute</key><integer>0</integer><key>Weekday</key><integer>4</integer></dict>
+    <dict><key>Hour</key><integer>16</integer><key>Minute</key><integer>0</integer><key>Weekday</key><integer>5</integer></dict>
+  </array>
+</dict>
+</plist>
