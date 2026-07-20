@@ -19,6 +19,7 @@ memoises this so sizing sweeps stay vectorised.
 from __future__ import annotations
 
 import json
+import logging
 from pathlib import Path
 
 import numpy as np
@@ -26,6 +27,13 @@ import pandas as pd
 
 from . import data as _data
 from . import audit as _audit
+from . import holdout_guard as _hg
+
+log = logging.getLogger(__name__)
+
+# Cost legs this engine is required to charge. Checked at run() so a config that
+# silently zeroes a friction leg is loud rather than optimistic.
+REQUIRED_COST_LEGS = ("spread", "slippage", "borrow_haircut")
 
 REPO = Path(__file__).resolve().parents[1]
 LOCATE_DIR = REPO / "data/research/gapper"
@@ -147,19 +155,50 @@ def _simulate_event(bars: pd.DataFrame, cfg: dict, gain: float) -> dict:
             "gross_pct": round(gross, 5), "net_pct": round(net, 5)}
 
 
+def _check_costs(cfg: dict) -> list[str]:
+    """WARN on any friction leg that has been zeroed or bypassed.
+
+    The spread and borrow legs are computed unconditionally inside
+    _simulate_event, so the only way to lose them is to hand in a config that
+    zeroes the knobs. Commission is genuinely absent (paper/IB tiered on these
+    names is ~0 for the modelled sizes) and is reported as an explicit
+    known-omission rather than left implicit.
+    """
+    missing = []
+    if float(cfg.get("slippage", 0.005)) <= 0:
+        missing.append("slippage=0 (per-side floor disabled)")
+    if cfg.get("commission_bps") is None:
+        missing.append("commission not modelled (known omission: ~0 for paper)")
+    if cfg.get("direction") == "short" and not cfg.get("locate_required"):
+        missing.append("short strategy without locate_required — borrow "
+                       "availability gate bypassed")
+    for m in missing:
+        log.warning("backtester.engine cost model: %s", m)
+    return missing
+
+
 def run(events_df: pd.DataFrame, strategy_config: dict,
-        data_cache=None, write_audit: bool = True) -> dict:
+        data_cache=None, write_audit: bool = True,
+        check_holdout: bool = True) -> dict:
     """Backtest every event in events_df under strategy_config.
 
     events_df columns required: date, ticker, gain (gap fraction for haircut).
     strategy_config: entry_time, stop_pct, exit_time, direction, sizing_pct,
                      locate_required (bool), on_missing_locate ('take'|'skip').
+
+    The event dates are validated against the sealed gapper holdout unless the
+    run is sanctioned (see backtester/holdout_guard.py).
     """
     cfg = dict(strategy_config)
+    if check_holdout and len(events_df) and "date" in events_df.columns:
+        d = events_df["date"].astype(str)
+        _hg.validate_date_range(d.min(), d.max(), context="engine.run",
+                                dataset="gapper_intraday")
     cfg.setdefault("exit_time", "15:45")
     cfg.setdefault("direction", "short")
     cfg.setdefault("on_missing_locate", "take")
     sizing = cfg.get("sizing_pct", 0.02)
+    cost_warnings = _check_costs(cfg)
 
     locate_cache: dict[str, dict | None] = {}
     records, daily = [], {}
@@ -224,6 +263,7 @@ def run(events_df: pd.DataFrame, strategy_config: dict,
     taken = [r for r in records if r.get("trade_taken")]
     result = {
         "config": cfg,
+        "cost_warnings": cost_warnings,
         "n_events": len(records), "n_taken": len(taken),
         "n_no_locate": sum(1 for r in records if r.get("reason") == "no_locate"),
         "n_unknown_locate": sum(1 for r in records

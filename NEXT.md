@@ -1310,3 +1310,42 @@ explicit instruction.
 - Vault artifacts: `~/Obsidian/Obsidian/BRAIN_INDEX.md` (one-shot situational-awareness file, regenerated nightly by `scripts/refresh_brain_index.py`) + `Trading Psychology/weakness_log.md` template. Vault repo commit b3b57b9 (local-only, no remote configured — expected).
 - Tests: `tests/unit/test_brain_obsidian.py` 5/5 green (write-read roundtrip per writer + missing-vault degradation + ict-isolation invariant). ICT isolation suite still green.
 - Pushed sovereign-v2 bbcba21. No live trading params touched (NN#4 respected); the brain is read/write-to-vault only and gates nothing.
+
+## 2026-07-20 — Overfitting safeguards audit + hardening
+
+Audited backtester/ + backtest/ + sovereign/discovery/ against the 5-step research
+method. Method was substantially enforced already; gaps were enforcement, not concept.
+
+**Shipped**
+- `backtester/holdout_guard.py` (new) — central HOLDOUT_REGISTRY replacing four
+  scattered constants (2025-07-17 / 2025-01-01 / 2024-01-01 / 2024-07-01), plus
+  `validate_date_range()`. Unbounded ranges count as touching. Access needs
+  explicit sanction; every access appended to `data/agent/holdout_access_log.jsonl`.
+  Wired into engine.run, scanner.scan, daily_engine.backtest_daily.
+  hyp104_holdout sanctions itself after its prereg-hash guard passes.
+- `backtester/walk_forward.py` (new) — row-based rolling WF for the backtester
+  stack, which previously had a SINGLE date split only. Test slices tile
+  contiguously; reports `param_stability.refit_churn`.
+- Fixed `backtest/walk_forward.py` EXPANDING bug — train_end never advanced, so
+  every "expanding" window was identical (silent single-split degradation).
+- `engine._check_costs()` — WARNs on zeroed slippage, unmodelled commission,
+  shorts without locate gate; surfaced as `result["cost_warnings"]`.
+
+**No parameter values changed** — registry dates mirror the constants already in
+megascan/yield_frontier, so no param_change_log entry is due. Changing one later
+does require one.
+
+**Verdicts** — `tests/test_overfitting_safeguards.py` 18/18 new, test_backtester
+7/7. Full suite 1533 passed / 20 failed; all 20 pre-existing ICT/forex failures,
+confirmed by stashing every change and reproducing them identically (those files
+don't import backtester). ICT/sovereign isolation test passing.
+
+**Refused to shortcut** — did NOT wire `realistic_fills` (measured TICK-039 spread)
+into `engine.py`. That is the top remaining gap: backtest and live harness charge
+different spreads, so reconciliation compares two cost worlds. Fixing it re-prices
+every gapper result and needs its own ticket + re-baseline, not a drive-by edit.
+Other open gaps: commission unmodelled, no cross-script n_trials budget, the four
+legacy forex-side holdout constants unmigrated, and walk_forward_backtest has no
+adoption yet (first candidate: re-run a megascan survivor under rolling windows).
+
+Full writeup: `~/Obsidian/Obsidian/System/overfitting_safeguards.md`

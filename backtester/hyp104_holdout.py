@@ -7,6 +7,7 @@ from pathlib import Path
 import numpy as np
 
 from . import daily_engine as de
+from . import holdout_guard
 
 REPO = Path(__file__).resolve().parents[1]
 PREREG = REPO / "research/hyp_104_downgap_short_prereg.md"
@@ -27,6 +28,9 @@ def guard():
     log = subprocess.run(["git", "-C", str(REPO), "log", "--oneline", "--",
                           str(PREREG)], capture_output=True, text=True).stdout
     assert log.strip(), "prereg not committed — holdout refused"
+    # Prereg is committed and hash-matched: this IS the sanctioned single touch
+    # of the sealed window. Recorded to data/agent/holdout_access_log.jsonl.
+    holdout_guard.sanction(f"HYP-104 prereg {PREREG_SHA[:7]} verified + committed")
 
 
 def main():

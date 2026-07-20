@@ -24,6 +24,7 @@ import numpy as np
 import pandas as pd
 
 from . import engine as _engine
+from . import holdout_guard as _hg
 
 _CTX = _mp.get_context("fork" if os.name == "posix" else "spawn")
 N_PERM = 100
@@ -43,7 +44,10 @@ def _event_nets(args):
            "exit_time": exit_time, "direction": direction, "sizing_pct": 1.0,
            "locate_required": locate_required, "on_missing_locate": "take"}
     ev = pd.DataFrame(events_records)
-    res = _engine.run(ev, cfg, data_cache=cache, write_audit=False)
+    # scan() already validated the event span once; re-checking per combo
+    # would log thousands of duplicate access records.
+    res = _engine.run(ev, cfg, data_cache=cache, write_audit=False,
+                      check_holdout=False)
     out = []
     for r in res["records"]:
         if r.get("trade_taken"):
@@ -98,8 +102,17 @@ def _latin_hypercube(grid, n, rng):
 
 
 def scan(events_df, param_grid, data_cache=None, n_jobs=None,
-         max_configs=1_000_000):
-    """Enumerate/sample configs, memoise fills, correct family-wise."""
+         max_configs=1_000_000, check_holdout=True):
+    """Enumerate/sample configs, memoise fills, correct family-wise.
+
+    A parameter scan is the single most overfitting-prone operation in the
+    stack, so the holdout span is validated here once, up front, before any
+    config is evaluated.
+    """
+    if check_holdout and len(events_df) and "date" in events_df.columns:
+        d = events_df["date"].astype(str)
+        _hg.validate_date_range(d.min(), d.max(), context="scanner.scan",
+                                dataset="gapper_intraday")
     grid = dict(param_grid)
     grid.setdefault("exit_time", ["15:45"])
     grid.setdefault("direction", ["short"])

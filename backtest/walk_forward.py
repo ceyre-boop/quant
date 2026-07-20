@@ -126,11 +126,18 @@ class WalkForwardTester:
         while True:
             # Calculate window boundaries
             if self.config.mode == WalkForwardMode.EXPANDING:
+                # Anchored: train_start pinned, train_end advances with the roll
+                # so the window genuinely EXPANDS. Previously train_end was
+                # train_start + train_window with train_start also pinned, which
+                # made every window identical and silently degraded EXPANDING
+                # into a single repeated split (fixed 2026-07-20).
                 train_start = self.config.start_date
+                train_end = current + timedelta(days=30 * self.config.train_window_months)
             else:
                 train_start = current
-            
-            train_end = train_start + timedelta(days=30 * self.config.train_window_months)
+                train_end = train_start + timedelta(days=30 * self.config.train_window_months)
+
+
             test_start = train_end
             test_end = test_start + timedelta(days=30 * self.config.test_window_months)
             

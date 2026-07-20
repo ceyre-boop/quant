@@ -24,6 +24,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+from . import holdout_guard as _hg
+
 REPO = Path(__file__).resolve().parents[1]
 UNIVERSE = REPO / "data/cache/daily_universe"
 _CTX = _mp.get_context("fork" if os.name == "posix" else "spawn")
@@ -87,8 +89,17 @@ def _signal_dates(df: pd.DataFrame, fam: str, cfg: dict) -> np.ndarray:
 
 
 def backtest_daily(df: pd.DataFrame, fam: str, cfg: dict,
-                   date_lo="0000", date_hi="9999") -> dict:
-    """Return per-trade net returns + aggregate metrics on [date_lo, date_hi)."""
+                   date_lo="0000", date_hi="9999", check_holdout: bool = True) -> dict:
+    """Return per-trade net returns + aggregate metrics on [date_lo, date_hi).
+
+    date_hi is exclusive, so the guard is asked about the last tradeable date.
+    A sanctioned verdict runner (prereg verified) sets ALLOW_HOLDOUT_ACCESS or
+    calls holdout_guard.sanction(); check_holdout=False is for unit tests on
+    synthetic frames only.
+    """
+    if check_holdout:
+        _hg.validate_date_range(date_lo, str(date_hi), context="daily_engine.backtest_daily",
+                                dataset="equities_daily")
     o = df["open"].to_numpy()
     h = df["high"].to_numpy()
     lo = df["low"].to_numpy()

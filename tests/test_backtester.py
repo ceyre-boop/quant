@@ -24,6 +24,7 @@ def test_stop_never_fills_at_trigger_on_gapthrough():
                direction="short", sizing_pct=1.0)
     ev = pd.DataFrame([{"date": "2026-01-05", "ticker": "TEST", "gain": 1.0}])
     res = engine.run(ev, cfg, data_cache={("TEST", "2026-01-05"): bars},
+                     check_holdout=False,
                      write_audit=False)
     r = res["records"][0]
     assert r["stop_hit"] and not r["filled_at_trigger"]
@@ -43,6 +44,7 @@ def test_intrabar_breach_fills_at_trigger():
                direction="short", sizing_pct=1.0)
     ev = pd.DataFrame([{"date": "2026-01-05", "ticker": "T", "gain": 1.0}])
     res = engine.run(ev, cfg, data_cache={("T", "2026-01-05"): bars},
+                     check_holdout=False,
                      write_audit=False)
     r = res["records"][0]
     assert r["stop_hit"] and r["filled_at_trigger"]
@@ -65,7 +67,7 @@ def test_locate_gate_skips_no_locate(tmp_path, monkeypatch):
     cfg = dict(entry_time="10:30", stop_pct=0.25, exit_time="15:45",
                direction="short", sizing_pct=1.0, locate_required=True,
                on_missing_locate="take")
-    res = eng.run(ev, cfg, data_cache=cache, write_audit=False)
+    res = eng.run(ev, cfg, data_cache=cache, write_audit=False, check_holdout=False)
     by = {r["ticker"]: r for r in res["records"]}
     assert by["GOODX"]["trade_taken"] is True
     assert by["BADX"]["trade_taken"] is False
@@ -96,12 +98,12 @@ def test_family_correction_monotonic_in_n_tested():
                        {"date": "2026-01-06", "ticker": "B", "gain": 1.0}])
     small = scanner.scan(ev, {"entry_time": ["10:30"], "stop_pct": [0.25],
                               "sizing_pct": [0.02], "direction": ["short"]},
-                         data_cache=cache, n_jobs=1)
+                         data_cache=cache, n_jobs=1, check_holdout=False)
     big = scanner.scan(ev, {"entry_time": ["10:30"],
                             "stop_pct": [0.20, 0.25, 0.30, 0.35],
                             "sizing_pct": [0.01, 0.02, 0.03],
                             "direction": ["short"]},
-                       data_cache=cache, n_jobs=1)
+                       data_cache=cache, n_jobs=1, check_holdout=False)
     shared = lambda df: df[(df.entry_time == "10:30") & (df.stop_pct == 0.25)
                            & (df.sizing_pct == 0.02)].iloc[0]
     assert big["n_tested"].iloc[0] > small["n_tested"].iloc[0]
@@ -116,6 +118,7 @@ def test_audit_catches_lookahead():
                direction="short", sizing_pct=1.0)
     ev = pd.DataFrame([{"date": "2026-01-05", "ticker": "T", "gain": 1.0}])
     res = engine.run(ev, cfg, data_cache={("T", "2026-01-05"): bars},
+                     check_holdout=False,
                      write_audit=False)
     r = res["records"][0]
     assert r["trade_taken"] is False and r["reason"] == "no_entry_bar"
@@ -130,5 +133,6 @@ def test_short_fade_pnl_sign():
                direction="short", sizing_pct=1.0, slippage=0.0)
     ev = pd.DataFrame([{"date": "2026-01-05", "ticker": "T", "gain": 1.0}])
     res = engine.run(ev, cfg, data_cache={("T", "2026-01-05"): bars},
+                     check_holdout=False,
                      write_audit=False)
     assert res["records"][0]["gross_pct"] > 0    # entry 10 -> exit 7, short wins
