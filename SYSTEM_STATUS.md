@@ -27,9 +27,12 @@ unproven edge tradeable.
 | 5 | Risk | `execution/risk.py` | **LIVE** | Ratified five enforced; 3 unlegislated gates refused |
 | 6 | Feedback | `execution/eod.py` + `obsidian.py` | **LIVE (code)** · plist PENDING INSTALL | EOD note → `Trading/Ops/System-EOD-{date}.md` |
 
-**Tests:** 1456 passing (+88 from this work). Pre-existing failures unchanged at 40
-(`test_ml_stack.py` tests a deleted API; ICT session-classifier and gate-ordering
-drift predate this work).
+**Tests:** 1541 collect cleanly. Pre-existing failures triaged 2026-07-19: in
+`test_ml_stack.py`, only `TestPCACompressor` + `TestBlackScholes` tested deleted
+APIs (`pca_compressor` removed, `bs_*` refactored into `VolRegimeSignal`) — now
+**skipped**. The other 12 failures there are **genuine risk-layer regressions**
+against still-existing Kalman/LQR/Pegasus/TradeMDP modules (OPEN_ITEMS #7), no
+longer masked. ICT session-classifier + gate-ordering drift still predate this work.
 
 ### Daily flow once installed
 
@@ -67,13 +70,14 @@ tell you the truth faster; it has not made the edges bigger.
 
 ## 3. Information health — measured, not assumed
 
-Latest `execution/context.py` run: **2 of 7 sources FRESH (29%)**.
+Latest `execution/context.py` run: **3 of 7 sources FRESH (43%)** after the
+sentiment plist was loaded 2026-07-19.
 
 | Source | Status | Detail |
 |---|---|---|
 | `fred_macro` | FRESH | 16 series |
 | `daily_panel` | FRESH | |
-| `sentiment_board` | **STALE 313h** | plist authored, never installed |
+| `sentiment_board` | FRESH | plist installed + loaded 2026-07-19 (`plist_manifest`: OK) |
 | `briefing` | STALE 37h | own plist never installed; survives via an in-process call |
 | `reddit` | **SILENT_NULL** | file 0.9h old, `posts_scanned: 0` |
 | `gdelt` | UNAVAILABLE | 0 rows ever ingested |
@@ -114,23 +118,21 @@ Latest `execution/context.py` run: **2 of 7 sources FRESH (29%)**.
 
 ## 5. Next action
 
-**Install the sentiment plist.** One command, highest value available:
+**~~Install the sentiment plist.~~ DONE 2026-07-19** — `com.alta.sentiment_update`
+is loaded (`plist_manifest`: OK); the board is fresh and feeds the 08:00 scan.
+**~~Export the 6 UNTRACKED plists into `scripts/`.~~ DONE 2026-07-19** (commit
+`cb6a9bf`) — UNTRACKED count 6 → 0; live jobs are now reviewable.
 
-```bash
-cp scripts/com.alta.sentiment_update.plist ~/Library/LaunchAgents/
-launchctl load ~/Library/LaunchAgents/com.alta.sentiment_update.plist
-python3 scripts/plist_watchdog.py --rebaseline "loaded sentiment_update"
-```
+Remaining, in order (see `OPEN_ITEMS.md` for the full audit):
 
-It un-darkens a board that has been stale 13 days and feeds the 08:00 scan.
-
-Then, in order:
-
-1. `com.alta.system_morning` + `com.alta.system_eod` (this work) — same pattern.
-2. **Fix the outcome loop.** Nothing downstream can be trusted while 0/23.
-3. **Export the 6 UNTRACKED plists** into `scripts/` so live jobs are reviewable.
-4. **Rule on `docs/proposed_amendment_art7-9.md`** — Art. 7 at 2.0% recommended,
-   Art. 8 defer, Art. 9 reject.
+1. **Install `com.alta.decision_backfill`** — Oracle entry-side backfill has been
+   unscheduled since 2026-07-01 (OPEN_ITEMS #1). Highest value now available.
+2. `com.alta.system_morning` + `com.alta.system_eod` — same install pattern; the
+   six-layer loop is code-only until they load.
+3. **Rule on `docs/proposed_amendment_art7-9.md`** — daily-loss cap is 5% (`gates.py`)
+   vs 2% (`prop_risk_manager.py:49`), both live, neither ratified. Art. 7 at 2.0%
+   recommended, Art. 8 defer, Art. 9 reject.
+4. **Triage the 12 genuine `test_ml_stack` regressions** (OPEN_ITEMS #7) — risk layer.
 5. **Re-run killed hypotheses under the corrected cost model.** The 11.3× spread
    overcharge (TICK-039) may have buried a real edge in the ~40 NOT_SIGNIFICANT
    verdicts. Highest expected value on the board, no new mining required.
