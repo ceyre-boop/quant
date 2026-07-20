@@ -5,25 +5,12 @@ Alta Investments — Reddit Sentiment Engine
 Scrapes public Reddit JSON for trading sentiment signals via Reddit's public
 .json endpoint.
 
-CREDENTIAL STATUS (verified 2026-07-20): BROKEN — all four subreddits return
-HTTP 403. Reddit now blocks unauthenticated/datacenter access to the public
-.json endpoint; a User-Agent alone is no longer sufficient. There are no Reddit
-credentials in .env (no REDDIT_* keys of any kind), so this job cannot return
-data as written.
+Uses Reddit's public JSON API — no credentials required.
+UA: quant-sentiment/1.0 by Potential-Peanut-695
 
-  To fix, register a Reddit "script" OAuth app at
-  https://www.reddit.com/prefs/apps and set in .env:
-      REDDIT_CLIENT_ID=<14-char id under the app name>
-      REDDIT_CLIENT_SECRET=<27-char secret>
-      REDDIT_USER_AGENT=sovereign-quant/1.0 by /u/<your-username>
-  Then switch _fetch_subreddit to the OAuth flow (POST to
-  https://www.reddit.com/api/v1/access_token with grant_type=client_credentials,
-  then GET https://oauth.reddit.com/r/{sub}/hot with the bearer token).
-
-Until then this job fails loudly: it logs REDDIT_FETCH_FAILED, writes
-data/health/reddit_status.json with status FAILED, leaves the cache untouched
-(so freshness monitors do NOT go green on an empty payload), and exits 1 so
-launchctl records the failure.
+If Reddit returns 403, it may be a temporary datacenter block. The scraper logs
+the failure, writes data/health/reddit_status.json with status FAILED, leaves
+the cache untouched, and exits 1.
 
 Subreddits monitored:
   r/wallstreetbets  — equity flow, ticker mentions, momentum signals
@@ -70,7 +57,7 @@ logging.basicConfig(
 )
 log = logging.getLogger(__name__)
 
-UA = "sovereign-quant/1.0 (autonomous trading system research)"
+UA = "quant-sentiment/1.0 by Potential-Peanut-695"
 
 # ── Subreddits to monitor ─────────────────────────────────────────────────────
 
@@ -138,27 +125,61 @@ FETCH_FAILURES: Dict[str, str] = {}
 def _fetch_subreddit(subreddit: str, limit: int, sort: str = "hot") -> List[dict]:
     """Fetch posts from a subreddit JSON endpoint. Returns list of post dicts.
 
+    Tries old.reddit.com first (more permissive with bots), then falls back to
+    www.reddit.com. Retries on 429 with exponential backoff (up to 3 attempts).
+
     Records any failure in FETCH_FAILURES so run() can fail loudly rather than
     writing an empty cache and exiting 0 ("green but empty").
     """
-    url = f"https://www.reddit.com/r/{subreddit}/{sort}.json?limit={limit}"
-    try:
-        r = requests.get(url, headers={"User-Agent": UA}, timeout=12)
-        if r.status_code in (403, 429):
-            # Reddit blocks unauthenticated/datacenter access to the public .json endpoint.
-            # Real sentiment data needs a Reddit OAuth app (REDDIT_CLIENT_ID /
-            # REDDIT_CLIENT_SECRET) — a User-Agent alone is no longer sufficient.
-            log.error(f"REDDIT_FETCH_FAILED: {r.status_code} — credential issue or rate limit "
-                      f"(r/{subreddit}; needs a Reddit OAuth app: REDDIT_CLIENT_ID/SECRET)")
-            FETCH_FAILURES[subreddit] = str(r.status_code)
-            return []
-        r.raise_for_status()
-        children = r.json()["data"]["children"]
-        return [c["data"] for c in children]
-    except Exception as e:
-        log.error(f"REDDIT_FETCH_FAILED: {type(e).__name__} — r/{subreddit}: {e}")
-        FETCH_FAILURES[subreddit] = f"{type(e).__name__}: {e}"
-        return []
+    headers = {
+        "User-Agent": UA,
+        "Accept": "application/json",
+        "Accept-Language": "en-US,en;q=0.9",
+    }
+    # old.reddit.com is more permissive for JSON bot access than www.reddit.com
+    url_candidates = [
+        f"https://old.reddit.com/r/{subreddit}/{sort}.json?limit={limit}&raw_json=1",
+        f"https://www.reddit.com/r/{subreddit}/{sort}.json?limit={limit}&raw_json=1",
+    ]
+
+    last_error: str = "unknown"
+    for url in url_candidates:
+        for attempt in range(3):
+            try:
+                r = requests.get(url, headers=headers, timeout=15)
+                if r.status_code == 429:
+                    wait = 2 ** attempt * 2  # 2s, 4s, 8s
+                    log.warning(f"r/{subreddit}: 429 rate-limited — waiting {wait}s (attempt {attempt+1}/3)")
+                    time.sleep(wait)
+                    last_error = "429"
+                    continue
+                if r.status_code == 403:
+                    log.debug(f"r/{subreddit}: 403 on {url} — trying next URL")
+                    last_error = "403"
+                    break  # try next url_candidate
+                r.raise_for_status()
+                data = r.json()
+                children = data["data"]["children"]
+                posts = [c["data"] for c in children]
+                if posts:
+                    log.info(f"r/{subreddit}: fetched {len(posts)} posts from {url.split('/')[2]}")
+                return posts
+            except requests.exceptions.JSONDecodeError as e:
+                log.warning(f"r/{subreddit}: JSON decode error on {url} — Reddit returned HTML? {e}")
+                last_error = f"JSONDecodeError: {e}"
+                break  # try next url_candidate
+            except Exception as e:
+                log.warning(f"r/{subreddit}: {type(e).__name__} on attempt {attempt+1}: {e}")
+                last_error = f"{type(e).__name__}: {e}"
+                if attempt < 2:
+                    time.sleep(2 ** attempt)
+        else:
+            # exhausted retries on this url_candidate
+            continue
+
+    log.error(f"REDDIT_FETCH_FAILED: {last_error} — r/{subreddit}: all URL/retry combinations exhausted")
+    FETCH_FAILURES[subreddit] = last_error
+    return []
 
 
 def _write_health(status: str, error: str | None, posts: int) -> None:

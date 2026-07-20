@@ -40,7 +40,10 @@ import oandapyV20.endpoints.trades as trades
 from dotenv import load_dotenv
 from oandapyV20.exceptions import V20Error
 
-load_dotenv()
+# Resolve ROOT first so load_dotenv always finds .env regardless of CWD
+# (launchd and cron jobs may run from /, ~ or any other directory).
+ROOT = Path(__file__).parents[2]
+load_dotenv(ROOT / '.env')
 logger = logging.getLogger(__name__)
 logging.basicConfig(
     level=logging.INFO,
@@ -49,7 +52,6 @@ logging.basicConfig(
 )
 
 # ── File paths ────────────────────────────────────────────────────────────────
-ROOT       = Path(__file__).parents[2]
 FILLS_LOG  = ROOT / 'data' / 'ledger' / 'oanda_fills.jsonl'
 VETO_LOG   = ROOT / 'data' / 'ledger' / 'oanda_veto_ledger.jsonl'
 FILLS_LOG.parent.mkdir(parents=True, exist_ok=True)

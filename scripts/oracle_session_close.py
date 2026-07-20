@@ -29,6 +29,12 @@ ROOT = Path(__file__).resolve().parent.parent
 # (the plist runs `python3 scripts/oracle_session_close.py`, so sys.path[0] is scripts/, not ROOT).
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
+
+# Load .env with an explicit path before any imports that need OANDA credentials.
+# Without this, load_dotenv() in oanda_bridge uses CWD, which is wrong under launchd.
+from dotenv import load_dotenv  # noqa: E402 (import after path setup is intentional)
+load_dotenv(ROOT / ".env")
+
 logging.basicConfig(level=logging.ERROR)
 for lib in ("oandapyV20", "urllib3", "requests"):
     logging.getLogger(lib).setLevel(logging.ERROR)

@@ -61,6 +61,28 @@ def query_library() -> dict:
         insight = lib.query(spy_arr, vix_prices=vix_arr,
                             gold_prices=gold_arr, dxy_prices=dxy_arr)
 
+        # Similarity floor: cosine similarity below 0.30 is indistinguishable
+        # from noise across a 23-feature normalised vector.  Firing a regime
+        # label (and the G1_LIBRARY veto) on a 0.067 match produces false
+        # precision.  Below the floor we return UNKNOWN with default sizing
+        # so the ICT engine behaves as if the library abstained.
+        # Added 2026-07-20 after forensics showed sim=0.067 at the last scan.
+        SIMILARITY_FLOOR = 0.30
+        if insight.primary_similarity < SIMILARITY_FLOOR:
+            logger.info(
+                "Library: sim=%.3f < floor %.2f — returning UNKNOWN (no regime call)",
+                insight.primary_similarity, SIMILARITY_FLOOR,
+            )
+            return {
+                **_FALLBACK,
+                'available': True,   # library loaded OK, just no confident match
+                'regime':   'UNKNOWN',
+                'advisory': (
+                    f'sim={insight.primary_similarity:.3f} below floor '
+                    f'{SIMILARITY_FLOOR:.2f} — no confident regime match.'
+                ),
+            }
+
         result = {
             'regime':        insight.primary_regime,
             'threat':        insight.threat_level,

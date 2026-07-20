@@ -19,5 +19,5 @@ if [ "$UTC_TIME" -lt 720 ] || [ "$UTC_TIME" -ge 900 ]; then
 fi
 
 echo "[$(date -u '+%Y-%m-%d %H:%M:%S UTC')] NY AM scan starting..." >> "$LOG"
-python3 -m ict.orchestrator --once --ny-am >> "$LOG" 2>&1
+.venv/bin/python3 -m ict.orchestrator --once --ny-am >> "$LOG" 2>&1
 echo "[$(date -u '+%Y-%m-%d %H:%M:%S UTC')] Done." >> "$LOG"
