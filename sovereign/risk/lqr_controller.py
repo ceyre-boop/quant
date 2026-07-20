@@ -95,8 +95,54 @@ class LQRController:
         # Control cost R: penalise large deviations from neutral sizing
         self._R = np.array([[r_control]], dtype=np.float64)
 
-        # Solve the discrete-time algebraic Riccati equation
+        # Solve the discrete-time algebraic Riccati equation (infinite horizon)
         self._K = self._solve_riccati()
+
+        # Finite-horizon backward Riccati recursion → per-step feedback gains.
+        # L_t is the positive-form gain so the optimal control is u* = -L_t·x
+        # (Ng L18). L_matrices[0] is the gain applied at the current step.
+        self._L_matrices = self._solve_finite_horizon()
+
+    # ── Finite-horizon Riccati recursion ─────────────────────────────── #
+
+    def _solve_finite_horizon(self) -> list:
+        """
+        Backward Riccati recursion over the planning horizon.
+
+        Terminal:  P_H = Q
+        Recursion: L_t = (BᵀP_{t+1}B + R)⁻¹ BᵀP_{t+1}A
+                   P_t = Q + AᵀP_{t+1}A − AᵀP_{t+1}B·L_t
+
+        Returns:
+            [L_0, …, L_{H-1}] — a list of (n_control, n_state) gain matrices,
+            L_0 applied at the current step.
+        """
+        A, B, Q, R = self._A, self._B, self._Q, self._R
+        P = Q.copy()
+        gains: list = []
+        for _ in range(max(1, self._horizon)):
+            M = B.T @ P @ B + R
+            L = np.linalg.inv(M) @ B.T @ P @ A
+            P = Q + A.T @ P @ A - A.T @ P @ B @ L
+            gains.append(L)
+        gains.reverse()   # gains[0] is the gain applied at the current step
+        return gains
+
+    # ── Linear optimal action ────────────────────────────────────────── #
+
+    def get_action(self, state: np.ndarray) -> float:
+        """
+        Optimal LQR control for a raw state vector (Ng L18: u* = -L·x).
+
+        Args:
+            state: shape (n_state,) = [drawdown_pct, rolling_pnl_3d,
+                   consecutive_losses, kelly_fraction].
+
+        Returns:
+            The scalar optimal control u* (deviation from neutral sizing).
+        """
+        x = np.asarray(state, dtype=np.float64)
+        return float(-(self._L_matrices[0] @ x)[0])
 
     # ── Riccati equation solver ──────────────────────────────────────── #
 

@@ -106,6 +106,39 @@ def _conf_bucket(hmm_confidence: float) -> int:
     return 1 if hmm_confidence >= 0.60 else 0
 
 
+def _discretize_state(
+    regime:            str,
+    consecutive_losses: int,
+    drawdown_pct:      float,
+    hmm_confidence:    float,
+) -> Tuple[str, int, int, int]:
+    """
+    Map raw inputs to the discrete MDP state tuple.
+
+    Returns:
+        (regime, consec_bucket, dd_bucket, conf_bucket) where regime is the
+        canonical regime string and the remaining elements are bucket indices.
+    """
+    regime_canon = _REGIMES[_regime_idx(regime)]
+    return (
+        regime_canon,
+        _consec_bucket(consecutive_losses),
+        _dd_bucket(drawdown_pct),
+        _conf_bucket(hmm_confidence),
+    )
+
+
+def _all_states() -> list:
+    """Enumerate all 72 discrete state tuples (regime, consec, dd, conf)."""
+    return [
+        (regime, c, d, hc)
+        for regime in _REGIMES
+        for c in _CONSEC_BUCKETS
+        for d in _DD_BUCKETS
+        for hc in _CONF_BUCKETS
+    ]
+
+
 def state_index(
     regime:            str,
     consecutive_losses: int,
