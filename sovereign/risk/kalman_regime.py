@@ -36,12 +36,41 @@ from __future__ import annotations
 
 import logging
 import pickle
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, Any, Optional
 
 import numpy as np
 
 logger = logging.getLogger(__name__)
+
+
+@dataclass
+class KalmanState:
+    """
+    Posterior state snapshot returned by KalmanRegimeEstimator.update().
+
+    Attributes:
+        mean:        Posterior state estimate z [3] = (trend, vol, momentum).
+        cov:         Posterior error covariance P [3, 3].
+        kalman_gain: Kalman gain K [3, 5] used for this update.
+        t:           Update index (number of updates applied so far).
+    """
+    mean:        np.ndarray
+    cov:         np.ndarray
+    kalman_gain: np.ndarray
+    t:           int
+
+    @property
+    def shape(self) -> tuple:
+        """Shape of the underlying mean vector — lets callers treat the
+        state like the posterior mean array (backward-compatible)."""
+        return self.mean.shape
+
+    def __array__(self, dtype=None):
+        """Expose the posterior mean when coerced to a numpy array, so the
+        state is drop-in usable anywhere the old bare-ndarray return was."""
+        return np.asarray(self.mean, dtype=dtype)
 
 _ROOT       = Path(__file__).resolve().parent.parent.parent
 _CHECKPOINT = _ROOT / "models" / "kalman_regime.pkl"
@@ -89,8 +118,18 @@ class KalmanRegimeEstimator:
         self._z = np.zeros(_N_STATE, dtype=np.float64)
         self._P = np.eye(_N_STATE, dtype=np.float64)
 
+        # Last Kalman gain (populated on first update)
+        self._K_last = np.zeros((_N_STATE, _N_OBS), dtype=np.float64)
+
         self._n_updates = 0
         self._try_load()
+
+    # ── State-vector alias ──────────────────────────────────────────────── #
+
+    @property
+    def _s(self) -> np.ndarray:
+        """Alias for the state estimate vector z (kept in sync)."""
+        return self._z
 
     # ── Serialisation ─────────────────────────────────────────────────── #
 
@@ -121,7 +160,7 @@ class KalmanRegimeEstimator:
 
     # ── Kalman predict / update ─────────────────────────────────────────── #
 
-    def update(self, observation: np.ndarray) -> np.ndarray:
+    def update(self, observation: np.ndarray) -> "KalmanState":
         """
         Feed one bar of observations and return the posterior state estimate.
 
@@ -136,7 +175,8 @@ class KalmanRegimeEstimator:
                          Missing pairs: pass 0.0 — won't crash.
 
         Returns:
-            Posterior state estimate z [3]: (trend, vol, momentum)
+            KalmanState with posterior mean [3], covariance [3, 3], the
+            Kalman gain [3, 5], and the update index t.
         """
         x = np.asarray(observation, dtype=np.float64)
         if x.shape[0] != _N_OBS:
@@ -156,12 +196,18 @@ class KalmanRegimeEstimator:
         innov = x - self._H @ z_pred                          # innovation
         self._z = z_pred + K @ innov
         self._P = (np.eye(_N_STATE) - K @ self._H) @ P_pred
+        self._K_last = K
 
         self._n_updates += 1
         if self._n_updates % 100 == 0:
             self._save()
 
-        return self._z.copy()
+        return KalmanState(
+            mean=self._z.copy(),
+            cov=self._P.copy(),
+            kalman_gain=self._K_last.copy(),
+            t=self._n_updates,
+        )
 
     # ── Regime output ─────────────────────────────────────────────────── #
 
@@ -206,6 +252,7 @@ class KalmanRegimeEstimator:
             "vol_factor":      round(vol, 4),
             "momentum_factor": round(float(self._z[2]), 4),
             "n_updates":       self._n_updates,
+            "kalman_t":        self._n_updates,
         }
 
     def state_uncertainty(self) -> float:
