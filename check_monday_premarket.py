@@ -4,6 +4,7 @@ Checks VIX, ATR and Data Feeds for the Trinity Assets.
 Objective: Confirm no-go conditions before the NY Open.
 """
 
+# TODO: migrate to MarketDataAdapter (TICK-043)
 import yfinance as yf
 import pandas as pd
 import logging

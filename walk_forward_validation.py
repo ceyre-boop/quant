@@ -34,6 +34,7 @@ from scipy import stats
 sys.path.insert(0, str(Path(__file__).parent))
 
 from training.feature_generator import FeatureGenerator
+# TODO: migrate to MarketDataAdapter (TICK-043)
 from data.alpaca_client import AlpacaDataClient
 
 

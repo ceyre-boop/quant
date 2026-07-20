@@ -15,6 +15,7 @@ from pathlib import Path
 
 from sovereign.orchestrator import SovereignOrchestrator
 from sovereign.features.factor_zoo import FactorZooScanner
+# TODO: migrate to MarketDataAdapter (TICK-043)
 from sovereign.data.feeds.alpaca_feed import AlpacaFeed
 from config.loader import params
 

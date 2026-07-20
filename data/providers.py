@@ -22,6 +22,7 @@ from datetime import datetime, timedelta
 from dataclasses import dataclass
 import json
 
+# TODO: migrate to MarketDataAdapter (TICK-043)
 import yfinance as yf
 import pandas as pd
 import requests

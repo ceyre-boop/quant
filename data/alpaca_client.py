@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Optional, List, Dict
 from datetime import datetime, timedelta, timezone
 from concurrent.futures import ThreadPoolExecutor, as_completed
+# TODO: migrate to MarketDataAdapter (TICK-043)
 from alpaca.data.historical import StockHistoricalDataClient
 from alpaca.data.requests import StockBarsRequest
 from alpaca.data.timeframe import TimeFrame

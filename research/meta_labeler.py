@@ -5,6 +5,7 @@ Fuses Momentum (V4.8) and Reversion (V2.2) results for Router Training.
 
 import pandas as pd
 import numpy as np
+# TODO: migrate to MarketDataAdapter (TICK-043)
 import yfinance as yf
 import pickle
 import logging

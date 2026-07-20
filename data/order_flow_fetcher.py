@@ -4,6 +4,7 @@ import logging
 from typing import Dict, List, Any, Optional
 from datetime import datetime
 
+# TODO: migrate to MarketDataAdapter (TICK-043)
 from data.polygon_client import PolygonRestClient
 
 logger = logging.getLogger(__name__)

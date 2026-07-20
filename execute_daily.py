@@ -68,6 +68,7 @@ def pre_market_checklist():
 def _check_alpaca():
     """Verify Alpaca API connection."""
     try:
+        # TODO: migrate to MarketDataAdapter (TICK-043)
         from sovereign.data.feeds.alpaca_feed import AlpacaFeed
         feed = AlpacaFeed()
         return feed.health_check()

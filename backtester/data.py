@@ -124,10 +124,58 @@ def get_minute_bars(ticker: str, date: str, source: str = "auto") -> pd.DataFram
             df.to_parquet(_parquet_path(ticker, date))
             return df
 
-    # Polygon / yfinance fallbacks intentionally omitted for year-old minute
-    # data (yfinance 7-day cap; Polygon optional) — auto already covers the
-    # cached historical universe. Extend here when a live source is wired.
+    # Vendor-agnostic last resort (TICK-043). Ordering is deliberate: parquet ->
+    # gz -> direct Alpaca -> adapter. Every day already covered by the first
+    # three paths returns byte-identical bars to pre-TICK-043, so the v015
+    # 0.6886 reconcile anchor cannot move. The adapter only fills days that
+    # previously returned an EMPTY frame — it can add coverage, never restate
+    # history.
+    if source in ("auto", "adapter"):
+        df = _adapter_fetch(ticker, date)
+        if df is not None and len(df):
+            df.to_parquet(_parquet_path(ticker, date))
+            return df
+
     return pd.DataFrame(columns=_BAR_COLS)
+
+
+def _adapter_fetch(ticker: str, date: str) -> pd.DataFrame | None:
+    """Fetch via MarketDataAdapter and coerce to this module's frame contract.
+
+    The adapter speaks UTC timestamps over a full window; this module speaks ET
+    'HH:MM' strings over the RTH session. Converting here — rather than changing
+    either contract — is what keeps the swap behaviour-preserving.
+    """
+    try:
+        from sovereign.data.adapter import MarketDataAdapter
+    except Exception:                                   # noqa: BLE001
+        return None
+
+    try:
+        nxt = (datetime.fromisoformat(date).date().toordinal() + 1)
+        end_date = datetime.fromordinal(nxt).date().isoformat()
+        # use_cache=False: this module owns its own parquet cache above, and two
+        # caches over one fetch is how stale data gets served twice.
+        raw = MarketDataAdapter(use_cache=False).get_bars(
+            ticker, date, end_date, timeframe="1min")
+    except Exception:                                   # noqa: BLE001
+        return None
+
+    if raw is None or raw.empty:
+        return None
+
+    ts = pd.to_datetime(raw["timestamp"], utc=True).dt.tz_convert(ET)
+    out = pd.DataFrame({
+        "time": ts.dt.strftime("%H:%M"),
+        "open": raw["open"].astype(float),
+        "high": raw["high"].astype(float),
+        "low": raw["low"].astype(float),
+        "close": raw["close"].astype(float),
+        "volume": raw["volume"].astype(float),
+    })
+    # Match the RTH window the direct Alpaca path requests (09:30–16:00 ET).
+    out = out[(out["time"] >= "09:30") & (out["time"] < "16:00")]
+    return out.reset_index(drop=True) if len(out) else None
 
 
 def get_minute_range(ticker: str, start: str, end: str) -> dict:

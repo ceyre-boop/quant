@@ -24,6 +24,7 @@ from typing import Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
+# TODO: migrate to MarketDataAdapter (TICK-043)
 import yfinance as yf
 
 warnings.filterwarnings("ignore")

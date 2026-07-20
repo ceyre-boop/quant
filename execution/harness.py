@@ -222,6 +222,58 @@ def write_daily_summary(day: date, rows: list[FillRecord], out_dir: Path) -> dic
 
 # ── Backtest comparison ───────────────────────────────────────────────────────
 
+def _adapter_minute_bars(symbol: str, day: date, *, lag_minutes: int = 17,
+                         start_et: dtime = dtime(9, 30),
+                         end_et: dtime = dtime(16, 10)) -> list[dict]:
+    """Vendor-agnostic fallback for `alpaca.minute_bars` (TICK-043).
+
+    Only consulted when the primary Alpaca call returns NOTHING, so on every
+    normal session the harness prices off exactly the bytes it did pre-TICK-043.
+
+    The SIP ceiling is reapplied here, not inherited. The harness's whole premise
+    (module docstring) is that signal INTENT is recorded off *delayed* bars; a
+    fallback that quietly served real-time bars would manufacture look-ahead in
+    the live shadow — the same failure class as the HYP-105/106 retraction. So
+    bars past the ceiling are dropped even if the vendor is willing to serve them.
+    """
+    try:
+        from sovereign.data.adapter import MarketDataAdapter
+    except Exception as e:                              # noqa: BLE001
+        _log(f"adapter fallback unavailable: {type(e).__name__}: {e}")
+        return []
+
+    start = alpaca.et_dt(day, start_et)
+    end = min(alpaca.et_dt(day, end_et), alpaca.sip_ceiling(lag_minutes))
+    if end <= start:
+        return []
+
+    try:
+        df = MarketDataAdapter(use_cache=False).get_bars(
+            symbol,
+            start.astimezone(UTC).strftime("%Y-%m-%d"),
+            (end.astimezone(UTC) + timedelta(days=1)).strftime("%Y-%m-%d"),
+            timeframe="1min")
+    except Exception as e:                              # noqa: BLE001
+        _log(f"adapter fallback failed for {symbol}: {type(e).__name__}: {e}")
+        return []
+
+    if df is None or df.empty:
+        return []
+
+    out: list[dict] = []
+    for row in df.itertuples(index=False):
+        ts = pd.Timestamp(row.timestamp).tz_convert(UTC)
+        if not (start.astimezone(UTC) <= ts.to_pydatetime() < end.astimezone(UTC)):
+            continue
+        out.append({"t": ts.strftime("%Y-%m-%dT%H:%M:%SZ"),
+                    "o": float(row.open), "h": float(row.high),
+                    "l": float(row.low), "c": float(row.close),
+                    "v": float(row.volume)})
+    if out:
+        _log(f"adapter fallback served {len(out)} bars for {symbol} {day}")
+    return out
+
+
 def _bars_frame(bars: list[dict]) -> pd.DataFrame:
     """Alpaca bars -> the frame shape realistic_fills expects."""
     return pd.DataFrame({
@@ -435,6 +487,8 @@ def run_backfill(events: Iterable[dict], *, out_dir: Path,
         side = str(ev.get("side", "LONG")).upper()
         hyp = str(ev.get("hypothesis", "HYP-107"))
         bars = alpaca.minute_bars(sym, d)
+        if not bars:
+            bars = _adapter_minute_bars(sym, d)
         if not bars:
             rec = FillRecord(ticker=sym, date=str(d), signal_type="SKIP_NO_DATA",
                              hypothesis=hyp, reason="no_bars")

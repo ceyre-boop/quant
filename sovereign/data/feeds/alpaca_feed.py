@@ -69,6 +69,7 @@ class AlpacaFeed:
             )
         
         # Lazy import — don't fail at module level if alpaca-py missing
+        # TODO: migrate to MarketDataAdapter (TICK-043)
         from alpaca.data.historical import StockHistoricalDataClient
         self.client = StockHistoricalDataClient(self.api_key, self.secret_key)
         
