@@ -2,8 +2,28 @@
 sovereign/data/reddit_scraper.py
 Alta Investments — Reddit Sentiment Engine
 
-Scrapes public Reddit JSON (no API key, no auth) for trading sentiment signals.
-Uses Reddit's undocumented but stable public .json endpoint.
+Scrapes public Reddit JSON for trading sentiment signals via Reddit's public
+.json endpoint.
+
+CREDENTIAL STATUS (verified 2026-07-20): BROKEN — all four subreddits return
+HTTP 403. Reddit now blocks unauthenticated/datacenter access to the public
+.json endpoint; a User-Agent alone is no longer sufficient. There are no Reddit
+credentials in .env (no REDDIT_* keys of any kind), so this job cannot return
+data as written.
+
+  To fix, register a Reddit "script" OAuth app at
+  https://www.reddit.com/prefs/apps and set in .env:
+      REDDIT_CLIENT_ID=<14-char id under the app name>
+      REDDIT_CLIENT_SECRET=<27-char secret>
+      REDDIT_USER_AGENT=sovereign-quant/1.0 by /u/<your-username>
+  Then switch _fetch_subreddit to the OAuth flow (POST to
+  https://www.reddit.com/api/v1/access_token with grant_type=client_credentials,
+  then GET https://oauth.reddit.com/r/{sub}/hot with the bearer token).
+
+Until then this job fails loudly: it logs REDDIT_FETCH_FAILED, writes
+data/health/reddit_status.json with status FAILED, leaves the cache untouched
+(so freshness monitors do NOT go green on an empty payload), and exits 1 so
+launchctl records the failure.
 
 Subreddits monitored:
   r/wallstreetbets  — equity flow, ticker mentions, momentum signals
@@ -27,6 +47,7 @@ from __future__ import annotations
 
 import json
 import re
+import sys
 import time
 import logging
 import argparse
@@ -40,6 +61,7 @@ import requests
 ROOT        = Path(__file__).parent.parent.parent
 CACHE_PATH  = ROOT / "data" / "cache" / "reddit_sentiment.json"
 LOG_PATH    = ROOT / "logs" / "reddit_scraper.log"
+HEALTH_PATH = ROOT / "data" / "health" / "reddit_status.json"
 
 logging.basicConfig(
     level=logging.INFO,
@@ -108,24 +130,50 @@ CONTEXT_REQUIRED = {"F", "A", "C"}  # tickers easily confused with words
 
 # ── Scraper ───────────────────────────────────────────────────────────────────
 
+# Populated by _fetch_subreddit; consumed by run() to decide exit status.
+# Maps subreddit -> failure reason string. Empty dict == every fetch succeeded.
+FETCH_FAILURES: Dict[str, str] = {}
+
+
 def _fetch_subreddit(subreddit: str, limit: int, sort: str = "hot") -> List[dict]:
-    """Fetch posts from a subreddit JSON endpoint. Returns list of post dicts."""
+    """Fetch posts from a subreddit JSON endpoint. Returns list of post dicts.
+
+    Records any failure in FETCH_FAILURES so run() can fail loudly rather than
+    writing an empty cache and exiting 0 ("green but empty").
+    """
     url = f"https://www.reddit.com/r/{subreddit}/{sort}.json?limit={limit}"
     try:
         r = requests.get(url, headers={"User-Agent": UA}, timeout=12)
         if r.status_code in (403, 429):
             # Reddit blocks unauthenticated/datacenter access to the public .json endpoint.
-            # The cache still refreshes (empty) so freshness stays GREEN, but real sentiment data
-            # needs a Reddit OAuth app (set REDDIT_CLIENT_ID / REDDIT_CLIENT_SECRET) — not just a UA.
-            log.warning(f"r/{subreddit}: HTTP {r.status_code} — Reddit blocks unauthenticated access "
-                        f"(needs a Reddit OAuth app: REDDIT_CLIENT_ID/SECRET).")
+            # Real sentiment data needs a Reddit OAuth app (REDDIT_CLIENT_ID /
+            # REDDIT_CLIENT_SECRET) — a User-Agent alone is no longer sufficient.
+            log.error(f"REDDIT_FETCH_FAILED: {r.status_code} — credential issue or rate limit "
+                      f"(r/{subreddit}; needs a Reddit OAuth app: REDDIT_CLIENT_ID/SECRET)")
+            FETCH_FAILURES[subreddit] = str(r.status_code)
             return []
         r.raise_for_status()
         children = r.json()["data"]["children"]
         return [c["data"] for c in children]
     except Exception as e:
-        log.warning(f"r/{subreddit} fetch failed: {e}")
+        log.error(f"REDDIT_FETCH_FAILED: {type(e).__name__} — r/{subreddit}: {e}")
+        FETCH_FAILURES[subreddit] = f"{type(e).__name__}: {e}"
         return []
+
+
+def _write_health(status: str, error: str | None, posts: int) -> None:
+    """Write data/health/reddit_status.json. Best-effort; never raises."""
+    try:
+        HEALTH_PATH.parent.mkdir(parents=True, exist_ok=True)
+        HEALTH_PATH.write_text(json.dumps({
+            "status": status,
+            "error":  error,
+            "ts":     datetime.now(timezone.utc).isoformat(),
+            "posts":  posts,
+            "failed_subreddits": dict(FETCH_FAILURES),
+        }, indent=2))
+    except Exception as e:
+        log.warning(f"Failed to write reddit health file: {e}")
 
 
 def _score_text(text: str) -> Tuple[float, float]:
@@ -276,8 +324,24 @@ def run(verbose: bool = False) -> dict:
     data = scrape_all(verbose=verbose)
     elapsed = time.time() - t0
 
+    total_failed = len(FETCH_FAILURES) == len(SUBREDDITS)
+    if total_failed:
+        # Every source failed. Do NOT overwrite the cache with an empty payload —
+        # that is exactly the silent-success bug: a fresh mtime on garbage keeps
+        # downstream freshness checks GREEN while sentiment is really dead.
+        err = sorted(set(FETCH_FAILURES.values()))[0]
+        log.error(f"REDDIT_FETCH_FAILED: all {len(SUBREDDITS)} subreddits failed "
+                  f"({FETCH_FAILURES}) — cache left untouched, exiting non-zero.")
+        _write_health("FAILED", err, 0)
+        data["_failed"] = True
+        return data
+
+    status = "DEGRADED" if FETCH_FAILURES else "OK"
     CACHE_PATH.parent.mkdir(parents=True, exist_ok=True)
     CACHE_PATH.write_text(json.dumps(data, indent=2))
+    _write_health(status, sorted(set(FETCH_FAILURES.values()))[0] if FETCH_FAILURES else None,
+                  data["posts_scanned"])
+    data["_failed"] = False
 
     log.info(
         f"Done in {elapsed:.1f}s — {data['posts_scanned']} posts | "
@@ -294,6 +358,10 @@ if __name__ == "__main__":
     parser.add_argument("--verbose", action="store_true")
     args = parser.parse_args()
     result = run(verbose=args.verbose)
+    if result.get("_failed"):
+        # Exit non-zero so launchctl records the failure instead of a green run.
+        print("REDDIT_FETCH_FAILED — see data/health/reddit_status.json", file=sys.stderr)
+        sys.exit(1)
     print(json.dumps(result["summary"], indent=2))
     print(f"\nTop equity tickers: {result['top_equity']}")
     print(f"Top forex pairs:    {result['top_forex']}")

@@ -1,0 +1,42 @@
+{
+  "ts": "2026-07-20T18:37:44.486945+00:00",
+  "overall": "RED",
+  "red": [
+    "reddit"
+  ],
+  "yellow": [],
+  "jobs": {
+    "reddit": {
+      "path": "data/cache/reddit_sentiment.json",
+      "age_minutes": 45.4,
+      "max_age_minutes": 1440,
+      "optional": false,
+      "status": "EMPTY",
+      "detail": "file is fresh but payload is empty (posts_scanned=0, tickers+pairs=0)"
+    },
+    "forex_scan": {
+      "path": "data/agent/forex_proximity.json",
+      "age_minutes": 45.4,
+      "max_age_minutes": 1440,
+      "optional": false,
+      "status": "OK",
+      "detail": "pairs_scored=3, verdict='NO_TRADE_TODAY \u2014 USDJPY=X closest at 100%'"
+    },
+    "forex_data": {
+      "path": "data/health/forex_data_status.json",
+      "age_minutes": 0.0,
+      "max_age_minutes": 1440,
+      "optional": false,
+      "status": "OK",
+      "detail": "overall=YELLOW, degraded=['GBPUSD=X'], fake_data=[]"
+    },
+    "api_health": {
+      "path": "data/agent/health.json",
+      "age_minutes": 45.4,
+      "max_age_minutes": 1440,
+      "optional": true,
+      "status": "OK",
+      "detail": "components=18, red=['oracle_pulse']"
+    }
+  }
+}

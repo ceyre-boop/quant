@@ -229,6 +229,35 @@ def _sync_reflections() -> str | None:
     return latest.stem
 
 
+def _sync_system_health() -> str:
+    """Per-pair forex data status + the 'green but empty' job check.
+
+    Runs last so it sees the files the earlier sync steps just wrote. Never
+    raises — a monitoring step must not break the sync.
+    """
+    print("Building data health (forex data sources + green-but-empty check)…")
+    overall = "UNKNOWN"
+    try:
+        from scripts.forex_data_health import build_status as _fx_status
+        fx = _fx_status()
+        fx_out = ROOT / "data" / "health" / "forex_data_status.json"
+        fx_out.parent.mkdir(parents=True, exist_ok=True)
+        fx_out.write_text(json.dumps(fx, indent=2))
+        print(f"  Forex data: {fx['overall']} | degraded={fx['degraded_pairs']} "
+              f"fake_data={fx['fake_data_pairs']}")
+
+        from scripts.health_check import run as _health_run
+        rep = _health_run()
+        overall = rep["overall"]
+        print(f"  System health: {overall} | RED={rep['red']} YELLOW={rep['yellow']}")
+        for name, r in sorted(rep["jobs"].items()):
+            if r["status"] != "OK":
+                print(f"    {r['status']:<8} {name}: {r['detail']}")
+    except Exception as e:
+        print(f"  ⚠️  health build failed: {type(e).__name__}: {e}")
+    return overall
+
+
 def main() -> None:
     print(f"\n{'='*54}")
     print(f"Sovereign Dashboard Sync — {datetime.now().strftime('%Y-%m-%d %H:%M')}")
@@ -241,6 +270,7 @@ def main() -> None:
     _sync_tv_regime_signals()
     _sync_indicators()
     ref_date = _sync_reflections()
+    _sync_system_health()
 
     print(f"\n{'─'*54}")
     print("Files ready to commit:")
@@ -248,6 +278,8 @@ def main() -> None:
     print("  data/agent/checklist_state.json")
     print("  data/ledger/oanda_fills.json")
     print("  data/agent/tv_regime_signals.json")
+    print("  data/health/system_health.json")
+    print("  data/health/forex_data_status.json")
     print("  data/indicators/oracle_indicator_memory.json  (if built)")
     print("  data/indicators/live_snapshot.json            (if pulse ran)")
     if ref_date:

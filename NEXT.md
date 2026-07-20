@@ -6,6 +6,49 @@ Standing constraints live in `CLAUDE.md` — not restated here.
 
 ---
 
+## 2026-07-20 · Fail-loud health infra — Reddit 403 + forex data status + green-but-empty check
+
+**What shipped:**
+- `sovereign/data/reddit_scraper.py` — was exiting 0 with 0 posts on HTTP 403 and rewriting
+  the cache with an empty payload (fresh mtime kept freshness monitors GREEN). Now logs
+  `REDDIT_FETCH_FAILED`, writes `data/health/reddit_status.json`, **leaves the cache untouched**
+  on total failure, and exits 1 so launchctl records it. Partial failure → status `DEGRADED`.
+- `scripts/forex_data_health.py` (NEW, read-only) — aggregates the existing TICK-025
+  `sentinel/DEGRADED_*` flags into `data/health/forex_data_status.json`, per-pair, with
+  `OK` / `DEGRADED` / `FAKE_DATA` classification.
+- `scripts/health_check.py` (NEW) — the "green but empty" detector. Per-job registry of
+  (output path, max age, substance predicate); verdicts `OK/EMPTY/STALE/MISSING/ERROR`.
+  `--strict` exits 1 for launchd/CI use.
+- `scripts/sync_dashboard_data.py` — runs both health builders last in the sync so the
+  dashboard has a real health indicator, not a freshness proxy.
+
+**Verdicts (measured, not asserted):**
+- Reddit: **all 4 subreddits 403**, verified live. Exit code now 1 (was 0).
+- `health_check.py` correctly flags `EMPTY reddit: file is fresh but payload is empty`.
+- Forex: `GBPUSD=X` **DEGRADED** as of 12:23 UTC today (`yfinance` empty OHLCV frame).
+  Classified DEGRADED not FAKE_DATA — that flag came from `macro_engine`, which drops the
+  pair (returns None). No fabricated price reached sizing.
+- Isolation test `test_pipeline_does_not_import_sovereign` **passes**. Suite 1542 passed /
+  11 failed — all 11 pre-existing ICT session-classifier + pipeline failures, confirmed
+  identical with these changes stashed. Not caused by this work; **unclaimed, still broken.**
+
+**Blockers / refused:**
+- **Reddit credentials do not exist.** No `REDDIT_*` keys in `.env`. The job cannot return
+  data until a Reddit "script" OAuth app is registered and `_fetch_subreddit` is moved to
+  the OAuth bearer flow. Exact steps in the module docstring. Not fabricated a workaround.
+- **REFUSED the MarketDataAdapter failover for GBPUSD.** The yfinance fetches live in
+  `sovereign/forex/carry_engine.py::_fetch_prices` and `macro_engine.py::_get_price_history`,
+  both importable by the live/backtest execution path and under the shadow freeze. Adding a
+  second price source changes what sizing sees — that is an execution-path change and needs a
+  logged unlock here first. Shipped the visibility half only. **Unlock still required.**
+- Note for whoever takes that unlock: `carry_engine._compute_atr` returns a hardcoded `0.001`
+  when prices are None. That *is* substituted fake data reaching sizing — it is the real
+  instance of the reported bug, and `forex_data_health.py` will classify it `FAKE_DATA` when
+  it fires. It did not fire today.
+- Left `.env.example` untouched — it carries another session's uncommitted edit.
+
+---
+
 ## 2026-07-19 · Autonomous agent setup — AGENT_DIRECTIVE + 3 launchd plists
 
 **What shipped:**
