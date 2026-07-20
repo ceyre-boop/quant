@@ -43,6 +43,24 @@ that `python3 -m execution.*` resolves and `python3 -c "from execution... "`
 imports work. All of these modules use launchd-safe `.env` parsing; no shell
 environment is assumed.
 
+### Step 0 — Brain read (load long-term memory FIRST)
+```bash
+cd ~/quant
+python3 -c "
+from sovereign.brain import obsidian_reader as brain
+import json
+ctx = brain.get_morning_context()
+print(json.dumps(ctx, indent=2, default=str))
+"
+```
+Loads `get_morning_context()` — regime, active/confirmed edges, recent verdicts,
+and the behavioral 'watch for today' list — from the Obsidian vault before any
+decision. **If the regime notes indicate the regime has changed since the edge
+was confirmed (carry is regime-fragile; gapper-fade depends on gap-through
+conditions), lower confidence on the day's signals accordingly and note it in
+the morning brief.** The read never crashes on a missing vault (returns empty
+structures); if it returns empty, proceed but note that the brain had no context.
+
 ### Step 1 — Information layer pull
 ```bash
 cd ~/quant
@@ -88,7 +106,14 @@ candidate count, running fill P&L from the shadow logs, and challenge status.
 If it exits non-zero, do NOT retry with different flags — apply STANDING RULE 9.
 
 ### Step 5 — Summarize and commit
-Append a morning-pass entry to NEXT.md:
+Write the morning brief back to the brain (vault Ops log) so the record is
+readable next session, then append a morning-pass entry to NEXT.md:
+```bash
+python3 -c "
+from sovereign.brain import obsidian_writer as brain
+brain.write_morning_brief(signals='{ranked GO list}', regime='{regime summary}', active_edges=['HYP-093','HYP-107'])
+"
+```
 ```
 ## {date} · MORNING PASS
 Context: {FRESH/STALE counts} | Bias: {bias direction} | Candidates GO: {n} NO-GO: {n}
@@ -162,6 +187,32 @@ note without touching the vault. If the vault is not mounted, `eod` raises
 `VaultUnavailable` loudly — that is an incident (STANDING RULE 9), not a silent
 skip.
 
+### Step 2b — Brain write-back (structured lessons + weakness scan + index)
+`execution.eod` writes the *narrative* EOD note; the brain writer adds the
+*structured* long-term memory the next agent reads. After Step 2:
+```bash
+python3 -c "
+from sovereign.brain import obsidian_writer as brain
+# Structured EOD lessons — surfaced to tomorrow's morning brief.
+brain.write_eod_summary(fills={n_fills}, pnl='{session_pnl}', notes='{one-line}', lessons=[{lessons}])
+# Any regime observation you read off today's tape:
+# brain.write_regime_observation('USDJPY', 'trending above 158 post-BoJ', 'eod')
+"
+```
+**On a losing day, self-interrogate the veto/decision ledger before writing:**
+did we overtrade? force an entry? ignore the regime gate? oversize? Write each
+real pattern found via `brain.write_weakness_note(type, description)` — the
+morning agent reads these as "watch for today". Do NOT invent weaknesses on
+flat/quiet days; only log patterns the ledger actually shows.
+
+Then refresh the one-shot index every agent reads first:
+```bash
+python3 -c "
+from sovereign.brain import obsidian_reader as brain
+brain.get_morning_context()  # smoke: confirms the vault reads cleanly
+" && python3 scripts/refresh_brain_index.py
+```
+
 ### Step 3 — Update dashboard
 ```bash
 python3 scripts/sync_dashboard_data.py
@@ -190,6 +241,22 @@ Goal: synthesize the recent market session's data, run exploratory
 micro-backtests from the queue, update the weekly pattern file, and flag any
 candidate that looks worth pre-registering — for OPERATOR review, never
 autonomous promotion.
+
+### Step 0 — Brain read (graveyard + confirmed edges FIRST)
+```bash
+cd ~/quant
+python3 -c "
+from sovereign.brain import obsidian_reader as brain
+import json
+print(json.dumps(brain.get_research_context(), indent=2, default=str))
+"
+```
+Loads `get_research_context()` — the graveyard (killed hypotheses), confirmed
+edges, and recent verdicts. **Pass the graveyard to any hypothesis generation so
+it does not re-propose a killed idea** (e.g. the daily-adaptive-parameter family
+HYP-090, the news-sniping family HYP-085 — both sealed NOT_SIGNIFICANT). Start
+sweeps from the confirmed edges, not from scratch. This directly serves the
+research method: don't re-litigate a sealed verdict; revival = NEW DATA only.
 
 ### Step 1 — Pull recent movers data
 `execution.alpaca` is a pure library with no CLI. Import `movers()` directly —

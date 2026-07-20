@@ -512,6 +512,21 @@ def run_reflect(harvests: list[dict], date: Optional[str] = None) -> dict:
 
     out_path = REFLECTIONS_DIR / f"{date}.json"
     out_path.write_text(json.dumps(output, indent=2))
+
+    # Mirror the candidate lesson into the Obsidian brain so the next agent
+    # reads it (best-effort; a vault write must never break the reflect cycle).
+    try:
+        cand = reflection.get("candidate_lesson") if isinstance(reflection, dict) else None
+        if isinstance(cand, dict) and cand.get("lesson_text"):
+            from sovereign.brain import obsidian_writer as _brain
+            _brain.write_regime_observation(
+                cand.get("reasoning_component_targeted") or cand.get("subsystem", "oracle"),
+                cand["lesson_text"],
+                source=f"oracle-reflect:{date}",
+            )
+    except Exception:
+        pass
+
     return output
 
 
