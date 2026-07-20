@@ -57,8 +57,9 @@ class ICAFactorSeparator:
         n_components (int): Number of ICA components to extract.
     """
 
-    def __init__(self, n_components: int = 5) -> None:
+    def __init__(self, n_components: int = 5, max_iter: int = 500) -> None:
         self.n_components = n_components
+        self.max_iter = max_iter
         self._fitted = False
         self._ica = None
         self._n_fit = 0
@@ -118,7 +119,7 @@ class ICAFactorSeparator:
                 n_components=n_comp,
                 algorithm="deflation",
                 fun="logcosh",
-                max_iter=500,
+                max_iter=self.max_iter,
                 random_state=42,
             )
             ica.fit(X)
@@ -166,6 +167,18 @@ class ICAFactorSeparator:
         except Exception as e:
             logger.debug(f"[ICA] Transform failed (non-fatal): {e}")
             return x
+
+    def transform_batch(self, X: np.ndarray) -> np.ndarray:
+        """
+        Project a batch matrix X (n_samples, n_features) into ICA space.
+
+        Thin wrapper over transform() that guarantees a 2-D array in, 2-D out.
+        Returns X unchanged if the separator is not fitted.
+        """
+        X = np.asarray(X, dtype=np.float64)
+        if X.ndim == 1:
+            X = X.reshape(1, -1)
+        return self.transform(X)
 
     def average_pairwise_correlation(self, X: np.ndarray) -> float:
         """

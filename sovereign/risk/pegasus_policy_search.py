@@ -85,6 +85,51 @@ class PegasusParams:
     kelly_fraction_cap: float = 0.025
 
 
+# TradingPolicyParams is an alias-shaped container used by the Pegasus
+# scenario-evaluation API (deterministic policy scoring). It mirrors
+# PegasusParams and additionally exposes the normalised search-space bounds.
+@dataclass
+class TradingPolicyParams:
+    """
+    Policy parameters consumed by PegasusPolicySearch.evaluate_policy().
+
+    Field values are in actual (real-world) units. bounds() returns the
+    normalised [0, 1] search-space limits for the underlying θ vector, which
+    is the space the REINFORCE update operates and clamps in.
+    """
+    entry_threshold:    float = 0.50
+    size_multiplier:    float = 1.00
+    stop_atr_mult:      float = 1.50
+    tp_rr_ratio:        float = 2.50
+    hmm_conf_gate:      float = 0.55
+    kelly_fraction_cap: float = 0.025
+
+    @classmethod
+    def bounds(cls) -> list:
+        """
+        Normalised search-space bounds for the θ vector — one (lo, hi) per
+        parameter. θ is optimised inside the unit cube [0, 1]^6, so every
+        entry is (0.0, 1.0). Length matches PegasusPolicySearch._theta.
+        """
+        return [(0.0, 1.0)] * _N_PARAMS
+
+
+@dataclass
+class Scenario:
+    """
+    A single Pegasus rollout scenario: a fixed set of trades replayed under a
+    candidate policy. Holding the trades fixed (seeded once) is what makes
+    policy evaluation deterministic — the Pegasus core property (CS229 L20).
+
+    Attributes:
+        seed:   Scenario seed / index (used when the scenario is generated).
+        trades: List of trade dicts, each with at least a 'pnl' key and the
+                gating fields 'predicted_win_rate' and 'hmm_confidence'.
+    """
+    seed:   int
+    trades: list
+
+
 class PegasusPolicySearch:
     """
     REINFORCE policy gradient for joint 6-parameter optimisation.
@@ -111,6 +156,13 @@ class PegasusPolicySearch:
         # Gradient accumulator (momentum)
         self._grad_acc = np.zeros(_N_PARAMS, dtype=np.float64)
         self._grad_momentum = 0.9
+
+        # Running reward baseline (EMA) for REINFORCE variance reduction.
+        # Starts at 0.0 so the first update produces a non-zero advantage.
+        self._reward_baseline = 0.0
+
+        # Pegasus scenarios (fixed rollouts for deterministic policy scoring)
+        self._scenarios: list = []
 
         # Learning rate (decays with updates)
         self._alpha0 = 0.05
@@ -197,10 +249,10 @@ class PegasusPolicySearch:
         state_features:   np.ndarray,
         action_taken:     float,
         realized_pnl:     float,
-        hmm_confidence:   float,
-        stop_atr_used:    float,
-        tp_rr_used:       float,
-        kelly_frac_used:  float,
+        hmm_confidence:   float = 0.55,
+        stop_atr_used:    float = 1.50,
+        tp_rr_used:       float = 2.50,
+        kelly_frac_used:  float = 0.025,
     ) -> None:
         """
         One REINFORCE gradient step from a single trade outcome.
@@ -246,6 +298,10 @@ class PegasusPolicySearch:
         self._theta += alpha * self._grad_acc
         self._theta  = np.clip(self._theta, 0.0, 1.0)
 
+        # Update the running reward baseline AFTER using it for this step
+        self._reward_baseline = (0.9 * self._reward_baseline
+                                 + 0.1 * float(realized_pnl))
+
         # Decay exploration noise slowly (Pegasus: exploit more as n grows)
         self._sigma = np.maximum(0.02, self._sigma * 0.998)
 
@@ -263,36 +319,99 @@ class PegasusPolicySearch:
         """
         REINFORCE gradient from the last N episodes in history.
 
-        ∇_θ E[R] ≈ (1/N) Σ_i (a_i − μ) · R_i / σ²
+        ∇_θ E[R] ≈ (1/N) Σ_i (a_i − μ) · (R_i − b) / σ²
 
-        Uses mean-baseline variance reduction: R_i − b, where b = mean(R).
+        Uses a running EMA baseline b (self._reward_baseline) for variance
+        reduction. A running baseline — rather than the within-window mean —
+        keeps a single-episode update non-trivial (a lone win still yields a
+        non-zero advantage, so θ actually moves).
         """
-        if len(self._history) < 2:
+        if not self._history:
             return np.zeros(_N_PARAMS)
 
         # Use last min(50, len) episodes
         window = self._history[-min(self._n_scenarios, len(self._history)):]
 
-        actions = np.array([h[1] for h in window])   # (N, n_params)
-        rewards = np.array([h[2] for h in window])    # (N,)
-
-        # Baseline variance reduction
-        baseline = float(rewards.mean())
-        advantages = rewards - baseline
+        # Baseline variance reduction against the running EMA baseline
+        baseline = float(self._reward_baseline)
 
         # Gradient: sum of (a - μ) * A / σ² over episodes
         mu    = self._theta                              # (n_params,)
         sigma2 = (self._sigma ** 2 + 1e-9)              # (n_params,)
 
         grad = np.zeros(_N_PARAMS)
-        for i, (_, a, _) in enumerate(window):
-            grad += (a - mu) * advantages[i] / sigma2
+        for (_, a, r) in window:
+            grad += (a - mu) * (float(r) - baseline) / sigma2
 
         grad /= max(len(window), 1)
 
         # Clip gradient to prevent huge steps
         grad = np.clip(grad, -0.5, 0.5)
         return grad
+
+    # ── Pegasus deterministic policy evaluation ───────────────────────── #
+
+    def evaluate_policy(self, params: "TradingPolicyParams") -> float:
+        """
+        Score a candidate policy across the fixed scenario set.
+
+        Pegasus core property (CS229 L20): with the scenarios held fixed, the
+        payoff is a deterministic function of the policy parameters — the same
+        policy on the same scenarios always yields the identical payoff, which
+        is what makes the search well-conditioned.
+
+        Each trade is admitted only if it clears the policy's entry gate
+        (predicted_win_rate ≥ entry_threshold) and confidence gate
+        (hmm_confidence ≥ hmm_conf_gate); admitted trades contribute
+        pnl × size_multiplier.
+
+        Returns:
+            Total payoff summed over all scenarios (deterministic).
+        """
+        total = 0.0
+        for scenario in self._scenarios:
+            for trade in scenario.trades:
+                if float(trade.get('predicted_win_rate', 0.0)) < params.entry_threshold:
+                    continue
+                if float(trade.get('hmm_confidence', 0.0)) < params.hmm_conf_gate:
+                    continue
+                total += float(trade.get('pnl', 0.0)) * params.size_multiplier
+        return float(total)
+
+    def build_risk_neutral_scenarios(
+        self,
+        sigma:   float,
+        r:       float,
+        T:       float,
+        n_steps: int = 30,
+    ) -> int:
+        """
+        Generate n_scenarios fixed rollouts from risk-neutral GBM paths.
+
+        Under Q, log-returns are (r − ½σ²)·dt + σ·√dt·Z. Each simulated step
+        becomes one synthetic trade whose pnl is that step's log-return. Each
+        scenario is seeded by its index, so the scenario set is reproducible.
+
+        Returns:
+            Number of scenarios built (== self._n_scenarios).
+        """
+        dt = float(T) / max(1, n_steps)
+        scenarios: list = []
+        for i in range(self._n_scenarios):
+            rng = np.random.default_rng(i)
+            log_returns = ((r - 0.5 * sigma ** 2) * dt
+                           + sigma * math.sqrt(dt) * rng.standard_normal(n_steps))
+            trades = [{
+                'pnl':                float(step_ret),
+                'status':             'closed',
+                'predicted_win_rate': 0.60,
+                'hmm_confidence':     0.70,
+                'stop_atr_mult':      1.5,
+                'tp_rr':              2.5,
+            } for step_ret in log_returns]
+            scenarios.append(Scenario(seed=i, trades=trades))
+        self._scenarios = scenarios
+        return len(scenarios)
 
     def describe(self) -> str:
         p = self.current_params
