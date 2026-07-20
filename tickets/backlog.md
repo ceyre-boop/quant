@@ -478,7 +478,9 @@ Schema per ticket:
 **status:** done (2026-07-19)
 **pre_approved:** true (operator instruction to install)
 
-## TICK-043 (Finding 4A)
+## TICK-044 (Finding 4A)
+> Renumbered 2026-07-20: filed as TICK-043, which commit 09c342d had already
+> assigned to MarketDataAdapter. Parallel-session numbering collision.
 **title:** Daily halt gate is inert on fresh trading days — needs real-time P&L feed or intraday position tracking
 **description:** `DAILY_LOSS_HALT` (2% daily loss gate, ratified in `RISK_FRAMEWORK.md`) is effectively inert at the start of each trading session. `AccountState` is constructed once at session start (`run_session`) from fills already persisted in `fill_log.jsonl`. Because no fills for the current day exist yet at session start, `daily_pnl_frac` evaluates to `0.0` and the halt gate cannot fire. The gate would only fire if the harness were restarted mid-session (with fills already written), which is not the normal scheduled path.
 

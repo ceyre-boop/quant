@@ -1,3 +1,6 @@
+# LOW-USE: imported by sovereign/orchestrator.py (verified 2026-07-20). NOT dead code — do not delete.
+# The earlier header read "not imported by any live path"; that was false for all 11 modules
+# in this group. See trial/subtraction_verdicts.md:47.
 """
 ICA Factor Separator — CS229 Lecture 15
 
