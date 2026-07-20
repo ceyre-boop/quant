@@ -6,6 +6,27 @@ Standing constraints live in `CLAUDE.md` — not restated here.
 
 ---
 
+## 2026-07-20 · EOD PASS
+Fills: 0 (GO: 0, NO-GO: 0) | Session P&L: 0.0%
+Challenge status: no live signal logged today — morning agent did not run; nothing to fill.
+Harness delta (vs backtest): n/a (no fills)
+
+EOD routine (16:05) completed correctly on a **zero-signal day**. `execution.eod` wrote the
+honest note (`Trading/Ops/System-EOD-2026-07-20.md`: "No morning context was built / 0 GO");
+brain write-back (`write_eod_summary` fills=0) + `refresh_brain_index.py` (74 lines) done.
+No weakness notes invented (STANDING RULE: flat day, no ledger pattern).
+
+**Three upstream failures surfaced (STANDING RULE 9 — logged, NOT fixed):**
+`logs/incidents/2026-07-20-eod-upstream-failures.md`
+1. **CRITICAL — `com.alta.morning_agent` never ran**: launchd invokes `/usr/local/bin/claude`
+   which does not exist on this machine → no context/bias/signals for today. Cascades to all else.
+2. **`com.alta.execution_harness` stuck on 2026-06-16**: `--live` processes the wrong date,
+   screens 0, writes no `data/execution/fill_log.jsonl` (file absent repo-wide). Step 1's
+   wait-for-fills can never be satisfied.
+3. **`sync_dashboard_data.py` green-but-empty**: exits 0 but `dashboard_state.json` mtime still
+   2026-05-31 (known dashboard data-path split).
+All three are the "jobs exit 0 while producing nothing" pattern. Operator triage next session.
+
 ## 2026-07-20 · Fail-loud health infra — Reddit 403 + forex data status + green-but-empty check
 
 **What shipped:**
