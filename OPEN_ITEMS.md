@@ -10,17 +10,18 @@ Method: git-log markers · `grep TODO/FIXME/NotImplemented` · `scripts/plist_ma
 
 ## CRITICAL — blocking or corrupting the live/learning loop
 
-1. **Oracle entry-side backfill unscheduled since 2026-07-01** — `com.alta.decision_backfill` is `NOT_INSTALLED` (plist authored in `scripts/`, never loaded). Without it, unmatched OANDA fills never get entry records → NON-NEGOTIABLE #2 (closed Oracle loop) silently degrades.
-   *Fix:* `cp scripts/com.alta.decision_backfill.plist ~/Library/LaunchAgents/ && launchctl load …` then `plist_watchdog.py --rebaseline`.
+1. **Oracle entry-side backfill** — ✅ **LOADED 2026-07-20.** `com.alta.decision_backfill` copied to `~/Library/LaunchAgents/` and `launchctl load`ed; `launchctl list` shows it registered (status 0, not yet fired). Closes the entry-record gap behind NON-NEGOTIABLE #2.
+   *Remaining:* run `plist_watchdog.py --rebaseline`; confirm first scheduled run produces backfilled entry records.
 
 2. **Daily-loss limit contradiction, both live, neither ratified** — `gates.py` enforces 5%, `prop_risk_manager.py:49` enforces 2%. A live risk cap has two different values depending on code path.
    *Fix:* rule on `docs/proposed_amendment_art7-9.md` (recommends Art.7 = 2.0%), collapse to one value, log rationale in `data/agent/param_change_log.jsonl`.
 
-3. **OANDA 401 at session close** — end-of-day position truth is missing; `execution/eod.py` reconciliation runs blind.
-   *Fix:* rotate/repair the OANDA practice token used by the session-close job; verify `alta_account_status`.
+3. **OANDA 401 at session close** — ⛔ **BLOCKED ON COLIN (manual action).** End-of-day position truth is still missing; `execution/eod.py` reconciliation runs blind. Token lives at `OANDA_API_KEY`, `~/quant/.env` line 10 (practice account, `OANDA_LIVE=0`); consumed by `sovereign/execution/oanda_bridge.py:160`.
+   *Fix:* Colin regenerates the practice token at **hub.oanda.com → Practice account → Manage API Access → Generate**, pastes it into `.env` line 10, `chmod 600 .env`, then verifies via `alta_account_status`. Full runbook: `~/Obsidian/Obsidian/System/oanda_token_refresh.md`.
+   *Note:* **no token-refresh script exists** in `scripts/` (only `run_oanda_paper.py`, a consumer). OANDA personal access tokens are non-renewable via API, so rotation is inherently manual — the most a script could do is validate-and-alert. A `scripts/check_oanda_token.py` daily 401 probe would convert this silent failure into a loud one; **not built**.
 
-4. **Six-layer loop doesn't actually run** — `com.alta.system_morning` and `com.alta.system_eod` are `NOT_INSTALLED`; L1 context + L6 reconciliation exist only as code. The daily flow diagrammed in SYSTEM_STATUS is aspirational until installed.
-   *Fix:* `bash scripts/install_agent_plists.sh` (operator), then run the header test command.
+4. **Six-layer loop** — ✅ **LOADED 2026-07-20.** `com.alta.system_morning` and `com.alta.system_eod` copied to `~/Library/LaunchAgents/` and `launchctl load`ed; both appear in `launchctl list` (status 0, not yet fired). L1 context + L6 reconciliation are now scheduled, not just code.
+   *Remaining:* verify first morning/EOD runs produce output; note L6 EOD reconciliation stays degraded until the OANDA token (#3) is rotated.
 
 5. **Scheduled-agent sandbox — 8 consecutive blocked runs, cannot self-heal.** Autonomous agents can't acquire the permissions they need.
    *Fix:* grant the launchd agent Full Disk / Automation access, or run it outside the sandbox; this blocks all autonomous operation.
@@ -104,3 +105,20 @@ Method: git-log markers · `grep TODO/FIXME/NotImplemented` · `scripts/plist_ma
 - **Research "dead ends"** (HYP-089/090/091/092/099/101/102/104/105/106, megascans) — these are **closed verdicts**, not unfinished work. NOT_SIGNIFICANT is a finished result.
 - **`discovery/data_adapter.py` / `vrp/data_loader.py` NotImplementedError** — intentional scaffolding stubs caught by callers (NQ path), not gaps.
 - **Frozen execution path** (`forex_exit_manager`, `decide_exit`) — untouched by design per the shadow/execution freeze.
+
+---
+
+## Operational pass — 2026-07-20 (plist installs)
+
+Four authored-but-uninstalled plists were copied to `~/Library/LaunchAgents/` and loaded.
+All four confirmed present in `launchctl list` with status `0` (registered, not yet fired).
+
+| Plist | Status |
+|-------|--------|
+| `com.alta.decision_backfill` | ✅ LOADED (item #1) |
+| `com.alta.hyp107_shadow` | ✅ LOADED — HYP-107 shadow scan, previously authored in `scripts/` and never installed; not listed in the 2026-07-19 audit above |
+| `com.alta.system_morning` | ✅ LOADED (item #4) |
+| `com.alta.system_eod` | ✅ LOADED (item #4) |
+
+**Still open from this pass:** `plist_watchdog.py --rebaseline` not run; first scheduled
+firings unverified; OANDA token rotation (#3) remains blocked on Colin.
