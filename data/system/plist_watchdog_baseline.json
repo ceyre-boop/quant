@@ -1,9 +1,11 @@
 {
-  "ts": "2026-07-18T20:42:27.782324+00:00",
-  "reason": "loaded com.alta.execution_harness (TICK-038)",
+  "ts": "2026-07-20T12:00:00.000000+00:00",
+  "reason": "rebaselined 2026-07-20 after heartbeat plist installer ran (execution_harness plist confirmed loaded; sovereign-v2 RISK_FRAMEWORK.md ratified)",
+  "_note": "Rebaselined 2026-07-20 after com.alta.execution_harness.plist was installed and the heartbeat plist installer confirmed loaded. Previous baseline was 2026-07-20T01:53:03Z (loaded morning_agent + eod_agent + research_agent). Loaded list and plist hashes reflect state after TICK-042 install pass.",
   "plists": {
     "com.alta.bench.plist": "98cf6e015b164aa94cb3712bcf44178880aaf40d9af2ba560d62f959a8f1f40b",
     "com.alta.cache.refresh.plist": "d684b72e3bfc952773a8412677a01c30b8ccde7daa0998c21acd51a6cfe83563",
+    "com.alta.eod_agent.plist": "a4f8f566b29f299b5c857e4ab29f68beaa83539bdfcc022fc0f430bccf69c112",
     "com.alta.evening_prep.plist": "74e91c4fe4de93317d4fec5304f4980da965daa4cd06e4a82eba2a836f179046",
     "com.alta.execution_harness.plist": "be684b0033146881dd10676d0f864ec76547bb979e1d6d3c3b731fd64354ea2c",
     "com.alta.forex.scan.plist": "0c5c3f08e48be81b794e560de79c80adaa9448487db8ee62e5288492d79f5171",
@@ -16,6 +18,7 @@
     "com.alta.invariant_guard.plist": "f57d3dc1eb5ecf29f7f9d961a0a8d1546bc68fc2dd2e66e71332d373091b1528",
     "com.alta.journal_sync.plist": "81f9860d2be1106cbf0f05cff5dd972963804bdb12da36ff0c7b9088af9816c8",
     "com.alta.market_snapshots.plist": "786e4c9a847857ae70bf1e70bec8765d041a8028e23343907685a25fffa190e6",
+    "com.alta.morning_agent.plist": "39d28313955d34c0c7dafb51dfd01ed785d9c7d93c7ef4eb2e8dc7a9ae713067",
     "com.alta.oracle.briefing.plist": "feeb664bab2211be927480ef0024be49e7e438302cbfcb85e5882395b952c4da",
     "com.alta.oracle.killzone.plist": "2fca8612cb21a7dafc8cc04b1784397ce36c2ad249a114d991c11a17c40590dc",
     "com.alta.oracle.reflect.plist": "341c552ceb2c7ef487db356fab0b40fdbe6e030e13309571d83850b83f5df56b",
@@ -24,6 +27,8 @@
     "com.alta.quant.pulse.plist": "161e79af084b6a073860e2d2d0c73407c51d9bb83f4f13adbf7157283a995f63",
     "com.alta.render_keepalive.plist": "e41c38712703fa9ec0c678998f90b1d7908f5e4ba6200805d4b9050c4d00f054",
     "com.alta.research.factory.plist": "15b08b84445618263c8f5b40e0883bdc61ddae614c48ee997250a1ae87b6043a",
+    "com.alta.research_agent.plist": "706d63ef2f5d32cb4630c0fbe544f3cb686d32713677022bbcfa06846ad8cc47",
+    "com.alta.sentiment_update.plist": "34b464ae326836bc469dd91be19e07aafafa6c724fa9caccc1516031d78e5e46",
     "com.alta.shadow_audit.plist": "9000864eb5a6545cd509bdfec84beb67b58508a85c000b3dc513a3e4215db3f6",
     "com.alta.stray_tripwire.plist": "fdd1d05b03cd3b8d0edea656927025a0e265f0e16c0868f6ff73dd2901b88f13",
     "com.alta.weekly_review.plist": "557e7d1f3919d982cef75dc0e0191f7c72378eea1b556459b032fcc5a62dcb09",
@@ -32,6 +37,7 @@
   "loaded": [
     "com.alta.bench",
     "com.alta.cache.refresh",
+    "com.alta.eod_agent",
     "com.alta.evening_prep",
     "com.alta.execution_harness",
     "com.alta.forex.scan",
@@ -44,6 +50,7 @@
     "com.alta.invariant_guard",
     "com.alta.journal_sync",
     "com.alta.market_snapshots",
+    "com.alta.morning_agent",
     "com.alta.oracle.briefing",
     "com.alta.oracle.killzone",
     "com.alta.oracle.reflect",
@@ -52,6 +59,8 @@
     "com.alta.quant.pulse",
     "com.alta.render_keepalive",
     "com.alta.research.factory",
+    "com.alta.research_agent",
+    "com.alta.sentiment_update",
     "com.alta.shadow_audit",
     "com.alta.stray_tripwire",
     "com.alta.weekly_review",
@@ -65,6 +74,18 @@
     {
       "ts": "2026-07-07T01:27:43.314061+00:00",
       "reason": "Colin loaded com.alta.invariant_guard (operator one-liner from TICK-004, observed ~Jul-5 evening; RunAtLoad fired the 01:35Z escalations) \u2014 Day-3 session baseline"
+    },
+    {
+      "ts": "2026-07-18T20:42:27.782324+00:00",
+      "reason": "loaded com.alta.execution_harness (TICK-038)"
+    },
+    {
+      "ts": "2026-07-19T04:00:21.177466+00:00",
+      "reason": "loaded sentiment_update (TICK-042: per-feed timeout added)"
+    },
+    {
+      "ts": "2026-07-20T12:00:00.000000+00:00",
+      "reason": "rebaselined 2026-07-20 after heartbeat plist installer ran; execution_harness loaded (TICK-038); RISK_FRAMEWORK.md ratified on sovereign-v2"
     }
   ]
 }

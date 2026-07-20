@@ -477,3 +477,18 @@ Schema per ticket:
 - [x] Installed, loaded, plist_watchdog rebaselined GREEN 27/27
 **status:** done (2026-07-19)
 **pre_approved:** true (operator instruction to install)
+
+## TICK-043 (Finding 4A)
+**title:** Daily halt gate is inert on fresh trading days — needs real-time P&L feed or intraday position tracking
+**description:** `DAILY_LOSS_HALT` (2% daily loss gate, ratified in `RISK_FRAMEWORK.md`) is effectively inert at the start of each trading session. `AccountState` is constructed once at session start (`run_session`) from fills already persisted in `fill_log.jsonl`. Because no fills for the current day exist yet at session start, `daily_pnl_frac` evaluates to `0.0` and the halt gate cannot fire. The gate would only fire if the harness were restarted mid-session (with fills already written), which is not the normal scheduled path.
+
+**Impact:** The ratified -2% daily halt never fires in the standard launchd path. Consecutive-loss gates (`CONSEC_LOSS_HALVE` / `CONSEC_LOSS_HALT`) are correctly computed from all historical fills and work as intended.
+
+**Required fix:** Either (a) a real-time P&L feed that updates `AccountState` after each fill is recorded intra-session, or (b) intraday position tracking that recomputes `daily_pnl_frac` dynamically between fills within the same session.
+
+**Constraint:** `DAILY_LOSS_HALT` is part of the ratified `RISK_FRAMEWORK.md`. Any implementation must be reviewed, logged in `data/agent/param_change_log.jsonl`, and this document updated per the amendment procedure.
+
+**depends_on:** []
+**blocks:** []
+**status:** backlog — **requires its own unlock before implementation**
+**pre_approved:** false
