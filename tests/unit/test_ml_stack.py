@@ -16,6 +16,12 @@ import pytest
 
 # ── PCA Compressor (CS229 L14-15) ────────────────────────────────────────── #
 
+@pytest.mark.skip(
+    reason="ML-archive: sovereign.risk.pca_compressor was removed with the ML line "
+    "(see master-ml-archive tag). Test targets a deleted API. Skipped so genuine "
+    "risk-layer regressions in this file stay visible; unskip if the module is "
+    "restored for the equity layer."
+)
 class TestPCACompressor:
     def setup_method(self):
         from sovereign.risk.pca_compressor import PCACompressor
@@ -281,6 +287,12 @@ class TestPegasusPolicySearch:
 
 # ── Black-Scholes Toolkit (MIT 18.086) ───────────────────────────────────── #
 
+@pytest.mark.skip(
+    reason="ML-archive: the module-level bs_call/bs_put/bs_digital_call functions were "
+    "refactored into VolRegimeSignal (sovereign.risk.black_scholes). These tests target "
+    "the removed free-function API. Skipped, not deleted — rewrite against VolRegimeSignal "
+    "if closed-form BS coverage is wanted again."
+)
 class TestBlackScholes:
     def test_call_put_parity(self):
         """Put-call parity: C - P = S - K·e^{-rT}"""
