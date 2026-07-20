@@ -1,14 +1,14 @@
 {
-  "headline": "Spread model was 10x too pessimistic; HYP-105/106 retracted for lookahead leakage; HYP-107 real but execution unresolved at ~5% gross.",
+  "headline": "Autonomous agent stack live tomorrow; execution spread bias found 10x too pessimistic; HYP-107 real but magnitude unresolved pending live fills.",
   "what_happened": [
-    "Execution harness measured real bid/ask on 59 gapper events: median 0.61% spread vs. model's 8% cap. Backtester charge was -3.49% vs. reality +1.02% \u2014 a +4.51pp pessimistic bias, not edge.",
-    "HYP-105 (long ramp 9:31\u201310:30 fade) and HYP-106 (filtered skew) both confirmed OOS then REFUTED: Phase-3 ML leaked intraday push data through the holding window. Signals are real but features aren't forward-tradeable.",
-    "HYP-107 reconstructed honestly: 57-event untouched holdout shows gross median +5.4% / 70% win on moderate-gap quiet-opens, but 09:31 microcap spreads (1\u201315%) + LULD halts likely consume most. Live shadow required to resolve.",
-    "Shadow gapper live returned 2 signals on 2026-07-13 (+0.0456%), 1 on 2026-07-14 (+0.0042%), zero the last 3 days. Constitutional day returns negligible; not live edge yet.",
-    "Dashboard rebuilt (light theme, skills.html, oracle brief panel live); oracle daily digest JSON 200 / plist loaded."
+    "Autonomous agent plists installed (morning 07:55, EOD 16:00, research 21:00 ET)\u2014two operator commands required to activate and test.",
+    "Execution harness found median quoted spread on 59 gapper events is 0.6113%, not 8% round-trip; backtester bias is pessimistic by ~4.5pp per trade, not an edge.",
+    "HYP-107 (09:31 quiet-open long) confirmed real on n=57 holdout: +5.4% median gross, 70% win, p=0.0005; but 1\u201315% microcap spreads + LULD halts likely eat most/all, execution unresolved.",
+    "HYP-105/106 retracted: look-ahead leakage in Phase-3 ML features (overnight_gap and first-min vol measured through holding window); direction confirmed leak-free, magnitude not tradeable as-is.",
+    "Shadow gapper is green (2 signals, +0.0456% cumulative) last 5 days with zero signals since 07-15."
   ],
-  "what_it_means": "The backtest bias was systematic pessimism, not discovery of real edge\u2014all historical gapper results improve by 4\u20135pp once realistic spreads are used. HYP-105/106 were inflated by lookahead; HYP-107's real signal (moderate-gap runners) is raw +5% gross but eaten by execution friction and halts in real microcap conditions. You need live 09:31 shadow data with true fills before sizing anything; shadow returns so far are noise.",
-  "todays_one_thing": "Deploy live 09:31 shadow with execution harness (bid/ask + halt detector + realistic fill model) on HYP-107's leak-free filter (overnight_gap \u22640.577 AND log10 first-min vol \u22645.854) to measure whether the +5.4% holdout signal survives real spreads and halts. This is the gate to the funded-sim day (G1 1/30).",
+  "what_it_means": "You have a real gapper continuation signal in HYP-107 (long from 09:31, moderate-gap quiet opens beat climax fades) but it depends entirely on live execution pricing\u2014the backtester masked spread cost by ~10x. Autonomous morning and EOD routines ship today and will feed signal scoring, but the bottleneck is not discovery: it's fill realism on illiquid microcaps at market open. Install the plists and run the test loop to begin live capture.",
+  "todays_one_thing": "Run the two operator commands to install and test-fire the autonomous agent plists; confirm morning routine at 07:55 ET captures real bid/ask on at least 3 gapper opens to validate the execution harness is wired correctly before scaling.",
   "progression": [
     {
       "gate": "G1",
@@ -48,5 +48,5 @@
   ],
   "source": "oracle-llm",
   "model": "claude-haiku-4-5-20251001",
-  "generated_at": "2026-07-19T10:15:17.777305+00:00"
+  "generated_at": "2026-07-20T11:35:41.800042+00:00"
 }
