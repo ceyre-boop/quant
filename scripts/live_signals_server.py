@@ -740,11 +740,33 @@ class Handler(BaseHTTPRequestHandler):
                '.svg': 'image/svg+xml', '.ico': 'image/x-icon',
                '.png': 'image/png', '.map': 'application/json'}
 
+    # Secret-shaped paths that must never be served, even though they live inside
+    # the repo root. The traversal guard below only stops escapes UP and out; it
+    # does nothing about .env / keys sitting right next to index.html. Without
+    # this, running the server from ~/quant serves .env over HTTP verbatim.
+    _STATIC_DENY_EXT = {'.env', '.key', '.pem', '.p12', '.pfx', '.crt'}
+    _STATIC_DENY_SUBSTR = ('secret', 'credential', 'password', 'token', 'holdout')
+
+    def _is_denied_static(self, rel_path: str) -> bool:
+        parts = [p for p in rel_path.replace('\\', '/').split('/') if p]
+        for p in parts:
+            low = p.lower()
+            # Any dotfile/dotdir (.env, .git, .ssh, .env.local, ...).
+            if low.startswith('.'):
+                return True
+            if os.path.splitext(low)[1] in self._STATIC_DENY_EXT:
+                return True
+            if any(s in low for s in self._STATIC_DENY_SUBSTR):
+                return True
+        return False
+
     def _send_static(self, rel_path):
         root = os.path.realpath('.')
         target = os.path.realpath(os.path.join(root, rel_path))
         # Path-traversal guard: refuse anything resolving outside the repo root.
-        if not (target == root or target.startswith(root + os.sep)) or not os.path.isfile(target):
+        # Secret guard: refuse secret-shaped paths INSIDE the root (see above).
+        if self._is_denied_static(rel_path) or \
+                not (target == root or target.startswith(root + os.sep)) or not os.path.isfile(target):
             self.send_response(404)
             self.send_header('Access-Control-Allow-Origin', '*')
             self.end_headers()
@@ -1087,10 +1109,23 @@ class Handler(BaseHTTPRequestHandler):
             except Exception:
                 self._send_json(500, {'error': traceback.format_exc()})
         elif path.startswith('/data/'):
+            # NOTE: this route used to open(path) directly, with no guards — so
+            # /data/../.env escaped the repo and was read off disk. Route it
+            # through the same traversal + secret checks the static handler uses.
+            rel = path.lstrip('/')
+            root = os.path.realpath('.')
+            target = os.path.realpath(os.path.join(root, rel))
+            if self._is_denied_static(rel) or not target.startswith(root + os.sep):
+                self._send_json(404, {'error': 'not_found', 'path': path})
+                return
             try:
-                file_path = path.lstrip('/')
-                with open(file_path) as f:
-                    self._send_json(200, json.load(f))
+                with open(target) as f:
+                    if target.endswith('.jsonl'):
+                        # Line-delimited: json.load() would choke on line 2.
+                        rows = [json.loads(ln) for ln in f if ln.strip()]
+                        self._send_json(200, rows)
+                    else:
+                        self._send_json(200, json.load(f))
             except FileNotFoundError:
                 self._send_json(404, {'error': 'not_found', 'path': path})
             except Exception:
@@ -1104,6 +1139,11 @@ class Handler(BaseHTTPRequestHandler):
                 self._send_static('ict/index.html')
             elif path in ('/scalp_calendar', '/scalp_calendar/'):
                 self._send_static('templates/scalp_calendar.html')
+            elif path.endswith('/'):
+                # Directory request (e.g. /dashboard/) — resolve to its index.html.
+                # The dashboard HTML sets BASE='..', so it must be reached at its
+                # own subdir path, not the repo root.
+                self._send_static(path.lstrip('/') + 'index.html')
             else:
                 self._send_static(path.lstrip('/'))
 
