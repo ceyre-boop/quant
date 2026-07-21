@@ -1,0 +1,5606 @@
+{
+  "source": "reproduced from sealed HYP-093 holdout via frozen fill rule",
+  "validated_against": "gauntlet/verdicts.json HYP-093",
+  "n_events": 559,
+  "tier_split": {
+    "T10": 354,
+    "T20": 205
+  },
+  "guards": {
+    "sparse": 251,
+    "mna_excluded": 44,
+    "no_data": 10
+  },
+  "events": [
+    {
+      "date": "2024-07-15",
+      "ticker": "SCNI",
+      "prev_close": 4.06,
+      "tier": "T10",
+      "gain_1030": 0.62596,
+      "entry": 6.5381,
+      "exit": 5.8,
+      "ret_event": 0.097413
+    },
+    {
+      "date": "2024-07-16",
+      "ticker": "TKLF",
+      "prev_close": 3.062,
+      "tier": "T10",
+      "gain_1030": 1.13945,
+      "entry": 6.552,
+      "exit": 6.117,
+      "ret_event": 0.045433
+    },
+    {
+      "date": "2024-07-16",
+      "ticker": "SILO",
+      "prev_close": 16.05,
+      "tier": "T10",
+      "gain_1030": 0.85981,
+      "entry": 29.78,
+      "exit": 38.714,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2024-07-18",
+      "ticker": "SILO",
+      "prev_close": 33.75,
+      "tier": "T10",
+      "gain_1030": 0.79111,
+      "entry": 60.38,
+      "exit": 51.74,
+      "ret_event": 0.127614
+    },
+    {
+      "date": "2024-07-19",
+      "ticker": "SERV",
+      "prev_close": 2.63,
+      "tier": "T20",
+      "gain_1030": 0.70878,
+      "entry": 4.4964,
+      "exit": 5.8453,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2024-07-22",
+      "ticker": "SERV",
+      "prev_close": 7.55,
+      "tier": "T10",
+      "gain_1030": 0.58477,
+      "entry": 11.96,
+      "exit": 8.73,
+      "ret_event": 0.254587
+    },
+    {
+      "date": "2024-07-22",
+      "ticker": "CMAX",
+      "prev_close": 1.58,
+      "tier": "T20",
+      "gain_1030": 2.15823,
+      "entry": 4.9501,
+      "exit": 6.4351,
+      "ret_event": -0.326438
+    },
+    {
+      "date": "2024-07-23",
+      "ticker": "SLRX",
+      "prev_close": 23.1,
+      "tier": "T10",
+      "gain_1030": 2.18182,
+      "entry": 73.5,
+      "exit": 95.55,
+      "ret_event": -0.326438
+    },
+    {
+      "date": "2024-07-23",
+      "ticker": "AZTR",
+      "prev_close": 10.79,
+      "tier": "T10",
+      "gain_1030": 3.84523,
+      "entry": 52.25,
+      "exit": 29.77,
+      "ret_event": 0.403801
+    },
+    {
+      "date": "2024-07-23",
+      "ticker": "ADIL",
+      "prev_close": 26.5,
+      "tier": "T10",
+      "gain_1030": 1.08038,
+      "entry": 55.13,
+      "exit": 33.56,
+      "ret_event": 0.370298
+    },
+    {
+      "date": "2024-07-24",
+      "ticker": "PIRS",
+      "prev_close": 7.98,
+      "tier": "T10",
+      "gain_1030": 0.6817,
+      "entry": 13.49,
+      "exit": 14.9491,
+      "ret_event": -0.123641
+    },
+    {
+      "date": "2024-07-24",
+      "ticker": "DRMA",
+      "prev_close": 13,
+      "tier": "T10",
+      "gain_1030": 1.19923,
+      "entry": 28.2,
+      "exit": 25.5,
+      "ret_event": 0.074786
+    },
+    {
+      "date": "2024-07-24",
+      "ticker": "NUZE",
+      "prev_close": 1.03,
+      "tier": "T20",
+      "gain_1030": 1.84466,
+      "entry": 2.9451,
+      "exit": 3.8286,
+      "ret_event": -0.326438
+    },
+    {
+      "date": "2024-07-24",
+      "ticker": "BBLG",
+      "prev_close": 7.5,
+      "tier": "T10",
+      "gain_1030": 0.876,
+      "entry": 14.16,
+      "exit": 11.28,
+      "ret_event": 0.18791
+    },
+    {
+      "date": "2024-07-25",
+      "ticker": "POAI",
+      "prev_close": 16.05,
+      "tier": "T10",
+      "gain_1030": 1.15452,
+      "entry": 34.58,
+      "exit": 28.04,
+      "ret_event": 0.168168
+    },
+    {
+      "date": "2024-07-29",
+      "ticker": "YIBO",
+      "prev_close": 2.915,
+      "tier": "T20",
+      "gain_1030": 0.62607,
+      "entry": 4.73,
+      "exit": 3.89,
+      "ret_event": 0.16211
+    },
+    {
+      "date": "2024-07-29",
+      "ticker": "LIPO",
+      "prev_close": 3.233,
+      "tier": "T10",
+      "gain_1030": 1.28116,
+      "entry": 7.375,
+      "exit": 6.861,
+      "ret_event": 0.048736
+    },
+    {
+      "date": "2024-07-29",
+      "ticker": "TWOU",
+      "prev_close": 1.25,
+      "tier": "T20",
+      "gain_1030": 1.128,
+      "entry": 2.67,
+      "exit": 3.471,
+      "ret_event": -0.320959
+    },
+    {
+      "date": "2024-07-30",
+      "ticker": "IMNN",
+      "prev_close": 17.85,
+      "tier": "T10",
+      "gain_1030": 1.58824,
+      "entry": 46.2,
+      "exit": 49.65,
+      "ret_event": -0.101114
+    },
+    {
+      "date": "2024-07-31",
+      "ticker": "NUZE",
+      "prev_close": 3.7,
+      "tier": "T10",
+      "gain_1030": 0.70808,
+      "entry": 6.3101,
+      "exit": 5.915,
+      "ret_event": 0.047134
+    },
+    {
+      "date": "2024-08-02",
+      "ticker": "OSTX",
+      "prev_close": 2.51,
+      "tier": "T20",
+      "gain_1030": 0.75697,
+      "entry": 4.39,
+      "exit": 3.8,
+      "ret_event": 0.118917
+    },
+    {
+      "date": "2024-08-02",
+      "ticker": "VSEE",
+      "prev_close": 2.43,
+      "tier": "T20",
+      "gain_1030": 0.94033,
+      "entry": 4.7,
+      "exit": 4.2,
+      "ret_event": 0.090904
+    },
+    {
+      "date": "2024-08-05",
+      "ticker": "MGOL",
+      "prev_close": 2.6299,
+      "tier": "T20",
+      "gain_1030": 0.52477,
+      "entry": 4,
+      "exit": 3.74,
+      "ret_event": 0.049521
+    },
+    {
+      "date": "2024-08-05",
+      "ticker": "UVXY",
+      "prev_close": 195.1,
+      "tier": "T10",
+      "gain_1030": 0.54818,
+      "entry": 302.15,
+      "exit": 317.2,
+      "ret_event": -0.065289
+    },
+    {
+      "date": "2024-08-06",
+      "ticker": "LYT",
+      "prev_close": 1.41,
+      "tier": "T20",
+      "gain_1030": 0.57092,
+      "entry": 2.215,
+      "exit": 2.15,
+      "ret_event": 0.013866
+    },
+    {
+      "date": "2024-08-06",
+      "ticker": "LUMN",
+      "prev_close": 2.59,
+      "tier": "T20",
+      "gain_1030": 0.57336,
+      "entry": 4.075,
+      "exit": 5.2975,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2024-08-08",
+      "ticker": "LODE",
+      "prev_close": 1.504,
+      "tier": "T20",
+      "gain_1030": 0.62899,
+      "entry": 2.45,
+      "exit": 1.681,
+      "ret_event": 0.298398
+    },
+    {
+      "date": "2024-08-12",
+      "ticker": "PSIG",
+      "prev_close": 8.08,
+      "tier": "T10",
+      "gain_1030": 1.375,
+      "entry": 19.17,
+      "exit": 18.4,
+      "ret_event": 0.019208
+    },
+    {
+      "date": "2024-08-12",
+      "ticker": "RVNC",
+      "prev_close": 3.53,
+      "tier": "T10",
+      "gain_1030": 0.86544,
+      "entry": 6.58,
+      "exit": 6.59,
+      "ret_event": -0.016999
+    },
+    {
+      "date": "2024-08-12",
+      "ticker": "DPRO",
+      "prev_close": 2.5,
+      "tier": "T20",
+      "gain_1030": 0.6148,
+      "entry": 4.073,
+      "exit": 3.383,
+      "ret_event": 0.153929
+    },
+    {
+      "date": "2024-08-13",
+      "ticker": "CXAI",
+      "prev_close": 1.47,
+      "tier": "T20",
+      "gain_1030": 0.82313,
+      "entry": 2.6702,
+      "exit": 3.4713,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2024-08-14",
+      "ticker": "ALBT",
+      "prev_close": 3.825,
+      "tier": "T10",
+      "gain_1030": 1.80261,
+      "entry": 10.75,
+      "exit": 6.735,
+      "ret_event": 0.34705
+    },
+    {
+      "date": "2024-08-15",
+      "ticker": "CING",
+      "prev_close": 1.845,
+      "tier": "T20",
+      "gain_1030": 1.21133,
+      "entry": 4.08,
+      "exit": 5.304,
+      "ret_event": -0.320959
+    },
+    {
+      "date": "2024-08-15",
+      "ticker": "VSME",
+      "prev_close": 14.54,
+      "tier": "T10",
+      "gain_1030": 0.51307,
+      "entry": 22.06,
+      "exit": 20.4,
+      "ret_event": 0.05977
+    },
+    {
+      "date": "2024-08-15",
+      "ticker": "TPST",
+      "prev_close": 15.47,
+      "tier": "T10",
+      "gain_1030": 0.77763,
+      "entry": 27.43,
+      "exit": 20.27,
+      "ret_event": 0.245549
+    },
+    {
+      "date": "2024-08-16",
+      "ticker": "CING",
+      "prev_close": 4.8,
+      "tier": "T10",
+      "gain_1030": 0.89375,
+      "entry": 9.1,
+      "exit": 11.83,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2024-08-16",
+      "ticker": "GOVX",
+      "prev_close": 83.75,
+      "tier": "T10",
+      "gain_1030": 0.59713,
+      "entry": 133.88,
+      "exit": 174.044,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2024-08-19",
+      "ticker": "SOND",
+      "prev_close": 2.62,
+      "tier": "T20",
+      "gain_1030": 0.61069,
+      "entry": 4.25,
+      "exit": 5.525,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2024-08-19",
+      "ticker": "VRAX",
+      "prev_close": 53.25,
+      "tier": "T10",
+      "gain_1030": 1.89671,
+      "entry": 165,
+      "exit": 214.5,
+      "ret_event": -0.326438
+    },
+    {
+      "date": "2024-08-19",
+      "ticker": "ALZN",
+      "prev_close": 18.36,
+      "tier": "T10",
+      "gain_1030": 4.52941,
+      "entry": 102.14,
+      "exit": 52.29,
+      "ret_event": 0.461617
+    },
+    {
+      "date": "2024-08-19",
+      "ticker": "TNXP",
+      "prev_close": 44.74,
+      "tier": "T10",
+      "gain_1030": 0.53241,
+      "entry": 68.55,
+      "exit": 44.5,
+      "ret_event": 0.335359
+    },
+    {
+      "date": "2024-08-20",
+      "ticker": "INM",
+      "prev_close": 2.96,
+      "tier": "T20",
+      "gain_1030": 2.41554,
+      "entry": 10.11,
+      "exit": 8.636,
+      "ret_event": 0.119358
+    },
+    {
+      "date": "2024-08-21",
+      "ticker": "SMFL",
+      "prev_close": 0.97,
+      "tier": "T20",
+      "gain_1030": 1.1134,
+      "entry": 2.0625,
+      "exit": 1.54,
+      "ret_event": 0.232374
+    },
+    {
+      "date": "2024-08-22",
+      "ticker": "SVMH",
+      "prev_close": 5.92,
+      "tier": "T10",
+      "gain_1030": 0.52365,
+      "entry": 9.11,
+      "exit": 7.575,
+      "ret_event": 0.153017
+    },
+    {
+      "date": "2024-08-22",
+      "ticker": "STAF",
+      "prev_close": 1.2,
+      "tier": "T20",
+      "gain_1030": 1.7295,
+      "entry": 3.27,
+      "exit": 2.96,
+      "ret_event": 0.068363
+    },
+    {
+      "date": "2024-08-22",
+      "ticker": "AIRI",
+      "prev_close": 3.75,
+      "tier": "T10",
+      "gain_1030": 1.19163,
+      "entry": 8.26,
+      "exit": 7.07,
+      "ret_event": 0.123109
+    },
+    {
+      "date": "2024-08-23",
+      "ticker": "PRTG",
+      "prev_close": 2.7003,
+      "tier": "T20",
+      "gain_1030": 1.696,
+      "entry": 7.28,
+      "exit": 5.9,
+      "ret_event": 0.163122
+    },
+    {
+      "date": "2024-08-23",
+      "ticker": "SQNS",
+      "prev_close": 13.58,
+      "tier": "T10",
+      "gain_1030": 1.338,
+      "entry": 31.75,
+      "exit": 29.25,
+      "ret_event": 0.057781
+    },
+    {
+      "date": "2024-08-26",
+      "ticker": "MRM",
+      "prev_close": 2.48,
+      "tier": "T20",
+      "gain_1030": 1.47984,
+      "entry": 6.1669,
+      "exit": 5.7275,
+      "ret_event": 0.050292
+    },
+    {
+      "date": "2024-08-26",
+      "ticker": "ASST",
+      "prev_close": 21.6,
+      "tier": "T10",
+      "gain_1030": 0.99074,
+      "entry": 42.84,
+      "exit": 36.8,
+      "ret_event": 0.12551
+    },
+    {
+      "date": "2024-08-28",
+      "ticker": "ASST",
+      "prev_close": 38.8,
+      "tier": "T10",
+      "gain_1030": 0.5567,
+      "entry": 60.4,
+      "exit": 78.52,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2024-08-29",
+      "ticker": "LUCY",
+      "prev_close": 3.31,
+      "tier": "T10",
+      "gain_1030": 0.73526,
+      "entry": 5.745,
+      "exit": 5.1,
+      "ret_event": 0.096792
+    },
+    {
+      "date": "2024-08-29",
+      "ticker": "XRTX",
+      "prev_close": 5.75,
+      "tier": "T10",
+      "gain_1030": 0.90609,
+      "entry": 10.95,
+      "exit": 14.235,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2024-08-29",
+      "ticker": "BCDA",
+      "prev_close": 2.2,
+      "tier": "T20",
+      "gain_1030": 0.51818,
+      "entry": 3.3312,
+      "exit": 4.3306,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2024-08-30",
+      "ticker": "ATPC",
+      "prev_close": 79.6,
+      "tier": "T10",
+      "gain_1030": 0.85942,
+      "entry": 148,
+      "exit": 125.5,
+      "ret_event": 0.136548
+    },
+    {
+      "date": "2024-09-03",
+      "ticker": "BOF",
+      "prev_close": 2,
+      "tier": "T20",
+      "gain_1030": 0.7216,
+      "entry": 3.45,
+      "exit": 3.36,
+      "ret_event": 0.010608
+    },
+    {
+      "date": "2024-09-03",
+      "ticker": "SIFY",
+      "prev_close": 1.987,
+      "tier": "T20",
+      "gain_1030": 1.04731,
+      "entry": 4.068,
+      "exit": 3.998,
+      "ret_event": -0.003751
+    },
+    {
+      "date": "2024-09-04",
+      "ticker": "FFIE",
+      "prev_close": 3.43,
+      "tier": "T10",
+      "gain_1030": 0.67784,
+      "entry": 5.755,
+      "exit": 5.235,
+      "ret_event": 0.074877
+    },
+    {
+      "date": "2024-09-05",
+      "ticker": "APLD",
+      "prev_close": 3.24,
+      "tier": "T10",
+      "gain_1030": 0.56352,
+      "entry": 5.07,
+      "exit": 5.37,
+      "ret_event": -0.074651
+    },
+    {
+      "date": "2024-09-06",
+      "ticker": "BLMZ",
+      "prev_close": 8.08,
+      "tier": "T10",
+      "gain_1030": 1.5495,
+      "entry": 20.65,
+      "exit": 26.845,
+      "ret_event": -0.326438
+    },
+    {
+      "date": "2024-09-06",
+      "ticker": "BENF",
+      "prev_close": 12,
+      "tier": "T10",
+      "gain_1030": 0.55,
+      "entry": 18.56,
+      "exit": 24.128,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2024-09-09",
+      "ticker": "SMMT",
+      "prev_close": 12.27,
+      "tier": "T10",
+      "gain_1030": 0.72613,
+      "entry": 21.176,
+      "exit": 19.13,
+      "ret_event": 0.081139
+    },
+    {
+      "date": "2024-09-09",
+      "ticker": "INBS",
+      "prev_close": 15.8,
+      "tier": "T10",
+      "gain_1030": 0.60759,
+      "entry": 25.5,
+      "exit": 18.2,
+      "ret_event": 0.270795
+    },
+    {
+      "date": "2024-09-09",
+      "ticker": "SINT",
+      "prev_close": 2.82,
+      "tier": "T20",
+      "gain_1030": 1.1466,
+      "entry": 6.056,
+      "exit": 4.3242,
+      "ret_event": 0.265005
+    },
+    {
+      "date": "2024-09-10",
+      "ticker": "QH",
+      "prev_close": 29.44,
+      "tier": "T10",
+      "gain_1030": 0.91814,
+      "entry": 56.49,
+      "exit": 73.437,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2024-09-10",
+      "ticker": "BKYI",
+      "prev_close": 10.15,
+      "tier": "T10",
+      "gain_1030": 0.97635,
+      "entry": 20.04,
+      "exit": 29.5,
+      "ret_event": -0.487535
+    },
+    {
+      "date": "2024-09-11",
+      "ticker": "CNEY",
+      "prev_close": 7.455,
+      "tier": "T10",
+      "gain_1030": 3.22535,
+      "entry": 31.25,
+      "exit": 34.25,
+      "ret_event": -0.122438
+    },
+    {
+      "date": "2024-09-11",
+      "ticker": "FTCI",
+      "prev_close": 2.251,
+      "tier": "T20",
+      "gain_1030": 0.92226,
+      "entry": 4.318,
+      "exit": 5.6134,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2024-09-11",
+      "ticker": "PLCE",
+      "prev_close": 4.9,
+      "tier": "T10",
+      "gain_1030": 0.63673,
+      "entry": 8.032,
+      "exit": 9.09,
+      "ret_event": -0.147203
+    },
+    {
+      "date": "2024-09-12",
+      "ticker": "OBLG",
+      "prev_close": 3.39,
+      "tier": "T10",
+      "gain_1030": 0.55162,
+      "entry": 5.2699,
+      "exit": 6.42,
+      "ret_event": -0.233719
+    },
+    {
+      "date": "2024-09-12",
+      "ticker": "MNPR",
+      "prev_close": 2.4,
+      "tier": "T20",
+      "gain_1030": 0.65625,
+      "entry": 3.975,
+      "exit": 3.9123,
+      "ret_event": 0.000294
+    },
+    {
+      "date": "2024-09-12",
+      "ticker": "TNON",
+      "prev_close": 3.06,
+      "tier": "T10",
+      "gain_1030": 1.35294,
+      "entry": 7.2,
+      "exit": 4.345,
+      "ret_event": 0.375569
+    },
+    {
+      "date": "2024-09-12",
+      "ticker": "GV",
+      "prev_close": 2.03,
+      "tier": "T20",
+      "gain_1030": 1.70936,
+      "entry": 5.5292,
+      "exit": 4.41,
+      "ret_event": 0.175978
+    },
+    {
+      "date": "2024-09-13",
+      "ticker": "IMRX",
+      "prev_close": 1.43,
+      "tier": "T20",
+      "gain_1030": 0.51741,
+      "entry": 2.18,
+      "exit": 2.02,
+      "ret_event": 0.057915
+    },
+    {
+      "date": "2024-09-13",
+      "ticker": "ATPC",
+      "prev_close": 72.5,
+      "tier": "T10",
+      "gain_1030": 0.94138,
+      "entry": 140.5,
+      "exit": 87,
+      "ret_event": 0.365303
+    },
+    {
+      "date": "2024-09-13",
+      "ticker": "TNON",
+      "prev_close": 4.4,
+      "tier": "T10",
+      "gain_1030": 1.24957,
+      "entry": 9.83,
+      "exit": 7.4597,
+      "ret_event": 0.22017
+    },
+    {
+      "date": "2024-09-16",
+      "ticker": "BBLG",
+      "prev_close": 4.8,
+      "tier": "T10",
+      "gain_1030": 1.0375,
+      "entry": 9.78,
+      "exit": 11.22,
+      "ret_event": -0.168198
+    },
+    {
+      "date": "2024-09-17",
+      "ticker": "GLMD",
+      "prev_close": 3.87,
+      "tier": "T10",
+      "gain_1030": 1.09563,
+      "entry": 8.16,
+      "exit": 10.608,
+      "ret_event": -0.320959
+    },
+    {
+      "date": "2024-09-18",
+      "ticker": "APLT",
+      "prev_close": 4.65,
+      "tier": "T10",
+      "gain_1030": 0.714,
+      "entry": 7.97,
+      "exit": 7.85,
+      "ret_event": -0.000423
+    },
+    {
+      "date": "2024-09-18",
+      "ticker": "LUNR",
+      "prev_close": 5.4,
+      "tier": "T10",
+      "gain_1030": 0.62233,
+      "entry": 8.765,
+      "exit": 7.47,
+      "ret_event": 0.132267
+    },
+    {
+      "date": "2024-09-18",
+      "ticker": "PRTG",
+      "prev_close": 4.53,
+      "tier": "T10",
+      "gain_1030": 2.14419,
+      "entry": 14.1476,
+      "exit": 18.3919,
+      "ret_event": -0.326438
+    },
+    {
+      "date": "2024-09-19",
+      "ticker": "ZEO",
+      "prev_close": 1.14,
+      "tier": "T20",
+      "gain_1030": 1.97281,
+      "entry": 3.41,
+      "exit": 2.5995,
+      "ret_event": 0.211245
+    },
+    {
+      "date": "2024-09-19",
+      "ticker": "XCUR",
+      "prev_close": 2.29,
+      "tier": "T20",
+      "gain_1030": 0.9738,
+      "entry": 4.53,
+      "exit": 3.85,
+      "ret_event": 0.134631
+    },
+    {
+      "date": "2024-09-19",
+      "ticker": "GLMD",
+      "prev_close": 6.9,
+      "tier": "T10",
+      "gain_1030": 0.71159,
+      "entry": 11.85,
+      "exit": 8.245,
+      "ret_event": 0.28874
+    },
+    {
+      "date": "2024-09-19",
+      "ticker": "TBIO",
+      "prev_close": 1.36,
+      "tier": "T20",
+      "gain_1030": 1.38971,
+      "entry": 3.26,
+      "exit": 2.9201,
+      "ret_event": 0.083305
+    },
+    {
+      "date": "2024-09-20",
+      "ticker": "XPON",
+      "prev_close": 5.82,
+      "tier": "T10",
+      "gain_1030": 2.30241,
+      "entry": 19.23,
+      "exit": 8.1,
+      "ret_event": 0.552345
+    },
+    {
+      "date": "2024-09-24",
+      "ticker": "MSS",
+      "prev_close": 7.15,
+      "tier": "T10",
+      "gain_1030": 1.11049,
+      "entry": 15.09,
+      "exit": 15.8,
+      "ret_event": -0.06801
+    },
+    {
+      "date": "2024-09-24",
+      "ticker": "SEEL",
+      "prev_close": 3.04,
+      "tier": "T10",
+      "gain_1030": 1.23947,
+      "entry": 6.81,
+      "exit": 4.72,
+      "ret_event": 0.285943
+    },
+    {
+      "date": "2024-09-25",
+      "ticker": "ATCH",
+      "prev_close": 11.56,
+      "tier": "T10",
+      "gain_1030": 0.62803,
+      "entry": 18.75,
+      "exit": 18,
+      "ret_event": 0.024521
+    },
+    {
+      "date": "2024-09-25",
+      "ticker": "OCTO",
+      "prev_close": 2.49,
+      "tier": "T20",
+      "gain_1030": 0.63253,
+      "entry": 4.07,
+      "exit": 3.61,
+      "ret_event": 0.097543
+    },
+    {
+      "date": "2024-09-26",
+      "ticker": "CNEY",
+      "prev_close": 10.38,
+      "tier": "T10",
+      "gain_1030": 0.53468,
+      "entry": 15.93,
+      "exit": 20.709,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2024-09-26",
+      "ticker": "TBIO",
+      "prev_close": 2.32,
+      "tier": "T20",
+      "gain_1030": 0.6444,
+      "entry": 3.82,
+      "exit": 3.98,
+      "ret_event": -0.057364
+    },
+    {
+      "date": "2024-09-26",
+      "ticker": "KTTA",
+      "prev_close": 3.845,
+      "tier": "T10",
+      "gain_1030": 0.6593,
+      "entry": 6.38,
+      "exit": 5.73,
+      "ret_event": 0.086401
+    },
+    {
+      "date": "2024-09-26",
+      "ticker": "DUO",
+      "prev_close": 8,
+      "tier": "T10",
+      "gain_1030": 1.53,
+      "entry": 20.16,
+      "exit": 16.8,
+      "ret_event": 0.140228
+    },
+    {
+      "date": "2024-09-27",
+      "ticker": "CNEY",
+      "prev_close": 14.5,
+      "tier": "T10",
+      "gain_1030": 0.91379,
+      "entry": 27.88,
+      "exit": 23.68,
+      "ret_event": 0.135166
+    },
+    {
+      "date": "2024-09-30",
+      "ticker": "EMKR",
+      "prev_close": 1.21,
+      "tier": "T20",
+      "gain_1030": 0.66942,
+      "entry": 2.02,
+      "exit": 2.2142,
+      "ret_event": -0.111618
+    },
+    {
+      "date": "2024-09-30",
+      "ticker": "DUO",
+      "prev_close": 20.16,
+      "tier": "T10",
+      "gain_1030": 0.88095,
+      "entry": 38,
+      "exit": 49.4,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2024-10-01",
+      "ticker": "UAVS",
+      "prev_close": 4.705,
+      "tier": "T10",
+      "gain_1030": 0.6525,
+      "entry": 7.77,
+      "exit": 7.66,
+      "ret_event": -0.001322
+    },
+    {
+      "date": "2024-10-01",
+      "ticker": "MGRX",
+      "prev_close": 3.54,
+      "tier": "T10",
+      "gain_1030": 0.58362,
+      "entry": 5.606,
+      "exit": 4.775,
+      "ret_event": 0.132755
+    },
+    {
+      "date": "2024-10-02",
+      "ticker": "API",
+      "prev_close": 2.75,
+      "tier": "T20",
+      "gain_1030": 0.94727,
+      "entry": 5.35,
+      "exit": 4.92,
+      "ret_event": 0.064894
+    },
+    {
+      "date": "2024-10-04",
+      "ticker": "BENF",
+      "prev_close": 9.52,
+      "tier": "T10",
+      "gain_1030": 0.66807,
+      "entry": 15.84,
+      "exit": 15.13,
+      "ret_event": 0.029344
+    },
+    {
+      "date": "2024-10-04",
+      "ticker": "FORD",
+      "prev_close": 3.5,
+      "tier": "T10",
+      "gain_1030": 0.55143,
+      "entry": 5.4399,
+      "exit": 5.3254,
+      "ret_event": 0.005569
+    },
+    {
+      "date": "2024-10-07",
+      "ticker": "SRRK",
+      "prev_close": 7.42,
+      "tier": "T10",
+      "gain_1030": 3.15044,
+      "entry": 30.78,
+      "exit": 34.24,
+      "ret_event": -0.138849
+    },
+    {
+      "date": "2024-10-07",
+      "ticker": "NAPA",
+      "prev_close": 5.4,
+      "tier": "T10",
+      "gain_1030": 1.0213,
+      "entry": 10.915,
+      "exit": 10.95,
+      "ret_event": -0.024166
+    },
+    {
+      "date": "2024-10-08",
+      "ticker": "BURU",
+      "prev_close": 2.231,
+      "tier": "T20",
+      "gain_1030": 0.71672,
+      "entry": 3.83,
+      "exit": 4.979,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2024-10-08",
+      "ticker": "OTRK",
+      "prev_close": 1.82,
+      "tier": "T20",
+      "gain_1030": 1.65934,
+      "entry": 4.83,
+      "exit": 2.76,
+      "ret_event": 0.402133
+    },
+    {
+      "date": "2024-10-09",
+      "ticker": "MNTS",
+      "prev_close": 103.71,
+      "tier": "T10",
+      "gain_1030": 0.70456,
+      "entry": 176.95,
+      "exit": 230.035,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2024-10-14",
+      "ticker": "LBPH",
+      "prev_close": 38.9,
+      "tier": "T10",
+      "gain_1030": 0.51247,
+      "entry": 58.835,
+      "exit": 58.99,
+      "ret_event": -0.018114
+    },
+    {
+      "date": "2024-10-14",
+      "ticker": "VERB",
+      "prev_close": 7.91,
+      "tier": "T10",
+      "gain_1030": 0.6359,
+      "entry": 12.98,
+      "exit": 12.8,
+      "ret_event": -0.001612
+    },
+    {
+      "date": "2024-10-14",
+      "ticker": "XPON",
+      "prev_close": 2.39,
+      "tier": "T20",
+      "gain_1030": 0.53084,
+      "entry": 3.6578,
+      "exit": 3.5,
+      "ret_event": 0.027661
+    },
+    {
+      "date": "2024-10-14",
+      "ticker": "TVGN",
+      "prev_close": 18.98,
+      "tier": "T10",
+      "gain_1030": 1.81665,
+      "entry": 53.26,
+      "exit": 54,
+      "ret_event": -0.040332
+    },
+    {
+      "date": "2024-10-15",
+      "ticker": "DRUG",
+      "prev_close": 2.49,
+      "tier": "T20",
+      "gain_1030": 1.44803,
+      "entry": 6.091,
+      "exit": 8.5,
+      "ret_event": -0.41646
+    },
+    {
+      "date": "2024-10-16",
+      "ticker": "VS",
+      "prev_close": 1.15,
+      "tier": "T20",
+      "gain_1030": 4.55643,
+      "entry": 6.37,
+      "exit": 3.9172,
+      "ret_event": 0.358617
+    },
+    {
+      "date": "2024-10-16",
+      "ticker": "WVE",
+      "prev_close": 8.56,
+      "tier": "T10",
+      "gain_1030": 0.70794,
+      "entry": 14.62,
+      "exit": 14.9,
+      "ret_event": -0.034631
+    },
+    {
+      "date": "2024-10-16",
+      "ticker": "PRQR",
+      "prev_close": 1.81,
+      "tier": "T20",
+      "gain_1030": 0.66304,
+      "entry": 3.0102,
+      "exit": 3.9133,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2024-10-17",
+      "ticker": "PIXY",
+      "prev_close": 5.5,
+      "tier": "T10",
+      "gain_1030": 1.2782,
+      "entry": 12.65,
+      "exit": 8.28,
+      "ret_event": 0.324496
+    },
+    {
+      "date": "2024-10-17",
+      "ticker": "NIXX",
+      "prev_close": 2.37,
+      "tier": "T20",
+      "gain_1030": 1.47679,
+      "entry": 5.88,
+      "exit": 2.7,
+      "ret_event": 0.519857
+    },
+    {
+      "date": "2024-10-17",
+      "ticker": "STAF",
+      "prev_close": 1.35,
+      "tier": "T20",
+      "gain_1030": 1.57037,
+      "entry": 3.48,
+      "exit": 2.3399,
+      "ret_event": 0.301177
+    },
+    {
+      "date": "2024-10-18",
+      "ticker": "VTAK",
+      "prev_close": 8.373,
+      "tier": "T10",
+      "gain_1030": 2.26765,
+      "entry": 27.36,
+      "exit": 17.14,
+      "ret_event": 0.3471
+    },
+    {
+      "date": "2024-10-18",
+      "ticker": "DRUG",
+      "prev_close": 21.7,
+      "tier": "T10",
+      "gain_1030": 1.15222,
+      "entry": 46.72,
+      "exit": 69,
+      "ret_event": -0.497842
+    },
+    {
+      "date": "2024-10-18",
+      "ticker": "PEGY",
+      "prev_close": 5.51,
+      "tier": "T10",
+      "gain_1030": 0.76951,
+      "entry": 9.745,
+      "exit": 8.19,
+      "ret_event": 0.14409
+    },
+    {
+      "date": "2024-10-21",
+      "ticker": "SYTA",
+      "prev_close": 40.4,
+      "tier": "T10",
+      "gain_1030": 1.16856,
+      "entry": 87.64,
+      "exit": 73.2,
+      "ret_event": 0.143806
+    },
+    {
+      "date": "2024-10-21",
+      "ticker": "BIVI",
+      "prev_close": 23.5,
+      "tier": "T10",
+      "gain_1030": 1.50638,
+      "entry": 59,
+      "exit": 26.2,
+      "ret_event": 0.529494
+    },
+    {
+      "date": "2024-10-21",
+      "ticker": "GNPX",
+      "prev_close": 20.65,
+      "tier": "T10",
+      "gain_1030": 1.7845,
+      "entry": 57.5,
+      "exit": 74.75,
+      "ret_event": -0.326438
+    },
+    {
+      "date": "2024-10-22",
+      "ticker": "ENSC",
+      "prev_close": 3.09,
+      "tier": "T10",
+      "gain_1030": 2.32039,
+      "entry": 10.23,
+      "exit": 7.952,
+      "ret_event": 0.19624
+    },
+    {
+      "date": "2024-10-22",
+      "ticker": "NDRA",
+      "prev_close": 7.735,
+      "tier": "T10",
+      "gain_1030": 0.69489,
+      "entry": 13.12,
+      "exit": 17.056,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2024-10-22",
+      "ticker": "GNPX",
+      "prev_close": 75.5,
+      "tier": "T10",
+      "gain_1030": 0.8543,
+      "entry": 140,
+      "exit": 182.0,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2024-10-23",
+      "ticker": "TVGN",
+      "prev_close": 80.5,
+      "tier": "T10",
+      "gain_1030": 0.70186,
+      "entry": 136.55,
+      "exit": 122.51,
+      "ret_event": 0.08734
+    },
+    {
+      "date": "2024-10-23",
+      "ticker": "VRAX",
+      "prev_close": 42,
+      "tier": "T10",
+      "gain_1030": 0.57738,
+      "entry": 66.01,
+      "exit": 63,
+      "ret_event": 0.03012
+    },
+    {
+      "date": "2024-10-24",
+      "ticker": "TC",
+      "prev_close": 28.99,
+      "tier": "T10",
+      "gain_1030": 1.51121,
+      "entry": 72.8,
+      "exit": 30.31,
+      "ret_event": 0.557215
+    },
+    {
+      "date": "2024-10-24",
+      "ticker": "EFSH",
+      "prev_close": 24.3,
+      "tier": "T10",
+      "gain_1030": 0.90741,
+      "entry": 46.65,
+      "exit": 48,
+      "ret_event": -0.044418
+    },
+    {
+      "date": "2024-10-25",
+      "ticker": "UPXI",
+      "prev_close": 3,
+      "tier": "T10",
+      "gain_1030": 3.45187,
+      "entry": 13.354,
+      "exit": 8.01,
+      "ret_event": 0.373741
+    },
+    {
+      "date": "2024-10-25",
+      "ticker": "UAVS",
+      "prev_close": 1.72,
+      "tier": "T20",
+      "gain_1030": 0.67442,
+      "entry": 2.8602,
+      "exit": 2.16,
+      "ret_event": 0.229329
+    },
+    {
+      "date": "2024-10-25",
+      "ticker": "ARBB",
+      "prev_close": 4.947,
+      "tier": "T10",
+      "gain_1030": 0.6507,
+      "entry": 8.166,
+      "exit": 10.6158,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2024-10-28",
+      "ticker": "GLUE",
+      "prev_close": 4.89,
+      "tier": "T10",
+      "gain_1030": 0.62577,
+      "entry": 7.965,
+      "exit": 10.3545,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2024-10-28",
+      "ticker": "EVOK",
+      "prev_close": 5.3,
+      "tier": "T10",
+      "gain_1030": 0.79655,
+      "entry": 9.5,
+      "exit": 7.025,
+      "ret_event": 0.245047
+    },
+    {
+      "date": "2024-10-29",
+      "ticker": "BKYI",
+      "prev_close": 6.9,
+      "tier": "T10",
+      "gain_1030": 0.94203,
+      "entry": 13.4,
+      "exit": 12.1,
+      "ret_event": 0.081535
+    },
+    {
+      "date": "2024-10-30",
+      "ticker": "THAR",
+      "prev_close": 2.03,
+      "tier": "T20",
+      "gain_1030": 1.25616,
+      "entry": 4.5722,
+      "exit": 3.42,
+      "ret_event": 0.231042
+    },
+    {
+      "date": "2024-10-30",
+      "ticker": "ENSC",
+      "prev_close": 6.225,
+      "tier": "T10",
+      "gain_1030": 0.64337,
+      "entry": 10.23,
+      "exit": 9.452,
+      "ret_event": 0.060571
+    },
+    {
+      "date": "2024-10-31",
+      "ticker": "ROOT",
+      "prev_close": 40.49,
+      "tier": "T10",
+      "gain_1030": 1.7671,
+      "entry": 112.38,
+      "exit": 68.4,
+      "ret_event": 0.364912
+    },
+    {
+      "date": "2024-11-01",
+      "ticker": "CDXC",
+      "prev_close": 3.49,
+      "tier": "T10",
+      "gain_1030": 0.5186,
+      "entry": 5.29,
+      "exit": 5.87,
+      "ret_event": -0.12512
+    },
+    {
+      "date": "2024-11-04",
+      "ticker": "SPPL",
+      "prev_close": 2.56,
+      "tier": "T20",
+      "gain_1030": 1.19727,
+      "entry": 5.65,
+      "exit": 7.345,
+      "ret_event": -0.320959
+    },
+    {
+      "date": "2024-11-04",
+      "ticker": "ADN",
+      "prev_close": 1.9,
+      "tier": "T20",
+      "gain_1030": 0.74737,
+      "entry": 3.3184,
+      "exit": 3.34,
+      "ret_event": -0.021989
+    },
+    {
+      "date": "2024-11-05",
+      "ticker": "BJDX",
+      "prev_close": 14.58,
+      "tier": "T10",
+      "gain_1030": 1.59396,
+      "entry": 37.82,
+      "exit": 27.4,
+      "ret_event": 0.249077
+    },
+    {
+      "date": "2024-11-05",
+      "ticker": "ALBT",
+      "prev_close": 2.24,
+      "tier": "T20",
+      "gain_1030": 0.53567,
+      "entry": 3.43,
+      "exit": 3.6,
+      "ret_event": -0.065042
+    },
+    {
+      "date": "2024-11-06",
+      "ticker": "ARBB",
+      "prev_close": 8.468,
+      "tier": "T10",
+      "gain_1030": 0.58243,
+      "entry": 13.4,
+      "exit": 12.04,
+      "ret_event": 0.086013
+    },
+    {
+      "date": "2024-11-06",
+      "ticker": "DATS",
+      "prev_close": 1.79,
+      "tier": "T20",
+      "gain_1030": 0.53626,
+      "entry": 2.745,
+      "exit": 2.21,
+      "ret_event": 0.17942
+    },
+    {
+      "date": "2024-11-06",
+      "ticker": "SONN",
+      "prev_close": 4.21,
+      "tier": "T10",
+      "gain_1030": 1.09739,
+      "entry": 8.8222,
+      "exit": 3.64,
+      "ret_event": 0.566446
+    },
+    {
+      "date": "2024-11-07",
+      "ticker": "NMHI",
+      "prev_close": 2.907,
+      "tier": "T20",
+      "gain_1030": 2.32508,
+      "entry": 9.6,
+      "exit": 4.275,
+      "ret_event": 0.528249
+    },
+    {
+      "date": "2024-11-07",
+      "ticker": "DXYZ",
+      "prev_close": 15.89,
+      "tier": "T10",
+      "gain_1030": 0.54496,
+      "entry": 24.34,
+      "exit": 22.2,
+      "ret_event": 0.072442
+    },
+    {
+      "date": "2024-11-07",
+      "ticker": "ATCH",
+      "prev_close": 10.79,
+      "tier": "T10",
+      "gain_1030": 0.58665,
+      "entry": 17.12,
+      "exit": 16.51,
+      "ret_event": 0.020151
+    },
+    {
+      "date": "2024-11-07",
+      "ticker": "CELU",
+      "prev_close": 1.45,
+      "tier": "T20",
+      "gain_1030": 0.75848,
+      "entry": 2.54,
+      "exit": 3.302,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2024-11-08",
+      "ticker": "INDI",
+      "prev_close": 3.43,
+      "tier": "T10",
+      "gain_1030": 0.51166,
+      "entry": 5.185,
+      "exit": 5.5,
+      "ret_event": -0.076232
+    },
+    {
+      "date": "2024-11-08",
+      "ticker": "NCL",
+      "prev_close": 1.795,
+      "tier": "T20",
+      "gain_1030": 0.65292,
+      "entry": 2.966,
+      "exit": 2.562,
+      "ret_event": 0.120731
+    },
+    {
+      "date": "2024-11-08",
+      "ticker": "TIVC",
+      "prev_close": 4.429,
+      "tier": "T10",
+      "gain_1030": 0.58591,
+      "entry": 7.021,
+      "exit": 6.805,
+      "ret_event": 0.015285
+    },
+    {
+      "date": "2024-11-08",
+      "ticker": "SEZL",
+      "prev_close": 41.75,
+      "tier": "T10",
+      "gain_1030": 0.50108,
+      "entry": 63.29,
+      "exit": 71.43,
+      "ret_event": -0.144094
+    },
+    {
+      "date": "2024-11-08",
+      "ticker": "GV",
+      "prev_close": 1.5,
+      "tier": "T20",
+      "gain_1030": 0.82667,
+      "entry": 2.748,
+      "exit": 1.45,
+      "ret_event": 0.456864
+    },
+    {
+      "date": "2024-11-12",
+      "ticker": "BTCT",
+      "prev_close": 2.52,
+      "tier": "T20",
+      "gain_1030": 1.96825,
+      "entry": 7.455,
+      "exit": 9.6915,
+      "ret_event": -0.326438
+    },
+    {
+      "date": "2024-11-13",
+      "ticker": "BTCT",
+      "prev_close": 10.5,
+      "tier": "T10",
+      "gain_1030": 0.62286,
+      "entry": 17.1,
+      "exit": 17.7,
+      "ret_event": -0.050567
+    },
+    {
+      "date": "2024-11-14",
+      "ticker": "PULM",
+      "prev_close": 3.56,
+      "tier": "T10",
+      "gain_1030": 1.14045,
+      "entry": 7.25,
+      "exit": 4.67,
+      "ret_event": 0.334903
+    },
+    {
+      "date": "2024-11-14",
+      "ticker": "UAVS",
+      "prev_close": 1.61,
+      "tier": "T20",
+      "gain_1030": 1.54981,
+      "entry": 4.11,
+      "exit": 3.58,
+      "ret_event": 0.102515
+    },
+    {
+      "date": "2024-11-14",
+      "ticker": "OMER",
+      "prev_close": 4.19,
+      "tier": "T10",
+      "gain_1030": 0.56802,
+      "entry": 6.5474,
+      "exit": 6.96,
+      "ret_event": -0.078497
+    },
+    {
+      "date": "2024-11-15",
+      "ticker": "SPPL",
+      "prev_close": 7.064,
+      "tier": "T10",
+      "gain_1030": 0.78935,
+      "entry": 12.56,
+      "exit": 10,
+      "ret_event": 0.188342
+    },
+    {
+      "date": "2024-11-18",
+      "ticker": "HCWB",
+      "prev_close": 70.7,
+      "tier": "T10",
+      "gain_1030": 3.63366,
+      "entry": 327.6,
+      "exit": 425.88,
+      "ret_event": -0.326438
+    },
+    {
+      "date": "2024-11-18",
+      "ticker": "APLM",
+      "prev_close": 9.59,
+      "tier": "T10",
+      "gain_1030": 0.7487,
+      "entry": 16.76,
+      "exit": 21.788,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2024-11-19",
+      "ticker": "SOAR",
+      "prev_close": 5.275,
+      "tier": "T10",
+      "gain_1030": 1.4436,
+      "entry": 12.89,
+      "exit": 11.58,
+      "ret_event": 0.08067
+    },
+    {
+      "date": "2024-11-19",
+      "ticker": "PRFX",
+      "prev_close": 10.7,
+      "tier": "T10",
+      "gain_1030": 2.23178,
+      "entry": 34.6,
+      "exit": 27,
+      "ret_event": 0.193215
+    },
+    {
+      "date": "2024-11-19",
+      "ticker": "SMCX",
+      "prev_close": 51.04,
+      "tier": "T10",
+      "gain_1030": 0.55682,
+      "entry": 79.32,
+      "exit": 82.95,
+      "ret_event": -0.061243
+    },
+    {
+      "date": "2024-11-20",
+      "ticker": "FBRX",
+      "prev_close": 5.9251,
+      "tier": "T10",
+      "gain_1030": 1.45059,
+      "entry": 15.6,
+      "exit": 13.6,
+      "ret_event": 0.107246
+    },
+    {
+      "date": "2024-11-20",
+      "ticker": "XCUR",
+      "prev_close": 5.82,
+      "tier": "T10",
+      "gain_1030": 0.54143,
+      "entry": 9.05,
+      "exit": 11.765,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2024-11-21",
+      "ticker": "SURG",
+      "prev_close": 1.46,
+      "tier": "T20",
+      "gain_1030": 0.59589,
+      "entry": 2.3233,
+      "exit": 1.79,
+      "ret_event": 0.214065
+    },
+    {
+      "date": "2024-11-21",
+      "ticker": "CRNC",
+      "prev_close": 2.82,
+      "tier": "T20",
+      "gain_1030": 0.69149,
+      "entry": 4.77,
+      "exit": 6.201,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2024-11-21",
+      "ticker": "WORX",
+      "prev_close": 14.7,
+      "tier": "T10",
+      "gain_1030": 1.12245,
+      "entry": 31.13,
+      "exit": 31.5,
+      "ret_event": -0.032845
+    },
+    {
+      "date": "2024-11-22",
+      "ticker": "SKK",
+      "prev_close": 11,
+      "tier": "T10",
+      "gain_1030": 0.92727,
+      "entry": 21.2,
+      "exit": 17.5,
+      "ret_event": 0.159049
+    },
+    {
+      "date": "2024-11-22",
+      "ticker": "PDYN",
+      "prev_close": 2,
+      "tier": "T20",
+      "gain_1030": 0.5875,
+      "entry": 3.16,
+      "exit": 4.108,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2024-11-25",
+      "ticker": "RGTI",
+      "prev_close": 1.74,
+      "tier": "T20",
+      "gain_1030": 0.84195,
+      "entry": 3.205,
+      "exit": 2.75,
+      "ret_event": 0.126486
+    },
+    {
+      "date": "2024-11-25",
+      "ticker": "QMCO",
+      "prev_close": 9.13,
+      "tier": "T10",
+      "gain_1030": 1.42826,
+      "entry": 22.15,
+      "exit": 21.67,
+      "ret_event": 0.000712
+    },
+    {
+      "date": "2024-11-26",
+      "ticker": "IDAI",
+      "prev_close": 2.7,
+      "tier": "T20",
+      "gain_1030": 1.2263,
+      "entry": 5.946,
+      "exit": 5.46,
+      "ret_event": 0.060777
+    },
+    {
+      "date": "2024-11-26",
+      "ticker": "VSEE",
+      "prev_close": 1.72,
+      "tier": "T20",
+      "gain_1030": 1.03488,
+      "entry": 3.494,
+      "exit": 2.025,
+      "ret_event": 0.399476
+    },
+    {
+      "date": "2024-11-26",
+      "ticker": "TOYO",
+      "prev_close": 2.9,
+      "tier": "T20",
+      "gain_1030": 0.59321,
+      "entry": 4.63,
+      "exit": 5.41,
+      "ret_event": -0.183946
+    },
+    {
+      "date": "2024-11-27",
+      "ticker": "UMAC",
+      "prev_close": 5.36,
+      "tier": "T10",
+      "gain_1030": 1.04104,
+      "entry": 10.9038,
+      "exit": 9.6501,
+      "ret_event": 0.094019
+    },
+    {
+      "date": "2024-11-27",
+      "ticker": "IDAI",
+      "prev_close": 5.475,
+      "tier": "T10",
+      "gain_1030": 0.63708,
+      "entry": 8.993,
+      "exit": 11.6909,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2024-11-27",
+      "ticker": "SOS",
+      "prev_close": 6.95,
+      "tier": "T10",
+      "gain_1030": 0.6,
+      "entry": 12.32,
+      "exit": 9.9,
+      "ret_event": 0.180949
+    },
+    {
+      "date": "2024-11-29",
+      "ticker": "BSLK",
+      "prev_close": 5.92,
+      "tier": "T10",
+      "gain_1030": 1.30574,
+      "entry": 13.6,
+      "exit": 14.04,
+      "ret_event": -0.053312
+    },
+    {
+      "date": "2024-12-02",
+      "ticker": "SNTI",
+      "prev_close": 2.16,
+      "tier": "T20",
+      "gain_1030": 5.54171,
+      "entry": 14.15,
+      "exit": 10.09,
+      "ret_event": 0.260487
+    },
+    {
+      "date": "2024-12-02",
+      "ticker": "PPBT",
+      "prev_close": 33.55,
+      "tier": "T10",
+      "gain_1030": 1.15201,
+      "entry": 78.8,
+      "exit": 102.44,
+      "ret_event": -0.320959
+    },
+    {
+      "date": "2024-12-02",
+      "ticker": "FOSL",
+      "prev_close": 1.46,
+      "tier": "T20",
+      "gain_1030": 0.63014,
+      "entry": 2.385,
+      "exit": 2.34,
+      "ret_event": 0.003388
+    },
+    {
+      "date": "2024-12-03",
+      "ticker": "SOAR",
+      "prev_close": 5.545,
+      "tier": "T10",
+      "gain_1030": 0.5266,
+      "entry": 8.465,
+      "exit": 8.865,
+      "ret_event": -0.062733
+    },
+    {
+      "date": "2024-12-03",
+      "ticker": "ZJK",
+      "prev_close": 6.34,
+      "tier": "T10",
+      "gain_1030": 2.44006,
+      "entry": 21.8563,
+      "exit": 17.185,
+      "ret_event": 0.187289
+    },
+    {
+      "date": "2024-12-03",
+      "ticker": "JANX",
+      "prev_close": 40.18,
+      "tier": "T10",
+      "gain_1030": 0.63514,
+      "entry": 65.82,
+      "exit": 59.7201,
+      "ret_event": 0.077196
+    },
+    {
+      "date": "2024-12-03",
+      "ticker": "PSQH",
+      "prev_close": 30.9,
+      "tier": "T10",
+      "gain_1030": 0.98058,
+      "entry": 61.2,
+      "exit": 79.56,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2024-12-04",
+      "ticker": "CYCN",
+      "prev_close": 1.61,
+      "tier": "T20",
+      "gain_1030": 2.78882,
+      "entry": 6.1082,
+      "exit": 7.9407,
+      "ret_event": -0.326438
+    },
+    {
+      "date": "2024-12-04",
+      "ticker": "CNEY",
+      "prev_close": 7.89,
+      "tier": "T10",
+      "gain_1030": 0.87579,
+      "entry": 14.84,
+      "exit": 13.37,
+      "ret_event": 0.083577
+    },
+    {
+      "date": "2024-12-04",
+      "ticker": "HTOO",
+      "prev_close": 11.13,
+      "tier": "T10",
+      "gain_1030": 1.2345,
+      "entry": 24.88,
+      "exit": 18.2,
+      "ret_event": 0.24753
+    },
+    {
+      "date": "2024-12-05",
+      "ticker": "MIGI",
+      "prev_close": 13.6,
+      "tier": "T10",
+      "gain_1030": 0.64706,
+      "entry": 22.4,
+      "exit": 26.5,
+      "ret_event": -0.198515
+    },
+    {
+      "date": "2024-12-05",
+      "ticker": "PRFX",
+      "prev_close": 13.4,
+      "tier": "T10",
+      "gain_1030": 0.63731,
+      "entry": 21.91,
+      "exit": 22.26,
+      "ret_event": -0.031454
+    },
+    {
+      "date": "2024-12-05",
+      "ticker": "TARA",
+      "prev_close": 3.54,
+      "tier": "T10",
+      "gain_1030": 0.95198,
+      "entry": 6.91,
+      "exit": 6.02,
+      "ret_event": 0.113319
+    },
+    {
+      "date": "2024-12-05",
+      "ticker": "RKDA",
+      "prev_close": 2.697,
+      "tier": "T20",
+      "gain_1030": 1.97327,
+      "entry": 7.9071,
+      "exit": 10.2792,
+      "ret_event": -0.326438
+    },
+    {
+      "date": "2024-12-06",
+      "ticker": "ALBT",
+      "prev_close": 2.66,
+      "tier": "T20",
+      "gain_1030": 0.7218,
+      "entry": 4.6,
+      "exit": 4.14,
+      "ret_event": 0.084521
+    },
+    {
+      "date": "2024-12-06",
+      "ticker": "GXAI",
+      "prev_close": 1.42,
+      "tier": "T20",
+      "gain_1030": 1.47183,
+      "entry": 3.49,
+      "exit": 2.5801,
+      "ret_event": 0.239757
+    },
+    {
+      "date": "2024-12-06",
+      "ticker": "UPC",
+      "prev_close": 42,
+      "tier": "T10",
+      "gain_1030": 2.1381,
+      "entry": 131.6,
+      "exit": 135.2,
+      "ret_event": -0.053794
+    },
+    {
+      "date": "2024-12-09",
+      "ticker": "ASST",
+      "prev_close": 9.198,
+      "tier": "T10",
+      "gain_1030": 0.55469,
+      "entry": 14.4,
+      "exit": 18.72,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2024-12-09",
+      "ticker": "ZEO",
+      "prev_close": 1.35,
+      "tier": "T20",
+      "gain_1030": 0.79259,
+      "entry": 2.43,
+      "exit": 2.65,
+      "ret_event": -0.106014
+    },
+    {
+      "date": "2024-12-09",
+      "ticker": "SONN",
+      "prev_close": 2.1,
+      "tier": "T20",
+      "gain_1030": 0.69048,
+      "entry": 3.51,
+      "exit": 1.9999,
+      "ret_event": 0.414748
+    },
+    {
+      "date": "2024-12-09",
+      "ticker": "DUO",
+      "prev_close": 9.251,
+      "tier": "T10",
+      "gain_1030": 1.32948,
+      "entry": 21.6,
+      "exit": 13.6,
+      "ret_event": 0.349411
+    },
+    {
+      "date": "2024-12-10",
+      "ticker": "CMRX",
+      "prev_close": 0.865,
+      "tier": "T20",
+      "gain_1030": 2.21387,
+      "entry": 2.78,
+      "exit": 2.77,
+      "ret_event": -0.022841
+    },
+    {
+      "date": "2024-12-10",
+      "ticker": "CPIX",
+      "prev_close": 1.24,
+      "tier": "T20",
+      "gain_1030": 0.8871,
+      "entry": 2.345,
+      "exit": 2.44,
+      "ret_event": -0.055991
+    },
+    {
+      "date": "2024-12-10",
+      "ticker": "QURE",
+      "prev_close": 7.295,
+      "tier": "T10",
+      "gain_1030": 0.89734,
+      "entry": 13.8882,
+      "exit": 15.3,
+      "ret_event": -0.117134
+    },
+    {
+      "date": "2024-12-10",
+      "ticker": "CRDF",
+      "prev_close": 2.44,
+      "tier": "T20",
+      "gain_1030": 0.50889,
+      "entry": 3.68,
+      "exit": 3.77,
+      "ret_event": -0.039936
+    },
+    {
+      "date": "2024-12-10",
+      "ticker": "ICCT",
+      "prev_close": 3.71,
+      "tier": "T10",
+      "gain_1030": 0.64906,
+      "entry": 6.11,
+      "exit": 4.206,
+      "ret_event": 0.296141
+    },
+    {
+      "date": "2024-12-11",
+      "ticker": "CADL",
+      "prev_close": 4.61,
+      "tier": "T10",
+      "gain_1030": 1.38612,
+      "entry": 11,
+      "exit": 7.7401,
+      "ret_event": 0.275396
+    },
+    {
+      "date": "2024-12-11",
+      "ticker": "LDTC",
+      "prev_close": 1.21,
+      "tier": "T20",
+      "gain_1030": 0.8843,
+      "entry": 2.2705,
+      "exit": 1.81,
+      "ret_event": 0.187339
+    },
+    {
+      "date": "2024-12-12",
+      "ticker": "TRVI",
+      "prev_close": 2.49,
+      "tier": "T20",
+      "gain_1030": 0.63052,
+      "entry": 4.0652,
+      "exit": 3.6,
+      "ret_event": 0.098955
+    },
+    {
+      "date": "2024-12-12",
+      "ticker": "PALI",
+      "prev_close": 1.4,
+      "tier": "T20",
+      "gain_1030": 0.75357,
+      "entry": 2.459,
+      "exit": 2.36,
+      "ret_event": 0.024781
+    },
+    {
+      "date": "2024-12-13",
+      "ticker": "WKEY",
+      "prev_close": 3.28,
+      "tier": "T10",
+      "gain_1030": 0.89024,
+      "entry": 6.21,
+      "exit": 8.073,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2024-12-16",
+      "ticker": "SIDU",
+      "prev_close": 1.43,
+      "tier": "T20",
+      "gain_1030": 0.61538,
+      "entry": 2.3199,
+      "exit": 3.0159,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2024-12-17",
+      "ticker": "OPTX",
+      "prev_close": 1.78,
+      "tier": "T20",
+      "gain_1030": 1.07022,
+      "entry": 3.6888,
+      "exit": 4.7954,
+      "ret_event": -0.320959
+    },
+    {
+      "date": "2024-12-17",
+      "ticker": "NUKK",
+      "prev_close": 1.39,
+      "tier": "T20",
+      "gain_1030": 2.04633,
+      "entry": 4.23,
+      "exit": 5.499,
+      "ret_event": -0.326438
+    },
+    {
+      "date": "2024-12-18",
+      "ticker": "NUKK",
+      "prev_close": 11.88,
+      "tier": "T10",
+      "gain_1030": 1.42424,
+      "entry": 27.38,
+      "exit": 35.594,
+      "ret_event": -0.320959
+    },
+    {
+      "date": "2024-12-18",
+      "ticker": "LITM",
+      "prev_close": 2.379,
+      "tier": "T20",
+      "gain_1030": 2.18075,
+      "entry": 7.563,
+      "exit": 9.8319,
+      "ret_event": -0.326438
+    },
+    {
+      "date": "2024-12-18",
+      "ticker": "PRZO",
+      "prev_close": 1.53,
+      "tier": "T20",
+      "gain_1030": 0.50327,
+      "entry": 2.2956,
+      "exit": 2.1301,
+      "ret_event": 0.056615
+    },
+    {
+      "date": "2024-12-19",
+      "ticker": "VRAR",
+      "prev_close": 3.2,
+      "tier": "T10",
+      "gain_1030": 0.53438,
+      "entry": 4.2,
+      "exit": 3.22,
+      "ret_event": 0.217854
+    },
+    {
+      "date": "2024-12-19",
+      "ticker": "PRFX",
+      "prev_close": 10.85,
+      "tier": "T10",
+      "gain_1030": 4.31336,
+      "entry": 57.75,
+      "exit": 55.35,
+      "ret_event": 0.01512
+    },
+    {
+      "date": "2024-12-19",
+      "ticker": "OMER",
+      "prev_close": 7.46,
+      "tier": "T10",
+      "gain_1030": 0.70107,
+      "entry": 12.71,
+      "exit": 10.24,
+      "ret_event": 0.178856
+    },
+    {
+      "date": "2024-12-20",
+      "ticker": "HUMA",
+      "prev_close": 3.46,
+      "tier": "T10",
+      "gain_1030": 0.5578,
+      "entry": 5.39,
+      "exit": 4.65,
+      "ret_event": 0.121812
+    },
+    {
+      "date": "2024-12-20",
+      "ticker": "NVNI",
+      "prev_close": 26.7,
+      "tier": "T10",
+      "gain_1030": 0.51236,
+      "entry": 40.5,
+      "exit": 52.65,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2024-12-20",
+      "ticker": "MYSZ",
+      "prev_close": 1.35,
+      "tier": "T20",
+      "gain_1030": 3.48519,
+      "entry": 6.08,
+      "exit": 4.2001,
+      "ret_event": 0.282756
+    },
+    {
+      "date": "2024-12-23",
+      "ticker": "RELI",
+      "prev_close": 1.2,
+      "tier": "T20",
+      "gain_1030": 2.175,
+      "entry": 3.8,
+      "exit": 4.94,
+      "ret_event": -0.326438
+    },
+    {
+      "date": "2024-12-23",
+      "ticker": "GTBP",
+      "prev_close": 1.745,
+      "tier": "T20",
+      "gain_1030": 1.07444,
+      "entry": 3.6081,
+      "exit": 2.82,
+      "ret_event": 0.197466
+    },
+    {
+      "date": "2024-12-23",
+      "ticker": "RAPT",
+      "prev_close": 6.603,
+      "tier": "T10",
+      "gain_1030": 1.13388,
+      "entry": 14.08,
+      "exit": 13.72,
+      "ret_event": 0.004609
+    },
+    {
+      "date": "2024-12-23",
+      "ticker": "TRAW",
+      "prev_close": 5.02,
+      "tier": "T10",
+      "gain_1030": 2.20717,
+      "entry": 16.08,
+      "exit": 12.5,
+      "ret_event": 0.196198
+    },
+    {
+      "date": "2024-12-23",
+      "ticker": "RUM",
+      "prev_close": 7.19,
+      "tier": "T10",
+      "gain_1030": 0.76968,
+      "entry": 12.74,
+      "exit": 13.025,
+      "ret_event": -0.03785
+    },
+    {
+      "date": "2024-12-24",
+      "ticker": "HOUR",
+      "prev_close": 1.43,
+      "tier": "T20",
+      "gain_1030": 2.39636,
+      "entry": 4.84,
+      "exit": 6.32,
+      "ret_event": -0.332223
+    },
+    {
+      "date": "2024-12-24",
+      "ticker": "CREV",
+      "prev_close": 3.89,
+      "tier": "T10",
+      "gain_1030": 1.54756,
+      "entry": 9.5,
+      "exit": 7.58,
+      "ret_event": 0.175667
+    },
+    {
+      "date": "2024-12-24",
+      "ticker": "BAOS",
+      "prev_close": 1.73,
+      "tier": "T20",
+      "gain_1030": 5.28902,
+      "entry": 10.8174,
+      "exit": 6.05,
+      "ret_event": 0.414278
+    },
+    {
+      "date": "2024-12-24",
+      "ticker": "MPLN",
+      "prev_close": 6.28,
+      "tier": "T10",
+      "gain_1030": 0.63296,
+      "entry": 10.4256,
+      "exit": 11.51,
+      "ret_event": -0.119493
+    },
+    {
+      "date": "2024-12-26",
+      "ticker": "ADD",
+      "prev_close": 2.16,
+      "tier": "T20",
+      "gain_1030": 0.70833,
+      "entry": 3.68,
+      "exit": 2.58,
+      "ret_event": 0.283434
+    },
+    {
+      "date": "2024-12-26",
+      "ticker": "MGIH",
+      "prev_close": 1.53,
+      "tier": "T20",
+      "gain_1030": 1.69281,
+      "entry": 4.115,
+      "exit": 2.9698,
+      "ret_event": 0.251861
+    },
+    {
+      "date": "2024-12-26",
+      "ticker": "PDYN",
+      "prev_close": 4.94,
+      "tier": "T10",
+      "gain_1030": 0.60121,
+      "entry": 7.9,
+      "exit": 7.2771,
+      "ret_event": 0.063369
+    },
+    {
+      "date": "2024-12-26",
+      "ticker": "ZCAR",
+      "prev_close": 28.6,
+      "tier": "T10",
+      "gain_1030": 0.99336,
+      "entry": 57.2,
+      "exit": 56,
+      "ret_event": 0.0055
+    },
+    {
+      "date": "2024-12-26",
+      "ticker": "SKK",
+      "prev_close": 7.48,
+      "tier": "T10",
+      "gain_1030": 1.59358,
+      "entry": 20.3,
+      "exit": 13.5,
+      "ret_event": 0.308537
+    },
+    {
+      "date": "2024-12-27",
+      "ticker": "AMBO",
+      "prev_close": 2.24,
+      "tier": "T20",
+      "gain_1030": 0.69643,
+      "entry": 3.825,
+      "exit": 3.09,
+      "ret_event": 0.176677
+    },
+    {
+      "date": "2024-12-27",
+      "ticker": "LITM",
+      "prev_close": 11.44,
+      "tier": "T10",
+      "gain_1030": 0.69318,
+      "entry": 19.37,
+      "exit": 20.93,
+      "ret_event": -0.096016
+    },
+    {
+      "date": "2024-12-27",
+      "ticker": "MYSZ",
+      "prev_close": 4.22,
+      "tier": "T10",
+      "gain_1030": 0.54739,
+      "entry": 6.535,
+      "exit": 6.43,
+      "ret_event": 0.000588
+    },
+    {
+      "date": "2024-12-27",
+      "ticker": "GTI",
+      "prev_close": 20.31,
+      "tier": "T10",
+      "gain_1030": 0.91925,
+      "entry": 38.86,
+      "exit": 50.518,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2024-12-30",
+      "ticker": "HOLO",
+      "prev_close": 96,
+      "tier": "T10",
+      "gain_1030": 0.72833,
+      "entry": 165.8,
+      "exit": 215.54,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2024-12-30",
+      "ticker": "WATT",
+      "prev_close": 12.15,
+      "tier": "T10",
+      "gain_1030": 3.49383,
+      "entry": 54.6,
+      "exit": 70.98,
+      "ret_event": -0.326438
+    },
+    {
+      "date": "2024-12-30",
+      "ticker": "KORE",
+      "prev_close": 2.44,
+      "tier": "T20",
+      "gain_1030": 0.58197,
+      "entry": 3.86,
+      "exit": 2.71,
+      "ret_event": 0.282448
+    },
+    {
+      "date": "2024-12-30",
+      "ticker": "VINC",
+      "prev_close": 3.88,
+      "tier": "T10",
+      "gain_1030": 1.47784,
+      "entry": 9.566,
+      "exit": 6.486,
+      "ret_event": 0.301015
+    },
+    {
+      "date": "2024-12-30",
+      "ticker": "INTZ",
+      "prev_close": 2.16,
+      "tier": "T20",
+      "gain_1030": 1.73843,
+      "entry": 5.8819,
+      "exit": 5.67,
+      "ret_event": 0.009587
+    },
+    {
+      "date": "2024-12-30",
+      "ticker": "GTI",
+      "prev_close": 60.6,
+      "tier": "T10",
+      "gain_1030": 0.62195,
+      "entry": 97.8,
+      "exit": 78,
+      "ret_event": 0.186975
+    },
+    {
+      "date": "2024-12-30",
+      "ticker": "CTM",
+      "prev_close": 1.42,
+      "tier": "T20",
+      "gain_1030": 0.64796,
+      "entry": 2.3492,
+      "exit": 2.5606,
+      "ret_event": -0.105468
+    },
+    {
+      "date": "2024-12-30",
+      "ticker": "NXU",
+      "prev_close": 4.868,
+      "tier": "T10",
+      "gain_1030": 2.28472,
+      "entry": 15.97,
+      "exit": 20.761,
+      "ret_event": -0.326438
+    },
+    {
+      "date": "2024-12-31",
+      "ticker": "APM",
+      "prev_close": 1.355,
+      "tier": "T20",
+      "gain_1030": 2.80812,
+      "entry": 5.15,
+      "exit": 6.695,
+      "ret_event": -0.326438
+    },
+    {
+      "date": "2024-12-31",
+      "ticker": "VRME",
+      "prev_close": 0.7899,
+      "tier": "T20",
+      "gain_1030": 1.53209,
+      "entry": 2.01,
+      "exit": 1.332,
+      "ret_event": 0.310875
+    },
+    {
+      "date": "2024-12-31",
+      "ticker": "SVMH",
+      "prev_close": 1.67,
+      "tier": "T20",
+      "gain_1030": 0.79641,
+      "entry": 2.995,
+      "exit": 2.115,
+      "ret_event": 0.278344
+    },
+    {
+      "date": "2024-12-31",
+      "ticker": "BDMD",
+      "prev_close": 1.05,
+      "tier": "T20",
+      "gain_1030": 1.47619,
+      "entry": 2.6015,
+      "exit": 3.382,
+      "ret_event": -0.320959
+    },
+    {
+      "date": "2025-01-02",
+      "ticker": "NITO",
+      "prev_close": 8.68,
+      "tier": "T10",
+      "gain_1030": 2.70853,
+      "entry": 32.14,
+      "exit": 41.782,
+      "ret_event": -0.326438
+    },
+    {
+      "date": "2025-01-02",
+      "ticker": "ICG",
+      "prev_close": 3.3,
+      "tier": "T10",
+      "gain_1030": 1.09094,
+      "entry": 7,
+      "exit": 4.48,
+      "ret_event": 0.339041
+    },
+    {
+      "date": "2025-01-02",
+      "ticker": "APM",
+      "prev_close": 2.8,
+      "tier": "T20",
+      "gain_1030": 0.55729,
+      "entry": 4.39,
+      "exit": 2.19,
+      "ret_event": 0.48566
+    },
+    {
+      "date": "2025-01-02",
+      "ticker": "SPCB",
+      "prev_close": 4.82,
+      "tier": "T10",
+      "gain_1030": 0.83402,
+      "entry": 8.8404,
+      "exit": 7.6567,
+      "ret_event": 0.118417
+    },
+    {
+      "date": "2025-01-03",
+      "ticker": "NITO",
+      "prev_close": 37.45,
+      "tier": "T10",
+      "gain_1030": 1.96262,
+      "entry": 110.95,
+      "exit": 92.07,
+      "ret_event": 0.143728
+    },
+    {
+      "date": "2025-01-03",
+      "ticker": "MFI",
+      "prev_close": 5.822,
+      "tier": "T10",
+      "gain_1030": 0.95809,
+      "entry": 11.4,
+      "exit": 10.2,
+      "ret_event": 0.089784
+    },
+    {
+      "date": "2025-01-03",
+      "ticker": "CRNC",
+      "prev_close": 7.93,
+      "tier": "T10",
+      "gain_1030": 0.76701,
+      "entry": 13.98,
+      "exit": 18.174,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2025-01-06",
+      "ticker": "FUBO",
+      "prev_close": 17.28,
+      "tier": "T10",
+      "gain_1030": 1.47975,
+      "entry": 42.96,
+      "exit": 55.848,
+      "ret_event": -0.320959
+    },
+    {
+      "date": "2025-01-06",
+      "ticker": "MEGL",
+      "prev_close": 2.248,
+      "tier": "T20",
+      "gain_1030": 0.70107,
+      "entry": 3.812,
+      "exit": 3.52,
+      "ret_event": 0.061121
+    },
+    {
+      "date": "2025-01-06",
+      "ticker": "GFAI",
+      "prev_close": 1.93,
+      "tier": "T20",
+      "gain_1030": 0.8342,
+      "entry": 3.55,
+      "exit": 2.99,
+      "ret_event": 0.142267
+    },
+    {
+      "date": "2025-01-06",
+      "ticker": "ARBE",
+      "prev_close": 2.63,
+      "tier": "T20",
+      "gain_1030": 0.51665,
+      "entry": 3.9888,
+      "exit": 3.9874,
+      "ret_event": -0.015128
+    },
+    {
+      "date": "2025-01-07",
+      "ticker": "RIME",
+      "prev_close": 28.96,
+      "tier": "T10",
+      "gain_1030": 0.74862,
+      "entry": 50.64,
+      "exit": 45.28,
+      "ret_event": 0.090366
+    },
+    {
+      "date": "2025-01-07",
+      "ticker": "XTIA",
+      "prev_close": 22,
+      "tier": "T10",
+      "gain_1030": 0.79545,
+      "entry": 39.32,
+      "exit": 27.63,
+      "ret_event": 0.281825
+    },
+    {
+      "date": "2025-01-07",
+      "ticker": "SVMH",
+      "prev_close": 2.315,
+      "tier": "T20",
+      "gain_1030": 0.50756,
+      "entry": 3.49,
+      "exit": 4.537,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2025-01-07",
+      "ticker": "DATS",
+      "prev_close": 1.96,
+      "tier": "T20",
+      "gain_1030": 0.72337,
+      "entry": 3.36,
+      "exit": 4.368,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2025-01-07",
+      "ticker": "HOTH",
+      "prev_close": 0.8196,
+      "tier": "T20",
+      "gain_1030": 1.90386,
+      "entry": 2.385,
+      "exit": 3.1005,
+      "ret_event": -0.326438
+    },
+    {
+      "date": "2025-01-08",
+      "ticker": "CURR",
+      "prev_close": 1.39,
+      "tier": "T20",
+      "gain_1030": 2.30935,
+      "entry": 4.6,
+      "exit": 5.98,
+      "ret_event": -0.326438
+    },
+    {
+      "date": "2025-01-08",
+      "ticker": "VIR",
+      "prev_close": 7.89,
+      "tier": "T10",
+      "gain_1030": 0.58584,
+      "entry": 12.5,
+      "exit": 12.48,
+      "ret_event": -0.013879
+    },
+    {
+      "date": "2025-01-08",
+      "ticker": "SANA",
+      "prev_close": 1.65,
+      "tier": "T20",
+      "gain_1030": 1.93333,
+      "entry": 4.85,
+      "exit": 4.29,
+      "ret_event": 0.089026
+    },
+    {
+      "date": "2025-01-08",
+      "ticker": "XHG",
+      "prev_close": 17.4,
+      "tier": "T10",
+      "gain_1030": 1.18391,
+      "entry": 38.2,
+      "exit": 49.66,
+      "ret_event": -0.320959
+    },
+    {
+      "date": "2025-01-08",
+      "ticker": "SILO",
+      "prev_close": 16.35,
+      "tier": "T10",
+      "gain_1030": 1.30275,
+      "entry": 37.51,
+      "exit": 25.65,
+      "ret_event": 0.295223
+    },
+    {
+      "date": "2025-01-10",
+      "ticker": "DATS",
+      "prev_close": 3.21,
+      "tier": "T10",
+      "gain_1030": 0.63863,
+      "entry": 5.2507,
+      "exit": 6.8259,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2025-01-10",
+      "ticker": "VRME",
+      "prev_close": 1.68,
+      "tier": "T20",
+      "gain_1030": 0.57149,
+      "entry": 2.64,
+      "exit": 2.57,
+      "ret_event": 0.011036
+    },
+    {
+      "date": "2025-01-13",
+      "ticker": "PHIO",
+      "prev_close": 1.69,
+      "tier": "T20",
+      "gain_1030": 3.82243,
+      "entry": 8.126,
+      "exit": 6.5,
+      "ret_event": 0.17366
+    },
+    {
+      "date": "2025-01-13",
+      "ticker": "SLRX",
+      "prev_close": 23.48,
+      "tier": "T10",
+      "gain_1030": 2.97998,
+      "entry": 96.3,
+      "exit": 54.75,
+      "ret_event": 0.405026
+    },
+    {
+      "date": "2025-01-14",
+      "ticker": "ERNA",
+      "prev_close": 115.88,
+      "tier": "T10",
+      "gain_1030": 1.68114,
+      "entry": 310.95,
+      "exit": 169.69,
+      "ret_event": 0.427847
+    },
+    {
+      "date": "2025-01-14",
+      "ticker": "AIFF",
+      "prev_close": 1.9,
+      "tier": "T20",
+      "gain_1030": 1.19937,
+      "entry": 4.1701,
+      "exit": 3.11,
+      "ret_event": 0.233256
+    },
+    {
+      "date": "2025-01-14",
+      "ticker": "HEES",
+      "prev_close": 43.94,
+      "tier": "T10",
+      "gain_1030": 1.05826,
+      "entry": 90.44,
+      "exit": 90.29,
+      "ret_event": -0.0193
+    },
+    {
+      "date": "2025-01-14",
+      "ticker": "NMHI",
+      "prev_close": 1.13,
+      "tier": "T20",
+      "gain_1030": 1.66522,
+      "entry": 3.0199,
+      "exit": 1.5106,
+      "ret_event": 0.473346
+    },
+    {
+      "date": "2025-01-15",
+      "ticker": "SGBX",
+      "prev_close": 34.56,
+      "tier": "T10",
+      "gain_1030": 1.37037,
+      "entry": 81.95,
+      "exit": 60.15,
+      "ret_event": 0.245057
+    },
+    {
+      "date": "2025-01-15",
+      "ticker": "BKYI",
+      "prev_close": 13.7,
+      "tier": "T10",
+      "gain_1030": 0.75182,
+      "entry": 23.93,
+      "exit": 31.109,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2025-01-15",
+      "ticker": "QMCO",
+      "prev_close": 22.41,
+      "tier": "T10",
+      "gain_1030": 0.55288,
+      "entry": 34.75,
+      "exit": 33.31,
+      "ret_event": 0.025959
+    },
+    {
+      "date": "2025-01-16",
+      "ticker": "BMRA",
+      "prev_close": 2.8,
+      "tier": "T20",
+      "gain_1030": 1.53286,
+      "entry": 7.07,
+      "exit": 5.612,
+      "ret_event": 0.179785
+    },
+    {
+      "date": "2025-01-17",
+      "ticker": "GSIT",
+      "prev_close": 2.75,
+      "tier": "T20",
+      "gain_1030": 0.60007,
+      "entry": 4.4199,
+      "exit": 3.97,
+      "ret_event": 0.08631
+    },
+    {
+      "date": "2025-01-17",
+      "ticker": "NUKK",
+      "prev_close": 20.53,
+      "tier": "T10",
+      "gain_1030": 0.66805,
+      "entry": 34.22,
+      "exit": 29.97,
+      "ret_event": 0.108717
+    },
+    {
+      "date": "2025-01-21",
+      "ticker": "ASST",
+      "prev_close": 9.29,
+      "tier": "T10",
+      "gain_1030": 1.56512,
+      "entry": 23.8,
+      "exit": 18,
+      "ret_event": 0.217259
+    },
+    {
+      "date": "2025-01-21",
+      "ticker": "CHRO",
+      "prev_close": 1.9,
+      "tier": "T20",
+      "gain_1030": 0.57368,
+      "entry": 2.982,
+      "exit": 2.6411,
+      "ret_event": 0.09884
+    },
+    {
+      "date": "2025-01-22",
+      "ticker": "BLBX",
+      "prev_close": 1.69,
+      "tier": "T20",
+      "gain_1030": 0.80473,
+      "entry": 3.06,
+      "exit": 3.978,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2025-01-23",
+      "ticker": "NITO",
+      "prev_close": 28.18,
+      "tier": "T10",
+      "gain_1030": 0.68914,
+      "entry": 47.27,
+      "exit": 41.34,
+      "ret_event": 0.10997
+    },
+    {
+      "date": "2025-01-23",
+      "ticker": "DGNX",
+      "prev_close": 7.5,
+      "tier": "T10",
+      "gain_1030": 1.29733,
+      "entry": 15.98,
+      "exit": 12.75,
+      "ret_event": 0.181169
+    },
+    {
+      "date": "2025-01-23",
+      "ticker": "VNCE",
+      "prev_close": 2.35,
+      "tier": "T20",
+      "gain_1030": 1.10851,
+      "entry": 4.952,
+      "exit": 3.9,
+      "ret_event": 0.191481
+    },
+    {
+      "date": "2025-01-24",
+      "ticker": "NVNI",
+      "prev_close": 14.9,
+      "tier": "T10",
+      "gain_1030": 1.15436,
+      "entry": 32,
+      "exit": 41.6,
+      "ret_event": -0.320959
+    },
+    {
+      "date": "2025-01-24",
+      "ticker": "ALUR",
+      "prev_close": 55.5,
+      "tier": "T10",
+      "gain_1030": 2.02973,
+      "entry": 168.3,
+      "exit": 124.8,
+      "ret_event": 0.232029
+    },
+    {
+      "date": "2025-01-24",
+      "ticker": "EVAX",
+      "prev_close": 3.64,
+      "tier": "T10",
+      "gain_1030": 1.10714,
+      "entry": 7.67,
+      "exit": 5.99,
+      "ret_event": 0.198076
+    },
+    {
+      "date": "2025-01-27",
+      "ticker": "JG",
+      "prev_close": 6.0121,
+      "tier": "T10",
+      "gain_1030": 1.42511,
+      "entry": 14.01,
+      "exit": 18.213,
+      "ret_event": -0.320959
+    },
+    {
+      "date": "2025-01-27",
+      "ticker": "AKRO",
+      "prev_close": 26.18,
+      "tier": "T10",
+      "gain_1030": 1.0296,
+      "entry": 53.03,
+      "exit": 51.71,
+      "ret_event": 0.003933
+    },
+    {
+      "date": "2025-01-27",
+      "ticker": "ETNB",
+      "prev_close": 7.13,
+      "tier": "T10",
+      "gain_1030": 0.53015,
+      "entry": 10.91,
+      "exit": 9,
+      "ret_event": 0.159589
+    },
+    {
+      "date": "2025-01-27",
+      "ticker": "YIBO",
+      "prev_close": 2.15,
+      "tier": "T20",
+      "gain_1030": 2.64223,
+      "entry": 7.84,
+      "exit": 10.192,
+      "ret_event": -0.326438
+    },
+    {
+      "date": "2025-01-27",
+      "ticker": "HWH",
+      "prev_close": 1.439,
+      "tier": "T20",
+      "gain_1030": 0.64489,
+      "entry": 2.357,
+      "exit": 3.0641,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2025-01-28",
+      "ticker": "YIBO",
+      "prev_close": 3.08,
+      "tier": "T10",
+      "gain_1030": 0.64286,
+      "entry": 5.06,
+      "exit": 5.1,
+      "ret_event": -0.023385
+    },
+    {
+      "date": "2025-01-28",
+      "ticker": "SLXN",
+      "prev_close": 87,
+      "tier": "T10",
+      "gain_1030": 0.93103,
+      "entry": 169.33,
+      "exit": 220.129,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2025-01-28",
+      "ticker": "DXF",
+      "prev_close": 7.75,
+      "tier": "T10",
+      "gain_1030": 2.29419,
+      "entry": 23.02,
+      "exit": 20.5,
+      "ret_event": 0.083032
+    },
+    {
+      "date": "2025-01-30",
+      "ticker": "AMOD",
+      "prev_close": 61.6,
+      "tier": "T10",
+      "gain_1030": 1.54545,
+      "entry": 156.8,
+      "exit": 129.2,
+      "ret_event": 0.149582
+    },
+    {
+      "date": "2025-01-30",
+      "ticker": "KZIA",
+      "prev_close": 6.9,
+      "tier": "T10",
+      "gain_1030": 0.6087,
+      "entry": 11.1,
+      "exit": 9.35,
+      "ret_event": 0.142178
+    },
+    {
+      "date": "2025-01-30",
+      "ticker": "FOXX",
+      "prev_close": 2.89,
+      "tier": "T20",
+      "gain_1030": 2.09343,
+      "entry": 8.9,
+      "exit": 6.355,
+      "ret_event": 0.259517
+    },
+    {
+      "date": "2025-01-30",
+      "ticker": "TECX",
+      "prev_close": 25.72,
+      "tier": "T10",
+      "gain_1030": 1.01811,
+      "entry": 52,
+      "exit": 55.18,
+      "ret_event": -0.082113
+    },
+    {
+      "date": "2025-01-31",
+      "ticker": "SGN",
+      "prev_close": 2.56,
+      "tier": "T20",
+      "gain_1030": 0.50781,
+      "entry": 3.87,
+      "exit": 3.73,
+      "ret_event": 0.020696
+    },
+    {
+      "date": "2025-02-03",
+      "ticker": "REBN",
+      "prev_close": 3.3,
+      "tier": "T10",
+      "gain_1030": 0.57573,
+      "entry": 5.1702,
+      "exit": 5.0886,
+      "ret_event": 0.000303
+    },
+    {
+      "date": "2025-02-03",
+      "ticker": "GHRS",
+      "prev_close": 10.6,
+      "tier": "T10",
+      "gain_1030": 0.76934,
+      "entry": 18.75,
+      "exit": 17.9991,
+      "ret_event": 0.024569
+    },
+    {
+      "date": "2025-02-04",
+      "ticker": "VLCN",
+      "prev_close": 26.72,
+      "tier": "T10",
+      "gain_1030": 1.3982,
+      "entry": 64,
+      "exit": 25.28,
+      "ret_event": 0.584041
+    },
+    {
+      "date": "2025-02-04",
+      "ticker": "QNTM",
+      "prev_close": 3.18,
+      "tier": "T10",
+      "gain_1030": 0.53931,
+      "entry": 4.91,
+      "exit": 6.4,
+      "ret_event": -0.318942
+    },
+    {
+      "date": "2025-02-04",
+      "ticker": "AZTR",
+      "prev_close": 1.855,
+      "tier": "T20",
+      "gain_1030": 0.50027,
+      "entry": 2.795,
+      "exit": 2.09,
+      "ret_event": 0.236757
+    },
+    {
+      "date": "2025-02-05",
+      "ticker": "OGEN",
+      "prev_close": 8.523,
+      "tier": "T10",
+      "gain_1030": 0.68955,
+      "entry": 14.4,
+      "exit": 8.85,
+      "ret_event": 0.369937
+    },
+    {
+      "date": "2025-02-05",
+      "ticker": "KTTA",
+      "prev_close": 2.08,
+      "tier": "T20",
+      "gain_1030": 0.52404,
+      "entry": 3.17,
+      "exit": 2.7396,
+      "ret_event": 0.120293
+    },
+    {
+      "date": "2025-02-05",
+      "ticker": "ASST",
+      "prev_close": 10.99,
+      "tier": "T10",
+      "gain_1030": 0.65605,
+      "entry": 18.2,
+      "exit": 16.2,
+      "ret_event": 0.094411
+    },
+    {
+      "date": "2025-02-06",
+      "ticker": "APPS",
+      "prev_close": 2.54,
+      "tier": "T20",
+      "gain_1030": 0.68307,
+      "entry": 4.2701,
+      "exit": 4.98,
+      "ret_event": -0.181728
+    },
+    {
+      "date": "2025-02-06",
+      "ticker": "LIPO",
+      "prev_close": 2.58,
+      "tier": "T20",
+      "gain_1030": 0.97442,
+      "entry": 5.0701,
+      "exit": 4.65,
+      "ret_event": 0.067379
+    },
+    {
+      "date": "2025-02-06",
+      "ticker": "QNTM",
+      "prev_close": 8.58,
+      "tier": "T10",
+      "gain_1030": 0.54314,
+      "entry": 13.27,
+      "exit": 17.251,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2025-02-10",
+      "ticker": "PNBK",
+      "prev_close": 1.45,
+      "tier": "T20",
+      "gain_1030": 0.51448,
+      "entry": 2.1906,
+      "exit": 2.3499,
+      "ret_event": -0.088199
+    },
+    {
+      "date": "2025-02-10",
+      "ticker": "BNAI",
+      "prev_close": 4.1,
+      "tier": "T10",
+      "gain_1030": 1.28049,
+      "entry": 9.35,
+      "exit": 6.802,
+      "ret_event": 0.251554
+    },
+    {
+      "date": "2025-02-10",
+      "ticker": "CYN",
+      "prev_close": 9.03,
+      "tier": "T10",
+      "gain_1030": 0.77741,
+      "entry": 16.05,
+      "exit": 20.865,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2025-02-11",
+      "ticker": "AIFF",
+      "prev_close": 3.1,
+      "tier": "T10",
+      "gain_1030": 0.55813,
+      "entry": 4.8484,
+      "exit": 6.3029,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2025-02-12",
+      "ticker": "XLO",
+      "prev_close": 9.198,
+      "tier": "T10",
+      "gain_1030": 1.00913,
+      "entry": 18.6,
+      "exit": 20.45,
+      "ret_event": -0.120421
+    },
+    {
+      "date": "2025-02-12",
+      "ticker": "AIFF",
+      "prev_close": 8.4,
+      "tier": "T10",
+      "gain_1030": 0.53332,
+      "entry": 12.88,
+      "exit": 13,
+      "ret_event": -0.024796
+    },
+    {
+      "date": "2025-02-12",
+      "ticker": "NXU",
+      "prev_close": 5.478,
+      "tier": "T10",
+      "gain_1030": 0.6203,
+      "entry": 8.87,
+      "exit": 8.2,
+      "ret_event": 0.060056
+    },
+    {
+      "date": "2025-02-12",
+      "ticker": "KDLY",
+      "prev_close": 1.4216,
+      "tier": "T20",
+      "gain_1030": 0.79375,
+      "entry": 2.55,
+      "exit": 3.315,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2025-02-13",
+      "ticker": "EDSA",
+      "prev_close": 1.86,
+      "tier": "T20",
+      "gain_1030": 1.00005,
+      "entry": 3.729,
+      "exit": 3.19,
+      "ret_event": 0.123584
+    },
+    {
+      "date": "2025-02-13",
+      "ticker": "AMOD",
+      "prev_close": 73.6,
+      "tier": "T10",
+      "gain_1030": 1.4038,
+      "entry": 176.66,
+      "exit": 144.2,
+      "ret_event": 0.162784
+    },
+    {
+      "date": "2025-02-13",
+      "ticker": "MBRX",
+      "prev_close": 10.5,
+      "tier": "T10",
+      "gain_1030": 3.88095,
+      "entry": 60.5,
+      "exit": 80,
+      "ret_event": -0.348752
+    },
+    {
+      "date": "2025-02-14",
+      "ticker": "MBRX",
+      "prev_close": 31.75,
+      "tier": "T10",
+      "gain_1030": 0.77575,
+      "entry": 56.5,
+      "exit": 53,
+      "ret_event": 0.046467
+    },
+    {
+      "date": "2025-02-14",
+      "ticker": "WRD",
+      "prev_close": 17.17,
+      "tier": "T10",
+      "gain_1030": 0.63891,
+      "entry": 28.0526,
+      "exit": 31.4877,
+      "ret_event": -0.137932
+    },
+    {
+      "date": "2025-02-18",
+      "ticker": "KWE",
+      "prev_close": 9.807,
+      "tier": "T10",
+      "gain_1030": 0.96186,
+      "entry": 19.24,
+      "exit": 16.66,
+      "ret_event": 0.118616
+    },
+    {
+      "date": "2025-02-18",
+      "ticker": "PRPH",
+      "prev_close": 3.25,
+      "tier": "T10",
+      "gain_1030": 0.55785,
+      "entry": 5.064,
+      "exit": 4.25,
+      "ret_event": 0.145263
+    },
+    {
+      "date": "2025-02-18",
+      "ticker": "ALLO",
+      "prev_close": 2.04,
+      "tier": "T20",
+      "gain_1030": 0.63235,
+      "entry": 3.325,
+      "exit": 2.855,
+      "ret_event": 0.125874
+    },
+    {
+      "date": "2025-02-18",
+      "ticker": "GCL",
+      "prev_close": 3.0492,
+      "tier": "T10",
+      "gain_1030": 0.92503,
+      "entry": 5.8609,
+      "exit": 7.6192,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2025-02-19",
+      "ticker": "SINT",
+      "prev_close": 2.82,
+      "tier": "T20",
+      "gain_1030": 0.65957,
+      "entry": 4.68,
+      "exit": 6.084,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2025-02-19",
+      "ticker": "OSRH",
+      "prev_close": 3.11,
+      "tier": "T10",
+      "gain_1030": 1.70096,
+      "entry": 8.4,
+      "exit": 5.43,
+      "ret_event": 0.327133
+    },
+    {
+      "date": "2025-02-20",
+      "ticker": "XOS",
+      "prev_close": 3.13,
+      "tier": "T10",
+      "gain_1030": 1.46003,
+      "entry": 7.7,
+      "exit": 6.245,
+      "ret_event": 0.168002
+    },
+    {
+      "date": "2025-02-21",
+      "ticker": "UPC",
+      "prev_close": 5.7,
+      "tier": "T10",
+      "gain_1030": 1.25965,
+      "entry": 12.84,
+      "exit": 8.012,
+      "ret_event": 0.355054
+    },
+    {
+      "date": "2025-02-21",
+      "ticker": "OSRH",
+      "prev_close": 3.45,
+      "tier": "T10",
+      "gain_1030": 0.75652,
+      "entry": 6.06,
+      "exit": 4.28,
+      "ret_event": 0.27825
+    },
+    {
+      "date": "2025-02-21",
+      "ticker": "MLGO",
+      "prev_close": 34.5,
+      "tier": "T10",
+      "gain_1030": 2.45246,
+      "entry": 119.1,
+      "exit": 154.83,
+      "ret_event": -0.326438
+    },
+    {
+      "date": "2025-02-24",
+      "ticker": "ATCH",
+      "prev_close": 2.35,
+      "tier": "T20",
+      "gain_1030": 2.77021,
+      "entry": 8.825,
+      "exit": 11.4725,
+      "ret_event": -0.326438
+    },
+    {
+      "date": "2025-02-24",
+      "ticker": "PEPG",
+      "prev_close": 1.37,
+      "tier": "T20",
+      "gain_1030": 1.48263,
+      "entry": 3.4,
+      "exit": 2.2868,
+      "ret_event": 0.306453
+    },
+    {
+      "date": "2025-02-25",
+      "ticker": "WAFU",
+      "prev_close": 1.79,
+      "tier": "T20",
+      "gain_1030": 1.61453,
+      "entry": 4.6996,
+      "exit": 2.825,
+      "ret_event": 0.372447
+    },
+    {
+      "date": "2025-02-26",
+      "ticker": "ATCH",
+      "prev_close": 3.82,
+      "tier": "T10",
+      "gain_1030": 0.83639,
+      "entry": 7,
+      "exit": 2.83,
+      "ret_event": 0.580235
+    },
+    {
+      "date": "2025-02-26",
+      "ticker": "ENVB",
+      "prev_close": 14.16,
+      "tier": "T10",
+      "gain_1030": 1.33898,
+      "entry": 33.24,
+      "exit": 27.24,
+      "ret_event": 0.159547
+    },
+    {
+      "date": "2025-02-27",
+      "ticker": "ULY",
+      "prev_close": 5.04,
+      "tier": "T10",
+      "gain_1030": 0.61905,
+      "entry": 8.16,
+      "exit": 8.058,
+      "ret_event": -0.002979
+    },
+    {
+      "date": "2025-02-27",
+      "ticker": "AMST",
+      "prev_close": 2.39,
+      "tier": "T20",
+      "gain_1030": 0.56485,
+      "entry": 3.74,
+      "exit": 2.5198,
+      "ret_event": 0.310777
+    },
+    {
+      "date": "2025-02-28",
+      "ticker": "ORGO",
+      "prev_close": 3.07,
+      "tier": "T10",
+      "gain_1030": 0.7199,
+      "entry": 5.285,
+      "exit": 6.21,
+      "ret_event": -0.190503
+    },
+    {
+      "date": "2025-03-03",
+      "ticker": "BTOG",
+      "prev_close": 10.92,
+      "tier": "T10",
+      "gain_1030": 1.94505,
+      "entry": 32.17,
+      "exit": 19.25,
+      "ret_event": 0.375178
+    },
+    {
+      "date": "2025-03-03",
+      "ticker": "BTAI",
+      "prev_close": 2.16,
+      "tier": "T20",
+      "gain_1030": 1.23148,
+      "entry": 4.8165,
+      "exit": 6.2614,
+      "ret_event": -0.320959
+    },
+    {
+      "date": "2025-03-03",
+      "ticker": "ACON",
+      "prev_close": 90.45,
+      "tier": "T10",
+      "gain_1030": 0.74627,
+      "entry": 157.68,
+      "exit": 207.9,
+      "ret_event": -0.333973
+    },
+    {
+      "date": "2025-03-03",
+      "ticker": "FTFT",
+      "prev_close": 32.32,
+      "tier": "T10",
+      "gain_1030": 0.72277,
+      "entry": 55.68,
+      "exit": 39.84,
+      "ret_event": 0.269003
+    },
+    {
+      "date": "2025-03-04",
+      "ticker": "MASS",
+      "prev_close": 1.98,
+      "tier": "T20",
+      "gain_1030": 0.66157,
+      "entry": 3.2805,
+      "exit": 3.8799,
+      "ret_event": -0.198196
+    },
+    {
+      "date": "2025-03-05",
+      "ticker": "GV",
+      "prev_close": 1.29,
+      "tier": "T20",
+      "gain_1030": 0.96,
+      "entry": 2.53,
+      "exit": 3.289,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2025-03-05",
+      "ticker": "ARBB",
+      "prev_close": 7.8,
+      "tier": "T10",
+      "gain_1030": 0.5,
+      "entry": 11.67,
+      "exit": 12.39,
+      "ret_event": -0.077176
+    },
+    {
+      "date": "2025-03-05",
+      "ticker": "CDXC",
+      "prev_close": 5.6,
+      "tier": "T10",
+      "gain_1030": 0.52321,
+      "entry": 8.52,
+      "exit": 8.56,
+      "ret_event": -0.020174
+    },
+    {
+      "date": "2025-03-06",
+      "ticker": "GV",
+      "prev_close": 3.695,
+      "tier": "T10",
+      "gain_1030": 0.50744,
+      "entry": 5.588,
+      "exit": 4.89,
+      "ret_event": 0.109431
+    },
+    {
+      "date": "2025-03-06",
+      "ticker": "AGMH",
+      "prev_close": 5.115,
+      "tier": "T10",
+      "gain_1030": 1.24047,
+      "entry": 11.45,
+      "exit": 10.65,
+      "ret_event": 0.04891
+    },
+    {
+      "date": "2025-03-07",
+      "ticker": "GV",
+      "prev_close": 4.89,
+      "tier": "T10",
+      "gain_1030": 0.58078,
+      "entry": 7.765,
+      "exit": 5.95,
+      "ret_event": 0.218262
+    },
+    {
+      "date": "2025-03-07",
+      "ticker": "BTOG",
+      "prev_close": 16.8,
+      "tier": "T10",
+      "gain_1030": 0.7125,
+      "entry": 28.8,
+      "exit": 37.44,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2025-03-10",
+      "ticker": "CKPT",
+      "prev_close": 2.47,
+      "tier": "T20",
+      "gain_1030": 0.6417,
+      "entry": 4.05,
+      "exit": 3.9895,
+      "ret_event": -0.000541
+    },
+    {
+      "date": "2025-03-10",
+      "ticker": "MLYS",
+      "prev_close": 10.52,
+      "tier": "T10",
+      "gain_1030": 0.53517,
+      "entry": 16.13,
+      "exit": 14.945,
+      "ret_event": 0.057986
+    },
+    {
+      "date": "2025-03-10",
+      "ticker": "SNOA",
+      "prev_close": 1.99,
+      "tier": "T20",
+      "gain_1030": 0.54221,
+      "entry": 3.0684,
+      "exit": 2.79,
+      "ret_event": 0.075252
+    },
+    {
+      "date": "2025-03-11",
+      "ticker": "TSVT",
+      "prev_close": 2.8,
+      "tier": "T20",
+      "gain_1030": 0.75893,
+      "entry": 4.93,
+      "exit": 4.945,
+      "ret_event": -0.018522
+    },
+    {
+      "date": "2025-03-11",
+      "ticker": "RAY",
+      "prev_close": 13.92,
+      "tier": "T10",
+      "gain_1030": 0.58621,
+      "entry": 22,
+      "exit": 28.6,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2025-03-12",
+      "ticker": "CRVO",
+      "prev_close": 2.36,
+      "tier": "T20",
+      "gain_1030": 0.64407,
+      "entry": 3.889,
+      "exit": 5.0557,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2025-03-13",
+      "ticker": "LFWD",
+      "prev_close": 17.64,
+      "tier": "T10",
+      "gain_1030": 0.69388,
+      "entry": 29.88,
+      "exit": 19.26,
+      "ret_event": 0.339942
+    },
+    {
+      "date": "2025-03-14",
+      "ticker": "SUNE",
+      "prev_close": 63.98,
+      "tier": "T10",
+      "gain_1030": 0.97781,
+      "entry": 126.56,
+      "exit": 104.26,
+      "ret_event": 0.160722
+    },
+    {
+      "date": "2025-03-14",
+      "ticker": "BON",
+      "prev_close": 18.39,
+      "tier": "T10",
+      "gain_1030": 2.69766,
+      "entry": 68,
+      "exit": 35,
+      "ret_event": 0.458856
+    },
+    {
+      "date": "2025-03-17",
+      "ticker": "MGRM",
+      "prev_close": 2.33,
+      "tier": "T20",
+      "gain_1030": 0.75107,
+      "entry": 4.1,
+      "exit": 3.65,
+      "ret_event": 0.094277
+    },
+    {
+      "date": "2025-03-17",
+      "ticker": "GLMD",
+      "prev_close": 1.7269,
+      "tier": "T20",
+      "gain_1030": 0.51601,
+      "entry": 2.62,
+      "exit": 2.51,
+      "ret_event": 0.026505
+    },
+    {
+      "date": "2025-03-19",
+      "ticker": "LSE",
+      "prev_close": 7.77,
+      "tier": "T10",
+      "gain_1030": 0.72973,
+      "entry": 13.43,
+      "exit": 12.36,
+      "ret_event": 0.064193
+    },
+    {
+      "date": "2025-03-19",
+      "ticker": "XHLD",
+      "prev_close": 8.778,
+      "tier": "T10",
+      "gain_1030": 0.6473,
+      "entry": 14.33,
+      "exit": 18.629,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2025-03-20",
+      "ticker": "WINT",
+      "prev_close": 1.69,
+      "tier": "T20",
+      "gain_1030": 0.66858,
+      "entry": 2.815,
+      "exit": 2.1699,
+      "ret_event": 0.213686
+    },
+    {
+      "date": "2025-03-21",
+      "ticker": "IBO",
+      "prev_close": 2.08,
+      "tier": "T20",
+      "gain_1030": 1.33173,
+      "entry": 4.83,
+      "exit": 4.76,
+      "ret_event": -0.006466
+    },
+    {
+      "date": "2025-03-21",
+      "ticker": "RNAZ",
+      "prev_close": 21.56,
+      "tier": "T10",
+      "gain_1030": 0.70037,
+      "entry": 36.4,
+      "exit": 31.08,
+      "ret_event": 0.130674
+    },
+    {
+      "date": "2025-03-21",
+      "ticker": "XHLD",
+      "prev_close": 14.96,
+      "tier": "T10",
+      "gain_1030": 0.82487,
+      "entry": 27.23,
+      "exit": 21.6,
+      "ret_event": 0.191278
+    },
+    {
+      "date": "2025-03-24",
+      "ticker": "XHLD",
+      "prev_close": 21,
+      "tier": "T10",
+      "gain_1030": 0.66429,
+      "entry": 34.81,
+      "exit": 32.55,
+      "ret_event": 0.049444
+    },
+    {
+      "date": "2025-03-24",
+      "ticker": "MLGO",
+      "prev_close": 75.6,
+      "tier": "T10",
+      "gain_1030": 1.16667,
+      "entry": 163.5,
+      "exit": 212.55,
+      "ret_event": -0.320959
+    },
+    {
+      "date": "2025-03-24",
+      "ticker": "CAPS",
+      "prev_close": 1.72,
+      "tier": "T20",
+      "gain_1030": 0.94721,
+      "entry": 3.34,
+      "exit": 2.6929,
+      "ret_event": 0.178263
+    },
+    {
+      "date": "2025-03-25",
+      "ticker": "TNON",
+      "prev_close": 0.9781,
+      "tier": "T20",
+      "gain_1030": 2.63879,
+      "entry": 3.56,
+      "exit": 4.628,
+      "ret_event": -0.326438
+    },
+    {
+      "date": "2025-03-25",
+      "ticker": "POAI",
+      "prev_close": 16.73,
+      "tier": "T10",
+      "gain_1030": 0.98087,
+      "entry": 33,
+      "exit": 25.21,
+      "ret_event": 0.220581
+    },
+    {
+      "date": "2025-03-25",
+      "ticker": "DATS",
+      "prev_close": 2.16,
+      "tier": "T20",
+      "gain_1030": 1.69444,
+      "entry": 5.82,
+      "exit": 3.78,
+      "ret_event": 0.324077
+    },
+    {
+      "date": "2025-03-26",
+      "ticker": "PTPI",
+      "prev_close": 1.445,
+      "tier": "T20",
+      "gain_1030": 1.25121,
+      "entry": 3.255,
+      "exit": 4.2315,
+      "ret_event": -0.320959
+    },
+    {
+      "date": "2025-03-26",
+      "ticker": "OSRH",
+      "prev_close": 1.6,
+      "tier": "T20",
+      "gain_1030": 0.85613,
+      "entry": 2.9602,
+      "exit": 3.8483,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2025-03-26",
+      "ticker": "SURG",
+      "prev_close": 1.38,
+      "tier": "T20",
+      "gain_1030": 0.72464,
+      "entry": 2.3704,
+      "exit": 2.341,
+      "ret_event": -0.003076
+    },
+    {
+      "date": "2025-03-27",
+      "ticker": "GTEC",
+      "prev_close": 1.31,
+      "tier": "T20",
+      "gain_1030": 0.54344,
+      "entry": 2.0209,
+      "exit": 2.1701,
+      "ret_event": -0.089308
+    },
+    {
+      "date": "2025-03-28",
+      "ticker": "SNSE",
+      "prev_close": 8.616,
+      "tier": "T10",
+      "gain_1030": 0.6539,
+      "entry": 14.29,
+      "exit": 10.4,
+      "ret_event": 0.256739
+    },
+    {
+      "date": "2025-03-28",
+      "ticker": "PRTG",
+      "prev_close": 4.71,
+      "tier": "T10",
+      "gain_1030": 1.00637,
+      "entry": 9.45,
+      "exit": 9.64,
+      "ret_event": -0.041065
+    },
+    {
+      "date": "2025-03-31",
+      "ticker": "CORT",
+      "prev_close": 54.63,
+      "tier": "T10",
+      "gain_1030": 0.84294,
+      "entry": 100.55,
+      "exit": 114.28,
+      "ret_event": -0.152028
+    },
+    {
+      "date": "2025-04-01",
+      "ticker": "ICCT",
+      "prev_close": 2.24,
+      "tier": "T20",
+      "gain_1030": 0.77228,
+      "entry": 3.9699,
+      "exit": 5.1609,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2025-04-01",
+      "ticker": "RSLS",
+      "prev_close": 9.013,
+      "tier": "T10",
+      "gain_1030": 1.9402,
+      "entry": 26.5,
+      "exit": 34.5,
+      "ret_event": -0.328325
+    },
+    {
+      "date": "2025-04-01",
+      "ticker": "BIAF",
+      "prev_close": 7.8,
+      "tier": "T10",
+      "gain_1030": 2.1859,
+      "entry": 24.78,
+      "exit": 32.214,
+      "ret_event": -0.326438
+    },
+    {
+      "date": "2025-04-01",
+      "ticker": "NMAX",
+      "prev_close": 83.51,
+      "tier": "T10",
+      "gain_1030": 0.74979,
+      "entry": 145.5286,
+      "exit": 189.1872,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2025-04-02",
+      "ticker": "IBG",
+      "prev_close": 12.32,
+      "tier": "T10",
+      "gain_1030": 2.19562,
+      "entry": 39.25,
+      "exit": 31.25,
+      "ret_event": 0.177383
+    },
+    {
+      "date": "2025-04-02",
+      "ticker": "TTEC",
+      "prev_close": 3.27,
+      "tier": "T10",
+      "gain_1030": 0.50306,
+      "entry": 4.91,
+      "exit": 4.99,
+      "ret_event": -0.031773
+    },
+    {
+      "date": "2025-04-02",
+      "ticker": "QNRX",
+      "prev_close": 7.406,
+      "tier": "T10",
+      "gain_1030": 0.50284,
+      "entry": 11.14,
+      "exit": 10.02,
+      "ret_event": 0.085059
+    },
+    {
+      "date": "2025-04-02",
+      "ticker": "CNTM",
+      "prev_close": 15.84,
+      "tier": "T10",
+      "gain_1030": 0.9798,
+      "entry": 31.24,
+      "exit": 24,
+      "ret_event": 0.216275
+    },
+    {
+      "date": "2025-04-03",
+      "ticker": "PTIX",
+      "prev_close": 3.178,
+      "tier": "T10",
+      "gain_1030": 1.14506,
+      "entry": 6.826,
+      "exit": 5.835,
+      "ret_event": 0.124221
+    },
+    {
+      "date": "2025-04-03",
+      "ticker": "OSRH",
+      "prev_close": 1.47,
+      "tier": "T20",
+      "gain_1030": 0.55109,
+      "entry": 2.29,
+      "exit": 2.977,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2025-04-03",
+      "ticker": "ICCT",
+      "prev_close": 2.07,
+      "tier": "T20",
+      "gain_1030": 1.20802,
+      "entry": 4.5704,
+      "exit": 5.9415,
+      "ret_event": -0.320959
+    },
+    {
+      "date": "2025-04-07",
+      "ticker": "BJDX",
+      "prev_close": 14.12,
+      "tier": "T10",
+      "gain_1030": 1.83003,
+      "entry": 39.8,
+      "exit": 30,
+      "ret_event": 0.219793
+    },
+    {
+      "date": "2025-04-08",
+      "ticker": "SXTP",
+      "prev_close": 7.194,
+      "tier": "T10",
+      "gain_1030": 0.96831,
+      "entry": 14.16,
+      "exit": 11.44,
+      "ret_event": 0.176611
+    },
+    {
+      "date": "2025-04-08",
+      "ticker": "NAOV",
+      "prev_close": 29.4,
+      "tier": "T10",
+      "gain_1030": 4.34014,
+      "entry": 156.02,
+      "exit": 71.3,
+      "ret_event": 0.516569
+    },
+    {
+      "date": "2025-04-09",
+      "ticker": "VERO",
+      "prev_close": 2.92,
+      "tier": "T20",
+      "gain_1030": 2.11986,
+      "entry": 9.1,
+      "exit": 8.935,
+      "ret_event": -0.008306
+    },
+    {
+      "date": "2025-04-10",
+      "ticker": "STSS",
+      "prev_close": 4.2,
+      "tier": "T10",
+      "gain_1030": 1.22857,
+      "entry": 9.36,
+      "exit": 5.46,
+      "ret_event": 0.395708
+    },
+    {
+      "date": "2025-04-10",
+      "ticker": "PRFX",
+      "prev_close": 9.1,
+      "tier": "T10",
+      "gain_1030": 0.57692,
+      "entry": 14.25,
+      "exit": 10.6,
+      "ret_event": 0.240661
+    },
+    {
+      "date": "2025-04-10",
+      "ticker": "RSLS",
+      "prev_close": 8.555,
+      "tier": "T10",
+      "gain_1030": 0.66569,
+      "entry": 14.25,
+      "exit": 14.16,
+      "ret_event": -0.009164
+    },
+    {
+      "date": "2025-04-11",
+      "ticker": "MSPR",
+      "prev_close": 8.96,
+      "tier": "T10",
+      "gain_1030": 1.11496,
+      "entry": 18.96,
+      "exit": 17.35,
+      "ret_event": 0.063957
+    },
+    {
+      "date": "2025-04-11",
+      "ticker": "THTX",
+      "prev_close": 1.33,
+      "tier": "T20",
+      "gain_1030": 0.54135,
+      "entry": 2.041,
+      "exit": 1.94,
+      "ret_event": 0.034006
+    },
+    {
+      "date": "2025-04-14",
+      "ticker": "XAGE",
+      "prev_close": 3.738,
+      "tier": "T10",
+      "gain_1030": 0.79374,
+      "entry": 6.705,
+      "exit": 6.03,
+      "ret_event": 0.085192
+    },
+    {
+      "date": "2025-04-14",
+      "ticker": "STSS",
+      "prev_close": 7.5,
+      "tier": "T10",
+      "gain_1030": 0.6,
+      "entry": 12.06,
+      "exit": 12.72,
+      "ret_event": -0.070206
+    },
+    {
+      "date": "2025-04-14",
+      "ticker": "BULL",
+      "prev_close": 13.25,
+      "tier": "T10",
+      "gain_1030": 2.64075,
+      "entry": 48.37,
+      "exit": 62.881,
+      "ret_event": -0.326438
+    },
+    {
+      "date": "2025-04-15",
+      "ticker": "MURA",
+      "prev_close": 1.03,
+      "tier": "T20",
+      "gain_1030": 1.43204,
+      "entry": 2.51,
+      "exit": 2.4,
+      "ret_event": 0.022866
+    },
+    {
+      "date": "2025-04-15",
+      "ticker": "DWTX",
+      "prev_close": 3,
+      "tier": "T10",
+      "gain_1030": 0.557,
+      "entry": 4.67,
+      "exit": 4.1204,
+      "ret_event": 0.102208
+    },
+    {
+      "date": "2025-04-15",
+      "ticker": "SNYR",
+      "prev_close": 1.79,
+      "tier": "T20",
+      "gain_1030": 0.60335,
+      "entry": 2.86,
+      "exit": 2.27,
+      "ret_event": 0.190814
+    },
+    {
+      "date": "2025-04-15",
+      "ticker": "SKYE",
+      "prev_close": 1.31,
+      "tier": "T20",
+      "gain_1030": 0.64244,
+      "entry": 2.15,
+      "exit": 1.7092,
+      "ret_event": 0.189544
+    },
+    {
+      "date": "2025-04-16",
+      "ticker": "TGL",
+      "prev_close": 41.6,
+      "tier": "T10",
+      "gain_1030": 0.65385,
+      "entry": 68.6,
+      "exit": 75.6,
+      "ret_event": -0.11752
+    },
+    {
+      "date": "2025-04-17",
+      "ticker": "ADGM",
+      "prev_close": 0.9232,
+      "tier": "T20",
+      "gain_1030": 1.45331,
+      "entry": 2.26,
+      "exit": 1.68,
+      "ret_event": 0.235678
+    },
+    {
+      "date": "2025-04-21",
+      "ticker": "UPXI",
+      "prev_close": 2.295,
+      "tier": "T20",
+      "gain_1030": 6.49608,
+      "entry": 17.15,
+      "exit": 9.87,
+      "ret_event": 0.398051
+    },
+    {
+      "date": "2025-04-21",
+      "ticker": "SHFS",
+      "prev_close": 2.23,
+      "tier": "T20",
+      "gain_1030": 0.89233,
+      "entry": 4.21,
+      "exit": 4.1799,
+      "ret_event": -0.00833
+    },
+    {
+      "date": "2025-04-22",
+      "ticker": "GELS",
+      "prev_close": 0.9,
+      "tier": "T20",
+      "gain_1030": 2.77778,
+      "entry": 3.4,
+      "exit": 2.87,
+      "ret_event": 0.129444
+    },
+    {
+      "date": "2025-04-22",
+      "ticker": "TIVC",
+      "prev_close": 3.5,
+      "tier": "T10",
+      "gain_1030": 1.21714,
+      "entry": 7.4,
+      "exit": 7.12,
+      "ret_event": 0.016879
+    },
+    {
+      "date": "2025-04-23",
+      "ticker": "JYD",
+      "prev_close": 5.1,
+      "tier": "T10",
+      "gain_1030": 0.55392,
+      "entry": 7.915,
+      "exit": 10.2895,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2025-04-23",
+      "ticker": "ENSC",
+      "prev_close": 1.87,
+      "tier": "T20",
+      "gain_1030": 0.88241,
+      "entry": 3.52,
+      "exit": 3.64,
+      "ret_event": -0.04957
+    },
+    {
+      "date": "2025-04-23",
+      "ticker": "SNOA",
+      "prev_close": 2.33,
+      "tier": "T20",
+      "gain_1030": 0.57979,
+      "entry": 3.6801,
+      "exit": 3.93,
+      "ret_event": -0.083385
+    },
+    {
+      "date": "2025-04-23",
+      "ticker": "AGMH",
+      "prev_close": 1.5,
+      "tier": "T20",
+      "gain_1030": 1.02,
+      "entry": 3.035,
+      "exit": 2.81,
+      "ret_event": 0.053176
+    },
+    {
+      "date": "2025-04-24",
+      "ticker": "CEP",
+      "prev_close": 16.5,
+      "tier": "T10",
+      "gain_1030": 1.26788,
+      "entry": 37.48,
+      "exit": 25,
+      "ret_event": 0.312019
+    },
+    {
+      "date": "2025-04-24",
+      "ticker": "CERO",
+      "prev_close": 15.99,
+      "tier": "T10",
+      "gain_1030": 0.5197,
+      "entry": 24.3,
+      "exit": 21.89,
+      "ret_event": 0.083698
+    },
+    {
+      "date": "2025-04-25",
+      "ticker": "AGMH",
+      "prev_close": 1.95,
+      "tier": "T20",
+      "gain_1030": 0.51538,
+      "entry": 2.95,
+      "exit": 2.385,
+      "ret_event": 0.176046
+    },
+    {
+      "date": "2025-04-28",
+      "ticker": "AGMH",
+      "prev_close": 2.43,
+      "tier": "T20",
+      "gain_1030": 0.96914,
+      "entry": 4.78,
+      "exit": 6.214,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2025-04-29",
+      "ticker": "WLDS",
+      "prev_close": 10.8,
+      "tier": "T10",
+      "gain_1030": 0.58333,
+      "entry": 17.14,
+      "exit": 16.11,
+      "ret_event": 0.044614
+    },
+    {
+      "date": "2025-04-29",
+      "ticker": "OMH",
+      "prev_close": 2.03,
+      "tier": "T20",
+      "gain_1030": 0.90118,
+      "entry": 3.85,
+      "exit": 3.1,
+      "ret_event": 0.179326
+    },
+    {
+      "date": "2025-04-30",
+      "ticker": "RGLS",
+      "prev_close": 3.37,
+      "tier": "T10",
+      "gain_1030": 1.3457,
+      "entry": 7.9088,
+      "exit": 7.98,
+      "ret_event": -0.029962
+    },
+    {
+      "date": "2025-05-01",
+      "ticker": "BTOG",
+      "prev_close": 9.048,
+      "tier": "T10",
+      "gain_1030": 0.58709,
+      "entry": 14.34,
+      "exit": 10.5,
+      "ret_event": 0.252303
+    },
+    {
+      "date": "2025-05-01",
+      "ticker": "ZCAR",
+      "prev_close": 4.07,
+      "tier": "T10",
+      "gain_1030": 2.53565,
+      "entry": 14.3909,
+      "exit": 10.42,
+      "ret_event": 0.249493
+    },
+    {
+      "date": "2025-05-05",
+      "ticker": "GPUS",
+      "prev_close": 1.37,
+      "tier": "T20",
+      "gain_1030": 2.60949,
+      "entry": 4.9498,
+      "exit": 6.4347,
+      "ret_event": -0.326438
+    },
+    {
+      "date": "2025-05-05",
+      "ticker": "NITO",
+      "prev_close": 9.905,
+      "tier": "T10",
+      "gain_1030": 0.9051,
+      "entry": 18.84,
+      "exit": 24.492,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2025-05-06",
+      "ticker": "BLMZ",
+      "prev_close": 1.806,
+      "tier": "T20",
+      "gain_1030": 0.73477,
+      "entry": 3.141,
+      "exit": 1.95,
+      "ret_event": 0.363699
+    },
+    {
+      "date": "2025-05-06",
+      "ticker": "KTTA",
+      "prev_close": 1.42,
+      "tier": "T20",
+      "gain_1030": 1.14732,
+      "entry": 3.04,
+      "exit": 1.5101,
+      "ret_event": 0.482298
+    },
+    {
+      "date": "2025-05-07",
+      "ticker": "GPUS",
+      "prev_close": 4.7,
+      "tier": "T10",
+      "gain_1030": 0.70423,
+      "entry": 8.0099,
+      "exit": 6.135,
+      "ret_event": 0.218593
+    },
+    {
+      "date": "2025-05-07",
+      "ticker": "PRCH",
+      "prev_close": 6.34,
+      "tier": "T10",
+      "gain_1030": 0.55284,
+      "entry": 9.8466,
+      "exit": 10.65,
+      "ret_event": -0.097071
+    },
+    {
+      "date": "2025-05-08",
+      "ticker": "ASST",
+      "prev_close": 67.8,
+      "tier": "T10",
+      "gain_1030": 0.72566,
+      "entry": 129.2,
+      "exit": 167.96,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2025-05-09",
+      "ticker": "SYTA",
+      "prev_close": 3.918,
+      "tier": "T10",
+      "gain_1030": 0.65646,
+      "entry": 6.482,
+      "exit": 6.64,
+      "ret_event": -0.039855
+    },
+    {
+      "date": "2025-05-09",
+      "ticker": "WBUY",
+      "prev_close": 7.11,
+      "tier": "T10",
+      "gain_1030": 1.95641,
+      "entry": 21.02,
+      "exit": 27.326,
+      "ret_event": -0.326438
+    },
+    {
+      "date": "2025-05-12",
+      "ticker": "TAOP",
+      "prev_close": 4.911,
+      "tier": "T10",
+      "gain_1030": 2.4942,
+      "entry": 17.13,
+      "exit": 8.853,
+      "ret_event": 0.456749
+    },
+    {
+      "date": "2025-05-12",
+      "ticker": "JYD",
+      "prev_close": 10.91,
+      "tier": "T10",
+      "gain_1030": 0.75435,
+      "entry": 19.06,
+      "exit": 24.778,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2025-05-12",
+      "ticker": "GRYP",
+      "prev_close": 0.52,
+      "tier": "T20",
+      "gain_1030": 3.03846,
+      "entry": 2.1,
+      "exit": 1.41,
+      "ret_event": 0.302133
+    },
+    {
+      "date": "2025-05-12",
+      "ticker": "KDLY",
+      "prev_close": 3.9,
+      "tier": "T10",
+      "gain_1030": 4.84359,
+      "entry": 22.745,
+      "exit": 13.515,
+      "ret_event": 0.379365
+    },
+    {
+      "date": "2025-05-13",
+      "ticker": "HCWB",
+      "prev_close": 31.26,
+      "tier": "T10",
+      "gain_1030": 1.43954,
+      "entry": 76.32,
+      "exit": 99.216,
+      "ret_event": -0.320959
+    },
+    {
+      "date": "2025-05-13",
+      "ticker": "ICCT",
+      "prev_close": 1.46,
+      "tier": "T20",
+      "gain_1030": 1.5274,
+      "entry": 3.68,
+      "exit": 2.3,
+      "ret_event": 0.348562
+    },
+    {
+      "date": "2025-05-13",
+      "ticker": "MOGO",
+      "prev_close": 0.9966,
+      "tier": "T20",
+      "gain_1030": 1.09512,
+      "entry": 2.085,
+      "exit": 2.7105,
+      "ret_event": -0.320959
+    },
+    {
+      "date": "2025-05-14",
+      "ticker": "IXHL",
+      "prev_close": 2.559,
+      "tier": "T20",
+      "gain_1030": 7.20633,
+      "entry": 20.96,
+      "exit": 27.248,
+      "ret_event": -0.326438
+    },
+    {
+      "date": "2025-05-15",
+      "ticker": "GTI",
+      "prev_close": 5.82,
+      "tier": "T10",
+      "gain_1030": 0.96735,
+      "entry": 11.45,
+      "exit": 9.522,
+      "ret_event": 0.152905
+    },
+    {
+      "date": "2025-05-15",
+      "ticker": "CLIK",
+      "prev_close": 8.4,
+      "tier": "T10",
+      "gain_1030": 1.74405,
+      "entry": 23.03,
+      "exit": 21.11,
+      "ret_event": 0.056931
+    },
+    {
+      "date": "2025-05-16",
+      "ticker": "TSSI",
+      "prev_close": 8.87,
+      "tier": "T10",
+      "gain_1030": 0.69511,
+      "entry": 15.0001,
+      "exit": 15.44,
+      "ret_event": -0.044806
+    },
+    {
+      "date": "2025-05-19",
+      "ticker": "PTIX",
+      "prev_close": 3.03,
+      "tier": "T10",
+      "gain_1030": 1.62706,
+      "entry": 7.9,
+      "exit": 10.4,
+      "ret_event": -0.342894
+    },
+    {
+      "date": "2025-05-19",
+      "ticker": "MULN",
+      "prev_close": 16.99,
+      "tier": "T10",
+      "gain_1030": 0.53031,
+      "entry": 25.88,
+      "exit": 33.644,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2025-05-19",
+      "ticker": "NWTN",
+      "prev_close": 1.87,
+      "tier": "T20",
+      "gain_1030": 0.53476,
+      "entry": 2.87,
+      "exit": 2.7496,
+      "ret_event": 0.026472
+    },
+    {
+      "date": "2025-05-20",
+      "ticker": "BLMZ",
+      "prev_close": 1.018,
+      "tier": "T20",
+      "gain_1030": 1.55501,
+      "entry": 2.602,
+      "exit": 1.522,
+      "ret_event": 0.388627
+    },
+    {
+      "date": "2025-05-20",
+      "ticker": "SYTA",
+      "prev_close": 16.28,
+      "tier": "T10",
+      "gain_1030": 0.58231,
+      "entry": 25.64,
+      "exit": 33.332,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2025-05-20",
+      "ticker": "NRXS",
+      "prev_close": 2.27,
+      "tier": "T20",
+      "gain_1030": 0.92978,
+      "entry": 4.4073,
+      "exit": 3.9199,
+      "ret_event": 0.09511
+    },
+    {
+      "date": "2025-05-20",
+      "ticker": "QBTX",
+      "prev_close": 22.11,
+      "tier": "T10",
+      "gain_1030": 0.5649,
+      "entry": 34.46,
+      "exit": 33.43,
+      "ret_event": 0.01441
+    },
+    {
+      "date": "2025-05-20",
+      "ticker": "TNMG",
+      "prev_close": 11.92,
+      "tier": "T10",
+      "gain_1030": 0.84564,
+      "entry": 22,
+      "exit": 18.2,
+      "ret_event": 0.157248
+    },
+    {
+      "date": "2025-05-21",
+      "ticker": "GPUS",
+      "prev_close": 4.61,
+      "tier": "T10",
+      "gain_1030": 1.08892,
+      "entry": 9.6294,
+      "exit": 7.015,
+      "ret_event": 0.250543
+    },
+    {
+      "date": "2025-05-21",
+      "ticker": "BDSX",
+      "prev_close": 5.416,
+      "tier": "T10",
+      "gain_1030": 0.53434,
+      "entry": 8.324,
+      "exit": 7.902,
+      "ret_event": 0.035217
+    },
+    {
+      "date": "2025-05-22",
+      "ticker": "NVTS",
+      "prev_close": 1.91,
+      "tier": "T20",
+      "gain_1030": 1.36728,
+      "entry": 4.525,
+      "exit": 5.04,
+      "ret_event": -0.134771
+    },
+    {
+      "date": "2025-05-22",
+      "ticker": "ASST",
+      "prev_close": 160.8,
+      "tier": "T10",
+      "gain_1030": 0.5717,
+      "entry": 252.8,
+      "exit": 259.2,
+      "ret_event": -0.040796
+    },
+    {
+      "date": "2025-05-23",
+      "ticker": "IMNN",
+      "prev_close": 6.233,
+      "tier": "T10",
+      "gain_1030": 2.22477,
+      "entry": 20,
+      "exit": 17.1,
+      "ret_event": 0.118562
+    },
+    {
+      "date": "2025-05-23",
+      "ticker": "BLMZ",
+      "prev_close": 1.34,
+      "tier": "T20",
+      "gain_1030": 0.56716,
+      "entry": 2.099,
+      "exit": 2.085,
+      "ret_event": -0.00881
+    },
+    {
+      "date": "2025-05-27",
+      "ticker": "SBET",
+      "prev_close": 6.72,
+      "tier": "T10",
+      "gain_1030": 4.66071,
+      "entry": 38.12,
+      "exit": 49.556,
+      "ret_event": -0.326438
+    },
+    {
+      "date": "2025-05-27",
+      "ticker": "WORX",
+      "prev_close": 6.038,
+      "tier": "T10",
+      "gain_1030": 0.59142,
+      "entry": 9.611,
+      "exit": 9.978,
+      "ret_event": -0.053665
+    },
+    {
+      "date": "2025-05-28",
+      "ticker": "SGN",
+      "prev_close": 0.83,
+      "tier": "T20",
+      "gain_1030": 2.09639,
+      "entry": 2.58,
+      "exit": 2.1701,
+      "ret_event": 0.132438
+    },
+    {
+      "date": "2025-05-28",
+      "ticker": "PLRZ",
+      "prev_close": 3.876,
+      "tier": "T10",
+      "gain_1030": 0.73375,
+      "entry": 6.36,
+      "exit": 8.268,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2025-05-29",
+      "ticker": "HBIO",
+      "prev_close": 2.843,
+      "tier": "T20",
+      "gain_1030": 1.07281,
+      "entry": 5.892,
+      "exit": 7.6596,
+      "ret_event": -0.320959
+    },
+    {
+      "date": "2025-05-29",
+      "ticker": "ZEO",
+      "prev_close": 1.58,
+      "tier": "T20",
+      "gain_1030": 0.82278,
+      "entry": 2.88,
+      "exit": 3.35,
+      "ret_event": -0.178674
+    },
+    {
+      "date": "2025-05-29",
+      "ticker": "WETO",
+      "prev_close": 1.96,
+      "tier": "T20",
+      "gain_1030": 0.68367,
+      "entry": 3.28,
+      "exit": 3.3,
+      "ret_event": -0.021577
+    },
+    {
+      "date": "2025-05-29",
+      "ticker": "ALZN",
+      "prev_close": 3.32,
+      "tier": "T10",
+      "gain_1030": 0.94636,
+      "entry": 6.46,
+      "exit": 5.41,
+      "ret_event": 0.147059
+    },
+    {
+      "date": "2025-05-30",
+      "ticker": "RRGB",
+      "prev_close": 3.13,
+      "tier": "T10",
+      "gain_1030": 0.63259,
+      "entry": 5.115,
+      "exit": 5.0851,
+      "ret_event": -0.009634
+    },
+    {
+      "date": "2025-05-30",
+      "ticker": "BLRX",
+      "prev_close": 3.7909,
+      "tier": "T10",
+      "gain_1030": 0.66451,
+      "entry": 6.29,
+      "exit": 5.18,
+      "ret_event": 0.160991
+    },
+    {
+      "date": "2025-05-30",
+      "ticker": "GITS",
+      "prev_close": 0.95,
+      "tier": "T20",
+      "gain_1030": 1.57653,
+      "entry": 2.45,
+      "exit": 2.38,
+      "ret_event": 0.002133
+    },
+    {
+      "date": "2025-05-30",
+      "ticker": "BSLK",
+      "prev_close": 1.81,
+      "tier": "T20",
+      "gain_1030": 0.59862,
+      "entry": 2.9,
+      "exit": 3.38,
+      "ret_event": -0.180997
+    },
+    {
+      "date": "2025-05-30",
+      "ticker": "BMGL",
+      "prev_close": 12.48,
+      "tier": "T10",
+      "gain_1030": 0.64423,
+      "entry": 20.64,
+      "exit": 26.832,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2025-05-30",
+      "ticker": "LVWR",
+      "prev_close": 2.87,
+      "tier": "T20",
+      "gain_1030": 0.74909,
+      "entry": 5.02,
+      "exit": 4.4899,
+      "ret_event": 0.090118
+    },
+    {
+      "date": "2025-06-02",
+      "ticker": "LYRA",
+      "prev_close": 4.93,
+      "tier": "T10",
+      "gain_1030": 4.60252,
+      "entry": 27.5735,
+      "exit": 20.0127,
+      "ret_event": 0.247767
+    },
+    {
+      "date": "2025-06-02",
+      "ticker": "BNAI",
+      "prev_close": 2.79,
+      "tier": "T20",
+      "gain_1030": 0.55269,
+      "entry": 4.332,
+      "exit": 4.95,
+      "ret_event": -0.158139
+    },
+    {
+      "date": "2025-06-02",
+      "ticker": "INM",
+      "prev_close": 2.49,
+      "tier": "T20",
+      "gain_1030": 1.43635,
+      "entry": 6.06,
+      "exit": 3.42,
+      "ret_event": 0.414685
+    },
+    {
+      "date": "2025-06-02",
+      "ticker": "OGEN",
+      "prev_close": 3.6,
+      "tier": "T10",
+      "gain_1030": 0.81667,
+      "entry": 6.54,
+      "exit": 4.986,
+      "ret_event": 0.222135
+    },
+    {
+      "date": "2025-06-02",
+      "ticker": "VERA",
+      "prev_close": 18.95,
+      "tier": "T10",
+      "gain_1030": 0.59894,
+      "entry": 30.3,
+      "exit": 31.71,
+      "ret_event": -0.062014
+    },
+    {
+      "date": "2025-06-03",
+      "ticker": "BMEA",
+      "prev_close": 1.55,
+      "tier": "T20",
+      "gain_1030": 0.5129,
+      "entry": 2.345,
+      "exit": 2.485,
+      "ret_event": -0.075181
+    },
+    {
+      "date": "2025-06-03",
+      "ticker": "MCTR",
+      "prev_close": 4.8999,
+      "tier": "T10",
+      "gain_1030": 0.97351,
+      "entry": 9.05,
+      "exit": 11.765,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2025-06-04",
+      "ticker": "STSS",
+      "prev_close": 3.74,
+      "tier": "T10",
+      "gain_1030": 0.64706,
+      "entry": 6.15,
+      "exit": 6.2401,
+      "ret_event": -0.03013
+    },
+    {
+      "date": "2025-06-04",
+      "ticker": "CLRB",
+      "prev_close": 8.328,
+      "tier": "T10",
+      "gain_1030": 0.8804,
+      "entry": 15.66,
+      "exit": 13.88,
+      "ret_event": 0.098186
+    },
+    {
+      "date": "2025-06-04",
+      "ticker": "KWM",
+      "prev_close": 1.92,
+      "tier": "T20",
+      "gain_1030": 1.67708,
+      "entry": 5.14,
+      "exit": 4.48,
+      "ret_event": 0.101966
+    },
+    {
+      "date": "2025-06-04",
+      "ticker": "BAOS",
+      "prev_close": 2.37,
+      "tier": "T20",
+      "gain_1030": 0.51477,
+      "entry": 3.59,
+      "exit": 3.64,
+      "ret_event": -0.029407
+    },
+    {
+      "date": "2025-06-04",
+      "ticker": "MULN",
+      "prev_close": 5.39,
+      "tier": "T10",
+      "gain_1030": 0.83488,
+      "entry": 10.6,
+      "exit": 13.78,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2025-06-05",
+      "ticker": "ZENA",
+      "prev_close": 3.18,
+      "tier": "T10",
+      "gain_1030": 0.93393,
+      "entry": 6.14,
+      "exit": 4.3698,
+      "ret_event": 0.272827
+    },
+    {
+      "date": "2025-06-05",
+      "ticker": "MKDW",
+      "prev_close": 9.576,
+      "tier": "T10",
+      "gain_1030": 0.61341,
+      "entry": 15.44,
+      "exit": 11.1,
+      "ret_event": 0.265609
+    },
+    {
+      "date": "2025-06-05",
+      "ticker": "RVYL",
+      "prev_close": 13.45,
+      "tier": "T10",
+      "gain_1030": 1.12788,
+      "entry": 28.62,
+      "exit": 37.206,
+      "ret_event": -0.320959
+    },
+    {
+      "date": "2025-06-05",
+      "ticker": "PL",
+      "prev_close": 3.99,
+      "tier": "T10",
+      "gain_1030": 0.55764,
+      "entry": 6.215,
+      "exit": 5.97,
+      "ret_event": 0.023941
+    },
+    {
+      "date": "2025-06-05",
+      "ticker": "TBH",
+      "prev_close": 4.76,
+      "tier": "T10",
+      "gain_1030": 0.83214,
+      "entry": 8.8,
+      "exit": 7.073,
+      "ret_event": 0.180771
+    },
+    {
+      "date": "2025-06-06",
+      "ticker": "WBUY",
+      "prev_close": 4.6,
+      "tier": "T10",
+      "gain_1030": 0.63898,
+      "entry": 7.54,
+      "exit": 7.1,
+      "ret_event": 0.042876
+    },
+    {
+      "date": "2025-06-06",
+      "ticker": "DTCK",
+      "prev_close": 12,
+      "tier": "T10",
+      "gain_1030": 0.545,
+      "entry": 18.54,
+      "exit": 15.51,
+      "ret_event": 0.147951
+    },
+    {
+      "date": "2025-06-06",
+      "ticker": "BJDX",
+      "prev_close": 6.08,
+      "tier": "T10",
+      "gain_1030": 0.53289,
+      "entry": 9.36,
+      "exit": 8.76,
+      "ret_event": 0.048623
+    },
+    {
+      "date": "2025-06-09",
+      "ticker": "NA",
+      "prev_close": 6.69,
+      "tier": "T10",
+      "gain_1030": 0.53961,
+      "entry": 10.26,
+      "exit": 11.0693,
+      "ret_event": -0.094359
+    },
+    {
+      "date": "2025-06-09",
+      "ticker": "KNW",
+      "prev_close": 1.56,
+      "tier": "T20",
+      "gain_1030": 0.91654,
+      "entry": 2.985,
+      "exit": 3.0799,
+      "ret_event": -0.047272
+    },
+    {
+      "date": "2025-06-09",
+      "ticker": "TWNP",
+      "prev_close": 4.23,
+      "tier": "T10",
+      "gain_1030": 0.65508,
+      "entry": 7.11,
+      "exit": 6.34,
+      "ret_event": 0.092819
+    },
+    {
+      "date": "2025-06-10",
+      "ticker": "KLTO",
+      "prev_close": 1.82,
+      "tier": "T20",
+      "gain_1030": 0.87637,
+      "entry": 3.4107,
+      "exit": 1.9912,
+      "ret_event": 0.400711
+    },
+    {
+      "date": "2025-06-10",
+      "ticker": "NCNA",
+      "prev_close": 15.24,
+      "tier": "T10",
+      "gain_1030": 1.18504,
+      "entry": 33.4,
+      "exit": 28.36,
+      "ret_event": 0.129939
+    },
+    {
+      "date": "2025-06-10",
+      "ticker": "ARAI",
+      "prev_close": 6.295,
+      "tier": "T10",
+      "gain_1030": 1.03654,
+      "entry": 12.8694,
+      "exit": 10.13,
+      "ret_event": 0.191903
+    },
+    {
+      "date": "2025-06-11",
+      "ticker": "KZIA",
+      "prev_close": 5.2553,
+      "tier": "T10",
+      "gain_1030": 0.73157,
+      "entry": 9.0999,
+      "exit": 12,
+      "ret_event": -0.334175
+    },
+    {
+      "date": "2025-06-11",
+      "ticker": "VTAK",
+      "prev_close": 4.302,
+      "tier": "T10",
+      "gain_1030": 1.94514,
+      "entry": 12.65,
+      "exit": 11.49,
+      "ret_event": 0.065261
+    },
+    {
+      "date": "2025-06-11",
+      "ticker": "NAOV",
+      "prev_close": 8.135,
+      "tier": "T10",
+      "gain_1030": 0.67179,
+      "entry": 13.55,
+      "exit": 11.9,
+      "ret_event": 0.106292
+    },
+    {
+      "date": "2025-06-11",
+      "ticker": "HSDT",
+      "prev_close": 42.25,
+      "tier": "T10",
+      "gain_1030": 1.05799,
+      "entry": 87,
+      "exit": 52.55,
+      "ret_event": 0.375018
+    },
+    {
+      "date": "2025-06-12",
+      "ticker": "RSLS",
+      "prev_close": 2.29,
+      "tier": "T20",
+      "gain_1030": 0.57642,
+      "entry": 3.6,
+      "exit": 3.14,
+      "ret_event": 0.112298
+    },
+    {
+      "date": "2025-06-13",
+      "ticker": "USEG",
+      "prev_close": 1.42,
+      "tier": "T20",
+      "gain_1030": 0.69007,
+      "entry": 2.4,
+      "exit": 2.21,
+      "ret_event": 0.063687
+    },
+    {
+      "date": "2025-06-13",
+      "ticker": "HUSA",
+      "prev_close": 7.14,
+      "tier": "T10",
+      "gain_1030": 1.35048,
+      "entry": 16.74,
+      "exit": 15.5499,
+      "ret_event": 0.050134
+    },
+    {
+      "date": "2025-06-13",
+      "ticker": "ICON",
+      "prev_close": 8.95,
+      "tier": "T10",
+      "gain_1030": 0.51397,
+      "entry": 13.55,
+      "exit": 14.5,
+      "ret_event": -0.08559
+    },
+    {
+      "date": "2025-06-16",
+      "ticker": "DWSN",
+      "prev_close": 1.37,
+      "tier": "T20",
+      "gain_1030": 1.70803,
+      "entry": 3.71,
+      "exit": 2.83,
+      "ret_event": 0.210758
+    },
+    {
+      "date": "2025-06-16",
+      "ticker": "SKYQ",
+      "prev_close": 6.034,
+      "tier": "T10",
+      "gain_1030": 1.20086,
+      "entry": 13.36,
+      "exit": 6.981,
+      "ret_event": 0.456511
+    },
+    {
+      "date": "2025-06-16",
+      "ticker": "STAK",
+      "prev_close": 1.95,
+      "tier": "T20",
+      "gain_1030": 0.60046,
+      "entry": 3.12,
+      "exit": 2.26,
+      "ret_event": 0.260162
+    },
+    {
+      "date": "2025-06-16",
+      "ticker": "SRM",
+      "prev_close": 1.45,
+      "tier": "T20",
+      "gain_1030": 2.42069,
+      "entry": 4.955,
+      "exit": 6.4415,
+      "ret_event": -0.326438
+    },
+    {
+      "date": "2025-06-17",
+      "ticker": "SLRX",
+      "prev_close": 9.377,
+      "tier": "T10",
+      "gain_1030": 0.8556,
+      "entry": 17.4,
+      "exit": 15.74,
+      "ret_event": 0.079923
+    },
+    {
+      "date": "2025-06-17",
+      "ticker": "ACXP",
+      "prev_close": 6.142,
+      "tier": "T10",
+      "gain_1030": 1.63758,
+      "entry": 16.2,
+      "exit": 16.16,
+      "ret_event": -0.023969
+    },
+    {
+      "date": "2025-06-17",
+      "ticker": "PCSA",
+      "prev_close": 5.627,
+      "tier": "T10",
+      "gain_1030": 1.81855,
+      "entry": 15.86,
+      "exit": 6.58,
+      "ret_event": 0.558681
+    },
+    {
+      "date": "2025-06-17",
+      "ticker": "CERO",
+      "prev_close": 6.868,
+      "tier": "T10",
+      "gain_1030": 1.59974,
+      "entry": 17.8397,
+      "exit": 23.1916,
+      "ret_event": -0.326438
+    },
+    {
+      "date": "2025-06-17",
+      "ticker": "EYEN",
+      "prev_close": 2.97,
+      "tier": "T20",
+      "gain_1030": 0.58081,
+      "entry": 4.69,
+      "exit": 6.097,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2025-06-18",
+      "ticker": "PTLE",
+      "prev_close": 15.83,
+      "tier": "T10",
+      "gain_1030": 1.07833,
+      "entry": 32.9,
+      "exit": 29.25,
+      "ret_event": 0.089983
+    },
+    {
+      "date": "2025-06-18",
+      "ticker": "APVO",
+      "prev_close": 50.76,
+      "tier": "T10",
+      "gain_1030": 2.20587,
+      "entry": 162.9,
+      "exit": 211.77,
+      "ret_event": -0.326438
+    },
+    {
+      "date": "2025-06-18",
+      "ticker": "KWE",
+      "prev_close": 5.76,
+      "tier": "T10",
+      "gain_1030": 1.01042,
+      "entry": 11.58,
+      "exit": 11.2296,
+      "ret_event": 0.0093
+    },
+    {
+      "date": "2025-06-18",
+      "ticker": "LSE",
+      "prev_close": 5.55,
+      "tier": "T10",
+      "gain_1030": 0.56038,
+      "entry": 8.7099,
+      "exit": 7.3799,
+      "ret_event": 0.13722
+    },
+    {
+      "date": "2025-06-20",
+      "ticker": "DFLI",
+      "prev_close": 2.18,
+      "tier": "T20",
+      "gain_1030": 0.55413,
+      "entry": 3.388,
+      "exit": 2.45,
+      "ret_event": 0.26138
+    },
+    {
+      "date": "2025-06-20",
+      "ticker": "LUCY",
+      "prev_close": 2.28,
+      "tier": "T20",
+      "gain_1030": 0.92325,
+      "entry": 4.3848,
+      "exit": 3.52,
+      "ret_event": 0.181747
+    },
+    {
+      "date": "2025-06-23",
+      "ticker": "INDP",
+      "prev_close": 7.563,
+      "tier": "T10",
+      "gain_1030": 1.10498,
+      "entry": 15.95,
+      "exit": 13.69,
+      "ret_event": 0.120734
+    },
+    {
+      "date": "2025-06-23",
+      "ticker": "CDTX",
+      "prev_close": 21.02,
+      "tier": "T10",
+      "gain_1030": 0.92243,
+      "entry": 40.4,
+      "exit": 44.905,
+      "ret_event": -0.126989
+    },
+    {
+      "date": "2025-06-24",
+      "ticker": "NKTR",
+      "prev_close": 9.54,
+      "tier": "T10",
+      "gain_1030": 1.02935,
+      "entry": 19.325,
+      "exit": 25.1225,
+      "ret_event": -0.320959
+    },
+    {
+      "date": "2025-06-24",
+      "ticker": "INM",
+      "prev_close": 2.45,
+      "tier": "T20",
+      "gain_1030": 0.59996,
+      "entry": 3.91,
+      "exit": 3.85,
+      "ret_event": -0.000134
+    },
+    {
+      "date": "2025-06-24",
+      "ticker": "NA",
+      "prev_close": 10.89,
+      "tier": "T10",
+      "gain_1030": 1.00184,
+      "entry": 21.832,
+      "exit": 14.73,
+      "ret_event": 0.304343
+    },
+    {
+      "date": "2025-06-25",
+      "ticker": "ULY",
+      "prev_close": 4.4908,
+      "tier": "T10",
+      "gain_1030": 0.79255,
+      "entry": 8.0836,
+      "exit": 8.23,
+      "ret_event": -0.03359
+    },
+    {
+      "date": "2025-06-25",
+      "ticker": "PSTV",
+      "prev_close": 4.675,
+      "tier": "T10",
+      "gain_1030": 0.97818,
+      "entry": 9.25,
+      "exit": 8.115,
+      "ret_event": 0.107223
+    },
+    {
+      "date": "2025-06-25",
+      "ticker": "ICU",
+      "prev_close": 3.596,
+      "tier": "T10",
+      "gain_1030": 0.61735,
+      "entry": 5.832,
+      "exit": 4.416,
+      "ret_event": 0.227319
+    },
+    {
+      "date": "2025-06-26",
+      "ticker": "ASTI",
+      "prev_close": 1.165,
+      "tier": "T20",
+      "gain_1030": 0.87983,
+      "entry": 2.1988,
+      "exit": 2.8584,
+      "ret_event": -0.315479
+    },
+    {
+      "date": "2025-06-26",
+      "ticker": "VOR",
+      "prev_close": 11.09,
+      "tier": "T10",
+      "gain_1030": 0.78539,
+      "entry": 19.8,
+      "exit": 17.8,
+      "ret_event": 0.085531
+    },
+    {
+      "date": "2025-06-26",
+      "ticker": "CYN",
+      "prev_close": 5.01,
+      "tier": "T10",
+      "gain_1030": 3.30938,
+      "entry": 22.33,
+      "exit": 29.029,
+      "ret_event": -0.326438
+    },
+    {
+      "date": "2025-06-27",
+      "ticker": "INMB",
+      "prev_close": 6.28,
+      "tier": "T10",
+      "gain_1030": 0.72771,
+      "entry": 10.87,
+      "exit": 5.31,
+      "ret_event": 0.49602
+    },
+    {
+      "date": "2025-06-27",
+      "ticker": "CYN",
+      "prev_close": 13.6,
+      "tier": "T10",
+      "gain_1030": 0.55515,
+      "entry": 21.0107,
+      "exit": 16.12,
+      "ret_event": 0.217292
+    },
+    {
+      "date": "2025-06-27",
+      "ticker": "LCFY",
+      "prev_close": 2.55,
+      "tier": "T20",
+      "gain_1030": 1.91765,
+      "entry": 7.4495,
+      "exit": 9.6844,
+      "ret_event": -0.326438
+    },
+    {
+      "date": "2025-06-27",
+      "ticker": "SVRE",
+      "prev_close": 27.6,
+      "tier": "T10",
+      "gain_1030": 1.14348,
+      "entry": 59.04,
+      "exit": 38.16,
+      "ret_event": 0.3327
+    },
+    {
+      "date": "2025-06-30",
+      "ticker": "ARTL",
+      "prev_close": 20.37,
+      "tier": "T10",
+      "gain_1030": 1.97938,
+      "entry": 61.2,
+      "exit": 39.6,
+      "ret_event": 0.326503
+    },
+    {
+      "date": "2025-06-30",
+      "ticker": "IPDN",
+      "prev_close": 1.75,
+      "tier": "T20",
+      "gain_1030": 1.29714,
+      "entry": 4.0297,
+      "exit": 3.3798,
+      "ret_event": 0.140319
+    },
+    {
+      "date": "2025-06-30",
+      "ticker": "BMNR",
+      "prev_close": 4.265,
+      "tier": "T10",
+      "gain_1030": 3.41735,
+      "entry": 18.87,
+      "exit": 24.531,
+      "ret_event": -0.326438
+    }
+  ]
+}

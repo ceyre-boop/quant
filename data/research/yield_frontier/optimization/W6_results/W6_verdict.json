@@ -1,0 +1,167 @@
+{
+  "id": "W6",
+  "date": "2026-07-21",
+  "hypothesis": "Optimal sizing policy for HYP-093 (The Undertow)",
+  "event_set": "559-event sealed HYP-093 gauntlet (validated vs verdicts.json)",
+  "input_hash": "854a588242c22c75",
+  "policies_tested": [
+    "F0",
+    "F1",
+    "F2",
+    "F2+F3",
+    "F2+F4",
+    "F2+F3+F4"
+  ],
+  "floor": 0.0005,
+  "f0_flat_anchor_yield_day": 0.000226,
+  "f0_flat_anchor_ok": true,
+  "recommended_policy": "F2+F3",
+  "recommended_f_T10": 0.03994,
+  "recommended_f_T20": 0.03364,
+  "G_day_mean": 0.000553,
+  "G_day_p10": -0.000307,
+  "G_day_p50": 0.000445,
+  "G_day_p90": 0.00156,
+  "best_arith_yield_day": 0.000598,
+  "gap_to_floor": -9.8e-05,
+  "CVaR_99": 0.01593,
+  "p95_MaxDD": 0.14,
+  "CDaR_90": 0.1405,
+  "P_ruin": 0.0,
+  "TPR": 203.1,
+  "floor_cleared": true,
+  "n_bootstrap_paths": 10000,
+  "disaster_p_range": [
+    0.001,
+    0.005
+  ],
+  "disaster_L_range": [
+    -2.0,
+    -1.0
+  ],
+  "disaster_robustness": {
+    "0.001": {
+      "G_day": 0.0008408831602949398,
+      "P_ruin": 0.0,
+      "arith_day": 0.0008903110933631642
+    },
+    "0.002": {
+      "G_day": 0.0007697391501411539,
+      "P_ruin": 0.0,
+      "arith_day": 0.0008184994095292614
+    },
+    "0.005": {
+      "G_day": 0.0005415203264118514,
+      "P_ruin": 0.0,
+      "arith_day": 0.0005868469760510765
+    }
+  },
+  "block_bootstrap_stress": {
+    "policy": "F2+F3",
+    "block_size": 5,
+    "arith_yield_day": 0.000573,
+    "G_day_mean": 0.000526,
+    "p95_MaxDD": 0.1389,
+    "P_ruin": 0.0,
+    "floor_cleared_under_clustering": true
+  },
+  "all_results": {
+    "F0": {
+      "policy": "F0",
+      "p_disaster": 0.005,
+      "G_day_mean": 0.00014285676574935522,
+      "G_day_p10": -3.100856467268975e-05,
+      "G_day_p50": 0.0001420987563874987,
+      "G_day_p90": 0.0003184276967004403,
+      "arith_yield_day_mean": 0.0001451015219356512,
+      "CVaR_99": 0.0023486912157042587,
+      "p50_MaxDD": 0.02609135994813605,
+      "p95_MaxDD": 0.05042313639270813,
+      "p99_MaxDD": 0.06466782209058909,
+      "CDaR_90": 0.05297066303900343,
+      "TPR": 198.33075733109192,
+      "P_ruin": 0.0
+    },
+    "F1": {
+      "policy": "F1",
+      "p_disaster": 0.005,
+      "G_day_mean": 0.0009879815447803597,
+      "G_day_p10": -0.00018579457527321804,
+      "G_day_p50": 0.0009894441260952169,
+      "G_day_p90": 0.002166620674405035,
+      "arith_yield_day_mean": 0.0010904227512336581,
+      "CVaR_99": 0.018281839691031296,
+      "p50_MaxDD": 0.15913161426266376,
+      "p95_MaxDD": 0.2881003061271881,
+      "p99_MaxDD": 0.3572560616160505,
+      "CDaR_90": 0.3008126056131438,
+      "TPR": 172.99855473347768,
+      "P_ruin": 0.0
+    },
+    "F2": {
+      "policy": "F2",
+      "p_disaster": 0.005,
+      "G_day_mean": 0.0008490291756505778,
+      "G_day_p10": -0.00035266788951719875,
+      "G_day_p50": 0.0008576848004281348,
+      "G_day_p90": 0.002042004244800613,
+      "arith_yield_day_mean": 0.0009533767534882611,
+      "CVaR_99": 0.015915120543213538,
+      "p50_MaxDD": 0.1683054476804294,
+      "p95_MaxDD": 0.3096188732653621,
+      "p99_MaxDD": 0.38581493406438955,
+      "CDaR_90": 0.3219042730969569,
+      "TPR": 213.61778938285394,
+      "P_ruin": 0.0
+    },
+    "F2+F3": {
+      "policy": "F2+F3",
+      "p_disaster": 0.005,
+      "G_day_mean": 0.0005527608195435942,
+      "G_day_p10": -0.00030722538882576884,
+      "G_day_p50": 0.00044461756030186894,
+      "G_day_p90": 0.0015600867714326864,
+      "arith_yield_day_mean": 0.0005984391117178603,
+      "CVaR_99": 0.01593340360743404,
+      "p50_MaxDD": 0.11347957282776149,
+      "p95_MaxDD": 0.1399708377747199,
+      "p99_MaxDD": 0.14499593641623962,
+      "CDaR_90": 0.14046554342989256,
+      "TPR": 203.05032473474955,
+      "P_ruin": 0.0
+    },
+    "F2+F4": {
+      "policy": "F2+F4",
+      "p_disaster": 0.005,
+      "G_day_mean": 0.00035746209094690215,
+      "G_day_p10": -0.00012896614614415559,
+      "G_day_p50": 0.0003571764886039397,
+      "G_day_p90": 0.000845323823601754,
+      "arith_yield_day_mean": 0.0003747516368885677,
+      "CVaR_99": 0.015874904468957923,
+      "p50_MaxDD": 0.07203201747477059,
+      "p95_MaxDD": 0.13672924810734036,
+      "p99_MaxDD": 0.17339818320766293,
+      "CDaR_90": 0.14275096126064898,
+      "TPR": 218.51542101560307,
+      "P_ruin": 0.0
+    },
+    "F2+F3+F4": {
+      "policy": "F2+F3+F4",
+      "p_disaster": 0.005,
+      "G_day_mean": 0.0003213157702723389,
+      "G_day_p10": -0.00018908868773255625,
+      "G_day_p50": 0.0003150554341954221,
+      "G_day_p90": 0.0008294086962687425,
+      "arith_yield_day_mean": 0.00033610528275341515,
+      "CVaR_99": 0.015613341789469192,
+      "p50_MaxDD": 0.06958943620095245,
+      "p95_MaxDD": 0.10030123218431852,
+      "p99_MaxDD": 0.10733909649334916,
+      "CDaR_90": 0.1009749638558093,
+      "TPR": 218.19759394442227,
+      "P_ruin": 0.0
+    }
+  },
+  "notes": "Event set is the full 559-event sealed gauntlet (reconciles to verdicts.json exactly), not the 539-event HYP-097 subset the spec inputs cite; the spec's 0.000166/day F0 target is on the 539 subset. F0-flat reproduces the sealed 0.00023 constitutional yield as the validation anchor. Floor comparison uses arithmetic yield/day per spec. RCK solved as scalar-f line search (exact for scalar leverage). Bootstrap is i.i.d.; real serial clustering is harder to compound, so a cleared floor here would be optimistic \u2014 flagged per spec."
+}
