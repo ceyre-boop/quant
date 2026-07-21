@@ -365,6 +365,24 @@ git push
    exact command run, the exit code, the stderr/stdout tail, and the routine and
    step it failed at. The next session will triage it.
 
+10. **An audit finding is a lead, not a fact — verify before acting.** Any claim
+    that something is missing, dead, unimported, silently crashing, or ratified
+    somewhere must be run through the checker before a single line of code moves:
+
+    ```bash
+    python3 -m audit.claim_check --claims <file.json>   # exit 1 == something REFUTED
+    ```
+
+    **A `REFUTED` claim may not be acted on.** Fix the claim, not the code.
+    `UNVERIFIABLE` is not permission to proceed — it means the tool could not test
+    it, so a human must.
+
+    This rule exists because on 2026-07-20 two autonomous audit passes produced six
+    false claims. Acting on them would have deleted 11 modules the orchestrator
+    imports, rebuilt a file that was removed on purpose, and stripped the time guard
+    from a working scanner so it fired at 3 a.m. Rules 1-9 were all in force that
+    day and none of them caught it, because none of them required *checking*.
+
 ---
 
 ## ESCALATION
