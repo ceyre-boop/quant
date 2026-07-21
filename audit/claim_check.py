@@ -290,6 +290,33 @@ def _plist_for(label: str) -> Path | None:
     return None
 
 
+# XML forbids "--" inside a comment. Several scripts/*.plist carry prose comment
+# headers documenting the promotion sequence — "python3 … --rebaseline", "--live" —
+# whose double-hyphens are invalid XML. launchd's lenient parser accepts them;
+# plistlib's strict expat does not, and rejected 7 of 45 plists here. That made the
+# whole LOGPATH class blind on exactly the operational plists it most needs to read.
+# Strip comments before parsing. This changes nothing launchd sees — the on-disk
+# file is untouched — it only lets the checker read past a header launchd ignores.
+def _age(p: Path) -> float | None:
+    """Seconds since the file was last written, or None if it cannot be stat'd."""
+    try:
+        import time
+        return time.time() - p.stat().st_mtime
+    except OSError:
+        return None
+
+
+_XML_COMMENT_RE = re.compile(rb"<!--.*?-->", re.S)
+
+
+def _load_plist(path: Path) -> dict:
+    raw = path.read_bytes()
+    try:
+        return plistlib.loads(raw)
+    except Exception:
+        return plistlib.loads(_XML_COMMENT_RE.sub(b"", raw))
+
+
 def _script_written_logs(script: Path) -> list[str]:
     """Log paths the script writes to itself — the ones a launchd log never shows."""
     try:
@@ -316,24 +343,33 @@ def check_logpath(claim: Claim, spec: dict) -> Result:
         return Result(claim, Verdict.UNVERIFIABLE, ev)
 
     try:
-        data = plistlib.loads(pl.read_bytes())
+        data = _load_plist(pl)
     except Exception as exc:
         ev.append(f"{pl.name}: unreadable ({exc})")
         return Result(claim, Verdict.UNVERIFIABLE, ev)
 
     ev.append(f"plist {pl.relative_to(pl.parent.parent)}")
-    live_logs: list[str] = []
+    recency_days = float(spec.get("log_recency_days", 4))
+    live_logs: list[str] = []   # non-empty AND recent — proof of a running job
+    stale_logs: list[str] = []  # non-empty but old — proof it RAN, not that it lives
+
+    def _classify(name: str, p: Path) -> None:
+        n = p.stat().st_size
+        if n <= spec["empty_log_bytes"]:
+            ev.append(f"  {name} = {n} bytes (empty)")
+            return
+        age_days = _age(p) / 86400.0 if _age(p) is not None else None
+        stamp = f"{age_days:.1f}d old" if age_days is not None else "age unknown"
+        ev.append(f"  {name} = {n} bytes, {stamp}")
+        if age_days is not None and age_days <= recency_days:
+            live_logs.append(f"{p.name} ({n} bytes, {stamp})")
+        else:
+            stale_logs.append(f"{p.name} ({n} bytes, {stamp})")
 
     for key in ("StandardOutPath", "StandardErrorPath"):
         raw = data.get(key)
-        if not raw:
-            continue
-        p = Path(raw)
-        if p.exists():
-            n = p.stat().st_size
-            ev.append(f"  {key}: {p.name} = {n} bytes")
-            if n > spec["empty_log_bytes"]:
-                live_logs.append(f"{p.name} ({n} bytes)")
+        if raw and Path(raw).exists():
+            _classify(key, Path(raw))
 
     # The decisive step: logs the script writes itself.
     args = data.get("ProgramArguments") or []
@@ -344,10 +380,7 @@ def check_logpath(claim: Claim, spec: dict) -> Result:
         for rel in _script_written_logs(script):
             lp = ROOT / rel
             if lp.exists():
-                n = lp.stat().st_size
-                ev.append(f"  script writes {rel} = {n} bytes")
-                if n > spec["empty_log_bytes"]:
-                    live_logs.append(f"{rel} ({n} bytes)")
+                _classify(f"script writes {rel}", lp)
 
         src = script.read_text(errors="ignore")
         if all(g in src for g in spec.get("time_guard_patterns", [])):
@@ -355,9 +388,19 @@ def check_logpath(claim: Claim, spec: dict) -> Result:
                       "window is healthy, not a crash. Do not remove it.")
 
     if live_logs:
-        ev.append("NON-EMPTY LOG(S) FOUND — claim of silent death is false: "
+        ev.append("RECENT NON-EMPTY LOG(S) — claim of silent death is false: "
                   + ", ".join(live_logs))
         return Result(claim, Verdict.REFUTED, ev)
+
+    if stale_logs:
+        # Wrote output once, but not lately. Size alone cannot tell "ran in the
+        # past" from "dark now" — that is a false REFUTED waiting to happen, so
+        # the honest verdict is that the tool cannot decide.
+        ev.append(f"non-empty log(s) but all older than {recency_days:g}d — proves the "
+                  f"job RAN, NOT that it is alive: " + ", ".join(stale_logs))
+        ev.append("size cannot distinguish 'ran once' from 'dark now' — a human "
+                  "must check whether it still fires")
+        return Result(claim, Verdict.UNVERIFIABLE, ev)
 
     ev.append("no non-empty log found by any route")
     return Result(claim, Verdict.CONFIRMED, ev)

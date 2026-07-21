@@ -110,4 +110,9 @@ empty_log_bytes: 0
 time_guard_patterns:
   - "UTC_TIME"
   - "exit 0"
+
+# C3: a non-empty log older than this proves the job RAN once, not that it is
+# still alive. Beyond it, "silently dead" cannot be refuted on log contents alone —
+# the verdict downgrades to UNVERIFIABLE rather than a false REFUTED.
+log_recency_days: 4
 ```

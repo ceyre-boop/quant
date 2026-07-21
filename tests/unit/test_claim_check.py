@@ -138,3 +138,32 @@ def test_corpus_verdict_counts():
     assert counts.get("REFUTED", 0) == 4
     assert counts.get("CONFIRMED", 0) == 6
     assert counts.get("UNVERIFIABLE", 0) == 0
+
+
+# ── LOGPATH robustness (added after 2026-07-20 triage found two gaps) ─────────
+
+def test_plist_with_double_hyphen_comment_is_parseable(spec):
+    """scripts/*.plist carry prose headers containing '--rebaseline' etc. The
+    '--' is invalid inside an XML comment; strict plistlib rejected 7 of 45,
+    blinding LOGPATH on the operational plists. The checker must read past it."""
+    r = _run("LOGPATH", "com.alta.execution_harness", spec)
+    # Whatever the verdict, it must not be the 'unreadable' UNVERIFIABLE.
+    assert not any("unreadable" in e for e in r.evidence)
+
+
+def test_stale_nonempty_log_downgrades_not_refutes(tmp_path, monkeypatch):
+    """A non-empty but OLD log proves the job ran once, not that it lives. LOGPATH
+    must return UNVERIFIABLE, never a false REFUTED, on stale output."""
+    import os, time, plistlib
+    log = tmp_path / "old.log"
+    log.write_text("ran long ago\n")
+    old = time.time() - 30 * 86400          # 30 days
+    os.utime(log, (old, old))
+    plp = tmp_path / "com.test.stale.plist"
+    plp.write_bytes(plistlib.dumps({"Label": "com.test.stale",
+                                    "StandardOutPath": str(log)}))
+    monkeypatch.setattr(cc, "_plist_for", lambda label: plp)
+    spec, _sha, _v = cc.load_spec()
+    r = cc.check_logpath(cc.Claim(kind=cc.ClaimKind.LOGPATH, subject="com.test.stale"), spec)
+    assert r.verdict is cc.Verdict.UNVERIFIABLE
+    assert any("RAN" in e or "ran once" in e for e in r.evidence)
