@@ -1,0 +1,26 @@
+{
+  "date": "2026-07-20",
+  "generated_at": "2026-07-20T08:19:45.340966+00:00",
+  "input_tokens": 5741,
+  "output_tokens": 923,
+  "estimated_cost_usd": 0.15534,
+  "harvest_days_read": 7,
+  "reflection": {
+    "candidate_lesson": {
+      "lesson_text": "When the 30-indicator consensus reports green_matches=0 and hist_hr=0%, treat directional conviction as unvalidated regardless of how high conv% is \u2014 only pairs with green_matches>=3 and hist_hr>60% have earned execution weight.",
+      "mechanism": "green_matches counts how many times the current live indicator configuration has resolved profitably in historical memory. Zero matches means the present bull/bear tally is a novel configuration with no realized-edge basis; a high conv% only measures agreement among indicators, not that agreement's historical payoff. AUDUSD (12/30 bull, conv=75%, green_matches=3, hist_hr=68%) is the only pair whose signal has institutional-flow precedent; AUDNZD's 100% conv with green_matches=0 is unanchored consensus that historically has not paid.",
+      "testable_rule": "if consensus.green_matches < 3 or consensus.hist_hr < 0.60: veto_entry(pair)  # conv% alone is insufficient",
+      "expected_impact": "Filters out 4 of 5 currently-signaling pairs (GBPUSD, EURUSD, USDJPY, AUDNZD), concentrating capital on the one validated setup (AUDUSD) \u2014 expected win-rate lift and Sharpe contribution by cutting zero-precedent trades that dilute avgR.",
+      "evidence_from_harvest": "Live consensus shows AUDNZD dir=SHORT at conv=100% but green_matches=0/hist_hr=0%, while AUDUSD at conv=75% carries green_matches=3/hist_hr=68% \u2014 the two highest-conviction signals diverge entirely on historical realized edge, and 4 of 5 pairs show hist_hr=0%.",
+      "evidence_from_reasoning": null,
+      "reasoning_component_targeted": "green_matches / hist_hr (consensus historical-match fields)",
+      "sample_needed": 40
+    },
+    "retirement_flag": {
+      "lesson_to_review": "L8",
+      "reason": "L8 sets USDJPY/AUDNZD VIX gate at 13, but live VIX is 16.73 and rising (15.67\u219216.73) \u2014 under L8 both pairs are already vetoed, so if AUDNZD keeps surfacing as a 100%-conv candidate the gate may be bypassed somewhere in the sizing path and needs an audit."
+    },
+    "system_health_note": "Zero trades in the last 7 days with regime=UNKNOWN and TradingView at 0 signals means the system is in a low-confidence CALIBRATING state \u2014 the only defensible action is tightening entry gates, not adding exposure."
+  },
+  "auto_validation": null
+}

@@ -1,22 +1,18 @@
 {
-  "ts": "2026-07-20T18:37:44.486945+00:00",
-  "overall": "RED",
-  "red": [
-    "reddit"
-  ],
+  "ts": "2026-07-21T01:57:39.538858+00:00",
+  "overall": "GREEN",
+  "red": [],
   "yellow": [],
   "jobs": {
     "reddit": {
+      "status": "RETIRED",
       "path": "data/cache/reddit_sentiment.json",
-      "age_minutes": 45.4,
-      "max_age_minutes": 1440,
-      "optional": false,
-      "status": "EMPTY",
-      "detail": "file is fresh but payload is empty (posts_scanned=0, tickers+pairs=0)"
+      "optional": true,
+      "detail": "retired \u2014 403 on old.reddit.com and www.reddit.com; no OAuth app"
     },
     "forex_scan": {
       "path": "data/agent/forex_proximity.json",
-      "age_minutes": 45.4,
+      "age_minutes": 485.3,
       "max_age_minutes": 1440,
       "optional": false,
       "status": "OK",
@@ -24,7 +20,7 @@
     },
     "forex_data": {
       "path": "data/health/forex_data_status.json",
-      "age_minutes": 0.0,
+      "age_minutes": 355.4,
       "max_age_minutes": 1440,
       "optional": false,
       "status": "OK",
@@ -32,7 +28,7 @@
     },
     "api_health": {
       "path": "data/agent/health.json",
-      "age_minutes": 45.4,
+      "age_minutes": 10.3,
       "max_age_minutes": 1440,
       "optional": true,
       "status": "OK",

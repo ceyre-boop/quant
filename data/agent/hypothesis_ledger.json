@@ -637,11 +637,11 @@
   {
     "id": "HYP-052",
     "name": "Rate differential trend gate (30d momentum)",
-    "status": "REJECTED",
+    "status": "CONFIRMED",
     "date": "2026-06-03",
     "note": "30-day cross-pair trend gate: 1/4 OOS years aligned. Rejected. See HYP-052b for reformulation.",
-    "last_result": "DRY RUN: echo no-op",
-    "updated_at": "2026-06-08T23:50:43",
+    "last_result": "OK: no-op",
+    "updated_at": "2026-07-20T21:00:27",
     "id_disambiguation": "ID_DISAMBIGUATION (REST-036): Ledger HYP-052 = REJECTED rate-differential 30d-momentum trend gate. It is NOT the DOM size-boost that RQ-REST-008 calls \"HYP-052\"; that queue label is a collision and actually maps to HYP-051. Keep these separate."
   },
   {
@@ -1279,7 +1279,7 @@
     "origin": "REST_MODE / RQ-REST-010 (clean re-test of the HYP-039 CB-blackout idea; note HYP-039 id in queue was a collision \u2014 ledger HYP-039 is the rejected UTC-15xx window)",
     "title": "CB-blackout veto: skip London ICT entries 3-14 days before a BOE/FED decision",
     "description": "Entries 3-14 calendar days before the next BOE or FED policy decision underperform badly. Tested on clean reconstructed BOE+FOMC schedule, N=101 GBPUSD London trades 2023-08..2025-03.",
-    "status": "CONFIRMED",
+    "status": "REJECTED",
     "result": {
       "universe": "GBPUSD London",
       "N": 101,
@@ -1313,7 +1313,9 @@
         "date": "2026-06-16T01:15:35Z",
         "note": "Wiring path clarified (REST-016): blackout veto is date-based -> wire via cb_calendar.py (clean, already used by present_state.py), NOT cb_decisions.json (97% phantom, FIND-REST-016-a). Precondition FIND-REST-015-b downgraded: the gate does NOT need cb_decisions.json rebuilt. Only remaining wiring prereq is extending cb_calendar.CB_MEETINGS back to 2023 (dates already in scripts/rq_rest_010_cb_blackout.py) for backtest reproducibility."
       }
-    ]
+    ],
+    "last_result": "ERROR: EXCEPTION: s argument must not be None",
+    "updated_at": "2026-07-20T21:00:27"
   },
   {
     "id": "VRP-001",
@@ -1947,14 +1949,6 @@
     ]
   },
   {
-    "id": "BENCH-THROUGHPUT",
-    "name": "Backtest throughput benchmark (measured, replaces the 148k claim)",
-    "status": "MEASURED",
-    "date_tested": "2026-07-12",
-    "result": "single-core(90bar)=21,692/s \u00b7 12-core ceiling=116,650/s \u00b7 best bar-evals=15,699,027/s \u00b7 legacy claim 148,193 (NOT beaten; numba INACTIVE on py3.14.4 \u2192 pure-Python fallback)",
-    "methodology_note": "arm, 12 physical cores, numba INACTIVE on py3.14.4 \u2192 pure-Python fallback. Time-boxed. FastBacktestEngine vs pure-Python forex kernel across 90bar/daily/5min/1min, single vs all-cores. See backtest_benchmark JSON."
-  },
-  {
     "id": "HYP-092",
     "name": "Gapper continuation/exhaustion read separates post-read returns (decision-card mechanization)",
     "status": "ADJUDICATED",
@@ -2166,5 +2160,13 @@
         "data/research/gapper/tick039/tick039_results.json"
       ]
     }
+  },
+  {
+    "id": "BENCH-THROUGHPUT",
+    "name": "Backtest throughput benchmark (measured, replaces the 148k claim)",
+    "status": "MEASURED",
+    "date_tested": "2026-07-19",
+    "result": "single-core(90bar)=24,885/s \u00b7 12-core ceiling=122,186/s \u00b7 best bar-evals=17,228,945/s \u00b7 legacy claim 148,193 (NOT beaten; numba INACTIVE on py3.14.4 \u2192 pure-Python fallback)",
+    "methodology_note": "arm, 12 physical cores, numba INACTIVE on py3.14.4 \u2192 pure-Python fallback. Time-boxed. FastBacktestEngine vs pure-Python forex kernel across 90bar/daily/5min/1min, single vs all-cores. See backtest_benchmark JSON."
   }
 ]

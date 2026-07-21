@@ -1,14 +1,14 @@
 {
-  "last_updated": "2026-07-18T06:31:06.820819+00:00",
+  "last_updated": "2026-07-20T08:19:45.368003+00:00",
   "harvest": {
     "trades_closed": 0,
     "win_rate": null,
     "failure_taxonomy": {}
   },
   "reflection": {
-    "candidate_lesson": "When the 30-indicator consensus shows conviction but green_matches=0 (no historical analog), treat the signal as UNRELIABLE regardless of live bull/bear tally \u2014 historical hit-rate of 0% is a hard veto, not a soft discount.",
-    "mechanism": "The consensus conviction score measures agreement among live indicators, but green_matches counts how many times this exact indicator configuration produced a win historically. A config with 0 historical matches (USDJPY 8/30 bull, conv=67%, green_matches=0, hist_hr=0%; AUDNZD conv=100%, green_matches=0, hist_hr=0%) is an out-of-sample regime the system has never profited from. Institutional flow that drove past instances of this indicator pattern is absent or inverted \u2014 high live conviction on a novel config is confirmation bias, not edge.",
-    "testable_rule": "if consensus.green_matches == 0 and consensus.conviction >= 0.60: veto_signal()  # only trade when green_matches >= 1 AND hist_hr > 0.50"
+    "candidate_lesson": "When the 30-indicator consensus reports green_matches=0 and hist_hr=0%, treat directional conviction as unvalidated regardless of how high conv% is \u2014 only pairs with green_matches>=3 and hist_hr>60% have earned execution weight.",
+    "mechanism": "green_matches counts how many times the current live indicator configuration has resolved profitably in historical memory. Zero matches means the present bull/bear tally is a novel configuration with no realized-edge basis; a high conv% only measures agreement among indicators, not that agreement's historical payoff. AUDUSD (12/30 bull, conv=75%, green_matches=3, hist_hr=68%) is the only pair whose signal has institutional-flow precedent; AUDNZD's 100% conv with green_matches=0 is unanchored consensus that historically has not paid.",
+    "testable_rule": "if consensus.green_matches < 3 or consensus.hist_hr < 0.60: veto_entry(pair)  # conv% alone is insufficient"
   },
   "validation": {
     "verdict": "REJECTED",
@@ -21,8 +21,8 @@
     "codify_error": null
   },
   "cycle": {
-    "cost_usd": 0.157635,
+    "cost_usd": 0.15534,
     "status": "COMPLETE",
-    "date": "2026-07-18"
+    "date": "2026-07-20"
   }
 }

@@ -1,29 +1,53 @@
 {
   "candidates": [
     {
-      "hypothesis_id": "AUTO-HYP-002",
+      "hypothesis_id": "AUTO-HYP-004",
       "feature": "eventual_correct",
       "condition": "eventual_correct < 1.0000",
-      "separation_accuracy": 0.7721,
-      "sample_size": 882,
-      "commitment_failures_analyzed": 342,
+      "separation_accuracy": 0.8103,
+      "sample_size": 464,
+      "commitment_failures_analyzed": 181,
       "status": "CANDIDATE",
-      "generated_at": "2026-05-19T17:10:18.548493+00:00",
+      "generated_at": "2026-07-20T17:49:06.858775+00:00",
       "source": "forensic_engine_auto",
       "note": "CANDIDATE ONLY. Human reviews and activates. Machine never auto-activates vetoes."
     },
     {
       "hypothesis_id": "AUTO-HYP-001",
       "feature": "mfe_within_3_bars",
-      "condition": "mfe_within_3_bars < 0.4426",
-      "separation_accuracy": 0.7449,
-      "sample_size": 882,
-      "commitment_failures_analyzed": 342,
+      "condition": "mfe_within_3_bars < 0.3984",
+      "separation_accuracy": 0.7909,
+      "sample_size": 464,
+      "commitment_failures_analyzed": 181,
       "status": "CANDIDATE",
-      "generated_at": "2026-05-19T17:10:18.548023+00:00",
+      "generated_at": "2026-07-20T17:49:06.858339+00:00",
+      "source": "forensic_engine_auto",
+      "note": "CANDIDATE ONLY. Human reviews and activates. Machine never auto-activates vetoes."
+    },
+    {
+      "hypothesis_id": "AUTO-HYP-002",
+      "feature": "hold",
+      "condition": "hold < 5.0000",
+      "separation_accuracy": 0.7155,
+      "sample_size": 464,
+      "commitment_failures_analyzed": 181,
+      "status": "CANDIDATE",
+      "generated_at": "2026-07-20T17:49:06.858560+00:00",
+      "source": "forensic_engine_auto",
+      "note": "CANDIDATE ONLY. Human reviews and activates. Machine never auto-activates vetoes."
+    },
+    {
+      "hypothesis_id": "AUTO-HYP-003",
+      "feature": "price_went_right",
+      "condition": "price_went_right < 1.0000",
+      "separation_accuracy": 0.7155,
+      "sample_size": 464,
+      "commitment_failures_analyzed": 181,
+      "status": "CANDIDATE",
+      "generated_at": "2026-07-20T17:49:06.858673+00:00",
       "source": "forensic_engine_auto",
       "note": "CANDIDATE ONLY. Human reviews and activates. Machine never auto-activates vetoes."
     }
   ],
-  "generated_at": "2026-05-19T17:10:18.549284+00:00"
+  "generated_at": "2026-07-20T17:49:06.859424+00:00"
 }

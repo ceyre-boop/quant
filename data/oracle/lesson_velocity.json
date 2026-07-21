@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-18T06:31:06.820337+00:00",
-  "as_of_date": "2026-07-18",
+  "generated_at": "2026-07-20T08:19:45.367367+00:00",
+  "as_of_date": "2026-07-20",
   "current_lesson": {
     "components": [
       "active",
@@ -31,6 +31,7 @@
       "internal",
       "jointly",
       "layers",
+      "match",
       "matches",
       "multiplier",
       "paired",
@@ -43,17 +44,17 @@
       "zone",
       "zscore"
     ],
-    "component_label": "consensus.green_matches",
+    "component_label": "green_matches / hist_hr (consensus historical-match fields)",
     "first_seen": "2026-05-29",
-    "last_seen": "2026-07-18",
-    "days_forming": 50,
-    "n_revisions": 42,
-    "n_days_appeared": 42,
+    "last_seen": "2026-07-20",
+    "days_forming": 52,
+    "n_revisions": 44,
+    "n_days_appeared": 44,
     "stable_days": 1,
     "status": "forming",
     "time_to_converge_days": null,
-    "latest_lesson_text": "When the 30-indicator consensus shows conviction but green_matches=0 (no historical analog), treat the signal as UNRELIABLE regardless of live bull/bear tally \u2014 historical hit-rate of 0% is a hard veto, not a soft discount.",
-    "latest_rule": "if consensus.green_matches == 0 and consensus.conviction >= 0.60: veto_signal()  # only trade when green_matches >= 1 AND hist_hr > 0.50",
+    "latest_lesson_text": "When the 30-indicator consensus reports green_matches=0 and hist_hr=0%, treat directional conviction as unvalidated regardless of how high conv% is \u2014 only pairs with green_matches>=3 and hist_hr>60% have earned execution weight.",
+    "latest_rule": "if consensus.green_matches < 3 or consensus.hist_hr < 0.60: veto_entry(pair)  # conv% alone is insufficient",
     "history": [
       {
         "date": "2026-05-29",
@@ -222,6 +223,14 @@
       {
         "date": "2026-07-18",
         "rule": "if consensus.green_matches == 0 and consensus.conviction >= 0.60: veto_signal()  # only trade when green_matches >= 1 AND hist_hr > 0.50"
+      },
+      {
+        "date": "2026-07-19",
+        "rule": "if consensus_conviction >= 0.90 and green_matches == 0 and hist_hr == 0.0: size_multiplier *= 0.5"
+      },
+      {
+        "date": "2026-07-20",
+        "rule": "if consensus.green_matches < 3 or consensus.hist_hr < 0.60: veto_entry(pair)  # conv% alone is insufficient"
       }
     ]
   },
@@ -256,6 +265,7 @@
         "internal",
         "jointly",
         "layers",
+        "match",
         "matches",
         "multiplier",
         "paired",
@@ -268,17 +278,17 @@
         "zone",
         "zscore"
       ],
-      "component_label": "consensus.green_matches",
+      "component_label": "green_matches / hist_hr (consensus historical-match fields)",
       "first_seen": "2026-05-29",
-      "last_seen": "2026-07-18",
-      "days_forming": 50,
-      "n_revisions": 42,
-      "n_days_appeared": 42,
+      "last_seen": "2026-07-20",
+      "days_forming": 52,
+      "n_revisions": 44,
+      "n_days_appeared": 44,
       "stable_days": 1,
       "status": "forming",
       "time_to_converge_days": null,
-      "latest_lesson_text": "When the 30-indicator consensus shows conviction but green_matches=0 (no historical analog), treat the signal as UNRELIABLE regardless of live bull/bear tally \u2014 historical hit-rate of 0% is a hard veto, not a soft discount.",
-      "latest_rule": "if consensus.green_matches == 0 and consensus.conviction >= 0.60: veto_signal()  # only trade when green_matches >= 1 AND hist_hr > 0.50",
+      "latest_lesson_text": "When the 30-indicator consensus reports green_matches=0 and hist_hr=0%, treat directional conviction as unvalidated regardless of how high conv% is \u2014 only pairs with green_matches>=3 and hist_hr>60% have earned execution weight.",
+      "latest_rule": "if consensus.green_matches < 3 or consensus.hist_hr < 0.60: veto_entry(pair)  # conv% alone is insufficient",
       "history": [
         {
           "date": "2026-05-29",
@@ -447,6 +457,14 @@
         {
           "date": "2026-07-18",
           "rule": "if consensus.green_matches == 0 and consensus.conviction >= 0.60: veto_signal()  # only trade when green_matches >= 1 AND hist_hr > 0.50"
+        },
+        {
+          "date": "2026-07-19",
+          "rule": "if consensus_conviction >= 0.90 and green_matches == 0 and hist_hr == 0.0: size_multiplier *= 0.5"
+        },
+        {
+          "date": "2026-07-20",
+          "rule": "if consensus.green_matches < 3 or consensus.hist_hr < 0.60: veto_entry(pair)  # conv% alone is insufficient"
         }
       ]
     }

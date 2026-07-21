@@ -1,0 +1,27 @@
+{
+  "date": "2026-07-19",
+  "generated_at": "2026-07-19T06:31:04.069417+00:00",
+  "input_tokens": 5748,
+  "output_tokens": 944,
+  "estimated_cost_usd": 0.15702,
+  "harvest_days_read": 7,
+  "reflection": {
+    "candidate_lesson": {
+      "lesson_text": "When the 30-indicator consensus reports conv>=90% but green_matches=0 and hist_hr=0%, treat the signal as UNVALIDATED and cap size at 0.5x until historical confirmation accrues.",
+      "mechanism": "A 100% conviction reading with zero historical green_matches means the live indicator stack has never resolved this exact configuration into a profitable outcome \u2014 the conviction reflects present-bar agreement, not a distribution of realized edge. Institutionally, a fully one-sided indicator vote (AUDNZD 18/30 bear, conv=100%) is where crowded positioning peaks and mean-reversion risk is highest; without a historical hit-rate anchor the conviction is regime-fragile, not edge-confirmed.",
+      "testable_rule": "if consensus_conviction >= 0.90 and green_matches == 0 and hist_hr == 0.0: size_multiplier *= 0.5",
+      "expected_impact": "Reduces variance drag from unvalidated max-conviction entries; expected Sharpe +0.02-0.03 by trimming the fat left tail of crowded-signal reversals without cutting validated setups.",
+      "evidence_from_harvest": "AUDNZD shows conv=100% (18/30 bear) yet green_matches=0 and hist_hr=0%; USDJPY conv=67% and GBPUSD conv=58% likewise all report hist_hr=0% \u2014 every current directional call lacks any historical hit-rate backing, so acting on raw conviction is unsupported.",
+      "evidence_from_reasoning": null,
+      "reasoning_component_targeted": "consensus_conviction / green_matches / hist_hr",
+      "sample_needed": 40
+    },
+    "retirement_flag": {
+      "lesson_to_review": "L8",
+      "reason": "VIX gate was tightened to 13 on a 'bull market' premise; current backdrop shows ROTATION_WARN, VIX rising 15.67->16.73, and 10Y-2Y flattening 0.41->0.37 \u2014 the safe-haven-corruption assumption may be shifting toward a genuine risk-off regime where the 13 gate is now too permissive rather than too tight.",
+      "system_health_note": "0 trades in the last 7 days with UNKNOWN regime and all directional consensus calls at hist_hr=0% \u2014 the system is data-starved and CALIBRATING, so any lesson must be validated on fresh paper trades before sizing on it."
+    },
+    "system_health_note": "Regime is UNKNOWN with internal/TV agreement forcing 75% sizing and zero closed trades this week \u2014 the pipeline is accumulating but not yet emitting validated signals, so favor caution gates over new alpha bets."
+  },
+  "auto_validation": null
+}

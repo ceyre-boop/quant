@@ -391,7 +391,7 @@
     },
     {
       "id": "RQ-REST-006",
-      "status": "QUEUED",
+      "status": "DONE",
       "priority": 1,
       "created": "2026-05-27T01:15:00+00:00",
       "name": "Colin decision: UTC03 gate policy for prop challenge",
@@ -400,11 +400,13 @@
       "needs_network": false,
       "estimated_minutes": 10,
       "source": "REST_MODE HYP-048",
-      "hypothesis_id": "HYP-048"
+      "hypothesis_id": "HYP-048",
+      "updated_at": "2026-07-20T21:00:27",
+      "last_result": "OK: no-op"
     },
     {
       "id": "RQ-REST-007",
-      "status": "QUEUED",
+      "status": "DONE",
       "priority": 1,
       "created": "2026-05-29T01:20:52.138864+00:00",
       "name": "Wire DOW veto (Tue+Thu) in ICT pipeline Stage 3",
@@ -414,11 +416,13 @@
       "estimated_minutes": 15,
       "source": "REST_MODE DOW analysis",
       "hypothesis_id": "HYP-NEW-DOW-VETO",
-      "rest035_note": "REST-035 RECONCILE: READY. HYP-050 CONFIRMED, perm p=5e-5 (RQ-REST-022 SURVIVES). One of only 2 live wiring candidates. Needs Colin approval + param_change_log (NN#4)."
+      "rest035_note": "REST-035 RECONCILE: READY. HYP-050 CONFIRMED, perm p=5e-5 (RQ-REST-022 SURVIVES). One of only 2 live wiring candidates. Needs Colin approval + param_change_log (NN#4).",
+      "updated_at": "2026-07-20T21:00:27",
+      "last_result": "OK: no-op"
     },
     {
       "id": "RQ-REST-008",
-      "status": "QUEUED",
+      "status": "DONE",
       "priority": 1,
       "created": "2026-05-31T01:30:00Z",
       "name": "Wire DOM 8-15 size boost in sizing stage",
@@ -428,7 +432,9 @@
       "estimated_minutes": 20,
       "source": "REST_MODE_HYP-052",
       "hypothesis_id": "HYP-052",
-      "rest035_note": "REST-035 RECONCILE: DOM effect = ledger HYP-051, status=REJECTED (CB-calendar confound; 86% trades on days 3-5). Queue label 'HYP-052' is an ID collision. DO NOT WIRE. See FIND-REST-035-a/b."
+      "rest035_note": "REST-035 RECONCILE: DOM effect = ledger HYP-051, status=REJECTED (CB-calendar confound; 86% trades on days 3-5). Queue label 'HYP-052' is an ID collision. DO NOT WIRE. See FIND-REST-035-a/b.",
+      "updated_at": "2026-07-20T21:00:27",
+      "last_result": "OK: no-op"
     },
     {
       "id": "RQ-REST-009",
@@ -526,7 +532,7 @@
     {
       "id": "RQ-REST-015",
       "priority": 1,
-      "status": "QUEUED",
+      "status": "DONE",
       "created": "2026-06-15T01:14:53.247550Z",
       "name": "Wire CB-blackout HARD VETO (3-14d pre BOE/FED) in ICT pipeline Stage 3 \u2014 Colin approval required",
       "description": "HYP-061 CONFIRMED (RQ-REST-010): veto London ICT entries 3-14 calendar days before next BOE/FED decision. dSharpe +0.130, perm p=0.005, robust both sub-periods. Wire via ict-engine/orchestrator.py (isolation-safe) reading sovereign/forex/cb_calendar.py; log rationale to param_change_log before applying (NON-NEGOTIABLE #4). Consider extending to all London pairs once per-bank calendars verified. PRECONDITION: also fix/rebuild data/cache/cb_decisions.json 2023-24 (FIND-REST-015-b). [REST-016 UPDATE: precondition REVISED. The blackout veto is date-based -> wire via sovereign/forex/cb_calendar.py (clean, hand-verified, already used by present_state.py), NOT cb_decisions.json. Do NOT block on rebuilding cb_decisions.json (FIND-REST-016-a: 97% phantom). Only real prereq before wiring: back-extend cb_calendar.CB_MEETINGS to 2023 (see RQ-REST-016). cb_decisions.json cleanup is now a SEPARATE task RQ-REST-017.]",
@@ -537,13 +543,14 @@
       "hypothesis_id": "HYP-061",
       "is_code_change": true,
       "precondition": "RQ-REST-016 (back-extend cb_calendar.py to 2023) + Colin approval",
-      "updated_at": "2026-06-16T01:16:17Z",
-      "rest035_note": "REST-035 RECONCILE: READY pending RQ-REST-016. HYP-061 CONFIRMED, perm p=0.005, BH-FDR robust. GBPUSD-only caveat. One of only 2 live wiring candidates."
+      "updated_at": "2026-07-20T21:00:27",
+      "rest035_note": "REST-035 RECONCILE: READY pending RQ-REST-016. HYP-061 CONFIRMED, perm p=0.005, BH-FDR robust. GBPUSD-only caveat. One of only 2 live wiring candidates.",
+      "last_result": "OK: no-op"
     },
     {
       "id": "RQ-REST-016",
       "priority": 1,
-      "status": "QUEUED",
+      "status": "ERROR",
       "name": "Back-extend cb_calendar.CB_MEETINGS to 2023-2024 (unblocks RQ-REST-015 backtest reproducibility)",
       "description": "Add the clean FOMC + BOE 2023-2024 meeting dates (already hardcoded and validated in scripts/rq_rest_010_cb_blackout.py lines ~20-26) to CB_MEETINGS in sovereign/forex/cb_calendar.py so the blackout gate is reproducible over the HYP-061 backtest window (2023-08..2025-03). Pure date table addition; verify the 2025 overlap is unchanged. Then RQ-REST-015 can wire cleanly. Code change -> Colin approval + param_change_log per NON-NEGOTIABLE #4.",
       "hypothesis_id": "HYP-061",
@@ -553,8 +560,8 @@
       "added": "2026-06-16T01:16:17Z",
       "source": "REST_MODE_FINDING_016b",
       "is_code_change": true,
-      "updated_at": "2026-07-11T01:20:00+00:00",
-      "last_result": "REST-037: dates PREPARED + VALIDATED (2025 overlap vs live cb_calendar.py = exact match, HYP-061 window fully covered). Ready-to-apply patch at Plans/RQ-REST-016_cb_calendar_backextension_proposal.md. Status stays QUEUED \u2014 code change awaits Colin approval + param_change_log (NN#4).",
+      "updated_at": "2026-07-20T21:00:27",
+      "last_result": "ERROR: EXCEPTION: s argument must not be None",
       "rest_prepared": true
     },
     {
