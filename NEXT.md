@@ -1524,3 +1524,42 @@ at module top level by `sovereign/specialists/base_specialist.py` and `sovereign
 so atticking them piecemeal breaks `sovereign/orchestrator.py` at import. Wants its own ticket.
 
 Full table + evidence: `~/Obsidian/Obsidian/System/full_functionality_audit.md`
+
+## Reddit retirement — landed in ddec713, not its own commit
+
+A parallel session ran `git commit` between my `git add` and my `git commit`. My four
+staged files were swept into **ddec713 "[INFRA] Log 2026-07-20 anatomy audit session
+in NEXT.md"**, whose message describes none of them. The code is intact and verified
+(16/16 tests, health GREEN); only the attribution is wrong.
+
+What is actually in ddec713 beyond the NEXT.md log:
+
+- `execution/context.py` — `Status.RETIRED`; `load_reddit` returns it carrying the
+  reason; retired sources leave the health denominator (`n_retired`/`retired`
+  reported separately). Health reads an honest 3/6.
+- `scripts/health_check.py` — RETIRED short-circuits before measurement, counts as
+  neither bad nor warning. system_health RED -> GREEN; reddit was the only job that
+  changed.
+- `scripts/refresh_caches.py` — stops calling the scraper. It burned three retries
+  per subreddit to fail, then rewrote the cache with `posts_scanned=0`, refreshing
+  the mtime so staleness checks read green over an empty payload.
+- `tests/unit/test_execution_context.py` — the degrade-never-fabricate contract was
+  exercised *through* `load_reddit`, so retiring it would have silently dropped five
+  tests' coverage. Retargeted to `load_fred` (still produces all five statuses); two
+  new tests pin the retirement itself.
+
+Evidence for retiring rather than fixing: tested live with a browser User-Agent,
+`old.reddit.com` **403** and `www.reddit.com` **403**, and there is no
+`REDDIT_CLIENT_ID` anywhere in the repo. The endpoint fix in 9bc2849 was correct code
+against a shut door. `sovereign/data/reddit_scraper.py` is deliberately left on disk
+as the starting point if an OAuth app is ever registered.
+
+**Operator action outstanding:** `com.sovereign.reddit_sentiment` is still loaded and
+will keep 403ing on schedule. Unloading it is an install action.
+
+**Process note — third occurrence today.** Explicit-path staging protects the *content*
+of a commit but not its *timing*: between `add` and `commit` another session can claim
+the index. Earlier today the same race left phantom deletions of `RISK_FRAMEWORK.md`,
+the watchdog baseline, and `backlog.md` staged, and produced stale `index.lock` and
+`HEAD.lock` files. Sequencing `git add && git commit` as one command would have
+prevented this one.
