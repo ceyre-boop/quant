@@ -1,0 +1,55 @@
+[
+  {
+    "kind": "DEAD",
+    "subject": "sovereign/risk/black_scholes.py",
+    "text": "CS229 stack inert — black_scholes not imported by anything live, safe to deprecate"
+  },
+  {
+    "kind": "DEAD",
+    "subject": "sovereign/risk/kalman_regime.py",
+    "text": "CS229 stack inert — kalman_regime not imported by anything live"
+  },
+  {
+    "kind": "ABSENT",
+    "subject": "stanford_cs229",
+    "text": "CS229 modules live in stanford_cs229/"
+  },
+  {
+    "kind": "LOGPATH",
+    "subject": "com.clawd.ny_am_scanner",
+    "text": "NY AM Scanner silently crashing since May, 0-byte logs, likely bad import"
+  },
+  {
+    "kind": "ABSENT",
+    "subject": "sovereign/risk/pca_compressor.py",
+    "text": "pca_compressor.py described but not built; equity pipeline depends on it"
+  },
+  {
+    "kind": "CITED",
+    "subject": "RISK_FRAMEWORK.md",
+    "cites": "DAILY_LOSS_HALT",
+    "text": "RISK_FRAMEWORK.md overlay ratified 2026-07-20 defines DAILY_LOSS_HALT"
+  },
+  {
+    "kind": "ABSENT",
+    "subject": "execution/order_router.py",
+    "text": "control: no order-placement module exists (system places no orders)"
+  },
+  {
+    "kind": "DEAD",
+    "subject": "sovereign/risk/pegasus_policy_search.py",
+    "text": "control-DEAD-probe: pegasus claimed unimported"
+  },
+  {
+    "kind": "CITED",
+    "subject": "tickets/backlog.md",
+    "cites": "TICK-044",
+    "text": "control: Finding 4A ticketed as TICK-044 after the collision"
+  },
+  {
+    "kind": "CITED",
+    "subject": "audit/invariants_spec.md",
+    "cites": "I1",
+    "text": "control: invariant I1 is specified"
+  }
+]
