@@ -1630,3 +1630,10 @@ the index. Earlier today the same race left phantom deletions of `RISK_FRAMEWORK
 the watchdog baseline, and `backlog.md` staged, and produced stale `index.lock` and
 `HEAD.lock` files. Sequencing `git add && git commit` as one command would have
 prevented this one.
+
+## 2026-07-20 · RESEARCH PASS (21:00 ET nightly)
+Brain read clean (27 killed hyps in graveyard; confirmed edges loaded; no sealed idea re-proposed).
+Queue: 5 tasks (`--max 5`) — 4 Colin-gated wiring no-ops (RQ-REST-006/007/008/015), RQ-REST-016 (CB_MEETINGS back-extend) threw its standing `EXCEPTION: s argument must not be None` (blocked on operator sign-off per FIND-REST-037-a; `code_change` cannot self-apply per NN#4). No autonomous micro-backtest ran — queue holds only operator-gated wiring.
+Candidates flagged for operator: **none** — nothing cleared a first-pass permutation test because nothing was tested. Zero-candidate night, logged per STANDING RULE 5.
+Movers snapshot: 50 gainers → `data/research/gapper/movers_recent.json` for tomorrow's scan (single snapshot, no lookback). ZYBT +1047% @ $8.01 leads; warrants (RNWWW/FGIWW/IVDAW/ACHR.WS) excluded by filters; non-warrant ≥40%: ZYBT/MF/ADVB.
+No live parameters touched. No incident.
