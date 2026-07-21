@@ -117,8 +117,12 @@ python3 -m pytest tests/ -q                  # full suite
 python3 -m pytest tests/ -k "not sklearn"    # skip missing-dependency tests
 python3 -m pytest tests/unit/test_*.py -v    # unit tests only
 
-# ICT pipeline suite (must stay 21/21)
-python3 -m pytest tests/ -k ict -v
+# ICT pipeline suite. BASELINE (re-verified 2026-07-21): `tests/ -k "ict and pipeline"`
+# is 4 failed / 23 passed — the old "must stay 21/21" was stale and made every session
+# think it had broken something. Do NOT treat 21/21 as the target. The 4 pre-existing
+# failures (test_ict_pipeline TestScoreAndGrade ×2, TestRiskEngineGate ×2) are tracked in
+# plans/restoration-ledger.md; a fresh session must not absorb them into its own result.
+python3 -m pytest tests/ -k "ict and pipeline" -v
 
 # v014 holdout validation
 python3 scripts/holdout_validation_v014.py

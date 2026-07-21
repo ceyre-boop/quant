@@ -134,3 +134,30 @@ governs is: *does the current system already cover it?*
 
 **Gate P3:** all 46 classified (44 stay-retired with bucket reason, 2 shortlisted with written
 cases); nothing resurrected. PASSED.
+
+---
+
+## Phase 4 — spot-check 20 of 294 ON-DEMAND tools (gate: breakages ticketed)
+
+**Method (limit named):** import/load-layer probe — exec each entry point, catch
+ImportError/SyntaxError/setup failures. This is the safe, side-effect-free detector of the
+bitrot the phase targets (renamed/removed deps silently breaking a validation tool). It is
+**not** a full data-run: a tool can load-clean and still fail on current data (API drift,
+missing file). A deeper live-data execution pass is deferred — it mutates ledgers, hits
+network, and needs the infra that is currently absent.
+
+**20 consequential tools probed (validation/holdout/audit/backtest — by what they measure):**
+`hyp104_holdout, backtest_integrity_audit, run_replay_validation, validation/backtest_engine,
+walk_forward_validation, mc, megascan, permutation_test_sovereign, backtest_lifecycle,
+accelerated_validation, conviction_audit_full, final_lookahead_audit, options_tradeability_audit,
+hyp_008_lift_audit, iv_sentinel_audit, modern/reconcile, holdout_validation_v014, discover,
+engine, stage1_discovery`.
+
+**Result: 20/20 load clean — no import-layer bitrot.** Initial probe flagged 3
+(`megascan`, `engine`, `hyp104_holdout`) with "relative import" errors — **false positives from
+the probe method** (loose-file exec vs package `-m`); re-probed as `python3 -m` → all import OK.
+The probe's own blind spot was caught and corrected before recording (the verification tooling
+got verified).
+
+**Gate P4:** 20 spot-checked, 0 breakages → none to ticket. Deeper live-data run of these tools
+deferred to a session with the infra available. PASSED (load-layer).
