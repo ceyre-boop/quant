@@ -116,3 +116,63 @@ away — it is structural. Cost model does not enter this argument.
 
 **Test baseline:** `tests/ -k "ict and pipeline"` = 4 failed / 23 passed (pre-existing, not
 absorbed). No code changed; nothing to break.
+
+---
+
+## ADDENDUM 2026-07-21 — TICK-055 item (1) closed: exact √n-weighted portfolio Sharpe
+
+The original pass reported the **equal-weight** portfolio Sharpe and ticketed the exact
+trade-weighted figure as TICK-055, noting a "format expectation mismatch" against the
+trades file.
+
+**The mismatch was in the call, not the data.** `sovereign.reporting.equity_curve.
+weighted_portfolio_sharpe` takes an iterable of `(sharpe, n)` tuples — per-pair Sharpe
+and per-pair trade count — not a trades payload. Supplied correctly, it runs first time.
+
+Trade counts from the canonical ledger `logs/forex_backtest_trades.json`
+(regenerated 2026-07-21 10:07): EURUSD 102 · GBPUSD 105 · USDJPY 96 · AUDUSD 108 —
+**411 trades total.**
+
+| | equal-weight | **√n-weighted (canonical)** |
+|---|---|---|
+| baseline (broken swap table) | 0.6893 | **0.6886** |
+| corrected (OANDA rates, in-memory) | 0.6487 | **0.6480** |
+| Δ | −0.0406 | **−0.0406** |
+
+### Why this matters more than the fourth decimal
+
+**The √n-weighted baseline reproduces the canonical reference 0.6886 to four decimal
+places — diff +0.0000.** That is not a rounding coincidence; it is the reconciliation
+check passing exactly, which means the cost-correction study was run against the same
+ledger and the same weighting as the headline figure. The verdict's setup is now
+validated by construction rather than by resemblance.
+
+The corrected headline is therefore **0.6480**, not "approximately 0.65". The delta is
+identical under both weightings (−0.0406), because the per-pair trade counts are nearly
+balanced (96–108) — so weighting was never going to change the conclusion, and now that
+is demonstrated rather than assumed.
+
+**Verdict unchanged: NO.** A cost correction that lowers Sharpe by 0.04 cannot rescue a
+funnel already at `P($10k/mo) = 0.0`, and the regime-fragility argument (negative in
+2021 and 2024) is independent of the cost model entirely.
+
+### TICK-055 remaining scope
+
+Item (1) — exact trade-weighted portfolio Sharpe — **CLOSED** by the above.
+Still open, and still unable to change the verdict:
+- (2) funnel re-sim on a corrected-cost pool (regenerate
+  `data/proof/backtest_trades_v015_2015_2024.csv` with corrected swap deltas, re-run
+  `research/prop_funnel/run_all.py`).
+- (3) upgrade from the static current-rate bound to the differential-tracking historical
+  model (`financing_side(t) = oanda_now + sign*(diff(t) - diff_now)` via
+  `data_fetcher.get_pair_differentials`).
+
+Both read-only. Neither touches the frozen `SWAP_RATES_ANNUAL` table — that remains
+TICK-024, gated on the 2026-07-28 unlock plus sign-off.
+
+**Note on ~1.25 OOS:** the full-decade 0.6886 and the OOS-2023-24 ~1.25 are two valid
+measurements over different windows, not a live figure and a stale one. ~1.25 is the
+reconciliation constant in `docs/MEASUREMENT_METHODOLOGY.md` RULE 1 and the assertion
+band in `scripts/test_regime_conditionality.py`. It must not be purged. (A 2026-07-21
+instruction in two vault planning documents said otherwise; that instruction was wrong
+and has been corrected at source.)
