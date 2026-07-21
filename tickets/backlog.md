@@ -575,3 +575,70 @@ reachability fact, not proof the code is worthless):
 
 **depends_on:** []
 **blocks:** []
+
+
+## TICK-050
+**title:** Decision-logger contract mismatch on the forex path — library_match + irp_z null by design/gap, not a leak
+**status:** open (BLOCKED on 2026-07-28 execution-path unlock)
+**pre_approved:** false
+
+**description:** Restoration campaign L1. 0/73 of the 2026-07 decisions carry all four
+DECISION_LOGGER contract fields. Root cause is NOT a silent leak — it is explicit `None`
+with documented reasons at `sovereign/forex/forex_specialist.py:118-131`:
+- `commitment_score=None` — an ICT price-action measure; forex macro signals have no analogue.
+  Decide whether forex should log an equivalent conviction score, or whether the contract is
+  ICT-only and forex nulls are correct.
+- `library_match=None` — "not yet wired into ForexEntrySignal". The AlexandrianLibrary exists
+  (`sovereign/orchestrator.py`); wiring it into the forex specialist is the one clearly-real gap.
+- `rate_diff_z=getattr(_macro,'irp_z',None)` — IS wired; nulls are upstream, when `irp_z` is not
+  computed on the macro signal. Trace why irp_z is often None.
+- `vix_at_entry=None` — correct: the VIX gate is dead (HYP-044 REJECTED_OOS). Leave None.
+- `cot_percentile=None` — COT engine returns a z-score, not a percentile. Either convert or
+  rename the field. Not a bug.
+
+**Outcome loop is HEALTHY** (campaign framing "learning from blanks" overstated the close side):
+73 decisions → 56 EXPIRED (unfilled limit orders), 5 closed with outcomes, 12 open.
+`update_outcome()` is firing for the ones that close.
+
+**Freeze classification:** `forex_specialist.py` is LIVE with 2 live importers (claim_check DEAD
+→ REFUTED), so it is importable by the execution path and under the shadow freeze. The fix
+therefore waits for the 2026-07-28 unlock or an explicit NEXT.md unlock. Diagnose-only this pass
+(operator ruling 2026-07-21).
+
+**Required fix (post-unlock):** wire `library_match` from AlexandrianLibrary into ForexEntrySignal;
+trace/populate `irp_z`; rule on commitment_score contract for forex; convert or rename cot_percentile.
+Each with a `param_change_log.jsonl` rationale.
+
+**depends_on:** [2026-07-28 execution-path unlock]
+**blocks:** [Oracle reasoning-aware reflection on forex decisions]
+
+## TICK-051
+**title:** Delete phantom dashboard_state.json and purge its false references
+**status:** open
+**pre_approved:** false
+
+**description:** Restoration campaign L2. `data/agent/dashboard_state.json` (dated 2026-05-31) has
+no writer in the repo and is read by no code — only `NEXT.md`, `AGENT_DIRECTIVE.md`, and
+`audit/claims/2026-07-20-launchd-path-cascade.json` mention it. `sync_dashboard_data.py` writes 8
+sibling state files, never this one. The false "sync writes dashboard_state.json" claim in
+`AGENT_DIRECTIVE.md:104` was corrected this session. Remaining: delete the stale file and purge
+the remaining textual mentions so no future session re-derives a dependency on it. Trivial, leaf-only.
+
+**depends_on:** []
+**blocks:** []
+
+## TICK-052
+**title:** Orphaned dashboard/index.html references two phantom files — point at real data or retire
+**status:** open
+**pre_approved:** false
+
+**description:** Restoration campaign L3. `dashboard/index.html` fetches
+`data/agent/prop_account_balance.json` and `data/execution/fills.json`, neither of which exists
+(only `fill_log.jsonl` does). But `deploy.yml:22-24` copies `dashboard/.` into the site and then
+**overwrites** the served root with repo-root `index.html`, so those fetches never run on the live
+site — `dashboard/` is the orphaned legacy view (live = repo-root `index.html` + `ict/index.html`).
+Decide: point `dashboard/index.html` at `fill_log.jsonl` + a real balance source, or delete
+`dashboard/` as superseded. Non-urgent — nothing served depends on it. Leaf HTML, non-frozen.
+
+**depends_on:** []
+**blocks:** []

@@ -1637,3 +1637,38 @@ Queue: 5 tasks (`--max 5`) — 4 Colin-gated wiring no-ops (RQ-REST-006/007/008/
 Candidates flagged for operator: **none** — nothing cleared a first-pass permutation test because nothing was tested. Zero-candidate night, logged per STANDING RULE 5.
 Movers snapshot: 50 gainers → `data/research/gapper/movers_recent.json` for tomorrow's scan (single snapshot, no lookback). ZYBT +1047% @ $8.01 leads; warrants (RNWWW/FGIWW/IVDAW/ACHR.WS) excluded by filters; non-warrant ≥40%: ZYBT/MF/ADVB.
 No live parameters touched. No incident.
+
+## 2026-07-21 · RESTORATION CAMPAIGN session 1 (TICK-049) — Phase 0 + Phase 1 loops
+
+Executed session 1 of the multi-session restoration campaign. Diagnose-and-ledger pass;
+no execution-path code touched (shadow freeze holds to 07-28). Ledger:
+`plans/restoration-ledger.md` (force-added; plans/ is gitignored).
+
+**Corrected 2 stale campaign premises before acting (its own NN#1):**
+- Phase 0 ("fix claim_check LOGPATH parser FIRST") was already done in `aab90eb` this session —
+  collapsed to a verification gate (self-test green, regression tests present).
+- "research_agent.log dark since 05-16" — false; it fired 07-20 21:02 on schedule.
+
+**Phase 1 findings (all 5 loops resolved or ticketed):**
+- **Oracle close-loop reframed (TICK-050).** The null contract fields are explicit `None` with
+  documented reasons at `forex_specialist.py:118-131`, not a silent leak. `commitment_score`
+  (ICT concept, N/A to forex), `vix_at_entry` (VIX gate dead), `cot_percentile` (z-score not
+  percentile) are null by design; only `library_match` and upstream `irp_z` are real gaps.
+  Outcome loop is HEALTHY (73 → 56 EXPIRED / 5 closed / 12 open). `forex_specialist.py` is
+  frozen-adjacent (2 live importers) → fix waits for the 07-28 unlock. Diagnose-only per ruling.
+- **dashboard_state.json is a phantom (fixed + TICK-051).** No writer, no code reader; dated
+  05-31. Corrected the false "sync writes it" claim in `AGENT_DIRECTIVE.md:104`. Did NOT write an
+  empty file — that is the green-but-empty trap one level up. TICK-051 to delete + purge mentions.
+- **dashboard "missing inputs" reframed (TICK-052).** `dashboard/index.html` fetches two absent
+  files, but `deploy.yml` overwrites the served root with repo-root `index.html`, so `dashboard/`
+  is the orphaned legacy view. Not a live break.
+
+**Refused to shortcut:** did not "fix" the decision-logger nulls (frozen-path); did not write a
+placeholder dashboard_state.json to make a check go green; did not touch the shadow window.
+
+**Pre-existing failures named, not absorbed:** `ict and pipeline` = 4 failed / 23 passed on the
+committed branch (campaign's "21/21" is already below that); 15 failed under broader `-k ict`.
+This session added zero failures — after-counts identical to before. Isolation guard PASS.
+
+Pushed. Next session: Phase 2 (28 DORMANT) or act on TICK-050/051/052 post-unlock. Re-verify
+every open ledger row against the filesystem first — the stale-premise pattern recurs.

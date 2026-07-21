@@ -100,9 +100,11 @@ python3 scripts/sync_dashboard_data.py
 ```
 **This script takes NO arguments** — it has no argument parser. Do not pass
 `--eod` or any other flag; extra args are silently ignored, which means a flag
-you expect to change behaviour will not. It refreshes
-`data/agent/dashboard_state.json` and `logs/prop_challenge_sim.json` with today's
-candidate count, running fill P&L from the shadow logs, and challenge status.
+you expect to change behaviour will not. It refreshes the dashboard state files it
+actually writes — `data/agent/health.json`, `checklist_state.json`,
+`prop_challenge_state.json`, `g2_progress.json`, and siblings. It does NOT write
+`data/agent/dashboard_state.json` (dated 2026-05-31, no writer in the repo, read by
+no code — TICK-051); earlier text here named that file falsely.
 If it exits non-zero, do NOT retry with different flags — apply STANDING RULE 9.
 
 ### Step 5 — Summarize and commit
