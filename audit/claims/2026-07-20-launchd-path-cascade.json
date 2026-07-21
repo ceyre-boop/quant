@@ -1,0 +1,29 @@
+[
+  {
+    "kind": "ABSENT",
+    "subject": "data/execution/fill_log.jsonl",
+    "text": "Incident 2026-07-20 #2 claims fill_log.jsonl is absent repo-wide because the harness never targets today."
+  },
+  {
+    "kind": "LOGPATH",
+    "subject": "com.alta.execution_harness",
+    "text": "Incident 2026-07-20 #2 claims com.alta.execution_harness --live is stuck processing 2026-06-16 and screens 0 candidates."
+  },
+  {
+    "kind": "LOGPATH",
+    "subject": "com.alta.morning_agent",
+    "text": "Incident 2026-07-20 #1 claims com.alta.morning_agent never ran: launchd log holds only a missing-binary error."
+  },
+  {
+    "kind": "CITED",
+    "subject": "AGENT_DIRECTIVE.md",
+    "text": "AGENT_DIRECTIVE states sync_dashboard_data.py refreshes data/agent/dashboard_state.json.",
+    "cites": "dashboard_state.json"
+  },
+  {
+    "kind": "CITED",
+    "subject": "scripts/sync_dashboard_data.py",
+    "text": "If the directive is right, the sync script must actually reference dashboard_state.json.",
+    "cites": "dashboard_state.json"
+  }
+]

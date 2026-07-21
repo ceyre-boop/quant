@@ -6,6 +6,73 @@ Standing constraints live in `CLAUDE.md` — not restated here.
 
 ---
 
+## 2026-07-20 — LAUNCHD TRIAGE: THERE IS NO `claude` CLI ON THIS MACHINE; TWO CASCADE CLAIMS REFUTED
+
+Dispatched to repoint the agent plists at the real `claude` binary, reload, verify, unload
+the retired Reddit agent, and adjudicate the cascade. **The premise did not survive contact.**
+
+**The blocker: the binary does not exist anywhere.** Not just at the path launchd names —
+anywhere. Enumerated on the host: `/usr/local/bin/*` returns *nothing at all*;
+`/Users/taboost/.local/bin/` holds only `mac-tune`/`dispatch`/`cc`/`route`;
+`/opt/homebrew/bin` has no `claude`; npm global has only `npm`; `~/.claude/local/` empty;
+no nvm/bun/volta copy. `/Applications/Claude.app` is the desktop app, not the CLI.
+**The fix is an install, not a path edit.** No path was fabricated into any plist.
+
+Also found: the installed and tracked plists have **drifted**. Installed names
+`/usr/local/bin/claude` (per `logs/morning_agent.log`); the repo copies name
+`/Users/taboost/.local/bin/claude`. Both are dead. Resync both when the CLI lands.
+
+**Single-source fix to apply then (not 3 hardcodes):** the three agent plists already
+`. /Users/taboost/quant/.env`. `.env` has no `CLAUDE_BIN`. Add
+`CLAUDE_BIN=/verified/abs/path` there and invoke `"$CLAUDE_BIN" --print ...`. launchd's
+empty PATH is a non-issue because the value arrives via the sourced file.
+
+**Not done, handed to operator:** `~/Library/LaunchAgents` is a protected location and
+cannot be mounted by a Cowork session, and `launchctl` is unavailable (the session's shell
+is an isolated Linux VM — its own `/usr/local/bin/claude` is NOT this Mac and must not be
+mistaken for it). So: no plist edited, nothing loaded/unloaded, nothing verified to fire.
+`com.sovereign.reddit_sentiment` still loaded — retirement itself IS verified in code
+(`execution/context.py:214,224,237` `Status.RETIRED`, `health_check.py:82`,
+`refresh_caches.py:35`, guarded by `test_execution_context.py:115`), so the unload is
+justified; it just needs the operator's hand + a `plist_watchdog --rebaseline`.
+
+**CASCADE VERDICT — mostly INDEPENDENT.** Ran `audit/claim_check.py` first (RULE 10):
+**2 REFUTED / 1 CONFIRMED / 2 UNVERIFIABLE**, exit 1. Claims file:
+`audit/claims/2026-07-20-launchd-path-cascade.json`.
+- **Harness "stuck on 2026-06-16" — REFUTED.** `harness.py:562` resolves live as
+  `datetime.now(ET).date()`; nothing is hardcoded. It ran today: `[2026-07-20T20:05:11]
+  2026-07-20: screened 14 candidate(s) / 1 filled / 3 skipped`. The `2026-06-16` lines
+  (13:59–18:37) are **manual `--replay` runs** in the same log; "NO ARCHIVED UNIVERSE" is
+  emitted only from the replay branch (`harness.py:405-412`) which `--live` never reaches.
+  Yesterday's incident misread replay output as the scheduled job.
+- **"`fill_log.jsonl` absent repo-wide" — REFUTED.** Exists, 3339 bytes, today 16:05.
+  EOD Step 1's wait-for-fills *can* be satisfied.
+- **`dashboard_state.json` — INDEPENDENT, and worse than stale.** `grep -rn dashboard_state
+  --include=*.py` over the repo returns **zero hits**. *Nothing writes that file.*
+  `sync_dashboard_data.py` writes `checklist_state.json` / `prop_challenge_state.json` /
+  `g2p_state.json` / health JSONs — never `dashboard_state.json`. It exits 0 honestly.
+  **`AGENT_DIRECTIVE.md:104` and `:218` are wrong** to name it as the writer (checker
+  confirms the citation is unsupported). Orphan artifact; needs a decision — repoint the
+  dashboard at `prop_challenge_state.json`, or delete it and correct the directive.
+
+So installing the CLI unblocks morning/EOD/research + the empty `data/decisions/` (no
+`signals_*.json` exists at all). It does **not** fix the harness (not broken) or the
+dashboard (never wired). Two separate tickets.
+
+**Found, NOT touched:**
+- `execution/harness.py`, `carry_engine` — frozen, read-only, untouched.
+- **`audit/claim_check.py` LOGPATH class is blind on this repo.** Both plist claims returned
+  `UNVERIFIABLE: not well-formed (invalid token)` — its plist parser chokes on the XML
+  comment header between DOCTYPE and `<plist>`, which most `scripts/*.plist` carry. Real bug
+  in the tool RULE 10 depends on. Left alone: patching the audit tool mid-triage is exactly
+  the drive-by-fix pattern it exists to prevent.
+- `logs/research_agent.log` is dated **May 16** — the research agent looks dark far longer
+  than today's break. Unexamined.
+- Full triage note on disk (untracked, `logs/` is gitignored):
+  `logs/incidents/2026-07-20-claude-binary-absent-triage.md`.
+
+---
+
 ## 2026-07-20 — Anatomy Audit + Heartbeat Install
 
 ### Shipped (committed + pushed, final commit d12fe17)
