@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  com.alta.intelligence_run  compute the nightly Oracle claim statistic on the host.
+
+  WHY: the oracle-market-intelligence scheduled task runs in a sandbox that mounts
+  only the Obsidian vault. It cannot reach data/cache/, so it resolved zero of its
+  ten claims for weeks. This job does the computing where the data lives and stages
+  the result into Trading/System/Mirror/intelligence/ for the task to narrate.
+
+  Fires 20:30 ET Sun to Thu, thirty minutes before the 21:00 task, so a fresh
+  result is always waiting. If this job fails the task reports NOT RUN rather than
+  inventing a verdict  that is the designed behaviour, not a gap.
+
+  Claim selection: rotates by day of week so the queue advances without a human.
+  Only claims with an implemented harness are attempted; the script refuses to
+  emit a result for a claim it did not measure.
+
+  INSTALL (operator hand):
+    cp scripts/com.alta.intelligence_run.plist ~/Library/LaunchAgents/
+    launchctl load ~/Library/LaunchAgents/com.alta.intelligence_run.plist
+    launchctl start com.alta.intelligence_run
+  VERIFY:
+    tail -20 ~/quant/logs/intelligence_run.log
+    ls ~/Obsidian/Obsidian/Trading/System/Mirror/intelligence/
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.alta.intelligence_run</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>-c</string>
+    <string>cd /Users/taboost/quant &amp;&amp; CLAIM=$(/bin/date +%u) &amp;&amp; case "$CLAIM" in 7) C=1;; 1) C=3;; 2) C=7;; 3) C=10;; *) C=1;; esac &amp;&amp; /Users/taboost/quant/.venv/bin/python3 scripts/intelligence_run.py --claim "$C"</string>
+  </array>
+
+  <key>WorkingDirectory</key>
+  <string>/Users/taboost/quant</string>
+
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>ALTA_VAULT</key>
+    <string>/Users/taboost/Obsidian/Obsidian</string>
+    <key>PYTHONPATH</key>
+    <string>/Users/taboost/quant</string>
+    <key>PATH</key>
+    <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+    <key>HOME</key>
+    <string>/Users/taboost</string>
+  </dict>
+
+  <key>StandardOutPath</key>
+  <string>/Users/taboost/quant/logs/intelligence_run.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/taboost/quant/logs/intelligence_run.log</string>
+
+  <key>RunAtLoad</key>
+  <false/>
+
+  <key>Nice</key>
+  <integer>5</integer>
+
+  <key>StartCalendarInterval</key>
+  <array>
+    <dict><key>Hour</key><integer>20</integer><key>Minute</key><integer>30</integer><key>Weekday</key><integer>0</integer></dict>
+    <dict><key>Hour</key><integer>20</integer><key>Minute</key><integer>30</integer><key>Weekday</key><integer>1</integer></dict>
+    <dict><key>Hour</key><integer>20</integer><key>Minute</key><integer>30</integer><key>Weekday</key><integer>2</integer></dict>
+    <dict><key>Hour</key><integer>20</integer><key>Minute</key><integer>30</integer><key>Weekday</key><integer>3</integer></dict>
+    <dict><key>Hour</key><integer>20</integer><key>Minute</key><integer>30</integer><key>Weekday</key><integer>4</integer></dict>
+  </array>
+</dict>
+</plist>
