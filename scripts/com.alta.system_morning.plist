@@ -15,7 +15,7 @@
   TRACKED-NOT-LOADED. Operator installs:
     cp scripts/com.alta.system_morning.plist ~/Library/LaunchAgents/
     launchctl load ~/Library/LaunchAgents/com.alta.system_morning.plist
-    python3 scripts/plist_watchdog.py --rebaseline "loaded system_morning"
+    python3 scripts/plist_watchdog.py with the rebaseline flag, "loaded system_morning"
 -->
 <plist version="1.0">
 <dict>

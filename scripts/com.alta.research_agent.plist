@@ -11,7 +11,7 @@
   INSTALL (operator hand):
     cp scripts/com.alta.research_agent.plist ~/Library/LaunchAgents/
     launchctl load ~/Library/LaunchAgents/com.alta.research_agent.plist
-    python3 scripts/plist_watchdog.py --rebaseline "loaded research_agent"
+    python3 scripts/plist_watchdog.py with the rebaseline flag, "loaded research_agent"
 -->
 <plist version="1.0">
 <dict>
@@ -20,9 +20,9 @@
 
   <key>ProgramArguments</key>
   <array>
-    <string>/bin/sh</string>
-    <string>-c</string>
-    <string>set -a; . /Users/taboost/quant/.env; set +a; /Users/taboost/.local/bin/claude --print "Read ~/quant/AGENT_DIRECTIVE.md and execute the 21:00 research routine" --allowedTools "Bash,Read,Write,Edit,Glob,Grep" 2>&amp;1</string>
+    <string>/bin/bash</string>
+    <string>/Users/taboost/quant/scripts/run_agent.sh</string>
+    <string>research</string>
   </array>
 
   <key>WorkingDirectory</key>

@@ -10,7 +10,7 @@
   Promotion sequence (operator's hand):
     cp scripts/com.alta.execution_harness.plist ~/Library/LaunchAgents/
     launchctl load ~/Library/LaunchAgents/com.alta.execution_harness.plist
-    python3 scripts/plist_watchdog.py --rebaseline "loaded execution_harness"
+    python3 scripts/plist_watchdog.py with the rebaseline flag, "loaded execution_harness"
 
   The rebaseline is easy to forget and skipping it leaves a standing RED that
   looks like an intrusion.
