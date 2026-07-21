@@ -674,3 +674,22 @@ generator-only.
 
 **depends_on:** []
 **blocks:** []
+
+## TICK-055
+**title:** Exact trade-weighted funnel EV + portfolio Sharpe under the TICK-024 differential-tracking cost model
+**status:** open
+**pre_approved:** false
+
+**description:** The 2026-07-21 goal-1 verdict (plans/goal-1-verdict.md) established the DIRECTION
+conclusively read-only: corrected costs lower carry Sharpe ~0.04 (0.6886→~0.65, all 4 pairs), so the
+prop funnel (P=0.0 on old costs) stays NO. Two refinements remain, neither able to change the verdict:
+(1) exact trade-weighted portfolio Sharpe via prove.py's weighted_portfolio_sharpe — the equity-curve
+helper's format expectation mismatched the trades file this pass; (2) the funnel re-sim on a
+corrected-cost pool (regenerate data/proof/backtest_trades_v015_2015_2024.csv with the corrected swap
+deltas, re-run research/prop_funnel/run_all.py). Also: upgrade from the static current-rate bound to
+the differential-tracking historical model (financing_side(t)=oanda_now+sign*(diff(t)-diff_now) via
+data_fetcher.get_pair_differentials). All read-only; none touches the frozen SWAP_RATES_ANNUAL table
+(that is TICK-024, gated on the 07-28 unlock + sign-off).
+
+**depends_on:** []
+**blocks:** []
