@@ -1699,3 +1699,16 @@ false-positives from probe method caught + corrected). Full live-data run deferr
 Phases 0-4 done. Remaining: Phase 5 (vault Sharpe purge + relink 56 orphans), TICK-050/051/052
 (post-07-28 unlock), TICK-053/054. OUTSTANDING (operator hand): obsidian_sync plist not yet
 installed — 6 scheduled tasks correctly report BLOCKED until `launchctl load`.
+
+### 2026-07-21 · Petrules Gate Phase 0 — data audit COMPLETE, verdict NARROW
+Executed Phase 0 of `research/PETRULES_GATE_SPEC.md` (data availability audit, no model code).
+Deliverable: `research/PETRULES_GATE_data_audit.md` + probe evidence in `research/petrules_audit/`
+(commit c42a0de, pushed). Verdict: NARROW. Verified by live query: AV EARNINGS = point-in-time
+pre-print consensus back to 1996 (surprise label OK) but NO revision path anywhere free →
+consensus_revision_momentum DROPPED (lookahead risk); congressional_trade_direction DROPPED
+(mirrors 403-dead, official = PDF parsing, ~500 PTR filings/yr); Form 4 lead vs earnings
+MEASURED n=791 clusters, median 56d, 100% ≥1d pre-event (KEEP); 13F staleness 44-45d (KEEP,
+demoted); 13D ~5.5k/yr (KEEP; 2025 files as "SCHEDULE 13D" new form name); ThetaData Value tier
+options history cutoff pinned at 2020-01 → training window 2020+ unless STANDARD upgrade.
+Biggest risk: revision-path features would have been a silent lookahead leak into a conviction
+engine. Next: file PETRULES_GATE_prereq.json with the narrowed feature set, then Phase 1 replay engine.
