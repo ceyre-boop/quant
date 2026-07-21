@@ -642,3 +642,35 @@ Decide: point `dashboard/index.html` at `fill_log.jsonl` + a real balance source
 
 **depends_on:** []
 **blocks:** []
+
+
+## TICK-053
+**title:** Execute 4 DORMANT retirements — move unimported one-offs to attic/
+**status:** open
+**pre_approved:** false
+
+**description:** Restoration campaign Phase 2. Four files decided RETIRE (claim_check confirms no
+live importer, no __main__, not referenced by any plist): `check_account.py`,
+`fix_hardcoded_equity.py` (one-off migration, job done), `research/debug_indexing.py` (491B debug),
+`clawd_trading/swing_prediction/TODO_COMPLETE_IMPLEMENTATION.py` (a literal TODO scratchpad by its
+own header). Execute via `git mv` to `attic/` with a one-line reason each, then run the full test
+suite to confirm nothing dynamically referenced them (the AST graph's one blind spot). Kept
+separate from the diagnosis pass per the >3-files discipline.
+
+**depends_on:** []
+**blocks:** []
+
+## TICK-054
+**title:** Inventory test-root detection is top-level-tests/ only — mislabels nested tests DORMANT
+**status:** open
+**pre_approved:** false
+
+**description:** `audit/system_inventory.py` derives test-reachability roots from
+`f.split("/")[0] == "tests"`, so real pytest tests under `research/*/tests/` (19 collected across
+fvg_corridor, gapper_continuation, political_alpha, political_alpha_v2, yield_frontier) fall through
+to DORMANT instead of TEST-ONLY. Fix: treat any file matching `**/tests/**` or `test_*.py`/`conftest.py`
+as a test root. Regenerate SYSTEM_INVENTORY.md; the true DORMANT count drops from 28 by ~7. Low risk,
+generator-only.
+
+**depends_on:** []
+**blocks:** []

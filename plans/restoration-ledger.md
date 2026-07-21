@@ -63,3 +63,39 @@ Present on committed HEAD before any campaign work (working tree clean):
 Resume at Phase 2 (TICK-048's 28 DORMANT) per the campaign, OR act on TICK-050/051/052
 if the 07-28 unlock has landed. Re-verify every open row above against the filesystem
 first — the stale-premise pattern (C-1, C-2, L1, L3) recurs.
+
+---
+
+## Phase 2 — the 28 DORMANT (all resolved; gate 28→0)
+
+Decisions with evidence. RETIRE *executions* are ticketed (TICK-053) per the >3-files
+discipline — this pass makes the decision, a focused pass moves the files with a full
+test run. Gate is "every file has a decision + evidence": met.
+
+**Inventory refinement found:** 7 of the 28 are real pytest tests under `research/*/tests/`
+(19 collected) mislabelled DORMANT because `system_inventory.py`'s test-root detection is
+top-level-`tests/` only. TICK-054 to fix the heuristic. These are KEEP (working tests).
+
+| id | file | claim_check | decision | reason |
+|---|---|---|---|---|
+| D-1..7 | `research/{fvg_corridor,gapper_continuation,political_alpha,political_alpha_v2,yield_frontier}/**/test_*.py` + `conftest.py` | collectable (19 tests) | KEEP | real tests; inventory test-root bug (TICK-054), not dormant |
+| D-8..15 | 8× `__init__.py` (root, models, clawd swing, fvg_corridor ×2, movers_study, yield_frontier tests, sovereign/strategies) | — | KEEP | package markers, structural, not features |
+| D-16 | `sovereign/strategies/strategy_selector.py` | REFUTED (imported by `sovereign/strategies/__init__.py`) | KEEP-DORMANT | dormant strategy-selection scaffold; revisit when equity layer activates (branch-topology note) |
+| D-17 | `check_account.py` | no importer | RETIRE→attic (TICK-053) | 1.4KB root utility, no importer, no `__main__` |
+| D-18 | `fix_hardcoded_equity.py` | no importer | RETIRE→attic (TICK-053) | one-off migration fix, job done (name states it) |
+| D-19 | `research/debug_indexing.py` | no importer | RETIRE→attic (TICK-053) | 491B debug one-off |
+| D-20 | `clawd_trading/swing_prediction/TODO_COMPLETE_IMPLEMENTATION.py` | no importer | RETIRE→attic (TICK-053) | literal TODO scratchpad by its own header; 39KB of unimplemented code, not a feature |
+| D-21..26 | `clawd_trading/{infrastructure/guardrails,infrastructure/risk_manager,swing_prediction/fomc_calendar,positioning_feed,prediction_scrutiny,real_base_rates}.py` | no importer | KEEP-DORMANT | `clawd_trading` is a separate incomplete swing-prediction system; revisit 2026-09 as a unit, not piecemeal |
+| D-27 | `firebase/rest_client.py` | no importer | KEEP-DORMANT | Firebase is a known dormant ghost (see memory `project_dashboard_data_architecture`); revisit if Firebase is ever activated |
+| D-28 | `data/research/sovereign_core_gauntlet/_diag_gates.py` | no importer | KEEP-DORMANT | research diagnostic in a data/ dir; harmless, revisit with the gauntlet |
+
+**Gate P2:** 28/28 resolved — 15 KEEP, 4 RETIRE (ticketed TICK-053), 9 KEEP-DORMANT with reasons. PASSED.
+
+---
+
+## Next session (updated)
+
+Phase 3 (the 46 RETIRED — triage for refurbishment under the resurrection rule; propose ≤5,
+implement none). Also pending: TICK-053 (execute the 4 retirements), TICK-054 (inventory
+test-root heuristic), and TICK-050/051/052 post-07-28-unlock. Re-verify every open row against
+the filesystem first.

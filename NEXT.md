@@ -1672,3 +1672,12 @@ This session added zero failures — after-counts identical to before. Isolation
 
 Pushed. Next session: Phase 2 (28 DORMANT) or act on TICK-050/051/052 post-unlock. Re-verify
 every open ledger row against the filesystem first — the stale-premise pattern recurs.
+
+### 2026-07-21 · RESTORATION continued — Phase 2 (28 DORMANT) gate met
+Continued the campaign as a standing command. Phase 2: all 28 DORMANT resolved with evidence
+(claim_check per file) — 15 KEEP (7 mislabelled tests + 8 package __init__), 9 KEEP-DORMANT
+(clawd_trading incomplete cluster, firebase ghost, strategy_selector scaffold, gauntlet diag),
+4 RETIRE (TICK-053: check_account, fix_hardcoded_equity, debug_indexing, TODO_COMPLETE_IMPL).
+Inventory bug found: test-root detection is top-level-only, mislabelling nested tests DORMANT
+(TICK-054). Decisions in plans/restoration-ledger.md; RETIRE moves ticketed not executed (>3-files
+discipline). No code touched; isolation guard still PASS. Next: Phase 3 (46 RETIRED triage).
