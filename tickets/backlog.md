@@ -494,3 +494,37 @@ Schema per ticket:
 **blocks:** []
 **status:** backlog — **requires its own unlock before implementation**
 **pre_approved:** false
+
+
+## TICK-046
+**title:** carry_engine._compute_atr returns a hardcoded 0.001 when prices are None
+**status:** open
+**pre_approved:** false
+
+**description:** `sovereign/forex/carry_engine.py::_compute_atr` substitutes a hardcoded
+`0.001` when price history is unavailable, and that value reaches sizing. It is the
+forex twin of the `execute_daily.py` placeholder fixed in TICK-045 (`close * 0.02`,
+measured wrong by 2.34x on META against real bars).
+
+**Why it is not fixed in TICK-045:** `carry_engine.py` is importable by the live and
+backtest execution path and is therefore under the shadow/execution-path freeze
+(CLAUDE.md standing constraints; NEXT.md:60-65 already refused a related change to
+`_fetch_prices` for the same reason). Changing what sizing sees requires an explicit
+unlock recorded in NEXT.md. `execute_daily.py` needed no unlock because nothing
+imports it — it is a leaf entry point.
+
+**Impact:** whenever it fires, fabricated volatility reaches position sizing.
+`forex_data_health.py` classifies this as FAKE_DATA. Per NEXT.md:65 it had not fired
+as of 2026-07-19, so this is a latent defect, not an active one — which is precisely
+why it should be fixed deliberately rather than during an incident.
+
+**Required fix:** return None and refuse to size, matching the TICK-045 contract:
+measured or absent, never substituted. Reuse `ForexSignalEngine._compute_atr_pct`
+rather than adding a third ATR implementation — two divergent ones is how this
+defect survived unnoticed.
+
+**Constraint:** requires a logged unlock in NEXT.md before implementation, plus a
+`data/agent/param_change_log.jsonl` entry, since it changes sizing inputs.
+
+**depends_on:** []
+**blocks:** []

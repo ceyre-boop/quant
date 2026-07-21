@@ -106,6 +106,62 @@ def _check_ledger():
     except Exception:
         return False
 
+#: Bars of history fetched for the ATR window. 14-period ATR needs 15 bars; 40
+#: leaves room for holidays and the odd missing session without silently
+#: shortening the window.
+_ATR_LOOKBACK_BARS = 40
+_ATR_PERIOD = 14
+
+
+def _compute_atr(feed, symbol: str, close_price: float) -> float | None:
+    """Real ATR for one symbol, or None — never a placeholder.
+
+    Reuses `ForexSignalEngine._compute_atr_pct` (a staticmethod, so no engine
+    instance and no forex coupling) rather than adding a second ATR implementation
+    to the repo. Two divergent ATRs is how `carry_engine._compute_atr` came to
+    return a hardcoded 0.001 without anyone noticing.
+
+    Returns absolute ATR. `_compute_atr_pct` returns a *fraction* of price, so the
+    result is multiplied by close — getting that wrong would silently under-size
+    every position by two orders of magnitude.
+    """
+    try:
+        from sovereign.forex.signal_engine import ForexSignalEngine
+
+        end = datetime.utcnow()
+        start = end - timedelta(days=_ATR_LOOKBACK_BARS * 2)  # calendar != trading days
+        df = feed.get_bars(symbol, start=start, end=end, timeframe='1d')
+        if df is None or len(df) < _ATR_PERIOD + 1:
+            logger.warning(
+                f"{symbol}: {0 if df is None else len(df)} daily bars, need "
+                f"{_ATR_PERIOD + 1} for a {_ATR_PERIOD}-period ATR")
+            return None
+
+        # _compute_atr_pct tests for capitalised OHLC columns; get_bars returns
+        # lowercase. Without the rename it silently falls back to the
+        # close-to-close proxy instead of true range.
+        ohlc = df.rename(columns={'open': 'Open', 'high': 'High',
+                                  'low': 'Low', 'close': 'Close'})
+        atr_pct = ForexSignalEngine._compute_atr_pct(
+            ohlc['Close'], ohlc, period=_ATR_PERIOD)
+        if atr_pct is None or len(atr_pct) == 0:
+            logger.warning(f"{symbol}: ATR computation returned nothing")
+            return None
+
+        latest_pct = float(atr_pct.iloc[-1])
+        if not (latest_pct > 0):          # also catches NaN
+            logger.warning(f"{symbol}: ATR%={latest_pct} is not positive")
+            return None
+
+        atr = latest_pct * close_price
+        logger.info(f"{symbol}: ATR({_ATR_PERIOD}) = {atr:.4f} "
+                    f"({latest_pct:.2%} of price, {len(df)} bars)")
+        return atr
+    except Exception as e:  # noqa: BLE001 — any failure means no trade, not a guess
+        logger.warning(f"{symbol}: ATR unavailable ({type(e).__name__}: {e})")
+        return None
+
+
 def execute_killzone(mode='paper'):
     """
     Phase 2: Execute during NY Open kill zone.
@@ -207,7 +263,16 @@ def execute_killzone(mode='paper'):
             )
             
             # Run orchestrator
-            atr = latest['close'] * 0.02  # 2% default ATR if not computed
+            atr = _compute_atr(feed, symbol, latest['close'])
+            if atr is None:
+                # No silent mocking. A substituted ATR reaching sizing is exactly
+                # the FAKE_DATA class forex_data_health.py exists to catch — and
+                # until 2026-07-20 this line was `latest['close'] * 0.02`, sizing
+                # every trade off a constant regardless of realised volatility.
+                logger.error(
+                    f"[SKIP] {symbol}: ATR unavailable — refusing to size off a "
+                    f"placeholder. No trade attempted.")
+                continue
             equity = 100000.0  # Paper equity
             
             result = orch.run_session(
