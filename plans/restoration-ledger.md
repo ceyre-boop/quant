@@ -95,9 +95,9 @@ top-level-`tests/` only. TICK-054 to fix the heuristic. These are KEEP (working 
 
 ## Next session (updated)
 
-**Phases 0–3 complete** (verify, loops, 28 DORMANT, 46 RETIRED triage). Remaining:
-- **Phase 4** — spot-check 20 of the 392 ON-DEMAND tools by executing them against current
-  data (network/credentials — stop honestly where infra is missing, don't mock).
+**Phases 0–4 complete** (verify, loops, 28 DORMANT, 46 RETIRED triage, 20 ON-DEMAND load-probe). Remaining:
+- **Phase 4 deeper run** (optional) — the 20 probed tools load clean; a full live-data
+  execution pass is deferred to a session with Alpaca/network infra available.
 - **Phase 5** — consistency sweep: purge retired Sharpe 1.2864 from vault notes (identified,
   not yet purged); reconcile fills logs; relink 56 orphan vault notes.
 - **Tickets:** TICK-050/051/052 (post-07-28 unlock), TICK-053 (execute 4 retirements),

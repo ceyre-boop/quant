@@ -1690,3 +1690,12 @@ to 5: lab/feature_registry.py (a GRAVEYARD registry — the antidote to HYP-044-
 partially covered by hypothesis_ledger.json/audit_live_features, so it's a consolidation proposal)
 + lab/baseline_registry.py (dependent). Nothing resurrected. Phases 0-3 done this session;
 Phase 4 (spot-check 20 on-demand tools) + Phase 5 (vault Sharpe purge, relink 56 orphans) next.
+
+### 2026-07-21 · RESTORATION Phase 4 + CLAUDE.md baseline fix
+Fixed CLAUDE.md:120 "must stay 21/21" → real baseline (4 failed/23 passed, `ict and pipeline`),
+the load-first re-injection source (same mechanism as HYP-044). Phase 4: 20 consequential
+ON-DEMAND validation tools probed at import/load layer — 20/20 clean, no bitrot (3 initial
+false-positives from probe method caught + corrected). Full live-data run deferred (infra).
+Phases 0-4 done. Remaining: Phase 5 (vault Sharpe purge + relink 56 orphans), TICK-050/051/052
+(post-07-28 unlock), TICK-053/054. OUTSTANDING (operator hand): obsidian_sync plist not yet
+installed — 6 scheduled tasks correctly report BLOCKED until `launchctl load`.
