@@ -1681,3 +1681,12 @@ Continued the campaign as a standing command. Phase 2: all 28 DORMANT resolved w
 Inventory bug found: test-root detection is top-level-only, mislabelling nested tests DORMANT
 (TICK-054). Decisions in plans/restoration-ledger.md; RETIRE moves ticketed not executed (>3-files
 discipline). No code touched; isolation guard still PASS. Next: Phase 3 (46 RETIRED triage).
+
+### 2026-07-21 · RESTORATION Phase 3 (46 RETIRED triaged) — gate met
+All 46 RETIRED are engineering-retired (the killed edges live in the ledger, not these files).
+44 stay retired: superseded clawd/Firebase/Kimi/XGBoost generation (attic ×31), scratch one-offs
+(×9), old scheduler (archive), Firebase pusher. Shortlist = 1 genuine + 1 dependent, NOT padded
+to 5: lab/feature_registry.py (a GRAVEYARD registry — the antidote to HYP-044-reproposed-3x — but
+partially covered by hypothesis_ledger.json/audit_live_features, so it's a consolidation proposal)
++ lab/baseline_registry.py (dependent). Nothing resurrected. Phases 0-3 done this session;
+Phase 4 (spot-check 20 on-demand tools) + Phase 5 (vault Sharpe purge, relink 56 orphans) next.

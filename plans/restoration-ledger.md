@@ -95,7 +95,42 @@ top-level-`tests/` only. TICK-054 to fix the heuristic. These are KEEP (working 
 
 ## Next session (updated)
 
-Phase 3 (the 46 RETIRED — triage for refurbishment under the resurrection rule; propose ≤5,
-implement none). Also pending: TICK-053 (execute the 4 retirements), TICK-054 (inventory
-test-root heuristic), and TICK-050/051/052 post-07-28-unlock. Re-verify every open row against
-the filesystem first.
+**Phases 0–3 complete** (verify, loops, 28 DORMANT, 46 RETIRED triage). Remaining:
+- **Phase 4** — spot-check 20 of the 392 ON-DEMAND tools by executing them against current
+  data (network/credentials — stop honestly where infra is missing, don't mock).
+- **Phase 5** — consistency sweep: purge retired Sharpe 1.2864 from vault notes (identified,
+  not yet purged); reconcile fills logs; relink 56 orphan vault notes.
+- **Tickets:** TICK-050/051/052 (post-07-28 unlock), TICK-053 (execute 4 retirements),
+  TICK-054 (inventory test-root heuristic).
+Re-verify every open row against the filesystem first — the stale-premise pattern recurs.
+
+---
+
+## Phase 3 — the 46 RETIRED, triaged (propose ≤5, implement none)
+
+**All 46 are ENGINEERING-retired, not evidence-retired.** The killed *edges* (HYP-044 VIX,
+v007, overnight-QQQ, AUDNZD) live in the hypothesis ledger, not as these files — so the
+resurrection rule's "stays dead" evidence list does not apply to any file here. The test that
+governs is: *does the current system already cover it?*
+
+**Buckets (44 stay retired):**
+- **attic/ (31)** — the superseded clawd_trading / Firebase / Kimi / XGBoost-brain generation
+  (run_clawd, kimi_brain, xgboost_brain, dashboard_api, realtime_publisher, ~12 test/runner
+  scripts). Replaced wholesale by the sovereign architecture. Reviving = restoring a dead
+  architecture. **STAYS RETIRED** (already covered).
+- **scratch/ (9)** — one-off diagnostics/audits (diagnose_alpaca, audit_trades, desk_audit…).
+  Throwaway by convention. **STAYS RETIRED.**
+- **archive/agent_scheduler.py** — replaced by launchd plists. **STAYS RETIRED.**
+- **scripts/push_to_firebase.py** — Firebase is a dormant ghost. **STAYS RETIRED.**
+
+**Refurbishment shortlist — 1 genuine (caveated) + 1 dependent. Not padded to 5.**
+
+| rank | file | case | serves | caveat |
+|---|---|---|---|---|
+| 1 | `lab/feature_registry.py` | Append-only GRAVEYARD registry whose explicit rule is "never re-deploy without new evidence" and a 90-day re-validation gate. This is the direct antidote to the demonstrated failure of HYP-044's VIX gate being re-proposed **3 times** off a formatting example. | Scientific-integrity tenet | **Partially covered:** `data/agent/hypothesis_ledger.json` (86 entries) + `sovereign/research/signal_decay.py` + `scripts/audit_live_features.py` already do much of this informally. So the real proposal is **consolidate the existing ledger into this principled schema**, not build new. Operator judgment. |
+| 2 | `lab/baseline_registry.py` | Baseline tracking for walk-forward marginal-contribution gating — pairs with #1. | Scientific-integrity tenet | Only worth it if #1 is pursued; standalone value low. |
+
+**Nothing resurrected.** Both candidates are proposals for a separate approved pass.
+
+**Gate P3:** all 46 classified (44 stay-retired with bucket reason, 2 shortlisted with written
+cases); nothing resurrected. PASSED.
