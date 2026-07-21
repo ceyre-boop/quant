@@ -59,6 +59,10 @@ class Status(str, Enum):
     SILENT_NULL = "SILENT_NULL"
     UNAVAILABLE = "UNAVAILABLE"
     ERROR = "ERROR"
+    #: Deliberately no longer asked for. Excluded from the health denominator —
+    #: a source we have stopped requesting is not a source that is failing, and
+    #: counting it as one makes the health number permanently and uselessly red.
+    RETIRED = "RETIRED"
 
 
 #: Per-source staleness budget in hours. Beyond this a value is kept but flagged
@@ -204,27 +208,34 @@ def load_gdelt() -> Field_:
         return _error("gdelt", str(p), e)
 
 
-def load_reddit() -> Field_:
-    """Reddit sentiment cache — the canonical SILENT_NULL.
+#: Why reddit was retired, kept next to the code so the decision is not re-litigated
+#: from memory. Reversing it means registering a Reddit OAuth app, not editing this.
+REDDIT_RETIREMENT = (
+    "RETIRED 2026-07-20. Reddit blocks unauthenticated JSON: old.reddit.com 403 and "
+    "www.reddit.com 403, tested live with a browser User-Agent. No REDDIT_CLIENT_ID "
+    "exists anywhere in the repo, so no request this system can make will succeed. "
+    "The endpoint fix in 9bc2849 (old.reddit + raw_json=1) was correct code against a "
+    "door that is shut. Reviving this source requires a registered OAuth app and "
+    "oauth.reddit.com — not a code change here."
+)
 
-    Exits clean, stamps a current `last_updated`, and returns
-    `posts_scanned: 0, equity: {}`. Freshness looks perfect; content is empty.
+
+def load_reddit() -> Field_:
+    """Reddit sentiment — RETIRED, not failing.
+
+    It was the canonical SILENT_NULL: the job exited clean, stamped a current
+    `last_updated`, and returned `posts_scanned: 0`. Freshness looked perfect while
+    content was empty — which is worse than an outage, because staleness checks
+    cannot see it.
+
+    It is now reported RETIRED and excluded from the health denominator. That is a
+    deliberate choice to make the health number mean something: 2/6 sources live is
+    a fact worth acting on, whereas a permanent 2/7 containing one member that can
+    never turn green is a number people learn to ignore.
     """
     p = ROOT / "data" / "cache" / "reddit_sentiment.json"
-    if not p.exists():
-        return _missing("reddit", str(p), "cache absent")
-    try:
-        d = json.loads(p.read_text())
-        scanned = int(d.get("posts_scanned", 0) or 0)
-        if scanned == 0:
-            return Field_("reddit", None, Status.SILENT_NULL, str(p), _age(p),
-                          "job succeeded but posts_scanned=0 (credentials likely absent)")
-        return Field_("reddit", {"posts_scanned": scanned,
-                                 "equity": d.get("equity"), "forex": d.get("forex")},
-                      _status_for("reddit", _age(p)), str(p), _age(p),
-                      f"{scanned} posts")
-    except Exception as e:                                   # noqa: BLE001
-        return _error("reddit", str(p), e)
+    return Field_("reddit", None, Status.RETIRED, str(p),
+                  _age(p) if p.exists() else None, REDDIT_RETIREMENT)
 
 
 def load_briefing() -> Field_:
@@ -293,16 +304,23 @@ def build_morning_context(day: date | None = None) -> dict:
     for f in fields:
         by_status.setdefault(f.status.value, []).append(f.name)
 
-    healthy = sum(1 for f in fields if f.status is Status.FRESH)
+    # Retired sources are still reported field-by-field, but they leave the
+    # denominator. Health should measure sources we are asking for and not getting;
+    # a source we stopped asking for is neither.
+    active = [f for f in fields if f.status is not Status.RETIRED]
+    retired = [f.name for f in fields if f.status is Status.RETIRED]
+    healthy = sum(1 for f in active if f.status is Status.FRESH)
     return {
         "date": str(day),
         "generated_at": canonical_timestamp(),
         "fields": {f.name: f.to_json() for f in fields},
         "health": {
-            "n_sources": len(fields),
+            "n_sources": len(active),
             "n_fresh": healthy,
-            "fraction_fresh": round(healthy / len(fields), 3),
+            "fraction_fresh": round(healthy / len(active), 3) if active else 0.0,
             "by_status": by_status,
+            "n_retired": len(retired),
+            "retired": retired,
         },
         "note": ("Every field carries an explicit status. SILENT_NULL means the "
                  "source succeeded but returned nothing — treat it as absent data, "

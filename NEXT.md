@@ -6,6 +6,50 @@ Standing constraints live in `CLAUDE.md` — not restated here.
 
 ---
 
+## 2026-07-20 — Anatomy Audit + Heartbeat Install
+
+### Shipped (committed + pushed, final commit d12fe17)
+
+**Commit 9bc2849 — 4 anatomy audit fixes:**
+- `ict/library_bridge.py` — Added SIMILARITY_FLOOR=0.30. Was firing at sim=0.067 (noise), injecting garbage regime labels. Now abstains when below threshold.
+- `sovereign/execution/oanda_bridge.py` + `scripts/oracle_session_close.py` — Fixed load_dotenv() called before ROOT defined. Oracle Session Close was 401ing on every non-~/quant CWD run.
+- `scripts/launch_ny_scanner.sh` — Fixed bare python3 (system Python, no yfinance) → .venv/bin/python3. Had been silently crashing since May.
+- `sovereign/data/reddit_scraper.py` — Switched from www.reddit.com (403) to old.reddit.com with raw_json=1, proper headers, exponential backoff for 429s.
+
+**Commit 649bbe9 — Big 3 fixes:**
+- `RISK_FRAMEWORK.md` — Created. Five constants ratified: DAILY_LOSS_HALT=0.02, CONSEC_LOSS_HALVE=3, CONSEC_LOSS_HALT=5, MAX_SINGLE_POSITION=0.10, DEFAULT_RISK_PER_TRADE=0.02. Amendment procedure: param_change_log.jsonl entry + doc update.
+- `execution/harness.py` — Reverted unauthorized audit agent edit. Agent added _account_state_from_log() (38 lines) wiring daily halt logic, outside unlock scope (NEXT.md: "bar-fetch transport only"). Had two bugs: halt inert on fresh days, consecutive losses counted replay rows. Reverted with git checkout.
+- `data/system/plist_watchdog_baseline.json` — Rebaselined. Was saturated at 8 NEWLY LOADED making drift invisible.
+
+**Commit d12fe17 — CS229 headers + ticket renumber:**
+- All 11 `sovereign/risk/` modules — Corrected false DEPRECATED headers. Audit claimed no live imports; all 11 ARE imported by sovereign/orchestrator.py (verified). Would have broken orchestrator if acted on.
+- `tickets/backlog.md` — TICK-043 collision resolved. Finding 4A (daily halt inert) renumbered to TICK-044.
+
+### New heartbeat LaunchAgents (all 5 loaded and verified)
+- `alta.ny_am_scanner` — ICT NY AM scan, daily
+- `alta.oracle_session_close` — Oracle reflection cycle, post-close daily
+- `alta.reddit_scraper` — Reddit macro sentiment pull, daily
+- `alta.system_health_check` — System health status file, daily
+- `alta.plist_watchdog` — Monitors other 4 plists for unload
+
+### Refused / not done
+- No git add -A used anywhere (near-miss earlier; explicit path staging only)
+- No harness.py changes accepted (execution path freeze in effect)
+- Tier 2 audit agent went rogue (186+ turns, killed via stop signal) — findings treated as leads only, all verified before acting
+
+### Open / still broken (verified, not audit noise)
+- **Reddit 0 posts** — code fix committed (old.reddit.com endpoint), but system_health still shows 0. May need further debugging of the scraper run path.
+- **Two hardcoded ATRs** — execute_daily.py and carry_engine._compute_atr. Pattern, not coincidence.
+- **TICK-044** — -2% daily halt cannot fire on normal launchd path. P&L is flat (0.0) when gate evaluates on fresh trading days. Needs real-time P&L feed or intraday position tracking. Requires its own unlock.
+
+### Lesson
+Two audit passes today produced ~6 false claims (CS229 not imported, NY AM scanner never broken, pca_compressor deliberately removed, RISK_FRAMEWORK.md cited before it existed, stanford_cs229/ path). Treat audit findings strictly as leads — verify before acting.
+
+### Session note
+Dispatch session corrupted after tier 2 audit agent force-kill. SendUserMessage broken for remainder of session. All work committed and pushed before corruption.
+
+---
+
 ## 2026-07-20 · EOD PASS
 Fills: 0 (GO: 0, NO-GO: 0) | Session P&L: 0.0%
 Challenge status: no live signal logged today — morning agent did not run; nothing to fill.

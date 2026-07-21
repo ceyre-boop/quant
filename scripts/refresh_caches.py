@@ -32,12 +32,20 @@ def _age_min(p: Path) -> str:
 
 
 def _refresh_reddit() -> None:
-    try:
-        from sovereign.data import reddit_scraper
-        reddit_scraper.run(verbose=False)
-        print(f"  reddit: refreshed -> {_age_min(REDDIT_CACHE)}")
-    except Exception as e:  # noqa: BLE001 — fail-soft
-        print(f"  reddit: FAILED ({type(e).__name__}: {e})")
+    """RETIRED 2026-07-20 — see execution/context.py::REDDIT_RETIREMENT.
+
+    Reddit 403s unauthenticated JSON on both old.reddit.com and www.reddit.com
+    (tested live with a browser User-Agent) and no OAuth app is registered. Calling
+    the scraper burns three retries per subreddit to fail, then rewrites the cache
+    with posts_scanned=0 — refreshing the mtime so every staleness check reads
+    green over an empty payload. Skipping is the honest behaviour: the cache stays
+    visibly old instead of freshly empty.
+
+    `sovereign/data/reddit_scraper.py` is deliberately left on disk and correct. It
+    is the starting point if an OAuth app is ever registered.
+    """
+    print("  reddit: SKIPPED — source retired (403, no OAuth app); "
+          f"cache left at {_age_min(REDDIT_CACHE)}")
 
 
 def _refresh_macro() -> None:

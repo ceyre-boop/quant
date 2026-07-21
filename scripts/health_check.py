@@ -79,11 +79,17 @@ def _components_substance(d: Any) -> tuple[bool, str]:
 # ── Job registry ──────────────────────────────────────────────────────────────
 
 JOBS: dict[str, dict] = {
+    # RETIRED 2026-07-20 — see execution/context.py::REDDIT_RETIREMENT.
+    # Reddit 403s unauthenticated JSON on both hosts and no OAuth app is registered,
+    # so this job cannot succeed. Left registered but `retired`, which keeps it
+    # visible without letting it hold system health RED forever. A permanently red
+    # check for a source nobody is asking for trains people to ignore the alarm.
     "reddit": {
         "path":        ROOT / "data" / "cache" / "reddit_sentiment.json",
         "max_age_min": 24 * 60,
         "substance":   _reddit_substance,
-        "optional":    False,
+        "optional":    True,
+        "retired":     "403 on old.reddit.com and www.reddit.com; no OAuth app",
     },
     "forex_scan": {
         "path":        ROOT / "data" / "agent" / "forex_proximity.json",
@@ -110,6 +116,12 @@ def check_job(name: str, cfg: dict, now: datetime | None = None) -> dict:
     now = now or datetime.now(timezone.utc)
     path: Path = cfg["path"]
     rel = str(path.relative_to(ROOT))
+
+    # A retired job is not measured. It stays listed so the decision is visible,
+    # but it cannot colour overall health — see the note on the reddit entry.
+    if cfg.get("retired"):
+        return {"status": "RETIRED", "path": rel, "optional": True,
+                "detail": f"retired — {cfg['retired']}"}
 
     if not path.exists():
         return {"status": "MISSING", "path": rel, "detail": "output file does not exist",
@@ -140,8 +152,16 @@ def run(only: str | None = None) -> dict:
     jobs = {only: JOBS[only]} if only else JOBS
     results = {name: check_job(name, cfg, now) for name, cfg in jobs.items()}
 
-    def _bad(r): return r["status"] in ("EMPTY", "MISSING", "ERROR") and not r["optional"]
-    def _warn(r): return r["status"] == "STALE" or (r["status"] != "OK" and r["optional"])
+    # RETIRED is neither bad nor a warning — it is a decision, already recorded.
+    # Letting it register as YELLOW would keep the dashboard permanently off-green
+    # for a source we chose to stop asking for, which is how alarms get ignored.
+    def _bad(r):
+        return r["status"] in ("EMPTY", "MISSING", "ERROR") and not r["optional"]
+
+    def _warn(r):
+        if r["status"] == "RETIRED":
+            return False
+        return r["status"] == "STALE" or (r["status"] != "OK" and r["optional"])
 
     red = [n for n, r in results.items() if _bad(r)]
     yellow = [n for n, r in results.items() if not _bad(r) and _warn(r)]
