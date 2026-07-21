@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  com.alta.obsidian_sync — mirror live system state into the Obsidian vault.
+
+  WHY: the scheduled Claude tasks mount ONLY ~/Obsidian/Obsidian. They cannot see
+  ~/quant and cannot request access mid-run. This job runs on the host, where
+  access is not a problem, and pushes state into the vault so those tasks have
+  something real to read.
+
+  Deliberately uses .venv/bin/python3 by absolute path. launchd has no PATH, and
+  a bare `python3` here is exactly the class of bug that left launch_ny_scanner.sh
+  silently crashing since May.
+
+  Runs every 30 minutes. That is well inside the 6h staleness limit the tasks
+  enforce, so a couple of consecutive failures still leaves a usable mirror while
+  being visible in mirror_status.json.
+
+  Install:
+    cp ~/quant/scripts/com.alta.obsidian_sync.plist ~/Library/LaunchAgents/
+    launchctl unload ~/Library/LaunchAgents/com.alta.obsidian_sync.plist 2>/dev/null
+    launchctl load  ~/Library/LaunchAgents/com.alta.obsidian_sync.plist
+    launchctl start com.alta.obsidian_sync
+  Verify:
+    launchctl list | grep obsidian_sync
+    tail -20 ~/quant/logs/obsidian_sync.log
+    python3 -c "import json;print(json.load(open('$HOME/Obsidian/Obsidian/Trading/System/Mirror/mirror_status.json'))['generated_at'])"
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.alta.obsidian_sync</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/taboost/quant/.venv/bin/python3</string>
+        <string>/Users/taboost/quant/scripts/obsidian_sync.py</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/taboost/quant</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>ALTA_VAULT</key>
+        <string>/Users/taboost/Obsidian/Obsidian</string>
+        <key>PATH</key>
+        <string>/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+    </dict>
+
+    <key>StartInterval</key>
+    <integer>1800</integer>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>StandardOutPath</key>
+    <string>/Users/taboost/quant/logs/obsidian_sync.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/Users/taboost/quant/logs/obsidian_sync.error.log</string>
+</dict>
+</plist>
