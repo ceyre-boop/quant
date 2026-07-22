@@ -35,6 +35,11 @@ from typing import Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
+# Layer-8 causal-chain journal (ict/, stdlib-only — no sovereign import). Every
+# paper close back-fills the ENTERED record's outcome, closing the update_outcome()
+# loop (CLAUDE.md NON-NEGOTIABLE #2).
+from ict import causal_journal
+
 try:
     from sovereign.ledger.live_trade_log import LiveTradeLog as _LTL
     _ltl = _LTL()
@@ -358,6 +363,24 @@ class PaperTrader:
             csv.writer(f).writerow(row)
 
         self._state.setdefault('closed', []).append(asdict(t))
+
+        # ── Close the causal-chain loop (NON-NEGOTIABLE #2) ────────────────
+        # Back-fill this trade's outcome onto its ENTERED journal record. The
+        # setup_id is reconstructed deterministically from the same identity the
+        # pipeline used at evaluation time (symbol/direction/entry/date). Fails
+        # loud inside update_outcome if no open ENTERED record matches — a close
+        # that matches nothing means the loop is not closing. Never blocks the trade.
+        try:
+            setup_id = causal_journal.make_setup_id(t.pair, t.direction, t.entry, t.open_time)
+            causal_journal.update_outcome(
+                setup_id=setup_id,
+                outcome=t.outcome,
+                outcome_r=t.pnl_r,
+                exit_timestamp=t.close_time or None,
+            )
+        except Exception as exc:
+            logger.debug("causal_journal.update_outcome failed (trade closed OK): %s", exc)
+
         self._push_to_firebase()
 
     def _load_state(self) -> dict:

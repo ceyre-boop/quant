@@ -321,6 +321,10 @@ platform:
     edge_health:
       n_needed_default: 250       # live signals needed before an edge can read "healthy" (not 3 trades)
       divergence_R_threshold: 0.5 # |live - backtest| expectancy (R) past this → divergence flag / HALT
+    process_adherence:
+      min_sample: 20              # ENTERED setups (w/ determinable bias alignment / closed outcome)
+                                  # needed before process-adherence & read-accuracy publish a number;
+                                  # below this → INSUFFICIENT_DATA (Layer-8 causal-chain journal)
     # Kill-switch HALT on consecutive drawdown-breaker hits. Ladder lives in RISK_CONSTITUTION.md
     # Art. 3 (3.5/5/6.5); this is the count of consecutive breaker trips that forces HALT.
     consecutive_breaker_halt_n: 2

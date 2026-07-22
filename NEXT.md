@@ -4,6 +4,61 @@ Per-session ledger: what shipped, push status, verdicts, blockers, refusals. New
 The Obsidian brain (`~/Obsidian/Obsidian/00-BRAIN/NEXT.md`) is the cross-project rollup.
 Standing constraints live in `CLAUDE.md` — not restated here.
 
+### 2026-07-22 · Layer-8 ICT causal-chain journal — the update_outcome() loop CLOSED (ICT non-frozen)
+Closes CLAUDE.md NON-NEGOTIABLE #2 for the ICT path: every evaluated ICT setup is now
+journaled with its full causal chain, and every ICT paper close fires update_outcome().
+The conscience's process-adherence + forecast-vs-execution sections moved from
+"UNAVAILABLE — ledger not written yet" to reading the real ledger.
+
+**Shipped (all ICT non-frozen; the frozen forex/carry path untouched; scoring weights
+market_structure/pd_alignment stay 0.0 — HYP-024/034):**
+- **`ict/causal_journal.py` (NEW)** — stdlib-only writer (NO sovereign import; reads the
+  neutral regime/bias JSON as data only). Appends one record per evaluated setup to
+  `data/agent/ict_causal_chain.jsonl` with the full schema (setup_id, symbol, timestamp,
+  level_id/type/tf/quality, regime_state, bias_state, bias_aligned, size_multiplier,
+  ict_grade, component_scores, r_r_computed, action, discard_reason, outcome, outcome_r).
+  `make_setup_id()` is deterministic (symbol/dir/entry/date) so eval-site and close-site
+  agree without threading state. `update_outcome()` back-fills the OPEN ENTERED record and
+  FAILS LOUD (warns + returns False, fabricates nothing) when nothing matches.
+- **`ict/pipeline.py`** — `evaluate()` is now a thin wrapper over `_evaluate_impl()` that
+  journals WHATEVER the pipeline returns — entries AND rejects — classifying action as
+  ENTERED / DISCARDED / VETOED / BELOW_MIN_RR / NO_OPPOSING_LEVEL. This is what makes
+  "was it the level or the bias?" answerable. Journaling never alters the decision and
+  never raises. Also stamps the applied regime `size_multiplier` onto the signal.
+- **`ict/paper_trader.py`** — `_log_trade()` (the single close choke point for stop / TP2 /
+  BE / session-end) now reconstructs the setup_id and calls
+  `causal_journal.update_outcome(setup_id, outcome, outcome_r)`. Every paper close closes
+  the loop.
+- **`alta_platform/measurement.py`** — added `process_adherence_from_journal()` +
+  `forecast_vs_execution_from_journal()`; `build_system_health.py` wires them for
+  `ict_equities`. Real counts where data allows (by_action, n_entered, n_closed), honest
+  INSUFFICIENT_DATA below `platform.health.process_adherence.min_sample` (20, logged to
+  param_change_log), UNAVAILABLE at 0 records. execution_quality stays UNAVAILABLE
+  (no per-fill cost in the journal — not faked from the read). undertow_gapper + carry
+  keep UNAVAILABLE (the ICT ledger is ICT-specific; their own process ledgers don't exist).
+
+**Verified (scratch run):** ENTERED/VETOED/DISCARDED records all wrote; `update_outcome`
+filled a sample ENTERED line (outcome STOP, outcome_r -1.0, r_r_computed 2.0); unknown
+setup_id returned False with the fail-loud warning. Synthetic records were then TRUNCATED —
+the committed journal is EMPTY (no fabricated trades). Live today the ICT regime gate is
+STAND_ASIDE (ict_equities stub), so real ENTERED records won't appear until that section
+populates; the wiring is the deliverable.
+
+**Tests:** `test_pipeline_does_not_import_sovereign` **PASS**; `test_alta_platform_isolation`
+**2 passed**; `tests/unit/test_ict_pipeline.py` **4 failed / 17 passed** — the 4 are the
+documented pre-existing failures (TestScoreAndGrade ×2, TestRiskEngineGate ×2) that fire at
+the HYP046 disp-gate BEFORE the new wrapper/journal is reached. No new failures.
+`ict/causal_journal.py` AST-checked: zero sovereign imports.
+
+**update_outcome status: WIRED (not PENDING)** — the ICT paper close path exists and is
+hooked. It will fire the moment a real paper trade closes; today none open (regime STAND_ASIDE).
+
+**Push status: commit made locally; push may fail on host keychain** (sandbox has no git
+creds). Explicit-path commit (never `-A`). If a stale `.git/index.lock` blocks it, on host:
+`rm -f .git/index.lock` then `git push`.
+
+---
+
 ### 2026-07-22 · The conscience (measurement layer) — BUILT + RUNNING
 Second organ of the nervous system, per `specs/measurement_layer.md`. Neutral `alta_platform/`
 module — imports neither `ict/` nor `sovereign/` (reads their journals/ledgers as data). Shipped:

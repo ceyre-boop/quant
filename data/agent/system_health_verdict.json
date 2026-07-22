@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-22T22:17:11.044874+00:00",
+  "generated_at": "2026-07-22T22:34:46.949418+00:00",
   "status": "DEGRADED",
   "status_reason": "portfolio:OK/REDUCE; undertow_gapper:REDUCE; ict_equities:REDUCE; carry:REDUCE",
   "strategies": {
@@ -19,15 +19,15 @@
       "process_adherence": {
         "decisions_matched_rules_pct": null,
         "status": "UNAVAILABLE",
-        "reason": "process-adherence requires the ICT causal-chain setup ledger (data/agent/ict_causal_chain.jsonl (ICT setup ledger, Layer 8 \u2014 not written yet)), which is not written yet. No adherence score is fabricated; this fills once the ledger exists.",
-        "needed_source": "data/agent/ict_causal_chain.jsonl (ICT setup ledger, Layer 8 \u2014 not written yet)"
+        "reason": "process-adherence requires the ICT causal-chain setup ledger (data/agent/ict_causal_chain.jsonl (ICT setup ledger, Layer 8 \u2014 ICT-specific)), which is not written yet. No adherence score is fabricated; this fills once the ledger exists.",
+        "needed_source": "data/agent/ict_causal_chain.jsonl (ICT setup ledger, Layer 8 \u2014 ICT-specific)"
       },
       "forecast_vs_execution": {
         "read_accuracy": null,
         "execution_quality": null,
         "status": "UNAVAILABLE",
-        "reason": "forecast-vs-execution requires per-setup read-outcome and fill-quality records from the ICT causal-chain ledger (data/agent/ict_causal_chain.jsonl (ICT setup ledger, Layer 8 \u2014 not written yet)), not written yet. 'Was the read right' and 'was the fill good' stay separate and unfaked.",
-        "needed_source": "data/agent/ict_causal_chain.jsonl (ICT setup ledger, Layer 8 \u2014 not written yet)"
+        "reason": "forecast-vs-execution requires per-setup read-outcome and fill-quality records from the ICT causal-chain ledger (data/agent/ict_causal_chain.jsonl (ICT setup ledger, Layer 8 \u2014 ICT-specific)), not written yet. 'Was the read right' and 'was the fill good' stay separate and unfaked.",
+        "needed_source": "data/agent/ict_causal_chain.jsonl (ICT setup ledger, Layer 8 \u2014 ICT-specific)"
       }
     },
     "ict_equities": {
@@ -46,15 +46,20 @@
       "process_adherence": {
         "decisions_matched_rules_pct": null,
         "status": "UNAVAILABLE",
-        "reason": "process-adherence requires the ICT causal-chain setup ledger (data/agent/ict_causal_chain.jsonl (ICT setup ledger, Layer 8 \u2014 not written yet)), which is not written yet. No adherence score is fabricated; this fills once the ledger exists.",
-        "needed_source": "data/agent/ict_causal_chain.jsonl (ICT setup ledger, Layer 8 \u2014 not written yet)"
+        "reason": "causal-chain journal exists but has 0 records",
+        "source": "data/agent/ict_causal_chain.jsonl"
       },
       "forecast_vs_execution": {
         "read_accuracy": null,
-        "execution_quality": null,
+        "execution_quality": {
+          "value": null,
+          "status": "UNAVAILABLE",
+          "reason": "execution_quality needs modeled-vs-realized fill cost per setup; the causal-chain journal does not carry fill cost yet \u2014 not faked from the read."
+        },
         "status": "UNAVAILABLE",
-        "reason": "forecast-vs-execution requires per-setup read-outcome and fill-quality records from the ICT causal-chain ledger (data/agent/ict_causal_chain.jsonl (ICT setup ledger, Layer 8 \u2014 not written yet)), not written yet. 'Was the read right' and 'was the fill good' stay separate and unfaked.",
-        "needed_source": "data/agent/ict_causal_chain.jsonl (ICT setup ledger, Layer 8 \u2014 not written yet)"
+        "reason": "no CLOSED entered setups in the journal yet (entries need update_outcome fills); read-accuracy not computable.",
+        "n_closed": 0,
+        "source": "data/agent/ict_causal_chain.jsonl"
       }
     },
     "carry": {
@@ -73,15 +78,15 @@
       "process_adherence": {
         "decisions_matched_rules_pct": null,
         "status": "UNAVAILABLE",
-        "reason": "process-adherence requires the ICT causal-chain setup ledger (data/agent/ict_causal_chain.jsonl (ICT setup ledger, Layer 8 \u2014 not written yet)), which is not written yet. No adherence score is fabricated; this fills once the ledger exists.",
-        "needed_source": "data/agent/ict_causal_chain.jsonl (ICT setup ledger, Layer 8 \u2014 not written yet)"
+        "reason": "process-adherence requires the ICT causal-chain setup ledger (data/agent/ict_causal_chain.jsonl (ICT setup ledger, Layer 8 \u2014 ICT-specific)), which is not written yet. No adherence score is fabricated; this fills once the ledger exists.",
+        "needed_source": "data/agent/ict_causal_chain.jsonl (ICT setup ledger, Layer 8 \u2014 ICT-specific)"
       },
       "forecast_vs_execution": {
         "read_accuracy": null,
         "execution_quality": null,
         "status": "UNAVAILABLE",
-        "reason": "forecast-vs-execution requires per-setup read-outcome and fill-quality records from the ICT causal-chain ledger (data/agent/ict_causal_chain.jsonl (ICT setup ledger, Layer 8 \u2014 not written yet)), not written yet. 'Was the read right' and 'was the fill good' stay separate and unfaked.",
-        "needed_source": "data/agent/ict_causal_chain.jsonl (ICT setup ledger, Layer 8 \u2014 not written yet)"
+        "reason": "forecast-vs-execution requires per-setup read-outcome and fill-quality records from the ICT causal-chain ledger (data/agent/ict_causal_chain.jsonl (ICT setup ledger, Layer 8 \u2014 ICT-specific)), not written yet. 'Was the read right' and 'was the fill good' stay separate and unfaked.",
+        "needed_source": "data/agent/ict_causal_chain.jsonl (ICT setup ledger, Layer 8 \u2014 ICT-specific)"
       }
     }
   },
@@ -91,7 +96,7 @@
     "drawdown_breaker_tripped": null,
     "drawdown_breaker_status": "UNAVAILABLE",
     "regime_contract_status": "DEGRADED",
-    "regime_contract_age_hours": 1.318,
+    "regime_contract_age_hours": 0.046,
     "kill_switch": "REDUCE",
     "reason": "portfolio drawdown-breaker feed UNAVAILABLE (no unified position/P&L ledger); cannot confirm account safety \u2192 REDUCE (never full TRADE)",
     "sources": [

@@ -52,6 +52,12 @@ from alta_platform.regime_client import get_regime
 # AND the conscience is HEALTHY; a HALT or stale conscience vetoes the trade.
 from alta_platform.health_client import get_health
 
+# Layer-8 causal-chain journal. Lives in ict/ (isolation-trivial — stdlib only),
+# writes data/agent/ict_causal_chain.jsonl. Wired below so EVERY evaluated setup
+# (entries AND rejects) is journaled with its full chain, closing the update_outcome
+# loop (CLAUDE.md NON-NEGOTIABLE #2).
+from ict import causal_journal
+
 logger = logging.getLogger(__name__)
 
 # ── Scoring weights (configurable via ict_params.yml) ─────────────────────── #
@@ -190,7 +196,35 @@ class ICTPipeline:
 
     # ── Public API ─────────────────────────────────────────────────────────── #
 
-    def evaluate(
+    def evaluate(self, *args, **kwargs) -> "ICTSignal | ICTVeto":
+        """Public entry point. Runs the full pipeline (`_evaluate_impl`) and then
+        journals the result to the Layer-8 causal-chain ledger — for ENTRIES AND
+        REJECTS alike — so "was it the level or the bias?" is answerable and the
+        update_outcome() loop can close (CLAUDE.md NON-NEGOTIABLE #2).
+
+        The journal write is the ONLY thing this wrapper adds; it never alters the
+        decision and never raises. The result object is returned unchanged.
+        """
+        result = self._evaluate_impl(*args, **kwargs)
+        try:
+            symbol = kwargs.get("symbol", args[0] if len(args) > 0 else getattr(result, "symbol", ""))
+            direction = kwargs.get("direction", args[1] if len(args) > 1 else getattr(result, "direction", ""))
+            timestamp = kwargs.get("timestamp", args[3] if len(args) > 3 else getattr(result, "timestamp", None))
+            # Size multiplier actually applied (regime dimmer). 1.0 unless the shared
+            # regime scaled it; captured for F2/F3 sizing analysis on the paper account.
+            size_mult = getattr(result, "_regime_size_multiplier", 1.0)
+            causal_journal.journal_result(
+                result=result,
+                symbol=symbol,
+                direction=direction,
+                timestamp=timestamp if timestamp is not None else getattr(result, "timestamp", None),
+                size_multiplier=size_mult,
+            )
+        except Exception:  # journaling must never break a trade decision
+            pass
+        return result
+
+    def _evaluate_impl(
         self,
         symbol:    str,
         direction: str,
@@ -706,6 +740,10 @@ class ICTPipeline:
                 component_scores=scores,
                 confirmations=confirmations, missing=missing,
             )
+            # Stamp the size multiplier actually applied (shared-regime dimmer), read
+            # by the causal-chain journal for F2/F3 sizing analysis. Non-dataclass
+            # attribute — no schema change, invisible to existing consumers.
+            _sig._regime_size_multiplier = getattr(_regime, "size_multiplier", 1.0)
             try:
                 import importlib as _il
                 _dl = _il.import_module("sovereign.intelligence.decision_logger")

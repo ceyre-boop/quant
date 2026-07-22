@@ -46,8 +46,11 @@ DATA = REPO / "data"
 CONFIG = REPO / "config" / "parameters.yml"
 OUT = DATA / "agent" / "system_health_verdict.json"
 
-# The ICT causal-chain setup ledger these sections need (not written yet).
-ICT_CAUSAL_LEDGER = "data/agent/ict_causal_chain.jsonl (ICT setup ledger, Layer 8 — not written yet)"
+# The ICT causal-chain setup ledger (Layer 8). Now written by ict/causal_journal.py.
+# ict_equities reads it directly (below); undertow_gapper + carry are DIFFERENT
+# strategies whose own process ledgers do not exist, so they stay UNAVAILABLE and
+# name this ICT-specific ledger only as the pattern to replicate for their own.
+ICT_CAUSAL_LEDGER = "data/agent/ict_causal_chain.jsonl (ICT setup ledger, Layer 8 — ICT-specific)"
 
 
 def build() -> dict:
@@ -88,8 +91,10 @@ def build() -> dict:
         ),
         source="(none yet)",
     )
-    ict.process_adherence = m.process_adherence_unavailable(ICT_CAUSAL_LEDGER)
-    ict.forecast_vs_execution = m.forecast_vs_execution_unavailable(ICT_CAUSAL_LEDGER)
+    # Layer 8 is now written — read the causal-chain journal for real numbers
+    # where the sample allows (honest INSUFFICIENT_DATA / UNAVAILABLE otherwise).
+    ict.process_adherence = m.process_adherence_from_journal(config, DATA)
+    ict.forecast_vs_execution = m.forecast_vs_execution_from_journal(config, DATA)
     ks, why = m.combine_kill_switch(pf_kill, ict.edge_health.status, ict.edge_health.divergence_flag)
     ict.kill_switch = ks
     ict.reason = why

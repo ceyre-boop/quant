@@ -417,3 +417,180 @@ def forecast_vs_execution_unavailable(needed_source: str) -> dict[str, Any]:
         ),
         "needed_source": needed_source,
     }
+
+
+# --------------------------------------------------------------------------
+# Journal-reading versions (Layer 8 is now written). These read
+# data/agent/ict_causal_chain.jsonl and compute REAL numbers where the sample
+# allows — honest INSUFFICIENT_DATA / UNAVAILABLE otherwise. Never fabricates.
+# --------------------------------------------------------------------------
+ICT_CAUSAL_PATH = "agent/ict_causal_chain.jsonl"
+
+
+def _load_causal_journal(data_dir: Path) -> tuple[list[dict[str, Any]] | None, str | None, Path]:
+    path = data_dir / "agent" / "ict_causal_chain.jsonl"
+    rows, err = _read_jsonl(path)
+    return rows, err, path
+
+
+def _proc_min_sample(config: dict[str, Any]) -> int:
+    try:
+        return int((_health_cfg(config).get("process_adherence", {}) or {})["min_sample"])
+    except (KeyError, TypeError, ValueError):
+        return 20
+
+
+def process_adherence_from_journal(config: dict[str, Any], data_dir: Path) -> dict[str, Any]:
+    """Process adherence (Part 2 #7) from the ICT causal-chain journal.
+
+    'Review decisions, not outcomes': of the setups the pipeline ACTED on (ENTERED),
+    what fraction satisfied the pre-registered directional-bias rule the chain records
+    (bias_aligned == True). Rejects (VETOED/DISCARDED/BELOW_MIN_RR/NO_OPPOSING_LEVEL)
+    are reported as counts for transparency but are the process WORKING, not a breach.
+
+    Honest statuses: UNAVAILABLE when the journal has no records; INSUFFICIENT_DATA
+    when fewer than min_sample entries carry a determinable bias alignment; OK with a
+    real percentage once the sample is large enough. No score is fabricated.
+    """
+    rows, err, path = _load_causal_journal(data_dir)
+    src = str(_rel(path))
+    if rows is None:
+        return {
+            "decisions_matched_rules_pct": None,
+            "status": UNAVAILABLE,
+            "reason": f"causal-chain journal unreadable ({err})",
+            "source": src,
+        }
+
+    n_total = len(rows)
+    by_action: dict[str, int] = {}
+    for r in rows:
+        a = str(r.get("action", "UNKNOWN"))
+        by_action[a] = by_action.get(a, 0) + 1
+
+    entered = [r for r in rows if r.get("action") == "ENTERED"]
+    evaluable = [r for r in entered if isinstance(r.get("bias_aligned"), bool)]
+    n_eval = len(evaluable)
+    min_sample = _proc_min_sample(config)
+
+    if n_total == 0:
+        return {
+            "decisions_matched_rules_pct": None,
+            "status": UNAVAILABLE,
+            "reason": "causal-chain journal exists but has 0 records",
+            "source": src,
+        }
+
+    if n_eval < min_sample:
+        return {
+            "decisions_matched_rules_pct": None,
+            "status": INSUFFICIENT_DATA,
+            "reason": (
+                f"{n_eval} entered setups with determinable bias alignment < {min_sample} "
+                f"needed — INSUFFICIENT_DATA. Journal has {n_total} total records "
+                f"({by_action}); process score not fabricated from a thin sample."
+            ),
+            "n_total": n_total,
+            "n_entered": len(entered),
+            "n_evaluable": n_eval,
+            "by_action": by_action,
+            "source": src,
+        }
+
+    matched = sum(1 for r in evaluable if r.get("bias_aligned") is True)
+    pct = round(matched / n_eval, 4)
+    return {
+        "decisions_matched_rules_pct": pct,
+        "status": OK,
+        "reason": (
+            f"{matched}/{n_eval} entered setups matched the pre-registered bias rule "
+            f"(bias_aligned). {n_total} total evaluated ({by_action})."
+        ),
+        "n_total": n_total,
+        "n_entered": len(entered),
+        "n_evaluable": n_eval,
+        "by_action": by_action,
+        "source": src,
+    }
+
+
+def forecast_vs_execution_from_journal(config: dict[str, Any], data_dir: Path) -> dict[str, Any]:
+    """Forecast-vs-execution (Part 2 #10) from the ICT causal-chain journal.
+
+    Two numbers, never conflated:
+      * read_accuracy — of CLOSED entries, the fraction whose directional read paid
+        (outcome_r > 0). This is "was the read right."
+      * execution_quality — "was the fill good": modeled-vs-realized fill cost. The
+        journal does not yet carry per-fill cost, so this stays UNAVAILABLE (honest)
+        rather than being faked from the read.
+
+    read_accuracy is INSUFFICIENT_DATA until min_sample closed entries exist.
+    """
+    rows, err, path = _load_causal_journal(data_dir)
+    src = str(_rel(path))
+    if rows is None:
+        return {
+            "read_accuracy": None,
+            "execution_quality": None,
+            "status": UNAVAILABLE,
+            "reason": f"causal-chain journal unreadable ({err})",
+            "source": src,
+        }
+
+    closed = [
+        r for r in rows
+        if r.get("action") == "ENTERED"
+        and r.get("outcome") is not None
+        and isinstance(r.get("outcome_r"), (int, float))
+    ]
+    n_closed = len(closed)
+    min_sample = _proc_min_sample(config)
+
+    exec_quality = {
+        "value": None,
+        "status": UNAVAILABLE,
+        "reason": (
+            "execution_quality needs modeled-vs-realized fill cost per setup; the "
+            "causal-chain journal does not carry fill cost yet — not faked from the read."
+        ),
+    }
+
+    if n_closed == 0:
+        return {
+            "read_accuracy": None,
+            "execution_quality": exec_quality,
+            "status": UNAVAILABLE,
+            "reason": (
+                "no CLOSED entered setups in the journal yet (entries need "
+                "update_outcome fills); read-accuracy not computable."
+            ),
+            "n_closed": 0,
+            "source": src,
+        }
+
+    if n_closed < min_sample:
+        return {
+            "read_accuracy": None,
+            "execution_quality": exec_quality,
+            "status": INSUFFICIENT_DATA,
+            "reason": (
+                f"{n_closed} closed entered setups < {min_sample} needed — "
+                f"INSUFFICIENT_DATA; read-accuracy not published from a thin sample."
+            ),
+            "n_closed": n_closed,
+            "source": src,
+        }
+
+    wins = sum(1 for r in closed if float(r["outcome_r"]) > 0)
+    read_acc = round(wins / n_closed, 4)
+    return {
+        "read_accuracy": read_acc,
+        "execution_quality": exec_quality,
+        "status": OK,
+        "reason": (
+            f"read right on {wins}/{n_closed} closed entries (outcome_r>0). "
+            "Execution_quality still UNAVAILABLE (no per-fill cost in journal)."
+        ),
+        "n_closed": n_closed,
+        "source": src,
+    }
