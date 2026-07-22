@@ -56,6 +56,6 @@
   "conviction_threshold_to_fire": 0.65,
   "universe": "US-listed equities >=$500M market cap at event time, earnings + activist (13D/G) events",
   "target_training_events": 5000,
-  "hash_lock_method": "SHA-256 of this file's bytes with hash_lock field set to empty string, computed at filing",
-  "hash_lock": "dc350169c062241db1e402eed545e4c022ad8e925268602e4da7621d8a11eb73"
+  "hash_lock_method": "SHA-256 of json.dumps(doc, indent=2, ensure_ascii=True)+newline with hash_lock=\"\" (verify: blank hash_lock, re-serialize identically, hash)",
+  "hash_lock": "085b83eaa4fbff83620819bd402eae906bc0397e70e0a786e29e673e7cc4c513"
 }
