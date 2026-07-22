@@ -6,6 +6,111 @@ Standing constraints live in `CLAUDE.md` — not restated here.
 
 ---
 
+## 2026-07-22 — [PLATFORM]/[ICT] Rename platform→alta_platform; wire ICT regime gate (shipped, push BLOCKED)
+
+Three follow-on tasks on top of the regime contract: stop the stdlib shadow, wire the first
+reader into a live (non-frozen) strategy, and scope the portfolio ledger.
+
+**Shipped:**
+- **[PLATFORM] `platform/` → `alta_platform/`** (commit `6f67d27`). The old name shadowed
+  Python's stdlib `platform` (breaks `uuid`, therefore `pytest`); the fragile superset guard
+  in `__init__.py` is **removed** — verified nothing depended on it (only imports were
+  `regime_client`/`regime_contract`). Updated every import: `scripts/build_system_regime.py`,
+  `scratch/proof_regime_client.py`, and the isolation test (renamed →
+  `tests/test_alta_platform_isolation.py`). Legit stdlib `import platform` usages
+  (`research/*/_lib.py`, `backtest/sweep.py`, `scripts/bench_throughput.py`) left untouched.
+  Plist calls the script by path (no module name) — no edit needed.
+- **[ICT] Regime gate at the ICT sizing boundary** (commit `cf56f64`, `ict/pipeline.py` only,
+  +42 lines). Added `from alta_platform.regime_client import get_regime` and a Gate-0 read of
+  `get_regime("ict_equities")` just before `risk_engine.size()`: STAND_ASIDE or stale →
+  ICTVeto (skip) with a logged reason; otherwise `size *= size_multiplier`. Did **not** touch
+  scoring weights or the frozen forex/carry path. `ict_equities` is an UNAVAILABLE stub today,
+  so ICT correctly stands aside until that section is populated — the wiring is the deliverable.
+- **Task 3 scope** — `research/position_ledger_scope.md`. Honest verdict: **partial**. Raw
+  open positions exist (ICT `data/ledger/ict_paper_trades.json` `open[]`; forex reconstructable
+  from `oanda_fills.json`; live NAV in `equity_curve_live.jsonl`), but **no cluster taxonomy**
+  (USD_MACRO/YEN/EQUITY_SMALLCAP) and **no cluster caps** exist on disk — so a by-cluster view
+  cannot be assembled without authoring those. Scoped, not built. This is what moves the
+  portfolio section `UNAVAILABLE → OK` later.
+
+**Verdicts / tests:**
+- `tests/test_alta_platform_isolation.py`: **2 passed** (both directions).
+- `test_pipeline_does_not_import_sovereign`: **still green** — the isolation allowlist forbids
+  only sovereign/layer imports; `alta_platform` (imports neither side) is legal from `ict/`.
+- `tests/unit/test_ict_pipeline.py`: **4 failed / 17 passed** — the 4 are the pre-existing,
+  documented failures (TestScoreAndGrade ×2, TestRiskEngineGate ×2), and they fail at the
+  disp-gate/scoring stage *before* the new regime gate is reached (reasons: `HYP046_DISP_GATE`,
+  missing `_weights` keys). No new failures from this change.
+- Stdlib shadow gone: `python3 -c "import platform; print(platform.system())"` → `Linux`.
+- `scripts/build_system_regime.py` still writes `system_regime_state.json` with **carry =
+  STAND_ASIDE** (narrowing on all 4 pairs).
+
+**Push status: BLOCKED** — sandbox has no git credentials (`could not read Username for
+github.com`). Both commits are local on `sovereign-v2` (HEAD `cf56f64`); Colin needs to
+`git push`. NB: the sandbox mount blocks `unlink` inside `.git`, so a stale `index.lock` /
+`HEAD.lock` may be present — remove them on the host before pushing
+(`rm -f .git/index.lock .git/HEAD.lock`). The Task-2 commit was made via plumbing
+(`commit-tree` + direct ref write) to work around that lock; it is a normal commit.
+
+**Carry read-wiring still waits for the post-2026-07-28 unlock** — carry is frozen; its
+one-line `size *= get_regime("carry").size_multiplier` is deferred until an explicit NEXT.md
+unlock, per the execution-path freeze. Only ICT (non-frozen) was wired this session.
+
+---
+
+## 2026-07-22 — [PLATFORM] System regime contract: the neutral nervous system (shipped, push BLOCKED)
+
+Built the shared connective layer from `specs/system_regime_contract.md` — a neutral
+`platform/` package that unifies the per-strategy regime signals already on disk into one
+canonical contract `data/agent/system_regime_state.json`, plus a tiny reader any strategy
+calls. Isolation-safe by construction: communicates by data contract (reads/writes JSON),
+never by cross-module import.
+
+**Shipped:**
+- `platform/__init__.py`, `platform/regime_client.py` (`get_regime(strategy) -> RegimeRead`
+  with `.verdict/.favorable/.size_multiplier/.stale`; safe-by-default — stale/missing =>
+  STAND_ASIDE, size 0.0), `platform/regime_contract.py` (Section model + carry/es_nq/macro
+  classifiers).
+- `scripts/build_system_regime.py` — the writer. Never raises. Sections from files that
+  exist today: carry ← `forex_proximity.json`, es_nq ← `nqes_regime.json` (INFO, never
+  sizes), macro ← `macro_snapshot.json` (INFO). Portfolio = honest UNAVAILABLE stub.
+- `scripts/com.alta.system_regime.plist` — 30-min schedule, NOT installed (launchd
+  unreachable). Load: `cp scripts/com.alta.system_regime.plist ~/Library/LaunchAgents/ &&
+  launchctl load ~/Library/LaunchAgents/com.alta.system_regime.plist`.
+- `tests/test_platform_isolation.py` — asserts `platform/` imports neither `ict` nor
+  `sovereign` (static AST + runtime sys.modules), both directions.
+- `config/parameters.yml` `platform.regime` block (freshness_hours + contract_max_age_hours);
+  new keys + the carry 6→12h bump logged to `data/agent/param_change_log.jsonl` (NN#4).
+
+**Verdicts / tests:**
+- `tests/test_platform_isolation.py`: **2 passed**. `test_pipeline_does_not_import_sovereign`:
+  **still green**. (Repo-wide collection has ~27 pre-existing errors from missing deps —
+  pydantic/yfinance/sklearn — NOT from this change.)
+- Live truth reproduced: **carry = STAND_ASIDE**, status OK, reason "rate differentials
+  NARROWING on all 4 pairs; none widening" — verified via `get_regime("carry")` from a
+  scratch script (`scratch/proof_regime_client.py`).
+
+**Note — stdlib shadow:** `platform` is also a stdlib module. `platform/__init__.py` absorbs
+the real stdlib `platform` attributes so `platform.system()` (uuid/pytest) keeps working.
+Do not remove that guard.
+
+**Follow-on (not this task):** `ict_equities` + `undertow_gapper` sections need PriceStore /
+gapper inputs; portfolio needs a unified position-by-cluster ledger (none on disk today).
+Strategy READ-wiring is next — carry consumption needs a post-freeze unlock recorded here
+before `size *= get_regime("carry").size_multiplier` touches the frozen sizing boundary.
+
+**BLOCKER — git push:** the sandbox has no GitHub credentials (HTTPS remote, no username)
+AND stale `.git/*.lock` files (index.lock, HEAD.lock, sovereign-v2.lock) that the restricted
+mount won't let me delete. Commit `20696b7` (step 1) landed on the branch; step-2+ changes are
+in the WORKING TREE, uncommitted. Operator recovery on host:
+`rm -f .git/index.lock .git/HEAD.lock .git/refs/heads/sovereign-v2.lock` then
+`git add platform tests/test_platform_isolation.py scripts/build_system_regime.py
+scripts/com.alta.system_regime.plist scratch/proof_regime_client.py config/parameters.yml
+data/agent/param_change_log.jsonl data/agent/system_regime_state.json NEXT.md &&
+git commit -m "[PLATFORM] regime writer + plist + proof + NEXT" && git push`.
+
+---
+
 ## 2026-07-20 — LAUNCHD TRIAGE: THERE IS NO `claude` CLI ON THIS MACHINE; TWO CASCADE CLAIMS REFUTED
 
 Dispatched to repoint the agent plists at the real `claude` binary, reload, verify, unload
@@ -1712,3 +1817,12 @@ demoted); 13D ~5.5k/yr (KEEP; 2025 files as "SCHEDULE 13D" new form name); Theta
 options history cutoff pinned at 2020-01 → training window 2020+ unless STANDARD upgrade.
 Biggest risk: revision-path features would have been a silent lookahead leak into a conviction
 engine. Next: file PETRULES_GATE_prereq.json with the narrowed feature set, then Phase 1 replay engine.
+
+### 2026-07-21 · RESEARCH PASS (21:00 routine, AGENT_DIRECTIVE.md)
+Brain read OK (27 graveyard hyps loaded, passed to hypothesis context — no re-proposals).
+Movers: 50 gainers → data/research/gapper/movers_recent.json.
+Queue: 5 tasks drained (--max 5), all OK — 4 no-ops (operator-decision items RQ-REST-019b/033/005/009);
+RQ-REST-017 cb_decisions audit: 1201 decisions, 71 surprises ≥25bp.
+Candidates flagged for operator: NONE — no pattern cleared first-pass permutation test tonight.
+Noted: recurring BLOCKED_NO_VALIDATOR on HYP-AUTO entries (07-20/21) — pre-existing, needs triage.
+Note: a parallel session wrote an earlier 2026-07-21 pattern entry; both retained (append-only).
