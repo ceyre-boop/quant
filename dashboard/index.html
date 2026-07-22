@@ -291,6 +291,35 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:14
   </div>
 
   <!-- ═══════════════════════════════════════════════════════
+       ROW 1b — CARRY PAPER ACCOUNT (OANDA practice)
+       ═══════════════════════════════════════════════════════ -->
+  <div class="row r1b">
+    <div class="panel">
+      <div class="ph">
+        Carry Paper — OANDA Practice
+        <span class="badge b-dim" id="cy-badge">LOADING</span>
+      </div>
+      <div class="prop-stats">
+        <div>
+          <div class="slbl">Live Balance</div>
+          <div class="sval" id="cy-bal">—</div>
+          <div class="ssub">paper equity</div>
+        </div>
+        <div>
+          <div class="slbl">Total P&amp;L</div>
+          <div class="sval" id="cy-pnl">—</div>
+          <div class="ssub">since curve start</div>
+        </div>
+        <div>
+          <div class="slbl">Regime Gate</div>
+          <div class="sval" id="cy-regime">—</div>
+          <div class="ssub" id="cy-regime-sub">carry rate-trend</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
        ROW 2 — SIGNAL  /  ORACLE BIAS  /  SYSTEM HEALTH
        ═══════════════════════════════════════════════════════ -->
   <div class="row r2">
@@ -808,6 +837,27 @@ async function updateResearch() {
 }
 
 /* ── Refresh loop ────────────────────────────────────────── */
+/* ── Row 1b: Carry paper account + regime gate ───────────── */
+async function updateCarry() {
+  const c = await fj('data/agent/carry_paper_account.json');
+  const reg = await fj('data/agent/system_regime_state.json');
+
+  document.getElementById('cy-bal').textContent   = c?.balance!=null ? fmtUSD(c.balance) : '—';
+  const pnlEl = document.getElementById('cy-pnl');
+  if (c?.total_pnl!=null){ pnlEl.textContent=fmtUSD(c.total_pnl,true); pnlEl.className=`sval ${c.total_pnl>=0?'cg':'cr'}`; }
+  else pnlEl.textContent='—';
+
+  const cy = reg?.strategies?.carry;
+  const verdict = cy?.verdict ?? 'UNKNOWN';
+  const rEl = document.getElementById('cy-regime');
+  rEl.textContent = verdict;
+  rEl.className = `sval ${verdict==='GO'?'cg':verdict==='STAND_ASIDE'?'cr':'cy'}`;
+  document.getElementById('cy-regime-sub').textContent = cy?.reason ? cy.reason.slice(0,42) : 'carry rate-trend';
+
+  const st = c?.status ?? 'PAPER';
+  setBadge('cy-badge', st, st==='OK'?'b-blue':st==='DEGRADED'?'b-yellow':'b-dim');
+}
+
 async function refreshAll() {
   const dot=document.getElementById('pdot');
   dot.classList.add('spin');
@@ -816,6 +866,7 @@ async function refreshAll() {
 
   await Promise.all([
     updateProp(fills),
+    updateCarry(),
     updateSignal(),
     updateBias(),
     updateHealth(),

@@ -26,6 +26,8 @@ FILES=(
   "dashboard/index.html"
   "data/agent/oracle_briefing_morning.json"
   "data/agent/prop_account_balance.json"
+  "data/agent/carry_paper_account.json"
+  "data/agent/system_regime_state.json"
   "data/agent/prop_challenge_state.json"
   "data/execution/fills.json"
   "data/execution/fills.jsonl"
