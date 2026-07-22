@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  com.alta.system_regime — schedule the system regime contract writer.
+
+  Runs scripts/build_system_regime.py every 30 minutes (StartInterval 1800s),
+  the same slow clock as the obsidian mirror. NOT installed by this task
+  (launchd / ~/Library is unreachable from the build sandbox). To install:
+
+      cp scripts/com.alta.system_regime.plist ~/Library/LaunchAgents/
+      launchctl load ~/Library/LaunchAgents/com.alta.system_regime.plist
+      launchctl start com.alta.system_regime      # optional: run once now
+
+  To stop / reload:
+      launchctl unload ~/Library/LaunchAgents/com.alta.system_regime.plist
+
+  EDIT the two absolute paths below if the repo or python3 lives elsewhere.
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.alta.system_regime</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/usr/bin/python3</string>
+        <string>/Users/taboost/quant/scripts/build_system_regime.py</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/taboost/quant</string>
+
+    <key>StartInterval</key>
+    <integer>1800</integer>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>StandardOutPath</key>
+    <string>/Users/taboost/quant/logs/system_regime.out.log</string>
+
+    <key>StandardErrorPath</key>
+    <string>/Users/taboost/quant/logs/system_regime.err.log</string>
+</dict>
+</plist>

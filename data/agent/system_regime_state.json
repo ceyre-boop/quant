@@ -1,0 +1,89 @@
+{
+  "generated_at": "2026-07-22T19:52:59.146255+00:00",
+  "status": "DEGRADED",
+  "status_reason": "carry:OK; es_nq:OK; macro:OK; portfolio:UNAVAILABLE",
+  "strategies": {
+    "carry": {
+      "status": "OK",
+      "verdict": "STAND_ASIDE",
+      "favorable": false,
+      "size_multiplier": 0.0,
+      "reason": "rate differentials NARROWING on all 4 pairs; none widening",
+      "source": "data/agent/forex_proximity.json",
+      "source_age_hours": 7.588,
+      "detail": {
+        "per_pair": {
+          "GBPUSD=X": {
+            "differential_trend": "NARROWING",
+            "rate_differential": 0.17,
+            "regime": "TRENDING"
+          },
+          "AUDUSD=X": {
+            "differential_trend": "NARROWING",
+            "rate_differential": 0.1,
+            "regime": "TRENDING"
+          },
+          "EURUSD=X": {
+            "differential_trend": "NARROWING",
+            "rate_differential": -2.08,
+            "regime": "TRENDING"
+          },
+          "USDJPY=X": {
+            "differential_trend": "NARROWING",
+            "rate_differential": 3.603,
+            "regime": "TRENDING"
+          }
+        },
+        "vix": 16.82,
+        "vix_extreme": false
+      }
+    },
+    "es_nq": {
+      "status": "OK",
+      "verdict": "INFO",
+      "favorable": false,
+      "size_multiplier": 0.0,
+      "reason": "research INFO only \u2014 regime 'ROTATION_WARN'",
+      "source": "data/research/nqes_regime.json",
+      "source_age_hours": 7.589,
+      "detail": {
+        "regime": "ROTATION_WARN",
+        "read": "NQ weak vs ES \u2014 rotation OUT of tech. A breadth/rotation warning; tech-led longs are suspect.",
+        "divergence": false,
+        "contemporaneous_corr": 0.887
+      }
+    },
+    "macro": {
+      "status": "OK",
+      "verdict": "INFO",
+      "favorable": false,
+      "size_multiplier": 0.0,
+      "reason": "macro backdrop INFO (VIX / curve / credit) \u2014 shared input",
+      "source": "data/macro/macro_snapshot.json",
+      "source_age_hours": 2.939,
+      "detail": {
+        "vix": 16.82,
+        "curve_10y2y": 0.621,
+        "curve_10y3m": 0.903,
+        "credit_hyg": 79.55,
+        "dgs10": 4.648
+      }
+    }
+  },
+  "portfolio": {
+    "status": "UNAVAILABLE",
+    "reason": "no unified position-by-cluster ledger on disk; open exposure and the drawdown breaker cannot be read. Caps/limits shown are from config.",
+    "open_exposure_by_cluster": null,
+    "cluster_caps": null,
+    "max_concurrent_positions": 5,
+    "daily_pnl_pct": null,
+    "daily_drawdown_limit_pct": 0.02,
+    "drawdown_breaker_tripped": null,
+    "drawdown_breaker_status": "UNAVAILABLE",
+    "source": "config/parameters.yml::hard_constraints (caps only); no position ledger"
+  },
+  "_meta": {
+    "writer": "scripts/build_system_regime.py",
+    "note": "Neutral platform/ layer \u2014 reads JSON outputs, imports neither ict/ nor sovereign/."
+  }
+}
