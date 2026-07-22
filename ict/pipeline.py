@@ -47,6 +47,10 @@ from ict.micro_risk import MicroRiskEngine, MicroRiskParams, PositionSizing, Ris
 # (CLAUDE.md NN#1 stands). Connected Edge × Regime: ICT sizes only when its
 # shared regime verdict is favorable, and never trades a stale/adverse regime.
 from alta_platform.regime_client import get_regime
+# Shared health read (the conscience / measurement layer). Same neutral layer,
+# same isolation legality. Connected gate: ICT sizes only when regime is FAVORABLE
+# AND the conscience is HEALTHY; a HALT or stale conscience vetoes the trade.
+from alta_platform.health_client import get_health
 
 logger = logging.getLogger(__name__)
 
@@ -634,6 +638,28 @@ class ICTPipeline:
                 return ICTVeto(symbol=symbol, direction=direction, timestamp=timestamp,
                                score=total_score, grade=ICTGrade.VETOED,
                                reason=f"Regime gate: STAND_ASIDE — {_regime.reason}",
+                               component_scores=scores,
+                               confirmations=confirmations, missing=missing,
+                               entry_level=ep, stop=stop)
+
+            # ── Gate 0b: shared conscience verdict (the measurement layer) ────
+            # Two live gates: trade only when regime says FAVORABLE (above) AND
+            # the conscience says HEALTHY. A HALT kill switch or a stale/missing
+            # verdict vetoes the trade — the conscience fails SAFE (absent
+            # evidence never green-lights). REDUCE does not veto here; it flows
+            # through as a size dampener once an ict_equities REDUCE multiplier is
+            # wired. Today ict_equities reads REDUCE (portfolio breaker feed
+            # UNAVAILABLE), so this gate does not yet veto — but a genuine HALT
+            # (data-integrity FAIL / breaker trip) or a stale conscience will.
+            _health = get_health("ict_equities")
+            if _health.kill_switch == "HALT" or _health.stale:
+                logger.info(
+                    "ICT conscience gate: %s (stale=%s) — %s; skipping %s %s",
+                    _health.kill_switch, _health.stale, _health.reason, symbol, direction,
+                )
+                return ICTVeto(symbol=symbol, direction=direction, timestamp=timestamp,
+                               score=total_score, grade=ICTGrade.VETOED,
+                               reason=f"Conscience gate: {_health.kill_switch} — {_health.reason}",
                                component_scores=scores,
                                confirmations=confirmations, missing=missing,
                                entry_level=ep, stop=stop)

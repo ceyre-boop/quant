@@ -1,0 +1,106 @@
+{
+  "generated_at": "2026-07-22T22:17:11.044874+00:00",
+  "status": "DEGRADED",
+  "status_reason": "portfolio:OK/REDUCE; undertow_gapper:REDUCE; ict_equities:REDUCE; carry:REDUCE",
+  "strategies": {
+    "undertow_gapper": {
+      "kill_switch": "REDUCE",
+      "reason": "edge health INSUFFICIENT_DATA \u2014 cannot confirm live edge \u2192 REDUCE floor",
+      "edge_health": {
+        "live_expectancy_R": null,
+        "backtest_expectancy_R": 0.01596,
+        "divergence_flag": false,
+        "n_live": 3,
+        "n_needed": 250,
+        "status": "INSUFFICIENT_DATA",
+        "reason": "3 live shadow signals < 250 needed \u2014 INSUFFICIENT_DATA. Live expectancy not estimable; no confident 'healthy' from a handful of signals. Backtest event-mean expectancy 0.01596 for reference.",
+        "source": "data/research/yield_frontier/shadow/shadow_daily.jsonl (live) + data/research/yield_frontier/gauntlet/verdicts.json::HYP-093 (backtest)"
+      },
+      "process_adherence": {
+        "decisions_matched_rules_pct": null,
+        "status": "UNAVAILABLE",
+        "reason": "process-adherence requires the ICT causal-chain setup ledger (data/agent/ict_causal_chain.jsonl (ICT setup ledger, Layer 8 \u2014 not written yet)), which is not written yet. No adherence score is fabricated; this fills once the ledger exists.",
+        "needed_source": "data/agent/ict_causal_chain.jsonl (ICT setup ledger, Layer 8 \u2014 not written yet)"
+      },
+      "forecast_vs_execution": {
+        "read_accuracy": null,
+        "execution_quality": null,
+        "status": "UNAVAILABLE",
+        "reason": "forecast-vs-execution requires per-setup read-outcome and fill-quality records from the ICT causal-chain ledger (data/agent/ict_causal_chain.jsonl (ICT setup ledger, Layer 8 \u2014 not written yet)), not written yet. 'Was the read right' and 'was the fill good' stay separate and unfaked.",
+        "needed_source": "data/agent/ict_causal_chain.jsonl (ICT setup ledger, Layer 8 \u2014 not written yet)"
+      }
+    },
+    "ict_equities": {
+      "kill_switch": "REDUCE",
+      "reason": "edge health UNAVAILABLE \u2014 cannot confirm live edge \u2192 REDUCE floor",
+      "edge_health": {
+        "live_expectancy_R": null,
+        "backtest_expectancy_R": null,
+        "divergence_flag": false,
+        "n_live": null,
+        "n_needed": null,
+        "status": "UNAVAILABLE",
+        "reason": "no ict_equities live edge ledger on disk; live-vs-backtest expectancy cannot be computed. Section fills once ICT logs closed-trade outcomes.",
+        "source": "(none yet)"
+      },
+      "process_adherence": {
+        "decisions_matched_rules_pct": null,
+        "status": "UNAVAILABLE",
+        "reason": "process-adherence requires the ICT causal-chain setup ledger (data/agent/ict_causal_chain.jsonl (ICT setup ledger, Layer 8 \u2014 not written yet)), which is not written yet. No adherence score is fabricated; this fills once the ledger exists.",
+        "needed_source": "data/agent/ict_causal_chain.jsonl (ICT setup ledger, Layer 8 \u2014 not written yet)"
+      },
+      "forecast_vs_execution": {
+        "read_accuracy": null,
+        "execution_quality": null,
+        "status": "UNAVAILABLE",
+        "reason": "forecast-vs-execution requires per-setup read-outcome and fill-quality records from the ICT causal-chain ledger (data/agent/ict_causal_chain.jsonl (ICT setup ledger, Layer 8 \u2014 not written yet)), not written yet. 'Was the read right' and 'was the fill good' stay separate and unfaked.",
+        "needed_source": "data/agent/ict_causal_chain.jsonl (ICT setup ledger, Layer 8 \u2014 not written yet)"
+      }
+    },
+    "carry": {
+      "kill_switch": "REDUCE",
+      "reason": "edge health UNAVAILABLE \u2014 cannot confirm live edge \u2192 REDUCE floor",
+      "edge_health": {
+        "live_expectancy_R": null,
+        "backtest_expectancy_R": null,
+        "divergence_flag": false,
+        "n_live": null,
+        "n_needed": null,
+        "status": "UNAVAILABLE",
+        "reason": "carry edge-health feed not wired (execution path frozen until 2026-07-28).",
+        "source": "(frozen)"
+      },
+      "process_adherence": {
+        "decisions_matched_rules_pct": null,
+        "status": "UNAVAILABLE",
+        "reason": "process-adherence requires the ICT causal-chain setup ledger (data/agent/ict_causal_chain.jsonl (ICT setup ledger, Layer 8 \u2014 not written yet)), which is not written yet. No adherence score is fabricated; this fills once the ledger exists.",
+        "needed_source": "data/agent/ict_causal_chain.jsonl (ICT setup ledger, Layer 8 \u2014 not written yet)"
+      },
+      "forecast_vs_execution": {
+        "read_accuracy": null,
+        "execution_quality": null,
+        "status": "UNAVAILABLE",
+        "reason": "forecast-vs-execution requires per-setup read-outcome and fill-quality records from the ICT causal-chain ledger (data/agent/ict_causal_chain.jsonl (ICT setup ledger, Layer 8 \u2014 not written yet)), not written yet. 'Was the read right' and 'was the fill good' stay separate and unfaked.",
+        "needed_source": "data/agent/ict_causal_chain.jsonl (ICT setup ledger, Layer 8 \u2014 not written yet)"
+      }
+    }
+  },
+  "portfolio": {
+    "data_integrity": "OK",
+    "consecutive_breaker_hits": null,
+    "drawdown_breaker_tripped": null,
+    "drawdown_breaker_status": "UNAVAILABLE",
+    "regime_contract_status": "DEGRADED",
+    "regime_contract_age_hours": 1.318,
+    "kill_switch": "REDUCE",
+    "reason": "portfolio drawdown-breaker feed UNAVAILABLE (no unified position/P&L ledger); cannot confirm account safety \u2192 REDUCE (never full TRADE)",
+    "sources": [
+      "data/agent/system_regime_state.json"
+    ]
+  },
+  "_meta": {
+    "writer": "scripts/build_system_health.py",
+    "spec": "specs/measurement_layer.md",
+    "note": "The conscience. Neutral alta_platform/ layer \u2014 reads JSON/JSONL outputs, imports neither ict/ nor sovereign/. Kill switch fails SAFE."
+  }
+}

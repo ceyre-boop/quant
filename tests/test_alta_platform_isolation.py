@@ -56,6 +56,8 @@ def test_importing_platform_pulls_neither_side_at_runtime():
         "import sys\n"
         "import alta_platform.regime_client\n"
         "import alta_platform.regime_contract\n"
+        "import alta_platform.health_client\n"
+        "import alta_platform.measurement\n"
         "bad = [m for m in sys.modules\n"
         "       if m.split('.')[0] in {'ict','ict_engine','sovereign','layer1','layer2','layer3'}]\n"
         "assert not bad, 'alta_platform import pulled in: %r' % bad\n"

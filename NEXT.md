@@ -4,6 +4,47 @@ Per-session ledger: what shipped, push status, verdicts, blockers, refusals. New
 The Obsidian brain (`~/Obsidian/Obsidian/00-BRAIN/NEXT.md`) is the cross-project rollup.
 Standing constraints live in `CLAUDE.md` — not restated here.
 
+### 2026-07-22 · The conscience (measurement layer) — BUILT + RUNNING
+Second organ of the nervous system, per `specs/measurement_layer.md`. Neutral `alta_platform/`
+module — imports neither `ict/` nor `sovereign/` (reads their journals/ledgers as data). Shipped:
+- `alta_platform/measurement.py` — EdgeHealth/StrategyHealth models, portfolio integrity + kill
+  switch, undertow edge-health, honest-UNAVAILABLE process-adherence + forecast-vs-execution.
+- `alta_platform/health_client.py` — `get_health(strategy) -> HealthRead` (`.kill_switch`,
+  `.edge_divergence`, `.stale`); safe-by-default HALT.
+- `scripts/build_system_health.py` (writer) + `scripts/com.alta.system_health_verdict.plist`
+  (30-min schedule, NOT installed).
+- Config `platform.health` thresholds logged to `param_change_log.jsonl` (NN#4). NO risk caps
+  duplicated — drawdown ladder read from RISK_CONSTITUTION.md Art.3.
+- ICT wired to read the conscience at its Gate-0 sizing gate (Gate 0b), alongside the regime read.
+
+LIVE VERDICT (`data/agent/system_health_verdict.json`, status DEGRADED — honest):
+- **undertow_gapper: edge_health = INSUFFICIENT_DATA (n_live=3 shadow signals < n_needed=250),
+  kill_switch = REDUCE.** Backtest event-mean expectancy 0.01596 (HYP-093) shown for reference;
+  live expectancy NOT estimated from 3 signals. This honesty is the deliverable.
+- ict_equities: edge_health UNAVAILABLE (no live edge ledger), kill_switch REDUCE.
+- carry: UNAVAILABLE (execution path frozen until 2026-07-28 — not wired).
+- portfolio: data_integrity OK; drawdown-breaker feed UNAVAILABLE → REDUCE (no unified
+  position/P&L ledger; cannot confirm account safety → never full TRADE).
+
+Honestly UNAVAILABLE + why: process-adherence + forecast-vs-execution across all strategies need
+the ICT causal-chain setup ledger (`data/agent/ict_causal_chain.jsonl`, Layer 8) which is not
+written yet — reported UNAVAILABLE with the exact source needed, no fabricated scores.
+
+TESTS: `tests/test_alta_platform_isolation.py` green both directions (extended to import
+`health_client` + `measurement`); `test_pipeline_does_not_import_sovereign` green after ICT wiring.
+
+BLOCKER (operator hand): git commit + push could NOT run — a stale `.git/index.lock` (crashed
+process from 16:10, owned by host) is unremovable from the sandbox ("Operation not permitted").
+All changes are on disk, UNCOMMITTED. Colin: on the host run
+`cd ~/quant && rm -f .git/index.lock`, then commit (suggested split: (1) config +
+param_change_log + alta_platform measurement/health_client/__init__ + isolation test;
+(2) scripts/build_system_health.py + plist + data/agent/system_health_verdict.json;
+(3) ict/pipeline.py conscience gate + NEXT.md), then `git push`.
+
+TO INSTALL the schedule (do once, on host):
+`cp scripts/com.alta.system_health_verdict.plist ~/Library/LaunchAgents/ && launchctl load
+~/Library/LaunchAgents/com.alta.system_health_verdict.plist`
+
 ---
 
 ## 2026-07-22 — [PLATFORM]/[ICT] Rename platform→alta_platform; wire ICT regime gate (shipped, push BLOCKED)

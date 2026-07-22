@@ -290,3 +290,37 @@ experience:
     review_enabled: false
     decision_time_enabled: false
     top_k: 3
+
+# ── Platform: system regime contract (platform/ neutral connective layer) ──────────────────────────
+# Config for scripts/build_system_regime.py + platform/regime_client.py. New keys logged to
+# data/agent/param_change_log.jsonl (CLAUDE.md NN#4). NOT risk caps — freshness/staleness limits and
+# the reader's whole-file age guard. Carry/VIX thresholds are READ from existing keys
+# (hard_constraints.vix_extreme_threshold), not duplicated here.
+platform:
+  regime:
+    # Per-source staleness limit (hours). A source older than this downgrades its
+    # section to STALE and forces that strategy's verdict to STAND_ASIDE.
+    freshness_hours:
+      carry: 12.0       # forex_proximity.json — same-session read; 12h avoids false-STALE between scans
+      es_nq: 12.0       # nqes_regime.json — research cadence
+      macro: 12.0       # macro_snapshot.json — daily-ish macro series
+    # Client-side whole-contract age guard (hours): regime_client forces every read
+    # STALE if system_regime_state.json is older than this (writer runs every 30 min;
+    # 1.5h = 3 missed runs). Mirrored by ALTA_REGIME_MAX_AGE_HOURS env default.
+    contract_max_age_hours: 1.5
+  # ── The conscience (measurement layer). specs/measurement_layer.md. ────────────────
+  # Config for scripts/build_system_health.py + alta_platform/health_client.py. NOT risk
+  # caps — measurement thresholds. Risk caps themselves are READ from RISK_CONSTITUTION.md
+  # / hard_constraints, never duplicated here. New keys logged to param_change_log.jsonl.
+  health:
+    freshness_hours:
+      shadow: 96.0        # shadow_daily.jsonl — appended on trading days; 4d tolerates weekends/gaps
+      gauntlet: 720.0     # verdicts.json — a backtest artifact, refreshed on re-runs (~monthly)
+      regime: 1.5         # system_regime_state.json — the conscience reads the regime organ's freshness
+    contract_max_age_hours: 1.5   # health_client whole-file age guard (writer every 30 min = 3 missed runs)
+    edge_health:
+      n_needed_default: 250       # live signals needed before an edge can read "healthy" (not 3 trades)
+      divergence_R_threshold: 0.5 # |live - backtest| expectancy (R) past this → divergence flag / HALT
+    # Kill-switch HALT on consecutive drawdown-breaker hits. Ladder lives in RISK_CONSTITUTION.md
+    # Art. 3 (3.5/5/6.5); this is the count of consecutive breaker trips that forces HALT.
+    consecutive_breaker_halt_n: 2

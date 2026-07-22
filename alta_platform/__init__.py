@@ -14,9 +14,12 @@ point: one place both walls can read from.
 
 Contents:
   * ``regime_client``   — the reader: ``get_regime(strategy) -> RegimeRead``.
-  * ``regime_contract`` — the writer's data-model + classifiers.
+  * ``regime_contract`` — the regime writer's data-model + classifiers.
+  * ``health_client``   — the conscience reader: ``get_health(strategy) -> HealthRead``.
+  * ``measurement``     — the conscience writer's data-model + measurements.
 
-The writer script lives at ``scripts/build_system_regime.py``.
+The writer scripts live at ``scripts/build_system_regime.py`` and
+``scripts/build_system_health.py``.
 
 Naming: this package was originally named ``platform``, which SHADOWED Python's
 stdlib ``platform`` module (used by ``uuid``, and therefore ``pytest``). It was
@@ -24,4 +27,4 @@ renamed to ``alta_platform`` on 2026-07-22 so the stdlib name is never masked;
 the transparent-superset workaround that renaming required is no longer needed.
 """
 
-__all__ = ["regime_client", "regime_contract"]
+__all__ = ["regime_client", "regime_contract", "health_client", "measurement"]

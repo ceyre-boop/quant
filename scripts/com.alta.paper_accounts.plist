@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  com.alta.paper_accounts  the observability plumbing.
+  Rebuilds data/agent/prop_account_balance.json (Undertow paper shadow, the dashboard's
+  prop panel) and data/agent/carry_paper_account.json from the real forward ledgers, so
+  the dashboard shows the live paper run instead of a phantom $0.
+
+  Every 15 min. New neutral script, touches no execution path.
+
+  INSTALL (once, on host):
+    cp scripts/com.alta.paper_accounts.plist ~/Library/LaunchAgents/
+    launchctl load ~/Library/LaunchAgents/com.alta.paper_accounts.plist
+    launchctl start com.alta.paper_accounts
+  VERIFY:
+    python3 -c "import json;print(json.load(open('$HOME/quant/data/agent/prop_account_balance.json'))['balance'])"
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.alta.paper_accounts</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/Users/taboost/quant/.venv/bin/python3</string>
+    <string>/Users/taboost/quant/scripts/build_paper_accounts.py</string>
+  </array>
+  <key>WorkingDirectory</key><string>/Users/taboost/quant</string>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key><string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+  </dict>
+  <key>StartInterval</key><integer>900</integer>
+  <key>RunAtLoad</key><true/>
+  <key>StandardOutPath</key><string>/Users/taboost/quant/logs/paper_accounts.log</string>
+  <key>StandardErrorPath</key><string>/Users/taboost/quant/logs/paper_accounts.log</string>
+</dict>
+</plist>
