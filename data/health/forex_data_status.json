@@ -1,0 +1,18 @@
+{
+  "ts": "2026-07-22T02:47:05.927154+00:00",
+  "overall": "GREEN",
+  "stale_hours": 24.0,
+  "degraded_pairs": [],
+  "fake_data_pairs": [],
+  "pairs": {
+    "GBPUSD=X": {
+      "status": "OK",
+      "source": "yfinance",
+      "reason": "yfinance returned an empty OHLCV frame",
+      "last_failure": "2026-07-20T12:23:49.675628+00:00",
+      "age_hours": 38.39,
+      "sentinel": "sentinel/DEGRADED_yfinance_GBPUSD.txt"
+    }
+  },
+  "note": "FAKE_DATA means carry_engine substituted a 0.001 ATR stub that reaches sizing. Fetcher failover is blocked by the execution-path freeze \u2014 see the module docstring and NEXT.md."
+}
