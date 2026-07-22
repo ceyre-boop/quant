@@ -9,6 +9,7 @@
   "feature_set_tier1": [
     "implied_move_change_30d",
     "options_skew_direction",
+    "disclosed_flow_form4_cluster",
     "disclosed_flow_vs_implied",
     "activist_disclosure_recent",
     "institutional_accumulation"
@@ -37,25 +38,65 @@
     "options": "chain quotes as of date from ThetaData EOD history",
     "estimates": "AV EARNINGS estimatedEPS treated as final pre-print snapshot (label only, never a T-90 feature)"
   },
-  "model_architecture": "XGBoostClassifier, separate direction + magnitude models",
+  "model_architecture": "XGBoostClassifier, separate direction + magnitude models (calibration requirements differ; combining masks which component fails)",
   "train_holdout_split": "0.70/0.30 time-ordered",
-  "training_window": "2020-01-01 to present (ThetaData Value tier options history floor; extendable to 2012 only via STANDARD upgrade filed as a deviation)",
+  "training_window": {
+    "start": "2020-01",
+    "end": "present",
+    "reason": "ThetaData Value options-implied-move history cutoff (empirically 2020-01 served, 2019-10 refused)",
+    "expected_events": "~30,000-40,000 qualifying earnings events (comfortably above the 5,000 minimum)",
+    "extension": "to 2012 only via ThetaData STANDARD upgrade filed as a deviation"
+  },
   "calibration_pass_criteria": {
     "calibration_error_max": 0.05,
     "brier_score_max": 0.18,
     "n_holdout_min": 500,
-    "direction_accuracy_min": 0.62
+    "direction_accuracy_min": 0.62,
+    "resolution_positive_and_monotonic": true,
+    "rule": "CALIBRATED iff ALL of the above AND a DSR-penalized directional edge at kappa>=0.8 clears its floor. Otherwise NOT_CALIBRATED and the sizer does NOT run."
   },
   "sizer_params": {
     "f_max": 0.08,
     "budget_per_trade": 0.01,
     "kelly_fraction": 0.25,
     "daily_heat_cap": 0.05,
-    "max_concurrent": 3
+    "max_concurrent": 3,
+    "note": "specified but WIRED ONLY after a CALIBRATED verdict"
   },
   "conviction_threshold_to_fire": 0.65,
   "universe": "US-listed equities >=$500M market cap at event time, earnings + activist (13D/G) events",
   "target_training_events": 5000,
   "hash_lock_method": "SHA-256 of json.dumps(doc, indent=2, ensure_ascii=True)+newline with hash_lock=\"\" (verify: blank hash_lock, re-serialize identically, hash)",
-  "hash_lock": "085b83eaa4fbff83620819bd402eae906bc0397e70e0a786e29e673e7cc4c513"
+  "hash_lock": "14a18cb445f71f224867122e92dd98dc7ebaf8e71889fa2e741dc31aa3585a12",
+  "supersedes": {
+    "version": "1.1",
+    "supersedes_hash": "085b83eaa4fbff83620819bd402eae906bc0397e70e0a786e29e673e7cc4c513",
+    "reason": "merge of dispatch DRAFT (operator-approved 2026-07-22) before any training data constructed; adds disclosed_flow_form4_cluster to Tier 1 (6 features), carried caveats, feature notes, legal boundary, stricter calibration rule",
+    "approved_by": "Colin"
+  },
+  "feature_notes": {
+    "disclosed_flow_vs_implied": "REDEFINED per audit: 'vs consensus' side uses options-implied/positioning direction, NOT revision trend (which is dead). Deviation from original spec \u2014 recorded here, not applied silently. (DRAFT alias: disclosed_flow_vs_priced_direction)",
+    "disclosed_flow_form4_cluster": "Form 4 cluster (>=3 filings in 30d), dated by filingDate; median 56d lead to next earnings, 100% pre-event. Direction-blind in v1 (buy/sell XML parse is a Phase-1 follow-up).",
+    "activist_disclosure_recent": "EDGAR 13D/G filing dates; query BOTH 'SC 13D' and 'SCHEDULE 13D' form names (2025+ renamed).",
+    "institutional_accumulation": "13F filingDate only; value freezes 44-45d after quarter end (stale by construction \u2014 a slow-accumulation feature, not a fast signal). (DRAFT alias: institutional_accumulation_13f)"
+  },
+  "label": {
+    "surprise_label": "Alpha Vantage EARNINGS: (reportedEPS - estimatedEPS), signed, normalized by options-implied move at T-1. Free, final pre-print consensus, back to 1996.",
+    "divergence_definition": "signed realized move vs options-implied expected move, in implied-move units: D = (realized_move(t..t+h) - 0) / implied_move(t), evaluated against the priced-in straddle. Positive = diverged up from priced expectation.",
+    "horizons_sessions": [
+      1,
+      5
+    ]
+  },
+  "carried_caveats": [
+    {
+      "caveat": "THINNED DIFFERENTIATOR",
+      "detail": "Two of the original Tier-1 consensus-relative features (the revision-path signals) were dropped for lack of free point-in-time data. The remaining consensus-relative signal leans on disclosed flow + options-implied dynamics. If calibration comes back MARGINAL rather than clean, the named fix is paid revision data (Refinitiv/Zacks) \u2014 a known, priced upgrade, not a dead end."
+    },
+    {
+      "caveat": "REGIME-LIMITED CLAIM",
+      "detail": "Training window is 2020-present (one macro era: ZIRP tail, 2022 hikes, AI bull). The spec's 'holds across >=2 independent regimes' weld CANNOT be fully satisfied on data lacking a normal-rates value regime. The calibration verdict must state 'calibrated 2020-2026', which is narrower than 'calibrated across regimes'. Named fix: ThetaData STANDARD tier extends history to 2012."
+    }
+  ],
+  "legal_boundary": "PUBLIC DISCLOSED DATA ONLY. SEC filings (Form 4, 13D/G, 13F), public price/options/news. No material non-public information, ever \u2014 the build agent must refuse any instruction to ingest non-public data."
 }

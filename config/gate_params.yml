@@ -1,0 +1,155 @@
+# ── Petrules Gate — Daily Scanner parameters ─────────────────────────────────
+# Single source of truth for every threshold in the Phase-0 rule-based scanner.
+# CLAUDE.md rule #4 / ticket non-negotiable: NO hardcoded thresholds in code.
+# Any change to this file → log rationale to data/agent/param_change_log.jsonl.
+#
+# Spec: tickets/DISPATCH_PETRULES_GATE_SCANNER.md
+#       research/PETRULES_GATE_SPEC.md
+#
+# DISCIPLINE: This scanner surfaces signals only. It NEVER auto-trades.
+# The `sizing` block it emits is informational/backtest-only, not a trade directive.
+
+meta:
+  version: 1
+  spec: tickets/DISPATCH_PETRULES_GATE_SCANNER.md
+  phase: 0                       # rule-based; ML calibration is a later ticket
+  updated: "2026-07-22"
+
+# ── Conviction rubric: factor weights (must sum to 1.0) ──────────────────────
+weights:
+  insider_cluster: 0.30          # Form 4 open-market insider clusters
+  revision_velocity: 0.25        # analyst upgrade/downgrade velocity, 10d
+  options_flow: 0.25             # unusual vol/OI + premium
+  activist: 0.20                 # 13D/G new filing or amendment
+
+# ── Tier cutoffs (conviction score in [0,1]) ─────────────────────────────────
+tiers:
+  tier4_min: 0.85                # SCREAMER  — surfaced
+  tier3_min: 0.70                # STRONG    — surfaced
+  tier2_min: 0.50                # WATCH     — logged to history, not on dashboard
+  # below tier2_min => TIER 1 noise, discarded after logging counts only
+
+# ── Per-factor scoring bands ─────────────────────────────────────────────────
+# Each band is [threshold_met_if_ge, score]. Evaluated highest-first.
+scoring:
+  insider_cluster:
+    # signal inputs: n_buyers, cluster_within_days, total_usd, includes_csuite, n_sellers
+    cluster_window_days: 5
+    csuite_bonus_min_usd: 1000000   # 4+ insiders incl C-suite > $1M total => 1.0
+    sell_penalty: 0.20              # any sells in same window => subtract this
+    bands:                          # keyed by (min_buyers, min_total_usd) -> score
+      - {min_buyers: 3, cluster_within_days: 5, score: 0.8}
+      - {min_buyers: 2, min_total_usd: 0,       score: 0.5}
+      - {min_buyers: 1, min_total_usd: 500000,  score: 0.3}
+      - {min_buyers: 1, min_total_usd: 0,       score: 0.1}
+      - {min_buyers: 0, min_total_usd: 0,       score: 0.0}
+  revision_velocity:
+    window_days: 10
+    downgrade_cap: 0.5              # any downgrade caps this factor at 0.5
+    bands:                          # keyed by (min_upgrades, max_downgrades) -> score
+      - {min_upgrades: 6, max_downgrades: 0, score: 1.0}
+      - {min_upgrades: 3, max_downgrades: 1, score: 0.6}
+      - {min_upgrades: 1, max_downgrades: 0, score: 0.3}
+      - {min_upgrades: 0, max_downgrades: 99, score: 0.0}
+  options_flow:
+    min_contract_volume: 5000       # single-strike volume floor for a "block"
+    bands:                          # keyed by (min_vol_oi, min_premium_usd) -> score
+      - {multiple_strikes_same_side: true,      score: 1.0}
+      - {min_vol_oi: 3.0, min_premium_usd: 500000, score: 0.8}
+      - {min_vol_oi: 3.0, min_premium_usd: 250000, score: 0.6}
+      - {min_vol_oi: 2.0, min_premium_usd: 0,      score: 0.3}
+      - {min_vol_oi: 0.0, min_premium_usd: 0,      score: 0.0}
+  activist:
+    bands:                          # keyed by filing type -> score
+      new_13d: 1.0                  # new activist
+      amend_13d_increase: 0.7       # activist increased stake
+      new_13g: 0.5                  # first passive disclosure
+      amend_13g_increase: 0.3       # passive increased
+      none: 0.0
+
+# ── Sizing block (INFORMATIONAL ONLY — never a trade directive) ──────────────
+# Mirrors research/PETRULES_GATE_SPEC.md Subsystem 3, but this Phase-0 scanner
+# is UNCALIBRATED, so every emitted sizing block carries calibration_status.
+sizing:
+  f_max: 0.08                       # hard notional ceiling — welded
+  budget_per_trade: 0.01            # 1% risk per trade
+  kelly_fraction: 0.25              # quarter-Kelly
+  worst_case_loss_default: 0.15     # activist-class default drawdown
+  edge_ratio_default: 2.0           # E[gain|correct]/E[loss|wrong], placeholder
+  calibration_status: "BACKTEST ONLY — uncalibrated, not a trade directive"
+
+# ── Universe construction ────────────────────────────────────────────────────
+universe:
+  refresh_days: 7                   # rebuild gate_universe.json weekly
+  sp500_wikipedia: "https://en.wikipedia.org/wiki/List_of_S%26P_500_companies"
+  russell2000_iwm_csv: "https://www.ishares.com/us/products/239710/ishares-russell-2000-etf/1467271812596.ajax?fileType=csv&fileName=IWM_holdings&dataType=fund"
+  carry_pairs: ["AUDUSD=X", "NZDUSD=X", "USDJPY=X", "EURUSD=X"]
+  etfs:
+    - SPY
+    - QQQ
+    - IWM
+    - DIA
+    - VTI
+    - VOO
+    - XLK
+    - XLF
+    - XLE
+    - XLV
+    - XLI
+    - XLY
+    - XLP
+    - XLU
+    - XLB
+    - XLRE
+    - XLC
+    - SMH
+    - SOXX
+    - XBI
+    - IBB
+    - KRE
+    - KBE
+    - ITB
+    - XHB
+    - GDX
+    - GDXJ
+    - SLV
+    - GLD
+    - USO
+    - UNG
+    - TLT
+    - IEF
+    - SHY
+    - HYG
+    - LQD
+    - EEM
+    - EFA
+    - FXI
+    - EWZ
+    - EWJ
+    - VNQ
+    - ARKK
+    - VXX
+    - UVXY
+    - TQQQ
+    - SQQQ
+    - SPXL
+    - SPXS
+    - VGK
+
+# ── EDGAR client (SEC rate-limit compliance) ─────────────────────────────────
+edgar:
+  user_agent: "Alta Research colineyre222@gmail.com"
+  request_sleep_sec: 1.0            # SEC fair-access: >= 1s between requests
+  max_retries: 3
+  backoff_base_sec: 2.0             # exponential backoff on 429
+  form4_lookback_days: 5
+  activist_lookback_days: 7
+  full_text_search: "https://efts.sec.gov/LATEST/search-index"
+
+# ── Output paths ─────────────────────────────────────────────────────────────
+paths:
+  scan_output: "data/agent/petrules_gate_scan.json"
+  universe: "data/agent/gate_universe.json"
+  scan_history: "data/agent/gate_scan_history.jsonl"     # append-only, tier 2+
+  calibration_log: "data/agent/gate_calibration.jsonl"   # append-only outcomes
+  param_change_log: "data/agent/param_change_log.jsonl"

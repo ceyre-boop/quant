@@ -4,6 +4,52 @@ Per-session ledger: what shipped, push status, verdicts, blockers, refusals. New
 The Obsidian brain (`~/Obsidian/Obsidian/00-BRAIN/NEXT.md`) is the cross-project rollup.
 Standing constraints live in `CLAUDE.md` — not restated here.
 
+### 2026-07-22 · Petrules Gate daily scanner BUILT (Phase 0, rule-based, standalone research)
+Built the free-data daily scanner per `tickets/DISPATCH_PETRULES_GATE_SCANNER.md`. Rule-based
+ONLY (no ML — that's a later ticket). Scores ~2,550 instruments (S&P500 + Russell2000 + 50 ETFs
++ 4 carry pairs) each morning on 4 factors and writes one JSON the dashboard already reads.
+
+**Shipped (all standalone research — NO sovereign/ or ict/ imports; verified via grep):**
+- **`config/gate_params.yml` (NEW)** — every factor weight (0.30/0.25/0.25/0.20), tier cutoff
+  (4≥0.85, 3≥0.70, 2≥0.50), per-factor scoring band, sizing params, EDGAR settings, and the
+  full universe (ETF list + carry pairs). No threshold is hardcoded in code.
+- **`scripts/gate_universe.py`** — S&P500 (Wikipedia), Russell2000 (iShares IWM CSV), ETFs +
+  carry from config → `data/agent/gate_universe.json`; weekly staleness refresh; raises (no
+  fabricated universe) on source failure.
+- **`scripts/gate_edgar_client.py`** — SEC EDGAR Form 4 + SC 13D/13G fetcher. Real UA
+  ("Alta Research colineyre222@gmail.com"), ≥1s spacing, 429 exponential backoff, raises
+  `EdgarUnavailable` (→ error JSON) rather than faking data.
+- **`scripts/gate_options_screen.py`** — yfinance vol/OI flow approximation + analyst
+  revision-velocity extraction. Missing data → None (scorer treats as 0.0, never fabricated).
+- **`scripts/gate_scorer.py`** — pure rule-based rubric: 4 factor scorers, weighted conviction,
+  tier assignment, and an INFORMATIONAL sizing block (quarter-Kelly, hard f_max=0.08) that
+  always carries `calibration_status: "BACKTEST ONLY — uncalibrated, not a trade directive"`.
+- **`scripts/petrules_gate_scanner.py`** — orchestrator. Writes `petrules_gate_scan.json`
+  (dashboard schema), appends `gate_scan_history.jsonl` (tier 2+) and `gate_calibration.jsonl`
+  (tier 3+ stubs, outcome=None, append-only). On any source failure writes the honest
+  `{"error","scanned_at"}` JSON and exits non-zero. `--self-test` runs a fully offline
+  fixture scan. **It writes a JSON file and nothing else — no execution/sizing wiring.**
+- **`scripts/com.alta.petrules_gate.plist`** — 09:00 ET Mon–Fri, TZ=America/New_York. NOT
+  installed. Colin installs with:
+  `cp scripts/com.alta.petrules_gate.plist ~/Library/LaunchAgents/ && launchctl load ~/Library/LaunchAgents/com.alta.petrules_gate.plist`
+- **`tests/test_petrules_gate_scanner.py`** — 8 offline tests, all pass.
+
+**Verified structurally in-sandbox (network firewalled — no live scan possible here):**
+- Self-test + pytest (8/8) green: tiering (NVDA→T4, AAPL→T3), weights sum to 1.0, selling
+  penalty, downgrade cap, missing-data→0.0, sizing honesty (f≤f_max, BACKTEST ONLY),
+  Tier-1 noise dropped from surfaced list.
+- ERROR-PATH proven: simulated `EdgarUnavailable` → honest `{"error","scanned_at"}` JSON, no crash.
+- Calibration append proven: tier-3+ signal → one appended stub line, append-only, outcome=None.
+- No forbidden imports (grep clean). Dashboard already wired to read the file (index.html:919).
+
+**Needs Colin's Mac for first live run** (sandbox returns HTTP 403 for yfinance/EDGAR): the
+first real `python3 scripts/petrules_gate_scanner.py` — builds the real universe, hits EDGAR +
+Yahoo, writes the first live scan. Everything upstream of the network is verified.
+
+**Push status:** committed locally in logical steps; push may fail on sandbox keychain — see
+commit log. Calibration/scan/history data files left empty (fixture artifacts truncated), scan
+output left as an honest "not yet run live" error placeholder until the first live scan.
+
 ### 2026-07-22 · Layer-8 ICT causal-chain journal — the update_outcome() loop CLOSED (ICT non-frozen)
 Closes CLAUDE.md NON-NEGOTIABLE #2 for the ICT path: every evaluated ICT setup is now
 journaled with its full causal chain, and every ICT paper close fires update_outcome().
@@ -1922,3 +1968,13 @@ RQ-REST-017 cb_decisions audit: 1201 decisions, 71 surprises ≥25bp.
 Candidates flagged for operator: NONE — no pattern cleared first-pass permutation test tonight.
 Noted: recurring BLOCKED_NO_VALIDATOR on HYP-AUTO entries (07-20/21) — pre-existing, needs triage.
 Note: a parallel session wrote an earlier 2026-07-21 pattern entry; both retained (append-only).
+
+### 2026-07-22 · Petrules prereg v1.1 (merged, re-locked) + Template B scaffold
+Reconciled the two competing preregs (my hash-locked v1 vs dispatch's DRAFT) with Colin's approval:
+merged DRAFT's carried caveats (THINNED DIFFERENTIATOR, REGIME-LIMITED CLAIM), feature notes, legal
+boundary, stricter CALIBRATED rule, and added disclosed_flow_form4_cluster → Tier 1 now 6 features.
+Re-hashed as v1.1 (14a18cb4…, self-verify green, supersedes 085b83ea… recorded in-file); DRAFT
+deleted. Legitimate re-lock: zero training data constructed. Template B scaffolded at repo root
+(TEMPLATE_B_MINIMUM_VIABLE_INCOME.md): chain-to-payout per edge, 5 Colin-only decisions blanked,
+capital→$/mo worksheet — honest reading: MVI is capital-bound (~$1,665/mo at $100k). launchctl
+sanity: paper_accounts/system_regime/system_health_verdict/obsidian_sync all loaded, exit 0.
