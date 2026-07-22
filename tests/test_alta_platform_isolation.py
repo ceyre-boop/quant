@@ -1,13 +1,13 @@
-"""Isolation test for the neutral platform/ connective layer.
+"""Isolation test for the neutral alta_platform/ connective layer.
 
 CLAUDE.md NON-NEGOTIABLE #1: ict/ and ict-engine/ must never import sovereign/.
-The platform/ package sits ABOVE both walls and is importable from BOTH sides,
-so it must import NEITHER — otherwise importing it from ict/ would drag in
+The alta_platform/ package sits ABOVE both walls and is importable from BOTH
+sides, so it must import NEITHER — otherwise importing it from ict/ would drag in
 sovereign/ transitively and breach the wall.
 
 This test asserts isolation BOTH DIRECTIONS:
-  (A) static — no platform/*.py source contains an import of ict or sovereign.
-  (B) runtime — importing platform.* pulls neither 'ict' nor 'sovereign'
+  (A) static — no alta_platform/*.py source contains an import of ict or sovereign.
+  (B) runtime — importing alta_platform.* pulls neither 'ict' nor 'sovereign'
       (nor their submodules) into sys.modules.
 """
 
@@ -19,7 +19,7 @@ import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
-PLATFORM = REPO / "platform"
+PLATFORM = REPO / "alta_platform"
 
 FORBIDDEN_ROOTS = {"ict", "ict_engine", "sovereign", "layer1", "layer2", "layer3"}
 
@@ -54,11 +54,11 @@ def test_importing_platform_pulls_neither_side_at_runtime():
     'ict' nor 'sovereign' (nor submodules) ended up in sys.modules."""
     code = (
         "import sys\n"
-        "import platform.regime_client\n"
-        "import platform.regime_contract\n"
+        "import alta_platform.regime_client\n"
+        "import alta_platform.regime_contract\n"
         "bad = [m for m in sys.modules\n"
         "       if m.split('.')[0] in {'ict','ict_engine','sovereign','layer1','layer2','layer3'}]\n"
-        "assert not bad, 'platform import pulled in: %r' % bad\n"
+        "assert not bad, 'alta_platform import pulled in: %r' % bad\n"
         "print('OK')\n"
     )
     result = subprocess.run(

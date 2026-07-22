@@ -1,8 +1,8 @@
 """regime_client — the tiny reader every strategy calls before it sizes.
 
-Usage (importable from BOTH ict/ and sovereign/ — platform imports neither):
+Usage (importable from BOTH ict/ and sovereign/ — alta_platform imports neither):
 
-    from platform.regime_client import get_regime
+    from alta_platform.regime_client import get_regime
     r = get_regime("carry")               # reads system_regime_state.json
     if r.stale or r.verdict == "STAND_ASIDE":
         skip()                            # never trade a stale/adverse regime
@@ -29,7 +29,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-# Repo root is two levels up from this file (platform/regime_client.py -> repo/).
+# Repo root is two levels up from this file (alta_platform/regime_client.py -> repo/).
 REPO = Path(__file__).resolve().parent.parent
 
 # The one canonical contract file, written by scripts/build_system_regime.py.

@@ -2,14 +2,14 @@
 """build_system_regime.py — the writer for the system regime contract.
 
 Reads each strategy's EXISTING regime signal (JSON files, never imports), runs
-the small per-strategy classifiers in platform/regime_contract.py, assembles one
+the small per-strategy classifiers in alta_platform/regime_contract.py, assembles one
 canonical contract, and writes:
 
     data/agent/system_regime_state.json
 
 This is the "mirror" pattern (scripts/obsidian_sync.py) applied to regime: read
 the scattered per-strategy signals, write one honest unified contract, everyone
-reads it via platform.regime_client.get_regime().
+reads it via alta_platform.regime_client.get_regime().
 
 DISCIPLINE (non-negotiable):
   * Never raises. A crashed writer that leaves a stale contract claiming
@@ -20,7 +20,7 @@ DISCIPLINE (non-negotiable):
   * No hardcoded thresholds — all read from config/parameters.yml. New keys were
     logged to data/agent/param_change_log.jsonl before use.
 
-Isolation: this script + platform/ import neither ict/ nor sovereign/. It only
+Isolation: this script + alta_platform/ import neither ict/ nor sovereign/. It only
 reads their JSON outputs. The ict/<->sovereign wall is never touched.
 
 Usage:
@@ -42,7 +42,7 @@ REPO = Path(__file__).resolve().parent.parent
 if str(REPO) not in sys.path:
     sys.path.insert(0, str(REPO))
 
-from platform import regime_contract as rc  # noqa: E402  (after sys.path setup)
+from alta_platform import regime_contract as rc  # noqa: E402  (after sys.path setup)
 
 DATA = REPO / "data"
 CONFIG = REPO / "config" / "parameters.yml"
@@ -101,7 +101,7 @@ def build() -> dict:
         "portfolio": portfolio,
         "_meta": {
             "writer": "scripts/build_system_regime.py",
-            "note": "Neutral platform/ layer — reads JSON outputs, imports neither ict/ nor sovereign/.",
+            "note": "Neutral alta_platform/ layer — reads JSON outputs, imports neither ict/ nor sovereign/.",
         },
     }
 
