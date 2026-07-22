@@ -1,18 +1,16 @@
 {
-  "ts": "2026-07-20T20:02:16.498667+00:00",
-  "overall": "YELLOW",
+  "ts": "2026-07-21T20:26:15.343645+00:00",
+  "overall": "GREEN",
   "stale_hours": 24.0,
-  "degraded_pairs": [
-    "GBPUSD=X"
-  ],
+  "degraded_pairs": [],
   "fake_data_pairs": [],
   "pairs": {
     "GBPUSD=X": {
-      "status": "DEGRADED",
+      "status": "OK",
       "source": "yfinance",
       "reason": "yfinance returned an empty OHLCV frame",
       "last_failure": "2026-07-20T12:23:49.675628+00:00",
-      "age_hours": 7.64,
+      "age_hours": 32.04,
       "sentinel": "sentinel/DEGRADED_yfinance_GBPUSD.txt"
     }
   },

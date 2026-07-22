@@ -1,14 +1,14 @@
 {
-  "last_updated": "2026-07-20T08:19:45.368003+00:00",
+  "last_updated": "2026-07-21T06:48:55.266273+00:00",
   "harvest": {
     "trades_closed": 0,
     "win_rate": null,
     "failure_taxonomy": {}
   },
   "reflection": {
-    "candidate_lesson": "When the 30-indicator consensus reports green_matches=0 and hist_hr=0%, treat directional conviction as unvalidated regardless of how high conv% is \u2014 only pairs with green_matches>=3 and hist_hr>60% have earned execution weight.",
-    "mechanism": "green_matches counts how many times the current live indicator configuration has resolved profitably in historical memory. Zero matches means the present bull/bear tally is a novel configuration with no realized-edge basis; a high conv% only measures agreement among indicators, not that agreement's historical payoff. AUDUSD (12/30 bull, conv=75%, green_matches=3, hist_hr=68%) is the only pair whose signal has institutional-flow precedent; AUDNZD's 100% conv with green_matches=0 is unanchored consensus that historically has not paid.",
-    "testable_rule": "if consensus.green_matches < 3 or consensus.hist_hr < 0.60: veto_entry(pair)  # conv% alone is insufficient"
+    "candidate_lesson": "When 30-indicator conviction is 100% but green_matches is 0 and hist_hr is 0%, the consensus is a live-only phantom with no historical analog and must be sized to zero, not full conviction.",
+    "mechanism": "A 100% live conviction with zero green_matches means no historical instance of this exact indicator configuration has ever resolved profitably \u2014 the system is extrapolating into a state space it has never observed. Institutionally this happens when a crowded one-directional flow (all indicators agree) coincides with a structural break (e.g. USDJPY LONG at 8/30 bull, 0 green_matches, hist_hr=0%): everyone is on the same side precisely because a regime is transitioning, and there is no memory to anchor the edge.",
+    "testable_rule": "if consensus_conviction >= 1.0 and green_matches == 0 and hist_hr == 0.0: size_multiplier = 0.0  # freeze, treat as UNRELIABLE"
   },
   "validation": {
     "verdict": "REJECTED",
@@ -21,8 +21,8 @@
     "codify_error": null
   },
   "cycle": {
-    "cost_usd": 0.15534,
+    "cost_usd": 0.15165,
     "status": "COMPLETE",
-    "date": "2026-07-20"
+    "date": "2026-07-21"
   }
 }

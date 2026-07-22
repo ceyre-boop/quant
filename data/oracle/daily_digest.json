@@ -1,21 +1,21 @@
 {
-  "headline": "Autonomous agent stack live tomorrow; execution spread bias found 10x too pessimistic; HYP-107 real but magnitude unresolved pending live fills.",
+  "headline": "System down: morning agent failed to run; three critical launchd jobs are stuck or producing nothing.",
   "what_happened": [
-    "Autonomous agent plists installed (morning 07:55, EOD 16:00, research 21:00 ET)\u2014two operator commands required to activate and test.",
-    "Execution harness found median quoted spread on 59 gapper events is 0.6113%, not 8% round-trip; backtester bias is pessimistic by ~4.5pp per trade, not an edge.",
-    "HYP-107 (09:31 quiet-open long) confirmed real on n=57 holdout: +5.4% median gross, 70% win, p=0.0005; but 1\u201315% microcap spreads + LULD halts likely eat most/all, execution unresolved.",
-    "HYP-105/106 retracted: look-ahead leakage in Phase-3 ML features (overnight_gap and first-min vol measured through holding window); direction confirmed leak-free, magnitude not tradeable as-is.",
-    "Shadow gapper is green (2 signals, +0.0456% cumulative) last 5 days with zero signals since 07-15."
+    "Claude CLI binary missing entirely\u2014launchd cannot invoke `/usr/local/bin/claude`, so `com.alta.morning_agent` never ran today, blocking all context/bias/signals.",
+    "Execution harness locked on 2026-06-16 in `--live` mode; processes wrong date, screens 0, writes no fills. Wait-for-fills gate cannot open.",
+    "`sync_dashboard_data.py` exits clean but produces stale data (mtime 2026-05-31); dashboard split unresolved.",
+    "Four anatomy bugs fixed (similarity floor, dotenv load order, venv Python, Reddit scraper); risk constants ratified in RISK_FRAMEWORK.md.",
+    "Shadow gapper logged zero signals today; last two live days (07-13, 07-14) posted +0.0456% and +0.0042% respectively\u2014marginal signal, execution risk unresolved on HYP-105/106."
   ],
-  "what_it_means": "You have a real gapper continuation signal in HYP-107 (long from 09:31, moderate-gap quiet opens beat climax fades) but it depends entirely on live execution pricing\u2014the backtester masked spread cost by ~10x. Autonomous morning and EOD routines ship today and will feed signal scoring, but the bottleneck is not discovery: it's fill realism on illiquid microcaps at market open. Install the plists and run the test loop to begin live capture.",
-  "todays_one_thing": "Run the two operator commands to install and test-fire the autonomous agent plists; confirm morning routine at 07:55 ET captures real bid/ask on at least 3 gapper opens to validate the execution harness is wired correctly before scaling.",
+  "what_it_means": "You cannot trade without the morning agent running. The Claude CLI install is a blocking prerequisite\u2014not optional polish. Once installed, repoint all three plists to `$CLAUDE_BIN` from `.env` (single-source fix), reload, and verify launchd logs. The anatomy fixes are solid (similarity floor alone stopped garbage regime labels), but HYP-105/106 are flagged for look-ahead leakage; HYP-107 shows a real but marginal +5.4% median signal that execution costs (spreads, halts) will likely erase. The goal ladder: first fix the jobs, then validate shadow fills on live data with realistic slippage.",
+  "todays_one_thing": "Install the Claude CLI binary, then add `CLAUDE_BIN=/verified/abs/path` to `~/quant/.env` and reload the three launchd plists via `launchctl`. Verify `com.alta.morning_agent` runs and logs a signal in tomorrow's morning session. Without this, the system remains inert.",
   "progression": [
     {
       "gate": "G1",
       "label": "30 clean shadow days (ICARUS)",
       "state": "IN_PROGRESS",
-      "pct": 17,
-      "detail": "5/30 days recorded \u00b7 2 green"
+      "pct": 20,
+      "detail": "6/30 days recorded \u00b7 2 green"
     },
     {
       "gate": "G2",
@@ -48,5 +48,5 @@
   ],
   "source": "oracle-llm",
   "model": "claude-haiku-4-5-20251001",
-  "generated_at": "2026-07-20T11:35:41.800042+00:00"
+  "generated_at": "2026-07-21T11:38:44.348163+00:00"
 }

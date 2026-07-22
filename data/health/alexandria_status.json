@@ -1,19 +1,19 @@
 {
-  "ts": "2026-07-20T22:00:04.231103+00:00",
-  "overall": "FAIL",
-  "detail": "1 sample(s) misbehaving: logs/scanner_state.json: sim=0.067 regime=VALUE_RATE_REGIME_SHIFT",
+  "ts": "2026-07-21T22:00:04.564527+00:00",
+  "overall": "PASS",
+  "detail": "1 samples checked. Low-sim (<0.3) abstained correctly: 1. High-sim fired correctly: 0.",
   "similarity_floor": 0.3,
   "samples_checked": 1,
-  "wrong_count": 1,
+  "wrong_count": 0,
   "error_count": 0,
   "samples": [
     {
       "source": "logs/scanner_state.json",
-      "sim": 0.067,
-      "regime": "VALUE_RATE_REGIME_SHIFT",
-      "abstained": false,
+      "sim": 0.069,
+      "regime": "UNKNOWN",
+      "abstained": true,
       "expected_abstain": true,
-      "verdict": "WRONG"
+      "verdict": "OK"
     }
   ]
 }

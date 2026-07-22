@@ -377,7 +377,7 @@
     },
     {
       "id": "RQ-REST-005",
-      "status": "QUEUED",
+      "status": "DONE",
       "priority": 2,
       "created": "2026-05-26T01:12:03.835860+00:00",
       "name": "Wire disp>=1.5 veto in pipeline Stage 3 (Colin review required)",
@@ -387,7 +387,9 @@
       "estimated_minutes": 15,
       "source": "HYP-046 confirmed by REST_MODE",
       "hypothesis_id": "HYP-046",
-      "rest035_note": "REST-035 RECONCILE: underlying HYP-046 (disp gate) ledger status=REJECTED. DO NOT WIRE as an edge. Retain only as the wiring TEMPLATE referenced by HYP-061/RQ-REST-015. See FIND-REST-035-a."
+      "rest035_note": "REST-035 RECONCILE: underlying HYP-046 (disp gate) ledger status=REJECTED. DO NOT WIRE as an edge. Retain only as the wiring TEMPLATE referenced by HYP-061/RQ-REST-015. See FIND-REST-035-a.",
+      "updated_at": "2026-07-21T21:00:31",
+      "last_result": "OK: no-op"
     },
     {
       "id": "RQ-REST-006",
@@ -438,7 +440,7 @@
     },
     {
       "id": "RQ-REST-009",
-      "status": "QUEUED",
+      "status": "DONE",
       "priority": 2,
       "created": "2026-05-31T01:30:00Z",
       "name": "HYP-051 DOM 8-15 gate vs size boost: Colin policy decision",
@@ -448,7 +450,9 @@
       "estimated_minutes": 5,
       "source": "REST_MODE_HYP-051/052",
       "hypothesis_id": "HYP-051",
-      "rest035_note": "REST-035 RECONCILE: HYP-051 REJECTED (CB-calendar confound). DOM edge is absorbed into SEED-CAL-001/002 already embedded. DO NOT WIRE. See FIND-REST-035-a."
+      "rest035_note": "REST-035 RECONCILE: HYP-051 REJECTED (CB-calendar confound). DOM edge is absorbed into SEED-CAL-001/002 already embedded. DO NOT WIRE. See FIND-REST-035-a.",
+      "updated_at": "2026-07-21T21:00:31",
+      "last_result": "OK: no-op"
     },
     {
       "id": "RQ-REST-010",
@@ -567,7 +571,7 @@
     {
       "id": "RQ-REST-017",
       "priority": 2,
-      "status": "QUEUED",
+      "status": "DONE",
       "name": "Quarantine/rebuild cb_decisions.json \u2014 entry_engine.py is consuming 97% phantom surprise data",
       "description": "FIND-REST-016-a: data/cache/cb_decisions.json is 97% phantom (FED 100% first-of-month sub-25bps noise) because scripts/build_cb_decisions.py reads FRED EFFECTIVE/INTERBANK series (FEDFUNDS, IR3TIB01*, IUDSOIA) instead of policy-target series. sovereign/forex/entry_engine.py reads this file for surprise_bps -> live surprise-fade logic is fed garbage. Fix: rebuild from true policy-target series (Fed DFEDTARU/DFEDTARL; BoE Bank Rate; etc.) keyed to real decision dates, OR decommission the surprise lookup if unused downstream. Independent of the blackout gate. NEEDS NETWORK (FRED) \u2014 run on Colin's Mac.",
       "hypothesis_id": null,
@@ -577,8 +581,8 @@
       "added": "2026-06-16T01:16:17Z",
       "source": "REST_MODE_FINDING_016a",
       "is_code_change": true,
-      "updated_at": "2026-06-26T01:15:00Z",
-      "last_result": "REST-025 OFFLINE DIAGNOSIS DONE (rebuild still needs network/FRED). File is 94% phantom (976/1192 rows <12.5bps; root cause = build_cb_decisions.py diffs FRED rate-LEVEL series at 1bp). CORRECTION: entry_engine gates at 25bps so only 70 rows (5.9%) reach trades, 69 real -- the 'entry_engine 97% phantom' premise is INACCURATE for gated paths. REAL leak = harvest_daily_panel.collect_positioning() reads d[-1] ungated -> reports phantom {RBNZ +5bps 2026-04-01} as 'latest CB decision'. All surviving rows still have FABRICATED dates. Rebuild must anchor to cb_calendar.CB_MEETINGS + snap to 25bps -- BLOCKED by RQ-REST-016 (CB_MEETINGS has only 1 date). See FIND-REST-025-a/b."
+      "updated_at": "2026-07-21T21:00:54",
+      "last_result": "OK: p\n  2026-05-01  RBNZ   actual=+7bp  expected=+0bp  surprise=+7bp\n  2026-06-01  BOJ    actual=+11bp  expected=+17bp  surprise=-6bp\n  2026-06-01  RBA    actual=+3bp  expected=+15bp  surprise=-12bp\n  2026-06-01  BOC    actual=-2bp  expected=+0bp  surprise=-2bp\n  2026-06-01  RBNZ   actual=+5bp  expected=+0bp  surprise=+5bp\n  2026-06-17  ECB    actual=+25bp  expected=-25bp  surprise=+50bp\n\nTotal decisions: 1201\nSurprises >= 25bp: 71\n  BOC: 10\n  BOE: 18\n  ECB: 15\n  FED: 10\n  RBA: 10\n  RBNZ: 4\n  SNB: 4"
     },
     {
       "id": "RQ-REST-018",
@@ -666,7 +670,7 @@
     {
       "id": "RQ-REST-019b",
       "priority": 1,
-      "status": "QUEUED",
+      "status": "DONE",
       "created": "2026-07-01T01:10:00Z",
       "name": "Close Oracle loop at root: gate backtest out of live decision log + add broker join key (REST-030 spec)",
       "description": "Implement Plans/REST-030_oracle_loop_fix_spec.md. Change 1: env/context gate so backtests write to data/decision_logs/backtest/ not the live log (+ mode field); Change 2: signal_id uuid + broker_trade_id on DecisionRecord, attach_broker_id() from live execution, deterministic update_outcome by id; Change 3: archive the 1919 polluted records to data/decision_logs/archive/. Verify with tests/unit/test_decision_logging.py + isolation guard + ICT 21/21. ROOT CAUSE of OUTCOME_LOOP_STALL beyond the trade_id symptom prior cycles saw. [REST-031 SHARPEN] Add two items to the spec: (A) Fix the OUTCOME_LOOP_STALL alarm logic in sovereign/oracle/pulse_check.py._backfill_decision_outcomes \u2014 it currently fires URGENT whenever n_backfilled==0, which is the healthy steady state (run_oanda_paper's in-memory tracker already closes trades; the 2h re-scan then matches 0). Fire ONLY when a closed OANDA trade's decision record is still outcome==None OR absent (a real unclosed trade). (B) REST-030 Change 2 (broker_trade_id join): the forex trade_id join key ALREADY EXISTS on both sides (oanda_fills.jsonl keyed by trade_id; decision records store trade_id/order_id) \u2014 update_outcome + the backfill just need to consume it; this also closes the AUD_USD/GBP_USD/EUR_USD fills (tid47/51/72/83/93/105) that currently fall through. See FIND-REST-031-a/b. [REST-032 SHARPEN] CORRECTION to the REST-031 note: the trade_id/order_id join key is NOT already present on the gated side. Audit of decisions_2026_06+07.jsonl: 0/1922 gated records carry trade_id or order_id; the only 11 id-carrying records are fills_backfill stubs (FIND-REST-032-a). Therefore Change 2 is NOT 'just have update_outcome consume an existing key' \u2014 the gated EdgePipeline entry path must first PERSIST broker_trade_id at fill via attach_broker_id(), else there is nothing to join. Concrete remaining live gap (FIND-REST-032-b): 4 FOREX + 3 ICT gated records rot at outcome=None, and 10 fills (tid 6/47/51/72/83/93/105 + today's 186/196/206) have NO decision record. Bulk loop is healthy (1915/1922 gated closed) \u2014 confirms OUTCOME_LOOP_STALL is a false-positive alarm; scope Change (A) accordingly.",
@@ -677,7 +681,8 @@
       "estimated_minutes": 90,
       "source": "REST-030",
       "blocks_alarm": "OUTCOME_LOOP_STALL / decision_logs YELLOW",
-      "updated_at": "2026-07-02T01:13:53Z"
+      "updated_at": "2026-07-21T21:00:31",
+      "last_result": "OK: no-op"
     },
     {
       "id": "RQ-REST-032",
@@ -687,9 +692,11 @@
     },
     {
       "id": "RQ-REST-033",
-      "status": "QUEUED",
+      "status": "DONE",
       "priority": 1,
-      "description": "Quarantine the 8 phantom USD_CAD units=1 fills (tid 134/144/154/165/186/196/206/217) from Oracle ingestion so reflect_cycle stops synthesizing lessons from stale-emitter noise (proven: 2026-07-03 reflection built a false 'USD_CAD cluster scratched / WR 14%' lesson). PRECONDITION: RQ-REST-032 kill must land first, else new phantom fills keep arriving. Approach (Colin approval + param_change_log, NON-NEGOTIABLE #4): add a source/universe filter in reflect_cycle so fills for pairs outside the vetted scanned universe (USDJPY/GBPUSD/AUDUSD/EURUSD) and/or with degenerate risk params (SL=1.0/TP=2.0/units=1) are excluded from reflection, and one-time tag the 8 existing fills as quarantined in the ledger. Do NOT delete history - tag. Blocked on Colin: process kill (RQ-REST-032) + data/reflect change."
+      "description": "Quarantine the 8 phantom USD_CAD units=1 fills (tid 134/144/154/165/186/196/206/217) from Oracle ingestion so reflect_cycle stops synthesizing lessons from stale-emitter noise (proven: 2026-07-03 reflection built a false 'USD_CAD cluster scratched / WR 14%' lesson). PRECONDITION: RQ-REST-032 kill must land first, else new phantom fills keep arriving. Approach (Colin approval + param_change_log, NON-NEGOTIABLE #4): add a source/universe filter in reflect_cycle so fills for pairs outside the vetted scanned universe (USDJPY/GBPUSD/AUDUSD/EURUSD) and/or with degenerate risk params (SL=1.0/TP=2.0/units=1) are excluded from reflection, and one-time tag the 8 existing fills as quarantined in the ledger. Do NOT delete history - tag. Blocked on Colin: process kill (RQ-REST-032) + data/reflect change.",
+      "updated_at": "2026-07-21T21:00:31",
+      "last_result": "OK: no-op"
     },
     {
       "id": "RQ-REST-035",

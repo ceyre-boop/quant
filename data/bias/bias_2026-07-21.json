@@ -1,0 +1,32 @@
+{
+  "date": "2026-07-21",
+  "direction": "NEUTRAL",
+  "confidence": 19.0,
+  "reasoning": [
+    "briefing directional_bias=NEUTRAL conf=38.0",
+    "regime: NQ weak vs ES \u2014 rotation OUT of tech. A breadth/rotation warning; tech-led longs are suspect.",
+    "macro context present (2026-07-21)"
+  ],
+  "inputs_used": [
+    "briefing",
+    "daily_panel",
+    "fred_macro"
+  ],
+  "inputs_missing": [
+    "calendar",
+    "gdelt",
+    "sentiment_board"
+  ],
+  "context_fraction_fresh": 0.5,
+  "generated_at": "2026-07-21T12:13:29+00:00",
+  "realised": {
+    "direction": "BULLISH",
+    "correct": null,
+    "scored_at": "2026-07-21T20:37:56+00:00",
+    "proxy": "SPY",
+    "return": 0.008031,
+    "neutral_band": 0.0025,
+    "close": 748.05,
+    "prev_close": 742.09
+  }
+}

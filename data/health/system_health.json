@@ -1,5 +1,5 @@
 {
-  "ts": "2026-07-21T01:57:39.538858+00:00",
+  "ts": "2026-07-22T01:48:25.061467+00:00",
   "overall": "GREEN",
   "red": [],
   "yellow": [],
@@ -12,23 +12,23 @@
     },
     "forex_scan": {
       "path": "data/agent/forex_proximity.json",
-      "age_minutes": 485.3,
+      "age_minutes": 799.2,
       "max_age_minutes": 1440,
       "optional": false,
       "status": "OK",
-      "detail": "pairs_scored=3, verdict='NO_TRADE_TODAY \u2014 USDJPY=X closest at 100%'"
+      "detail": "pairs_scored=4, verdict='NO_TRADE_TODAY \u2014 USDJPY=X closest at 100%'"
     },
     "forex_data": {
       "path": "data/health/forex_data_status.json",
-      "age_minutes": 355.4,
+      "age_minutes": 322.2,
       "max_age_minutes": 1440,
       "optional": false,
       "status": "OK",
-      "detail": "overall=YELLOW, degraded=['GBPUSD=X'], fake_data=[]"
+      "detail": "overall=GREEN, degraded=[], fake_data=[]"
     },
     "api_health": {
       "path": "data/agent/health.json",
-      "age_minutes": 10.3,
+      "age_minutes": 69.6,
       "max_age_minutes": 1440,
       "optional": true,
       "status": "OK",

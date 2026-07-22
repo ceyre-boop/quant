@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-07-20T08:19:45.367367+00:00",
-  "as_of_date": "2026-07-20",
+  "generated_at": "2026-07-21T06:48:55.265359+00:00",
+  "as_of_date": "2026-07-21",
   "current_lesson": {
     "components": [
       "active",
@@ -44,17 +44,17 @@
       "zone",
       "zscore"
     ],
-    "component_label": "green_matches / hist_hr (consensus historical-match fields)",
+    "component_label": "green_matches",
     "first_seen": "2026-05-29",
-    "last_seen": "2026-07-20",
-    "days_forming": 52,
-    "n_revisions": 44,
-    "n_days_appeared": 44,
+    "last_seen": "2026-07-21",
+    "days_forming": 53,
+    "n_revisions": 45,
+    "n_days_appeared": 45,
     "stable_days": 1,
     "status": "forming",
     "time_to_converge_days": null,
-    "latest_lesson_text": "When the 30-indicator consensus reports green_matches=0 and hist_hr=0%, treat directional conviction as unvalidated regardless of how high conv% is \u2014 only pairs with green_matches>=3 and hist_hr>60% have earned execution weight.",
-    "latest_rule": "if consensus.green_matches < 3 or consensus.hist_hr < 0.60: veto_entry(pair)  # conv% alone is insufficient",
+    "latest_lesson_text": "When 30-indicator conviction is 100% but green_matches is 0 and hist_hr is 0%, the consensus is a live-only phantom with no historical analog and must be sized to zero, not full conviction.",
+    "latest_rule": "if consensus_conviction >= 1.0 and green_matches == 0 and hist_hr == 0.0: size_multiplier = 0.0  # freeze, treat as UNRELIABLE",
     "history": [
       {
         "date": "2026-05-29",
@@ -231,6 +231,10 @@
       {
         "date": "2026-07-20",
         "rule": "if consensus.green_matches < 3 or consensus.hist_hr < 0.60: veto_entry(pair)  # conv% alone is insufficient"
+      },
+      {
+        "date": "2026-07-21",
+        "rule": "if consensus_conviction >= 1.0 and green_matches == 0 and hist_hr == 0.0: size_multiplier = 0.0  # freeze, treat as UNRELIABLE"
       }
     ]
   },
@@ -278,17 +282,17 @@
         "zone",
         "zscore"
       ],
-      "component_label": "green_matches / hist_hr (consensus historical-match fields)",
+      "component_label": "green_matches",
       "first_seen": "2026-05-29",
-      "last_seen": "2026-07-20",
-      "days_forming": 52,
-      "n_revisions": 44,
-      "n_days_appeared": 44,
+      "last_seen": "2026-07-21",
+      "days_forming": 53,
+      "n_revisions": 45,
+      "n_days_appeared": 45,
       "stable_days": 1,
       "status": "forming",
       "time_to_converge_days": null,
-      "latest_lesson_text": "When the 30-indicator consensus reports green_matches=0 and hist_hr=0%, treat directional conviction as unvalidated regardless of how high conv% is \u2014 only pairs with green_matches>=3 and hist_hr>60% have earned execution weight.",
-      "latest_rule": "if consensus.green_matches < 3 or consensus.hist_hr < 0.60: veto_entry(pair)  # conv% alone is insufficient",
+      "latest_lesson_text": "When 30-indicator conviction is 100% but green_matches is 0 and hist_hr is 0%, the consensus is a live-only phantom with no historical analog and must be sized to zero, not full conviction.",
+      "latest_rule": "if consensus_conviction >= 1.0 and green_matches == 0 and hist_hr == 0.0: size_multiplier = 0.0  # freeze, treat as UNRELIABLE",
       "history": [
         {
           "date": "2026-05-29",
@@ -465,6 +469,10 @@
         {
           "date": "2026-07-20",
           "rule": "if consensus.green_matches < 3 or consensus.hist_hr < 0.60: veto_entry(pair)  # conv% alone is insufficient"
+        },
+        {
+          "date": "2026-07-21",
+          "rule": "if consensus_conviction >= 1.0 and green_matches == 0 and hist_hr == 0.0: size_multiplier = 0.0  # freeze, treat as UNRELIABLE"
         }
       ]
     }

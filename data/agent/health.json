@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-20T16:02:13",
+  "timestamp": "2026-07-21T16:26:12",
   "overall": "RED",
   "components": {
     "duckdb": {
@@ -16,7 +16,7 @@
     },
     "ict_scanner": {
       "status": "GREEN",
-      "detail": "log updated 5min ago"
+      "detail": "log updated 50min ago"
     },
     "backtest_engine": {
       "status": "GREEN",
@@ -24,7 +24,7 @@
     },
     "alpaca": {
       "status": "GREEN",
-      "detail": "paper account equity=$104,770"
+      "detail": "paper account equity=$105,319"
     },
     "fred": {
       "status": "GREEN",
@@ -32,7 +32,7 @@
     },
     "alpha_vantage": {
       "status": "GREEN",
-      "detail": "latest bar 2026-07-17"
+      "detail": "latest bar 2026-07-20"
     },
     "tiingo": {
       "status": "GREEN",
@@ -40,11 +40,11 @@
     },
     "news_api": {
       "status": "GREEN",
-      "detail": "69 business articles"
+      "detail": "61 business articles"
     },
     "oanda": {
       "status": "GREEN",
-      "detail": "NAV=$0 practice"
+      "detail": "NAV=$109,597 practice"
     },
     "firebase": {
       "status": "GREEN",
@@ -64,17 +64,17 @@
     },
     "reddit": {
       "status": "YELLOW",
-      "detail": "cache 130m old \u2014 needs refresh"
+      "detail": "cache 1594m old \u2014 needs refresh"
     },
     "decision_logs": {
       "status": "YELLOW",
-      "detail": "WARNING: 1 trades >7d old missing outcome backfill (EURUSD=X...)"
+      "detail": "WARNING: 2 trades >7d old missing outcome backfill (EURUSD=X, USD_CAD...)"
     },
     "oracle_pulse": {
       "status": "RED",
-      "detail": "0 new entries, 2 anomalies",
-      "last_pulse": "2026-07-21T01:47:20+00:00"
+      "detail": "0 new entries, 1 anomalies",
+      "last_pulse": "2026-07-22T00:38:50+00:00"
     }
   },
-  "last_checked": "2026-07-20T16:02:13"
+  "last_checked": "2026-07-21T16:26:12"
 }

@@ -1,14 +1,14 @@
 {
-  "generated_at": "2026-07-21T01:47:20.818914+00:00",
+  "generated_at": "2026-07-22T00:38:50.175524+00:00",
   "alive": true,
   "fired_today": false,
   "frozen": null,
-  "scan_age_hours": 13.4,
-  "n_pairs_scanned": 3,
-  "n_would_fire_today": 0,
+  "scan_age_hours": 12.2,
+  "n_pairs_scanned": 4,
+  "n_would_fire_today": 1,
   "strongest_signal": {
     "pair": "USDJPY=X",
-    "conviction": 0.413,
+    "conviction": 0.634,
     "direction": "NO_TRADE",
     "pct_to_trigger": 100.0,
     "regime": "TRENDING",
@@ -17,15 +17,23 @@
   "pairs": [
     {
       "pair": "USDJPY=X",
-      "conviction": 0.413,
+      "conviction": 0.634,
       "direction": "NO_TRADE",
       "pct_to_trigger": 100.0,
       "regime": "TRENDING",
       "rate_differential": 3.603
     },
     {
+      "pair": "GBPUSD=X",
+      "conviction": 0.478,
+      "direction": "NO_TRADE",
+      "pct_to_trigger": 100.0,
+      "regime": "TRENDING",
+      "rate_differential": 0.17
+    },
+    {
       "pair": "AUDUSD=X",
-      "conviction": 0.297,
+      "conviction": 0.342,
       "direction": "NO_TRADE",
       "pct_to_trigger": 100.0,
       "regime": "TRENDING",
@@ -33,8 +41,8 @@
     },
     {
       "pair": "EURUSD=X",
-      "conviction": 0.109,
-      "direction": "NO_TRADE",
+      "conviction": 0.181,
+      "direction": "LONG",
       "pct_to_trigger": 100.0,
       "regime": "TRENDING",
       "rate_differential": -2.08
@@ -45,10 +53,10 @@
     "direction": "SHORT",
     "fill_price": 161.323,
     "date": "2026-07-03",
-    "days_ago": 17.3
+    "days_ago": 18.3
   },
   "loops_alive": 7,
   "loops_down": [],
-  "summary_line": "System alive. 3 pairs scanned 13.4h ago \u2014 all NO_TRADE (edge not firing \u2014 correct, not broken). Highest conviction: USDJPY=X 0.413. Last fill: USD_JPY SHORT, 17.3d ago.",
+  "summary_line": "System alive. 4 pairs scanned 12.2h ago \u2014 1 signalling (EURUSD=X LONG). Highest conviction: USDJPY=X 0.634. Last fill: USD_JPY SHORT, 18.3d ago.",
   "note": "Honest proof-of-life: would-be signals + proximity, never a forced trade. Read-only."
 }

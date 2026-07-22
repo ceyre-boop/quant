@@ -1,0 +1,26 @@
+{
+  "date": "2026-07-21",
+  "generated_at": "2026-07-21T06:48:55.243418+00:00",
+  "input_tokens": 5745,
+  "output_tokens": 873,
+  "estimated_cost_usd": 0.15165,
+  "harvest_days_read": 7,
+  "reflection": {
+    "candidate_lesson": {
+      "lesson_text": "When 30-indicator conviction is 100% but green_matches is 0 and hist_hr is 0%, the consensus is a live-only phantom with no historical analog and must be sized to zero, not full conviction.",
+      "mechanism": "A 100% live conviction with zero green_matches means no historical instance of this exact indicator configuration has ever resolved profitably \u2014 the system is extrapolating into a state space it has never observed. Institutionally this happens when a crowded one-directional flow (all indicators agree) coincides with a structural break (e.g. USDJPY LONG at 8/30 bull, 0 green_matches, hist_hr=0%): everyone is on the same side precisely because a regime is transitioning, and there is no memory to anchor the edge.",
+      "testable_rule": "if consensus_conviction >= 1.0 and green_matches == 0 and hist_hr == 0.0: size_multiplier = 0.0  # freeze, treat as UNRELIABLE",
+      "expected_impact": "Removes zero-memory phantom entries (USDJPY LONG, AUDNZD SHORT today both qualify) that dilute Sharpe with noise trades; expected +0.02-0.04 Sharpe by cutting negative-expectancy tails.",
+      "evidence_from_harvest": "Live state shows USDJPY dir=LONG conv=67% green_matches=0 hist_hr=0% and AUDNZD dir=SHORT conv=100% green_matches=0 hist_hr=0% \u2014 both maximum-conviction signals with zero historical confirmation, contrasted against AUDUSD LONG conv=100% green_matches=3 hist_hr=68% which HAS analog support.",
+      "evidence_from_reasoning": null,
+      "reasoning_component_targeted": "green_matches",
+      "sample_needed": 25
+    },
+    "retirement_flag": {
+      "lesson_to_review": "L8",
+      "reason": "L8 tightens USDJPY/AUDNZD VIX gate to 13; VIX is now 18.77 and rising (16.73\u219218.77 intraday), which under L8 already vetoes both pairs \u2014 verify L8 is actually firing before adding the green_matches gate, or the two rules may be redundant on exactly these pairs."
+    },
+    "system_health_note": "Regime is UNKNOWN with zero trades in 7 days and TradingView showing 0 signals \u2014 the system is correctly in a low-conviction hold, so any new gate must be validated on historical harvest data since no live decision logs exist yet."
+  },
+  "auto_validation": null
+}

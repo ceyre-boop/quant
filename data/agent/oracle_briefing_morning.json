@@ -1,14 +1,16 @@
 {
-  "generated_at": "2026-07-20T12:44:35.328178+00:00",
-  "briefing": "Session open 2026-07-20T12:44Z. No qualifying forex setup today (rate differentials within normal range). 1 open position(s). All monitored loops alive. NQ/ES regime: ROTATION_WARN (NQ weak vs ES \u2014 rotation OUT of tech. A breadth/rotation warning; tech-led longs). Forex macro is a swing edge (~1 trade/pair/month) \u2014 a no-signal day is the strategy working, not failing. Watching for rate-differential divergence to widen past threshold.",
+  "generated_at": "2026-07-21T12:47:05.446687+00:00",
+  "briefing": "Session open 2026-07-21T12:47Z. Scanner: EURUSD=X LONG (PLACED, risk 0.38%). 1 open position(s). \u26a0\ufe0f loops down: ict_scanner. NQ/ES regime: ROTATION_WARN (NQ weak vs ES \u2014 rotation OUT of tech. A breadth/rotation warning; tech-led longs). Forex macro is a swing edge (~1 trade/pair/month) \u2014 a no-signal day is the strategy working, not failing. Watching for rate-differential divergence to widen past threshold.",
   "scan_verdicts": [
-    "NO_SIGNALS"
+    "PLACED"
   ],
   "open_positions": 1,
-  "loops_down": [],
+  "loops_down": [
+    "ict_scanner"
+  ],
   "nqes_regime": {
     "regime": "ROTATION_WARN",
-    "nq_last": 28997.0,
-    "es_last": 7524.5
+    "nq_last": 29153.5,
+    "es_last": 7513.8
   }
 }
