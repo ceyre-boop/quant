@@ -1,0 +1,61 @@
+{
+  "id": "PETRULES-001",
+  "name": "Petrules Gate v1 \u2014 consensus-divergence conviction engine",
+  "registered": "2026-07-21",
+  "design_doc": "research/PETRULES_GATE_design.md",
+  "spec_doc": "research/PETRULES_GATE_SPEC.md",
+  "data_audit": "research/PETRULES_GATE_data_audit.md",
+  "narrowing_note": "Feature set narrowed from spec v1.0 per Phase 0 audit (verdict NARROW), BEFORE any training data was constructed. Dropped: consensus_revision_momentum (no point-in-time revision history exists at budget \u2014 lookahead risk), congressional_trade_direction (free mirrors dead, official sources PDF-only, ~500 filings/yr). Added: implied_move_change_30d as the consensus-expectation dynamics feature. Redefined: disclosed_flow_vs_consensus -> disclosed_flow_vs_implied (consensus direction from options-implied/positioning, not analyst revisions).",
+  "feature_set_tier1": [
+    "implied_move_change_30d",
+    "options_skew_direction",
+    "disclosed_flow_vs_implied",
+    "activist_disclosure_recent",
+    "institutional_accumulation"
+  ],
+  "feature_set_tier2": [
+    "price_vs_52w_high",
+    "volume_ratio_20d",
+    "short_interest_ratio",
+    "earnings_surprise_history"
+  ],
+  "feature_set_excluded_tier3": [
+    "headline_sentiment_30d",
+    "earnings_call_tone_prior_q",
+    "analyst_commentary_trend"
+  ],
+  "feature_set_dropped_phase0": [
+    "consensus_revision_momentum",
+    "congressional_trade_direction"
+  ],
+  "consensus_baseline": "options-implied move (ThetaData event-dated ATM straddle at T-1) for all setup classes; Alpha Vantage EARNINGS pre-print estimatedEPS used for the earnings divergence label only",
+  "point_in_time_rules": {
+    "form4": "filingDate (EDGAR), never transaction reportDate",
+    "13f": "filingDate, never period-of-report",
+    "13d_13g": "filingDate; query both 'SC 13D' and 'SCHEDULE 13D' form names",
+    "short_interest": "FINRA publication date (settlement + ~7 business days), never settlementDate",
+    "options": "chain quotes as of date from ThetaData EOD history",
+    "estimates": "AV EARNINGS estimatedEPS treated as final pre-print snapshot (label only, never a T-90 feature)"
+  },
+  "model_architecture": "XGBoostClassifier, separate direction + magnitude models",
+  "train_holdout_split": "0.70/0.30 time-ordered",
+  "training_window": "2020-01-01 to present (ThetaData Value tier options history floor; extendable to 2012 only via STANDARD upgrade filed as a deviation)",
+  "calibration_pass_criteria": {
+    "calibration_error_max": 0.05,
+    "brier_score_max": 0.18,
+    "n_holdout_min": 500,
+    "direction_accuracy_min": 0.62
+  },
+  "sizer_params": {
+    "f_max": 0.08,
+    "budget_per_trade": 0.01,
+    "kelly_fraction": 0.25,
+    "daily_heat_cap": 0.05,
+    "max_concurrent": 3
+  },
+  "conviction_threshold_to_fire": 0.65,
+  "universe": "US-listed equities >=$500M market cap at event time, earnings + activist (13D/G) events",
+  "target_training_events": 5000,
+  "hash_lock_method": "SHA-256 of this file's bytes with hash_lock field set to empty string, computed at filing",
+  "hash_lock": "dc350169c062241db1e402eed545e4c022ad8e925268602e4da7621d8a11eb73"
+}
