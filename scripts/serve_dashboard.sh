@@ -28,6 +28,7 @@ FILES=(
   "data/agent/prop_account_balance.json"
   "data/agent/carry_paper_account.json"
   "data/agent/system_regime_state.json"
+  "data/agent/petrules_gate_scan.json"
   "data/agent/prop_challenge_state.json"
   "data/execution/fills.json"
   "data/execution/fills.jsonl"
