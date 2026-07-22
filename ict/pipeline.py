@@ -42,6 +42,12 @@ from ict.sweep_detector import SweepDetector, SweepResult
 from ict.fvg_detector import FVGDetector, FVGResult, OrderBlockResult
 from ict.micro_risk import MicroRiskEngine, MicroRiskParams, PositionSizing, RiskVeto
 
+# Shared regime read. alta_platform is the NEUTRAL connective layer — it imports
+# neither ict/ nor sovereign/, so reading it from ict/ is isolation-legal
+# (CLAUDE.md NN#1 stands). Connected Edge × Regime: ICT sizes only when its
+# shared regime verdict is favorable, and never trades a stale/adverse regime.
+from alta_platform.regime_client import get_regime
+
 logger = logging.getLogger(__name__)
 
 # ── Scoring weights (configurable via ict_params.yml) ─────────────────────── #
@@ -611,6 +617,27 @@ class ICTPipeline:
             else:
                 stop = self.risk_engine.suggest_stop(ep, direction, atr)
 
+            # ── Gate 0: shared regime verdict (Connected Edge × Regime) ──────
+            # Read the neutral alta_platform contract before sizing. STAND_ASIDE
+            # or a stale read → skip the trade (never trade an adverse/stale
+            # regime). Otherwise scale size by the regime multiplier. The
+            # ict_equities section is an UNAVAILABLE stub today, so this returns
+            # a safe-default STAND_ASIDE and ICT correctly stands aside until the
+            # section is populated — the wiring is the point.
+            _regime = get_regime("ict_equities")
+            if _regime.verdict == "STAND_ASIDE" or _regime.stale:
+                logger.info(
+                    "ICT regime gate: STAND_ASIDE (ict_equities section not yet "
+                    "populated) — %s; skipping %s %s",
+                    _regime.reason, symbol, direction,
+                )
+                return ICTVeto(symbol=symbol, direction=direction, timestamp=timestamp,
+                               score=total_score, grade=ICTGrade.VETOED,
+                               reason=f"Regime gate: STAND_ASIDE — {_regime.reason}",
+                               component_scores=scores,
+                               confirmations=confirmations, missing=missing,
+                               entry_level=ep, stop=stop)
+
             sz   = self.risk_engine.size(
                 direction=direction, entry=ep, stop_loss=stop, atr=atr, params=account,
                 grade=getattr(_effective_grade, "value", None),
@@ -622,6 +649,21 @@ class ICTPipeline:
                                component_scores=scores,
                                confirmations=confirmations, missing=missing,
                                entry_level=ep, stop=stop)
+            # Apply the shared-regime size multiplier (Connected Edge × Regime).
+            # 1.0 = full size; <1.0 dims; >1.0 (improving regime) scales up. While
+            # ict_equities is a STAND_ASIDE stub this branch is unreachable (we
+            # returned above), so live sizing is unchanged until the section exists.
+            if _regime.size_multiplier != 1.0 and isinstance(sz, PositionSizing):
+                _m = _regime.size_multiplier
+                sz = sz.__class__(**{
+                    **{f: getattr(sz, f) for f in sz.__dataclass_fields__},
+                    'position_units': round(sz.position_units * _m, 6),
+                    'tp1_units': round(sz.tp1_units * _m, 6),
+                    'tp2_units': round(sz.tp2_units * _m, 6),
+                    'risk_dollars': round(sz.risk_dollars * _m, 2),
+                    'risk_pct': sz.risk_pct * _m,
+                })
+
             # Apply allocation weight to position size (continuous dimmer)
             if _ict_alloc_weight < 1.0 and hasattr(sz, 'units') and sz.units:
                 sz = sz.__class__(**{
