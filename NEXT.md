@@ -2039,3 +2039,8 @@ sanity: paper_accounts/system_regime/system_health_verdict/obsidian_sync all loa
 - **Verified** rendered under `file://` in real browser: prop/carry/oracle/health/fills/gates all populate. Secret grep CLEAN.
 - `dashboard/dashboard_live.html` gitignored (regenerated, data baked in). Pushed 8e4c587 on sovereign-v2.
 - Untouched: execution path, `serve_dashboard.sh`, all frozen files. New files only.
+
+## 2026-07-23 — Fix bias-panel confidence double-multiply (FIX)
+- **Root cause**: `data/bias/bias_*.json` stores `confidence` as a percentage (e.g. 21.0), but `updateBias()` in `dashboard/index.html:720` did `Math.round(conf*100)` → "2100%".
+- **Fix**: treat conf as already-a-percentage, guard the legacy fraction convention (`conf<=1 → ×100`), clamp 0–100. Verified in real browser: today (07-23) reads 0%; test vector 21.0→21, 0.21→21, 42→42, 150→100. Display-only.
+- Regenerated `dashboard_live.html` so the fix shows in the standalone build too. Pushed 709c114 on sovereign-v2. No execution-path files touched.
