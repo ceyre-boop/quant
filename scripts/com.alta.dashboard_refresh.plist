@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  com.alta.dashboard_refresh — regenerate the standalone dashboard every 15 min.
+
+  Runs build_standalone_dashboard.py on a timer so dashboard/dashboard_live.html
+  stays fresh automatically. Read-only w.r.t. the trading path: it only reads the
+  allowlisted JSON files and writes the single HTML output. Touches nothing on
+  the frozen execution path.
+
+  INSTALL (hand-run by Colin — sandboxed sessions cannot load launchd agents):
+    cp scripts/com.alta.dashboard_refresh.plist ~/Library/LaunchAgents/
+    launchctl load ~/Library/LaunchAgents/com.alta.dashboard_refresh.plist
+
+  VERIFY:   launchctl list | grep dashboard_refresh
+  LOGS:     data/system/dashboard_refresh.log  /  .err.log
+  UNLOAD:   launchctl unload ~/Library/LaunchAgents/com.alta.dashboard_refresh.plist
+
+  NOTE: if your python3 is not at /usr/bin/python3 (e.g. Homebrew/pyenv), edit the
+  first ProgramArguments entry to the absolute path from `which python3`.
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.alta.dashboard_refresh</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/usr/bin/python3</string>
+        <string>/Users/taboost/quant/scripts/build_standalone_dashboard.py</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/taboost/quant</string>
+
+    <key>StartInterval</key>
+    <integer>900</integer>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>StandardOutPath</key>
+    <string>/Users/taboost/quant/data/system/dashboard_refresh.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/taboost/quant/data/system/dashboard_refresh.err.log</string>
+</dict>
+</plist>
