@@ -4,6 +4,35 @@ Per-session ledger: what shipped, push status, verdicts, blockers, refusals. New
 The Obsidian brain (`~/Obsidian/Obsidian/00-BRAIN/NEXT.md`) is the cross-project rollup.
 Standing constraints live in `CLAUDE.md` — not restated here.
 
+### 2026-07-23 · DIP pipeline revived — harvest→train fuel line restored (diagnose-before-build)
+
+Work order specced a from-scratch DIP build; survey said most exists. Followed diagnose-first
+discipline — did NOT rebuild. **Diagnosis:** `data/harvest.db` frozen since 2026-06-29, `trades`
+table empty, `_price_cache` empty. Root cause: `continuous_harvester` forks a `Pool` whose workers
+call `yf.download` *inside child processes* → macOS fork-after-network deadlock. Proof: isolated
+`yf.download('AAPL')` = 1.0s; harvester `--passes 1 --symbols AAPL NVDA` hung >10min, wrote nothing;
+parent-prefetch + sequential compute = 65,734 trades/17s. Not a broken dep, not a rebuild.
+
+**Shipped (commit `28640b5`, pushed to sovereign-v2):**
+- NEW `scripts/dip_data_fetcher.py` — centralized PARENT-process yfinance pull that warms the
+  parquet cache (reuses `continuous_harvester.load_ohlcv`; zero duplication). The one genuinely new
+  file the survey identified.
+- Wired harvester to prefetch in parent before the fork pool → workers only READ cached parquet.
+- Fixed pre-existing bug in `training/retrain_loop.load_trades`: SELECTed 3 lagged features that are
+  derived in pandas post-query and don't exist in `trades` (BinderException). Added `BASE_FEATURE_COLS`.
+- NEW `scripts/dip_daily.sh` orchestrator (harvest 1 pass → retrain once, checkpoint/error files) +
+  `scripts/com.alta.dip_daily.plist` (tracked-not-loaded, daily 02:30; operator promotes with launchctl).
+
+**Verified E2E:** harvester fork pool no longer hangs — 195,688 trades (3 syms, 18s) → `retrain_loop
+--once` trains XGBoost (val acc 92.3%, model saved) → threshold upgraded 0.50→0.70.
+
+**Did NOT rebuild:** harvester compute, XGBoost trainer, sentiment, Oracle reflect, Obsidian sync —
+all pre-existing and working. **Compliance:** ICT/sovereign isolation test passes; new scripts import
+no sovereign; research loop only (no order_send / MT5 bridge); no frozen execution-path files touched;
+training ran against accumulated harvest under CONFIRMED carry_v015/HYP-093.
+**Operator TODO:** promote plist — `launchctl load ~/Library/LaunchAgents/com.alta.dip_daily.plist`
+(symlink/copy from `scripts/com.alta.dip_daily.plist` first).
+
 ### 2026-07-22 · TICK-056 MT5 execution bridge — SPEC + TICKET + PLAN shipped (spec-first, STOPPED before code)
 Prerequisite for Step 3 (The5%ers $100K High Stakes), forcing date FOMC 2026-07-29. Per plan→build
 separation I produced the spec/ticket/plan and STOPPED before connector code — this needs a platform
