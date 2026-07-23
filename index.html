@@ -801,6 +801,50 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
 <!-- ══════════ /ORACLE BRIEF ══════════ -->
 
 
+<!-- ══════════ L1 DIRECTIONAL READ (briefing synthesizer — CONTEXT ONLY) ══════════ -->
+<style>
+#l1read{display:none;margin:10px 0;padding:12px 14px;border:1px solid #e2e8f0;border-radius:10px;background:#f8fafc;font-family:inherit}
+#l1read .l1-head{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:#334155}
+#l1read .l1-badge{font-size:9px;font-weight:800;letter-spacing:.04em;padding:2px 7px;border-radius:99px;background:#fef3c7;color:#92400e;border:1px solid #fcd34d}
+#l1read .l1-row{display:flex;gap:18px;flex-wrap:wrap;margin-top:8px;align-items:baseline}
+#l1read .l1-bias{font-size:20px;font-weight:800}
+#l1read .l1-bias.LONG{color:#16a34a}#l1read .l1-bias.SHORT{color:#dc2626}#l1read .l1-bias.NEUTRAL{color:#64748b}
+#l1read .l1-kv{font-size:11px;color:#475569}#l1read .l1-kv b{color:#0f172a}
+#l1read .l1-note{font-size:10px;color:#94a3b8;margin-top:7px;line-height:1.4}
+#l1read .l1-when{margin-left:auto;font-size:10px;color:#94a3b8;font-weight:400}
+</style>
+<div id="l1read">
+  <div class="l1-head">🧭 L1 DIRECTIONAL READ <span class="l1-badge" id="l1-badge">CONTEXT ONLY</span><span class="l1-when" id="l1-when"></span></div>
+  <div class="l1-row">
+    <span class="l1-bias" id="l1-bias">—</span>
+    <span class="l1-kv">confidence <b id="l1-conf">—</b></span>
+    <span class="l1-kv">regime <b id="l1-regime">—</b></span>
+    <span class="l1-kv">invalidation <b id="l1-key">—</b></span>
+    <span class="l1-kv">source <b id="l1-src">—</b></span>
+  </div>
+  <div class="l1-note" id="l1-note"></div>
+</div>
+<script>
+(function(){
+  fetch('data/oracle/market_briefings/latest.json?t='+Date.now()).then(r=>r.json()).then(function(d){
+    var el=document.getElementById('l1read'); el.style.display='block';
+    var bias=(d.directional_bias||'NEUTRAL');
+    var b=document.getElementById('l1-bias'); b.textContent=bias; b.className='l1-bias '+bias;
+    document.getElementById('l1-conf').textContent=(d.confidence!=null?d.confidence+'%':'—');
+    document.getElementById('l1-regime').textContent=d.regime_call||d.meta_regime||'—';
+    document.getElementById('l1-key').textContent=(d.key_level!=null?d.key_level:'—');
+    document.getElementById('l1-src').textContent=d.synthesis_source||'—';
+    document.getElementById('l1-when').textContent=(d.generated_at||'').slice(0,16).replace('T',' ')+'Z';
+    var verified=(d.provenance||{}).verified;
+    var badge=document.getElementById('l1-badge');
+    badge.textContent=verified?'SCORED':'CONTEXT ONLY — not a trade signal';
+    document.getElementById('l1-note').textContent=(d.provenance||{}).note||'';
+  }).catch(function(){});
+})();
+</script>
+<!-- ══════════ /L1 DIRECTIONAL READ ══════════ -->
+
+
 <div id="tabs">
 
   <!-- ══ TAB 1: TRADE ══ -->

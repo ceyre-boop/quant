@@ -4,7 +4,40 @@ Per-session ledger: what shipped, push status, verdicts, blockers, refusals. New
 The Obsidian brain (`~/Obsidian/Obsidian/00-BRAIN/NEXT.md`) is the cross-project rollup.
 Standing constraints live in `CLAUDE.md` — not restated here.
 
-### 2026-07-23 · DIP pipeline revived — harvest→train fuel line restored (diagnose-before-build)
+### 2026-07-23 · Briefing synthesizer wired (AlphaZero L1 → dashboard + hypothesis batch, CONTEXT ONLY)
+
+Colin-approved concrete fix from the two-half inventory: wire `sovereign/briefing/synthesize.py`
+(the L1 directional read) to consumers. Diagnosis first, per discipline.
+
+**`provenance.verified=false` root cause — NOT a data-integrity failure.** It is a deliberate,
+hardcoded epistemic label (`scripts/morning_market_briefing.py:191` + `sovereign/briefing/__init__.py`):
+"qualitative regime context + a self-scored directional call, NOT a verified data feed or validated
+edge... never ingested as trading inputs." Stays false BY DESIGN until `scorecard.py` proves the call
+is calibrated over a real sample. No no-lookahead guard tripped. This is correct discipline, not a bug.
+
+**Correction to the survey framing:** the synthesizer was NOT wired to nothing — Oracle already reads
+it (`reflect_cycle._load_market_briefing`, lines 445/554). The gap was Colin's two named consumers.
+Also: today's output is `synthesis_source=deterministic_fallback`, bias NEUTRAL/conf 0 — the Opus call
+fell back (no API key this run); wiring surfaces whatever it produces, honestly labeled.
+
+**Shipped (append/additive, no rebuild):**
+- `index.html` — NEW "🧭 L1 DIRECTIONAL READ" panel; fetches `data/oracle/market_briefings/latest.json`
+  (mirrors the proven daily_digest fetch pattern), renders bias/confidence/regime/invalidation/source
+  with a prominent "CONTEXT ONLY — not a trade signal" badge driven off `provenance.verified`.
+- `sovereign/autonomous/hypothesis_generator.py` — NEW `_load_briefing_context()`; `run()` stamps each
+  candidate + the generator-log batch + return dict with `l1_briefing_context` (role=context_only).
+  Verified via dry-run: `L1 context: bias=NEUTRAL conf=0 regime=BREADTH verified=False (context-only)`,
+  86 ledger entries loaded.
+
+**Compliance:** ICT/sovereign isolation test passes; briefing is ES/NQ data-only (no OANDA/MT5, no
+order_send); L2 shadow exit machine untouched (freeze/July-28 go-date respected); L1 output is context
+ONLY — never gates/sizes/auto-promotes; HYP-071 NNUE value table NOT built (stays gated, unapproved);
+append-only writes. Dashboard panel lives on sovereign-v2; live deploy serves from master (operator
+worktree-push data+panel to master to surface on the Render/Pages dashboard).
+**NOTE:** live browser render of the panel deferred — safety classifier outage mid-session blocked the
+served-render check; panel verified structurally (element IDs ↔ JSON fields, proven fetch pattern).
+
+
 
 Work order specced a from-scratch DIP build; survey said most exists. Followed diagnose-first
 discipline — did NOT rebuild. **Diagnosis:** `data/harvest.db` frozen since 2026-06-29, `trades`

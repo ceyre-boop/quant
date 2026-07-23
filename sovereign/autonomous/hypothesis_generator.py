@@ -34,8 +34,35 @@ LEDGER_PATH = ROOT / "data" / "agent" / "hypothesis_ledger.json"
 ARCHIVE_PATH = ROOT / "I_was_a_good_trader.md"
 QUEUE_PATH = ROOT / "data" / "research" / "auto_hypothesis_queue.jsonl"
 GENERATOR_LOG = ROOT / "data" / "agent" / "generator_log.jsonl"
+BRIEFING_PATH = ROOT / "data" / "oracle" / "market_briefings" / "latest.json"
 
 _log = C.make_logger("hypothesis_generator")
+
+
+def _load_briefing_context() -> dict | None:
+    """The L1 briefing synthesizer's directional read, as CONTEXT for hypotheses.
+
+    This is qualitative regime context (provenance.verified is False by design until
+    the scorecard proves the call is calibrated). It is attached to the batch so a
+    human reviewer sees the L1 read alongside the candidates — it NEVER gates, sizes,
+    filters, or auto-promotes a hypothesis. Returns None if the briefing is absent.
+    """
+    if not BRIEFING_PATH.exists():
+        return None
+    try:
+        d = json.loads(BRIEFING_PATH.read_text())
+    except Exception:
+        return None
+    return {
+        "directional_bias": d.get("directional_bias"),
+        "confidence": d.get("confidence"),
+        "regime_call": d.get("regime_call") or d.get("meta_regime"),
+        "key_level": d.get("key_level"),
+        "synthesis_source": d.get("synthesis_source"),
+        "generated_at": d.get("generated_at"),
+        "verified": bool((d.get("provenance") or {}).get("verified", False)),
+        "role": "context_only",  # never a gate — human decides
+    }
 
 # A component whose score is ~0 across essentially every rep is an anti-signal
 # candidate (it contributes weight while never firing). Threshold is deliberately
@@ -294,6 +321,14 @@ def run(dry_run: bool = False) -> dict:
             continue
         kept.append(c)
 
+    # L1 briefing synthesizer read — attached as CONTEXT ONLY (never a gate).
+    l1 = _load_briefing_context()
+    if l1:
+        _log(f"L1 context: bias={l1['directional_bias']} conf={l1['confidence']} "
+             f"regime={l1['regime_call']} verified={l1['verified']} (context-only)")
+        for c in kept:
+            c["l1_briefing_context"] = l1
+
     _log(f"generated {len(kept)} candidate(s) from {len(candidates)} raw")
     for c in kept:
         _log(f"  + [{c['detector']}] {c['hypothesis'][:90]}...")
@@ -307,10 +342,12 @@ def run(dry_run: bool = False) -> dict:
             "ledger": len(ledger),
             "generated": len(kept),
             "detectors": Counter(c["detector"] for c in kept),
+            "l1_briefing_context": l1,
         })
 
     return {"timestamp": C.now_iso(), "generated": len(kept),
             "by_detector": dict(Counter(c["detector"] for c in kept)),
+            "l1_briefing_context": l1,
             "dry_run": dry_run}
 
 
