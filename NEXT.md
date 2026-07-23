@@ -2003,3 +2003,10 @@ deleted. Legitimate re-lock: zero training data constructed. Template B scaffold
 (TEMPLATE_B_MINIMUM_VIABLE_INCOME.md): chain-to-payout per edge, 5 Colin-only decisions blanked,
 capital→$/mo worksheet — honest reading: MVI is capital-bound (~$1,665/mo at $100k). launchctl
 sanity: paper_accounts/system_regime/system_health_verdict/obsidian_sync all loaded, exit 0.
+
+## 2026-07-22 — Always-available standalone dashboard (INFRA)
+- **Shipped** `scripts/build_standalone_dashboard.py`: reads the SAME allowlist as `serve_dashboard.sh`, inlines JSON into `dashboard/dashboard_live.html`, injects a `fetch()` shim so the unmodified dashboard renders under `file://` (no server). Hard secret guards: name + content sweep abort before write; final HTML re-swept.
+- **Shipped** `scripts/com.alta.dashboard_refresh.plist`: regenerates the file every 15min (`StartInterval` 900, `RunAtLoad`). NOT auto-loaded (sandbox) — Colin runs `launchctl load`.
+- **Verified** rendered under `file://` in real browser: prop/carry/oracle/health/fills/gates all populate. Secret grep CLEAN.
+- `dashboard/dashboard_live.html` gitignored (regenerated, data baked in). Pushed 8e4c587 on sovereign-v2.
+- Untouched: execution path, `serve_dashboard.sh`, all frozen files. New files only.
