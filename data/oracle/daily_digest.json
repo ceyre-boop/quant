@@ -1,21 +1,19 @@
 {
-  "headline": "System down: morning agent failed to run; three critical launchd jobs are stuck or producing nothing.",
+  "headline": "ICARUS shadow day 7: +0.000% \u2014 2/7 green so far",
   "what_happened": [
-    "Claude CLI binary missing entirely\u2014launchd cannot invoke `/usr/local/bin/claude`, so `com.alta.morning_agent` never ran today, blocking all context/bias/signals.",
-    "Execution harness locked on 2026-06-16 in `--live` mode; processes wrong date, screens 0, writes no fills. Wait-for-fills gate cannot open.",
-    "`sync_dashboard_data.py` exits clean but produces stale data (mtime 2026-05-31); dashboard split unresolved.",
-    "Four anatomy bugs fixed (similarity floor, dotenv load order, venv Python, Reddit scraper); risk constants ratified in RISK_FRAMEWORK.md.",
-    "Shadow gapper logged zero signals today; last two live days (07-13, 07-14) posted +0.0456% and +0.0042% respectively\u2014marginal signal, execution risk unresolved on HYP-105/106."
+    "2026-07-20 \u2014 LAUNCHD TRIAGE: THERE IS NO `claude` CLI ON THIS MACHINE; TWO CASCADE CLAIMS REFUTED",
+    "2026-07-20 \u2014 Anatomy Audit + Heartbeat Install",
+    "2026-07-20 \u00b7 EOD PASS"
   ],
-  "what_it_means": "You cannot trade without the morning agent running. The Claude CLI install is a blocking prerequisite\u2014not optional polish. Once installed, repoint all three plists to `$CLAUDE_BIN` from `.env` (single-source fix), reload, and verify launchd logs. The anatomy fixes are solid (similarity floor alone stopped garbage regime labels), but HYP-105/106 are flagged for look-ahead leakage; HYP-107 shows a real but marginal +5.4% median signal that execution costs (spreads, halts) will likely erase. The goal ladder: first fix the jobs, then validate shadow fills on live data with realistic slippage.",
-  "todays_one_thing": "Install the Claude CLI binary, then add `CLAUDE_BIN=/verified/abs/path` to `~/quant/.env` and reload the three launchd plists via `launchctl`. Verify `com.alta.morning_agent` runs and logs a signal in tomorrow's morning session. Without this, the system remains inert.",
+  "what_it_means": "Template digest (no LLM call) \u2014 see NEXT.md for detail. (LLM fallback: BadRequestError)",
+  "todays_one_thing": "Check the ICARUS calendar; the ladder does the rest.",
   "progression": [
     {
       "gate": "G1",
       "label": "30 clean shadow days (ICARUS)",
       "state": "IN_PROGRESS",
-      "pct": 20,
-      "detail": "6/30 days recorded \u00b7 2 green"
+      "pct": 23,
+      "detail": "7/30 days recorded \u00b7 2 green"
     },
     {
       "gate": "G2",
@@ -46,7 +44,7 @@
       "detail": "the actual goal"
     }
   ],
-  "source": "oracle-llm",
-  "model": "claude-haiku-4-5-20251001",
-  "generated_at": "2026-07-21T11:38:44.348163+00:00"
+  "source": "template-fallback",
+  "model": null,
+  "generated_at": "2026-07-22T10:15:43.193020+00:00"
 }

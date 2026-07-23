@@ -1,31 +1,23 @@
 {
-  "generated_at": "2026-07-22T00:38:50.175524+00:00",
+  "generated_at": "2026-07-23T01:02:43.379448+00:00",
   "alive": true,
   "fired_today": false,
   "frozen": null,
-  "scan_age_hours": 12.2,
+  "scan_age_hours": 12.8,
   "n_pairs_scanned": 4,
   "n_would_fire_today": 1,
   "strongest_signal": {
-    "pair": "USDJPY=X",
-    "conviction": 0.634,
+    "pair": "GBPUSD=X",
+    "conviction": 0.296,
     "direction": "NO_TRADE",
     "pct_to_trigger": 100.0,
     "regime": "TRENDING",
-    "rate_differential": 3.603
+    "rate_differential": 0.17
   },
   "pairs": [
     {
-      "pair": "USDJPY=X",
-      "conviction": 0.634,
-      "direction": "NO_TRADE",
-      "pct_to_trigger": 100.0,
-      "regime": "TRENDING",
-      "rate_differential": 3.603
-    },
-    {
       "pair": "GBPUSD=X",
-      "conviction": 0.478,
+      "conviction": 0.296,
       "direction": "NO_TRADE",
       "pct_to_trigger": 100.0,
       "regime": "TRENDING",
@@ -33,7 +25,7 @@
     },
     {
       "pair": "AUDUSD=X",
-      "conviction": 0.342,
+      "conviction": 0.284,
       "direction": "NO_TRADE",
       "pct_to_trigger": 100.0,
       "regime": "TRENDING",
@@ -41,11 +33,19 @@
     },
     {
       "pair": "EURUSD=X",
-      "conviction": 0.181,
+      "conviction": 0.241,
       "direction": "LONG",
       "pct_to_trigger": 100.0,
       "regime": "TRENDING",
       "rate_differential": -2.08
+    },
+    {
+      "pair": "USDJPY=X",
+      "conviction": 0.17,
+      "direction": "NO_TRADE",
+      "pct_to_trigger": 100.0,
+      "regime": "TRENDING",
+      "rate_differential": 3.603
     }
   ],
   "last_fill": {
@@ -53,10 +53,10 @@
     "direction": "SHORT",
     "fill_price": 161.323,
     "date": "2026-07-03",
-    "days_ago": 18.3
+    "days_ago": 19.3
   },
   "loops_alive": 7,
   "loops_down": [],
-  "summary_line": "System alive. 4 pairs scanned 12.2h ago \u2014 1 signalling (EURUSD=X LONG). Highest conviction: USDJPY=X 0.634. Last fill: USD_JPY SHORT, 18.3d ago.",
+  "summary_line": "System alive. 4 pairs scanned 12.8h ago \u2014 1 signalling (EURUSD=X LONG). Highest conviction: GBPUSD=X 0.296. Last fill: USD_JPY SHORT, 19.3d ago.",
   "note": "Honest proof-of-life: would-be signals + proximity, never a forced trade. Read-only."
 }

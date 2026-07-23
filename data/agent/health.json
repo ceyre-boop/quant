@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-21T16:26:12",
+  "timestamp": "2026-07-21T22:47:03",
   "overall": "RED",
   "components": {
     "duckdb": {
@@ -16,7 +16,7 @@
     },
     "ict_scanner": {
       "status": "GREEN",
-      "detail": "log updated 50min ago"
+      "detail": "outside session hours \u2014 last run 7.2h ago"
     },
     "backtest_engine": {
       "status": "GREEN",
@@ -24,7 +24,7 @@
     },
     "alpaca": {
       "status": "GREEN",
-      "detail": "paper account equity=$105,319"
+      "detail": "paper account equity=$105,571"
     },
     "fred": {
       "status": "GREEN",
@@ -32,7 +32,7 @@
     },
     "alpha_vantage": {
       "status": "GREEN",
-      "detail": "latest bar 2026-07-20"
+      "detail": "latest bar 2026-07-21"
     },
     "tiingo": {
       "status": "GREEN",
@@ -40,11 +40,11 @@
     },
     "news_api": {
       "status": "GREEN",
-      "detail": "61 business articles"
+      "detail": "31 business articles"
     },
     "oanda": {
       "status": "GREEN",
-      "detail": "NAV=$109,597 practice"
+      "detail": "NAV=$109,591 practice"
     },
     "firebase": {
       "status": "GREEN",
@@ -64,7 +64,7 @@
     },
     "reddit": {
       "status": "YELLOW",
-      "detail": "cache 1594m old \u2014 needs refresh"
+      "detail": "cache 1975m old \u2014 needs refresh"
     },
     "decision_logs": {
       "status": "YELLOW",
@@ -72,9 +72,9 @@
     },
     "oracle_pulse": {
       "status": "RED",
-      "detail": "0 new entries, 1 anomalies",
-      "last_pulse": "2026-07-22T00:38:50+00:00"
+      "detail": "0 new entries, 2 anomalies",
+      "last_pulse": "2026-07-23T01:02:43+00:00"
     }
   },
-  "last_checked": "2026-07-21T16:26:12"
+  "last_checked": "2026-07-21T22:47:03"
 }

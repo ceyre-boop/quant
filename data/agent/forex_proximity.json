@@ -1,34 +1,22 @@
 {
-  "last_scan": "2026-07-21T12:29:13.167275+00:00",
+  "last_scan": "2026-07-22T12:17:41.093868+00:00",
   "pairs": [
-    {
-      "pair": "USDJPY=X",
-      "pct_to_trigger": 100.0,
-      "conviction": 0.634,
-      "direction": "NO_TRADE",
-      "trend": "OK",
-      "regime": "TRENDING",
-      "hurst": 0.65,
-      "rate_differential": 3.603,
-      "differential_trend": "NARROWING",
-      "est_days_to_trigger": null
-    },
     {
       "pair": "GBPUSD=X",
       "pct_to_trigger": 100.0,
-      "conviction": 0.478,
+      "conviction": 0.296,
       "direction": "NO_TRADE",
       "trend": "OK",
       "regime": "TRENDING",
       "hurst": 0.66,
       "rate_differential": 0.17,
-      "differential_trend": "NEW",
+      "differential_trend": "NARROWING",
       "est_days_to_trigger": null
     },
     {
       "pair": "AUDUSD=X",
       "pct_to_trigger": 100.0,
-      "conviction": 0.342,
+      "conviction": 0.284,
       "direction": "NO_TRADE",
       "trend": "OK",
       "regime": "TRENDING",
@@ -40,7 +28,7 @@
     {
       "pair": "EURUSD=X",
       "pct_to_trigger": 100.0,
-      "conviction": 0.181,
+      "conviction": 0.241,
       "direction": "LONG",
       "trend": "OK",
       "regime": "TRENDING",
@@ -48,7 +36,19 @@
       "rate_differential": -2.08,
       "differential_trend": "NARROWING",
       "est_days_to_trigger": null
+    },
+    {
+      "pair": "USDJPY=X",
+      "pct_to_trigger": 100.0,
+      "conviction": 0.17,
+      "direction": "NO_TRADE",
+      "trend": "OK",
+      "regime": "TRENDING",
+      "hurst": 0.65,
+      "rate_differential": 3.603,
+      "differential_trend": "NARROWING",
+      "est_days_to_trigger": null
     }
   ],
-  "verdict": "NO_TRADE_TODAY \u2014 USDJPY=X closest at 100%"
+  "verdict": "NO_TRADE_TODAY \u2014 GBPUSD=X closest at 100%"
 }
