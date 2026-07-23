@@ -4,7 +4,32 @@ Per-session ledger: what shipped, push status, verdicts, blockers, refusals. New
 The Obsidian brain (`~/Obsidian/Obsidian/00-BRAIN/NEXT.md`) is the cross-project rollup.
 Standing constraints live in `CLAUDE.md` — not restated here.
 
-### 2026-07-22 · Petrules Gate daily scanner BUILT (Phase 0, rule-based, standalone research)
+### 2026-07-22 · TICK-056 MT5 execution bridge — SPEC + TICKET + PLAN shipped (spec-first, STOPPED before code)
+Prerequisite for Step 3 (The5%ers $100K High Stakes), forcing date FOMC 2026-07-29. Per plan→build
+separation I produced the spec/ticket/plan and STOPPED before connector code — this needs a platform
+decision from Colin first (below).
+
+**Shipped (commit `31e71bc`, pushed to sovereign-v2):**
+- `specs/mt5_bridge.md` (LAW) — order-routing `order_intent` JSON contract, demo-vs-live guard,
+  approval flow, failure modes, file layout, test strategy. NEW-infra design: the bridge consumes a
+  decoupled JSON contract and imports NOTHING from the frozen execution path.
+- `tickets/backlog.md` → **TICK-056** (ready, pre_approved:false) with acceptance criteria.
+- `plans/TICK-056.md` (force-added; plans/ gitignored) — build sequence, risks, the Open Decision.
+
+**Freeze compliance:** zero edits to `forex_exit_manager` / `decide_exit` / `execution/harness.py` /
+`carry_engine` / `ict/pipeline.py`. No unlock consumed. Wiring a producer to EMIT `order_intent` and
+any live route are separate future unlocks.
+
+**BLOCKER — Colin's decision needed before connector code:** `MetaTrader5` pip package is Windows-only
+and is NOT importable on this Mac (Darwin — verified in-sandbox). The native bridge needs one of:
+(A) Windows box/VM, (B) Wine-prefix Python + Wine MT5 on the Mac, (C) socket-EA bridge. The guard /
+contract / idempotency / approval logic are identical across all three and can be built + unit-tested
+now with a MockConnector; only the connector layer + live-terminal validation wait on this answer.
+
+**Refused to shortcut:** did not scaffold an unvalidatable real connector or fake a fill (no MT5 pkg,
+wrong OS) — surfaced the blocker instead. Did not proceed past the plan (not pre_approved).
+
+
 Built the free-data daily scanner per `tickets/DISPATCH_PETRULES_GATE_SCANNER.md`. Rule-based
 ONLY (no ML — that's a later ticket). Scores ~2,550 instruments (S&P500 + Russell2000 + 50 ETFs
 + 4 carry pairs) each morning on 4 factors and writes one JSON the dashboard already reads.
