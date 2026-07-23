@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>EnvironmentVariables</key>
+	<dict>
+		<key>PATH</key>
+		<string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+	</dict>
+	<key>Label</key>
+	<string>com.alta.dip_daily</string>
+	<key>Nice</key>
+	<integer>10</integer>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/bin/bash</string>
+		<string>/Users/taboost/quant/scripts/dip_daily.sh</string>
+	</array>
+	<key>StandardErrorPath</key>
+	<string>/Users/taboost/quant/logs/dip_daily.err</string>
+	<key>StandardOutPath</key>
+	<string>/Users/taboost/quant/logs/dip_daily.log</string>
+	<key>StartCalendarInterval</key>
+	<dict>
+		<key>Hour</key>
+		<integer>2</integer>
+		<key>Minute</key>
+		<integer>30</integer>
+	</dict>
+	<key>WorkingDirectory</key>
+	<string>/Users/taboost/quant</string>
+</dict>
+</plist>

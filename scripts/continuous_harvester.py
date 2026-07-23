@@ -468,6 +468,14 @@ def run_harvest(symbols: List[str], max_passes: int = 0) -> None:
         t0 = time.time()
         log.info(f"=== PASS {pass_num} START — {len(symbols)} symbols ===")
 
+        # PREFETCH IN THE PARENT before forking. yfinance network calls inside a
+        # fork() child deadlock on macOS; warming the parquet cache here means the
+        # forked workers only ever READ cached files (load_ohlcv short-circuits its
+        # download branch). Without this, the pool hangs indefinitely and the DB
+        # never grows. See scripts/dip_data_fetcher.py for the full rationale.
+        from scripts.dip_data_fetcher import prefetch
+        prefetch(symbols)
+
         # Parallel COMPUTE across N_CORES (workers return records); SERIAL write in
         # the parent — DuckDB is single-writer, so only the parent touches harvest.db.
         # imap streams results in order, overlapping the next symbol's compute with

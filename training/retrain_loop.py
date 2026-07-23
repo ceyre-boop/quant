@@ -75,6 +75,17 @@ FEATURE_COLS = [
     "bars_since_profitable",    # how long since last win (capped at 50)
 ]
 
+# The 3 lagged features are DERIVED in add_lagged_features() from raw trades —
+# they are NOT columns in the harvester's `trades` table. Only the base columns
+# below can be pulled from SQL; selecting the derived names would raise a
+# BinderException. Keep this in sync with add_lagged_features().
+_LAGGED_FEATURES = {
+    "rolling_win_rate_regime",
+    "recent_drawdown_streak",
+    "bars_since_profitable",
+}
+BASE_FEATURE_COLS = [c for c in FEATURE_COLS if c not in _LAGGED_FEATURES]
+
 
 # ── Sequence feature engineering ─────────────────────────────────────────────
 
@@ -119,7 +130,7 @@ def load_trades(min_rows: int = 1000) -> Optional[pd.DataFrame]:
 
     con = duckdb.connect(str(DB_PATH), read_only=True)
     df = con.execute(f"""
-        SELECT {', '.join(FEATURE_COLS)},
+        SELECT {', '.join(BASE_FEATURE_COLS)},
                pnl, pnl_r, is_profitable,
                window_start, harvested_at,
                symbol, strategy
