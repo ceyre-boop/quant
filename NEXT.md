@@ -2077,3 +2077,60 @@ sanity: paper_accounts/system_regime/system_health_verdict/obsidian_sync all loa
 - **Root cause**: `data/bias/bias_*.json` stores `confidence` as a percentage (e.g. 21.0), but `updateBias()` in `dashboard/index.html:720` did `Math.round(conf*100)` → "2100%".
 - **Fix**: treat conf as already-a-percentage, guard the legacy fraction convention (`conf<=1 → ×100`), clamp 0–100. Verified in real browser: today (07-23) reads 0%; test vector 21.0→21, 0.21→21, 42→42, 150→100. Display-only.
 - Regenerated `dashboard_live.html` so the fix shows in the standalone build too. Pushed 709c114 on sovereign-v2. No execution-path files touched.
+
+## 2026-07-23 — AlphaZero/Stockfish activation (WORKSTREAM A wired LIVE, B computed) — freeze-safe
+Implements `research/ALPHAZERO_STOCKFISH_REPORT.md` as far as the execution-path freeze (runs to
+2026-07-28) allows. **No frozen file touched** (forex_exit_manager, decide_exit, exit_machine,
+carry_engine, execution/harness.py, ict scoring, L2 shadow all untouched). Named isolation test
+`test_pipeline_does_not_import_sovereign` GREEN; ICT baseline unchanged (4 failed/23 passed).
+
+### WORKSTREAM A — briefing synthesizer (AlphaZero)
+- **A1 (LIVE, code-complete)** — `scripts/morning_market_briefing.py::build()` now publishes the
+  agent-facing contract `data/agent/daily_briefing.json` every run, idempotent, fail-loud (partial
+  writes surface as `contract_write_errors` in the briefing). This is the "call it every morning +
+  write daily_briefing.json" wiring. Verified: contract written this run (deterministic fallback).
+- **A2 (BUILT + STAGED)** — new `sovereign/briefing/briefing_context.py`: a CONTINUOUS sizing
+  multiplier from confidence + regime quality + optional direction-vs-carry alignment. Band
+  [0.80,1.20], **fail-to-neutral (=1.0)** on deterministic fallback / missing confidence — NEVER a
+  veto (strictly positive, can't zero a trade). Published each run to
+  `data/agent/briefing_multiplier.json`. Consumer note: the **Petrules Gate conviction scorer does
+  not exist yet** (Phase-1 groundwork only — `research/petrules/`), so the multiplier is published on
+  a clean contract + a ready consumer hook rather than wired into nonexistent code. **Carry hookup is
+  STAGED, unwired**: `briefing_context.staged_carry_size_multiplier()` is the one-line switch to flip
+  after 2026-07-28 (editing carry_engine is frozen). 9 unit tests green (`tests/test_briefing_context.py`).
+- **A3 (LIVE)** — (1) every morning's call appended to `data/agent/briefing_log.jsonl` (append-only).
+  (2) `decision_logger._with_briefing()` auto-stamps the L1 call (verified=False, context_only) into
+  `present_state_snapshot.l1_briefing` on EVERY forex + ICT decision at the logging choke point — so
+  trade outcomes can later be matched back to the briefing that preceded them. (3) The self-improving
+  loop is already turning: `scorecard.summary_line()` (n=14 dir-calls, hit 0.786) feeds back into the
+  next synthesizer call. Honest n; still CALIBRATING (<30 samples).
+- **BLOCKER (honest, not a code fault)**: real Opus synthesis returns HTTP 400 *"credit balance too
+  low"* — key valid, model id `claude-opus-4-8` accepted, account out of credits. Until topped up the
+  system runs deterministic_fallback (bias NEUTRAL, conf 0) and the multiplier correctly neutralises
+  to 1.0. Wiring is LIVE and correct; it will produce real calls the moment credit is restored.
+
+### WORKSTREAM B — HYP-071 exit value table (Stockfish) — COMPUTED + VALIDATED
+- Ran `scripts/research/hyp_071_exit_value_function.py`: both prereg hashes verified, reconcile gate
+  **0.6886 exact**, re-trace parity **459/459**. Table computed (108 cells, 10k continuations, L=5).
+- **PROVISIONAL PASS** against the locked §7 gate — **10** CPCV-stable economically-sensible EXIT_NOW
+  divergences, **9** forward-consistent across 2023-24↔2025-26. Forward agree 0.870 (n=23),
+  separability 0.862 (n=29), regime-window 0.854 (n=48 — **below the 0.90 "robust" bar**). This
+  **contradicts** the pre-registered NOT_SIGNIFICANT expectation.
+- **Not sealed as CONFIRMED.** Dominant caveat: R is GROSS; all 9 divergences are carry-ALIGNED cells,
+  and correctly-modelled carry (known ~10× mis-modelled, TICK-024) is a reason to HOLD longer → could
+  ERASE the PASS. Correct next step (freeze-independent, runnable now): recompute on NET returns and
+  see how many of the 9 survive. Left for Colin to adjudicate the ledger.
+- Report: `research/HYP-071_VALIDATION_REPORT.md`. Results JSON:
+  `data/research/HYP-071_tabular_exit_value_results.json`.
+
+### STAGED for 2026-07-28 unlock (checklist Colin can action)
+1. [ ] Confirm L2 shadow exit-machine window passed clean and went live (go-date 2026-07-28).
+2. [ ] Recompute HYP-071 table on NET returns (corrected TICK-024 financing); verify the 9
+       forward-consistent EXIT_NOW divergences survive AND regime-window agreement ≥ 0.90.
+3. [ ] If they survive: write CONFIRMED (or APPROVED-FOR-APPLICATION) HYP-071 entry to
+       `data/agent/hypothesis_ledger.json`, then apply the staged cells via a NEW
+       `config/exit_value_overrides.yml` read by the exit machine (logged in param_change_log.jsonl).
+       Full spec: `research/HYP-071_STAGED_EXIT_RULE_PROPOSAL.md`.
+4. [ ] Flip A2 carry hookup: call `briefing_context.staged_carry_size_multiplier(carry_direction=...)`
+       from the carry sizing engine (one line), record the unlock here + in param_change_log.jsonl.
+5. [ ] Top up Anthropic API credit so the synthesizer produces real (non-fallback) morning calls.

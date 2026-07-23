@@ -116,6 +116,25 @@ def _safe_append(record: DecisionRecord) -> None:
         _dlog.warning("Decision log write failed (trade continues): %s", exc)
 
 
+def _with_briefing(snapshot: Optional[dict]) -> dict:
+    """Stamp the session's L1 briefing call onto the entry snapshot (A3 — the AlphaZero loop).
+
+    Every decision that follows a morning briefing carries that briefing's self-scored call under
+    `l1_briefing`, so a later pass can match the trade's OUTCOME back to the call that preceded it.
+    CONTEXT ONLY (verified=False) — it is not a gate, a size input, or a filter here; it is provenance
+    for the learning loop. Never raises: a briefing-read failure must not block a trade from logging.
+    """
+    snap = dict(snapshot or {})
+    try:
+        from sovereign.briefing.briefing_context import briefing_stamp
+        stamp = briefing_stamp()
+        if stamp is not None:
+            snap["l1_briefing"] = stamp
+    except Exception:
+        pass
+    return snap
+
+
 # ─── ICT builder ─────────────────────────────────────────────────────────────
 
 def log_ict_decision(
@@ -203,7 +222,7 @@ def log_ict_decision(
         component_scores=dict(signal.component_scores),
         confirmations=list(signal.confirmations),
         missing=list(signal.missing),
-        present_state_snapshot=present_state_snapshot or {},
+        present_state_snapshot=_with_briefing(present_state_snapshot),
         active_lessons=list(active_lessons or []),
     )
 
@@ -293,7 +312,7 @@ def log_forex_decision(
         component_scores=extra or {},
         confirmations=signal_layers,
         missing=[],
-        present_state_snapshot=present_state_snapshot or {},
+        present_state_snapshot=_with_briefing(present_state_snapshot),
         active_lessons=list(active_lessons or []),
     )
 

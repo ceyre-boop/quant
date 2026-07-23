@@ -41,6 +41,11 @@ FOREX_PROX = ROOT / "data" / "agent" / "forex_proximity.json"
 BIG_MOVE_PATH = ROOT / "data" / "agent" / "big_move.json"
 HEARTBEAT = ROOT / "logs" / ".heartbeat_morning_briefing"
 
+# Agent-facing data contracts (the "AlphaZero" wiring — see research/ALPHAZERO_STOCKFISH_REPORT.md).
+DAILY_BRIEFING_JSON = ROOT / "data" / "agent" / "daily_briefing.json"      # A1 — the call, for consumers
+BRIEFING_LOG = ROOT / "data" / "agent" / "briefing_log.jsonl"             # A3 — append-only call history
+BRIEFING_MULT_JSON = ROOT / "data" / "agent" / "briefing_multiplier.json"  # A2 — continuous sizing multiplier
+
 
 def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
@@ -200,6 +205,49 @@ def build(narrative_file: str | None = None) -> dict:
     BRIEF_DIR.mkdir(parents=True, exist_ok=True)
     (BRIEF_DIR / f"{today}.json").write_text(json.dumps(briefing, indent=2))
     (BRIEF_DIR / "latest.json").write_text(json.dumps(briefing, indent=2))
+
+    # ── AlphaZero wiring: publish the agent-facing contracts (A1/A2/A3) ──────────────────────────
+    # Fail-loud but never abort the run: each write is guarded and records an error marker in the
+    # briefing so a downstream reader can see a partial write instead of silently trusting stale data.
+    write_errors: dict[str, str] = {}
+
+    # A1 — the call itself, at the stable path consumers read (idempotent overwrite each run).
+    try:
+        DAILY_BRIEFING_JSON.parent.mkdir(parents=True, exist_ok=True)
+        DAILY_BRIEFING_JSON.write_text(json.dumps(briefing, indent=2))
+    except Exception as e:
+        write_errors["daily_briefing"] = str(e)
+
+    # A3 — append this morning's call to the append-only log (one line per run) for later
+    # trade-outcome attribution. Idempotent per date: last write for a date wins on read.
+    try:
+        BRIEFING_LOG.parent.mkdir(parents=True, exist_ok=True)
+        with BRIEFING_LOG.open("a") as fh:
+            fh.write(json.dumps({
+                "date": today, "logged_at": _now(),
+                "directional_bias": directional_bias, "confidence": confidence,
+                "regime_call": regime_call, "key_level": key_level,
+                "synthesis_source": synth_source, "verified": False,
+            }) + "\n")
+    except Exception as e:
+        write_errors["briefing_log"] = str(e)
+
+    # A2 — the continuous sizing multiplier (context only, never a veto).
+    try:
+        from sovereign.briefing.briefing_context import compute_multiplier
+        mult = compute_multiplier(confidence, directional_bias,
+                                  synthesis_source=synth_source, regime_call=regime_call)
+        mult["date"] = today
+        BRIEFING_MULT_JSON.parent.mkdir(parents=True, exist_ok=True)
+        BRIEFING_MULT_JSON.write_text(json.dumps(mult, indent=2))
+    except Exception as e:
+        write_errors["briefing_multiplier"] = str(e)
+
+    if write_errors:
+        # Surface partial-write failures loudly in the briefing itself (fail-loud, not fail-silent).
+        briefing["contract_write_errors"] = write_errors
+        (DAILY_BRIEFING_JSON if not write_errors.get("daily_briefing") else (BRIEF_DIR / f"{today}.json")).write_text(
+            json.dumps(briefing, indent=2))
 
     # Heartbeat for loop_health (written every run, before nothing gates it).
     try:
