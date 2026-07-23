@@ -95,6 +95,43 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:14
 .r1{grid-template-columns:1fr}
 .r2{grid-template-columns:1.1fr 1fr 1fr}
 .r3{grid-template-columns:2fr 1fr}
+.r4{grid-template-columns:1fr}
+
+/* ── Petrules Gate panel ─────────────────────────────────── */
+.gate-panel-inner{display:grid;grid-template-columns:auto 1fr 1fr 1fr;gap:0;align-items:stretch}
+.gate-tier-col{padding:16px 20px;display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:120px;border-right:1px solid var(--border)}
+.gate-tier-badge{font-size:11px;font-weight:700;letter-spacing:2px;padding:5px 12px;border-radius:4px;text-align:center}
+.gate-tier-badge.t4{background:rgba(74,250,122,.15);color:#4afa7a;border:1px solid rgba(74,250,122,.4)}
+.gate-tier-badge.t3{background:rgba(255,202,40,.12);color:#ffca28;border:1px solid rgba(255,202,40,.3)}
+.gate-tier-badge.t2{background:rgba(85,153,255,.12);color:#5599ff;border:1px solid rgba(85,153,255,.3)}
+.gate-tier-badge.t0{background:#111;color:var(--text-muted);border:1px solid var(--border);font-weight:400;letter-spacing:1px}
+.gate-sym{font-size:20px;font-weight:700;color:#fff;margin-top:8px}
+.gate-score{font-size:10px;color:var(--text-muted);margin-top:3px}
+.gate-score span{color:var(--green)}
+.gate-org{padding:14px 16px;border-right:1px solid var(--border)}
+.gate-org:last-child{border-right:none}
+.gate-org-lbl{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px}
+.gate-org-title{font-size:11px;color:#fff;font-weight:600;margin-bottom:8px}
+.gate-row{display:flex;justify-content:space-between;font-size:10px;padding:3px 0;border-bottom:.5px solid #1a1a1a}
+.gate-row:last-child{border-bottom:none}
+.gate-row .k{color:var(--text-muted)}
+.gate-row .v{font-weight:600}
+.gate-footprint{font-size:10px;color:var(--text-dim);line-height:1.55;margin-top:3px}
+.gate-footprint .fp-item{display:flex;gap:6px;padding:3px 0;border-bottom:.5px solid #1a1a1a}
+.gate-footprint .fp-item:last-child{border-bottom:none}
+.gate-fp-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.gate-quiet{padding:20px;display:flex;align-items:center;gap:14px;grid-column:1/-1}
+.gate-scan-meta{font-size:10px;color:var(--text-muted);margin-top:6px}
+.gate-verdict{padding:10px 16px;background:#0d0d0d;border-top:1px solid var(--border);font-size:10px;color:var(--text-dim);line-height:1.5}
+.gate-verdict .vkey{color:var(--text-muted)}
+.gate-verdict .vval{color:#fff}
+.gate-change{display:flex;gap:16px;margin-top:8px;flex-wrap:wrap}
+.gate-change-item{font-size:9px;color:var(--text-muted)}
+.gate-change-item .up{color:var(--green)}
+.gate-change-item .dn{color:var(--red)}
+.gate-ph{display:flex;align-items:center;justify-content:space-between;margin-bottom:0}
+.gate-ph .ph{margin-bottom:0;border-bottom:.5px solid var(--border);padding-bottom:10px}
+
 
 /* ============================================================
    PANEL
@@ -439,6 +476,25 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:14
     </div>
 
   </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       ROW 4 — PETRULES GATE  (whole-market conviction scanner)
+       data/agent/petrules_gate_scan.json
+       ═══════════════════════════════════════════════════════ -->
+  <div class="row r4">
+    <div class="panel" style="padding:0;overflow:hidden">
+      <div class="ph" style="padding:12px 18px 10px;border-bottom:.5px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+        <span>⚡ Petrules Gate
+          <span style="font-size:9px;color:var(--text-muted);font-weight:400;margin-left:6px">whole-market conviction scanner</span>
+        </span>
+        <span style="font-size:9px;color:var(--text-muted)" id="gate-scan-ts">—</span>
+      </div>
+      <div id="gate-panel-body">
+        <div class="gate-quiet"><span style="color:var(--text-muted);font-size:11px">Loading…</span></div>
+      </div>
+    </div>
+  </div>
+
 </main>
 
 <script>
@@ -661,7 +717,9 @@ async function updateBias() {
   const PAIRS=['EUR/USD','GBP/USD','USD/JPY','AUD/USD'];
   const dir  = bias?.direction  ?? 'NEUTRAL';
   const conf = bias?.confidence ?? 0;
-  const pct  = Math.round(conf*100);
+  // bias files store confidence as a percentage (e.g. 21.0). Guard the legacy
+  // fraction convention (0–1 → ×100) so both render sanely; clamp to 0–100.
+  const pct  = Math.round(Math.min(100, Math.max(0, conf<=1 ? conf*100 : conf)));
 
   const dbCls  = dir==='BULLISH'?'b-green':dir==='BEARISH'?'b-red':'b-dim';
   const barClr = dir==='BULLISH'?'var(--green)':dir==='BEARISH'?'var(--red)':'var(--text-muted)';
@@ -858,6 +916,77 @@ async function updateCarry() {
   setBadge('cy-badge', st, st==='OK'?'b-blue':st==='DEGRADED'?'b-yellow':'b-dim');
 }
 
+/* ── Petrules Gate panel ─────────────────────────────────── */
+async function updateGate() {
+  const d = await fj('data/agent/petrules_gate_scan.json');
+  const body = document.getElementById('gate-panel-body');
+  const ts   = document.getElementById('gate-scan-ts');
+  if (!d) {
+    body.innerHTML = `<div class="gate-quiet"><span style="color:var(--text-muted);font-size:11px">No scan data yet — scanner not built yet. <span style="color:#5599ff">See tickets/DISPATCH_PETRULES_GATE_SCANNER.md</span></span></div>`;
+    return;
+  }
+  ts.textContent = d.scanned_at ? fmtAgo(d.scanned_at)+' · '+d.instruments_scanned?.toLocaleString()+' instruments' : '—';
+  const top = d.top_signal;
+  if (!top || top.tier < 3) {
+    const msg = top ? `Highest today: <b style="color:#fff">${top.symbol}</b> at conviction <b>${top.conviction_score?.toFixed(2)}</b> (Tier ${top.tier}) — below threshold` : 'No signals cleared Tier 2 today';
+    body.innerHTML = `<div class="gate-quiet" style="flex-direction:column;align-items:flex-start;gap:6px">
+      <span class="gate-tier-badge t0">QUIET</span>
+      <span style="font-size:11px;color:var(--text-dim);margin-top:4px">${msg}</span>
+      <span class="gate-scan-meta">${d.instruments_scanned?.toLocaleString() || '—'} instruments scanned · ${d.tier3_plus || 0} cleared Tier 3+</span>
+    </div>`;
+    return;
+  }
+  const tierCls = top.tier===4?'t4':'t3';
+  const tierLbl = top.tier===4?'⚡ TIER 4 — SCREAMER':'▲ TIER 3 — STRONG';
+  const dotColor= (s)=>s==='bullish'?'#4afa7a':s==='bearish'?'#ff5f5f':'#ffca28';
+  const fpHtml  = (top.divergence_signals||[]).map(f=>`
+    <div class="fp-item"><div class="gate-fp-dot" style="background:${dotColor(f.direction)}"></div><div>${f.label}</div></div>`).join('');
+  const orgConsensus = top.consensus || {};
+  const orgConv      = top.sizing    || {};
+  const barW = Math.round((top.conviction_score||0)*100);
+  body.innerHTML = `
+    <div class="gate-panel-inner">
+      <div class="gate-tier-col">
+        <span class="gate-tier-badge ${tierCls}">${tierLbl}</span>
+        <div class="gate-sym">${top.symbol}</div>
+        <div class="gate-score">Score <span>${(top.conviction_score||0).toFixed(2)}</span></div>
+        <div style="margin-top:10px;width:80px;height:4px;background:#1a1a1a;border-radius:2px;overflow:hidden">
+          <div style="width:${barW}%;height:100%;background:${top.tier===4?'var(--green)':'var(--yellow)'}"></div>
+        </div>
+      </div>
+      <div class="gate-org">
+        <div class="gate-org-lbl">Organ 1 — Consensus</div>
+        <div class="gate-org-title">What the street expects</div>
+        ${orgConsensus.eps_est!=null?`<div class="gate-row"><span class="k">EPS est.</span><span class="v">${orgConsensus.eps_est}</span></div>`:''}
+        ${orgConsensus.implied_move!=null?`<div class="gate-row"><span class="k">Implied move</span><span class="v">${orgConsensus.implied_move}</span></div>`:''}
+        ${orgConsensus.analyst_buy_pct!=null?`<div class="gate-row"><span class="k">Buy %</span><span class="v" style="color:var(--green)">${orgConsensus.analyst_buy_pct}% buy</span></div>`:''}
+        ${orgConsensus.narrative?`<div class="gate-row"><span class="k">Narrative</span><span class="v" style="color:var(--yellow)">${orgConsensus.narrative}</span></div>`:''}
+        ${!orgConsensus.eps_est&&!orgConsensus.implied_move?`<div style="font-size:10px;color:var(--text-muted)">${orgConsensus.summary||'—'}</div>`:''}
+      </div>
+      <div class="gate-org">
+        <div class="gate-org-lbl">Organ 2 — Divergence</div>
+        <div class="gate-org-title">What the footprints say</div>
+        <div class="gate-footprint">${fpHtml||'<span style="color:var(--text-muted)">No footprints loaded</span>'}</div>
+      </div>
+      <div class="gate-org">
+        <div class="gate-org-lbl">Organ 3 — Conviction</div>
+        <div class="gate-org-title">Sizing output</div>
+        <div class="gate-row"><span class="k">Tier</span><span class="v" style="color:${top.tier===4?'var(--green)':'var(--yellow)'}">TIER ${top.tier}</span></div>
+        <div class="gate-row"><span class="k">Size multiplier</span><span class="v" style="color:var(--green)">${(orgConv.size_multiplier||1).toFixed(2)}×</span></div>
+        <div class="gate-row"><span class="k">Position size</span><span class="v">f = ${((orgConv.f||0)*100).toFixed(1)}% notional</span></div>
+        <div class="gate-row"><span class="k">f_max ceiling</span><span class="v" style="color:var(--yellow)">${((orgConv.f_max||0.08)*100).toFixed(0)}% — ${orgConv.f_max_hit?'<span style="color:var(--red)">HIT — capped</span>':'not hit'}</span></div>
+        <div class="gate-row"><span class="k">Calibration</span><span class="v" style="color:var(--yellow)">${orgConv.calibration_status||'BACKTEST ONLY'}</span></div>
+      </div>
+    </div>
+    <div class="gate-verdict">
+      <span class="vkey">Hypothesis: </span><span class="vval">${top.hypothesis||'—'}</span>
+      ${(top.move_up||top.move_down)?`<div class="gate-change">
+        ${(top.move_up||[]).map(u=>`<div class="gate-change-item"><span class="up">↑</span> ${u}</div>`).join('')}
+        ${(top.move_down||[]).map(u=>`<div class="gate-change-item"><span class="dn">↓</span> ${u}</div>`).join('')}
+      </div>`:''}
+    </div>`;
+}
+
 async function refreshAll() {
   const dot=document.getElementById('pdot');
   dot.classList.add('spin');
@@ -872,6 +1001,7 @@ async function refreshAll() {
     updateHealth(),
     updateFills(fills),
     updateResearch(),
+    updateGate(),
   ]);
 
   drawEquity(fills);
