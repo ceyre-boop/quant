@@ -693,3 +693,41 @@ data_fetcher.get_pair_differentials). All read-only; none touches the frozen SWA
 
 **depends_on:** []
 **blocks:** []
+
+## TICK-056
+**title:** MT5 execution bridge (DEMO-only) — order-intent → MetaTrader5 order_send for The5%ers Step 3
+**status:** ready
+**pre_approved:** false
+
+**description:** Build the MT5 execution bridge that turns the sovereign system's signal output into
+MetaTrader5 orders on a DEMO/practice account only — the prerequisite that unlocks Step 3 (opening
+The5%ers $100K High Stakes challenge). FOMC 2026-07-29 is the forcing date: the bridge must EXIST before
+then so a green-light FOMC outcome can be acted on. Spec: `specs/mt5_bridge.md` (LAW). Plan:
+`plans/TICK-056.md`.
+
+NEW infrastructure only — the bridge consumes a decoupled `order_intent` JSON contract (defined in the
+spec) and NEVER imports or edits frozen execution code (`forex_exit_manager`, `decide_exit`,
+`execution/harness.py`, `carry_engine`, `ict/pipeline.py` scoring). Wiring the signal producer to EMIT
+the contract, and any live routing, are separate unlocks recorded in NEXT.md.
+
+Hard invariants: (1) DEMO-ONLY guard — the bridge refuses to `order_send` unless the connected account
+reports `trade_mode == ACCOUNT_TRADE_MODE_DEMO`; a live account aborts loudly. A live route requires an
+explicit, logged unlock file + env flag, absent by default. (2) NO auto-trading — the bridge stages the
+order and requires human approval before routing. (3) NO silent mocking — missing `MetaTrader5` pkg /
+terminal / creds → STOP with the exact remediation, never a faked fill.
+
+**PLATFORM BLOCKER (must be decided before connector code):** the `MetaTrader5` pip package is
+Windows-only; this repo runs on macOS (Darwin) and the package is NOT importable here. Colin's Mac
+cannot run the native bridge without one of: a Windows VM / box running MT5+Python, or a Wine-prefix
+Python co-located with a Wine MT5 terminal, or a socket-EA bridge. This choice determines the connector
+architecture — see spec §Failure Modes and plan §Open Decision.
+
+**depends_on:** []
+**blocks:** []
+**acceptance_criteria:**
+- [ ] `specs/mt5_bridge.md` written and reviewed BEFORE connector code (order-routing contract, demo-vs-live guard, failure modes)
+- [ ] Demo-vs-live guard unit-tested against a mock connector (demo → allowed; live → hard abort; unknown → abort)
+- [ ] `order_intent` contract parse/validate unit-tested (schema, required fields, reject malformed)
+- [ ] Bridge imports NOTHING from the frozen execution path (AST isolation test)
+- [ ] Live-terminal validation steps documented for Colin's Mac; no fabricated fill in-sandbox
+- [ ] Push at least once; NEXT.md updated with what shipped + exact operator steps
