@@ -280,6 +280,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:14
 .sp-reason:last-child{border-bottom:none}
 .sp-reason .rdot{width:5px;height:5px;border-radius:50%;background:var(--red);flex-shrink:0;margin-top:5px}
 .sp-placeholder{font-size:11px;font-style:italic;color:var(--text-muted)}
+.sp-scorecard{font-size:10px;color:var(--text-dim);line-height:1.5;margin-top:8px}
 .sp-syslist{display:flex;flex-direction:column;gap:6px}
 .sp-sysrow{display:grid;grid-template-columns:82px 1fr auto;gap:8px;align-items:center;
   padding:6px 8px;background:var(--bg);border:1px solid var(--border);font-size:11px}
@@ -591,8 +592,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:14
       </div>
 
       <div class="sp-block" style="margin-top:12px">
-        <div class="sp-lbl">Prob(win today)</div>
-        <span class="sp-placeholder" id="sp-prob">Prob(win today): pending definition</span>
+        <div class="sp-lbl">AlphaZero confidence · today's call</div>
+        <div id="sp-prob"><span class="nd">Loading…</span></div>
+        <div class="sp-scorecard" id="sp-prob-caveat"></div>
       </div>
     </div>
 
@@ -1268,6 +1270,37 @@ async function updateTraining(){
         `<span class="v ${last.committed?'cg':'cd'}">${last.committed?'YES':'NO'}</span></div>`+
       `<div class="sp-lbl" style="margin-top:9px">Params (before → after)</div>`+
       `<div style="font-size:10px;color:${changed?'var(--text)':'var(--text-dim)'};line-height:1.6">${paramLine}</div>`;
+  }
+
+  // ── AlphaZero confidence · today's call (read-only, display-only) ──
+  // Reads directional_bias/confidence/synthesis_source from daily_briefing.json
+  // and the maturity/sample count from scorecard_status.json. Never computes or
+  // fabricates — surfaces what the briefing already recorded. If synthesis ran
+  // as deterministic_fallback the number is meaningless, so we grey it out.
+  const briefing  = await fj('data/agent/daily_briefing.json');
+  const scorecard = await fj('data/briefing/scorecard_status.json');
+  const probBody   = document.getElementById('sp-prob');
+  const probCaveat = document.getElementById('sp-prob-caveat');
+
+  if(!briefing || briefing.directional_bias==null || briefing.confidence==null){
+    probBody.innerHTML = '<span class="sp-placeholder">UNAVAILABLE</span>';
+  } else if(briefing.synthesis_source === 'deterministic_fallback'){
+    probBody.innerHTML =
+      `<span class="sp-placeholder" style="opacity:.55">brain offline — no live synthesis this cycle</span>`;
+  } else {
+    const bias = String(briefing.directional_bias);
+    const conf = briefing.confidence;
+    const bc = bias==='LONG'?'cg':bias==='SHORT'?'cr':'cy';
+    probBody.innerHTML =
+      `<span class="v ${bc}" style="font-size:15px;font-weight:600">${bias} · ${conf}%</span>`;
+  }
+
+  // Scorecard maturity caveat — always shown (honesty: not a proven edge until MATURE).
+  if(scorecard && scorecard.maturity){
+    const n = scorecard.n_scored_directional!=null ? scorecard.n_scored_directional : '?';
+    probCaveat.textContent = `${scorecard.maturity} (n=${n} directional calls scored)`;
+  } else {
+    probCaveat.innerHTML = '<span class="nd">scorecard_status.json not found — run scripts/write_briefing_scorecard_status.py</span>';
   }
 }
 

@@ -31,6 +31,8 @@ FILES=(
   "data/agent/petrules_gate_scan.json"
   "data/agent/prop_challenge_state.json"
   "data/agent/training_gate_status.json"
+  "data/agent/daily_briefing.json"
+  "data/briefing/scorecard_status.json"
   "data/proof/v015_manifest.json"
   "logs/training_log.jsonl"
   "data/execution/fills.json"
