@@ -181,9 +181,11 @@ def test_placebo_shuffle_is_reproducible_for_fixed_seed():
 
 def test_ict_sovereign_isolation_still_green():
     import subprocess
+    import sys
     result = subprocess.run(
-        ["python3", "-m", "pytest", "tests/",
-         "-k", "test_pipeline_does_not_import_sovereign", "-q"],
+        [sys.executable, "-m", "pytest",
+         "tests/unit/test_ict_pipeline.py::test_pipeline_does_not_import_sovereign",
+         "-q"],
         cwd=ROOT, capture_output=True, text=True,
     )
     assert result.returncode == 0, result.stdout + result.stderr
