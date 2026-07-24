@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-23T01:52:35.499825+00:00",
+  "generated_at": "2026-07-24T01:45:53.619643+00:00",
   "status": "DEGRADED",
   "status_reason": "portfolio:OK/REDUCE; undertow_gapper:REDUCE; ict_equities:REDUCE; carry:REDUCE",
   "strategies": {
@@ -45,8 +45,14 @@
       },
       "process_adherence": {
         "decisions_matched_rules_pct": null,
-        "status": "UNAVAILABLE",
-        "reason": "causal-chain journal exists but has 0 records",
+        "status": "INSUFFICIENT_DATA",
+        "reason": "0 entered setups with determinable bias alignment < 20 needed \u2014 INSUFFICIENT_DATA. Journal has 294 total records ({'VETOED': 294}); process score not fabricated from a thin sample.",
+        "n_total": 294,
+        "n_entered": 0,
+        "n_evaluable": 0,
+        "by_action": {
+          "VETOED": 294
+        },
         "source": "data/agent/ict_causal_chain.jsonl"
       },
       "forecast_vs_execution": {

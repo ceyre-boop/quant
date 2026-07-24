@@ -1,6 +1,177 @@
 {
   "messages": [
     {
+      "id": "pulse-20260724T0026",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] REST_MODE_EXPIRED: HYP-063 () validated and unimplemented for 32 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
+      "timestamp": "2026-07-24T00:26:53+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260724T0026",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] REST_MODE_EXPIRED: HYP-046 (Displacement Gate >= 1.5 improves London trade qua) validated and unimplemented for 59 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
+      "timestamp": "2026-07-24T00:26:53+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260724T0026",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] OUTCOME_LOOP_STALL: 20 of 20 closed OANDA trades failed to match an open decision this run (3 already matched previously). First failures: USDJPY@2026-07-03T17:24:53, USDCAD@2026-07-02T18:35:03, USDJPY@2026-07-01T02:55:52, USDCAD@2026-06-30T22:30:04, USDCAD@2026-06-30T13:33:11. Check pair/timestamp/system matching in decision_logger.update_outcome.",
+      "timestamp": "2026-07-24T00:26:51+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260723T1930",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] REST_MODE_EXPIRED: HYP-063 () validated and unimplemented for 31 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
+      "timestamp": "2026-07-23T19:30:39+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260723T1930",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] REST_MODE_EXPIRED: HYP-046 (Displacement Gate >= 1.5 improves London trade qua) validated and unimplemented for 58 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
+      "timestamp": "2026-07-23T19:30:39+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260723T1930",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] OUTCOME_LOOP_STALL: 20 of 20 closed OANDA trades failed to match an open decision this run (3 already matched previously). First failures: USDJPY@2026-07-03T17:24:53, USDCAD@2026-07-02T18:35:03, USDJPY@2026-07-01T02:55:52, USDCAD@2026-06-30T22:30:04, USDCAD@2026-06-30T13:33:11. Check pair/timestamp/system matching in decision_logger.update_outcome.",
+      "timestamp": "2026-07-23T19:30:31+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260723T1730",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] REST_MODE_EXPIRED: HYP-063 () validated and unimplemented for 31 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
+      "timestamp": "2026-07-23T17:30:12+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260723T1730",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] REST_MODE_EXPIRED: HYP-046 (Displacement Gate >= 1.5 improves London trade qua) validated and unimplemented for 58 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
+      "timestamp": "2026-07-23T17:30:12+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260723T1730",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] OUTCOME_LOOP_STALL: 20 of 20 closed OANDA trades failed to match an open decision this run (3 already matched previously). First failures: USDJPY@2026-07-03T17:24:53, USDCAD@2026-07-02T18:35:03, USDJPY@2026-07-01T02:55:52, USDCAD@2026-06-30T22:30:04, USDCAD@2026-06-30T13:33:11. Check pair/timestamp/system matching in decision_logger.update_outcome.",
+      "timestamp": "2026-07-23T17:30:10+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "invariant-2026-07-23-fills_stale",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "[INVARIANT] FILLS_STALE: all fills ledgers stale (data/ledger/oanda_fills.jsonl, data/execution/fills.jsonl) \u2014 recent writes unverifiable (2026-07-23)",
+      "timestamp": "2026-07-23T13:28:27.737997+00:00",
+      "read": false,
+      "source": "invariant_guard"
+    },
+    {
+      "id": "audit-2026-07-23-price_source_drift",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "[AUDIT] PRICE_SOURCE_DRIFT: AUD_NZD median |\u0394close|/close 0.00227 (2026-07-23)",
+      "timestamp": "2026-07-23T13:12:41.599093+00:00",
+      "read": false,
+      "source": "shadow_audit"
+    },
+    {
+      "id": "audit-2026-07-23-unexplained_divergence",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[AUDIT] UNEXPLAINED_DIVERGENCE: C5 count 1 (2026-07-23)",
+      "timestamp": "2026-07-23T13:12:41.599085+00:00",
+      "read": false,
+      "source": "shadow_audit"
+    },
+    {
+      "id": "audit-2026-07-23-l1_determinism_fail",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[AUDIT] L1_DETERMINISM_FAIL: 1 record(s) not reproducible (2026-07-23)",
+      "timestamp": "2026-07-23T13:12:41.599057+00:00",
+      "read": false,
+      "source": "shadow_audit"
+    },
+    {
+      "id": "pulse-20260723T0715",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] REST_MODE_EXPIRED: HYP-063 () validated and unimplemented for 31 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
+      "timestamp": "2026-07-23T07:15:40+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260723T0715",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] REST_MODE_EXPIRED: HYP-046 (Displacement Gate >= 1.5 improves London trade qua) validated and unimplemented for 58 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
+      "timestamp": "2026-07-23T07:15:40+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260723T0715",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] OUTCOME_LOOP_STALL: 20 of 20 closed OANDA trades failed to match an open decision this run (3 already matched previously). First failures: USDJPY@2026-07-03T17:24:53, USDCAD@2026-07-02T18:35:03, USDJPY@2026-07-01T02:55:52, USDCAD@2026-06-30T22:30:04, USDCAD@2026-06-30T13:33:11. Check pair/timestamp/system matching in decision_logger.update_outcome.",
+      "timestamp": "2026-07-23T07:15:39+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260723T0302",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] REST_MODE_EXPIRED: HYP-063 () validated and unimplemented for 31 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
+      "timestamp": "2026-07-23T03:02:50+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260723T0302",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] REST_MODE_EXPIRED: HYP-046 (Displacement Gate >= 1.5 improves London trade qua) validated and unimplemented for 58 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
+      "timestamp": "2026-07-23T03:02:50+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260723T0302",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] OUTCOME_LOOP_STALL: 20 of 20 closed OANDA trades failed to match an open decision this run (3 already matched previously). First failures: USDJPY@2026-07-03T17:24:53, USDCAD@2026-07-02T18:35:03, USDJPY@2026-07-01T02:55:52, USDCAD@2026-06-30T22:30:04, USDCAD@2026-06-30T13:33:11. Check pair/timestamp/system matching in decision_logger.update_outcome.",
+      "timestamp": "2026-07-23T03:02:48+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
       "id": "pulse-20260723T0102",
       "priority": "URGENT",
       "emoji": "\ud83d\udd34",
@@ -271,177 +442,7 @@
       "timestamp": "2026-07-21T18:54:13+00:00",
       "read": false,
       "source": "oracle_pulse"
-    },
-    {
-      "id": "pulse-20260721T1854",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[PULSE] OUTCOME_LOOP_STALL: 20 of 20 closed OANDA trades failed to match an open decision this run (3 already matched previously). First failures: USDJPY@2026-07-03T17:24:53, USDCAD@2026-07-02T18:35:03, USDJPY@2026-07-01T02:55:52, USDCAD@2026-06-30T22:30:04, USDCAD@2026-06-30T13:33:11. Check pair/timestamp/system matching in decision_logger.update_outcome.",
-      "timestamp": "2026-07-21T18:54:12+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "pulse-20260721T1654",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[PULSE] REST_MODE_EXPIRED: HYP-063 () validated and unimplemented for 29 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
-      "timestamp": "2026-07-21T16:54:07+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "pulse-20260721T1654",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[PULSE] OUTCOME_LOOP_STALL: 20 of 20 closed OANDA trades failed to match an open decision this run (3 already matched previously). First failures: USDJPY@2026-07-03T17:24:53, USDCAD@2026-07-02T18:35:03, USDJPY@2026-07-01T02:55:52, USDCAD@2026-06-30T22:30:04, USDCAD@2026-06-30T13:33:11. Check pair/timestamp/system matching in decision_logger.update_outcome.",
-      "timestamp": "2026-07-21T16:54:05+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "pulse-20260721T1454",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[PULSE] REST_MODE_EXPIRED: HYP-063 () validated and unimplemented for 29 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
-      "timestamp": "2026-07-21T14:54:00+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "pulse-20260721T1453",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[PULSE] OUTCOME_LOOP_STALL: 20 of 20 closed OANDA trades failed to match an open decision this run (3 already matched previously). First failures: USDJPY@2026-07-03T17:24:53, USDCAD@2026-07-02T18:35:03, USDJPY@2026-07-01T02:55:52, USDCAD@2026-06-30T22:30:04, USDCAD@2026-06-30T13:33:11. Check pair/timestamp/system matching in decision_logger.update_outcome.",
-      "timestamp": "2026-07-21T14:53:58+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "invariant-2026-07-21-fills_stale",
-      "priority": "IMPORTANT",
-      "emoji": "\ud83d\udfe1",
-      "text": "[INVARIANT] FILLS_STALE: all fills ledgers stale (data/ledger/oanda_fills.jsonl, data/execution/fills.jsonl) \u2014 recent writes unverifiable (2026-07-21)",
-      "timestamp": "2026-07-21T13:20:04.431689+00:00",
-      "read": false,
-      "source": "invariant_guard"
-    },
-    {
-      "id": "audit-2026-07-21-price_source_drift",
-      "priority": "IMPORTANT",
-      "emoji": "\ud83d\udfe1",
-      "text": "[AUDIT] PRICE_SOURCE_DRIFT: AUD_NZD median |\u0394close|/close 0.00227 (2026-07-21)",
-      "timestamp": "2026-07-21T13:05:07.188481+00:00",
-      "read": false,
-      "source": "shadow_audit"
-    },
-    {
-      "id": "audit-2026-07-21-unexplained_divergence",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[AUDIT] UNEXPLAINED_DIVERGENCE: C5 count 1 (2026-07-21)",
-      "timestamp": "2026-07-21T13:05:07.188474+00:00",
-      "read": false,
-      "source": "shadow_audit"
-    },
-    {
-      "id": "audit-2026-07-21-l1_determinism_fail",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[AUDIT] L1_DETERMINISM_FAIL: 1 record(s) not reproducible (2026-07-21)",
-      "timestamp": "2026-07-21T13:05:07.188442+00:00",
-      "read": false,
-      "source": "shadow_audit"
-    },
-    {
-      "id": "msg-20260721075541",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "Health check FAILED: oracle_pulse are RED. Check logs.",
-      "timestamp": "2026-07-21T07:55:41",
-      "read": false
-    },
-    {
-      "id": "pulse-20260721T0938",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[PULSE] REST_MODE_EXPIRED: HYP-063 () validated and unimplemented for 29 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
-      "timestamp": "2026-07-21T09:38:49+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "pulse-20260721T0938",
-      "priority": "FYI",
-      "emoji": "\ud83d\udfe2",
-      "text": "[PULSE] STALE_ENTRY: 3 entries with bars_since_signal > 5 \u2014 entries may be chasing stale FVGs",
-      "timestamp": "2026-07-21T09:38:49+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "loophealth-20260721T093849",
-      "timestamp": "2026-07-21T09:38:49.193200+00:00",
-      "priority": "CRITICAL",
-      "source": "LOOP_HEALTH",
-      "subject": "\ud83d\udea8 LOOP CRITICAL: ict_scanner silent 2h",
-      "message": "ict_scanner has not run for 2h (expected < 0.5h; >2x threshold = broken, not late). The self-improvement machinery is degraded \u2014 a system that doesn't reflect doesn't compound. Check the loop's launchd plist is loaded (`launchctl list | grep alta`) and its logs/.heartbeat_<loop> mtime.",
-      "action_required": true
-    },
-    {
-      "id": "pulse-20260721T0938",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[PULSE] OUTCOME_LOOP_STALL: 20 of 20 closed OANDA trades failed to match an open decision this run (3 already matched previously). First failures: USDJPY@2026-07-03T17:24:53, USDCAD@2026-07-02T18:35:03, USDJPY@2026-07-01T02:55:52, USDCAD@2026-06-30T22:30:04, USDCAD@2026-06-30T13:33:11. Check pair/timestamp/system matching in decision_logger.update_outcome.",
-      "timestamp": "2026-07-21T09:38:47+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "pulse-20260721T0347",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[PULSE] REST_MODE_EXPIRED: HYP-063 () validated and unimplemented for 29 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
-      "timestamp": "2026-07-21T03:47:28+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "pulse-20260721T0347",
-      "priority": "FYI",
-      "emoji": "\ud83d\udfe2",
-      "text": "[PULSE] STALE_ENTRY: 3 entries with bars_since_signal > 5 \u2014 entries may be chasing stale FVGs",
-      "timestamp": "2026-07-21T03:47:28+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "pulse-20260721T0347",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[PULSE] OUTCOME_LOOP_STALL: 20 of 20 closed OANDA trades failed to match an open decision this run (3 already matched previously). First failures: USDJPY@2026-07-03T17:24:53, USDCAD@2026-07-02T18:35:03, USDJPY@2026-07-01T02:55:52, USDCAD@2026-06-30T22:30:04, USDCAD@2026-06-30T13:33:11. Check pair/timestamp/system matching in decision_logger.update_outcome.",
-      "timestamp": "2026-07-21T03:47:25+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "pulse-20260721T0147",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[PULSE] REST_MODE_EXPIRED: HYP-063 () validated and unimplemented for 29 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
-      "timestamp": "2026-07-21T01:47:20+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "pulse-20260721T0147",
-      "priority": "FYI",
-      "emoji": "\ud83d\udfe2",
-      "text": "[PULSE] STALE_ENTRY: 3 entries with bars_since_signal > 5 \u2014 entries may be chasing stale FVGs",
-      "timestamp": "2026-07-21T01:47:20+00:00",
-      "read": false,
-      "source": "oracle_pulse"
     }
   ],
-  "last_updated": "2026-07-23T01:02:43+00:00"
+  "last_updated": "2026-07-24T00:26:53+00:00"
 }

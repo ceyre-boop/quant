@@ -1,0 +1,271 @@
+{
+  "report_id": "PERF-REVIEW-2026-07-23",
+  "generated_at": "2026-07-23",
+  "scope": "AlphaZero (briefing synthesizer) + Stockfish (HYP-071 exit value function)",
+  "review_period": "Inception to 2026-07-23",
+
+  "alphazero": {
+    "component": "Briefing Synthesizer",
+    "file": "sovereign/briefing/synthesize.py",
+    "commit": "114eaaf",
+    "status": "LIVE_FALLBACK",
+    "synthesis_source_today": "deterministic_fallback",
+    "reason_fallback": "ANTHROPIC_API_KEY present but account credit balance zero — HTTP 400",
+    "provenance_verified": false,
+    "provenance_note": "By design — self-scored calls, not a validated edge. Stays false until scorecard proves calibration.",
+
+    "todays_output": {
+      "date": "2026-07-23",
+      "directional_bias": "NEUTRAL",
+      "confidence": 0,
+      "regime_call": "ROTATION_WARN",
+      "key_level": null,
+      "regime_interpretation": "NQ weak vs ES — rotation OUT of tech. Tech-led longs suspect.",
+      "lead_lag_spread_avg": -0.00158,
+      "lead_lag_corr": 0.887,
+      "lead_lag_leader": "NONE",
+      "forex_regime": "NO_TRADE_TODAY",
+      "big_move_pair": "USDJPY",
+      "big_move_direction": "LONG",
+      "big_move_p": 0.7314,
+      "big_move_confidence": 0.42,
+      "big_move_expected_pct": 0.5444,
+      "big_move_session": "NY_PM",
+      "big_move_validation": "UNVALIDATED",
+      "big_move_top_driver": "event_risk",
+      "big_move_driver_score": 0.9
+    },
+
+    "macro_snapshot": {
+      "date": "2026-07-23",
+      "gdp_growth_pct": 2.1,
+      "cpi_yoy_pct": 3.23,
+      "core_cpi_yoy_pct": 2.25,
+      "core_pce_yoy_pct": 2.89,
+      "fed_funds_pct": 3.63,
+      "ten_year_pct": 4.63,
+      "yield_curve_10y2y": 0.36,
+      "yield_curve_state": "NORMAL",
+      "unemployment_pct": 4.2,
+      "vix": 17.05,
+      "consumer_sentiment": 44.8,
+      "consumer_sentiment_flag": "LOW — below 50 historically signals consumer stress"
+    },
+
+    "volume_profile": {
+      "ES": {
+        "poc": 7545.87,
+        "value_area_low": 7428.79,
+        "value_area_high": 7549.42,
+        "price_range_low": 7419.92,
+        "price_range_high": 7561.83
+      },
+      "NQ": {
+        "poc": 29318.32,
+        "value_area_low": 28724.16,
+        "value_area_high": 29340.33,
+        "price_range_low": 28471.08,
+        "price_range_high": 29351.33
+      }
+    },
+
+    "event_calendar": [
+      {"event": "FOMC", "days_until": 6, "action": "reduce size / widen stops"},
+      {"event": "PCE", "days_until": 8, "action": "reduce size into window"},
+      {"event": "ISM PMI", "days_until": 11, "action": "reduce size"},
+      {"event": "NFP", "days_until": 15, "action": "widen stops / size down"},
+      {"event": "CPI", "days_until": 20, "action": "reduce size"}
+    ],
+
+    "scorecard": {
+      "n_directional_calls": 14,
+      "directional_hit_rate": 0.786,
+      "regime_accuracy": 0.314,
+      "calibration_status": "CALIBRATING",
+      "samples_needed_for_significance": 50,
+      "random_baseline_regime": 0.333,
+      "regime_above_baseline": false,
+      "notes": [
+        "14 calls is below minimum threshold for statistical significance",
+        "Directional hit rate of 0.786 is promising but cannot be trusted at n=14",
+        "Regime accuracy 0.314 is at random-baseline for a 3-class problem — watch closely",
+        "Opus brain has not fired yet (credits) — all 14 calls were deterministic fallback"
+      ]
+    },
+
+    "confidence_multiplier": {
+      "status": "BUILT_STAGED",
+      "band": [0.80, 1.20],
+      "neutral_fallback": 1.0,
+      "strictly_positive": true,
+      "cannot_veto": true,
+      "carry_engine_hookup": "staged — one-line switch, not yet flipped",
+      "flip_date": "2026-07-28",
+      "tests_green": 9
+    },
+
+    "consumers": [
+      {"name": "dashboard", "panel": "L1 Directional Read", "status": "LIVE"},
+      {"name": "DIP hypothesis batch", "role": "context injection", "status": "LIVE"},
+      {"name": "Oracle", "role": "already consumed pre-wiring", "status": "LIVE"}
+    ],
+
+    "blockers": [
+      {
+        "blocker": "API credits exhausted",
+        "impact": "Opus synthesis not firing — running deterministic fallback",
+        "fix": "Top up Anthropic account balance",
+        "urgency": "HIGH"
+      }
+    ],
+
+    "grade": "B",
+    "grade_rationale": "Infrastructure correct and honest. Real data flowing. Scorecard accumulating. Grade capped at B because Opus never fired and n=14 is pre-statistical.",
+    "next_milestone": "n=50 observations with Opus running"
+  },
+
+  "stockfish": {
+    "component": "HYP-071 Tabular Exit Value Function",
+    "preregistration": "data/research/preregister/HYP-071_tabular_exit_value.yaml",
+    "prereg_hash": "3d500bda3249c4615698ce311a7cbad41a35600a23abd2a4ea4526416eac06a4",
+    "prereg_hash_verified": true,
+    "addendum_hash": "c1fab80",
+    "addendum_hash_verified": true,
+    "report": "research/HYP-071_VALIDATION_REPORT.md",
+    "staged_rules": "research/HYP-071_STAGED_EXIT_RULE_PROPOSAL.md",
+    "status": "PROVISIONAL_PASS",
+    "pre_registered_expectation": "NOT_SIGNIFICANT",
+    "expectation_contradicted": true,
+
+    "harness_gates": {
+      "prereg_hash_ok": true,
+      "addendum_hash_ok": true,
+      "reconcile_sharpe_target": 0.6886,
+      "reconcile_sharpe_actual": 0.6886,
+      "reconcile_tolerance": 0.01,
+      "reconcile_passed": true,
+      "trace_parity_total": 459,
+      "trace_parity_matched": 459,
+      "trace_parity_pct": 1.0
+    },
+
+    "board": {
+      "total_cells": 108,
+      "evaluated_cells": 54,
+      "na_cells": 54,
+      "na_reason": "carry-not-aligned — handled by REVERSAL hard rule",
+      "dimensions": ["atr_percentile_tercile", "excursion_state", "hold_fraction", "rsi14_extreme_flag", "carry_signal_state"],
+      "block_length_L": 5,
+      "continuations_per_cell": 10000,
+      "lambda_downside_penalty": 0.5
+    },
+
+    "results": {
+      "decade_members": 2111,
+      "forward_members": 246,
+      "forward_window_thin": true,
+      "exit_now_cells_decade": 45,
+      "cpcv_stable_sensible_divergences": 10,
+      "forward_consistent_divergences": 9,
+      "forward_agreement_fraction": 0.870,
+      "forward_n_common_cells": 23,
+      "separability_hiking_cutting": 0.862,
+      "regime_window_robustness_60d_252d": 0.854,
+      "regime_window_robustness_bar": 0.90,
+      "regime_window_robustness_passed": false
+    },
+
+    "exit_now_divergences": [
+      {"cell": 72, "atr": "high", "excursion": "underwater", "hold": "early", "n": 70, "margin": -0.214, "cpcv_stable": true, "forward_consistent": true},
+      {"cell": 84, "atr": "high", "excursion": "modest",     "hold": "early", "n": 154, "margin": -0.239, "cpcv_stable": true, "forward_consistent": true},
+      {"cell": 76, "atr": "high", "excursion": "underwater", "hold": "mid",   "n": 80,  "margin": -0.134, "cpcv_stable": true, "forward_consistent": true},
+      {"cell": 88, "atr": "high", "excursion": "modest",     "hold": "mid",   "n": 103, "margin": -0.177, "cpcv_stable": true, "forward_consistent": true},
+      {"cell": 92, "atr": "high", "excursion": "modest",     "hold": "late",  "n": 58,  "margin": -0.104, "cpcv_stable": true, "forward_consistent": true},
+      {"cell": 44, "atr": "mid",  "excursion": "underwater", "hold": "late",  "n": 32,  "margin": -0.078, "cpcv_stable": true, "forward_consistent": true},
+      {"cell": 56, "atr": "mid",  "excursion": "modest",     "hold": "late",  "n": 60,  "margin": -0.084, "cpcv_stable": true, "forward_consistent": true},
+      {"cell": 8,  "atr": "low",  "excursion": "underwater", "hold": "late",  "n": 39,  "margin": -0.054, "cpcv_stable": true, "forward_consistent": true},
+      {"cell": 20, "atr": "low",  "excursion": "modest",     "hold": "late",  "n": 75,  "margin": -0.069, "cpcv_stable": true, "forward_consistent": true}
+    ],
+
+    "pattern_summary": "High-ATR (any hold stage) + late-hold lower-ATR (underwater-to-modest) → EXIT_NOW. All carry-aligned. Economically coherent.",
+
+    "caveats": [
+      {
+        "id": "C1",
+        "severity": "CRITICAL",
+        "description": "Gross returns only. All 9 divergences are carry-aligned — positive carry income favors holding. Mis-modelled financing (TICK-024, ~10x too small, sign flip EUR-short) means net-of-carry recompute could erase some or all divergences.",
+        "blocker_for_confirmed": true
+      },
+      {
+        "id": "C2",
+        "severity": "MODERATE",
+        "description": "Regime-window robustness 0.854 < 0.90 bar. Optimal policy is somewhat sensitive to ATR-percentile window choice (60d vs 252d).",
+        "blocker_for_confirmed": false
+      },
+      {
+        "id": "C3",
+        "severity": "MINOR",
+        "description": "Forward window thin — 246 members, 23 common cells. Agreement of 0.870 is encouraging but not decisive.",
+        "blocker_for_confirmed": false
+      },
+      {
+        "id": "C4",
+        "severity": "MINOR",
+        "description": "Vol innovations are ~white. Structure is excursion geometry conditioned on entry regime, NOT intra-trade vol momentum. Weaker but still usable claim.",
+        "blocker_for_confirmed": false
+      }
+    ],
+
+    "freeze_status": {
+      "applying_to_live": "FROZEN",
+      "frozen_until": "2026-07-28",
+      "also_requires": "Colin explicit ledger stamp",
+      "frozen_files": ["forex_exit_manager", "decide_exit", "exit_machine", "any config"],
+      "touched_frozen_files": false
+    },
+
+    "next_step": {
+      "action": "Recompute identical table on NET returns using TICK-024 corrected financing model",
+      "type": "SAME HARNESS — not a new experiment, not a new preregistration",
+      "decider": "If 9 divergences survive net-of-carry AND regime-window robustness clears 0.90 → CONFIRMED. If they collapse → data-ceiling thesis confirmed.",
+      "timing": "After TICK-024 financing fix is merged; before or at July 28"
+    },
+
+    "grade": "B+",
+    "grade_rationale": "Airtight methodology, clean harness, coherent economic finding. Capped at B+ because one known cost-model flaw stands between PROVISIONAL and CONFIRMED, and that flaw is directionally adverse to the result.",
+    "ledger_verdict": "NOT_SEALED — PROVISIONAL, left for Colin to adjudicate per research method"
+  },
+
+  "combined": {
+    "both_halves_honest": true,
+    "both_halves_non_claiming": true,
+    "infrastructure_working": true,
+    "action_items": [
+      {
+        "priority": 1,
+        "action": "Top up Anthropic API credits",
+        "impact": "Enables real Opus synthesis — AlphaZero brain actually fires",
+        "effort": "Minutes"
+      },
+      {
+        "priority": 2,
+        "action": "Recompute HYP-071 on net returns (TICK-024 corrected financing)",
+        "impact": "Determines whether Stockfish finding is real or gross-returns artifact",
+        "effort": "Hours (same harness, different cost model)"
+      },
+      {
+        "priority": 3,
+        "action": "July 28: confirm L2 shadow went live, flip A2 carry multiplier switch, adjudicate HYP-071 if net recompute complete",
+        "impact": "Activates confidence multiplier in carry sizing; potentially applies 9 exit rule changes",
+        "effort": "One session"
+      },
+      {
+        "priority": 4,
+        "action": "Push sovereign-v2 to master",
+        "impact": "L1 Directional Read panel shows on live dashboard URL",
+        "effort": "Minutes"
+      }
+    ],
+    "check_back_at": "n=50 AlphaZero calls (est. ~36 more trading days) + net-of-carry recompute complete"
+  }
+}

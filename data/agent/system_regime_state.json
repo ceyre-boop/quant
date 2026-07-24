@@ -1,27 +1,32 @@
 {
-  "generated_at": "2026-07-23T01:32:03.240074+00:00",
+  "generated_at": "2026-07-24T01:55:20.910205+00:00",
   "status": "DEGRADED",
-  "status_reason": "carry:STALE; es_nq:STALE; macro:OK; portfolio:UNAVAILABLE",
+  "status_reason": "carry:STALE; es_nq:OK; macro:OK; portfolio:UNAVAILABLE",
   "strategies": {
     "carry": {
       "status": "STALE",
       "verdict": "STAND_ASIDE",
       "favorable": false,
       "size_multiplier": 0.0,
-      "reason": "forex_proximity.json 13.2h old > 12.0h freshness limit",
+      "reason": "forex_proximity.json 13.8h old > 12.0h freshness limit",
       "source": "data/agent/forex_proximity.json",
-      "source_age_hours": 13.239,
+      "source_age_hours": 13.786,
       "detail": {}
     },
     "es_nq": {
-      "status": "STALE",
-      "verdict": "STAND_ASIDE",
+      "status": "OK",
+      "verdict": "INFO",
       "favorable": false,
       "size_multiplier": 0.0,
-      "reason": "nqes_regime.json 13.2h old > 12.0h freshness limit",
+      "reason": "research INFO only \u2014 regime 'ROTATION_WARN'",
       "source": "data/research/nqes_regime.json",
-      "source_age_hours": 13.24,
-      "detail": {}
+      "source_age_hours": 0.804,
+      "detail": {
+        "regime": "ROTATION_WARN",
+        "read": "NQ weak vs ES \u2014 rotation OUT of tech. A breadth/rotation warning; tech-led longs are suspect.",
+        "divergence": false,
+        "contemporaneous_corr": 0.887
+      }
     },
     "macro": {
       "status": "OK",
@@ -30,13 +35,13 @@
       "size_multiplier": 0.0,
       "reason": "macro backdrop INFO (VIX / curve / credit) \u2014 shared input",
       "source": "data/macro/macro_snapshot.json",
-      "source_age_hours": 0.405,
+      "source_age_hours": 0.395,
       "detail": {
-        "vix": 16.64,
-        "curve_10y2y": 0.63,
-        "curve_10y3m": 0.912,
-        "credit_hyg": 79.52,
-        "dgs10": 4.657
+        "vix": 18.7,
+        "curve_10y2y": 0.67,
+        "curve_10y3m": 0.903,
+        "credit_hyg": 79.23,
+        "dgs10": 4.703
       }
     }
   },

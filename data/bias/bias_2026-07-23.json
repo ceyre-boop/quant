@@ -1,0 +1,32 @@
+{
+  "date": "2026-07-23",
+  "direction": "NEUTRAL",
+  "confidence": 0.0,
+  "reasoning": [
+    "briefing directional_bias=NEUTRAL conf=0.0",
+    "regime: NQ weak vs ES \u2014 rotation OUT of tech. A breadth/rotation warning; tech-led longs are suspect.",
+    "macro context present (2026-07-23)"
+  ],
+  "inputs_used": [
+    "briefing",
+    "daily_panel",
+    "fred_macro"
+  ],
+  "inputs_missing": [
+    "calendar",
+    "gdelt",
+    "sentiment_board"
+  ],
+  "context_fraction_fresh": 0.5,
+  "generated_at": "2026-07-23T12:08:03+00:00",
+  "realised": {
+    "direction": "BEARISH",
+    "correct": null,
+    "scored_at": "2026-07-23T20:33:25+00:00",
+    "proxy": "SPY",
+    "return": -0.011346,
+    "neutral_band": 0.0025,
+    "close": 738.93,
+    "prev_close": 747.41
+  }
+}
