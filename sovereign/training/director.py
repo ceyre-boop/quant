@@ -48,13 +48,15 @@ class DirectorReport:
     mechanism_ok: bool
     regime_ok: bool
     magnitude_ok: bool
+    placebo_ok: bool = False
+    placebo_margin: float | None = None
     flags: list[str] = field(default_factory=list)
     recommendation: str = "DEFER"
     human_gated: bool = True   # ALWAYS true — never auto-approve
 
     @property
     def all_pass(self) -> bool:
-        return self.mechanism_ok and self.regime_ok and self.magnitude_ok
+        return self.mechanism_ok and self.regime_ok and self.magnitude_ok and self.placebo_ok
 
 
 def _load_config(config_path: Path | None = None) -> dict:
@@ -108,10 +110,27 @@ def _regime_check(regime_fraction: float | None) -> tuple[bool, list[str]]:
     return True, []
 
 
+def _placebo_check(placebo) -> tuple[bool, float | None, list[str]]:
+    """MANDATORY random-reweighting placebo control (HYP-090 lesson, structural).
+    Fail-closed: no placebo result (None) or an ineligible verdict both FAIL this
+    check — never treated as a pass."""
+    if placebo is None:
+        return False, None, [
+            "PLACEBO: no placebo-control result provided — fail-closed, cannot approve"
+        ]
+    if not getattr(placebo, "eligible", False):
+        return False, getattr(placebo, "margin", None), [f"PLACEBO: {placebo.reason}"]
+    return True, placebo.margin, [
+        f"PLACEBO: real beats random-reweighting placebo by {placebo.margin:+.3f} "
+        f"(min {placebo.margin_min:.3f}, t over {placebo.n_folds} folds, seed={placebo.seed})"
+    ]
+
+
 def review(old_params: dict, new_params: dict, *,
            regime_fraction: float | None = None,
+           placebo=None,
            config_path: Path | None = None) -> DirectorReport:
-    """Run the three constitutional checks and produce a human-gated recommendation."""
+    """Run the constitutional checks and produce a human-gated recommendation."""
     cfg = _load_config(config_path)
     dcfg = cfg.get("director", {})
     cap = float(dcfg.get("max_param_change_pct", 20.0))
@@ -120,11 +139,13 @@ def review(old_params: dict, new_params: dict, *,
     mech_ok, mech_flags = _mechanism_check(diffs)
     regime_ok, regime_flags = _regime_check(regime_fraction)
     mag_ok, mag_flags = _magnitude_check(diffs, cap)
+    placebo_ok, placebo_margin, placebo_flags = _placebo_check(placebo)
 
-    flags = mech_flags + regime_flags + mag_flags
+    flags = mech_flags + regime_flags + mag_flags + placebo_flags
     report = DirectorReport(
         diffs=diffs, mechanism_ok=mech_ok, regime_ok=regime_ok,
-        magnitude_ok=mag_ok, flags=flags,
+        magnitude_ok=mag_ok, placebo_ok=placebo_ok, placebo_margin=placebo_margin,
+        flags=flags,
     )
     # Never auto-approve (dcfg.auto_approve is enforced as always-false at the runner).
     report.recommendation = (
@@ -142,6 +163,8 @@ def render_report(report: DirectorReport) -> str:
     lines.append(f"    Mechanism: {'PASS' if report.mechanism_ok else 'FAIL'}")
     lines.append(f"    Regime:    {'PASS' if report.regime_ok else 'FAIL'}")
     lines.append(f"    Magnitude: {'PASS' if report.magnitude_ok else 'FAIL'}")
+    margin_str = f"{report.placebo_margin:+.3f}" if report.placebo_margin is not None else "n/a"
+    lines.append(f"    Placebo:   {'PASS' if report.placebo_ok else 'FAIL'} (margin={margin_str})")
     for f in report.flags:
         lines.append(f"    ! {f}")
     lines.append(f"    Recommendation: {report.recommendation}")

@@ -46,6 +46,20 @@ reward:
   top_weight: 2.0           # sample weight for top-quartile trades
   bottom_weight: 0.5        # sample weight for bottom-quartile trades
 
+# MANDATORY random-reweighting placebo control (HYP-090 lesson, made structural).
+# HYP-090 (daily adaptive parameter selection) was KILLED because it lost to a
+# random-selection placebo — the same class of search this loop's value-weighted
+# reweighting performs. Every cycle must prove the real weighting beats a placebo
+# with the IDENTICAL weight composition but a shuffled assignment, on a purged
+# walk-forward OOS split, or the cycle is REJECTED before it ever reaches Phase 4
+# human approval. Fail-closed: missing/malformed placebo data REJECTS, never passes.
+placebo:
+  enabled: true
+  seed: 42                    # fixed RNG seed for the shuffle — logged for reproducibility
+  n_splits: 5                 # purged walk-forward folds for the OOS comparison
+  embargo_frac: 0.02          # fraction of the window purged from each fold edge
+  placebo_margin_min: 0.15    # real Sharpe must beat placebo Sharpe by at least this
+
 # Policy rollout (Phase 1).
 rollout:
   lookback_days: 252

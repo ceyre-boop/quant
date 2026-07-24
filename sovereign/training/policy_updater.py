@@ -29,6 +29,8 @@ class UpdateResult:
     n_bottom: int
     threshold: float
     note: str
+    placebo: "object | None" = None
+    eligible: bool = False
 
 
 def _load_config(config_path: Path | None = None) -> dict:
@@ -56,13 +58,23 @@ def compute_sample_weights(value_scores, config_path: Path | None = None) -> np.
     )
 
 
-def refit_policy(value_scores, *, gate_open: bool,
+def refit_policy(value_scores, returns=None, *, gate_open: bool,
                  config_path: Path | None = None) -> UpdateResult:
     """Refit the policy on reweighted trades — or refuse in DRY mode.
 
-    gate_open=False → compute weights, return a dry report, train NOTHING, write
-        NOTHING. gate_open=True → delegate the reweighted purged-walk-forward refit
-        to ml_trainer (not wired until ignition; raises loudly if reached)."""
+    MANDATORY placebo control (HYP-090 lesson, structural — spec addendum): before
+    any refit is even considered eligible, the value-informed weighting must beat a
+    random-reweighting placebo (same weight composition, shuffled assignment) on a
+    purged walk-forward OOS split, by at least config `placebo.placebo_margin_min`.
+    Fail-closed: missing/malformed placebo inputs (e.g. no `returns` passed) produce
+    an ineligible verdict, never a pass. This runs regardless of the ignition gate,
+    so the mechanism is exercised in DRY mode too.
+
+    gate_open=False → compute weights + placebo verdict, return a dry report, train
+        NOTHING, write NOTHING. gate_open=True → refuse (REJECTED, no commit) if the
+        placebo verdict is ineligible; otherwise delegate the reweighted purged-
+        walk-forward refit to ml_trainer (not wired until ignition; raises loudly if
+        reached)."""
     cfg = _load_config(config_path)
     r = cfg.get("reward", {})
     weights = compute_sample_weights(value_scores, config_path)
@@ -74,10 +86,33 @@ def refit_policy(value_scores, *, gate_open: bool,
     n_top = int((weights == float(r.get("top_weight", 2.0))).sum())
     n_bottom = int((weights == float(r.get("bottom_weight", 0.5))).sum())
 
+    from sovereign.training import placebo_control  # local import: avoid import cycle
+
+    try:
+        if returns is None:
+            raise placebo_control.PlaceboDataError("no `returns` provided to refit_policy")
+        verdict = placebo_control.run_control(returns, value_scores, config_path)
+    except placebo_control.PlaceboDataError as exc:
+        verdict = placebo_control.PlaceboVerdict(
+            eligible=False, real_metric=0.0, placebo_metric=0.0, margin=0.0,
+            margin_min=float(cfg.get("placebo", {}).get("placebo_margin_min", 0.15)),
+            significant=False, composition_ok=False, n_folds=0,
+            seed=int(cfg.get("placebo", {}).get("seed", 42)),
+            reason=f"FAIL-CLOSED: placebo control could not run — {exc}",
+        )
+
     if not gate_open:
         return UpdateResult(
             dry=True, n_top=n_top, n_bottom=n_bottom, threshold=threshold,
             note="DRY: sample weights computed; NO refit, NO production policy written.",
+            placebo=verdict, eligible=False,
+        )
+
+    if not verdict.eligible:
+        return UpdateResult(
+            dry=True, n_top=n_top, n_bottom=n_bottom, threshold=threshold,
+            note=f"REJECTED — {verdict.reason}",
+            placebo=verdict, eligible=False,
         )
 
     raise NotImplementedError(

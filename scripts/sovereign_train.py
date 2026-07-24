@@ -80,9 +80,9 @@ def run(watch: bool = False) -> dict:
     _stamp(watch, "PHASE 2: Scoring positions via HYP-071 board...")
     scorer = ValueScorer(CONFIG)
     scoring_skipped = False
+    net_r = np.array([t["gross_return_r"] for t in rollout.trades])  # dry: gross
     try:
         scorer.load_board()
-        net_r = np.array([t["gross_return_r"] for t in rollout.trades])  # dry: gross
         exp_r = np.array([t["expected_r"] for t in rollout.trades])
         value_scores = scorer.score_batch(net_r, exp_r)
         _stamp(watch, f"PHASE 2: Done. mean={value_scores.mean():+.3f} "
@@ -100,21 +100,27 @@ def run(watch: bool = False) -> dict:
 
     # ── PHASE 3: Policy update ────────────────────────────────────────────────
     _stamp(watch, "PHASE 3: Training next policy on top-quartile trades...")
-    update = policy_updater.refit_policy(value_scores, gate_open=gate_open, config_path=CONFIG)
+    update = policy_updater.refit_policy(value_scores, net_r, gate_open=gate_open, config_path=CONFIG)
     _stamp(watch, f"PHASE 3: {update.note} "
                   f"(top n={update.n_top}, bottom n={update.n_bottom}, "
                   f"threshold={update.threshold:+.3f})")
+    if update.placebo is not None:
+        _stamp(watch, f"PHASE 3: placebo margin={update.placebo.margin:+.3f} "
+                      f"(min {update.placebo.margin_min:.3f}) eligible={update.placebo.eligible}")
 
     # ── PHASE 4: Director review (human-gated) ────────────────────────────────
     _stamp(watch, "PHASE 4: Director review...")
     baseline = cfg.get("policy_params", {})
     # DRY: nothing was refit, so proposed == baseline (no parameter movement).
     proposed = dict(baseline)
-    report = director_mod.review(baseline, proposed, regime_fraction=0.60, config_path=CONFIG)
+    report = director_mod.review(baseline, proposed, regime_fraction=0.60,
+                                  placebo=update.placebo, config_path=CONFIG)
     if watch:
         print(director_mod.render_report(report), flush=True)
 
-    # Enforce: never auto-approve, and never commit a real update while gate closed.
+    # Enforce: never auto-approve, never commit while gate closed, and never reach
+    # the human-approval step at all if the mandatory placebo control failed
+    # (report.all_pass already folds in placebo_ok — see director.py).
     committed = False
     if gate_open and report.all_pass and not cfg.get("director", {}).get("auto_approve", False):
         _stamp(watch, "PHASE 4: [Waiting for human confirmation → Enter to commit, Ctrl-C to abort]")
@@ -151,10 +157,26 @@ def _write_checkpoint_and_log(cfg, status, rollout, update, report,
             "dry": update.dry, "n_top": update.n_top,
             "n_bottom": update.n_bottom, "threshold": update.threshold,
         },
+        "placebo_control": (
+            {
+                "eligible": update.placebo.eligible,
+                "real_metric": update.placebo.real_metric,
+                "placebo_metric": update.placebo.placebo_metric,
+                "margin": update.placebo.margin,
+                "margin_min": update.placebo.margin_min,
+                "significant": update.placebo.significant,
+                "composition_ok": update.placebo.composition_ok,
+                "n_folds": update.placebo.n_folds,
+                "seed": update.placebo.seed,
+                "reason": update.placebo.reason,
+            } if update.placebo is not None else None
+        ),
         "director": {
             "all_pass": report.all_pass,
             "recommendation": report.recommendation,
             "flags": report.flags,
+            "placebo_ok": report.placebo_ok,
+            "placebo_margin": report.placebo_margin,
             "params_before": {d.name: d.old for d in report.diffs},
             "params_after": {d.name: d.new for d in report.diffs},
         },
