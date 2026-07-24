@@ -124,3 +124,12 @@ dashboard/dashboard_live.html
 
 # Self-play training cycle checkpoints (large; spec §9)
 data/training/
+
+# MT5 bridge runtime data (TICK-056) — never commit routed orders, live unlock, or FOMC captures
+data/execution/mt5_intents/*.json
+data/execution/mt5_pending/*.json
+data/execution/mt5_routed.jsonl
+data/execution/mt5_LIVE_UNLOCK.json
+data/execution/fomc_window_*.jsonl
+!data/execution/mt5_intents/.gitkeep
+!data/execution/mt5_pending/.gitkeep

@@ -4,6 +4,54 @@ Per-session ledger: what shipped, push status, verdicts, blockers, refusals. New
 The Obsidian brain (`~/Obsidian/Obsidian/00-BRAIN/NEXT.md`) is the cross-project rollup.
 Standing constraints live in `CLAUDE.md` — not restated here.
 
+### 2026-07-24 · MT5 execution bridge (DEMO-only) + FOMC-window logger SHIPPED (TICK-056)
+
+Built the MT5 demo-only execution bridge and its companion FOMC-window logger per
+`specs/mt5_bridge.md` (LAW) and `plans/TICK-056.md`. Connector architecture = Option A
+(Windows 11 ARM VM via UTM on Apple Silicon; Parallels as later reliability upgrade),
+Colin's decision. **All NEW files — nothing on the frozen execution path was touched.**
+
+**Shipped (all freeze-safe, new paths):**
+- `mt5_bridge.py` — CLI: `--selftest` / `--stage <id>` / `--route <id> --approve`. Surfaces an
+  order card for human approval; routes only on explicit `--approve` (no flag = dry-run, exit 0,
+  routes nothing). No auto-fire.
+- `sovereign/execution/mt5/guard.py` — demo-vs-live guard (the load-bearing invariant). Runs at
+  stage time AND again immediately before every `order_send` (TOCTOU-safe). Non-DEMO = hard abort.
+  Live route needs BOTH env `ALTA_MT5_ALLOW_LIVE=1` AND a well-formed `data/execution/mt5_LIVE_UNLOCK.json`
+  (rationale + operator signature) — neither exists by default; the live path is dead code.
+- `sovereign/execution/mt5/contract.py` — `OrderIntent` parse/validate (spec §5 rules).
+- `sovereign/execution/mt5/connector.py` — `Connector` seam + `MT5Connector` (lazy import, fails
+  LOUD with exact remediation on Darwin) + `MockConnector` (tests only, never fakes a fill in prod).
+- `scripts/fomc_window_logger.py` — PURE OBSERVATION, PLACES NO ORDERS. Samples the demo terminal
+  at high frequency over a window (default 2:00pm ET 2026-07-29, ±15m) for bid/ask/spread + realized
+  slippage on open positions vs the bridge's intended prices. Writes `data/execution/fomc_window_<date>.jsonl`.
+  Shares the SAME MT5 connection (MT5Connector + demo guard).
+- `config/mt5.yml` — placeholders only, NO secrets. `tests/test_mt5_bridge.py` (41) +
+  `tests/test_fomc_window_logger.py` (10) — **51 passed**.
+
+**Freeze-safe (a):** confirmed. AST-isolation test asserts none of the 5 new source files import
+`forex_exit_manager`, `decide_exit`, `execution.harness`, `carry_engine`, or `ict.pipeline`. Repo's
+own `test_pipeline_does_not_import_sovereign` still passes. Zero edits to any frozen file.
+**Demo-only hard guard (b):** confirmed. `assert_routable()` rejects REAL/CONTEST/unknown/None; unit
+tests prove a REAL account aborts even with only-env or only-file, and never sends an order.
+
+**Blocker (expected, honest):** `MetaTrader5` is Windows-only; this Mac (Darwin/arm64) cannot import
+it — verified: `--selftest` aborts loud with the remediation, no fabricated fill. The connector cannot
+be exercised from here. Everything testable-without-a-terminal is built + unit-tested; the VM-side
+runbook is below and in the report.
+
+**Operator runbook (Mac side, Option A):**
+1. UTM (free) → install Windows 11 ARM. 2. Inside Windows: install MT5 terminal, log into The5%ers
+   DEMO/practice server, enable Algo Trading, add EURUSD/GBPUSD/AUDUSD/GBPJPY/USDJPY to Market Watch.
+3. In the VM's Python: `pip install MetaTrader5 pyyaml`. 4. Clone/sync the repo into the VM.
+5. `python mt5_bridge.py --selftest` (prints account, asserts DEMO, routes nothing) → fill exact
+   server name + any symbol suffixes into `config/mt5.yml`. 6. Arm the FOMC logger before 2:00pm ET
+   Jul 29: `python scripts/fomc_window_logger.py` (it waits for window start, then samples).
+No live unlock created. Wiring a producer to EMIT `order_intent` and any live routing are separate
+tickets/unlocks.
+
+---
+
 ### 2026-07-24 · Self-play training board BUILT — ignition GATED CLOSED
 
 Built the AlphaZero-style self-play policy training loop from Colin's spec

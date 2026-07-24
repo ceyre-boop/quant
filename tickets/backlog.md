@@ -696,7 +696,7 @@ data_fetcher.get_pair_differentials). All read-only; none touches the frozen SWA
 
 ## TICK-056
 **title:** MT5 execution bridge (DEMO-only) — order-intent → MetaTrader5 order_send for The5%ers Step 3
-**status:** ready
+**status:** done
 **pre_approved:** false
 
 **description:** Build the MT5 execution bridge that turns the sovereign system's signal output into
@@ -725,9 +725,9 @@ architecture — see spec §Failure Modes and plan §Open Decision.
 **depends_on:** []
 **blocks:** []
 **acceptance_criteria:**
-- [ ] `specs/mt5_bridge.md` written and reviewed BEFORE connector code (order-routing contract, demo-vs-live guard, failure modes)
-- [ ] Demo-vs-live guard unit-tested against a mock connector (demo → allowed; live → hard abort; unknown → abort)
-- [ ] `order_intent` contract parse/validate unit-tested (schema, required fields, reject malformed)
-- [ ] Bridge imports NOTHING from the frozen execution path (AST isolation test)
-- [ ] Live-terminal validation steps documented for Colin's Mac; no fabricated fill in-sandbox
-- [ ] Push at least once; NEXT.md updated with what shipped + exact operator steps
+- [x] `specs/mt5_bridge.md` written and reviewed BEFORE connector code (order-routing contract, demo-vs-live guard, failure modes)
+- [x] Demo-vs-live guard unit-tested against a mock connector (demo → allowed; live → hard abort; unknown → abort)
+- [x] `order_intent` contract parse/validate unit-tested (schema, required fields, reject malformed)
+- [x] Bridge imports NOTHING from the frozen execution path (AST isolation test)
+- [x] Live-terminal validation steps documented for Colin's Mac; no fabricated fill in-sandbox
+- [x] Push at least once; NEXT.md updated with what shipped + exact operator steps

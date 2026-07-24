@@ -1,0 +1,37 @@
+# MT5 execution bridge config (TICK-056, spec: specs/mt5_bridge.md §11)
+# PLACEHOLDERS ONLY — no secrets committed. Real login/password live in the
+# environment or the MT5 terminal session, never in this file.
+#
+# Any change to lot bounds / magic / symbol map is a parameter change under
+# NN#4 and must be logged to data/agent/param_change_log.jsonl before applying.
+
+connection:
+  # Login/password/server are supplied via env on the connector host, NOT here.
+  #   ALTA_MT5_LOGIN, ALTA_MT5_PASSWORD, ALTA_MT5_SERVER
+  # The5%ers demo server name goes here once known from --selftest output.
+  server: "The5ers-Demo"          # placeholder; confirm exact name in terminal
+  terminal_path: null              # optional explicit path to terminal64.exe
+
+# Broker lot bounds — the bridge rejects any intent outside [min_lot, max_lot].
+lots:
+  min_lot: 0.01
+  max_lot: 5.0
+
+# Strategy magic tag (int); intents carry their own but this documents the range.
+magic_base: 5015
+
+# Symbol map: canonical intent symbol -> broker symbol (The5%ers may suffix, e.g.
+# "EURUSD.r"). Fill from --selftest Market Watch listing, not from a guess.
+# When a map is present, intents for unlisted symbols are rejected.
+symbol_map:
+  EURUSD: EURUSD
+  GBPUSD: GBPUSD
+  AUDUSD: AUDUSD
+  GBPJPY: GBPJPY
+  USDJPY: USDJPY
+
+paths:
+  intents_dir: data/execution/mt5_intents
+  pending_dir: data/execution/mt5_pending
+  routed_ledger: data/execution/mt5_routed.jsonl
+  live_unlock: data/execution/mt5_LIVE_UNLOCK.json
