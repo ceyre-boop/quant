@@ -25,6 +25,13 @@ ignition:
   # The gross board's EXIT_NOW divergences may collapse on net returns.
   hyp_071_net_confirmed: false
 
+  # Optional override for the hypothesis ledger path the HYP-071 REVIVAL GUARD reads
+  # (sovereign/training/gate.py::_hyp071_revival_confirmed). Defaults to
+  # data/agent/hypothesis_ledger.json. This flag alone does NOT open the gate — the
+  # ledger must independently show a fresh-prereg CONFIRMED adjudication dated after
+  # the 2026-06-30 METRIC_ARTIFACT verdict; see HYP-071-GOVFLAG.
+  # hypothesis_ledger_path: data/agent/hypothesis_ledger.json
+
 # Value function (HYP-071 board) — used READ-ONLY by value_scorer.py.
 value_function:
   board_path: data/research/HYP-071_tabular_exit_value_results.json

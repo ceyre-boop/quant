@@ -8,8 +8,22 @@ guards pass. Config flags are necessary but not sufficient: the runtime guards c
 only ADD refusal reasons, never open a gate the data doesn't support. This makes the
 runner physically incapable of igniting a real cycle before TICK-024 + HYP-071-net.
 
-Nothing here trades or mutates state — it reads config + the value board and returns
-a verdict. The runner (scripts/sovereign_train.py) prints it loudly at startup.
+HYP-071 REVIVAL GUARD (added post HYP-071-GOVFLAG, ledger 2026-07-24): HYP-071 is
+adjudicated METRIC_ARTIFACT (2026-06-30, hash-locked prereg 3d500bda…, addendum
+c1fab807…) — the flaw is structural to the value metric itself (EXIT_NOW dominance
+is a forecast-variance artifact, not an edge), not to the cost model. A recompute on
+NET returns does not touch that flaw, so `hyp_071_net_confirmed=true` alone must
+never be trusted to mean HYP-071 is safe to train on — the 2026-07-23 recompute
+(2be5726) proved a mere rerun can flip a plausible-looking number without curing the
+underlying artifact (see HYP-071-GOVFLAG). The gate additionally requires a FRESH
+pre-registration (a prereg hash distinct from the original locked v1/v2/addendum
+hashes) backing a NEW ledger adjudication that flips HYP-071's status to CONFIRMED,
+dated after the original verdict. Reusing the killed prereg, or the METRIC_ARTIFACT /
+GOVFLAG entries themselves, does NOT satisfy this — the gate fails closed and loud.
+
+Nothing here trades or mutates state — it reads config + the value board + the
+hypothesis ledger (read-only) and returns a verdict. The runner
+(scripts/sovereign_train.py) prints it loudly at startup.
 """
 from __future__ import annotations
 
@@ -21,6 +35,20 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_CONFIG = ROOT / "config" / "training.yml"
+DEFAULT_LEDGER = ROOT / "data" / "agent" / "hypothesis_ledger.json"
+
+HYP071_ID = "HYP-071"
+# The original 2026-06-30 METRIC_ARTIFACT verdict date. Any revival adjudication
+# must be dated strictly after this.
+HYP071_ORIGINAL_VERDICT_DATE = "2026-06-30"
+# The hash-locked prereg family behind the killed verdict (data/research/preregister/
+# HYP-071_tabular_exit_value.v1.yaml, .yaml [v2], HYP-071_interpretation_notes.yaml).
+# A revival must NOT reuse any of these — that's a rerun, not a fresh registration.
+HYP071_LOCKED_PREREG_HASHES = frozenset({
+    "c4f29ac387669fc77ac33f1d2570042898d8f81bc0409e1fd0e7d57ba9a41546",  # v1 prereg
+    "3d500bda3249c4615698ce311a7cbad41a35600a23abd2a4ea4526416eac06a4",  # v2 prereg
+    "c1fab80730f1ebf3af7c35e4bbd8fc80e2bafd86419fc0125acc140b414d806f",  # interp addendum
+})
 
 
 @dataclass
@@ -65,6 +93,64 @@ def _board_is_net(cfg: dict) -> tuple[bool, str]:
     return True, "board carries no gross marker"
 
 
+def _hyp071_revival_confirmed(cfg: dict) -> tuple[bool, str]:
+    """Corroborating runtime guard: does the hypothesis ledger record an actual
+    revival of HYP-071 (fresh prereg + new CONFIRMED adjudication), as opposed to
+    the killed METRIC_ARTIFACT verdict standing plus an unprereg'd recompute?
+
+    Fail-closed: any missing file, unreadable/malformed JSON, or absence of a
+    qualifying entry returns (False, <reason>). Never raises — the gate itself
+    decides whether that closes ignition.
+    """
+    ign = cfg.get("ignition", {})
+    ledger_path_cfg = ign.get("hypothesis_ledger_path")
+    ledger_path = Path(ledger_path_cfg) if ledger_path_cfg else DEFAULT_LEDGER
+    if not ledger_path.is_absolute():
+        ledger_path = ROOT / ledger_path
+
+    if not ledger_path.exists():
+        return False, f"hypothesis ledger missing: {ledger_path}"
+    try:
+        ledger = json.loads(ledger_path.read_text())
+    except (json.JSONDecodeError, OSError) as exc:
+        return False, f"hypothesis ledger unreadable: {exc}"
+    if not isinstance(ledger, list):
+        return False, "hypothesis ledger malformed (expected a list of entries)"
+
+    reused_locked_prereg = False
+    for entry in ledger:
+        if not isinstance(entry, dict) or entry.get("id") != HYP071_ID:
+            continue
+        if str(entry.get("status", "")).upper() != "CONFIRMED":
+            continue
+        result = entry.get("result", {})
+        if not isinstance(result, dict):
+            result = {}
+        prereg_hash = result.get("prereg_hash") or entry.get("prereg_hash")
+        if not prereg_hash:
+            continue  # CONFIRMED with no traceable prereg hash — not qualifying
+        if prereg_hash in HYP071_LOCKED_PREREG_HASHES:
+            reused_locked_prereg = True
+            continue  # rerun on the killed prereg, not a fresh registration
+        date_tested = entry.get("date_tested") or entry.get("date")
+        if not date_tested or str(date_tested) <= HYP071_ORIGINAL_VERDICT_DATE:
+            continue  # not dated after the original METRIC_ARTIFACT verdict
+        return True, (
+            f"fresh CONFIRMED adjudication found "
+            f"(prereg_hash={prereg_hash[:12]}…, date={date_tested})"
+        )
+
+    if reused_locked_prereg:
+        return False, (
+            "HYP-071 CONFIRMED entry found but its prereg_hash reuses the "
+            "original locked/killed prereg — a rerun is not a fresh registration"
+        )
+    return False, (
+        "HYP-071 METRIC_ARTIFACT verdict stands; recompute is not revival — "
+        "fresh prereg + adjudication required"
+    )
+
+
 def evaluate_gate(config_path: Path | None = None) -> GateStatus:
     """Evaluate the ignition gate. Gate opens ONLY if every condition below holds."""
     cfg = load_config(config_path)
@@ -73,11 +159,13 @@ def evaluate_gate(config_path: Path | None = None) -> GateStatus:
     tick_024 = bool(ign.get("tick_024_carry_fix_landed", False))
     hyp_071 = bool(ign.get("hyp_071_net_confirmed", False))
     board_net, board_detail = _board_is_net(cfg)
+    hyp_071_revival, hyp_071_revival_detail = _hyp071_revival_confirmed(cfg)
 
     checks = {
         "tick_024_carry_fix_landed": tick_024,
         "hyp_071_net_confirmed": hyp_071,
         "value_board_is_net": board_net,
+        "hyp_071_revival_confirmed": hyp_071_revival,
     }
 
     reasons: list[str] = []
@@ -93,8 +181,10 @@ def evaluate_gate(config_path: Path | None = None) -> GateStatus:
         )
     if not board_net:
         reasons.append(f"NET-RETURN GUARD: {board_detail}")
+    if not hyp_071_revival:
+        reasons.append(f"HYP-071 REVIVAL GUARD: {hyp_071_revival_detail}")
 
-    is_open = tick_024 and hyp_071 and board_net
+    is_open = tick_024 and hyp_071 and board_net and hyp_071_revival
     return GateStatus(open=is_open, reasons=reasons, checks=checks)
 
 
