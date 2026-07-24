@@ -4,6 +4,44 @@ Per-session ledger: what shipped, push status, verdicts, blockers, refusals. New
 The Obsidian brain (`~/Obsidian/Obsidian/00-BRAIN/NEXT.md`) is the cross-project rollup.
 Standing constraints live in `CLAUDE.md` — not restated here.
 
+### 2026-07-24 · Placebo control governance fix — rebuilt on real permutation distribution (007189f)
+
+Audit of cf41ec3's placebo control (below) found it structurally broken: single-shuffle
++ t>=1.0 threshold false-passed pure noise in 39/200 Monte-Carlo seeds (**20%**) — the
+"mandatory" control let noise through 1 in 5 times. Rebuilt `sovereign/training/
+placebo_control.py::run_control()` on a real permutation test matching the existing
+gauntlet methodology (`sovereign/discovery/gate.py::Gate._permutation_p`): real margin
+(real-weighted minus unweighted-baseline Sharpe, over the same purged OOS folds) computed
+once, compared against a null of `placebo_permutations` (new config key, default 200)
+composition-preserving shuffles of the identical weights. Verdict now requires
+permutation p<0.05 (real margin exceeds the 95th percentile of the null) — the t-stat
+logic is gone entirely. `PlaceboVerdict` gained `perm_p`/`perm_percentile_95`/`n_perms`;
+existing fields (`margin`, `margin_min`, `eligible`, `n_folds`, `seed`, `reason`) and all
+downstream consumers (`policy_updater.py`, `director.py`, `sovereign_train.py`,
+`training_log`) are unchanged in shape — `director.py`'s report string now also surfaces
+the permutation p-value.
+
+**Measured false-pass rate post-fix: 5.2%** (1000 MC seeds, ad hoc) — at nominal 5%,
+down from 20%. Added `test_noise_monte_carlo_false_pass_rate_at_nominal_level` (slow,
+200 seeds, asserts ≤10% to absorb MC sampling noise; measured 9% in-suite) to
+`tests/test_placebo_control.py`; also updated the informative/uninformative-data tests
+to assert against `perm_p`/`perm_percentile_95`/`significant` instead of the retired
+t-stat. Full suite (12 tests) + ICT/sovereign isolation test green.
+
+Also audited the cosmetic flag: `sovereign/training/gate.py`'s `HYP071_LOCKED_PREREG_
+HASHES` per-hash comments (`# v1 prereg`, `# v2 prereg`, `# interp addendum`) were
+verified against the actual prereg files' `hash_lock` fields (`HYP-071_tabular_exit_
+value.v1.yaml` → `c4f29ac3…`, `HYP-071_tabular_exit_value.yaml` [v2] → `3d500bda…`,
+`HYP-071_interpretation_notes.yaml` → `c1fab807…`) and the ledger's `result.prereg_hash`
+(`3d500bda…`, matching v2) — **already correctly labeled, no change made.**
+
+Discipline: freeze-safe (no execution-path files touched), no gate weakened (permutation
+p<0.05 is at least as strict as the nominal-5%-target t-test was intended to be, and is
+now actually calibrated), no ledger edits, explicit `git add` of the 4 touched files only
+(`placebo_control.py`, `director.py`, `config/training.yml`, `tests/test_placebo_control.py`)
+— repo has substantial unrelated pre-existing dirty state (data/*.json etc.) left untouched.
+Pushed to `sovereign-v2` (007189f).
+
 ### 2026-07-24 · Mandatory random-reweighting placebo control for self-play training loop (cf41ec3)
 
 Made the HYP-090 lesson structural: HYP-090 (daily adaptive parameter selection) was
