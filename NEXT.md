@@ -2134,3 +2134,43 @@ carry_engine, execution/harness.py, ict scoring, L2 shadow all untouched). Named
 4. [ ] Flip A2 carry hookup: call `briefing_context.staged_carry_size_multiplier(carry_direction=...)`
        from the carry sizing engine (one line), record the unlock here + in param_change_log.jsonl.
 5. [ ] Top up Anthropic API credit so the synthesizer produces real (non-fallback) morning calls.
+
+## 2026-07-24 — Ollama local synthesis (3-tier chain) + phased DIP relocation (INFRA)
+Removes the "credit balance too low" blocker by making the briefing synthesizer run on a FREE local
+model first. Freeze-safe (no execution-path file); isolation `test_pipeline_does_not_import_sovereign`
+GREEN; append-only; explicit git add.
+
+### PART 1 — three-tier fallback in `sovereign/briefing/synthesize.py`
+- Tier 1 = local **Ollama** (tried first, always): `ollama.generate(model, prompt, format="json",
+  options={temperature:0.2, num_predict:1024})`. Model select via `ollama.list()`: **qwen2.5**, else
+  **llama3.1**, else None → next tier. On success: `model="ollama/qwen2.5"`, `cost_usd=0.0`, logged via
+  `_log_cost(..., model="ollama/qwen2.5")`. **NEVER retries** — any error → next tier immediately.
+- Tier 2 = Anthropic Opus, UNCHANGED, only if Ollama returned None AND `ANTHROPIC_API_KEY` present.
+- Tier 3 = None → orchestrator writes deterministic fallback (unchanged).
+- `synthesis_source` reflects the tier: `ollama/qwen2.5` | `claude-opus-4-8` | `deterministic_fallback`.
+- Prompt, `_parse()`, schema, downstream consumers untouched. `format="json"` on every Ollama call.
+- Tests: `tests/test_synthesize_tiers.py` (4) — order + short-circuit + key gating — GREEN.
+
+### PART 2 — phased pipeline `scripts/daily_intelligence_pipeline.py` (NEW)
+- **Reconciliation (stated honestly)**: there was NO `daily_intelligence_pipeline.py`. The DIP compute
+  half lives in `scripts/dip_daily.sh` (harvest→XGBoost retrain); the briefing half in
+  `morning_market_briefing.build()`. This new file SEQUENCES those into explicit phases; it does not
+  duplicate them.
+- **Phase 1** (`--phase 1`): fetch 5 collectors → write raw JSONs to `data/briefing/`. **NO synthesis**
+  (checkpoint records `synthesis_called=false`). Verified: 5/5 written, no synth.
+- **Phase 2** (`--phase 2`): 2a/2b retrain delegated to dip_daily.sh (OFF by default, `--with-retrain`);
+  **2c synthesis** → `morning_market_briefing.build()` writes `data/agent/daily_briefing.json`
+  (Ollama-first; deterministic fallback if all tiers None; NEVER blocks the phase); **2d** hypothesis
+  batch `hypothesis_generator.run()` receives the briefing as context-only.
+- **DoD verified**: `python3 scripts/daily_intelligence_pipeline.py --phase 2` produces
+  `daily_briefing.json` with **`synthesis_source: ollama/qwen2.5`** (bias SHORT, conf 65). A2 multiplier
+  now lights up real (0.9405, effect applied) instead of neutral. Cost log records ollama @ $0.0.
+
+### Ollama host status — INSTALLED + WORKING on this host (not a Colin to-do)
+- `ollama` binary already present (v0.22.0). **This session installed** the python module
+  (`python3 -m pip install ollama --break-system-packages` → ollama 0.6.2) and **pulled qwen2.5**
+  (`ollama pull qwen2.5` → 4.7GB, `ollama list` confirms `qwen2.5:latest`). End-to-end verified live.
+- If reproducing on a fresh host: `brew install ollama`; `ollama serve` (background);
+  `ollama pull qwen2.5`; `python3 -m pip install ollama --break-system-packages`; confirm `ollama list`.
+- NOTE for scheduled/launchd runs: ensure `ollama serve` is running (a login agent or `brew services
+  start ollama`), else Tier 1 silently falls through to Tier 2/3 (by design, but you lose the free path).

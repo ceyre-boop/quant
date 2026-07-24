@@ -33,6 +33,12 @@ MODEL = "claude-opus-4-8"
 _IN_RATE = 0.000015
 _OUT_RATE = 0.000075
 
+# --- Tier 1: local Ollama (free, tried first) ---
+# Preferred model, with an auto-fallback if it isn't pulled. format="json" is MANDATORY on every
+# Ollama call — without it local models emit prose that breaks _parse(). temperature=0.2, no retries.
+_OLLAMA_PREFERRED = "qwen2.5"
+_OLLAMA_FALLBACK = "llama3.1"
+
 PROMPT_TEMPLATE = """You are the morning market analyst for a disciplined quant trader who trades the ES/NQ \
 (S&P 500 / Nasdaq-100 futures) correlated pair. Produce a pre-US-open market briefing.
 
@@ -81,7 +87,7 @@ Respond with ONLY a JSON object (no prose outside it):
 }}"""
 
 
-def _log_cost(in_tok: int, out_tok: int, cost: float) -> None:
+def _log_cost(in_tok: int, out_tok: int, cost: float, model: str = MODEL) -> None:
     try:
         COST_LOG.parent.mkdir(parents=True, exist_ok=True)
         log = json.loads(COST_LOG.read_text()) if COST_LOG.exists() else {"entries": []}
@@ -89,7 +95,7 @@ def _log_cost(in_tok: int, out_tok: int, cost: float) -> None:
             log = {"entries": []}
         log["entries"].append({
             "at": datetime.now(timezone.utc).isoformat(), "source": "morning_briefing_synthesis",
-            "model": MODEL, "input_tokens": in_tok, "output_tokens": out_tok, "cost_usd": round(cost, 6),
+            "model": model, "input_tokens": in_tok, "output_tokens": out_tok, "cost_usd": round(cost, 6),
         })
         log["entries"] = log["entries"][-500:]
         COST_LOG.write_text(json.dumps(log, indent=2))
@@ -152,18 +158,86 @@ def _parse(raw: str) -> dict | None:
     }
 
 
-def synthesize(market_state: dict, lead_lag: dict, volume_profile: dict,
-               news: dict, event_calendar: dict, scorecard_summary: str) -> dict | None:
-    """Run the Opus synthesis. Returns the structured briefing, or None to trigger fallback."""
+def _select_ollama_model() -> str | None:
+    """Return the Ollama model to use: preferred if pulled, else the fallback if pulled, else None.
+
+    Checks `ollama list` (via the python client) so a missing model degrades to the next tier
+    instead of erroring on the generate call.
+    """
     try:
-        from sovereign.oracle.oracle_agent import _load_dotenv
-        _load_dotenv()
+        import ollama
+        listed = ollama.list()
+        names = {m.get("model", m.get("name", "")) for m in (listed.get("models") or [])}
+        # names look like "qwen2.5:latest" — match on the bare prefix.
+        def _has(tag: str) -> bool:
+            return any(n == tag or n.split(":")[0] == tag for n in names)
+        if _has(_OLLAMA_PREFERRED):
+            return _OLLAMA_PREFERRED
+        if _has(_OLLAMA_FALLBACK):
+            return _OLLAMA_FALLBACK
     except Exception:
-        pass
-    api_key = os.environ.get("ANTHROPIC_API_KEY")
-    if not api_key:
+        return None
+    return None
+
+
+def _try_ollama(prompt: str) -> dict | None:
+    """Tier 1 — local Ollama. Returns the structured briefing, or None to fall through to the next tier.
+
+    NEVER retries: any failure (module missing, no model pulled, server down, parse failure) returns
+    None immediately so the caller proceeds to the next tier. format="json" is mandatory. Free, so it
+    is logged via _log_cost() with cost_usd=0.0.
+    """
+    model = _select_ollama_model()
+    if model is None:
+        return None
+    try:
+        import ollama
+        resp = ollama.generate(
+            model=model, prompt=prompt, format="json",
+            options={"temperature": 0.2, "num_predict": 1024},
+        )
+        raw = (resp.get("response") or "").strip()
+    except Exception:
         return None
 
+    data = _parse(raw)
+    if data is None:
+        return None
+    _log_cost(0, 0, 0.0, model=f"ollama/{model}")
+    return _finalize(data, f"ollama/{model}", 0.0)
+
+
+def _finalize(data: dict, model: str, cost: float, lead_lag: dict | None = None) -> dict:
+    """Normalise a parsed model response into the structured briefing contract (shared by all tiers)."""
+    bias = str(data.get("directional_bias", "NEUTRAL")).upper()
+    if bias not in ("LONG", "SHORT", "NEUTRAL"):
+        bias = "NEUTRAL"
+    try:
+        conf = int(data.get("confidence", 0))
+    except Exception:
+        conf = 0
+    return {
+        "directional_bias": bias,
+        "confidence": max(0, min(100, conf)),
+        "regime_call": data.get("regime_call") or (lead_lag or {}).get("regime"),
+        "key_level": data.get("key_level"),
+        "narrative": data.get("narrative", ""),
+        "model": model,
+        "cost_usd": round(cost, 6),
+    }
+
+
+def synthesize(market_state: dict, lead_lag: dict, volume_profile: dict,
+               news: dict, event_calendar: dict, scorecard_summary: str) -> dict | None:
+    """Three-tier synthesis: local Ollama → Anthropic Opus → None (deterministic fallback upstream).
+
+    Order (each tier is tried once, NEVER retried; any failure falls straight through):
+      Tier 1  local Ollama (free)          — always tried first
+      Tier 2  Anthropic Opus               — only if Ollama returned None AND ANTHROPIC_API_KEY is set
+      Tier 3  return None                  — the orchestrator writes its deterministic fallback
+
+    The `model` field reflects which tier fired: "ollama/qwen2.5" | "claude-opus-4-8".
+    """
     prompt = PROMPT_TEMPLATE.format(
         market_state=_compact(market_state),
         lead_lag=_compact(lead_lag),
@@ -172,6 +246,22 @@ def synthesize(market_state: dict, lead_lag: dict, volume_profile: dict,
         event_calendar=_compact(event_calendar, 1500),
         scorecard=scorecard_summary,
     )
+
+    # Tier 1 — local Ollama (free, first).
+    ollama_result = _try_ollama(prompt)
+    if ollama_result is not None:
+        ollama_result["regime_call"] = ollama_result.get("regime_call") or lead_lag.get("regime")
+        return ollama_result
+
+    # Tier 2 — Anthropic Opus (unchanged), only if a key is present.
+    try:
+        from sovereign.oracle.oracle_agent import _load_dotenv
+        _load_dotenv()
+    except Exception:
+        pass
+    api_key = os.environ.get("ANTHROPIC_API_KEY")
+    if not api_key:
+        return None
 
     try:
         import anthropic
@@ -190,20 +280,4 @@ def synthesize(market_state: dict, lead_lag: dict, volume_profile: dict,
     data = _parse(raw)
     if data is None:
         return None
-
-    bias = str(data.get("directional_bias", "NEUTRAL")).upper()
-    if bias not in ("LONG", "SHORT", "NEUTRAL"):
-        bias = "NEUTRAL"
-    try:
-        conf = int(data.get("confidence", 0))
-    except Exception:
-        conf = 0
-    return {
-        "directional_bias": bias,
-        "confidence": max(0, min(100, conf)),
-        "regime_call": data.get("regime_call") or lead_lag.get("regime"),
-        "key_level": data.get("key_level"),
-        "narrative": data.get("narrative", ""),
-        "model": MODEL,
-        "cost_usd": round(cost, 6),
-    }
+    return _finalize(data, MODEL, cost, lead_lag)
