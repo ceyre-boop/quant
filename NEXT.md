@@ -2365,3 +2365,35 @@ Closed the exposure HYP-071-GOVFLAG flagged, above. `sovereign/training/gate.py`
   `carry_engine`, `ict.pipeline` — this is scaffold hardening only (`sovereign/training/gate.py`,
   `config/training.yml`, its test file). No ledger write, no prereg created.
 - Pushed to `sovereign-v2` (`10681e9`).
+
+---
+
+## 2026-07-24 (session cont'd) — Dashboard: Elo bar + self-play training panel
+
+Added two read-only, static-file-compatible panels to `dashboard/index.html` (Engineer agent,
+committed `0bfc414`, worktree base verified at `8f78ec8` before merge):
+
+- **Elo estimate bar**: vertical gauge derived from `data/proof/v015_manifest.json`
+  `recorded_oos_sharpe` (1.2504) mapped via the Sharpe→Elo table in
+  `research/SELF_PLAY_TRAINING_ARCHITECTURE.md` §5. Lands **Expert / 1600–1800 / ≈1625 Elo** —
+  note this contradicts the doc's own prose ("900–1100"), which is stale relative to its table;
+  we trust the table and said so in an HTML comment. Fetched once at page load, NOT on the 60s
+  refresh timer (updates only when a new Sharpe measurement lands). Renders UNAVAILABLE if the
+  source is missing — never fabricates a value.
+- **Self-play training panel**: ignition gate OPEN/CLOSED + reasons (new
+  `data/agent/training_gate_status.json`, written by new `scripts/write_training_gate_status.py`
+  which calls `sovereign/training/gate.py::evaluate_gate()` — gate.py logic untouched); latest
+  cycle from `logs/training_log.jsonl` (currently: 2026-07-24T15:33Z, SCAFFOLD/DRY, placebo FAIL
+  Δ-0.010, director REJECT, committed=false); today's per-system read from the existing
+  prop/carry/regime JSON files (Undertow DD OK, Carry DD n/a — `carry_paper_account.json` has no
+  drawdown fields, not fabricated); inert `Prob(win today): pending definition` placeholder
+  (Colin hasn't defined that metric).
+- `scripts/serve_dashboard.sh` + `scripts/build_standalone_dashboard.py`: added explicit allowlist
+  entries for `training_gate_status.json`, `v015_manifest.json`, `training_log.jsonl` — no globs,
+  same pattern as existing lines. `dashboard/dashboard_live.html` regenerated (gitignored artifact,
+  not committed).
+- Verified in real browser via `scripts/serve_dashboard.sh` on 127.0.0.1:8080: both panels render
+  correctly, gate shows CLOSED with all 4 blocker reasons, Elo bar shows Expert band at the
+  Sharpe-mapped position.
+- No execution-path file touched; `gate.py` logic unmodified (read-only helper only).
+- Pushed to `sovereign-v2` (`0bfc414`).
