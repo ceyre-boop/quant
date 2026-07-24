@@ -2289,3 +2289,29 @@ No logic changed, nothing recomputed. Documenting a gap before it leaks further.
 - Corresponding append-only ledger entry: `data/agent/hypothesis_ledger.json` (new record,
   `id: HYP-071-GOVFLAG`, `status: governance_flag`, dated 2026-07-24). Existing HYP-071 record
   untouched.
+
+## 2026-07-24 — Gate hardened: recompute can no longer satisfy HYP-071 ignition (commit `10681e9`)
+Closed the exposure HYP-071-GOVFLAG flagged, above. `sovereign/training/gate.py` now requires a
+**fourth** AND condition, `hyp_071_revival_confirmed`, on top of the existing three
+(`tick_024`, `hyp_071_net_confirmed` flag, `value_board_is_net`) — none weakened.
+
+- New check `_hyp071_revival_confirmed()` reads the hypothesis ledger (path overridable via
+  `config/training.yml::ignition.hypothesis_ledger_path`, default `data/agent/hypothesis_ledger.json`)
+  and only passes if it finds a `HYP-071` entry with `status: CONFIRMED`, a `result.prereg_hash`
+  that is **not** one of the three original locked hashes (v1 `c4f29ac3…`, v2 `3d500bda…`, addendum
+  `c1fab807…` — `gate.HYP071_LOCKED_PREREG_HASHES`), dated strictly after `2026-06-30`
+  (`gate.HYP071_ORIGINAL_VERDICT_DATE`). Reusing a locked hash, or the METRIC_ARTIFACT/GOVFLAG
+  entries alone, explicitly does NOT satisfy it — distinct refusal reason string either way.
+  Fails closed + loud on missing/unreadable/malformed ledger.
+- `tests/test_sovereign_training_gate.py`: `_write_cfg` now writes a ledger fixture per-test
+  (defaults to the real killed-verdict shape: METRIC_ARTIFACT + GOVFLAG). Added 9 tests: reuse of
+  locked prereg hash rejected; real repo state (no overrides) independently CLOSED; hypothetical
+  fresh-prereg+CONFIRMED fixture WOULD open it (no real ledger/prereg touched); fail-closed on
+  missing/malformed/non-list ledger, missing prereg_hash, and pre-verdict-dated entries. 21/21 pass.
+- Verified against current real state: `python3 -m sovereign.training.gate` → CLOSED, all 4 checks
+  FAIL, reason includes "HYP-071 METRIC_ARTIFACT verdict stands; recompute is not revival — fresh
+  prereg + adjudication required". `test_pipeline_does_not_import_sovereign` still green.
+- Untouched by design: `forex_exit_manager`, `decide_exit`, `exit_machine`, `harness`,
+  `carry_engine`, `ict.pipeline` — this is scaffold hardening only (`sovereign/training/gate.py`,
+  `config/training.yml`, its test file). No ledger write, no prereg created.
+- Pushed to `sovereign-v2` (`10681e9`).
