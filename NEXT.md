@@ -4,6 +4,56 @@ Per-session ledger: what shipped, push status, verdicts, blockers, refusals. New
 The Obsidian brain (`~/Obsidian/Obsidian/00-BRAIN/NEXT.md`) is the cross-project rollup.
 Standing constraints live in `CLAUDE.md` — not restated here.
 
+### 2026-07-24 · Mandatory random-reweighting placebo control for self-play training loop (cf41ec3)
+
+Made the HYP-090 lesson structural: HYP-090 (daily adaptive parameter selection) was
+KILLED because it lost to a random-selection placebo. The self-play loop's value-weighted
+XGBoost reweighting (top_weight 2.0 / bottom_weight 0.5) is the same class of search, so
+it must now beat a placebo every cycle or get rejected — not just be assumed better because
+it has a value-function story.
+
+**Shipped (scaffold hardening only, all freeze-safe):**
+- `sovereign/training/placebo_control.py` (new) — `run_control()`: computes the real
+  value-informed sample weights, shuffles the IDENTICAL weight composition under a fixed
+  logged seed (config `placebo.seed`, default 42), runs both on a purged walk-forward OOS
+  split (`purged_kfold_indices`, default 5 folds, 2% embargo), computes weighted-Sharpe
+  margin (real − placebo) with a simple per-fold t-stat significance check. Fail-closed:
+  `PlaceboDataError` on empty/mismatched/malformed input — never a silent pass.
+- `sovereign/training/policy_updater.py` — `refit_policy()` now takes `returns` and runs
+  the placebo control before any refit is considered. DRY mode (gate closed) always
+  computes and logs the verdict but never marks eligible; gate-open mode REJECTS (no
+  commit, reason logged) if the placebo verdict is ineligible, only reaching the
+  (still-unwired) live-refit `NotImplementedError` path if placebo passes.
+- `sovereign/training/director.py` — added `placebo_ok`/`placebo_margin` as a 4th
+  mandatory check folded into `DirectorReport.all_pass` (mechanism/regime/magnitude/
+  placebo); `render_report` prints the margin. **Did not touch `gate.py`** (another
+  session was concurrently hardening the HYP-071 ignition guard there — avoided clobbering).
+- `scripts/sovereign_train.py` — wires Phase 2 returns into Phase 3's placebo check,
+  passes the verdict into Phase 4's director review, logs a `placebo_control` block to
+  both the checkpoint JSON and `logs/training_log.jsonl`.
+- `config/training.yml` — new `placebo:` section (`seed`, `n_splits`, `embargo_frac`,
+  `placebo_margin_min: 0.15` — real Sharpe must beat placebo Sharpe by ≥0.15).
+- `tests/test_placebo_control.py` (new, 11 tests, all green): tie/loss → REJECTED no
+  commit; clear beat → eligible (falls through to the still-unwired live path, which is
+  the correct "would commit" signal at this scaffold stage); fail-closed on missing
+  `returns`, empty arrays, mismatched lengths, and no-placebo-provided; weight composition
+  parity (same count of 2.0s/0.5s, only assignment shuffles) and shuffle reproducibility;
+  ICT/sovereign isolation test re-verified green in the same run.
+
+**Verified:** `python3 -m pytest tests/test_placebo_control.py tests/test_sovereign_training_gate.py -q`
+→ 32 passed. `python3 scripts/sovereign_train.py --watch` end-to-end: placebo margin
+computed and printed every DRY cycle, director correctly shows `Placebo: FAIL` and
+`Recommendation: REJECT` against the real (still-gross, still-uninformative-for-training)
+board data. Isolation test independently re-run green. Pushed to `sovereign-v2` (cf41ec3).
+
+**Confirmed:** a placebo-failing cycle cannot commit — `refit_policy` returns
+`UpdateResult(dry=True, eligible=False, note="REJECTED — ...HYP-090 pattern")` and never
+reaches the live-refit branch; `director.review().all_pass` is `False` whenever
+`placebo_ok` is `False`, so the runner's gate-open commit condition
+(`gate_open and report.all_pass and not auto_approve`) short-circuits before the human
+"Enter to commit" step is ever reached. No ledger edits, no recompute, ignition gate
+untouched (still CLOSED).
+
 ### 2026-07-24 · MT5 execution bridge (DEMO-only) + FOMC-window logger SHIPPED (TICK-056)
 
 Built the MT5 demo-only execution bridge and its companion FOMC-window logger per
