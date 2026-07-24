@@ -55,10 +55,11 @@ reward:
 # human approval. Fail-closed: missing/malformed placebo data REJECTS, never passes.
 placebo:
   enabled: true
-  seed: 42                    # fixed RNG seed for the shuffle — logged for reproducibility
+  seed: 42                    # fixed RNG seed for the shuffles — logged for reproducibility
   n_splits: 5                 # purged walk-forward folds for the OOS comparison
   embargo_frac: 0.02          # fraction of the window purged from each fold edge
   placebo_margin_min: 0.15    # real Sharpe must beat placebo Sharpe by at least this
+  placebo_permutations: 200   # null-distribution shuffles for the permutation significance test
 
 # Policy rollout (Phase 1).
 rollout:

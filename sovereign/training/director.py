@@ -120,9 +120,11 @@ def _placebo_check(placebo) -> tuple[bool, float | None, list[str]]:
         ]
     if not getattr(placebo, "eligible", False):
         return False, getattr(placebo, "margin", None), [f"PLACEBO: {placebo.reason}"]
+    perm_p = getattr(placebo, "perm_p", None)
+    perm_str = f", permutation p={perm_p:.4f}" if perm_p is not None else ""
     return True, placebo.margin, [
         f"PLACEBO: real beats random-reweighting placebo by {placebo.margin:+.3f} "
-        f"(min {placebo.margin_min:.3f}, t over {placebo.n_folds} folds, seed={placebo.seed})"
+        f"(min {placebo.margin_min:.3f}, over {placebo.n_folds} folds, seed={placebo.seed}{perm_str})"
     ]
 
 

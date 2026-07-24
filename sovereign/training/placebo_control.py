@@ -15,6 +15,13 @@ the assignment differs; the composition (how many trades get which weight) is
 unchanged, so any margin is attributable to the value information, not to weighting
 magnitude or class imbalance.
 
+Significance is a real permutation test (matches sovereign/discovery/gate.py's
+Gate._permutation_p): the real margin (real-weighted Sharpe minus the unweighted
+baseline Sharpe, averaged over the purged OOS folds) is computed once, then compared
+against a null distribution built from `placebo_permutations` composition-preserving
+shuffles of the same weights. The verdict requires permutation p < 0.05 (real margin
+exceeds the 95th percentile of the null) — NOT a single-shuffle t-test.
+
 FAIL-CLOSED: any missing/malformed input (empty returns, empty value_scores,
 mismatched lengths, degenerate splits) raises PlaceboDataError. Callers MUST treat
 that as an ineligible cycle — never interpret a raised/caught error as a pass.
@@ -50,6 +57,9 @@ class PlaceboVerdict:
     seed: int
     reason: str
     per_fold_margins: list = field(default_factory=list)
+    perm_p: float | None = None
+    perm_percentile_95: float | None = None
+    n_perms: int = 0
 
 
 def _load_config(config_path: Path | None = None) -> dict:
@@ -117,6 +127,10 @@ def weighted_sharpe(returns: np.ndarray, weights: np.ndarray) -> float:
     return mean / std * (r.size ** 0.5)
 
 
+def _mean_weighted_sharpe(returns: np.ndarray, weights: np.ndarray, folds: list) -> float:
+    return float(np.mean([weighted_sharpe(returns[idx], weights[idx]) for idx in folds]))
+
+
 def run_control(returns, value_scores, config_path: Path | None = None) -> PlaceboVerdict:
     """Run the mandatory placebo control. Raises PlaceboDataError on any
     malformed/insufficient input — the caller must treat that as a REJECTED cycle."""
@@ -126,6 +140,7 @@ def run_control(returns, value_scores, config_path: Path | None = None) -> Place
     n_splits = int(pcfg.get("n_splits", 5))
     embargo_frac = float(pcfg.get("embargo_frac", 0.02))
     margin_min = float(pcfg.get("placebo_margin_min", 0.15))
+    n_perms = int(pcfg.get("placebo_permutations", 200))
 
     returns = np.asarray(returns, dtype=float)
     scores = np.asarray(value_scores, dtype=float)
@@ -137,34 +152,37 @@ def run_control(returns, value_scores, config_path: Path | None = None) -> Place
         )
 
     real_weights = policy_updater.compute_sample_weights(scores, config_path)
-    placebo_weights = random_reweight(real_weights, seed)
-    composition_ok = _composition_matches(real_weights, placebo_weights)
+    reference_placebo_weights = random_reweight(real_weights, seed)
+    composition_ok = _composition_matches(real_weights, reference_placebo_weights)
 
     folds = purged_kfold_indices(returns.size, n_splits, embargo_frac)
-    per_fold_margins = []
-    real_metrics, placebo_metrics = [], []
-    for idx in folds:
-        real_m = weighted_sharpe(returns[idx], real_weights[idx])
-        placebo_m = weighted_sharpe(returns[idx], placebo_weights[idx])
-        real_metrics.append(real_m)
-        placebo_metrics.append(placebo_m)
-        per_fold_margins.append(real_m - placebo_m)
+    baseline_weights = np.ones_like(real_weights)
 
-    real_metric = float(np.mean(real_metrics))
-    placebo_metric = float(np.mean(placebo_metrics))
-    margin = real_metric - placebo_metric
+    # Real margin, computed ONCE: real-weighted Sharpe vs the unweighted baseline.
+    real_metric = _mean_weighted_sharpe(returns, real_weights, folds)
+    baseline_metric = _mean_weighted_sharpe(returns, baseline_weights, folds)
+    margin = real_metric - baseline_metric
+    per_fold_margins = [
+        weighted_sharpe(returns[idx], real_weights[idx]) - weighted_sharpe(returns[idx], baseline_weights[idx])
+        for idx in folds
+    ]
 
-    margins = np.asarray(per_fold_margins, dtype=float)
-    n = margins.size
-    mean_margin = float(margins.mean())
-    std_margin = float(margins.std(ddof=1)) if n > 1 else 0.0
-    if std_margin < 1e-12:
-        t_stat = float("inf") if mean_margin > 0 else (float("-inf") if mean_margin < 0 else 0.0)
-    else:
-        t_stat = mean_margin / (std_margin / (n ** 0.5))
-    # Simple, sample-appropriate check for ~n_splits folds: require the margin to be
-    # consistently positive (t_stat >= 1.0), not a single lucky fold.
-    significant = t_stat >= 1.0
+    # Null distribution: N composition-preserving shuffles of the SAME weights,
+    # each re-scored against the same unweighted baseline (Gate._permutation_p
+    # pattern — shuffle assignment only, keep composition, recompute the metric).
+    rng = np.random.default_rng(seed)
+    null_margins = np.empty(n_perms, dtype=float)
+    for i in range(n_perms):
+        shuffled = rng.permutation(real_weights)
+        null_metric = _mean_weighted_sharpe(returns, shuffled, folds)
+        null_margins[i] = null_metric - baseline_metric
+
+    n_ge = int((null_margins >= margin).sum())
+    perm_p = (n_ge + 1) / (n_perms + 1)  # +1 smoothing (never exactly 0), one-sided
+    perm_percentile_95 = float(np.percentile(null_margins, 95))
+    significant = perm_p < 0.05
+
+    placebo_metric = float(np.mean(null_margins)) + baseline_metric  # mean placebo (shuffled) Sharpe, for reporting
 
     eligible = composition_ok and (margin >= margin_min) and significant
 
@@ -172,8 +190,9 @@ def run_control(returns, value_scores, config_path: Path | None = None) -> Place
         reason = "REJECTED: placebo weight composition does not match real weights (implementation bug)"
     elif not significant:
         reason = (
-            f"REJECTED: real-vs-placebo margin ({margin:+.3f}) not significant "
-            f"(t={t_stat:+.2f} over {n} folds) — failed random-reweighting placebo control - HYP-090 pattern"
+            f"REJECTED: real margin ({margin:+.3f}) not significant under permutation test "
+            f"(p={perm_p:.4f} over {n_perms} shuffles, 95th pct of null={perm_percentile_95:+.3f}) "
+            "— failed random-reweighting placebo control - HYP-090 pattern"
         )
     elif margin < margin_min:
         reason = (
@@ -181,11 +200,15 @@ def run_control(returns, value_scores, config_path: Path | None = None) -> Place
             "— failed random-reweighting placebo control - HYP-090 pattern"
         )
     else:
-        reason = f"ELIGIBLE: real beats placebo by {margin:+.3f} (>= {margin_min:.3f}), t={t_stat:+.2f}"
+        reason = (
+            f"ELIGIBLE: real beats placebo by {margin:+.3f} (>= {margin_min:.3f}), "
+            f"permutation p={perm_p:.4f} over {n_perms} shuffles"
+        )
 
     return PlaceboVerdict(
         eligible=eligible, real_metric=real_metric, placebo_metric=placebo_metric,
         margin=margin, margin_min=margin_min, significant=significant,
-        composition_ok=composition_ok, n_folds=n, seed=seed, reason=reason,
-        per_fold_margins=per_fold_margins,
+        composition_ok=composition_ok, n_folds=len(folds), seed=seed, reason=reason,
+        per_fold_margins=per_fold_margins, perm_p=perm_p,
+        perm_percentile_95=perm_percentile_95, n_perms=n_perms,
     )

@@ -91,6 +91,10 @@ def test_random_scores_do_not_reliably_beat_placebo(tmp_path):
     # Uninformative value_scores → real weighting is itself just another arbitrary
     # weighting; it must not be structurally guaranteed to clear the margin.
     assert verdict.margin < 5.0  # sanity: no absurd separation from noise alone
+    assert verdict.perm_p is not None
+    # A single uninformative seed can land either side of the gate by chance (this is
+    # exactly what the Monte-Carlo acceptance test below measures at scale); assert
+    # the mechanism ran, not a specific outcome for this one seed.
 
 
 # ── (b) real clearly beats placebo by > margin → eligible ──────────────────────
@@ -102,6 +106,9 @@ def test_informative_scores_beat_placebo_and_are_eligible(tmp_path):
     assert verdict.composition_ok is True
     assert verdict.eligible is True
     assert verdict.margin >= verdict.margin_min
+    assert verdict.significant is True
+    assert verdict.perm_p is not None and verdict.perm_p < 0.05
+    assert verdict.margin > verdict.perm_percentile_95
 
     # Eligible placebo verdict → refit_policy proceeds past the placebo gate to the
     # not-yet-wired live refit path, which raises loudly (ignition itself is a
@@ -175,6 +182,31 @@ def test_placebo_shuffle_is_reproducible_for_fixed_seed():
     a = placebo_control.random_reweight(weights, seed=42)
     b = placebo_control.random_reweight(weights, seed=42)
     assert np.array_equal(a, b)
+
+
+# ── (f) governance fix acceptance test — noise Monte-Carlo false-pass rate ─────
+#
+# Audit (cf41ec3) found the single-shuffle t>=1.0 threshold false-passed pure noise
+# in 39/200 seeds (20%). The permutation-test rebuild must bring that down to the
+# nominal ~5% (one-sided p<0.05) or below. Marked slow: 200 seeds x 200 perms.
+
+@pytest.mark.slow
+def test_noise_monte_carlo_false_pass_rate_at_nominal_level(tmp_path):
+    cfg = _write_cfg(tmp_path)  # placebo_margin_min=0.15 default — pure noise margins hover near 0
+    n_seeds = 200
+    false_passes = 0
+    for seed in range(n_seeds):
+        returns, value_scores = _make_uninformative_data(n=400, seed=seed)
+        verdict = placebo_control.run_control(returns, value_scores, cfg)
+        if verdict.eligible:
+            false_passes += 1
+    false_pass_rate = false_passes / n_seeds
+    print(f"\nmeasured false-pass rate: {false_pass_rate:.1%} ({false_passes}/{n_seeds})")
+    # Nominal one-sided alpha is 5%; allow slack for Monte-Carlo sampling noise but
+    # stay well clear of the old 20% failure rate.
+    assert false_pass_rate <= 0.10, (
+        f"false-pass rate {false_pass_rate:.1%} too high — permutation gate not working"
+    )
 
 
 # ── (e) isolation test still green ──────────────────────────────────────────────
