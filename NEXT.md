@@ -4,6 +4,44 @@ Per-session ledger: what shipped, push status, verdicts, blockers, refusals. New
 The Obsidian brain (`~/Obsidian/Obsidian/00-BRAIN/NEXT.md`) is the cross-project rollup.
 Standing constraints live in `CLAUDE.md` — not restated here.
 
+### 2026-07-24 · Self-play training board BUILT — ignition GATED CLOSED
+
+Built the AlphaZero-style self-play policy training loop from Colin's spec
+(`research/SELF_PLAY_TRAINING_ARCHITECTURE.md`, 2026-07-24). **The board is built;
+it is NOT ignited.** Training a trading policy is model training, gated by
+RISK_CONSTITUTION Art. 6 behind a CONFIRMED ledger verdict — enforced in code, not
+by convention.
+
+**Shipped (all freeze-safe, new paths; one 4-line non-frozen edit):**
+- `scripts/sovereign_train.py` — runner, `--watch`, phases 0-5, prints gate loudly.
+- `sovereign/training/gate.py` — ignition gate (mirrors research_factory + autonomous.yml::live).
+- `sovereign/training/value_scorer.py` — HYP-071 board READ-ONLY; `trade_score()` net-guarded.
+- `sovereign/training/policy_rollout.py` — Phase 1 sim trades (DRY placeholder while gated).
+- `sovereign/training/policy_updater.py` — Phase 3 sample-weight reweight (refuses refit while gated).
+- `sovereign/training/director.py` — Phase 4 MECHANISM / REGIME / MAGNITUDE(±20%) checks; HUMAN-gated, never auto-approves.
+- `config/training.yml` — hyperparams + ignition flags (default OFF).
+- `logs/training_log.jsonl` — append-only, one entry/cycle. `data/training/` gitignored.
+- `sovereign/ml_trainer.py` — added `value_weights` sample_weight passthrough (~6 lines, preserves purged split).
+- `tests/test_sovereign_training_gate.py` — 12 tests, all green.
+
+**Gate/guard proven (DRY `--watch` run pasted in session):** gate held CLOSED on all
+three conditions [tick_024=FAIL, hyp_071=FAIL, value_board_is_net=FAIL]; net-return
+guard FIRED in Phase 2 (board carries `gross_R_caveat`); Phase 3 wrote NO policy;
+verdict `SCAFFOLD_DRY`, committed=false. Isolation test
+`test_pipeline_does_not_import_sovereign` still green; `sovereign/training/` imports no `ict/`.
+
+**Ignition is GATED CLOSED** pending BOTH: (1) TICK-024 carry-cost fix landed, and
+(2) HYP-071 recomputed on NET returns with a CONFIRMED ledger stamp. The runner is
+physically incapable of a real cycle until both config flags are flipped (logged
+rationale per CLAUDE.md #4) AND the value board sheds its gross marker.
+
+**July-28 ignition checklist (spec §8.3):**
+- Jul 26-27: TICK-024 fix merged (net carry costs corrected) → flip `ignition.tick_024_carry_fix_landed`.
+- Jul 28: HYP-071 net recompute runs (same harness, corrected costs).
+- Jul 28: Colin adjudicates HYP-071 net → ledger stamp or data-ceiling. If CONFIRMED, board loses `gross_R_caveat` → flip `ignition.hyp_071_net_confirmed`.
+- Jul 28: with the gate open, `sovereign_train.py` receives its reward signal.
+- Jul 29 (after FOMC): first real training cycle in the FOMC-quiet afternoon.
+
 ### 2026-07-23 · Briefing synthesizer wired (AlphaZero L1 → dashboard + hypothesis batch, CONTEXT ONLY)
 
 Colin-approved concrete fix from the two-half inventory: wire `sovereign/briefing/synthesize.py`

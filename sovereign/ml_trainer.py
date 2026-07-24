@@ -235,7 +235,8 @@ class MLTrainer:
               labels: pd.Series,
               feature_cols: list,
               regime: str,
-              label_horizon: int = 10) -> tuple:
+              label_horizon: int = 10,
+              value_weights: "pd.Series | None" = None) -> tuple:
         """
         Purged walk-forward train with uniqueness sample weights.
 
@@ -296,6 +297,12 @@ class MLTrainer:
             # Fast path: uniform weights for large datasets
             # (uniqueness computation becomes O(n²) expensive)
             sample_weights = np.ones(len(X_train))
+
+        # Self-play passthrough: multiply value-function weights into the uniqueness
+        # weights, aligned to X_train (spec §4.3). Preserves the purged split above.
+        if value_weights is not None:
+            vw = value_weights.reindex(X_train.index).fillna(1.0).values
+            sample_weights = sample_weights * vw
 
         model = xgb.XGBClassifier(**self.XGB_PARAMS)
         model.fit(

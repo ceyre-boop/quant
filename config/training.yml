@@ -1,0 +1,66 @@
+# Self-Play Training configuration — single source of truth for the IGNITION GATE.
+#
+# This governs sovereign_train.py (the self-play policy training loop). Training a
+# trading policy is MODEL TRAINING, which CLAUDE.md NN + RISK_CONSTITUTION Art. 6
+# (Unproven Edges) gate behind a CONFIRMED ledger verdict. The runner is
+# PHYSICALLY INCAPABLE of igniting a real cycle until BOTH ignition flags below are
+# true AND the corroborating runtime guards pass (net-return board, no gross marker).
+#
+# Mirror of config/autonomous.yml::live — flags default OFF. Flipping either
+# ignition flag is a live behaviour change: log a rationale in
+# data/agent/param_change_log.jsonl BEFORE flipping (CLAUDE.md rule #4).
+#
+# With the gate CLOSED (default), the runner executes in SCAFFOLD/DRY mode:
+# it exercises the full Phase 0-5 pipeline, writes checkpoints + a training_log
+# entry, but does NOT train a production policy and does NOT write any parameter
+# update. See spec: research/SELF_PLAY_TRAINING_ARCHITECTURE.md §8.
+
+ignition:
+  # BLOCKER 8.1 — TICK-024 carry-cost fix landed (net returns correct).
+  # The current cost model understates financing ~10x with a sign flip on EUR
+  # shorts. Until this is true the reward signal trains on fictional carry.
+  tick_024_carry_fix_landed: false
+
+  # BLOCKER 8.2 — HYP-071 recomputed on NET returns with a CONFIRMED ledger stamp.
+  # The gross board's EXIT_NOW divergences may collapse on net returns.
+  hyp_071_net_confirmed: false
+
+# Value function (HYP-071 board) — used READ-ONLY by value_scorer.py.
+value_function:
+  board_path: data/research/HYP-071_tabular_exit_value_results.json
+  # The scorer REFUSES if the board still carries this gross-returns marker.
+  # Its presence keeps the gate closed regardless of the ignition flags above.
+  gross_marker_key: gross_R_caveat
+
+# Reward signal — trade_score() maps NET return (R-multiples) to [-1, +1].
+reward:
+  alpha_scale: 2.0          # tanh(alpha * alpha_scale); spec §4.2
+  top_quartile_pct: 75      # trades above this percentile get up-weighted
+  top_weight: 2.0           # sample weight for top-quartile trades
+  bottom_weight: 0.5        # sample weight for bottom-quartile trades
+
+# Policy rollout (Phase 1).
+rollout:
+  lookback_days: 252
+  n_trades: 50000
+  pairs: [GBPUSD, EURUSD, AUDUSD, GBPJPY]   # AUDNZD excluded (HYP-045 CONFIRMED)
+
+# Director (Phase 4) — the constitutional review. HUMAN-GATED approval.
+director:
+  # MAGNITUDE check: any single parameter moving more than this fraction in one
+  # cycle is flagged as a suspected degenerate path (spec §6.3).
+  max_param_change_pct: 20.0
+  # Never auto-approve. Phase 4 approval requires an explicit human confirmation.
+  auto_approve: false
+
+# The tunable policy-parameter surface the director diffs. These are the loop's
+# own knobs (NOT config/parameters.yml, which stays frozen). Baseline values are
+# illustrative anchors for the diff; DRY mode never mutates them.
+policy_params:
+  conviction_entry_min: 0.62
+  conviction_exit_trail: 0.58
+  atr_threshold_high: 0.71
+
+paths:
+  checkpoint_dir: data/training
+  training_log: logs/training_log.jsonl
