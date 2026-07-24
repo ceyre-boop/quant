@@ -2397,3 +2397,30 @@ committed `0bfc414`, worktree base verified at `8f78ec8` before merge):
   Sharpe-mapped position.
 - No execution-path file touched; `gate.py` logic unmodified (read-only helper only).
 - Pushed to `sovereign-v2` (`0bfc414`).
+
+---
+
+## 2026-07-24 (session cont'd 2) — Wired real "Prob(win today)" field
+
+Replaced the dashboard's "Prob(win today): pending definition" placeholder now that Colin
+defined the metric (commit `4a9b9b8`):
+
+- Reads `directional_bias` + `confidence` + `synthesis_source` from `data/agent/daily_briefing.json`
+  — renders `"{BIAS} · {confidence}%"`. Today: **NEUTRAL · 50%**.
+- `synthesis_source === "deterministic_fallback"` → greys out, shows "brain offline — no live
+  synthesis this cycle" instead of a number (today's run is a real `ollama/qwen2.5` read, so this
+  branch didn't fire).
+- Added new `scripts/write_briefing_scorecard_status.py` (mirrors the training-gate-status writer)
+  that calls `sovereign/briefing/scorecard.py`'s existing `report()` (untouched) and writes
+  `data/briefing/scorecard_status.json`. Dashboard always shows the scorecard's own `maturity`
+  string verbatim as a caveat next to the confidence line — today: "CALIBRATING — need ~30-60
+  samples... (n=14 directional calls scored)" — so a low-sample read is never presented as proven.
+- Deliberately did NOT attach `big_move_headline.pair` (GBPUSD) to the confidence line —
+  `directional_bias` has no pair in this file and that's a separate unvalidated metric; didn't
+  invent data.
+- Allowlists (`serve_dashboard.sh`, `build_standalone_dashboard.py`) updated with explicit entries
+  for `daily_briefing.json` + `scorecard_status.json`. `dashboard_live.html` regenerated (gitignored).
+- Verified live via `scripts/serve_dashboard.sh`: rendered string matched
+  `sovereign.briefing.scorecard.report()` output exactly.
+- No execution-path file touched; `scorecard.py`/`briefing_context.py` logic unmodified.
+- Pushed to `sovereign-v2` (`4a9b9b8`).
