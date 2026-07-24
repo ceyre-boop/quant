@@ -242,6 +242,49 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:14
 .gpct{font-size:11px;color:var(--text-dim);text-align:right}
 
 .nd{color:var(--text-muted);font-size:12px;font-style:italic}
+
+/* ============================================================
+   ELO GAUGE  (derived from measured OOS Sharpe — read once)
+   ============================================================ */
+.elo-wrap{display:flex;gap:18px;align-items:stretch}
+.elo-gauge{position:relative;width:48px;height:300px;flex-shrink:0;
+  border:1px solid var(--border);background:#080808;overflow:visible}
+.elo-zone{position:absolute;left:0;right:0}
+.elo-marker{position:absolute;left:-6px;right:-6px;height:0;
+  border-top:2px solid var(--text-hi);z-index:6}
+.elo-marker::after{content:'';position:absolute;right:-4px;top:-4px;
+  width:8px;height:8px;border-radius:50%;background:var(--text-hi)}
+.elo-legend{flex:1;display:flex;flex-direction:column;gap:2px;min-width:0}
+.elo-lrow{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;
+  padding:5px 8px;border:1px solid transparent;font-size:11px}
+.elo-lrow.active{border-color:var(--border-mid);background:rgba(255,255,255,.03)}
+.elo-lname{font-weight:600;color:var(--text)}
+.elo-lelo{font-size:9px;color:var(--text-muted)}
+.elo-lsharpe{font-size:10px;color:var(--text-dim);text-align:right;white-space:nowrap}
+.elo-src{font-size:9px;color:var(--text-muted);margin-top:9px;line-height:1.5}
+.elo-read{font-size:22px;font-weight:700;line-height:1;color:var(--text-hi)}
+.elo-readsub{font-size:10px;color:var(--text-dim);margin-top:3px}
+
+/* ============================================================
+   SELF-PLAY TRAINING STATUS
+   ============================================================ */
+.sp-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.sp-block{background:var(--bg);border:1px solid var(--border);padding:11px 13px}
+.sp-lbl{font-size:9px;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-muted);margin-bottom:7px}
+.sp-kv{display:flex;justify-content:space-between;gap:8px;font-size:11px;padding:3px 0;border-bottom:.5px solid #1a1a1a}
+.sp-kv:last-child{border-bottom:none}
+.sp-kv .k{color:var(--text-muted)}
+.sp-kv .v{color:var(--text);font-weight:600;text-align:right}
+.sp-reasons{margin-top:7px;font-size:10px;color:var(--text-dim);line-height:1.5}
+.sp-reason{display:flex;gap:6px;padding:3px 0;border-bottom:.5px solid #1a1a1a}
+.sp-reason:last-child{border-bottom:none}
+.sp-reason .rdot{width:5px;height:5px;border-radius:50%;background:var(--red);flex-shrink:0;margin-top:5px}
+.sp-placeholder{font-size:11px;font-style:italic;color:var(--text-muted)}
+.sp-syslist{display:flex;flex-direction:column;gap:6px}
+.sp-sysrow{display:grid;grid-template-columns:82px 1fr auto;gap:8px;align-items:center;
+  padding:6px 8px;background:var(--bg);border:1px solid var(--border);font-size:11px}
+.sp-sysnm{font-weight:700;color:var(--text-hi)}
+.sp-sysreason{font-size:9px;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 </style>
 </head>
 <body>
@@ -493,6 +536,66 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:14
         <div class="gate-quiet"><span style="color:var(--text-muted);font-size:11px">Loading…</span></div>
       </div>
     </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════
+       ROW 5 — ELO ESTIMATE  /  SELF-PLAY TRAINING STATUS
+       ═══════════════════════════════════════════════════════ -->
+  <!-- NOTE: the Elo bar is DERIVED from the measured OOS Sharpe, not an
+       independent live metric. It reads data/proof/v015_manifest.json ONCE at
+       page load (outside the 60s refresh timer) because that file only changes
+       when a human re-runs a Sharpe measurement. Band is computed from the
+       table in research/SELF_PLAY_TRAINING_ARCHITECTURE.md §5 against the
+       Sharpe actually read — so if the number moves, the band moves with it.
+       At Sharpe 1.2504 that lands in the 1600-1800 "Expert" band per the
+       table's literal ranges (1.2-1.6). The doc's own PROSE says "900-1100";
+       that estimate predates a hold-days config change and contradicts its own
+       table — we trust the TABLE. -->
+  <div class="row r-selfplay" style="display:grid;gap:9px;grid-template-columns:340px 1fr">
+
+    <!-- Elo estimate (vertical gauge) -->
+    <div class="panel">
+      <div class="ph">
+        Elo estimate — derived from measured OOS Sharpe
+        <span class="badge b-dim" id="elo-badge">—</span>
+      </div>
+      <div class="elo-wrap">
+        <div class="elo-gauge" id="elo-gauge"></div>
+        <div style="display:flex;flex-direction:column">
+          <div class="elo-read" id="elo-read">—</div>
+          <div class="elo-readsub" id="elo-readsub">—</div>
+          <div class="elo-legend" id="elo-legend" style="margin-top:10px"></div>
+          <div class="elo-src" id="elo-src">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Self-play training status -->
+    <div class="panel">
+      <div class="ph">
+        Self-Play Training
+        <span class="badge b-dim" id="sp-badge">—</span>
+      </div>
+
+      <div class="sp-syslist" id="sp-syslist" style="margin-bottom:12px"></div>
+
+      <div class="sp-grid">
+        <div class="sp-block">
+          <div class="sp-lbl">Ignition Gate</div>
+          <div id="sp-gate-body"><span class="nd">Loading…</span></div>
+        </div>
+        <div class="sp-block">
+          <div class="sp-lbl">Latest Training Cycle</div>
+          <div id="sp-cycle-body"><span class="nd">Loading…</span></div>
+        </div>
+      </div>
+
+      <div class="sp-block" style="margin-top:12px">
+        <div class="sp-lbl">Prob(win today)</div>
+        <span class="sp-placeholder" id="sp-prob">Prob(win today): pending definition</span>
+      </div>
+    </div>
+
   </div>
 
 </main>
@@ -987,6 +1090,187 @@ async function updateGate() {
     </div>`;
 }
 
+/* ── Row 5a: Elo estimate — derived from measured OOS Sharpe ──
+   Read ONCE at page load, NOT inside refreshAll(). The manifest only changes
+   when a human re-runs a Sharpe measurement, so polling it on a timer would be
+   noise. Band is computed from the table (research/SELF_PLAY_TRAINING_ARCHITECTURE.md
+   §5), so if the Sharpe read moves, the band moves with it — nothing hardcoded. */
+const ELO_BANDS = [
+  { lo:400,  hi:500,  label:'Beginner-systematic',   sLo:0.0, sHi:0.5, clr:'var(--red)'    },
+  { lo:800,  hi:1000, label:'Club-level systematic', sLo:0.5, sHi:0.8, clr:'#ff8a3d'       },
+  { lo:1200, hi:1400, label:'Strong club',           sLo:0.8, sHi:1.2, clr:'var(--yellow)' },
+  { lo:1600, hi:1800, label:'Expert',                sLo:1.2, sHi:1.6, clr:'var(--blue)'   },
+  { lo:2000, hi:2300, label:'Master',                sLo:1.6, sHi:2.5, clr:'var(--green)'  },
+];
+const ELO_MIN = 400, ELO_MAX = 2300;
+const eloPct = elo => clamp(((elo-ELO_MIN)/(ELO_MAX-ELO_MIN))*100, 0, 100);
+
+function eloBandFor(sharpe){
+  // First band whose upper Sharpe bound the value is under; 1.2 → Expert (table:
+  // 1.2-1.6), matching the literal ranges. Last band catches Sharpe ≥ 2.5.
+  for(const b of ELO_BANDS){ if(sharpe < b.sHi) return b; }
+  return ELO_BANDS[ELO_BANDS.length-1];
+}
+function eloForSharpe(sharpe, b){
+  // Linear interpolation of the Sharpe value within its band's Elo sub-range.
+  const s = clamp(sharpe, b.sLo, b.sHi);
+  const frac = b.sHi>b.sLo ? (s-b.sLo)/(b.sHi-b.sLo) : 0;
+  return Math.round(b.lo + frac*(b.hi-b.lo));
+}
+
+async function updateElo(){
+  const m = await fj('data/proof/v015_manifest.json');
+  const gaugeEl  = document.getElementById('elo-gauge');
+  const legendEl = document.getElementById('elo-legend');
+  const readEl   = document.getElementById('elo-read');
+  const subEl    = document.getElementById('elo-readsub');
+  const srcEl    = document.getElementById('elo-src');
+
+  const sharpe = m && typeof m.recorded_oos_sharpe === 'number' ? m.recorded_oos_sharpe : null;
+
+  // Always render the 5 band zones on the gauge.
+  gaugeEl.innerHTML = ELO_BANDS.map(b=>{
+    const bottom = eloPct(b.lo), top = eloPct(b.hi);
+    return `<div class="elo-zone" title="${b.label}"
+      style="bottom:${bottom}%;height:${top-bottom}%;background:${b.clr};opacity:.55"></div>`;
+  }).join('');
+
+  if(sharpe == null){
+    setBadge('elo-badge','UNAVAILABLE','b-yellow');
+    readEl.textContent='UNAVAILABLE';
+    readEl.className='elo-read cy';
+    subEl.textContent='recorded_oos_sharpe missing / unreadable';
+    legendEl.innerHTML = ELO_BANDS.map(b=>bandRow(b,false)).join('');
+    srcEl.textContent='source: data/proof/v015_manifest.json (field absent)';
+    return;
+  }
+
+  const band = eloBandFor(sharpe);
+  const elo  = eloForSharpe(sharpe, band);
+
+  // Marker line on the gauge at the derived Elo.
+  gaugeEl.innerHTML += `<div class="elo-marker" style="bottom:${eloPct(elo)}%"></div>`;
+
+  readEl.textContent = `≈ ${elo} Elo`;
+  readEl.className='elo-read ch';
+  subEl.innerHTML = `<span style="color:${band.clr};font-weight:700">${band.label}</span> band`;
+  setBadge('elo-badge', band.label.split('-')[0].toUpperCase(), 'b-blue');
+
+  legendEl.innerHTML = ELO_BANDS.map(b=>bandRow(b, b===band)).join('');
+
+  srcEl.innerHTML =
+    `OOS Sharpe <b style="color:var(--text)">${sharpe.toFixed(4)}</b> `+
+    `→ ${band.lo}-${band.hi} band (table-derived)<br>`+
+    `source: data/proof/v015_manifest.json · frozen ${m.frozen_at||'—'}`;
+}
+function bandRow(b, active){
+  return `<div class="elo-lrow${active?' active':''}">
+    <div>
+      <div class="elo-lname" style="color:${active?b.clr:'var(--text)'}">${b.label}</div>
+      <div class="elo-lelo">Elo ${b.lo}-${b.hi}</div>
+    </div>
+    <div class="elo-lsharpe">Sharpe ${b.sLo}${b.sHi>=2.5?'+':'–'+b.sHi}</div>
+  </div>`;
+}
+
+/* ── Row 5b: Self-play training status ───────────────────────
+   Reads training_gate_status.json + logs/training_log.jsonl (last line) + the
+   regime/account files already fetched elsewhere. Runs INSIDE refreshAll(). */
+async function updateTraining(){
+  const gate = await fj('data/agent/training_gate_status.json');
+  const logLines = await fjl('logs/training_log.jsonl');
+  const last = logLines && logLines.length ? logLines[logLines.length-1] : null;
+  const prop = await fj('data/agent/prop_account_balance.json');
+  const carry = await fj('data/agent/carry_paper_account.json');
+  const reg = await fj('data/agent/system_regime_state.json');
+
+  // ── Which systems are live today + drawdown lock ──
+  const sysRows = [];
+  const ddLock = (a) => {
+    if(a && a.drawdown_used!=null && a.max_dd!=null)
+      return a.drawdown_used >= a.max_dd
+        ? '<span class="cr">LOCKED</span>' : '<span class="cg">OK</span>';
+    return '<span class="cd">n/a</span>';   // no dd fields → don't fabricate
+  };
+  if(prop){
+    sysRows.push(`<div class="sp-sysrow">
+      <span class="sp-sysnm">Undertow</span>
+      <span class="sp-sysreason">${prop.status||'—'} · ${fmtUSD(prop.total_pnl,true)} P&amp;L</span>
+      <span>DD ${ddLock(prop)}</span></div>`);
+  }
+  if(carry){
+    const cv = reg?.strategies?.carry?.verdict ?? '—';
+    sysRows.push(`<div class="sp-sysrow">
+      <span class="sp-sysnm">Carry</span>
+      <span class="sp-sysreason">${carry.status||'—'} · regime ${cv}</span>
+      <span>DD ${ddLock(carry)}</span></div>`);
+  }
+  if(reg?.strategies){
+    for(const [nm,s] of Object.entries(reg.strategies)){
+      if(nm==='carry') continue;                       // already shown above
+      const vc = s.verdict==='GO'?'cg':s.verdict==='STAND_ASIDE'?'cr':'cy';
+      sysRows.push(`<div class="sp-sysrow">
+        <span class="sp-sysnm">${nm.replace('_','/').toUpperCase()}</span>
+        <span class="sp-sysreason">${s.reason||'—'}</span>
+        <span class="${vc}">${s.verdict||'—'}</span></div>`);
+    }
+  }
+  document.getElementById('sp-syslist').innerHTML =
+    sysRows.join('') || '<span class="nd">No system state on disk</span>';
+
+  // ── Ignition gate ──
+  const gateBody = document.getElementById('sp-gate-body');
+  if(!gate){
+    gateBody.innerHTML='<span class="nd">training_gate_status.json not found — run scripts/write_training_gate_status.py</span>';
+    setBadge('sp-badge','NO DATA','b-dim');
+  } else {
+    const open = gate.open===true;
+    setBadge('sp-badge', open?'GATE OPEN':'GATE CLOSED', open?'b-green':'b-red');
+    const checks = Object.entries(gate.checks||{}).map(([k,v])=>
+      `<div class="sp-kv"><span class="k">${k}</span><span class="v ${v?'cg':'cr'}">${v?'PASS':'FAIL'}</span></div>`
+    ).join('');
+    const reasons = (gate.reasons||[]).map(r=>
+      `<div class="sp-reason"><div class="rdot"></div><div>${r}</div></div>`).join('');
+    gateBody.innerHTML =
+      `<div class="sp-kv"><span class="k">Status</span>`+
+      `<span class="v ${open?'cg':'cr'}">${open?'OPEN':'CLOSED'}</span></div>`+
+      `<div class="sp-kv"><span class="k">Mode</span><span class="v cy">${gate.mode||'—'}</span></div>`+
+      checks +
+      (reasons?`<div class="sp-reasons">${reasons}</div>`:'');
+  }
+
+  // ── Latest training cycle ──
+  const cycleBody = document.getElementById('sp-cycle-body');
+  if(!last){
+    cycleBody.innerHTML='<span class="nd">No training cycles logged</span>';
+  } else {
+    const dry = /DRY|SCAFFOLD/i.test(last.mode||'') || last.rollout_dry===true;
+    const pc  = last.placebo_control || {};
+    const placeboPass = pc.significant===true;
+    const dir = last.director || {};
+    const pb = dir.params_before || {}, pa = dir.params_after || {};
+    const changed = Object.keys(pa).some(k=>pa[k]!==pb[k]);
+    const paramLine = Object.keys(pb).length
+      ? Object.keys(pb).map(k=>`${k}: ${pb[k]}${pb[k]!==pa[k]?' → '+pa[k]:''}`).join('<br>')
+      : '—';
+    cycleBody.innerHTML =
+      `<div class="sp-kv"><span class="k">When</span><span class="v">${fmtDT(last.timestamp)}</span></div>`+
+      `<div class="sp-kv"><span class="k">Mode</span>`+
+        `<span class="v ${dry?'cy':'cg'}">${dry?'DRY / SCAFFOLD':'LIVE'}</span></div>`+
+      `<div class="sp-kv"><span class="k">Verdict</span>`+
+        `<span class="v ${last.committed?'cg':'cd'}">${last.verdict||'—'}</span></div>`+
+      `<div class="sp-kv"><span class="k">Placebo control</span>`+
+        `<span class="v ${placeboPass?'cg':'cr'}">${placeboPass?'PASS':'FAIL'}`+
+        `${pc.margin!=null?` (Δ ${pc.margin.toFixed(3)})`:''}</span></div>`+
+      `<div class="sp-kv"><span class="k">Director</span>`+
+        `<span class="v" style="max-width:170px">${dir.recommendation||'—'}</span></div>`+
+      `<div class="sp-kv"><span class="k">Committed</span>`+
+        `<span class="v ${last.committed?'cg':'cd'}">${last.committed?'YES':'NO'}</span></div>`+
+      `<div class="sp-lbl" style="margin-top:9px">Params (before → after)</div>`+
+      `<div style="font-size:10px;color:${changed?'var(--text)':'var(--text-dim)'};line-height:1.6">${paramLine}</div>`;
+  }
+}
+
 async function refreshAll() {
   const dot=document.getElementById('pdot');
   dot.classList.add('spin');
@@ -1002,6 +1286,7 @@ async function refreshAll() {
     updateFills(fills),
     updateResearch(),
     updateGate(),
+    updateTraining(),
   ]);
 
   drawEquity(fills);
@@ -1014,6 +1299,10 @@ async function refreshAll() {
 
 refreshAll();
 setInterval(refreshAll,REFRESH_MS);
+
+/* Elo estimate reads a static research manifest — fetch ONCE at load, never on
+   the 60s timer. It only changes when a human re-runs a Sharpe measurement. */
+updateElo();
 </script>
 </body>
 </html>
