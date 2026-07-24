@@ -2260,3 +2260,32 @@ GREEN; append-only; explicit git add.
   `ollama pull qwen2.5`; `python3 -m pip install ollama --break-system-packages`; confirm `ollama list`.
 - NOTE for scheduled/launchd runs: ensure `ollama serve` is running (a login agent or `brew services
   start ollama`), else Tier 1 silently falls through to Tier 2/3 (by design, but you lose the free path).
+
+## 2026-07-24 — HYP-071 revival flag: killed hypothesis re-entering via recompute (GOVERNANCE, append-only)
+No logic changed, nothing recomputed. Documenting a gap before it leaks further.
+
+- **METRIC_ARTIFACT verdict STANDS.** `data/agent/hypothesis_ledger.json` HYP-071, sealed 2026-06-30
+  (commit `3682f75`): EXIT_NOW dominance is a forecast-variance artifact (a locked value has zero
+  forecast variance, HOLD does) — the flaw is in the λ-penalized VALUE FUNCTION itself, not the costs.
+  `reopen_condition` requires a *new prereg* with symmetric forecast variance or a pure E[R] comparison
+  without the λ·downside penalty. Nothing since 2026-06-30 satisfies that.
+- **Commit `2be5726` (2026-07-23) reran the killed table** ("Activate briefing synthesizer + compute
+  HYP-071 exit value table") and reported "PROVISIONAL PASS — 10 CPCV-stable sensible EXIT_NOW
+  divergences, 9 forward-consistent," contradicting the prereg NOT_SIGNIFICANT expectation — **without
+  a fresh pre-registration**. A rerun of the same metric on the same locked prereg cannot flip a
+  METRIC_ARTIFACT verdict; the artifact is structural (the metric), so a net-return recompute doesn't
+  fix it either. This is the same side-door pattern CLAUDE.md already flags for HYP-044 (rejected
+  gate re-proposed three times via rerun instead of fresh adjudication).
+- **Downstream exposure**: `sovereign/training/gate.py` (built same day in `68a7fcb`, "self-play
+  training board — ignition GATED CLOSED") names `hyp_071_net_confirmed` as one of three ignition
+  conditions (`tick_024 and hyp_071 and board_net`) for the self-play policy trainer. The gate
+  currently reads `False` and holds CLOSED correctly — but it treats "HYP-071 net recompute CONFIRMED"
+  as achievable via rerun, which would let a METRIC_ARTIFACT-verdicted table become a training reward
+  signal the moment someone flips that config flag on a recompute alone.
+- **Standing position**: HYP-071 must NOT be used as the self-play reward signal, and
+  `hyp_071_net_confirmed` must NOT be set to `true`, until HYP-071 is re-adjudicated via a **NEW**
+  pre-registration treating it as a new hypothesis (per its own `reopen_condition`) — not via any
+  further recompute of the existing locked prereg.
+- Corresponding append-only ledger entry: `data/agent/hypothesis_ledger.json` (new record,
+  `id: HYP-071-GOVFLAG`, `status: governance_flag`, dated 2026-07-24). Existing HYP-071 record
+  untouched.

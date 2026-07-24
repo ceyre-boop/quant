@@ -2168,5 +2168,25 @@
     "date_tested": "2026-07-19",
     "result": "single-core(90bar)=24,885/s \u00b7 12-core ceiling=122,186/s \u00b7 best bar-evals=17,228,945/s \u00b7 legacy claim 148,193 (NOT beaten; numba INACTIVE on py3.14.4 \u2192 pure-Python fallback)",
     "methodology_note": "arm, 12 physical cores, numba INACTIVE on py3.14.4 \u2192 pure-Python fallback. Time-boxed. FastBacktestEngine vs pure-Python forex kernel across 90bar/daily/5min/1min, single vs all-cores. See backtest_benchmark JSON."
+  },
+  {
+    "id": "HYP-071-GOVFLAG",
+    "name": "Governance flag: HYP-071 unprereg'd recompute (2be5726) does not revive METRIC_ARTIFACT verdict",
+    "status": "governance_flag",
+    "date": "2026-07-24",
+    "source": "manual",
+    "references": {
+      "original_verdict_id": "HYP-071",
+      "original_verdict_commit": "3682f75",
+      "original_verdict_status": "METRIC_ARTIFACT",
+      "flagged_commit": "2be5726",
+      "downstream_gate_commit": "68a7fcb",
+      "downstream_gate_file": "sovereign/training/gate.py",
+      "downstream_gate_key": "hyp_071_net_confirmed"
+    },
+    "finding": "Commit 2be5726 (2026-07-23) reran the HYP-071 exit value table computation and reported 'PROVISIONAL PASS' (10 CPCV-stable sensible EXIT_NOW divergences, 9 forward-consistent), contradicting the prereg NOT_SIGNIFICANT expectation, without a fresh pre-registration. The 2026-06-30 METRIC_ARTIFACT verdict (this ledger, id=HYP-071) identified the flaw as structural to the value metric itself (EXIT_NOW dominance is a forecast-variance artifact, not an edge) -- a rerun on the same locked prereg, or any net-return recompute, does not address that flaw and cannot satisfy HYP-071's own reopen_condition, which requires a NEW pre-registration with symmetric forecast variance or a pure E[R] comparison without the lambda*downside penalty.",
+    "risk": "sovereign/training/gate.py (commit 68a7fcb, same day) gates self-play policy-trainer ignition on hyp_071_net_confirmed among other conditions. Gate currently reads False and correctly holds CLOSED, but nothing structurally prevents a future recompute-only pass from flipping that flag to true, which would let a METRIC_ARTIFACT-verdicted table become a training reward signal.",
+    "action": "HYP-071 must not be used as the self-play reward signal and hyp_071_net_confirmed must not be set true until HYP-071 is re-adjudicated via a NEW pre-registration treating it as a new hypothesis, per its own reopen_condition. Original HYP-071 METRIC_ARTIFACT verdict stands unmodified.",
+    "auto_generated": false
   }
 ]
