@@ -31,6 +31,7 @@ from sovereign.training import gate as gate_mod            # noqa: E402
 from sovereign.training import policy_rollout              # noqa: E402
 from sovereign.training import policy_updater              # noqa: E402
 from sovereign.training import director as director_mod    # noqa: E402
+from sovereign.training import snapshots as snapshots_mod  # noqa: E402
 from sovereign.training.value_scorer import ValueScorer, GrossReturnError  # noqa: E402
 
 CONFIG = ROOT / "config" / "training.yml"
@@ -129,13 +130,15 @@ def run(watch: bool = False) -> dict:
     # ── PHASE 5: Checkpoint ───────────────────────────────────────────────────
     _stamp(watch, "PHASE 5: Writing checkpoint + training_log entry...")
     entry = _write_checkpoint_and_log(cfg, status, rollout, update, report,
-                                       scoring_skipped, committed, started)
+                                       scoring_skipped, committed, started,
+                                       baseline, proposed)
     _stamp(watch, f"PHASE 5: Done. verdict={entry['verdict']} mode={entry['mode']}")
     return entry
 
 
 def _write_checkpoint_and_log(cfg, status, rollout, update, report,
-                              scoring_skipped, committed, started) -> dict:
+                              scoring_skipped, committed, started,
+                              baseline, proposed) -> dict:
     ckpt_dir = ROOT / cfg.get("paths", {}).get("checkpoint_dir", "data/training")
     log_path = ROOT / cfg.get("paths", {}).get("training_log", "logs/training_log.jsonl")
     ckpt_dir.mkdir(parents=True, exist_ok=True)
@@ -191,6 +194,17 @@ def _write_checkpoint_and_log(cfg, status, rollout, update, report,
     # Append-only training log.
     with log_path.open("a") as fh:
         fh.write(json.dumps(entry) + "\n")
+
+    # Snapshot the policy-param state for undo/restore (data/training/snapshots/,
+    # see sovereign/training/snapshots.py). While the gate is closed baseline ==
+    # proposed by construction, so this records a legitimate no-op state.
+    snapshots_mod.record_cycle(
+        params_before=baseline,
+        params_after=proposed,
+        cycle_ref=ckpt_path.name,
+        committed=committed,
+        timestamp=ts,
+    )
     return entry
 
 

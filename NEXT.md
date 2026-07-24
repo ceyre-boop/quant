@@ -2424,3 +2424,61 @@ defined the metric (commit `4a9b9b8`):
   `sovereign.briefing.scorecard.report()` output exactly.
 - No execution-path file touched; `scorecard.py`/`briefing_context.py` logic unmodified.
 - Pushed to `sovereign-v2` (`4a9b9b8`).
+
+---
+
+## 2026-07-24 (session cont'd 3) — Self-play training interactive controls
+
+Built the localhost control server + undo/restore mechanism + dashboard buttons Colin asked
+for on top of the shipped Elo bar / training-status panel (`4a9b9b8`/`6ceb869`):
+
+- **`scripts/training_control_server.py`** (new): stdlib `http.server`, binds `127.0.0.1:8787`
+  only. Fixed allowlist of exactly 4 mutating routes (`POST /api/start_watch`, `/api/kill`,
+  `/api/undo_last_cycle`, `/api/restore_last_cycle`) + 1 read-only `GET /api/status`. No shell
+  passthrough, no query-param-to-command path — `TRAIN_CMD` is a hard-coded argv list
+  (`shell=False`). `start_watch` refuses a second concurrent run (409); `kill` is idempotent.
+  Serves no repo files (no static handler); `/api/status` embeds a tail of the run's own stdout
+  log as JSON. Source-level test asserts the module never references `training.yml`/`gate.py`/
+  `evaluate_gate` outside its own docstring — it structurally cannot open the ignition gate.
+- **`sovereign/training/snapshots.py`** (new): append-only undo/redo stack under
+  `data/training/snapshots/` (gitignored). `record_cycle()` called from `sovereign_train.py`
+  after every Phase 5 checkpoint write (dry or committed). `undo_last_cycle`/`restore_last_cycle`
+  only ever move between states the gated pipeline itself already produced — while the ignition
+  gate is closed, `params_before == params_after` by construction, so undo/restore cannot
+  activate a real policy change today. New cycle clears the redo stack (standard undo/redo rule).
+- **`scripts/sovereign_train.py`**: one additive hook — imports `snapshots` and calls
+  `record_cycle()` at the end of `_write_checkpoint_and_log`. No other line changed; gate.py
+  untouched.
+- **`dashboard/index.html`**: new "Training Controls" block under the Self-Play Training panel
+  — 4 buttons (Run --watch / Kill / Undo last cycle / Restore), each with a `confirm()` dialog,
+  calling the control server via `fetch('http://127.0.0.1:8787/...')`. Polls `/api/status` every
+  5s, disables buttons appropriately (Start disabled while running, Kill disabled while idle,
+  Undo/Restore disabled when their stacks are empty), shows the last ~40 log lines while a run
+  is active. Explicitly labeled: runs the DRY scaffold only, ignition gate gates any real commit.
+  If the control server is unreachable, shows a banner explaining the standalone
+  `dashboard_live.html` (file://) can't reach a server and stays read-only — regenerated via
+  `scripts/build_standalone_dashboard.py` (no new allowlist entries needed; the control server
+  is a separate origin, not a staged JSON file).
+- **Tests**: `tests/test_training_control_server.py`, 12 cases — unknown-action rejection
+  (404), double-start refusal (409), idempotent kill, undo/restore round-trip + redo-stack-clear,
+  undo/restore can never produce a `committed=True` state while gate closed, loopback bind,
+  and the source-level gate-immunity check. All green, plus the isolation test
+  (`test_pipeline_does_not_import_sovereign`) and the existing 21 gate tests still pass.
+- **Browser-verified** (Browser pane screenshot renderer was stuck this session — verified via
+  `javascript_tool` executing the real `ctlAction()`/`pollCtlStatus()` functions in-page instead):
+  served dashboard fetched `/api/status` cross-origin successfully; clicked-equivalent calls to
+  undo, restore, start_watch, and kill all round-tripped through the real button code path with
+  correct button enable/disable state and status messages.
+- No execution-path file touched (forex_exit_manager/decide_exit/exit_machine/harness/
+  carry_engine/ict.pipeline untouched); `gate.py` logic unmodified; no live trades; ignition
+  flags in `config/training.yml` untouched.
+- Explicit `git add` (repo has large unrelated dirty state from data-file churn — never `-A`):
+  `scripts/training_control_server.py`, `sovereign/training/snapshots.py`,
+  `scripts/sovereign_train.py`, `dashboard/index.html`, `tests/test_training_control_server.py`.
+
+**To run locally on the Mac:**
+```bash
+python3 scripts/training_control_server.py       # binds 127.0.0.1:8787
+scripts/serve_dashboard.sh                        # binds 127.0.0.1:8080, separate terminal
+# open http://127.0.0.1:8080/dashboard/
+```

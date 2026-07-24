@@ -285,6 +285,13 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:14
 .sp-sysrow{display:grid;grid-template-columns:82px 1fr auto;gap:8px;align-items:center;
   padding:6px 8px;background:var(--bg);border:1px solid var(--border);font-size:11px}
 .sp-sysnm{font-weight:700;color:var(--text-hi)}
+.sp-ctl-row{display:flex;gap:8px;flex-wrap:wrap}
+.sp-btn{font:inherit;font-size:11px;font-weight:600;padding:6px 12px;border-radius:4px;
+  border:1px solid var(--border);background:var(--bg);color:var(--text-hi);cursor:pointer}
+.sp-btn:hover:not(:disabled){border-color:var(--text-dim)}
+.sp-btn:disabled{opacity:.4;cursor:not-allowed}
+.sp-btn-danger{border-color:var(--red);color:var(--red)}
+.sp-btn-danger:hover:not(:disabled){background:var(--red);color:#fff}
 .sp-sysreason{font-size:9px;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 </style>
 </head>
@@ -595,6 +602,23 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:14
         <div class="sp-lbl">AlphaZero confidence · today's call</div>
         <div id="sp-prob"><span class="nd">Loading…</span></div>
         <div class="sp-scorecard" id="sp-prob-caveat"></div>
+      </div>
+
+      <div class="sp-block" style="margin-top:12px">
+        <div class="sp-lbl">Training Controls <span style="font-weight:400;color:var(--text-dim)">— runs the DRY scaffold only; ignition gate is CLOSED, no real cycle can commit</span></div>
+        <div id="sp-ctl-unavailable" class="nd" style="display:none;margin-bottom:8px">
+          Control server unreachable — interactive buttons require the served dashboard
+          (<code>scripts/serve_dashboard.sh</code> + <code>python3 scripts/training_control_server.py</code>).
+          The standalone <code>dashboard_live.html</code> is read-only and cannot reach a server.
+        </div>
+        <div class="sp-ctl-row" id="sp-ctl-row">
+          <button class="sp-btn" id="sp-btn-start" onclick="ctlAction('start_watch','Start sovereign_train.py --watch (DRY scaffold — ignition gate closed, no real cycle will commit)?')">Run --watch</button>
+          <button class="sp-btn sp-btn-danger" id="sp-btn-kill" onclick="ctlAction('kill','Kill the active training run?')">Kill</button>
+          <button class="sp-btn" id="sp-btn-undo" onclick="ctlAction('undo_last_cycle','Undo the last training cycle (restore prior policy-param snapshot)?')">Undo last cycle</button>
+          <button class="sp-btn" id="sp-btn-restore" onclick="ctlAction('restore_last_cycle','Restore the most recently undone cycle?')">Restore</button>
+        </div>
+        <div id="sp-ctl-status" style="margin-top:8px"></div>
+        <pre id="sp-ctl-log" style="display:none;max-height:160px;overflow:auto;font-size:10px;line-height:1.5;background:var(--bg-alt,#0d1117);padding:8px;border-radius:4px;margin-top:8px;white-space:pre-wrap"></pre>
       </div>
     </div>
 
@@ -1304,6 +1328,74 @@ async function updateTraining(){
   }
 }
 
+/* ── Training control server (127.0.0.1:8787 only) ──────────────────
+   Fixed allowlist of 4 actions, see scripts/training_control_server.py.
+   Standalone dashboard_live.html has no server behind it, so every call
+   here fails silently into the "unavailable" banner — that's expected. */
+const CTL_BASE = 'http://127.0.0.1:8787';
+let ctlPolling = false;
+
+async function ctlFetch(path, opts){
+  const r = await fetch(CTL_BASE+path, {...opts, signal: AbortSignal.timeout(4000)});
+  const body = await r.json().catch(()=>({}));
+  return {ok:r.ok, status:r.status, body};
+}
+
+async function ctlAction(action, confirmMsg){
+  if(!confirm(confirmMsg)) return;
+  const btns = document.querySelectorAll('.sp-btn');
+  btns.forEach(b=>b.disabled=true);
+  try{
+    const {ok, body} = await ctlFetch('/api/'+action, {method:'POST'});
+    document.getElementById('sp-ctl-status').innerHTML =
+      `<span class="${ok && body.ok ? 'cg' : 'cr'}">${body.message || (ok?'done':'failed')}</span>`;
+  } catch(e){
+    document.getElementById('sp-ctl-status').innerHTML = `<span class="cr">request failed: ${e}</span>`;
+  } finally {
+    btns.forEach(b=>b.disabled=false);
+    pollCtlStatus();
+  }
+}
+
+async function pollCtlStatus(){
+  const unavail = document.getElementById('sp-ctl-unavailable');
+  const row = document.getElementById('sp-ctl-row');
+  const logEl = document.getElementById('sp-ctl-log');
+  try{
+    const {ok, body} = await ctlFetch('/api/status', {method:'GET'});
+    if(!ok) throw new Error('bad status');
+    unavail.style.display = 'none';
+    row.style.opacity = 1;
+    const run = body.run || {};
+    const running = run.running === true;
+    document.getElementById('sp-btn-start').disabled = running;
+    document.getElementById('sp-btn-kill').disabled = !running;
+    const snaps = body.snapshots || {};
+    document.getElementById('sp-btn-undo').disabled = !(snaps.applied_count > 0);
+    document.getElementById('sp-btn-restore').disabled = !(snaps.undone_count > 0);
+
+    if(running || (run.log_tail && run.log_tail.length)){
+      logEl.style.display = 'block';
+      logEl.textContent = (run.log_tail||[]).join('\n');
+      logEl.scrollTop = logEl.scrollHeight;
+    } else {
+      logEl.style.display = 'none';
+    }
+  } catch(e){
+    unavail.style.display = 'block';
+    row.style.opacity = .4;
+    ['sp-btn-start','sp-btn-kill','sp-btn-undo','sp-btn-restore'].forEach(id=>
+      document.getElementById(id).disabled = true);
+  }
+}
+
+function startCtlPolling(){
+  if(ctlPolling) return;
+  ctlPolling = true;
+  pollCtlStatus();
+  setInterval(pollCtlStatus, 5000);
+}
+
 async function refreshAll() {
   const dot=document.getElementById('pdot');
   dot.classList.add('spin');
@@ -1332,6 +1424,7 @@ async function refreshAll() {
 
 refreshAll();
 setInterval(refreshAll,REFRESH_MS);
+startCtlPolling();
 
 /* Elo estimate reads a static research manifest — fetch ONCE at load, never on
    the 60s timer. It only changes when a human re-runs a Sharpe measurement. */
