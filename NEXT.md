@@ -2520,3 +2520,60 @@ python3 scripts/training_control_server.py       # binds 127.0.0.1:8787
 scripts/serve_dashboard.sh                        # binds 127.0.0.1:8080, separate terminal
 # open http://127.0.0.1:8080/dashboard/
 ```
+
+---
+
+## 2026-07-24 (session cont'd 4) — Diagnosed harvester "stopped" report: code already fixed, automation never installed
+
+Ticket premise ("harvester stopped writing after 2026-06-29") was stale — the fork/network
+deadlock root cause was already diagnosed and fixed last session (`28640b5`, 2026-07-23,
+"Revive DIP harvest→train pipeline"). Re-verified rather than re-diagnosing from scratch:
+
+- **`data/harvest.db` is alive**, not frozen: `harvest_progress` table shows
+  `last_pass_ts=2026-07-23 17:19:04` (the E2E verification run from `28640b5`), 195,688 trades.
+  Re-ran `python3 scripts/continuous_harvester.py --passes 1 --symbols AAPL` live in this
+  session — completed in ~17s (parquet cache warm, no fresh network fetch needed), exit 0,
+  wrote a new pass to `harvest_progress` (`last_pass_ts=2026-07-25 01:29:25`). **Not a sandbox
+  artifact** — this ran and wrote real DB rows in-session; the yfinance-403 sandbox limitation
+  didn't even trigger here because AAPL's parquet cache was already warm from the prior run.
+  (Read the DB with `duckdb.connect(..., read_only=True)` — it's DuckDB, not SQLite; an initial
+  sqlite3 probe misreported "file is not a database" / "OpenPGP Secret Key", which was just the
+  wrong client library, not corruption.)
+- **The actual remaining gap: no launchd automation was ever installed.** `28640b5` shipped
+  `scripts/com.alta.dip_daily.plist` "tracked-not-loaded; operator promotes" and it's still sitting
+  unloaded — confirmed via `launchctl list | grep alta` (no `com.alta.dip_daily` entry) and
+  `~/Library/LaunchAgents/` (no copy there at all). So the harvester works whenever run by hand,
+  but nothing keeps it alive day to day — that's the "stays alive on Colin's Mac" gap this ticket
+  was actually about.
+- **Fixed `scripts/com.alta.dip_daily.plist`**: added `RunAtLoad` (so a missed 02:30 fire while
+  the Mac was asleep/off gets caught on next login, matching the pattern other `com.alta.*.plist`
+  files use) and `HOME`/`PYTHONPATH` env vars (matching `com.alta.morning_agent.plist`'s pattern —
+  `dip_daily.sh` itself doesn't strictly need `PYTHONPATH` since it `cd`s to repo root, but the
+  child `continuous_harvester.py`/`retrain_loop.py` processes benefit from the same defensive env
+  every other job sets). Paths, interpreter (`/opt/homebrew/bin/python3` via `dip_daily.sh`'s
+  `PYTHON` default), and log paths (`logs/dip_daily.{log,err}`) were already correct — verified
+  with `plutil -lint` (OK).
+- Isolation test green: `test_pipeline_does_not_import_sovereign` passes (1 passed, 1 skipped).
+- No execution-path file touched; no live launchctl action taken from this session (installing
+  a job that will fire in the future is a standing-automation change — left for Colin to run by
+  hand per the ticket).
+- Explicit `git add` (repo has large unrelated dirty state from data-file churn — never `-A`):
+  `scripts/com.alta.dip_daily.plist`, `NEXT.md`.
+
+**Mac-side commands for Colin:**
+```bash
+# One-off backfill (safe to run any time, ~17s-few min depending on how stale cache is):
+cd ~/quant && python3 scripts/dip_daily.sh
+# or just the harvest half:
+python3 scripts/continuous_harvester.py --passes 1
+
+# Install the keeper (fires 02:30 daily + RunAtLoad catches missed runs on wake/login):
+cp scripts/com.alta.dip_daily.plist ~/Library/LaunchAgents/
+launchctl load ~/Library/LaunchAgents/com.alta.dip_daily.plist
+python3 scripts/plist_watchdog.py --rebaseline "loaded dip_daily"   # records the job-surface change
+
+# Verify it's loaded:
+launchctl list | grep com.alta.dip_daily
+```
+No new credentials/config needed — the harvester only needs network access to Yahoo Finance
+(yfinance), which the Mac already has; nothing else to provision.

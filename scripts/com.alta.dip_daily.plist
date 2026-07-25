@@ -1,11 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  DIP harvest→train daily orchestrator (revived 2026-07-23, commit 28640b5;
+  automation installed 2026-07-24 — see NEXT.md).
+
+  Runs continuous_harvester.py --passes 1 then retrain_loop.py --once.
+  RunAtLoad catches a missed 02:30 fire after the Mac was asleep/off; the
+  StartCalendarInterval keeps the daily cadence once it's awake.
+
+  INSTALL (operator hand):
+    cp scripts/com.alta.dip_daily.plist ~/Library/LaunchAgents/
+    launchctl load ~/Library/LaunchAgents/com.alta.dip_daily.plist
+    python3 scripts/plist_watchdog.py --rebaseline "loaded dip_daily"
+-->
 <plist version="1.0">
 <dict>
 	<key>EnvironmentVariables</key>
 	<dict>
 		<key>PATH</key>
-		<string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+		<string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+		<key>PYTHONPATH</key>
+		<string>/Users/taboost/quant</string>
+		<key>HOME</key>
+		<string>/Users/taboost</string>
 	</dict>
 	<key>Label</key>
 	<string>com.alta.dip_daily</string>
@@ -16,6 +33,8 @@
 		<string>/bin/bash</string>
 		<string>/Users/taboost/quant/scripts/dip_daily.sh</string>
 	</array>
+	<key>RunAtLoad</key>
+	<true/>
 	<key>StandardErrorPath</key>
 	<string>/Users/taboost/quant/logs/dip_daily.err</string>
 	<key>StandardOutPath</key>
