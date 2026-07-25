@@ -755,3 +755,23 @@ architecture — see spec §Failure Modes and plan §Open Decision.
 - [x] Bridge imports NOTHING from the frozen execution path (AST isolation test)
 - [x] Live-terminal validation steps documented for Colin's Mac; no fabricated fill in-sandbox
 - [x] Push at least once; NEXT.md updated with what shipped + exact operator steps
+
+## TICK-057 — Wire training/retrain_loop.py through the training gate
+**Filed:** 2026-07-25 · **Priority:** HIGH (blocks re-enabling com.alta.dip_daily)
+**Problem:** dip_daily → retrain_loop.py --once auto-updates models/xgb_veto.json +
+models/current_threshold.json, consumed live by sovereign/orchestrator.py HarvestVeto
+("auto-reloads as retrain loop improves it"). NO CONFIRMED-ledger gate, no prereg, no
+placebo — violates RISK_CONSTITUTION Art. 6 pattern enforced everywhere else (research
+factory, sovereign/training/gate.py). Plist unloaded 2026-07-25 by operator; watchdog
+baseline (54 loaded) now stale by one.
+**Acceptance:** retrain_loop refuses to overwrite the live model/threshold unless the
+governing hypothesis has a CONFIRMED ledger entry (same refusal pattern as
+sovereign/training/gate.py); dip_daily can then be re-loaded; watchdog rebaselined.
+
+## TICK-058 — Petrules scanner: IWM holdings CSV header-row parse broken
+**Filed:** 2026-07-25 · **Priority:** MEDIUM
+**Problem:** com.alta.petrules_gate first pass failed loudly (correct behavior):
+"IWM holdings CSV — could not locate Ticker header row" → error JSON at
+data/agent/petrules_gate_scan.json. iShares changed the CSV preamble format.
+**Acceptance:** universe loader tolerates preamble drift (scan for the header row by
+content, not fixed offset); scanner completes a pass; error JSON cleared.
