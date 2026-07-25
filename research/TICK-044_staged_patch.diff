@@ -1,0 +1,67 @@
+--- a/execution/harness.py
++++ b/execution/harness.py
+@@ -55,7 +55,7 @@
+ import pandas as pd
+ 
+ from backtester.realistic_fills import realistic_long_return
+-from execution import alpaca, borrow, halts, quotes, risk, scan, signals as signals_mod
++from execution import alpaca, borrow, daily_pnl_store, halts, quotes, risk, scan, signals as signals_mod
+ from execution.config import frozen, verify_frozen_hash, FROZEN_HASH
+ from sovereign.autonomous._common import append_jsonl, make_logger
+ from sovereign.utils import kill_switch
+@@ -110,6 +110,11 @@
+     risk_allowed: bool | None = None
+     risk_breached: list[str] = field(default_factory=list)
+     risk_size_mult: float | None = None
++    # TICK-044: the fraction of session-start equity this fill actually put at
++    # risk (risk.RiskDecision.detail["effective_risk"]). Persisted so a later
++    # session-start can turn net_return back into a daily_pnl_frac contribution
++    # without re-deriving position sizing from scratch.
++    effective_risk_frac: float | None = None
+     wide_quote: bool = False
+     luld_band_used: float | None = None
+     scenario: str = "base"
+@@ -144,9 +149,20 @@
+     rec.risk_allowed = d.allowed
+     rec.risk_breached = list(d.breached)
+     rec.risk_size_mult = d.size_mult
++    rec.effective_risk_frac = d.detail.get("effective_risk")
+     if not d.allowed:
+         rec.signal_type = "SKIP_RISK"
+         rec.reason = d.reason
++    # TICK-044: close the daily-halt gap. Without this, `state.daily_pnl_frac`
++    # never moves off 0.0 even across fills within the SAME run, so
++    # DAILY_LOSS_HALT can only ever see the flat value it started with.
++    # Applies to realized (priced) fills only — a fill blocked by risk has
++    # net_return from price_leg but no capital was actually put at risk.
++    if d.allowed and rec.net_return is not None and rec.effective_risk_frac is not None:
++        contribution = rec.net_return * rec.effective_risk_frac
++        state.daily_pnl_frac += contribution
++        state.consecutive_losses = (state.consecutive_losses + 1
++                                     if contribution < 0 else 0)
+     return rec
+ 
+ 
+@@ -395,10 +411,18 @@
+     sig_index = _signal_index(day, signals_dir)
+     if signals_dir is not None:
+         _log(f"{day}: Layer 3 signal file supplies {len(sig_index)} GO signal(s)")
+-    # Flat account state unless supplied. With no live equity feed the honest
+-    # default is zero drawdown, which means the Art. 3 ladder cannot fire — that
+-    # is recorded per fill via risk_action so it is visible, not assumed.
+-    acct = account or risk.AccountState(equity=100_000.0, peak_equity=100_000.0)
++    # TICK-044: seed daily_pnl_frac / consecutive_losses from fills this process
++    # already wrote today (covers a mid-session restart, and a re-run of the
++    # same day) instead of always starting flat. Equity/drawdown are still
++    # flat absent a live equity feed — that gap is unchanged and still
++    # recorded per fill via risk_action, so it stays visible, not assumed.
++    if account is None:
++        _seed = daily_pnl_store.reconstruct_daily_state(day, out_dir)
++        acct = risk.AccountState(equity=100_000.0, peak_equity=100_000.0,
++                                 daily_pnl_frac=_seed.daily_pnl_frac,
++                                 consecutive_losses=_seed.consecutive_losses)
++    else:
++        acct = account
+ 
+     symbols = None
+     if replay:

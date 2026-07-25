@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  DIP Phase 1 — warm-up (built 2026-07-25, DISPATCH_DAILY_INTELLIGENCE_PIPELINE reconciliation).
+
+  Fires scripts/daily_intelligence_pipeline.py --phase 1 at 06:00 ET (10:00 UTC during EDT /
+  11:00 UTC during EST — StartCalendarInterval is wall-clock local time, so this fires at 06:00
+  in whatever zone the Mac is set to; verify TZ if the box is not America/New_York).
+  Lightweight: fetches the 5 briefing collectors, writes data/agent/dip_phase1.json. No inference.
+
+  RunAtLoad catches a missed fire after the Mac was asleep/off; StartCalendarInterval keeps the
+  daily cadence once awake. daily_intelligence_pipeline.py's own idempotency check (checkpoint
+  already dated today) makes a duplicate same-day fire a clean no-op.
+
+  INSTALL (operator hand — Colin, not Claude Code):
+    cp scripts/com.alta.dip_warmup.plist ~/Library/LaunchAgents/
+    launchctl load ~/Library/LaunchAgents/com.alta.dip_warmup.plist
+    python3 scripts/plist_watchdog.py --rebaseline "loaded dip_warmup"
+-->
+<plist version="1.0">
+<dict>
+	<key>EnvironmentVariables</key>
+	<dict>
+		<key>PATH</key>
+		<string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+		<key>PYTHONPATH</key>
+		<string>/Users/taboost/quant</string>
+		<key>HOME</key>
+		<string>/Users/taboost</string>
+	</dict>
+	<key>Label</key>
+	<string>com.alta.dip_warmup</string>
+	<key>Nice</key>
+	<integer>10</integer>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/opt/homebrew/bin/python3</string>
+		<string>/Users/taboost/quant/scripts/daily_intelligence_pipeline.py</string>
+		<string>--phase</string>
+		<string>1</string>
+	</array>
+	<key>RunAtLoad</key>
+	<true/>
+	<key>StandardErrorPath</key>
+	<string>/Users/taboost/quant/logs/dip_warmup.err</string>
+	<key>StandardOutPath</key>
+	<string>/Users/taboost/quant/logs/dip_warmup.log</string>
+	<key>StartCalendarInterval</key>
+	<dict>
+		<key>Hour</key>
+		<integer>6</integer>
+		<key>Minute</key>
+		<integer>0</integer>
+	</dict>
+	<key>WorkingDirectory</key>
+	<string>/Users/taboost/quant</string>
+</dict>
+</plist>

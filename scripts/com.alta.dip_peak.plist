@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  DIP Phase 2 — peak heat (built 2026-07-25, DISPATCH_DAILY_INTELLIGENCE_PIPELINE reconciliation).
+
+  Fires scripts/daily_intelligence_pipeline.py --phase 2 at 08:30 ET. Runs the Ollama-first
+  synthesis (data/agent/daily_briefing.json) + hypothesis batch. Deliberately does NOT pass
+  --with-retrain: the harvest+XGBoost-retrain compute (dip_daily.sh) is ALREADY scheduled once
+  daily via com.alta.dip_daily.plist at 02:30 ET — running it again here would duplicate a
+  60-120min compute job for no benefit. If Colin wants Phase 2 to also retrain, edit the
+  ProgramArguments below to add "--with-retrain" AND unload com.alta.dip_daily.plist first so
+  retrain only fires once a day.
+
+  RunAtLoad catches a missed fire after sleep/off; idempotency check in
+  daily_intelligence_pipeline.py makes a same-day duplicate fire a clean no-op.
+
+  INSTALL (operator hand — Colin, not Claude Code):
+    cp scripts/com.alta.dip_peak.plist ~/Library/LaunchAgents/
+    launchctl load ~/Library/LaunchAgents/com.alta.dip_peak.plist
+    python3 scripts/plist_watchdog.py --rebaseline "loaded dip_peak"
+-->
+<plist version="1.0">
+<dict>
+	<key>EnvironmentVariables</key>
+	<dict>
+		<key>PATH</key>
+		<string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+		<key>PYTHONPATH</key>
+		<string>/Users/taboost/quant</string>
+		<key>HOME</key>
+		<string>/Users/taboost</string>
+	</dict>
+	<key>Label</key>
+	<string>com.alta.dip_peak</string>
+	<key>Nice</key>
+	<integer>10</integer>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/opt/homebrew/bin/python3</string>
+		<string>/Users/taboost/quant/scripts/daily_intelligence_pipeline.py</string>
+		<string>--phase</string>
+		<string>2</string>
+	</array>
+	<key>RunAtLoad</key>
+	<true/>
+	<key>StandardErrorPath</key>
+	<string>/Users/taboost/quant/logs/dip_peak.err</string>
+	<key>StandardOutPath</key>
+	<string>/Users/taboost/quant/logs/dip_peak.log</string>
+	<key>StartCalendarInterval</key>
+	<dict>
+		<key>Hour</key>
+		<integer>8</integer>
+		<key>Minute</key>
+		<integer>30</integer>
+	</dict>
+	<key>WorkingDirectory</key>
+	<string>/Users/taboost/quant</string>
+</dict>
+</plist>

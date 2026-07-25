@@ -4,6 +4,44 @@ Per-session ledger: what shipped, push status, verdicts, blockers, refusals. New
 The Obsidian brain (`~/Obsidian/Obsidian/00-BRAIN/NEXT.md`) is the cross-project rollup.
 Standing constraints live in `CLAUDE.md` — not restated here.
 
+### 2026-07-24 · TICK-044 — DAILY_LOSS_HALT confirmed inert, fix STAGED not applied
+
+**SAFETY FLAG — read before assuming the -2% daily loss halt protects anything.**
+`DAILY_LOSS_HALT` (`execution/risk.py:69`, ratified `RISK_FRAMEWORK.md` 2026-07-20) has never
+been able to fire on the primary `execution/harness.py --live` path (launchd 09:25 ET
+Mon-Fri). Root cause confirmed by grep, not inference: `AccountState.daily_pnl_frac`
+(`risk.py:102`) and `AccountState.consecutive_losses` (`risk.py:103`) are written NOWHERE in
+the codebase after their `0.0`/`0` defaults — `execution/harness.py:401` builds a fresh
+`AccountState` on every invocation and nothing ever updates it, not even across fills
+within the same run. The backlog's prior description ("fires on a mid-session restart")
+was optimistic; there is no path, restart or otherwise, that arms this gate today. This
+extends to `consecutive_losses` too — the backlog previously (incorrectly) called that gate
+"correctly computed"; it is not, in this file.
+
+Diagnose+stage only, per the task's own constraint — `execution/harness.py` is under the
+shadow-audit freeze until 2026-07-28 and was NOT edited (`git diff --stat execution/harness.py`
+confirms empty). What's ready for the 07-28 apply:
+- `research/TICK-044_staged_patch.diff` — unified diff against `harness.py`, verified
+  `git apply --check`-clean against the current tracked file (never actually applied).
+  Persists `FillRecord.effective_risk_frac`, accumulates `daily_pnl_frac`/`consecutive_losses`
+  in `apply_risk()` per fill, seeds both at `run_session()` start from today's already-logged
+  fills.
+- `execution/daily_pnl_store.py` — new, **not frozen, dormant**: reconstructs today's P&L
+  fraction from `fill_log.jsonl`. Nothing imports it yet, so it changes zero live behavior
+  by itself. 4/4 tests green (`tests/test_daily_pnl_store.py`).
+- `research/TICK-044_design_note.md` — full mechanism writeup + exact 2026-07-28 apply
+  steps (`git apply`, test commands, `param_change_log.jsonl` rationale entry, commit/push).
+- `tickets/backlog.md` TICK-044 updated with the corrected diagnosis and staged-not-resolved
+  status.
+
+Isolation test green: `test_pipeline_does_not_import_sovereign` (1 passed, 1 skipped).
+**Until the 2026-07-28 apply lands, the -2% daily loss halt is inert on the primary
+execution path — this is a live safety gap, not a documentation gap.**
+Explicit `git add` (repo has large unrelated dirty state from data-file churn — never `-A`):
+`execution/daily_pnl_store.py`, `tests/test_daily_pnl_store.py`,
+`research/TICK-044_staged_patch.diff`, `research/TICK-044_design_note.md`,
+`tickets/backlog.md`, `NEXT.md`.
+
 ### 2026-07-24 · TICK-024 — swap/carry cost model measured (before-numbers), fix STAGED not applied
 
 Pure measurement + staging session, no live/execution-path file touched. Pulled actual
@@ -2646,3 +2684,79 @@ updated in place (not append-only convention for that file).
 (10/10); explicit `git add` of the 3 touched files only (`sovereign/risk/config/risk_config.yaml`,
 `data/agent/param_change_log.jsonl`, `tickets/backlog.md`) — repo has large unrelated
 data-file churn, never `-A`. Pushed to sovereign-v2.
+
+---
+
+## 2026-07-25 — DIP honest reconciliation: Phase 3 built, plists added, DoD map corrected (INFRA)
+
+DISPATCH_DAILY_INTELLIGENCE_PIPELINE's own Definition of Done was unmet (`launchctl list | grep
+alta.dip` showed only `com.alta.dip_daily`, not the three the spec names; no `data/ml/`; no
+`data/agent/dip_phase{1,2,3}.json`). Did the honest reconciliation the ticket asked for, not a
+blind rebuild — mapped every spec item to what already exists under a different name before
+building anything new.
+
+**Spec-to-reality map:**
+| Spec item | Reality |
+|---|---|
+| Phase 1 regime/macro fetch | Already live via `sovereign/briefing/*` collectors (`market_data`, `lead_lag`, `volume_profile`, `news_feed`, `event_calendar`) called from `scripts/daily_intelligence_pipeline.py::phase1()` — different file names (`data/briefing/*.json`) than spec assumed, same function |
+| Phase 2 synthesis + hypothesis batch | Already live (`morning_market_briefing.build()` Ollama-first, `hypothesis_generator.run()`) — wired 2026-07-24, re-verified today |
+| Phase 2 walk-forward XGBoost training | Already live as a DIFFERENT system: `continuous_harvester.py` + `training/retrain_loop.py` → `data/harvest.db`, `models/xgb_veto.json`, `models/threshold_history.json` — delegated via `dip_daily.sh` behind `--with-retrain`. Re-scoped (see DoD below), not duplicated. |
+| Phase 2 `data/ml/` feature-matrix + VADER sentiment layer | **Genuinely absent.** No sentiment feature anywhere in the repo. Named honestly in the ticket's DoD, not faked. |
+| Phase 3 diffusion (Obsidian sync, ledger stamp, calibration) | **Genuinely absent — built today** (below), re-scoped against what the real ledger/Obsidian layout actually looks like |
+| Training gate (Art. 6, CONFIRMED-verdict-only) | Not enforced anywhere before today — `retrain_loop.py`/`dip_daily.sh` have no gate check. Added at the orchestrator level (new file, does not touch `retrain_loop.py`) |
+| Three timed launchd plists | **Genuinely absent — built today.** Only `com.alta.dip_daily` (02:30, harvest+retrain) existed |
+
+**Built (new files only, freeze-safe):**
+- `scripts/daily_intelligence_pipeline.py` extended: `--phase 3` (diffusion), spec-named checkpoints
+  `data/agent/dip_phase{1,2,3}.json` alongside the pre-existing `_dip_pipeline_phaseN_checkpoint.json`
+  (kept for compat), same-day idempotency skip on all three phases, and a training-gate check (scans
+  `hypothesis_ledger.json` for any `CONFIRMED` status — 14 present today, gate reads open) before
+  Phase 2 will pass `--with-retrain` through to `dip_daily.sh`.
+- Phase 3 diffuses today's regime + hypothesis-batch summary into
+  `~/Obsidian/Obsidian/Trading/System/DIP-Daily-Log.md` (new file, append-only) and opens
+  `data/agent/gate_calibration.jsonl` rows when the gate scan is fresh with `tier3_plus > 0` (it
+  is not, today — `petrules_gate_scan.json` has never run live on Colin's Mac, so 0 rows opened,
+  which is the spec's own designed behavior for a stale scan).
+- `scripts/com.alta.dip_{warmup,peak,diffuse}.plist` — 06:00 / 08:30 / 16:30 ET, `--phase 1/2/3`
+  respectively. `dip_peak` deliberately omits `--with-retrain` so harvest+retrain doesn't run twice
+  a day (it's already scheduled separately at 02:30 via `com.alta.dip_daily.plist`). All three
+  `plutil -lint` clean.
+
+**Re-scoped, not duplicated:** `data/ml/` feature-matrix/XGBoost contract → satisfied by the
+existing `continuous_harvester.py`/`retrain_loop.py` pair under different paths (see table).
+Ledger stamping → satisfied by the existing `data/agent/generator_log.jsonl` per-run append rather
+than writing a synthetic `last_batch_run` field into the adjudicated `hypothesis_ledger.json`.
+
+**Verified live, 2026-07-25 (no `--with-retrain`, retrain compute left untouched this session):**
+- `--phase 1`: 5/5 collectors written; `dip_phase1.json` has `regime=ROTATION_WARN`,
+  `gate_scan_fresh=false`; re-run same day → "already completed today. Skip."
+- `--phase 2`: `training_gate_open=true`; synthesis `ollama/qwen2.5` bias=LONG conf=75; 5
+  hypotheses generated; `dip_phase2.json` written with an honest `skipped` list
+  (`feature_matrix`, `dip_xgb_trainer`, `retrain`).
+- `--phase 3`: Obsidian section appended; `calibration_rows_opened=0` (gate scan stale, correct);
+  `dip_phase3.json` written.
+- `tests/ -k test_pipeline_does_not_import_sovereign`: green (1 passed).
+
+**tickets/DISPATCH_DAILY_INTELLIGENCE_PIPELINE.md**: DoD checklist rewritten in place with `[x]`
+verified / `[~]` re-scoped / `[ ]` genuinely-not-built markers and a "RECONCILED 2026-07-25" header
+— no more silent gap between the ticket's checkboxes and what actually runs.
+
+**DoD status: honestly reconciled, not fully passing as originally specified.** The sentiment
+feature layer and `data/ml/` file contract remain genuinely unbuilt; everything else in the DoD is
+either verified live or re-scoped to an existing equivalent, documented in the ticket itself.
+
+**Operator TODO (Colin, not automatable from here):**
+```
+cp scripts/com.alta.dip_warmup.plist scripts/com.alta.dip_peak.plist scripts/com.alta.dip_diffuse.plist ~/Library/LaunchAgents/
+launchctl load ~/Library/LaunchAgents/com.alta.dip_warmup.plist
+launchctl load ~/Library/LaunchAgents/com.alta.dip_peak.plist
+launchctl load ~/Library/LaunchAgents/com.alta.dip_diffuse.plist
+python3 scripts/plist_watchdog.py --rebaseline "loaded dip_warmup/peak/diffuse"
+launchctl list | grep alta.dip   # should show three
+```
+
+**Discipline:** no execution-path file touched (`forex_exit_manager`/`decide_exit`/`exit_machine`/
+`harness`/`carry_engine`/`ict.pipeline` untouched; `retrain_loop.py`/`continuous_harvester.py`
+untouched — new orchestrator-level gate only); isolation test green; no silent mocking — the
+`data/ml/` gap is named, not faked; explicit `git add` of touched files only, never `-A` (repo has
+large unrelated data-file churn from other running jobs). Pushed to sovereign-v2.

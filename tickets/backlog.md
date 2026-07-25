@@ -484,15 +484,39 @@ Schema per ticket:
 **title:** Daily halt gate is inert on fresh trading days — needs real-time P&L feed or intraday position tracking
 **description:** `DAILY_LOSS_HALT` (2% daily loss gate, ratified in `RISK_FRAMEWORK.md`) is effectively inert at the start of each trading session. `AccountState` is constructed once at session start (`run_session`) from fills already persisted in `fill_log.jsonl`. Because no fills for the current day exist yet at session start, `daily_pnl_frac` evaluates to `0.0` and the halt gate cannot fire. The gate would only fire if the harness were restarted mid-session (with fills already written), which is not the normal scheduled path.
 
-**Impact:** The ratified -2% daily halt never fires in the standard launchd path. Consecutive-loss gates (`CONSEC_LOSS_HALVE` / `CONSEC_LOSS_HALT`) are correctly computed from all historical fills and work as intended.
+**2026-07-24 diagnosis (confirmed, stronger than the original description):** it is not
+just "0.0 at session start" — `daily_pnl_frac` is written NOWHERE in the codebase, ever,
+by any path. `grep -rn daily_pnl_frac **/*.py` has exactly 3 hits, all in `execution/risk.py`
+(the field default at `:102` and the two read sites at `:171-173`). `execution/harness.py:401`
+constructs a fresh `AccountState` on every `--live` invocation (launchd, 09:25 ET Mon-Fri)
+and nothing writes back to it afterward — not even across fills within the SAME run. A
+mid-session restart would not have helped either, since nothing reads `fill_log.jsonl` back
+into `AccountState` on construction. **Correction to the Impact line below:**
+`consecutive_losses` (`risk.py:103`) has the identical defect — also never written by
+anything in `execution/*.py` — so that gate is inert too, not "correctly computed."
+
+**Impact:** The ratified -2% daily halt never fires in the standard launchd path. ~~Consecutive-loss gates (`CONSEC_LOSS_HALVE` / `CONSEC_LOSS_HALT`) are correctly computed from all historical fills and work as intended.~~ **Corrected 2026-07-24: consecutive-loss gates are equally inert in this file** — see diagnosis above.
 
 **Required fix:** Either (a) a real-time P&L feed that updates `AccountState` after each fill is recorded intra-session, or (b) intraday position tracking that recomputes `daily_pnl_frac` dynamically between fills within the same session.
 
-**Constraint:** `DAILY_LOSS_HALT` is part of the ratified `RISK_FRAMEWORK.md`. Any implementation must be reviewed, logged in `data/agent/param_change_log.jsonl`, and this document updated per the amendment procedure.
+**Staged fix (2026-07-24, NOT applied):** `research/TICK-044_staged_patch.diff` — a
+`git apply`-clean unified diff against `execution/harness.py` (frozen; verified with
+`git apply --check`, never actually applied to the tracked file). Adds
+`FillRecord.effective_risk_frac` (persists `RiskDecision.detail["effective_risk"]`,
+previously computed and discarded), accumulates `state.daily_pnl_frac`/`consecutive_losses`
+in `apply_risk()` after every allowed fill (arms the gate mid-run), and seeds both from
+already-persisted same-day fills at `run_session()` start via the new dormant helper
+`execution/daily_pnl_store.py` (not imported by anything yet — inert until the patch wires
+it in). Full design + apply steps: `research/TICK-044_design_note.md`.
+Dormant helper tests green: `tests/test_daily_pnl_store.py` (4/4).
+**Until the patch applies, the -2% daily loss halt remains inert on the primary path — this
+is a live safety gap, not a cosmetic one.**
+
+**Constraint:** `DAILY_LOSS_HALT` is part of the ratified `RISK_FRAMEWORK.md`. Any implementation must be reviewed, logged in `data/agent/param_change_log.jsonl`, and this document updated per the amendment procedure. `execution/harness.py` is under the standing shadow-audit freeze until 2026-07-28 (`CLAUDE.md`) — the patch above must not be applied before then.
 
 **depends_on:** []
 **blocks:** []
-**status:** backlog — **requires its own unlock before implementation**
+**status:** staged — diagnosis confirmed, patch ready for post-freeze apply (2026-07-28); NOT resolved, NOT applied
 **pre_approved:** false
 
 

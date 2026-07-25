@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  DIP Phase 3 — diffusion (built 2026-07-25, DISPATCH_DAILY_INTELLIGENCE_PIPELINE reconciliation).
+
+  Fires scripts/daily_intelligence_pipeline.py --phase 3 at 16:30 ET. Appends today's regime +
+  hypothesis-batch summary to ~/Obsidian/Obsidian/Trading/System/DIP-Daily-Log.md (append-only)
+  and opens gate-calibration rows if a fresh Tier3+ scan exists. See phase3() docstring in
+  daily_intelligence_pipeline.py for the honest scope of what this diffuses vs. the original
+  work order (no per-hypothesis Obsidian note writer / Library-pattern similarity matcher exists).
+
+  RunAtLoad catches a missed fire after sleep/off; idempotency check in
+  daily_intelligence_pipeline.py makes a same-day duplicate fire a clean no-op.
+
+  INSTALL (operator hand — Colin, not Claude Code):
+    cp scripts/com.alta.dip_diffuse.plist ~/Library/LaunchAgents/
+    launchctl load ~/Library/LaunchAgents/com.alta.dip_diffuse.plist
+    python3 scripts/plist_watchdog.py --rebaseline "loaded dip_diffuse"
+-->
+<plist version="1.0">
+<dict>
+	<key>EnvironmentVariables</key>
+	<dict>
+		<key>PATH</key>
+		<string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+		<key>PYTHONPATH</key>
+		<string>/Users/taboost/quant</string>
+		<key>HOME</key>
+		<string>/Users/taboost</string>
+	</dict>
+	<key>Label</key>
+	<string>com.alta.dip_diffuse</string>
+	<key>Nice</key>
+	<integer>10</integer>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/opt/homebrew/bin/python3</string>
+		<string>/Users/taboost/quant/scripts/daily_intelligence_pipeline.py</string>
+		<string>--phase</string>
+		<string>3</string>
+	</array>
+	<key>RunAtLoad</key>
+	<true/>
+	<key>StandardErrorPath</key>
+	<string>/Users/taboost/quant/logs/dip_diffuse.err</string>
+	<key>StandardOutPath</key>
+	<string>/Users/taboost/quant/logs/dip_diffuse.log</string>
+	<key>StartCalendarInterval</key>
+	<dict>
+		<key>Hour</key>
+		<integer>16</integer>
+		<key>Minute</key>
+		<integer>30</integer>
+	</dict>
+	<key>WorkingDirectory</key>
+	<string>/Users/taboost/quant</string>
+</dict>
+</plist>
