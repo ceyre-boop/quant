@@ -2803,3 +2803,10 @@ Commit audit cf81267..b8d175f: 0 RISK, 3 NEEDS-REVIEW — do NOT load com.alta.d
 daily retraining feeding live veto gate); training-control POST endpoints CSRF-open. Also verified:
 placebo control rebuilt as true permutation test (false-pass on noise 20%→4%). Oracle 3-day lesson
 streak: green_matches=0 consensus = phantom, size 0. Panel fx_macro US rate stale (4.33 vs 3.63).
+
+### 2026-07-25 · Training-data harvest COMMITTED (e96c70b, 16MB, 49 files)
+Real data, dated: policy-rate vintages + CORRECT differentials 2015→now (UK−US +0.10 — replaces
+wrong-sign feed), indicator panel (ATR14/RSI14/vol/52w/momentum, 10 instruments 2015→now), COT
+2020→07-21 (JPY net spec −152k crowded short), vol term structure, FRED macro panel + earnings
+spine 15 tickers (wave-1 agents wrote before session limit killed them). NOT harvested: news,
+GDELT, EDGAR bulk, ALFRED vintages, FINRA history — re-runnable via saved workflow scripts.
