@@ -4,6 +4,46 @@ Per-session ledger: what shipped, push status, verdicts, blockers, refusals. New
 The Obsidian brain (`~/Obsidian/Obsidian/00-BRAIN/NEXT.md`) is the cross-project rollup.
 Standing constraints live in `CLAUDE.md` — not restated here.
 
+### 2026-07-24 · TICK-024 — swap/carry cost model measured (before-numbers), fix STAGED not applied
+
+Pure measurement + staging session, no live/execution-path file touched. Pulled actual
+per-trade financing directly from OANDA (`GET /v3/accounts/{id}/trades/{id}`, read-only,
+24/24 trades in `data/ledger/oanda_fills.json` served with 0 errors) and compared
+position-by-position to what `sovereign/forex/forex_backtester.py::SWAP_RATES_ANNUAL`
+would have modeled. Confirms and quantifies the ~10x claim already in the ticket text:
+**median understatement 9x (range 5.5x-11.9x) across all 4 live v015 pairs**, plus the
+**EURUSD SHORT sign flip is real** (model predicts a cost, OANDA actually paid a net
++$6.24 credit across 3 trades — reproduces the trade-227 anchor independently across the
+full ledger, not just that one trade). Cross-checked against the existing
+`data/research/swap_calibration.json` rate-snapshot comparison (2026-07-12) — both
+measurements agree on magnitude and the sign flip. Full writeup + the downstream cascade
+(v015 0.6886 anchor, OOS 1.25/0.69 headlines, HYP-045 Sharpe numbers, exit-research
+studies, discovery pipeline, hypothesis-ledger scripts) in
+`research/TICK-024_cost_measurement.md`.
+
+**Staged, NOT applied**: `research/TICK-024_staged_patch.diff` — replaces the static
+`SWAP_RATES_ANNUAL` lookup in `_apply_costs` with the rate-differential-derived model
+already built and reasoned-through for HYP-091 (`research/tsmom_hyp091/financing.py::
+ratediff_financing`), which satisfies TICK-024's own design constraint (don't paste
+today's OANDA rates over 2015-2024 history — derive financing from the FRED
+rate-differential series, anchored to the OANDA snapshot at calibration date). The diff
+also sketches a new `sovereign/forex/swap_model.py` (not written) that would promote that
+financing model from research-only to backtester-importable.
+
+**Unlock-ready note for 2026-07-28**: before applying `TICK-024_staged_patch.diff` —
+(1) run the impact study TICK-024's acceptance criteria require (canonical decade + OOS
+re-run under the corrected model, per-pair deltas, list of which sealed verdicts are
+cost-sensitive — direction is NOT obvious a priori: EURUSD short financing flips from a
+cost to a credit while GBP/AUD/JPY costs get ~7-12x larger, so net effect on the blended
+Sharpe is unknown until re-run); (2) write the `param_change_log` rationale entry per
+CLAUDE.md NN#4; (3) get Colin's explicit sign-off (ticket text: "Colin sign-off required
+before ANY table change"); (4) decide the RECON_TARGET/band re-anchoring for the new
+0.6886-anchor replacement; (5) only then apply the diff and re-run the full reconcile.
+Isolation test green (`test_pipeline_does_not_import_sovereign`, unaffected — nothing in
+`ict/` touched). Explicit `git add` of only the two new research files (repo has large
+unrelated dirty state from live background-job data churn — never `-A`). Pushed to
+sovereign-v2.
+
 ### 2026-07-24 · Placebo control governance fix — rebuilt on real permutation distribution (007189f)
 
 Audit of cf41ec3's placebo control (below) found it structurally broken: single-shuffle

@@ -1,0 +1,109 @@
+# TICK-024 STAGED PATCH — NOT APPLIED
+#
+# Target: sovereign/forex/forex_backtester.py
+# Gate: TICK-024 acceptance criteria require an impact study + param_change_log
+# rationale + Colin sign-off BEFORE this lands. Do not apply before 2026-07-28
+# without an explicit unlock recorded in NEXT.md (CLAUDE.md shadow/execution
+# freeze, extended to this ticket by its own "Colin sign-off required" clause).
+#
+# Approach: reuse the already-built, already-reasoned-about rate-differential
+# model from research/tsmom_hyp091/financing.py::ratediff_financing (built for
+# HYP-091, satisfies TICK-024's own DESIGN CONSTRAINT that today's OANDA rates
+# must not be pasted over 2015-2024 history). Replaces the static
+# SWAP_RATES_ANNUAL lookup in _apply_costs with a per-day rate computed from
+# the FRED policy-rate differential, anchored to the OANDA snapshot in
+# data/research/swap_calibration.json at the calibration date.
+#
+# This diff is illustrative/staged — apply via `git apply` only after unlock,
+# and only after the impact study (re-run canonical decade + OOS, report
+# per-pair deltas) required by TICK-024's acceptance criteria has been done
+# and reviewed.
+
+diff --git a/sovereign/forex/forex_backtester.py b/sovereign/forex/forex_backtester.py
+--- a/sovereign/forex/forex_backtester.py
++++ b/sovereign/forex/forex_backtester.py
+@@ -1,6 +1,7 @@
+ from __future__ import annotations
+ 
+ import json
++import functools
+ import logging
+ import argparse
+ from dataclasses import dataclass, asdict
+@@ -13,6 +14,7 @@ import yfinance as yf
+ 
+ from sovereign.forex.pair_universe import ALL_PAIRS, PAIR_CONFIG, CB_TO_COUNTRY
+ from sovereign.forex.data_fetcher import ForexDataFetcher
++from sovereign.forex.swap_model import ratediff_financing_rate  # TICK-024 corrected model
+ from sovereign.forex.entry_engine import CBEventTrigger, CB_MIN_SURPRISE_BPS
+ from sovereign.forex.fast_backtester import simulate_forex_trades, simulate_forex_trades_arrays
+ from sovereign.forex.signal_engine import ForexSignalEngine, SignalConfig
+@@ -55,15 +57,20 @@ _DEFAULT_SPREAD = 0.00015     # fallback for pairs without an explicit entry
+ # by hold_days with a Wednesday-triple / weekend approximation. News-spread widening
+ # is intentionally NOT modeled: the array backtest path has no per-trade high-impact-
+ # news flag, so a per-trade multiplier would be fabricated rather than measured.
++#
++# TICK-024 (2026-07-24 measurement): this table understates realized OANDA
++# financing by ~5.5x-11.9x on all 4 live pairs (median ~9x) and has a SIGN
++# FLIP on EURUSD SHORT (model charges, broker credits). Superseded by
++# sovereign/forex/swap_model.py::ratediff_financing_rate below for any run
++# built after the TICK-024 unlock. Retained here ONLY as the "broken" leg
++# for apples-to-apples robustness comparisons (see research/tsmom_hyp091/financing.py).
+ SWAP_RATES_ANNUAL = {
+     'GBPUSD=X': {'LONG': -0.0012, 'SHORT': -0.0008},
+     'EURUSD=X': {'LONG': -0.0015, 'SHORT': -0.0010},
+     'USDJPY=X': {'LONG':  0.0020, 'SHORT': -0.0035},   # positive carry long
+     'AUDUSD=X': {'LONG': -0.0008, 'SHORT': -0.0012},
+     'AUDNZD=X': {'LONG': -0.0003, 'SHORT': -0.0003},   # near-zero carry cross
+ }
+ _DEFAULT_SWAP = {'LONG': -0.0010, 'SHORT': -0.0010}
+ 
+@@ -527,8 +534,15 @@ class ForexBacktester:
+         per_side = _calibrated_slippage(pair)
+         slip = per_side if per_side is not None else SLIPPAGE_PER_SIDE
+         cost_price = spread + 2 * slip
+-        swap_tbl = SWAP_RATES_ANNUAL.get(pair, _DEFAULT_SWAP)
+         for t in trades:
+             entry = max(t.get('entry', 0.0), 1e-9)
+             spread_frac = cost_price / entry
+             # Swap: signed annual rate / 365, scaled by hold days + weekend triple.
+             side = 'LONG' if t.get('direction', 1) >= 0 else 'SHORT'
+             hold_days = max(int(t.get('hold_days', 0)), 0)
+             swap_days = hold_days + (hold_days // 5) * 2   # ~Wed-triple/weekend uplift
+-            swap_frac = (swap_tbl[side] / 365.0) * swap_days   # signed: +earn / -pay
++            # TICK-024 corrected model: per-trade entry date drives the FRED
++            # differential lookup so 2015-2024 history is NOT flattened to
++            # today's OANDA snapshot (design constraint from the TICK-024
++            # ticket). Falls back to the broken static table only if the
++            # differential series or the swap_calibration.json anchor is
++            # unavailable (e.g. an unlisted pair) — fail loud, not silent,
++            # in the real patch (this staged version omits the raise for
++            # brevity).
++            entry_date = t.get('entry_date')
++            annual_rate = ratediff_financing_rate(pair, side, entry_date)
++            if annual_rate is None:
++                annual_rate = SWAP_RATES_ANNUAL.get(pair, _DEFAULT_SWAP)[side]
++            swap_frac = (annual_rate / 365.0) * swap_days   # signed: +earn / -pay
+             t['pnl_pct'] = t.get('pnl_pct', 0.0) - spread_frac + swap_frac
+             t['cost_spread_frac'] = round(spread_frac, 6)
+             t['cost_swap_frac'] = round(swap_frac, 6)
+             t['risk_adjusted_pnl_pct'] = t['pnl_pct'] * t.get('risk_pct', 1.0)
+         return trades
+
+# NEW FILE (not yet created): sovereign/forex/swap_model.py
+# Thin wrapper promoting research/tsmom_hyp091/financing.py::ratediff_financing
+# from research-only to a shared module the live backtester can import,
+# parameterized on data/research/swap_calibration.json (regenerate via
+# research/swap_calibration.py before each use — do not hardcode the snapshot).
+# NOT written in this staged patch; sketch only:
+#
+#   def ratediff_financing_rate(pair: str, side: str, entry_date) -> Optional[float]:
+#       """Annual financing rate (fraction/yr) for `pair`/`side` on `entry_date`,
+#       anchored to the OANDA snapshot in data/research/swap_calibration.json and
+#       varied by the FRED rate-differential change since the snapshot date.
+#       Returns None if the pair has no differential series (caller falls back
+#       to the broken static table with a loud warning, never silently)."""
+#       ...
+#
+# This mirrors research/tsmom_hyp091/financing.py::ratediff_financing exactly,
+# generalized to accept a single entry_date instead of a full price index.
