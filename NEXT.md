@@ -2617,3 +2617,32 @@ launchctl list | grep com.alta.dip_daily
 ```
 No new credentials/config needed — the harvester only needs network access to Yahoo Finance
 (yfinance), which the Mac already has; nothing else to provision.
+
+---
+
+## 2026-07-24 — Governance-hygiene audit: two fixes (e3023d3, pushed)
+
+**Fix 1 — stale risk value applied (not staged).** `sovereign/risk/config/risk_config.yaml`
+`prop.daily_loss_limit_pct` was 0.05 (stale) vs live `gates.daily_loss_limit_pct` 0.02
+(RISK_FRAMEWORK.md ratified 2026-07-20). Verified first: grepped all consumers of
+`daily_loss_limit_pct` and every FROZEN file (`forex_exit_manager`, `decide_exit`,
+`exit_machine`, `execution/harness.py` — including `execution/risk.py` it imports,
+`carry_engine`, `ict/pipeline.py`). None reads `cfg["prop"]` or imports
+`sovereign.risk.risk_engine`/`layers/prop.py` — that chain is only reached via
+`kelly_engine.py`, `engine_adapter.py`, `orchestrator/*_lifecycle.py`, `backtest_runner.py`,
+tests. Since no frozen consumer is affected, applied directly (not staged): corrected to
+0.02 to match the ratified value. Logged rationale in `data/agent/param_change_log.jsonl`
+before commit per NN#4.
+
+**Fix 2 — TICK-011 backlog entry updated to RESOLVED.** Verified the RED-1 fix
+(`source=='fills_backfill'`/`test_fill==True` exclusion) is present and complete at
+`sovereign/oracle/reflect_cycle.py:280-285`, landed in commit `78c8c0b`. Confirmed live
+via `python3 audit/invariant_guard.py --run` → `I1=0` (the exact green condition TICK-004
+names). No second unfinished component found — `tickets/backlog.md` TICK-011 status field
+updated in place (not append-only convention for that file).
+
+**Discipline:** no execution-path files touched; isolation test
+(`test_pipeline_does_not_import_sovereign`) green; `test_risk_engine_prop`/`_gates` green
+(10/10); explicit `git add` of the 3 touched files only (`sovereign/risk/config/risk_config.yaml`,
+`data/agent/param_change_log.jsonl`, `tickets/backlog.md`) — repo has large unrelated
+data-file churn, never `-A`. Pushed to sovereign-v2.
