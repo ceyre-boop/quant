@@ -2810,3 +2810,28 @@ wrong-sign feed), indicator panel (ATR14/RSI14/vol/52w/momentum, 10 instruments 
 2020→07-21 (JPY net spec −152k crowded short), vol term structure, FRED macro panel + earnings
 spine 15 tickers (wave-1 agents wrote before session limit killed them). NOT harvested: news,
 GDELT, EDGAR bulk, ALFRED vintages, FINRA history — re-runnable via saved workflow scripts.
+
+### 2026-07-25 · Game-spec contract for self-play (36ec72d) — state vector, gym, Elo harness
+Built the missing board/gym/Elo contract from Colin's Six Questions doc, freeze-safe, 3 new files:
+- `sovereign/training/state_space.py` — locked S(t): exactly 8 dims, fixed order (hold_frac,
+  excursion_pct, atr_pct, rsi_14, carry_alignment, rate_diff_z, cot_z, drawdown_from_peak).
+  `build_state()` is the one builder; schema-drift test asserts the tuple never changes.
+- `sovereign/training/trading_env.py` — `TradingEnv` gym over one trade. A = {HOLD, EXIT_FULL,
+  EXIT_HALF, ADD_HALF}; 4 enumerated terminals (STOP_LOSS, HOLD_LIMIT, EXIT_FULL_CHOSEN,
+  CARRY_REVERSAL) via the frozen `exit_machine.decide_exit` (import-only). r(t) = daily_pnl_frac −
+  swap_cost_daily − 0.001·hold_count, guarded by the same `GrossReturnError` pattern as
+  `value_scorer.py`, keyed off `ignition.tick_024_carry_fix_landed` — refuses real training rewards
+  while that's false. `mode='provisional_gross'` is wiring-only, refuses `for_training=True`.
+- `sovereign/training/elo_harness.py` — agent-vs-static-v015 head-to-head. Win/loss is **pure net-R
+  thresholds only** (WIN≥+1.0R, LOSS≤−0.75R, DRAW between) — HYP-071 board-score conditions
+  explicitly NOT wired pending a fresh prereg + CONFIRMED revival (gate.py's revival guard).
+  `run_provisional_baseline()`: **PROVISIONAL win_rate=0.44, Elo_agent≈958 vs static=1000** (200
+  games) — labeled twice-provisional: gross costs (pre-TICK-024) AND the "agent" side is the
+  existing SCAFFOLD/DRY placeholder rollout, not a trained policy (none exists, ignition CLOSED).
+  Re-running with a different seed moves the number; it carries no signal about a real agent.
+
+45 new tests green (schema lock, env step/terminal logic incl. net-cost-guard firing, Elo math +
+baseline determinism). Isolation test (`test_pipeline_does_not_import_sovereign`) still green.
+Ignition gate untouched, still CLOSED (tick_024_carry_fix_landed=false, hyp_071_net_confirmed=false).
+No frozen execution-path file touched — new files only. Explicit `git add` of the 6 new files only
+(repo has heavy unrelated concurrent dirty state). Pushed to sovereign-v2 (36ec72d).
