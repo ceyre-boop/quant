@@ -203,6 +203,13 @@ Do not skip it.
 If `scripts/ict_daily_pipeline.py` exists: run it.
 If not: log "ICT pipeline not yet built — skip" and continue.
 
+**2026-07-24: this is the intended steady state, not a temporary stub.**
+`tickets/DISPATCH_ICT_DAILY_PIPELINE.md` (the spec that would have produced this script)
+is SHELVED/RE-SCOPED — ICT's role in this system is a TP/SL/entry reference layer, not a
+predictive daily pipeline, so `scripts/ict_daily_pipeline.py` is not expected to exist.
+The skip branch above should be treated as the normal, permanent path for 2e, not a
+placeholder awaiting a future build.
+
 ---
 
 ### 2f — Checkpoint

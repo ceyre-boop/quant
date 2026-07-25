@@ -4,6 +4,36 @@ Per-session ledger: what shipped, push status, verdicts, blockers, refusals. New
 The Obsidian brain (`~/Obsidian/Obsidian/00-BRAIN/NEXT.md`) is the cross-project rollup.
 Standing constraints live in `CLAUDE.md` — not restated here.
 
+### 2026-07-24 · ICT re-scope — DISPATCH_ICT_DAILY_PIPELINE.md shelved (doc-only)
+
+**Docs/backlog reconciliation, no code changed.** Colin clarified ICT's intended role: it
+was the first framework built into the system, and it's a **reference layer for TP/SL and
+occasional entries** — not a prediction/edge engine. ICT levels work because other traders
+watch them (self-fulfilling reference points), not because structure predicts direction.
+Matches existing evidence: ICT pattern edge NOT PROVEN (permutation p=0.52, fails BH). The
+system has since moved to carry macro / self-play / Petrules; ICT is deliberately
+deprioritized as a signal source.
+
+`tickets/DISPATCH_ICT_DAILY_PIPELINE.md` framed ICT as an 8-layer predictive pipeline
+(Regime Map → Level Engine → Bias Engine → Proximity Controller → Entry Engine → Position
+Manager → Risk → Journal) culminating in `scripts/ict_daily_pipeline.py`. That framing is
+mis-scoped given the above — **not building it.** Annotated the dispatch file with a dated
+SHELVED/RE-SCOPED header (original spec preserved below, unmodified, for history).
+
+Cross-referenced `tickets/DISPATCH_DAILY_INTELLIGENCE_PIPELINE.md` Phase 2e, which already
+skips gracefully when `scripts/ict_daily_pipeline.py` is absent — added a note there that
+this skip is the permanent intended state, not a stub awaiting a future build. No open
+`tickets/backlog.md` entry tracked the ICT pipeline as a gap, so nothing to reconcile there.
+
+**Not touched:** `ict/pipeline.py`, `ict/fvg_detector.py`, `ict/sweep_detector.py`,
+`ict/session_classifier.py`, `ict/daily_bias.py`, `ict/memory_engine.py` — the existing ICT
+code that provides reference levels is unaffected; this re-scoping only retires the build
+spec, not shipped code. No execution-path files touched. No isolation-test-relevant changes.
+
+**Files changed:** `tickets/DISPATCH_ICT_DAILY_PIPELINE.md`,
+`tickets/DISPATCH_DAILY_INTELLIGENCE_PIPELINE.md`. Explicit `git add` of these two paths only.
+Pushed to sovereign-v2.
+
 ### 2026-07-24 · TICK-044 — DAILY_LOSS_HALT confirmed inert, fix STAGED not applied
 
 **SAFETY FLAG — read before assuming the -2% daily loss halt protects anything.**
