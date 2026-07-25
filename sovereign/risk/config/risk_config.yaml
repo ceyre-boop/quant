@@ -77,7 +77,7 @@ prop:
   profit_target_pct: 0.08
   max_drawdown_pct: 0.08
   drawdown_type: "trailing"      # "trailing" (from peak) or "static" (from start)
-  daily_loss_limit_pct: 0.05
+  daily_loss_limit_pct: 0.02     # aligned to RISK_FRAMEWORK.md 2026-07-20 ratified 2% (was stale 0.05)
   equity_basis: "equity"         # "equity" or "balance"
   safety_buffer_pct: 0.005       # slippage/safety cushion subtracted from the floor
 

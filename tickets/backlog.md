@@ -130,7 +130,7 @@ Schema per ticket:
 **depends_on:** []
 **blocks:** []
 **blocked_until:** colin_review (Blue-Team-Proposed-Fix-2026-07-01.md)
-**status:** backlog
+**status:** RESOLVED — verified 2026-07-24: `sovereign/oracle/reflect_cycle.py` lines ~280-285 exclude `source=='fills_backfill'` and `test_fill==True` from `_load_decision_log_summary`; landed in commit 78c8c0b ("[FIX] Oracle reflection excludes fills_backfill records — RED-1 confirmed"). Confirmed live: `python3 audit/invariant_guard.py --run` reports I1=0 (guard green per TICK-004's stated turn-green condition). No second unfinished component found.
 **pre_approved:** false
 
 ## TICK-012
