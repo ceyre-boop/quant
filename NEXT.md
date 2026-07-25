@@ -2790,3 +2790,16 @@ launchctl list | grep alta.dip   # should show three
 untouched — new orchestrator-level gate only); isolation test green; no silent mocking — the
 `data/ml/` gap is named, not faked; explicit `git add` of touched files only, never `-A` (repo has
 large unrelated data-file churn from other running jobs). Pushed to sovereign-v2.
+
+### 2026-07-25 · FOMC readiness intel sweep (autonomous, pre-limit-reset)
+5-agent workflow (2 web, 2 repo, 1 synthesis) → research/FOMC_READINESS_INTEL_2026-07-25.md (+appendix).
+HEADLINE: recorded rate differentials WRONG on all 4 foreign legs — GBPUSD wrong SIGN (rec −0.60 vs
+actual +0.12), USDJPY overstated +86bp, AUD understated 59bp, EUR drag overstated 70bp; feed is a
+mixed-vintage ~2025 snapshot. TICK-024 fix staged NOT applied. Art.3 portfolio breaker UNOBSERVABLE
+(no position ledger); STAND_ASIDE verdict is a staleness fallback not a market read. Market: hawkish
+hold base case, July hike tail ~38-46% on oil (Brent ~$97-102), Sep hike ~80% priced; BoJ Jul 31,
+RBA CPI Jul 29 same week. FOMC logger code-done (51 tests) but 100% blocked on operator VM runbook.
+Commit audit cf81267..b8d175f: 0 RISK, 3 NEEDS-REVIEW — do NOT load com.alta.dip_daily (ungated
+daily retraining feeding live veto gate); training-control POST endpoints CSRF-open. Also verified:
+placebo control rebuilt as true permutation test (false-pass on noise 20%→4%). Oracle 3-day lesson
+streak: green_matches=0 consensus = phantom, size 0. Panel fx_macro US rate stale (4.33 vs 3.63).
