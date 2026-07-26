@@ -146,6 +146,43 @@ def build_shim(data: dict[str, str]) -> str:
 """
 
 
+def strip_live_firebase(html: str) -> str:
+    """The standalone build has no network/auth at view time, so it can never
+    hold real Firebase live state (see decision note in dashboard/index.html's
+    header comment) — it stays AUDIT-ONLY. Cut the three LIVE:FIREBASE-marked
+    regions (config script, panel markup, JS wiring) entirely rather than
+    relying on the secret-content regex to tolerate an embedded `apiKey` —
+    if the marker pair goes missing this raises loudly instead of silently
+    leaving live wiring (or worse, a stale auth attempt) in a file:// build."""
+    regions = [
+        ("<!-- LIVE:FIREBASE:SCRIPT:BEGIN", "<!-- LIVE:FIREBASE:SCRIPT:END -->"),
+        ("<!-- LIVE:FIREBASE:PANEL:BEGIN", "<!-- LIVE:FIREBASE:PANEL:END -->"),
+        ("// LIVE:FIREBASE:JS:BEGIN", "// LIVE:FIREBASE:JS:END"),
+    ]
+    panel_notice = (
+        '<div class="row r1"><div class="panel">'
+        '<div class="ph"><span class="ph-lbl">Live State '
+        '<span class="plane-tag plane-audit">audit/historical — standalone build</span>'
+        "</span></div>"
+        '<div style="font-size:11px;color:var(--text-dim)">'
+        "This standalone file was baked at build time and has no network or "
+        "Firebase auth at view time, so it cannot hold live state. Open the "
+        "served dashboard (<code>scripts/serve_dashboard.sh</code> → "
+        "http://127.0.0.1:8080/dashboard/) for the LIVE (Firebase) panel."
+        "</div></div></div>"
+    )
+    for begin, end in regions:
+        start = html.find(begin)
+        stop = html.find(end)
+        if start == -1 or stop == -1:
+            sys.exit(f"ABORT: LIVE:FIREBASE marker pair not found ({begin!r}..{end!r}) — "
+                      "dashboard/index.html structure changed; update strip_live_firebase().")
+        stop += len(end)
+        replacement = panel_notice if "PANEL" in begin else ""
+        html = html[:start] + replacement + html[stop:]
+    return html
+
+
 def main() -> None:
     if not SRC_HTML.is_file():
         sys.exit(f"ABORT: source dashboard not found: {SRC_HTML}")
@@ -153,6 +190,7 @@ def main() -> None:
     data = collect()
 
     html = SRC_HTML.read_text(encoding="utf-8")
+    html = strip_live_firebase(html)
     shim = build_shim(data)
 
     # Inject the shim immediately before the app's <script> block.

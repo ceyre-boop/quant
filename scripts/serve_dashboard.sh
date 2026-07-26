@@ -78,8 +78,31 @@ for rel in "${DIRS[@]}"; do
 done
 
 # Hard safety assertion: no secrets may exist under the served root.
+#
+# dashboard/index.html now embeds a Firebase Web SDK config (apiKey,
+# authDomain, databaseURL, projectId, storageBucket, messagingSenderId,
+# appId) so the LIVE panel can read the RTDB. That config is a PUBLIC client
+# identifier by Firebase's own design — it identifies the project to Google's
+# servers, it does not authorize anything by itself (RTDB rules + the auth
+# token do that) — so filename-based blocking of "*secret*"/".env"/"*.key" is
+# unaffected (dashboard/index.html matches none of those patterns) and does
+# NOT need loosening for it to pass. What we harden instead: a CONTENT scan so
+# a real secret (service-account private key, .env contents, raw JWT) landing
+# in this file by accident still aborts, while the known-public config-key
+# names alone do not trip a false positive.
 if find "${STAGE}" -iname '.env' -o -iname '*.key' -o -iname '*secret*' | grep -q .; then
   echo "ABORT: secret-looking file found under ${STAGE}. Not serving." >&2
+  exit 1
+fi
+
+# Content-level guard: scan every staged file for real-secret markers.
+# "apiKey" alone is NOT in this list — it is the public Firebase web-config
+# field name and is expected in dashboard/index.html. Real secrets (private
+# keys, service-account JSON, .env-style assignments) still abort.
+SECRET_MARKERS='BEGIN PRIVATE KEY|BEGIN RSA PRIVATE KEY|"type": *"service_account"|private_key_id|client_secret|AWS_SECRET|OANDA_API_TOKEN *=|_API_KEY *=|THETADATA_API_KEY'
+if grep -RIlE "${SECRET_MARKERS}" "${STAGE}" 2>/dev/null | grep -q .; then
+  echo "ABORT: real-secret marker found in staged content under ${STAGE}. Not serving." >&2
+  grep -RIlE "${SECRET_MARKERS}" "${STAGE}" 2>/dev/null | sed 's/^/  ! /' >&2
   exit 1
 fi
 

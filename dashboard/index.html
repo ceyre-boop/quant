@@ -2,8 +2,24 @@
 <!--
   Alta Investments — Trading Terminal Dashboard
   Replaces legacy Firebase dashboard (v4) — 2026-07-19 · branch sovereign-v2
+  TWO-PLANE UPDATE 2026-07-26: LIVE panels re-pointed to Firebase RTDB
+  (clawd-trading-7b8de-default-rtdb) — see "LIVE (Firebase)" row at top.
+  Everything below that row is the AUDIT/HISTORICAL plane (repo JSON,
+  committed snapshots) and is labelled as such in each panel header so
+  nobody mistakes a stale audit panel for live state during FOMC.
 
-  DATA SOURCES (all relative to repo root; serve with python3 -m http.server):
+  LIVE DATA SOURCE (Firebase RTDB, requires anonymous auth — see script):
+    signals/{pair}/latest, signals/{pair}/history   — per-pair signal state
+    session/controls                                — trading-enabled, daily-loss pct
+    session/positions/{pair}                         — open positions
+    system/health                                    — live loop health
+    system/regime/{pair}                             — live regime per pair
+    account/equity, account/pnl                      — live account state
+    oracle/latest_reflection, petroulas/decisions,
+    carry/rate_differentials, mesolimbic/elo          — newly-wired live nodes
+    alphazero/*, stockfish/*, propfirm/mt5            — STATIC STUBS (pending)
+
+  AUDIT/HISTORICAL DATA SOURCES (all relative to repo root; serve with python3 -m http.server):
     data/oracle/loop_health_status.json       — system loop health per component
     data/oracle/market_briefings/latest.json  — latest market briefing / regime
     data/oracle/daily_digest.json             — progression gates, gapper shadow
@@ -18,6 +34,11 @@
   NOTE: fetch() on file:// is blocked in Chrome/Chromium. Serve locally:
     python3 -m http.server 8080  (from repo root)
     open: http://localhost:8080/dashboard/
+  NOTE: the standalone dashboard_live.html (built by
+    scripts/build_standalone_dashboard.py) bakes repo JSON in at build time —
+    it has no network/auth at view time, so it CANNOT hold Firebase live state.
+    It stays AUDIT-ONLY (historical, clearly labelled). The served
+    dashboard/index.html (via scripts/serve_dashboard.sh) is the LIVE one.
 -->
 <html lang="en">
 <head>
@@ -144,6 +165,15 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:14
   padding-bottom:10px;margin-bottom:12px;
   display:flex;align-items:center;justify-content:space-between;
 }
+.ph-lbl{display:flex;align-items:center;gap:8px}
+.plane-tag{font-size:8px;font-weight:700;letter-spacing:1px;padding:2px 6px;border-radius:3px;text-transform:uppercase}
+.plane-live{color:#4afa7a;background:rgba(74,250,122,.12);border:1px solid rgba(74,250,122,.4)}
+.plane-audit{color:#707070;background:rgba(255,255,255,.04);border:1px solid var(--border-mid)}
+.live-row{display:flex;flex-direction:column;gap:6px}
+.live-kv{display:grid;grid-template-columns:1fr auto;gap:8px;padding:4px 0;border-bottom:.5px solid #1a1a1a;font-size:11px}
+.live-kv:last-child{border-bottom:none}
+.live-kv .k{color:var(--text-muted)}
+.live-pending{font-size:10px;color:var(--text-muted);font-style:italic;padding:8px 0}
 
 /* ============================================================
    BADGES
@@ -313,7 +343,106 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:14
   </div>
 </header>
 
+<!-- LIVE:FIREBASE:SCRIPT:BEGIN — stripped by build_standalone_dashboard.py
+     (standalone build is audit-only; see decision note at top of file) -->
+<!-- Firebase Web SDK (public client config — see FIREBASE_CONFIG below).
+     COLIN CONSOLE DEPENDENCY #1: paste your Firebase web app config here if the
+     placeholder below hasn't already been replaced with the real one.
+     COLIN CONSOLE DEPENDENCY #2: enable Anonymous sign-in under
+     Firebase Console → Authentication → Sign-in method. RTDB rules are locked
+     to `auth != null`, so the client must sign in before any node will read. -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+  import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+  import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js";
+  window._fb = { initializeApp, getAuth, signInAnonymously, getDatabase, ref, onValue };
+  window._fbReady = true;
+</script>
+<script>
+// Public Firebase web app config — these are client identifiers (apiKey etc.),
+// safe by design to embed in served HTML; they are NOT secrets (unlike the
+// service-account key in config/firebase_service_account.json, which must
+// NEVER appear in this file). Same project/config already committed in
+// trading-dashboard.html — reused here for the forex live nodes.
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyB4kM62IkwV8n2IgRh5eI7I15dtnNCvYbc",
+  authDomain: "clawd-trading-7b8de.firebaseapp.com",
+  databaseURL: "https://clawd-trading-7b8de-default-rtdb.firebaseio.com",
+  projectId: "clawd-trading-7b8de",
+  storageBucket: "clawd-trading-7b8de.firebasestorage.app",
+  messagingSenderId: "407183241024",
+  appId: "1:407183241024:web:185f9744b9eeaaa8cc14a5"
+};
+</script>
+<!-- LIVE:FIREBASE:SCRIPT:END -->
+
 <main class="wrap">
+
+  <!-- LIVE:FIREBASE:PANEL:BEGIN — stripped/replaced by build_standalone_dashboard.py -->
+  <!-- ═══════════════════════════════════════════════════════
+       ROW 0 — LIVE (FIREBASE RTDB) — v015 4-pair live state
+       ═══════════════════════════════════════════════════════ -->
+  <div class="row r1">
+    <div class="panel">
+      <div class="ph">
+        <span class="ph-lbl">Live State <span class="plane-tag plane-live">LIVE (Firebase)</span></span>
+        <span class="badge b-dim" id="lv-conn-badge">CONNECTING</span>
+      </div>
+
+      <div id="lv-error" style="display:none;font-size:10px;color:var(--red);margin-bottom:10px">
+        Firebase connection/auth failed — see console. Falling back to no data (this panel only; audit panels below are unaffected).
+      </div>
+
+      <div class="row r2" style="margin-bottom:10px">
+        <div>
+          <div class="slbl">Live Equity</div>
+          <div class="sval" id="lv-equity">—</div>
+          <div class="ssub">account/equity</div>
+        </div>
+        <div>
+          <div class="slbl">Live P&amp;L</div>
+          <div class="sval" id="lv-pnl">—</div>
+          <div class="ssub">account/pnl</div>
+        </div>
+        <div>
+          <div class="slbl">Trading Enabled</div>
+          <div class="sval" id="lv-trading-enabled">—</div>
+          <div class="ssub" id="lv-daily-loss">daily-loss pct —</div>
+        </div>
+      </div>
+
+      <div class="row r2">
+        <div>
+          <div class="plbl">Per-Pair Signals</div>
+          <div class="live-row" id="lv-signals"><div class="live-pending">connecting…</div></div>
+        </div>
+        <div>
+          <div class="plbl">Live Positions</div>
+          <div class="live-row" id="lv-positions"><div class="live-pending">connecting…</div></div>
+        </div>
+        <div>
+          <div class="plbl">Live System Health / Regime</div>
+          <div class="live-row" id="lv-health"><div class="live-pending">connecting…</div></div>
+        </div>
+      </div>
+
+      <div class="row r2" style="margin-top:10px">
+        <div>
+          <div class="plbl">Oracle Reflection</div>
+          <div class="live-row" id="lv-oracle"><div class="live-pending">pending — wires when oracle activates</div></div>
+        </div>
+        <div>
+          <div class="plbl">Petroulas Decisions / Carry Rate Diff</div>
+          <div class="live-row" id="lv-petroulas"><div class="live-pending">pending — wires when petroulas activates</div></div>
+        </div>
+        <div>
+          <div class="plbl">Mesolimbic Elo / Gated Stubs</div>
+          <div class="live-row" id="lv-mesolimbic"><div class="live-pending">pending — wires when mesolimbic activates</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- LIVE:FIREBASE:PANEL:END -->
 
   <!-- ═══════════════════════════════════════════════════════
        ROW 1 — PROP CHALLENGE STATUS
@@ -321,7 +450,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:14
   <div class="row r1">
     <div class="panel">
       <div class="ph">
-        Prop Challenge — FunderPro $200K
+        <span class="ph-lbl">Prop Challenge — FunderPro $200K <span class="plane-tag plane-audit">audit/historical</span></span>
         <span class="badge b-dim" id="ch-badge">LOADING</span>
       </div>
 
@@ -384,7 +513,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:14
   <div class="row r1b">
     <div class="panel">
       <div class="ph">
-        Carry Paper — OANDA Practice
+        <span class="ph-lbl">Carry Paper — OANDA Practice <span class="plane-tag plane-audit">audit/historical</span></span>
         <span class="badge b-dim" id="cy-badge">LOADING</span>
       </div>
       <div class="prop-stats">
@@ -415,7 +544,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:14
     <!-- Active Signal -->
     <div class="panel">
       <div class="ph">
-        Active Signal
+        <span class="ph-lbl">Active Signal <span class="plane-tag plane-audit">audit/historical</span></span>
         <span class="badge b-dim" id="sig-badge">—</span>
       </div>
       <div class="sig-big cd" id="sig-text">SCANNING</div>
@@ -436,7 +565,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:14
     <!-- Oracle Bias -->
     <div class="panel">
       <div class="ph">
-        Oracle Bias
+        <span class="ph-lbl">Oracle Bias <span class="plane-tag plane-audit">audit/historical</span></span>
         <span style="font-size:9px;color:var(--text-muted)" id="bias-dt">—</span>
       </div>
       <div class="pair-list" id="pair-list"></div>
@@ -454,7 +583,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:14
     <!-- System Health -->
     <div class="panel">
       <div class="ph">
-        System Health
+        <span class="ph-lbl">System Health (loop timestamps) <span class="plane-tag plane-audit">audit/historical</span></span>
         <span class="badge b-dim" id="hlth-badge">—</span>
       </div>
       <div class="hlth-list" id="hlth-list"></div>
@@ -470,7 +599,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:14
     <!-- Recent Fills -->
     <div class="panel">
       <div class="ph">
-        Recent Fills
+        <span class="ph-lbl">Recent Fills <span class="plane-tag plane-audit">audit/historical</span></span>
         <span style="font-size:9px;color:var(--text-muted)" id="fills-ct">—</span>
       </div>
       <div class="fills-scroll">
@@ -500,7 +629,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:14
     <!-- Research Pulse -->
     <div class="panel">
       <div class="ph">
-        Research Pulse
+        <span class="ph-lbl">Research Pulse <span class="plane-tag plane-audit">audit/historical</span></span>
         <span style="font-size:9px;color:var(--text-muted)" id="pulse-dt">—</span>
       </div>
 
@@ -537,6 +666,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:14
       <div class="ph" style="padding:12px 18px 10px;border-bottom:.5px solid var(--border);display:flex;align-items:center;justify-content:space-between">
         <span>⚡ Petrules Gate
           <span style="font-size:9px;color:var(--text-muted);font-weight:400;margin-left:6px">whole-market conviction scanner</span>
+          <span class="plane-tag plane-audit" style="margin-left:6px">audit/historical</span>
         </span>
         <span style="font-size:9px;color:var(--text-muted)" id="gate-scan-ts">—</span>
       </div>
@@ -564,7 +694,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:14
     <!-- Elo estimate (vertical gauge) -->
     <div class="panel">
       <div class="ph">
-        Elo estimate — derived from measured OOS Sharpe
+        <span class="ph-lbl">Elo estimate — derived from measured OOS Sharpe <span class="plane-tag plane-audit">audit/historical</span></span>
         <span class="badge b-dim" id="elo-badge">—</span>
       </div>
       <div class="elo-wrap">
@@ -581,7 +711,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:14
     <!-- Self-play training status -->
     <div class="panel">
       <div class="ph">
-        Self-Play Training
+        <span class="ph-lbl">Self-Play Training <span class="plane-tag plane-audit">audit/historical</span></span>
         <span class="badge b-dim" id="sp-badge">—</span>
       </div>
 
@@ -1425,6 +1555,150 @@ async function refreshAll() {
 refreshAll();
 setInterval(refreshAll,REFRESH_MS);
 startCtlPolling();
+
+// LIVE:FIREBASE:JS:BEGIN — stripped by build_standalone_dashboard.py
+/* ============================================================
+   LIVE (FIREBASE RTDB) PANEL — separate from the fj()/repo-JSON
+   pipeline above. This is the LIVE plane; everything above is
+   the AUDIT/HISTORICAL plane. Requires anonymous auth (RTDB
+   rules are locked to `auth != null`).
+   ============================================================ */
+const LV_PAIRS = ['AUDUSD','EURUSD','GBPUSD','GBPJPY']; // v015 4-pair (AUDNZD excluded)
+
+function lvSetBadge(text, cls) {
+  const e = document.getElementById('lv-conn-badge');
+  if (e) { e.textContent = text; e.className = `badge ${cls}`; }
+}
+
+function lvRow(k, v) {
+  return `<div class="live-kv"><span class="k">${k}</span><span>${v}</span></div>`;
+}
+
+async function initLiveFirebase() {
+  // window._fb is set by the module script tag above; poll briefly in case
+  // the module hasn't executed yet (module scripts run after parsing but
+  // this listener may fire first on a slow connection).
+  for (let i = 0; i < 50 && !window._fbReady; i++) {
+    await new Promise(r => setTimeout(r, 100));
+  }
+  if (!window._fbReady) {
+    lvSetBadge('SDK LOAD FAILED', 'b-red');
+    document.getElementById('lv-error').style.display = 'block';
+    return;
+  }
+
+  const { initializeApp, getAuth, signInAnonymously, getDatabase, ref, onValue } = window._fb;
+
+  try {
+    const app = initializeApp(FIREBASE_CONFIG);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    await signInAnonymously(auth);
+    lvSetBadge('LIVE', 'b-green');
+
+    onValue(ref(db, 'account/equity'), snap => {
+      const v = snap.val();
+      document.getElementById('lv-equity').textContent =
+        v?.equity != null ? fmtUSD(v.equity) : '—';
+    });
+
+    onValue(ref(db, 'account/pnl'), snap => {
+      const v = snap.val();
+      const el = document.getElementById('lv-pnl');
+      el.textContent = v?.pnl != null ? fmtUSD(v.pnl, true) : '—';
+      if (v?.pnl != null) el.className = `sval ${v.pnl >= 0 ? 'cg' : 'cr'}`;
+    });
+
+    onValue(ref(db, 'session/controls'), snap => {
+      const v = snap.val() || {};
+      const enabled = v['trading-enabled'];
+      const el = document.getElementById('lv-trading-enabled');
+      el.textContent = enabled == null ? '—' : (enabled ? 'ENABLED' : 'DISABLED');
+      el.className = `sval ${enabled ? 'cg' : 'cr'}`;
+      document.getElementById('lv-daily-loss').textContent =
+        `daily-loss pct ${v['daily-loss-pct'] ?? '—'}`;
+    });
+
+    onValue(ref(db, 'signals'), snap => {
+      const v = snap.val() || {};
+      document.getElementById('lv-signals').innerHTML =
+        LV_PAIRS.map(p => {
+          const s = v[p]?.latest;
+          return lvRow(p, s ? (s.direction || s.signal || 'FLAT') : '—');
+        }).join('') || '<div class="live-pending">no signal data</div>';
+    });
+
+    onValue(ref(db, 'session/positions'), snap => {
+      const v = snap.val() || {};
+      const rows = LV_PAIRS.map(p => {
+        const pos = v[p];
+        return pos ? lvRow(p, `${pos.direction || '—'} @ ${pos.entry_price ?? '—'}`) : null;
+      }).filter(Boolean);
+      document.getElementById('lv-positions').innerHTML =
+        rows.length ? rows.join('') : '<div class="live-pending">no open positions</div>';
+    });
+
+    onValue(ref(db, 'system/health'), snap => {
+      const h = snap.val();
+      const rows = [];
+      if (h) rows.push(lvRow('system/health', h.status || JSON.stringify(h).slice(0, 40)));
+      onValue(ref(db, 'system/regime'), rsnap => {
+        const r = rsnap.val() || {};
+        const regimeRows = LV_PAIRS.map(p => r[p] ? lvRow(`regime ${p}`, r[p].regime || '—') : null).filter(Boolean);
+        document.getElementById('lv-health').innerHTML =
+          [...rows, ...regimeRows].join('') || '<div class="live-pending">no health/regime data</div>';
+      }, { onlyOnce: true });
+    });
+
+    onValue(ref(db, 'oracle/latest_reflection'), snap => {
+      const v = snap.val();
+      document.getElementById('lv-oracle').innerHTML = v
+        ? lvRow('latest_reflection', (v.summary || v.lesson || 'wired').toString().slice(0, 60))
+        : '<div class="live-pending">pending — wires when oracle activates</div>';
+    });
+
+    onValue(ref(db, 'petroulas/decisions'), snap => {
+      const v = snap.val();
+      document.getElementById('lv-petroulas').innerHTML = v
+        ? lvRow('petroulas', 'wired')
+        : '<div class="live-pending">pending — wires when petroulas activates</div>';
+    });
+    onValue(ref(db, 'carry/rate_differentials'), snap => {
+      const v = snap.val() || {};
+      const rows = Object.keys(v).slice(0, 4).map(k => lvRow(k, v[k]?.diff ?? v[k]));
+      if (rows.length) {
+        const cur = document.getElementById('lv-petroulas').innerHTML;
+        document.getElementById('lv-petroulas').innerHTML = cur + rows.join('');
+      }
+    });
+
+    onValue(ref(db, 'mesolimbic/elo'), snap => {
+      const v = snap.val();
+      const rows = v ? Object.entries(v).map(([k, val]) => lvRow(k, val?.elo ?? val)) : [];
+      document.getElementById('lv-mesolimbic').innerHTML =
+        rows.length ? rows.join('') : '<div class="live-pending">pending — wires when mesolimbic activates</div>';
+    });
+
+    // Static-stub nodes — always render "pending" regardless of RTDB content,
+    // since these components are gated and not yet activated (per ticket).
+    ['alphazero', 'stockfish', 'propfirm/mt5'].forEach(node => {
+      const el = document.getElementById('lv-mesolimbic');
+      if (el && !el.dataset.stubsAdded) {
+        el.innerHTML += `<div class="live-pending">${node}/ — pending, gated (static stub)</div>`;
+      }
+    });
+    document.getElementById('lv-mesolimbic').dataset.stubsAdded = '1';
+
+  } catch (e) {
+    console.error('[Firebase live panel]', e);
+    lvSetBadge('AUTH/CONN FAILED', 'b-red');
+    document.getElementById('lv-error').style.display = 'block';
+  }
+}
+
+initLiveFirebase();
+// LIVE:FIREBASE:JS:END
 
 /* Elo estimate reads a static research manifest — fetch ONCE at load, never on
    the 60s timer. It only changes when a human re-runs a Sharpe measurement. */
