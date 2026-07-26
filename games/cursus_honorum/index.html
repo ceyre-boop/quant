@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Cursus Honorum — Sovereign Trading Trainer</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root {
+    --bg: #14100a; --panel: #1f1810; --gold: #c9a24b; --gold-dim: #8a6f34;
+    --text: #ecdfc4; --dim: #a89878; --red: #a3352d; --green: #4f7d43;
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: radial-gradient(ellipse at top, #241c12 0%, #0f0c08 100%);
+    color: var(--text); font-family: 'Georgia', 'Times New Roman', serif;
+    margin: 0; min-height: 100vh; display: flex; flex-direction: column; align-items: center;
+    padding: 24px 16px 60px;
+  }
+  h1 { font-family: 'Trajan Pro', 'Georgia', serif; letter-spacing: 3px; color: var(--gold);
+       text-transform: uppercase; font-size: 1.8em; margin: 4px 0 2px; text-align: center; }
+  .subtitle { color: var(--dim); font-size: 0.85em; margin-bottom: 18px; letter-spacing: 1px; }
+  .wrap { width: 100%; max-width: 760px; }
+  .panel {
+    background: var(--panel); border: 1px solid var(--gold-dim); border-radius: 6px;
+    padding: 20px; margin-bottom: 16px; box-shadow: 0 4px 18px rgba(0,0,0,0.4);
+  }
+  .statbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+  .stat { text-align: center; }
+  .stat .v { font-size: 1.5em; color: var(--gold); font-weight: bold; }
+  .stat .l { font-size: 0.7em; color: var(--dim); text-transform: uppercase; letter-spacing: 1px; }
+  .rank-badge { display: inline-block; padding: 4px 14px; border: 1px solid var(--gold);
+    border-radius: 3px; color: var(--gold); font-weight: bold; letter-spacing: 2px; }
+  .timerbar { height: 6px; background: #332818; border-radius: 3px; overflow: hidden; margin: 10px 0 0; }
+  .timerfill { height: 100%; background: var(--gold); width: 100%; transition: width 1s linear, background 0.3s; }
+  .cat-tag { display: inline-block; background: #2a2114; border: 1px solid var(--gold-dim);
+    color: var(--dim); font-size: 0.72em; padding: 2px 8px; border-radius: 10px; margin-bottom: 10px;
+    text-transform: uppercase; letter-spacing: 1px; }
+  .prompt { font-size: 1.05em; line-height: 1.55; margin-bottom: 16px; }
+  .opt { display: block; width: 100%; text-align: left; background: #24190f; color: var(--text);
+    border: 1px solid var(--gold-dim); border-radius: 4px; padding: 12px 14px; margin-bottom: 9px;
+    cursor: pointer; font-family: inherit; font-size: 0.95em; line-height: 1.4; transition: all 0.15s; }
+  .opt:hover:not(:disabled) { border-color: var(--gold); background: #2e2213; }
+  .opt:disabled { cursor: default; }
+  .opt.correct { border-color: var(--green); background: #1f2e1a; }
+  .opt.wrong { border-color: var(--red); background: #2e1a17; }
+  .opt .letter { color: var(--gold); font-weight: bold; margin-right: 8px; }
+  .explain { background: #17130b; border-left: 3px solid var(--gold); padding: 14px 16px;
+    margin-top: 14px; border-radius: 0 4px 4px 0; display: none; }
+  .explain.show { display: block; }
+  .explain .tenet-line { color: var(--gold); font-size: 0.8em; text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 8px; }
+  .explain p { margin: 0; line-height: 1.55; font-style: italic; }
+  .nextbtn { background: var(--gold-dim); color: #14100a; border: none; padding: 10px 22px;
+    border-radius: 4px; font-family: inherit; font-weight: bold; cursor: pointer; margin-top: 14px;
+    letter-spacing: 1px; text-transform: uppercase; font-size: 0.85em; }
+  .nextbtn:hover { background: var(--gold); }
+  .heatmap { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px,1fr)); gap: 8px; }
+  .heat-cell { border: 1px solid var(--gold-dim); border-radius: 4px; padding: 8px 10px; }
+  .heat-cell .name { font-size: 0.72em; color: var(--dim); text-transform: uppercase; letter-spacing: 0.5px; }
+  .heat-cell .pct { font-size: 1.2em; font-weight: bold; }
+  .heat-bar { height: 4px; border-radius: 2px; margin-top: 4px; background: #332818; overflow: hidden; }
+  .heat-bar div { height: 100%; }
+  .ceremony { position: fixed; inset: 0; background: rgba(10,8,4,0.92); display: none;
+    align-items: center; justify-content: center; z-index: 50; flex-direction: column; text-align: center; }
+  .ceremony.show { display: flex; }
+  .ceremony h2 { color: var(--gold); font-size: 2.2em; letter-spacing: 3px; text-transform: uppercase; }
+  .ceremony p { color: var(--text); max-width: 420px; }
+  .phase-label { color: var(--dim); font-size: 0.75em; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px; }
+  .btn-row { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
+  button.secondary { background: transparent; border: 1px solid var(--gold-dim); color: var(--dim);
+    padding: 8px 16px; border-radius: 4px; cursor: pointer; font-family: inherit; }
+  #loadErr { color: var(--red); text-align: center; }
+</style>
+</head>
+<body>
+
+<h1>Cursus Honorum</h1>
+<div class="subtitle">The Sovereign Trading Trainer — 100% Offline</div>
+
+<div class="wrap">
+  <div id="loadErr"></div>
+
+  <div class="panel" id="statPanel" style="display:none">
+    <div class="statbar">
+      <div class="stat"><div class="v" id="eloVal">—</div><div class="l">Elo</div></div>
+      <div class="stat"><span class="rank-badge" id="rankVal">—</span></div>
+      <div class="stat"><div class="v" id="streakVal">0</div><div class="l">Streak</div></div>
+      <div class="stat"><div class="v" id="phaseVal">—</div><div class="l">Phase</div></div>
+    </div>
+  </div>
+
+  <div class="panel" id="qPanel" style="display:none">
+    <div class="phase-label" id="qPhaseLabel"></div>
+    <div class="cat-tag" id="qCat"></div>
+    <div class="timerbar"><div class="timerfill" id="timerFill"></div></div>
+    <div class="prompt" id="qPrompt"></div>
+    <div id="qOpts"></div>
+    <div class="explain" id="explainBox">
+      <div class="tenet-line" id="explainTenet"></div>
+      <p id="explainText"></p>
+      <button class="nextbtn" id="nextBtn">Next Question →</button>
+    </div>
+  </div>
+
+  <div class="panel" id="heatPanel" style="display:none">
+    <div class="phase-label">Per-Category Accuracy — The Heatmap</div>
+    <div class="heatmap" id="heatGrid"></div>
+  </div>
+
+  <div class="panel" id="controlPanel" style="display:none; text-align:center;">
+    <button class="secondary" id="resetBtn">Reset Progress</button>
+  </div>
+</div>
+
+<div class="ceremony" id="ceremony">
+  <h2 id="ceremonyRank"></h2>
+  <p>The Senate recognizes your ascent. Elo <span id="ceremonyElo"></span>.</p>
+  <button class="nextbtn" id="ceremonyClose">Continue</button>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  const STORE_KEY = "cursus_honorum_save_v1";
+  const QUESTION_TIME_S = 30;
+
+  const RANKS = [
+    ["Quaestor", 800, 1000], ["Aedile", 1000, 1200], ["Praetor", 1200, 1400],
+    ["Consul", 1400, 1600], ["Dictator", 1600, 1800], ["SPQR", 1800, 3000]
+  ];
+
+  function rankFor(elo) {
+    for (const [name, lo, hi] of RANKS) if (elo >= lo && elo < hi) return name;
+    return elo < 800 ? "Quaestor" : "SPQR";
+  }
+  function rankIndex(name) { return RANKS.findIndex(r => r[0] === name); }
+
+  function defaultState() {
+    return {
+      elo: 1000,
+      rank: "Quaestor",
+      streak: 0,
+      losingStreak: 0,
+      phase: "calibration",       // calibration | diagnostic | done
+      calIndex: 0,                // pointer into CAL-01..30 in order
+      askedIds: [],                // diagnostic ids already asked (avoid immediate repeats)
+      categoryStats: {},           // { category: {correct, attempted} }
+      totalAnswered: 0,
+      totalCorrect: 0
+    };
+  }
+
+  function loadState() {
+    try {
+      const raw = localStorage.getItem(STORE_KEY);
+      if (!raw) return defaultState();
+      const parsed = JSON.parse(raw);
+      return Object.assign(defaultState(), parsed);
+    } catch (e) { return defaultState(); }
+  }
+  function saveState() { localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
+
+  let state = loadState();
+  let bank = null;
+  let categoriesMeta = null;
+  let currentQ = null;
+  let timerHandle = null;
+  let timeLeft = QUESTION_TIME_S;
+  let answered = false;
+
+  const $ = id => document.getElementById(id);
+
+  function eloK(elo) { return elo >= 1200 ? 16 : 32; }
+
+  function updateElo(playerElo, itemElo, won) {
+    const expected = 1 / (1 + Math.pow(10, (itemElo - playerElo) / 400));
+    const k = eloK(playerElo);
+    const delta = Math.round(k * ((won ? 1 : 0) - expected));
+    return playerElo + delta;
+  }
+
+  function catStats(cat) {
+    if (!state.categoryStats[cat]) state.categoryStats[cat] = { correct: 0, attempted: 0 };
+    return state.categoryStats[cat];
+  }
+
+  function pickCalibrationQ() {
+    const calQs = bank.questions.filter(q => q.phase === "calibration")
+      .sort((a,b) => a.elo_weight - b.elo_weight);
+    if (state.calIndex >= calQs.length) { state.phase = "diagnostic"; saveState(); return pickDiagnosticQ(); }
+    return calQs[state.calIndex];
+  }
+
+  // Adaptive router: weight toward weak categories, zone-of-proximal-development difficulty.
+  function pickDiagnosticQ() {
+    const diagQs = bank.questions.filter(q => q.phase === "diagnostic");
+    const cats = Object.keys(categoriesMeta.categories);
+
+    // per-category accuracy (unseen categories treated as weakest -> priority)
+    const catScore = {};
+    for (const c of cats) {
+      const s = catStats(c);
+      catScore[c] = s.attempted > 0 ? s.correct / s.attempted : 0; // 0 = unseen/weak -> high priority
+    }
+    // weight = inverse of accuracy (weaker categories sampled more), min floor so nothing is starved
+    const weight = c => Math.max(0.15, 1 - catScore[c]);
+
+    // difficulty target: ease off on losing streak (ZPD), push up on hot streak
+    let targetElo = state.elo;
+    if (state.losingStreak >= 2) targetElo -= 120;
+    else if (state.streak >= 3) targetElo += 80;
+
+    // build candidate pool excluding recently asked (last 15) if possible
+    const recentSet = new Set(state.askedIds.slice(-15));
+    let pool = diagQs.filter(q => !recentSet.has(q.id));
+    if (pool.length === 0) pool = diagQs.slice();
+
+    // score each candidate: category weight (favor weak) * proximity to target elo
+    let best = null, bestScore = -Infinity;
+    for (const q of pool) {
+      const catW = weight(q.category);
+      const dist = Math.abs(q.elo_weight - targetElo);
+      const proximity = 1 / (1 + dist / 150);
+      const score = catW * 0.65 + proximity * 0.35 + Math.random() * 0.05;
+      if (score > bestScore) { bestScore = score; best = q; }
+    }
+    return best;
+  }
+
+  function nextQuestion() {
+    answered = false;
+    clearInterval(timerHandle);
+    if (state.phase === "calibration") currentQ = pickCalibrationQ();
+    else currentQ = pickDiagnosticQ();
+
+    if (!currentQ) { renderDone(); return; }
+    renderQuestion();
+    startTimer();
+  }
+
+  function startTimer() {
+    timeLeft = QUESTION_TIME_S;
+    const fill = $("timerFill");
+    fill.style.width = "100%";
+    fill.style.background = "var(--gold)";
+    timerHandle = setInterval(() => {
+      timeLeft -= 1;
+      const pct = Math.max(0, (timeLeft / QUESTION_TIME_S) * 100);
+      fill.style.width = pct + "%";
+      if (timeLeft <= 8) fill.style.background = "var(--red)";
+      if (timeLeft <= 0) {
+        clearInterval(timerHandle);
+        if (!answered) commitAnswer(null); // timeout = wrong, no letter selected
+      }
+    }, 1000);
+  }
+
+  function renderQuestion() {
+    $("qPhaseLabel").textContent = state.phase === "calibration"
+      ? `Calibration — ${currentQ.id}` : `Diagnostic — ${currentQ.id} · Rank tier ${currentQ.rank}`;
+    $("qCat").textContent = currentQ.category.replace(/_/g, " ");
+    $("qPrompt").textContent = currentQ.prompt_roman;
+    const optsDiv = $("qOpts");
+    optsDiv.innerHTML = "";
+    const letters = Object.keys(currentQ.options);
+    for (const letter of letters) {
+      const btn = document.createElement("button");
+      btn.className = "opt";
+      btn.innerHTML = `<span class="letter">${letter}.</span>${currentQ.options[letter]}`;
+      btn.addEventListener("click", () => commitAnswer(letter));
+      optsDiv.appendChild(btn);
+    }
+    $("explainBox").classList.remove("show");
+    updateStatDisplay();
+  }
+
+  function commitAnswer(chosenLetter) {
+    if (answered) return;
+    answered = true;
+    clearInterval(timerHandle);
+    const won = chosenLetter === currentQ.correct;
+
+    // lock buttons, mark colors
+    const buttons = $("qOpts").querySelectorAll(".opt");
+    buttons.forEach(b => {
+      b.disabled = true;
+      const letter = b.querySelector(".letter").textContent.replace(".", "");
+      if (letter === currentQ.correct) b.classList.add("correct");
+      else if (letter === chosenLetter) b.classList.add("wrong");
+    });
+
+    // Elo update
+    const prevElo = state.elo;
+    state.elo = updateElo(state.elo, currentQ.elo_weight, won);
+    const prevRankIdx = rankIndex(state.rank);
+    state.rank = rankFor(state.elo);
+    const newRankIdx = rankIndex(state.rank);
+
+    // streaks
+    if (won) { state.streak += 1; state.losingStreak = 0; }
+    else { state.streak = 0; state.losingStreak += 1; }
+
+    // category + totals
+    const cs = catStats(currentQ.category);
+    cs.attempted += 1;
+    if (won) cs.correct += 1;
+    state.totalAnswered += 1;
+    if (won) state.totalCorrect += 1;
+
+    // progression bookkeeping
+    if (state.phase === "calibration") {
+      state.calIndex += 1;
+      if (state.calIndex >= 30) state.phase = "diagnostic";
+    } else {
+      state.askedIds.push(currentQ.id);
+      if (state.askedIds.length > 200) state.askedIds = state.askedIds.slice(-100);
+    }
+
+    saveState();
+    updateStatDisplay();
+    renderHeatmap();
+
+    // explanation panel — shown after commit, win or lose, straight from the bank record
+    $("explainTenet").textContent = `Tenet ${currentQ.tenet} — ${categoriesMeta.tenets[currentQ.tenet] || ""}`;
+    $("explainText").textContent = currentQ.stockfish_explanation;
+    $("explainBox").classList.add("show");
+
+    if (newRankIdx > prevRankIdx) {
+      setTimeout(() => showCeremony(state.rank, state.elo), 400);
+    }
+  }
+
+  function showCeremony(rank, elo) {
+    $("ceremonyRank").textContent = "Ascension: " + rank;
+    $("ceremonyElo").textContent = elo;
+    $("ceremony").classList.add("show");
+  }
+
+  function updateStatDisplay() {
+    $("eloVal").textContent = state.elo;
+    $("rankVal").textContent = state.rank;
+    $("streakVal").textContent = state.streak;
+    $("phaseVal").textContent = state.phase === "calibration"
+      ? `Calibration ${state.calIndex}/30` : (state.phase === "diagnostic" ? "Diagnostic" : "Done");
+  }
+
+  function renderHeatmap() {
+    const grid = $("heatGrid");
+    grid.innerHTML = "";
+    const cats = Object.keys(categoriesMeta.categories);
+    for (const c of cats) {
+      const s = catStats(c);
+      const pct = s.attempted > 0 ? Math.round((s.correct / s.attempted) * 100) : null;
+      const cell = document.createElement("div");
+      cell.className = "heat-cell";
+      const color = pct === null ? "#665533" : pct >= 70 ? "var(--green)" : pct >= 40 ? "var(--gold)" : "var(--red)";
+      cell.innerHTML = `
+        <div class="name">${c.replace(/_/g," ")}</div>
+        <div class="pct" style="color:${color}">${pct === null ? "—" : pct + "%"}</div>
+        <div class="heat-bar"><div style="width:${pct===null?0:pct}%;background:${color}"></div></div>
+      `;
+      grid.appendChild(cell);
+    }
+  }
+
+  function renderDone() {
+    $("qPanel").innerHTML = `<div class="prompt">The bank is exhausted for this session, citizen. Elo ${state.elo}, Rank ${state.rank}. Return after Claude authors more (see AUTHOR_MORE.md).</div>`;
+  }
+
+  function init() {
+    fetch("question_bank.json").then(r => r.json()).then(b => {
+      bank = b;
+      return fetch("categories.json");
+    }).then(r => r.json()).then(c => {
+      categoriesMeta = c;
+      $("statPanel").style.display = "block";
+      $("qPanel").style.display = "block";
+      $("heatPanel").style.display = "block";
+      $("controlPanel").style.display = "block";
+      renderHeatmap();
+      updateStatDisplay();
+      nextQuestion();
+    }).catch(err => {
+      $("loadErr").textContent = "Failed to load question_bank.json / categories.json — serve this folder over a local HTTP server (e.g. `python3 -m http.server`) rather than opening the file directly, since browsers block fetch() on file:// URLs. Error: " + err;
+    });
+  }
+
+  $("nextBtn").addEventListener("click", nextQuestion);
+  $("ceremonyClose").addEventListener("click", () => $("ceremony").classList.remove("show"));
+  $("resetBtn").addEventListener("click", () => {
+    if (confirm("Reset all Elo, rank, and heatmap progress?")) {
+      localStorage.removeItem(STORE_KEY);
+      state = defaultState();
+      saveState();
+      location.reload();
+    }
+  });
+
+  init();
+})();
+</script>
+</body>
+</html>
