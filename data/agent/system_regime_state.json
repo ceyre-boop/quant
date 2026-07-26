@@ -1,57 +1,27 @@
 {
-  "generated_at": "2026-07-25T01:34:07.968632+00:00",
+  "generated_at": "2026-07-25T20:01:15.293122+00:00",
   "status": "DEGRADED",
-  "status_reason": "carry:OK; es_nq:OK; macro:OK; portfolio:UNAVAILABLE",
+  "status_reason": "carry:STALE; es_nq:STALE; macro:OK; portfolio:UNAVAILABLE",
   "strategies": {
     "carry": {
-      "status": "OK",
-      "verdict": "GO",
-      "favorable": true,
-      "size_multiplier": 0.5,
-      "reason": "2/4 pairs WIDENING; VIX 18.58 not extreme",
-      "source": "data/agent/forex_proximity.json",
-      "source_age_hours": 11.925,
-      "detail": {
-        "per_pair": {
-          "USDJPY=X": {
-            "differential_trend": "NARROWING",
-            "rate_differential": 3.489,
-            "regime": "TRENDING"
-          },
-          "GBPUSD=X": {
-            "differential_trend": "WIDENING",
-            "rate_differential": -0.6,
-            "regime": "TRENDING"
-          },
-          "AUDUSD=X": {
-            "differential_trend": "WIDENING",
-            "rate_differential": 0.13,
-            "regime": "TRENDING"
-          },
-          "EURUSD=X": {
-            "differential_trend": "NARROWING",
-            "rate_differential": -2.08,
-            "regime": "TRENDING"
-          }
-        },
-        "vix": 18.58,
-        "vix_extreme": false
-      }
-    },
-    "es_nq": {
-      "status": "OK",
-      "verdict": "INFO",
+      "status": "STALE",
+      "verdict": "STAND_ASIDE",
       "favorable": false,
       "size_multiplier": 0.0,
-      "reason": "research INFO only \u2014 regime 'NO_DATA'",
+      "reason": "forex_proximity.json 30.4h old > 12.0h freshness limit",
+      "source": "data/agent/forex_proximity.json",
+      "source_age_hours": 30.377,
+      "detail": {}
+    },
+    "es_nq": {
+      "status": "STALE",
+      "verdict": "STAND_ASIDE",
+      "favorable": false,
+      "size_multiplier": 0.0,
+      "reason": "nqes_regime.json 18.3h old > 12.0h freshness limit",
       "source": "data/research/nqes_regime.json",
-      "source_age_hours": 11.93,
-      "detail": {
-        "regime": "NO_DATA",
-        "read": "ES=F/NQ=F fetch failed",
-        "divergence": null,
-        "contemporaneous_corr": null
-      }
+      "source_age_hours": 18.259,
+      "detail": {}
     },
     "macro": {
       "status": "OK",
@@ -60,10 +30,10 @@
       "size_multiplier": 0.0,
       "reason": "macro backdrop INFO (VIX / curve / credit) \u2014 shared input",
       "source": "data/macro/macro_snapshot.json",
-      "source_age_hours": 0.665,
+      "source_age_hours": 2.136,
       "detail": {
         "vix": 18.58,
-        "curve_10y2y": 0.644,
+        "curve_10y2y": 0.628,
         "curve_10y3m": 0.874,
         "credit_hyg": 79.23,
         "dgs10": 4.679
