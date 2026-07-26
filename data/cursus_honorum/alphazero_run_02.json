@@ -1,0 +1,755 @@
+{
+  "player": "alphazero",
+  "bank_version": "v2",
+  "score": 66,
+  "total": 100,
+  "pct": 66.0,
+  "elo_before": 1200,
+  "elo_after": 1495,
+  "category_results": {
+    "EXPECTANCY": {
+      "correct": 11,
+      "total": 13
+    },
+    "SIZING": {
+      "correct": 9,
+      "total": 12
+    },
+    "CARRY": {
+      "correct": 10,
+      "total": 13
+    },
+    "KELLY": {
+      "correct": 9,
+      "total": 12
+    },
+    "SHARPE": {
+      "correct": 9,
+      "total": 13
+    },
+    "EXITS": {
+      "correct": 4,
+      "total": 12
+    },
+    "RECOVERY": {
+      "correct": 6,
+      "total": 12
+    },
+    "TRUST": {
+      "correct": 8,
+      "total": 13
+    }
+  },
+  "az_profile_used": {
+    "EXPECTANCY": 0.72,
+    "SIZING": 0.68,
+    "CARRY": 0.8,
+    "KELLY": 0.65,
+    "SHARPE": 0.7,
+    "EXITS": 0.55,
+    "RECOVERY": 0.6,
+    "TRUST": 0.62
+  },
+  "question_log": [
+    {
+      "id": "CAL-01",
+      "bucket": "EXPECTANCY",
+      "correct": true,
+      "elo_after": 1223,
+      "difficulty": 1350
+    },
+    {
+      "id": "CAL-02",
+      "bucket": "EXPECTANCY",
+      "correct": true,
+      "elo_after": 1242,
+      "difficulty": 1280
+    },
+    {
+      "id": "CAL-03",
+      "bucket": "EXPECTANCY",
+      "correct": true,
+      "elo_after": 1267,
+      "difficulty": 1450
+    },
+    {
+      "id": "CAL-04",
+      "bucket": "EXPECTANCY",
+      "correct": true,
+      "elo_after": 1288,
+      "difficulty": 1380
+    },
+    {
+      "id": "CAL-05",
+      "bucket": "EXPECTANCY",
+      "correct": false,
+      "elo_after": 1273,
+      "difficulty": 1300
+    },
+    {
+      "id": "CAL-06",
+      "bucket": "EXPECTANCY",
+      "correct": true,
+      "elo_after": 1290,
+      "difficulty": 1300
+    },
+    {
+      "id": "CAL-07",
+      "bucket": "EXPECTANCY",
+      "correct": false,
+      "elo_after": 1274,
+      "difficulty": 1280
+    },
+    {
+      "id": "CAL-08",
+      "bucket": "EXPECTANCY",
+      "correct": true,
+      "elo_after": 1293,
+      "difficulty": 1350
+    },
+    {
+      "id": "CAL-09",
+      "bucket": "EXPECTANCY",
+      "correct": true,
+      "elo_after": 1315,
+      "difficulty": 1420
+    },
+    {
+      "id": "CAL-10",
+      "bucket": "EXPECTANCY",
+      "correct": true,
+      "elo_after": 1335,
+      "difficulty": 1400
+    },
+    {
+      "id": "CAL-11",
+      "bucket": "EXPECTANCY",
+      "correct": true,
+      "elo_after": 1357,
+      "difficulty": 1460
+    },
+    {
+      "id": "CAL-12",
+      "bucket": "EXPECTANCY",
+      "correct": true,
+      "elo_after": 1379,
+      "difficulty": 1500
+    },
+    {
+      "id": "CAL-13",
+      "bucket": "EXPECTANCY",
+      "correct": true,
+      "elo_after": 1395,
+      "difficulty": 1380
+    },
+    {
+      "id": "CAR-01",
+      "bucket": "CARRY",
+      "correct": true,
+      "elo_after": 1408,
+      "difficulty": 1320
+    },
+    {
+      "id": "CAR-02",
+      "bucket": "CARRY",
+      "correct": true,
+      "elo_after": 1424,
+      "difficulty": 1400
+    },
+    {
+      "id": "CAR-03",
+      "bucket": "CARRY",
+      "correct": true,
+      "elo_after": 1438,
+      "difficulty": 1380
+    },
+    {
+      "id": "CAR-04",
+      "bucket": "CARRY",
+      "correct": true,
+      "elo_after": 1451,
+      "difficulty": 1380
+    },
+    {
+      "id": "CAR-05",
+      "bucket": "CARRY",
+      "correct": true,
+      "elo_after": 1465,
+      "difficulty": 1400
+    },
+    {
+      "id": "CAR-06",
+      "bucket": "CARRY",
+      "correct": false,
+      "elo_after": 1443,
+      "difficulty": 1320
+    },
+    {
+      "id": "CAR-07",
+      "bucket": "CARRY",
+      "correct": true,
+      "elo_after": 1455,
+      "difficulty": 1350
+    },
+    {
+      "id": "CAR-08",
+      "bucket": "CARRY",
+      "correct": false,
+      "elo_after": 1434,
+      "difficulty": 1350
+    },
+    {
+      "id": "CAR-09",
+      "bucket": "CARRY",
+      "correct": true,
+      "elo_after": 1443,
+      "difficulty": 1280
+    },
+    {
+      "id": "CAR-10",
+      "bucket": "CARRY",
+      "correct": true,
+      "elo_after": 1458,
+      "difficulty": 1430
+    },
+    {
+      "id": "CAR-11",
+      "bucket": "CARRY",
+      "correct": true,
+      "elo_after": 1474,
+      "difficulty": 1450
+    },
+    {
+      "id": "CAR-12",
+      "bucket": "CARRY",
+      "correct": false,
+      "elo_after": 1457,
+      "difficulty": 1460
+    },
+    {
+      "id": "CAR-13",
+      "bucket": "CARRY",
+      "correct": true,
+      "elo_after": 1471,
+      "difficulty": 1420
+    },
+    {
+      "id": "EXI-01",
+      "bucket": "EXITS",
+      "correct": true,
+      "elo_after": 1482,
+      "difficulty": 1350
+    },
+    {
+      "id": "EXI-02",
+      "bucket": "EXITS",
+      "correct": true,
+      "elo_after": 1493,
+      "difficulty": 1380
+    },
+    {
+      "id": "EXI-03",
+      "bucket": "EXITS",
+      "correct": false,
+      "elo_after": 1474,
+      "difficulty": 1420
+    },
+    {
+      "id": "EXI-04",
+      "bucket": "EXITS",
+      "correct": false,
+      "elo_after": 1456,
+      "difficulty": 1430
+    },
+    {
+      "id": "EXI-05",
+      "bucket": "EXITS",
+      "correct": false,
+      "elo_after": 1437,
+      "difficulty": 1400
+    },
+    {
+      "id": "EXI-06",
+      "bucket": "EXITS",
+      "correct": false,
+      "elo_after": 1417,
+      "difficulty": 1350
+    },
+    {
+      "id": "EXI-07",
+      "bucket": "EXITS",
+      "correct": true,
+      "elo_after": 1430,
+      "difficulty": 1360
+    },
+    {
+      "id": "EXI-08",
+      "bucket": "EXITS",
+      "correct": false,
+      "elo_after": 1412,
+      "difficulty": 1380
+    },
+    {
+      "id": "EXI-09",
+      "bucket": "EXITS",
+      "correct": true,
+      "elo_after": 1429,
+      "difficulty": 1440
+    },
+    {
+      "id": "EXI-10",
+      "bucket": "EXITS",
+      "correct": false,
+      "elo_after": 1415,
+      "difficulty": 1480
+    },
+    {
+      "id": "EXI-11",
+      "bucket": "EXITS",
+      "correct": false,
+      "elo_after": 1401,
+      "difficulty": 1450
+    },
+    {
+      "id": "EXI-12",
+      "bucket": "EXITS",
+      "correct": false,
+      "elo_after": 1385,
+      "difficulty": 1400
+    },
+    {
+      "id": "KEL-01",
+      "bucket": "KELLY",
+      "correct": false,
+      "elo_after": 1372,
+      "difficulty": 1450
+    },
+    {
+      "id": "KEL-02",
+      "bucket": "KELLY",
+      "correct": true,
+      "elo_after": 1391,
+      "difficulty": 1430
+    },
+    {
+      "id": "KEL-03",
+      "bucket": "KELLY",
+      "correct": false,
+      "elo_after": 1374,
+      "difficulty": 1360
+    },
+    {
+      "id": "KEL-04",
+      "bucket": "KELLY",
+      "correct": true,
+      "elo_after": 1391,
+      "difficulty": 1400
+    },
+    {
+      "id": "KEL-05",
+      "bucket": "KELLY",
+      "correct": true,
+      "elo_after": 1410,
+      "difficulty": 1460
+    },
+    {
+      "id": "KEL-06",
+      "bucket": "KELLY",
+      "correct": true,
+      "elo_after": 1425,
+      "difficulty": 1380
+    },
+    {
+      "id": "KEL-07",
+      "bucket": "KELLY",
+      "correct": true,
+      "elo_after": 1443,
+      "difficulty": 1470
+    },
+    {
+      "id": "KEL-08",
+      "bucket": "KELLY",
+      "correct": true,
+      "elo_after": 1462,
+      "difficulty": 1500
+    },
+    {
+      "id": "KEL-09",
+      "bucket": "KELLY",
+      "correct": true,
+      "elo_after": 1476,
+      "difficulty": 1420
+    },
+    {
+      "id": "KEL-10",
+      "bucket": "KELLY",
+      "correct": true,
+      "elo_after": 1493,
+      "difficulty": 1490
+    },
+    {
+      "id": "KEL-11",
+      "bucket": "KELLY",
+      "correct": false,
+      "elo_after": 1474,
+      "difficulty": 1430
+    },
+    {
+      "id": "KEL-12",
+      "bucket": "KELLY",
+      "correct": true,
+      "elo_after": 1490,
+      "difficulty": 1470
+    },
+    {
+      "id": "REC-01",
+      "bucket": "RECOVERY",
+      "correct": true,
+      "elo_after": 1497,
+      "difficulty": 1280
+    },
+    {
+      "id": "REC-02",
+      "bucket": "RECOVERY",
+      "correct": true,
+      "elo_after": 1505,
+      "difficulty": 1300
+    },
+    {
+      "id": "REC-03",
+      "bucket": "RECOVERY",
+      "correct": true,
+      "elo_after": 1518,
+      "difficulty": 1440
+    },
+    {
+      "id": "REC-04",
+      "bucket": "RECOVERY",
+      "correct": false,
+      "elo_after": 1493,
+      "difficulty": 1300
+    },
+    {
+      "id": "REC-05",
+      "bucket": "RECOVERY",
+      "correct": false,
+      "elo_after": 1473,
+      "difficulty": 1400
+    },
+    {
+      "id": "REC-06",
+      "bucket": "RECOVERY",
+      "correct": false,
+      "elo_after": 1450,
+      "difficulty": 1320
+    },
+    {
+      "id": "REC-07",
+      "bucket": "RECOVERY",
+      "correct": true,
+      "elo_after": 1466,
+      "difficulty": 1460
+    },
+    {
+      "id": "REC-08",
+      "bucket": "RECOVERY",
+      "correct": false,
+      "elo_after": 1445,
+      "difficulty": 1360
+    },
+    {
+      "id": "REC-09",
+      "bucket": "RECOVERY",
+      "correct": true,
+      "elo_after": 1458,
+      "difficulty": 1380
+    },
+    {
+      "id": "REC-10",
+      "bucket": "RECOVERY",
+      "correct": true,
+      "elo_after": 1470,
+      "difficulty": 1380
+    },
+    {
+      "id": "REC-11",
+      "bucket": "RECOVERY",
+      "correct": false,
+      "elo_after": 1453,
+      "difficulty": 1440
+    },
+    {
+      "id": "REC-12",
+      "bucket": "RECOVERY",
+      "correct": false,
+      "elo_after": 1435,
+      "difficulty": 1400
+    },
+    {
+      "id": "SHA-01",
+      "bucket": "SHARPE",
+      "correct": true,
+      "elo_after": 1447,
+      "difficulty": 1350
+    },
+    {
+      "id": "SHA-02",
+      "bucket": "SHARPE",
+      "correct": true,
+      "elo_after": 1457,
+      "difficulty": 1320
+    },
+    {
+      "id": "SHA-03",
+      "bucket": "SHARPE",
+      "correct": false,
+      "elo_after": 1434,
+      "difficulty": 1300
+    },
+    {
+      "id": "SHA-04",
+      "bucket": "SHARPE",
+      "correct": false,
+      "elo_after": 1412,
+      "difficulty": 1300
+    },
+    {
+      "id": "SHA-05",
+      "bucket": "SHARPE",
+      "correct": true,
+      "elo_after": 1422,
+      "difficulty": 1280
+    },
+    {
+      "id": "SHA-06",
+      "bucket": "SHARPE",
+      "correct": true,
+      "elo_after": 1436,
+      "difficulty": 1380
+    },
+    {
+      "id": "SHA-07",
+      "bucket": "SHARPE",
+      "correct": true,
+      "elo_after": 1453,
+      "difficulty": 1450
+    },
+    {
+      "id": "SHA-08",
+      "bucket": "SHARPE",
+      "correct": true,
+      "elo_after": 1468,
+      "difficulty": 1430
+    },
+    {
+      "id": "SHA-09",
+      "bucket": "SHARPE",
+      "correct": true,
+      "elo_after": 1482,
+      "difficulty": 1420
+    },
+    {
+      "id": "SHA-10",
+      "bucket": "SHARPE",
+      "correct": false,
+      "elo_after": 1465,
+      "difficulty": 1460
+    },
+    {
+      "id": "SHA-11",
+      "bucket": "SHARPE",
+      "correct": false,
+      "elo_after": 1449,
+      "difficulty": 1460
+    },
+    {
+      "id": "SHA-12",
+      "bucket": "SHARPE",
+      "correct": true,
+      "elo_after": 1459,
+      "difficulty": 1300
+    },
+    {
+      "id": "SHA-13",
+      "bucket": "SHARPE",
+      "correct": true,
+      "elo_after": 1468,
+      "difficulty": 1290
+    },
+    {
+      "id": "SIZ-01",
+      "bucket": "SIZING",
+      "correct": true,
+      "elo_after": 1478,
+      "difficulty": 1320
+    },
+    {
+      "id": "SIZ-02",
+      "bucket": "SIZING",
+      "correct": false,
+      "elo_after": 1460,
+      "difficulty": 1430
+    },
+    {
+      "id": "SIZ-03",
+      "bucket": "SIZING",
+      "correct": true,
+      "elo_after": 1468,
+      "difficulty": 1280
+    },
+    {
+      "id": "SIZ-04",
+      "bucket": "SIZING",
+      "correct": true,
+      "elo_after": 1483,
+      "difficulty": 1450
+    },
+    {
+      "id": "SIZ-05",
+      "bucket": "SIZING",
+      "correct": true,
+      "elo_after": 1492,
+      "difficulty": 1320
+    },
+    {
+      "id": "SIZ-06",
+      "bucket": "SIZING",
+      "correct": true,
+      "elo_after": 1500,
+      "difficulty": 1300
+    },
+    {
+      "id": "SIZ-07",
+      "bucket": "SIZING",
+      "correct": true,
+      "elo_after": 1508,
+      "difficulty": 1320
+    },
+    {
+      "id": "SIZ-08",
+      "bucket": "SIZING",
+      "correct": true,
+      "elo_after": 1522,
+      "difficulty": 1470
+    },
+    {
+      "id": "SIZ-09",
+      "bucket": "SIZING",
+      "correct": false,
+      "elo_after": 1502,
+      "difficulty": 1430
+    },
+    {
+      "id": "SIZ-10",
+      "bucket": "SIZING",
+      "correct": true,
+      "elo_after": 1513,
+      "difficulty": 1400
+    },
+    {
+      "id": "SIZ-11",
+      "bucket": "SIZING",
+      "correct": true,
+      "elo_after": 1525,
+      "difficulty": 1430
+    },
+    {
+      "id": "SIZ-12",
+      "bucket": "SIZING",
+      "correct": false,
+      "elo_after": 1507,
+      "difficulty": 1490
+    },
+    {
+      "id": "TRU-01",
+      "bucket": "TRUST",
+      "correct": true,
+      "elo_after": 1517,
+      "difficulty": 1380
+    },
+    {
+      "id": "TRU-02",
+      "bucket": "TRUST",
+      "correct": true,
+      "elo_after": 1529,
+      "difficulty": 1430
+    },
+    {
+      "id": "TRU-03",
+      "bucket": "TRUST",
+      "correct": true,
+      "elo_after": 1539,
+      "difficulty": 1400
+    },
+    {
+      "id": "TRU-04",
+      "bucket": "TRUST",
+      "correct": true,
+      "elo_after": 1549,
+      "difficulty": 1400
+    },
+    {
+      "id": "TRU-05",
+      "bucket": "TRUST",
+      "correct": false,
+      "elo_after": 1529,
+      "difficulty": 1450
+    },
+    {
+      "id": "TRU-06",
+      "bucket": "TRUST",
+      "correct": false,
+      "elo_after": 1512,
+      "difficulty": 1500
+    },
+    {
+      "id": "TRU-07",
+      "bucket": "TRUST",
+      "correct": true,
+      "elo_after": 1524,
+      "difficulty": 1430
+    },
+    {
+      "id": "TRU-08",
+      "bucket": "TRUST",
+      "correct": true,
+      "elo_after": 1535,
+      "difficulty": 1420
+    },
+    {
+      "id": "TRU-09",
+      "bucket": "TRUST",
+      "correct": true,
+      "elo_after": 1548,
+      "difficulty": 1470
+    },
+    {
+      "id": "TRU-10",
+      "bucket": "TRUST",
+      "correct": false,
+      "elo_after": 1525,
+      "difficulty": 1380
+    },
+    {
+      "id": "TRU-11",
+      "bucket": "TRUST",
+      "correct": true,
+      "elo_after": 1536,
+      "difficulty": 1420
+    },
+    {
+      "id": "TRU-12",
+      "bucket": "TRUST",
+      "correct": false,
+      "elo_after": 1512,
+      "difficulty": 1350
+    },
+    {
+      "id": "TRU-13",
+      "bucket": "TRUST",
+      "correct": false,
+      "elo_after": 1495,
+      "difficulty": 1480
+    }
+  ]
+}

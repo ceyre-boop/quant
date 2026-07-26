@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AlphaZero — Cursus Honorum v2 Weakness Heatmap</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0d0d0f; color: #e8e6e0; font-family: -apple-system, "Segoe UI", sans-serif; padding: 40px 32px; }
+  h1 { font-size: 22px; font-weight: 600; letter-spacing: 0.04em; color: #f0ede6; margin-bottom: 4px; }
+  .subtitle { font-size: 13px; color: #6b6a63; margin-bottom: 36px; letter-spacing: 0.03em; }
+  .meta-row { display: flex; gap: 40px; margin-bottom: 48px; }
+  .stat-box { background: #17181a; border: 1px solid #2a2a2e; border-radius: 8px; padding: 20px 28px; }
+  .stat-label { font-size: 11px; color: #6b6a63; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+  .stat-value { font-size: 32px; font-weight: 700; }
+  .stat-value.green { color: #4caf7d; }
+  .stat-value.yellow { color: #d4a84b; }
+  .stat-value.red { color: #c6613f; }
+  .stat-note { font-size: 11px; color: #6b6a63; margin-top: 4px; }
+  .heatmap-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 48px; }
+  .cat-card {
+    border-radius: 10px;
+    padding: 20px 22px;
+    border: 1px solid transparent;
+    position: relative;
+    overflow: hidden;
+  }
+  .cat-card::after {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+  }
+  .cat-card.strong { background: #0f1f16; border-color: #1a3a24; }
+  .cat-card.strong::after { background: #4caf7d; }
+  .cat-card.good { background: #191a10; border-color: #2e2e18; }
+  .cat-card.good::after { background: #9ab848; }
+  .cat-card.moderate { background: #1c1a10; border-color: #33300f; }
+  .cat-card.moderate::after { background: #d4a84b; }
+  .cat-card.weak { background: #1f1510; border-color: #3a2010; }
+  .cat-card.weak::after { background: #c6613f; }
+  .cat-card.critical { background: #1f0f0f; border-color: #3a1010; }
+  .cat-card.critical::after { background: #c62f2f; }
+  .cat-name { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #9b9a93; margin-bottom: 10px; }
+  .cat-score { font-size: 36px; font-weight: 700; margin-bottom: 4px; }
+  .strong .cat-score { color: #4caf7d; }
+  .good .cat-score { color: #9ab848; }
+  .moderate .cat-score { color: #d4a84b; }
+  .weak .cat-score { color: #c6613f; }
+  .critical .cat-score { color: #c62f2f; }
+  .cat-fraction { font-size: 12px; color: #6b6a63; margin-bottom: 14px; }
+  .cat-bar { height: 4px; background: #2a2a2e; border-radius: 2px; }
+  .cat-bar-fill { height: 4px; border-radius: 2px; }
+  .strong .cat-bar-fill { background: #4caf7d; }
+  .good .cat-bar-fill { background: #9ab848; }
+  .moderate .cat-bar-fill { background: #d4a84b; }
+  .weak .cat-bar-fill { background: #c6613f; }
+  .critical .cat-bar-fill { background: #c62f2f; }
+  .cat-label { font-size: 11px; color: #6b6a63; margin-top: 10px; }
+  .verdict-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 48px; }
+  .verdict-box { background: #17181a; border: 1px solid #2a2a2e; border-radius: 8px; padding: 20px 24px; }
+  .verdict-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #6b6a63; margin-bottom: 14px; }
+  .verdict-item { font-size: 14px; color: #e0ddd6; margin-bottom: 8px; display: flex; align-items: baseline; gap: 10px; }
+  .verdict-item .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; position: relative; top: -1px; }
+  .dot-green { background: #4caf7d; }
+  .dot-red { background: #c62f2f; }
+  .dot-yellow { background: #d4a84b; }
+  .verdict-item span { color: #6b6a63; font-size: 12px; }
+  .elo-track { background: #17181a; border: 1px solid #2a2a2e; border-radius: 8px; padding: 24px; margin-bottom: 32px; }
+  .elo-track-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #6b6a63; margin-bottom: 20px; }
+  canvas { width: 100%; height: 120px; }
+  .footer { font-size: 11px; color: #3a3a3e; margin-top: 8px; }
+  .badge { display: inline-block; font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; padding: 2px 8px; border-radius: 4px; margin-left: 8px; font-weight: 600; }
+  .badge-warning { background: #3a2010; color: #c6613f; }
+  .badge-ok { background: #0f1f16; color: #4caf7d; }
+</style>
+</head>
+<body>
+<h1>AlphaZero — Cursus Honorum v2 <span style="color:#6b6a63;font-weight:400">Weakness Heatmap</span></h1>
+<p class="subtitle">Run 02 · Objective bank · 100 questions · Seed 42 · 2026-07-26</p>
+
+<div class="meta-row">
+  <div class="stat-box">
+    <div class="stat-label">Score</div>
+    <div class="stat-value yellow">66/100</div>
+    <div class="stat-note">66% — genuine signal, not circular</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-label">Final Elo</div>
+    <div class="stat-value yellow">1495</div>
+    <div class="stat-note">Started 1200 · +295 over session</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-label">v1 Score (retired)</div>
+    <div class="stat-value" style="color:#3a3a3e;">100/100</div>
+    <div class="stat-note">Invalid — tested doc adherence only</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-label">Difficulty Range</div>
+    <div class="stat-value" style="color:#9b9a93;font-size:22px;">1280–1500</div>
+    <div class="stat-note">Elo-weighted opponent per question</div>
+  </div>
+</div>
+
+<div class="heatmap-grid">
+  <!-- EXPECTANCY 85% strong -->
+  <div class="cat-card strong">
+    <div class="cat-name">Expectancy</div>
+    <div class="cat-score">85%</div>
+    <div class="cat-fraction">11 / 13 correct</div>
+    <div class="cat-bar"><div class="cat-bar-fill" style="width:85%"></div></div>
+    <div class="cat-label">EV math · calibration · probability</div>
+  </div>
+  <!-- CARRY 77% good -->
+  <div class="cat-card good">
+    <div class="cat-name">Carry</div>
+    <div class="cat-score">77%</div>
+    <div class="cat-fraction">10 / 13 correct</div>
+    <div class="cat-bar"><div class="cat-bar-fill" style="width:77%"></div></div>
+    <div class="cat-label">UIP · rollover · crowding · crash risk</div>
+  </div>
+  <!-- SIZING 75% good -->
+  <div class="cat-card good">
+    <div class="cat-name">Sizing</div>
+    <div class="cat-score">75%</div>
+    <div class="cat-fraction">9 / 12 correct</div>
+    <div class="cat-bar"><div class="cat-bar-fill" style="width:75%"></div></div>
+    <div class="cat-label">Position sizing · risk of ruin · correlation</div>
+  </div>
+  <!-- KELLY 75% good -->
+  <div class="cat-card good">
+    <div class="cat-name">Kelly</div>
+    <div class="cat-score">75%</div>
+    <div class="cat-fraction">9 / 12 correct</div>
+    <div class="cat-bar"><div class="cat-bar-fill" style="width:75%"></div></div>
+    <div class="cat-label">Kelly fraction · fractional · overkelly</div>
+  </div>
+  <!-- SHARPE 69% moderate -->
+  <div class="cat-card moderate">
+    <div class="cat-name">Sharpe</div>
+    <div class="cat-score">69%</div>
+    <div class="cat-fraction">9 / 13 correct</div>
+    <div class="cat-bar"><div class="cat-bar-fill" style="width:69%"></div></div>
+    <div class="cat-label">Sortino · Calmar · Omega · vol drag</div>
+  </div>
+  <!-- TRUST 62% moderate -->
+  <div class="cat-card moderate">
+    <div class="cat-name">Trust</div>
+    <div class="cat-score">62%</div>
+    <div class="cat-fraction">8 / 13 correct</div>
+    <div class="cat-bar"><div class="cat-bar-fill" style="width:62%"></div></div>
+    <div class="cat-label">p-values · multiple testing · DSR · WFV</div>
+  </div>
+  <!-- RECOVERY 50% weak -->
+  <div class="cat-card weak">
+    <div class="cat-name">Recovery <span class="badge badge-warning">Weak</span></div>
+    <div class="cat-score">50%</div>
+    <div class="cat-fraction">6 / 12 correct</div>
+    <div class="cat-bar"><div class="cat-bar-fill" style="width:50%"></div></div>
+    <div class="cat-label">Drawdown math · behavioral bias · disposition</div>
+  </div>
+  <!-- EXITS 33% critical -->
+  <div class="cat-card critical">
+    <div class="cat-name">Exits <span class="badge badge-warning">Critical</span></div>
+    <div class="cat-score">33%</div>
+    <div class="cat-fraction">4 / 12 correct</div>
+    <div class="cat-bar"><div class="cat-bar-fill" style="width:33%"></div></div>
+    <div class="cat-label">OU process · trailing stops · scaling out</div>
+  </div>
+</div>
+
+<div class="verdict-row">
+  <div class="verdict-box">
+    <div class="verdict-title">Strengths (≥75%)</div>
+    <div class="verdict-item"><div class="dot dot-green"></div>EXPECTANCY — 85% · EV math is clean</div>
+    <div class="verdict-item"><div class="dot dot-green"></div>CARRY — 77% · Core strategy knowledge solid</div>
+    <div class="verdict-item"><div class="dot dot-green"></div>SIZING — 75% · Position sizing fundamentals intact</div>
+    <div class="verdict-item"><div class="dot dot-green"></div>KELLY — 75% · Formula knowledge present <span>but edge estimation confidence may be inflated</span></div>
+  </div>
+  <div class="verdict-box">
+    <div class="verdict-title">Weaknesses (≤69%)</div>
+    <div class="verdict-item"><div class="dot dot-yellow"></div>SHARPE — 69% · <span>Sortino / Calmar / Omega ratio distinctions blur</span></div>
+    <div class="verdict-item"><div class="dot dot-yellow"></div>TRUST — 62% · <span>Multiple testing correction (Bonferroni / BH) weakest here</span></div>
+    <div class="verdict-item"><div class="dot dot-red"></div>RECOVERY — 50% · <span>Behavioral biases (disposition effect, house money) poorly modeled</span></div>
+    <div class="verdict-item"><div class="dot dot-red"></div>EXITS — 33% · <span>OU mean-reversion, trailing stop mechanics, scaling out underfit</span></div>
+  </div>
+</div>
+
+<div class="verdict-box" style="margin-bottom:32px;">
+  <div class="verdict-title">System Diagnosis</div>
+  <p style="font-size:14px;color:#c0bdb5;line-height:1.7;margin-bottom:12px;">
+    AlphaZero's 66% on the objective v2 bank is a <strong style="color:#d4a84b">genuine signal</strong> — not circular. 
+    The system was trained on carry and rate-differential mechanics, which shows. But two categories expose hard gaps:
+  </p>
+  <p style="font-size:14px;color:#c0bdb5;line-height:1.7;margin-bottom:12px;">
+    <strong style="color:#c62f2f">EXITS (33%)</strong> is the system's biggest blind spot. The backtest confirmed edges on entry timing, 
+    but exit mechanics — OU mean-reversion targets, trailing stop geometry, scaling-out logic — have no dedicated model.
+    This is consistent with the live system's known weakness: the hold-period model is blunt (60d default after v007 rollback).
+  </p>
+  <p style="font-size:14px;color:#c0bdb5;line-height:1.7;">
+    <strong style="color:#c6613f">RECOVERY (50%)</strong> failure is mostly behavioral: disposition effect, house money bias, gambler's fallacy 
+    during drawdown. The system has risk caps but no model of how cognitive biases degrade decision quality during loss sequences.
+    <strong style="color:#4caf7d">TRUST (62%)</strong> reveals gap in multiple-testing discipline — Bonferroni / BH correction knowledge is weak, 
+    which matters because the hypothesis ledger is the entire epistemological foundation.
+  </p>
+</div>
+
+<div class="footer">Alta Investments · Sovereign Trading Intelligence · Cursus Honorum v2 · alphazero_run_02 · 2026-07-26</div>
+
+</body>
+</html>

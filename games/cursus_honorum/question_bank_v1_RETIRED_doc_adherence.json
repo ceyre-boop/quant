@@ -1,0 +1,1731 @@
+{
+  "meta": {
+    "name": "Cursus Honorum — Sovereign Mastery Bank",
+    "schema_version": "1.0.0",
+    "author": "Claude (Magistrate)",
+    "date": "2026-07-25",
+    "grounded_in": [
+      "TRADING_PHILOSOPHY.md (six tenets + time-horizon doctrine)",
+      "RISK_CONSTITUTION.md (Art 1-6)",
+      "config/parameters.yml",
+      "config/ict_params.yml",
+      "sovereign/forex/carry_engine.py",
+      "sovereign/forex/strategy.py (grade + conviction thresholds)",
+      "sovereign/forex/risk_sentiment.py (regime map)",
+      "sovereign/forex/combat_vetoes.py (C-001/C-005)",
+      "sovereign/training/state_space.py (8-dim S(t))",
+      "imbalance_engine/petroulas_gate.py",
+      "CLAUDE.md live state (HYP-045 4-pair, evidence status)"
+    ],
+    "structure": {
+      "calibration_count": 30,
+      "diagnostic_count": 70,
+      "calibration_note": "Q1-30 locate a ballpark Elo. Ordered easy->hard, one clear concept each, broad topic spread across all six ranks.",
+      "diagnostic_note": "Q31-100 map strengths/weaknesses. Each carries a `category` tag; 13-15 categories, ~4-6 items each at varied difficulty."
+    },
+    "answer_key_convention": "`correct` is the single optimal letter. Every scenario's numbers are chosen so the optimal is unambiguous per the cited tenet.",
+    "correctness_pass": "Completed 2026-07-25 — every `correct` re-verified against cited tenet + scenario numbers; see README."
+  },
+  "questions": [
+    {
+      "id": "CAL-01",
+      "phase": "calibration",
+      "rank": "Quaestor",
+      "category": "carry_direction",
+      "elo_weight": 850,
+      "prompt_roman": "Citizen, the carry trade is the coupon that funds the legion's patience. You are shown two currencies and asked only which one to HOLD. THE DATA: AUD policy rate 4.35%, CHF policy rate 1.50%. Differential +285bp in AUD's favour, above the 100bp floor. ATR normal.",
+      "options": {
+        "A": "Long CHF against AUD — safe havens always win.",
+        "B": "Long AUDCHF — hold the high-yield AUD, borrow the near-zero CHF.",
+        "C": "Short AUDCHF — the higher rate will fall first.",
+        "D": "Stand aside — 285bp is not enough carry."
+      },
+      "correct": "B",
+      "tenet": "T5",
+      "stockfish_explanation": "This is the whole carry idea in one line: you get paid to HOLD the currency with the higher rate and BORROW the one with the lower rate. AUD pays 4.35, CHF pays ~1.5, so you're being handed ~285bp a year just for being long AUDCHF. The differential clears our 100bp floor easily, so there's real coupon here. Don't overthink it — the coupon doesn't need a narrative, it just pays."
+    },
+    {
+      "id": "CAL-02",
+      "phase": "calibration",
+      "rank": "Quaestor",
+      "category": "tenet_mapping",
+      "elo_weight": 870,
+      "prompt_roman": "A young engineer wants to add a feature because 'it obviously makes sense that news sentiment should move price.' THE DATA: the feature has NOT been tested out-of-sample; no IC number exists; it simply sounds right.",
+      "options": {
+        "A": "Add it at half size as a compromise.",
+        "B": "Add it only during high-volatility days.",
+        "C": "Add it — intuitive features are the safest kind.",
+        "D": "Refuse until it clears the promotion gates (IC OOS > 0.15, positive marginal contribution, no holdout degradation)."
+      },
+      "correct": "D",
+      "tenet": "T1",
+      "stockfish_explanation": "Tenet 1: statistical utility beats narrative coherence. 'It makes sense' is exactly the trap — remember the pd_alignment lesson, where deleting a perfectly logical feature pushed win rate from 20% to 35%. A feature earns its place with an out-of-sample number, not a good story. No IC, no seat."
+    },
+    {
+      "id": "CAL-03",
+      "phase": "calibration",
+      "rank": "Quaestor",
+      "category": "risk_constitution",
+      "elo_weight": 890,
+      "prompt_roman": "The Kelly optimiser reports that a single high-conviction EURUSD trade 'should' be sized at 1.8% of equity. THE DATA: conviction 0.82, grade A+, rate diff +2.4%. The RISK_CONSTITUTION Article 1 per-trade cap is 0.75%.",
+      "options": {
+        "A": "Size 0.75% — no grade, conviction, or Kelly output raises the per-trade cap.",
+        "B": "Size 1.2% — split the difference.",
+        "C": "Size 1.5% — the grade table allows A+ at 1.5%.",
+        "D": "Size 1.8% — the optimiser has the most information."
+      },
+      "correct": "A",
+      "tenet": "T3",
+      "stockfish_explanation": "The constitution is the conscience layer — no optimiser reasons its way past it. Article 1 says the per-trade cap is 0.75%, and it explicitly names grade, conviction, and Kelly as things that do NOT raise it. Even the grade table's A+ 1.5% gets clamped down to 0.75% at live. When a number wants to exceed a hard cap, the cap wins, every time."
+    },
+    {
+      "id": "CAL-04",
+      "phase": "calibration",
+      "rank": "Quaestor",
+      "category": "regime_id",
+      "elo_weight": 910,
+      "prompt_roman": "The augurs read the sky before the battle. THE DATA: VIX 14.2, VIX3M 16.0 (spread +1.8, contango), no scheduled macro event, trend calm.",
+      "options": {
+        "A": "Cannot be classified without the COT report.",
+        "B": "EXTREME_RISK_OFF — low VIX is the calm before the storm.",
+        "C": "RISK_ON — VIX <= 20 with contango term structure.",
+        "D": "RISK_OFF — always assume the worst."
+      },
+      "correct": "C",
+      "tenet": "T2",
+      "stockfish_explanation": "Regime first, strategy second. The map is mechanical: VIX at or below 20 AND the term structure in contango (VIX3M above VIX) = RISK_ON. 14.2 with a +1.8 contango spread is textbook calm. This is the environment where carry is allowed to breathe — no unwind pressure."
+    },
+    {
+      "id": "CAL-05",
+      "phase": "calibration",
+      "rank": "Quaestor",
+      "category": "isolation_discipline",
+      "elo_weight": 930,
+      "prompt_roman": "An apprentice proposes feeding the ICT intraday sweep signal directly into the Forex macro engine 'to make it smarter.' THE DATA: ICT operates intraday/4h; the Forex macro engine holds 5-60 days.",
+      "options": {
+        "A": "Allow it if the ICT signal is inverted first.",
+        "B": "Allow it — more signal is always better.",
+        "C": "Forbid it — the time-horizon wall prohibits feature sharing between ICT and Forex.",
+        "D": "Allow it only on Fridays."
+      },
+      "correct": "C",
+      "tenet": "T5",
+      "stockfish_explanation": "The isolation rule is a hard constraint, not a style preference. ICT lives intraday; Forex holds for weeks. Mix their features and you manufacture correlation artifacts that look like edge but aren't. The ONLY legal channels between systems are the macro-threat bridge and the capital allocator — not raw signal sharing. If you want to share a feature, stop, write it up as a hypothesis, and prove cross-system IC > 0.15 out-of-sample first."
+    },
+    {
+      "id": "CAL-06",
+      "phase": "calibration",
+      "rank": "Quaestor",
+      "category": "graveyard_discipline",
+      "elo_weight": 950,
+      "prompt_roman": "A feature buried in the graveyard last quarter is proposed for revival because 'the market feels different now.' THE DATA: no new hypothesis, no fresh trade sample, no ledger sign-off — just a feeling.",
+      "options": {
+        "A": "Leave it buried — revival requires a new hypothesis, N >= 200 fresh trades, and logged sign-off.",
+        "B": "Revive it at quarter size to test quietly.",
+        "C": "Revive it but do not log it, to avoid clutter.",
+        "D": "Revive it — market conditions clearly changed."
+      },
+      "correct": "A",
+      "tenet": "T6",
+      "stockfish_explanation": "The graveyard is institutional memory, not a shame pile. Things get buried because real data showed them harmful or neutral. 'It feels different' is precisely the impulse the rule exists to block. Three conditions to exhume: a new hypothesis explaining why the old conditions no longer hold, at least 200 fresh trades, and a signed ledger entry. Feelings are not evidence."
+    },
+    {
+      "id": "CAL-07",
+      "phase": "calibration",
+      "rank": "Aedile",
+      "category": "sizing_conviction",
+      "elo_weight": 1010,
+      "prompt_roman": "The macro engine returns a conviction score below the neutral floor. THE DATA: raw conviction 0.07; the CONVICTION_NEUTRAL_THRESHOLD is 0.10; grade would otherwise be C.",
+      "options": {
+        "A": "Take the trade but invert the direction.",
+        "B": "Escalate to the Petroulas gate.",
+        "C": "Take a minimum-size trade — never waste a scan.",
+        "D": "Do not trade — conviction below 0.10 is NEUTRAL, no position."
+      },
+      "correct": "D",
+      "tenet": "T2",
+      "stockfish_explanation": "Below 0.10 conviction the engine is effectively saying 'I don't know.' Article 4 — the right to abstain — turns that into a rule: a day with no trades is a day the system worked. Forcing a min-size trade just to feel productive is how you bleed. No conviction, no bet."
+    },
+    {
+      "id": "CAL-08",
+      "phase": "calibration",
+      "rank": "Aedile",
+      "category": "cot_interpretation",
+      "elo_weight": 1040,
+      "prompt_roman": "The scouts count the enemy's ranks each Tuesday but the tablet only reaches Rome on Friday. THE DATA: COT positioning measured Tuesday; CFTC publishes Friday ~15:30 ET. A backtest dates each COT row to the Tuesday it was measured.",
+      "options": {
+        "A": "Correct — Tuesday is when the data is true.",
+        "B": "Look-ahead bias — the row must be dated to the Friday publish, never the Tuesday measurement.",
+        "C": "Harmless — three days makes no difference.",
+        "D": "Correct only for currency pairs, not equities."
+      },
+      "correct": "B",
+      "tenet": "T1",
+      "stockfish_explanation": "This is a silent time-machine bug. The board can't 'know' Tuesday's positioning until CFTC actually releases it on Friday afternoon. Dating the feature to Tuesday hands the backtest three days of the future — the result looks like edge but is pure leakage. Every COT row is stamped to the Friday publish timestamp. Small date error, fatal to the evidence."
+    },
+    {
+      "id": "CAL-09",
+      "phase": "calibration",
+      "rank": "Aedile",
+      "category": "confirmation_protocol",
+      "elo_weight": 1070,
+      "prompt_roman": "The macro engine wants to go LONG a pair, but the rate differential points the other way. THE DATA: signal direction LONG; real_rate_diff -1.1% (favours SHORT); combat veto C-001 deadband 0.2.",
+      "options": {
+        "A": "Take the LONG — momentum overrides macro.",
+        "B": "Veto the trade — C-001 MACRO_AGAINST fires when the rate-diff sign opposes the direction.",
+        "C": "Take the LONG at double size to overpower the macro drag.",
+        "D": "Flip to SHORT automatically."
+      },
+      "correct": "B",
+      "tenet": "T1",
+      "stockfish_explanation": "C-001 is one of the most expensive lessons in the ledger — trading against the real rate differential cost -158R historically. With real_rate_diff at -1.1% (well past the 0.2 deadband) and the signal pointing LONG, macro and direction disagree, so the veto kills it. Note the veto's job is to STOP the trade, not to flip it — that's a different decision. When the coupon fights you, you don't take the trade."
+    },
+    {
+      "id": "CAL-10",
+      "phase": "calibration",
+      "rank": "Aedile",
+      "category": "tail_risk_fomc",
+      "elo_weight": 1100,
+      "prompt_roman": "Storm signs gather over the carry legion. THE DATA: VIX 36.5, VIX3M 33.0 (backwardation, spread -3.5), AUDJPY and NZDJPY held long for carry.",
+      "options": {
+        "A": "Ignore VIX — carry is a permanent floor that never closes.",
+        "B": "Hold and hope; volatility mean-reverts.",
+        "C": "Add to the carry longs — the dip is a gift.",
+        "D": "Recognise EXTREME_RISK_OFF — carry unwind active; the risk-sentiment engine forces shorts on the carry pairs."
+      },
+      "correct": "D",
+      "tenet": "T2",
+      "stockfish_explanation": "VIX above 35 with the term structure inverted (VIX3M below VIX) is EXTREME_RISK_OFF — the regime where carry pairs violently re-couple and unwind together. The risk-sentiment engine stops treating them as independent and forces shorts on AUDJPY/NZDJPY/USDJPY (short USDJPY = long the JPY safe haven). Adding to carry into a backwardated 36 VIX is how carry traders die: picking up pennies in front of the steamroller."
+    },
+    {
+      "id": "CAL-11",
+      "phase": "calibration",
+      "rank": "Aedile",
+      "category": "ict_reference",
+      "elo_weight": 1130,
+      "prompt_roman": "A trader treats the ICT sweep/FVG signal as a directional PREDICTION of where price will go next. THE DATA: ICT pattern edge permutation test p=0.52, fails Benjamini-Hochberg; it has never been proven predictive.",
+      "options": {
+        "A": "Wrong — ICT is an unproven TP/SL reference layer, not a predictive edge.",
+        "B": "Correct only inside the London kill zone.",
+        "C": "ICT predicts direction but not magnitude.",
+        "D": "Correct — ICT reliably predicts direction."
+      },
+      "correct": "A",
+      "tenet": "T1",
+      "stockfish_explanation": "ICT has a permutation p-value of 0.52 — that's a coin flip. It does NOT clear the bar for a predictive edge, and we don't pretend it does. What it's genuinely useful for is structure: reference levels for take-profit and stop placement. Treating an unproven pattern as a directional oracle is the narrative trap Tenet 1 warns against. Use it to place stops, not to pick sides."
+    },
+    {
+      "id": "CAL-12",
+      "phase": "calibration",
+      "rank": "Aedile",
+      "category": "carry_mechanics",
+      "elo_weight": 1160,
+      "prompt_roman": "An officer asks why the carry engine risks so little per pair and logs to its own ledger. THE DATA: carry sized at 0.3% of equity per pair, 3xATR stops, logged to a dedicated carry ledger — NOT the signal ledger.",
+      "options": {
+        "A": "It should share the signal ledger for simplicity.",
+        "B": "It is a bug — carry should be sized like any macro signal.",
+        "C": "By design — carry is infrastructure (the coupon), not a conviction signal; small size + wide stops let it survive flushes and it is kept out of macro Sharpe stats.",
+        "D": "It should be sized at 2% to matter."
+      },
+      "correct": "C",
+      "tenet": "T5",
+      "stockfish_explanation": "Think of carry as the coupon on a bond, not a trade you 'win.' It runs every day regardless of regime, sized tiny (0.3%) with wide 3xATR stops so an occasional risk-off flush doesn't knock it out. It's logged separately precisely so it never contaminates the macro engine's Sharpe — the coupon funds the legion's patience while the bigger, rarer macro trades do the heavy lifting."
+    },
+    {
+      "id": "CAL-13",
+      "phase": "calibration",
+      "rank": "Praetor",
+      "category": "sizing_conviction",
+      "elo_weight": 1210,
+      "prompt_roman": "The macro engine grades a fresh EURUSD long. THE DATA: real rate diff +1.7%, conviction 0.55. Grade table: A+ needs |diff|>=2.0 AND conviction>=0.60; A needs |diff|>=1.5; B needs |diff|>=0.5.",
+      "options": {
+        "A": "C — anything under 0.60 conviction is weak.",
+        "B": "A+ — the differential is strong.",
+        "C": "A — |diff| 1.7 clears 1.5 but conviction 0.55 is below the A+ 0.60 gate.",
+        "D": "B — conviction is too low for A."
+      },
+      "correct": "C",
+      "tenet": "T2",
+      "stockfish_explanation": "Walk the ladder carefully. A+ needs BOTH a big differential (>=2.0) AND conviction >=0.60 — the 1.7 diff fails the 2.0 leg, so no A+. But A only cares about the differential: |1.7| clears 1.5, so it's an A. Conviction 0.55 doesn't demote it — the A tier has no conviction floor. The trap here is letting the sub-0.60 conviction scare you down to B; the grade rules don't work that way."
+    },
+    {
+      "id": "CAL-14",
+      "phase": "calibration",
+      "rank": "Praetor",
+      "category": "state_vector",
+      "elo_weight": 1250,
+      "prompt_roman": "The Kalman scribe records the position's state each bar. THE DATA: dimension 5 of the locked 8-dim state vector S(t) is `carry_alignment`. The trade is LONG a pair whose active carry signal is SHORT.",
+      "options": {
+        "A": "carry_alignment = -1 (trade direction opposes the active carry signal).",
+        "B": "carry_alignment = 0 (no active carry signal).",
+        "C": "carry_alignment = the rate differential in bp.",
+        "D": "carry_alignment = +1 (a carry signal exists)."
+      },
+      "correct": "A",
+      "tenet": "T5",
+      "stockfish_explanation": "carry_alignment is a clean three-state flag: +1 if your trade direction matches the active carry signal, -1 if it fights it, 0 if there's no active carry signal at all. Here you're LONG but carry says SHORT — you're leaning against the coupon, so it's -1. This dimension is how the state vector 'feels' whether the trade is swimming with or against the tide."
+    },
+    {
+      "id": "CAL-15",
+      "phase": "calibration",
+      "rank": "Praetor",
+      "category": "evidence_epistemics",
+      "elo_weight": 1290,
+      "prompt_roman": "A backtester reports the forex macro edge as a single all-weather Sharpe and calls it robust. THE DATA: rolling walk-forward by year — 2021 -0.13, 2022 +0.51, 2023 +1.26, 2024 -0.09. Permutation p<0.001.",
+      "options": {
+        "A": "Not real — two negative years disprove it.",
+        "B": "A data error — Sharpe cannot vary this much.",
+        "C": "Robust and all-weather — the permutation test proves it.",
+        "D": "Real but REGIME-FRAGILE — it only pays in rate-trending years and goes flat-to-negative otherwise."
+      },
+      "correct": "D",
+      "tenet": "T2",
+      "stockfish_explanation": "Two truths hold at once. The permutation p<0.001 says the edge is REAL — not luck. But the year-by-year split says it's regime-fragile: it prints in trending-rate years (2022-23) and does nothing-to-worse in 2021 and 2024. That's Tenet 2 in the flesh — the strategy isn't 'good' or 'bad,' it's appropriate or inappropriate depending on regime. Report both numbers or you're lying by omission."
+    },
+    {
+      "id": "CAL-16",
+      "phase": "calibration",
+      "rank": "Praetor",
+      "category": "isolation_discipline",
+      "elo_weight": 1330,
+      "prompt_roman": "A macro-threat signal (rate shock across all systems) needs to reach ICT, Forex, and Equity simultaneously. THE DATA: the only sanctioned cross-system channels are the cross-system bridge (macro threat) and the capital allocator (sizing).",
+      "options": {
+        "A": "Broadcast it via a shared feature column all three systems read.",
+        "B": "Route it through the cross-system bridge — the sanctioned macro-threat channel that can halt/tighten all systems at once.",
+        "C": "Copy the ICT signal into Forex and let it propagate.",
+        "D": "Have each system compute the threat independently from raw features."
+      },
+      "correct": "B",
+      "tenet": "T5",
+      "stockfish_explanation": "This is the legal way to be cross-cutting. A genuine macro threat SHOULD hit every system at once — that's exactly what the cross-system bridge is for. It carries macro-threat signals that can halt or tighten everything simultaneously, without leaking any strategy's private features. Orchestration (Tenet 5) is the durable edge: the bridge and the allocator are the durable machinery, not the individual strategies."
+    },
+    {
+      "id": "CAL-17",
+      "phase": "calibration",
+      "rank": "Praetor",
+      "category": "petroulas_conviction",
+      "elo_weight": 1360,
+      "prompt_roman": "The Petroulas gate is offered a 'conviction' trade. THE DATA: thesis rests on 'AI will change everything so tech is mispriced.' No specific arithmetic. XGBoost confidence 0.71.",
+      "options": {
+        "A": "Approve conviction size — XGBoost confidence is high.",
+        "B": "Reject for conviction sizing — the thesis is narrative, not an arithmetic fault; Petroulas requires a measurable proof.",
+        "C": "Approve at 5% — maximum size for maximum conviction.",
+        "D": "Approve at 3% as a compromise."
+      },
+      "correct": "B",
+      "tenet": "T4",
+      "stockfish_explanation": "Petroulas doesn't bet big on vibes — he bets big when the ARITHMETIC is conclusive while consensus still sees no fault. 'AI changes everything' is a story, not a number. The gate wants something like 'ERP = 0.3% vs 3.5% historical' — a specific, falsifiable calculation. High XGBoost confidence alone never earns 3-5% size; you need the measurable structural fault too. No arithmetic, no conviction tranche."
+    },
+    {
+      "id": "CAL-18",
+      "phase": "calibration",
+      "rank": "Praetor",
+      "category": "risk_constitution",
+      "elo_weight": 1390,
+      "prompt_roman": "The account has drawn down and the breaker ladder is in play. THE DATA: peak-to-trough drawdown 5.2%. Article 3 ladder: 3.5% halve new sizes, 5% halt new entries, 6.5% flatten predictive positions.",
+      "options": {
+        "A": "Flatten every position immediately — 5.2% is an emergency.",
+        "B": "Do nothing until 8%.",
+        "C": "Keep entering at half size — 5.2% only triggers the halving rung.",
+        "D": "Halt all new entries — 5.2% is past the 5% rung; no new entries until recovery."
+      },
+      "correct": "D",
+      "tenet": "T3",
+      "stockfish_explanation": "The ladder is cumulative and mechanical. At 3.5% you halve; by 5% you STOP opening new entries entirely; only at 6.5% do you flatten the predictive book. At 5.2% you're past the second rung but not the third — so no new entries, but you don't panic-flatten yet. The ladder sits below the 8% trailing prop halt on purpose, so each rung can actually act before the account is dead."
+    },
+    {
+      "id": "CAL-19",
+      "phase": "calibration",
+      "rank": "Consul",
+      "category": "carry_direction",
+      "elo_weight": 1410,
+      "prompt_roman": "The carry engine evaluates NZDJPY under the high-yield-side rule. THE DATA: NZD rate 5.50%, JPY rate 0.10%; high-yield side = BASE (NZD). Differential +540bp, well above the 100bp floor.",
+      "options": {
+        "A": "LONG NZDJPY — high-yield side is the BASE, so long the pair to earn the differential.",
+        "B": "FLAT — 540bp is an outlier and probably a data error.",
+        "C": "LONG JPY — the funding currency always appreciates.",
+        "D": "SHORT NZDJPY — sell the overvalued high-yielder."
+      },
+      "correct": "A",
+      "tenet": "T5",
+      "stockfish_explanation": "The rule is: long the pair when the high-yield currency is the BASE, short when it's the QUOTE. NZD is the base and pays 5.5 vs JPY's 0.1, so you long NZDJPY to collect the ~540bp coupon. This is the highest carry differential in the G10 — which is exactly why it's also the first pair to get shredded in a risk-off unwind. Great coupon, fragile in a flush."
+    },
+    {
+      "id": "CAL-20",
+      "phase": "calibration",
+      "rank": "Consul",
+      "category": "isolation_discipline",
+      "elo_weight": 1460,
+      "prompt_roman": "The AUDNZD pair is proposed as a carry addition for 'diversification.' THE DATA: RBNZ policy tracks the RBA within roughly one quarter; both legs are RBA-driven. AUDNZD OOS Sharpe was -0.879 (active drag) in the 5-pair era.",
+      "options": {
+        "A": "Add AUDNZD at double size to overcome the drag.",
+        "B": "Add AUDNZD — more pairs means more diversification.",
+        "C": "Exclude AUDNZD — both legs are RBA-driven, so there is no independent rate differential; it was a proven drag.",
+        "D": "Add AUDNZD but only in RISK_ON regimes."
+      },
+      "correct": "C",
+      "tenet": "T1",
+      "stockfish_explanation": "This is why HYP-045 runs 4 pairs, not 5. Carry needs an INDEPENDENT rate differential to be a real second bet. AUDNZD has almost none — the RBNZ shadows the RBA within a quarter, so both legs move to the same drummer. The data confirmed the intuition for once: AUDNZD's OOS Sharpe was -0.879, an active drag. Excluding it lifted the portfolio. 'More pairs' is not diversification if the pairs share a central bank."
+    },
+    {
+      "id": "CAL-21",
+      "phase": "calibration",
+      "rank": "Consul",
+      "category": "tenet_mapping",
+      "elo_weight": 1510,
+      "prompt_roman": "The capital allocator reports one system in a FROZEN (self-declared UNRELIABLE) state. A prop challenge is scheduled to start today. THE DATA: 'What the system should never do' includes running a prop challenge while any system is frozen.",
+      "options": {
+        "A": "Unfreeze the system so the challenge can proceed.",
+        "B": "Start the challenge — one frozen system does not affect the others.",
+        "C": "Do not start — never run a prop challenge while the allocator has any system frozen.",
+        "D": "Start but exclude the frozen system's capital."
+      },
+      "correct": "C",
+      "tenet": "T3",
+      "stockfish_explanation": "A frozen system is the stack telling you 'I'm currently unreliable' — the single most important safety feature we have (Tenet 3). The explicit rule is: don't launch a prop challenge while ANY system is frozen. And option A is the real villain — unfreezing a system to clear the way is overriding the conscience layer to chase money. When the machine says it's unreliable, you listen; you don't gag it."
+    },
+    {
+      "id": "CAL-22",
+      "phase": "calibration",
+      "rank": "Consul",
+      "category": "cot_interpretation",
+      "elo_weight": 1550,
+      "prompt_roman": "COT positioning on the yen future is read for a USDJPY view. THE DATA: leveraged funds are record NET LONG the JPY future (extreme percentile vs the trailing 3-year window).",
+      "options": {
+        "A": "Note the inverse: JPY-long positioning maps to USDJPY DOWN; and at a 3-yr extreme, it is a contrarian (crowded) signal.",
+        "B": "Irrelevant — COT does not apply to USDJPY.",
+        "C": "Bullish USDJPY and add size because the crowd confirms it.",
+        "D": "Bullish USDJPY — long JPY futures means USDJPY goes up."
+      },
+      "correct": "A",
+      "tenet": "T1",
+      "stockfish_explanation": "Two traps in one. First, direction: the CME future is the YEN, so JPY-long = USDJPY DOWN — the sign inverts for this pair, and the feeder handles that at test time. Second, extremes: COT positioning at a 3-year percentile extreme is a CONTRARIAN tell, not a confirmation — a crowded long is fuel for a squeeze, not a green light to pile in. So record-long JPY futures leans USDJPY-down but flags a stretched, mean-reversion-prone book."
+    },
+    {
+      "id": "CAL-23",
+      "phase": "calibration",
+      "rank": "Consul",
+      "category": "confirmation_protocol",
+      "elo_weight": 1580,
+      "prompt_roman": "The classifier abstains on a murky board. THE DATA: board-state ambiguous, classifier returns no confident label; there is an open scan slot and no macro veto fired.",
+      "options": {
+        "A": "Take a half-size trade in the marginally more likely direction.",
+        "B": "Escalate to Petroulas for a conviction override.",
+        "C": "Take the best-guess trade to keep the slot working.",
+        "D": "Abstain — Article 4: when the board is ambiguous or the classifier abstains, the predictive layer does not enter."
+      },
+      "correct": "D",
+      "tenet": "T2",
+      "stockfish_explanation": "No veto firing is not the same as a green light. Article 4 makes abstention a first-class action: when the classifier itself says 'ambiguous,' the predictive layer stands down. Doing nothing IS a position — and often the correct one. The failure mode here is treating an empty slot as an obligation to trade. It isn't."
+    },
+    {
+      "id": "CAL-24",
+      "phase": "calibration",
+      "rank": "Consul",
+      "category": "ict_reference",
+      "elo_weight": 1600,
+      "prompt_roman": "The ICT scorer weights components for an intraday setup. THE DATA: market_structure (BOS/CHOCH) weight = 0.0 (HYP-034), pd_alignment weight = 0.0 (HYP-024); sweep = 4.0, fvg_tap = 3.0, kill_zone = 2.0, displacement = 1.0.",
+      "options": {
+        "A": "A scoring bug — structure and premium/discount are core ICT concepts and should carry weight.",
+        "B": "Correct — both were proven anti-edges and zeroed; structure is lagging and pd_alignment hurt win rate.",
+        "C": "Correct, but only sweep should be non-zero.",
+        "D": "A bug — the weights must sum to more than 10."
+      },
+      "correct": "B",
+      "tenet": "T1",
+      "stockfish_explanation": "Two of the most 'obvious' ICT concepts were tested and found to be anti-edges, so they carry zero weight. Market structure (BOS/CHOCH) is lagging — by the time structure confirms, the displacement is already over. And pd_alignment is the famous HYP-024 lesson: removing it lifted win rate 20%->35%. The scorer improved by SUBTRACTING intelligence. The freed points went to what actually works — sweep and fvg_tap. Weights still sum to 10."
+    },
+    {
+      "id": "CAL-25",
+      "phase": "calibration",
+      "rank": "Dictator",
+      "category": "risk_constitution",
+      "elo_weight": 1620,
+      "prompt_roman": "Four carry positions are open and a fifth is signalled. THE DATA: current simultaneous carry risk 2.1% of equity; the new position would add 0.6%, total 2.7%. Article 2 caps the whole carry complex at 2.5%.",
+      "options": {
+        "A": "Open it — each individual trade is under the 0.75% per-trade cap.",
+        "B": "Refuse or trim — the carry complex is ONE bet and its total heat may not exceed 2.5%; 2.7% breaches it.",
+        "C": "Open it — carry is a floor and exempt from heat caps.",
+        "D": "Open it and offset with an equity short."
+      },
+      "correct": "B",
+      "tenet": "T3",
+      "stockfish_explanation": "Article 2's whole point: the carry pairs are treated as a SINGLE position under stress because their correlations converge to 1 exactly when it hurts most. So the binding limit isn't per-trade (each leg is fine at 0.6%) — it's the aggregate carry heat, capped at 2.5%. 2.1 + 0.6 = 2.7 breaks it, so you refuse or trim the new leg down until total heat sits at or under 2.5%. Five separate 'small' bets in the same complex is one big bet in disguise."
+    },
+    {
+      "id": "CAL-26",
+      "phase": "calibration",
+      "rank": "Dictator",
+      "category": "evidence_epistemics",
+      "elo_weight": 1680,
+      "prompt_roman": "Overnight-QQQ is proposed as a second, crisis-independent edge to sit beside carry. THE DATA: real standalone edge (net Sharpe 0.574) BUT the long-short re-couples with carry in the COVID crash (rho 0.42, BH p=0.007, correlation higher in stress than calm).",
+      "options": {
+        "A": "Add it only in calm regimes.",
+        "B": "Add it at conviction size because two edges are better than one.",
+        "C": "Add it — a standalone Sharpe of 0.574 is a free second edge.",
+        "D": "Reject it as a carry diversifier — it re-couples with carry precisely in a crisis, so it is correlated return-stacking, not a crisis-independent second edge."
+      },
+      "correct": "D",
+      "tenet": "T2",
+      "stockfish_explanation": "The seductive part is the standalone Sharpe — but a diversifier only earns its name if it's uncorrelated WHEN YOU NEED IT. Overnight-QQQ does the opposite: it re-couples with carry (rho 0.42, BH-significant, and stronger in stress than in calm) right in the COVID crash. So in the exact moment carry blows up, this 'diversifier' blows up with it. That's correlated return-stacking dressed as diversification. It was rejected for a reason — don't re-explore it as a carry hedge."
+    },
+    {
+      "id": "CAL-27",
+      "phase": "calibration",
+      "rank": "Dictator",
+      "category": "petroulas_conviction",
+      "elo_weight": 1720,
+      "prompt_roman": "The dual-confirmation gate weighs a structural-fault trade. THE DATA: composite macro stress 7.2/10 (>=6 needed), consensus fault across 5/6 frameworks, XGBoost confidence 0.72 (>0.65), Kimi magnitude 8, Kimi conviction 8, arithmetic proof supplied with real numbers.",
+      "options": {
+        "A": "Approve conviction sizing (~3-5%) — both legs confirm: XGBoost > 0.65 AND Kimi magnitude>=7 and conviction>=7 with an arithmetic proof.",
+        "B": "Approve at the normal 1.5% only.",
+        "C": "Approve at 10% — every gate passed.",
+        "D": "Reject — no single model should ever get conviction size."
+      },
+      "correct": "A",
+      "tenet": "T4",
+      "stockfish_explanation": "This is the rare case where the gate SHOULD say yes. It's dual-confirmation on purpose: XGBoost (the numbers model) is confident above 0.65, AND Kimi independently scores the structural fault at magnitude 8 / conviction 8 with an actual arithmetic proof — both above the 7 thresholds — sitting on top of a real macro-stress backdrop (7.2) with consensus fault. That earns the 3-5% tranche. But note the ceiling: conviction size tops out around 5%, never 10% — even the biggest fault respects the max."
+    },
+    {
+      "id": "CAL-28",
+      "phase": "calibration",
+      "rank": "Dictator",
+      "category": "tail_risk_fomc",
+      "elo_weight": 1760,
+      "prompt_roman": "An FOMC decision lands in 20 minutes. THE DATA: a fresh A-grade EURUSD macro long is signalled; spreads are widening into the event; the edge is a 5-60 day macro hold, not an event scalp.",
+      "options": {
+        "A": "Cancel the trade permanently — FOMC ruins the thesis.",
+        "B": "Enter now to catch the pre-FOMC drift.",
+        "C": "Wait until after the release — a multi-day macro edge gains nothing from taking binary event risk on the entry bar into a widening-spread FOMC print.",
+        "D": "Enter at triple size to exploit the volatility."
+      },
+      "correct": "C",
+      "tenet": "T4",
+      "stockfish_explanation": "The edge is a multi-week macro hold — it does not depend on being filled in the 20 minutes before a coin-flip event. Entering into a widening-spread FOMC print just bolts binary gap risk and worse execution onto a trade that gains nothing from it. Wait for the release, let spreads normalise, and enter into the post-event tape. The thesis isn't cancelled (A) — it's just not worth the entry-bar lottery. Complexity/risk you don't need is how good edges die (Tenet 4)."
+    },
+    {
+      "id": "CAL-29",
+      "phase": "calibration",
+      "rank": "SPQR",
+      "category": "regime_id",
+      "elo_weight": 1820,
+      "prompt_roman": "The Senate demands a single regime verdict from mixed signals. THE DATA: VIX 22.4 (between the 20 risk-on and 25 risk-off lines), VIX3M 22.9 (spread +0.5, inside the +/-1 FLAT band), no macro event, rate differentials range-bound and narrow.",
+      "options": {
+        "A": "EXTREME_RISK_OFF — narrow differentials signal stress.",
+        "B": "RISK_ON — VIX is closer to 20 than 25.",
+        "C": "NEUTRAL — VIX is in the 20-25 no-man's-land and the term structure is FLAT; neither risk-on nor risk-off conditions are met.",
+        "D": "RISK_OFF — any VIX above 20 is risk-off."
+      },
+      "correct": "C",
+      "tenet": "T2",
+      "stockfish_explanation": "The regime map has explicit gates and this reading satisfies none of them. RISK_ON needs VIX <=20 AND contango; RISK_OFF needs VIX >=25 AND backwardation. Here VIX 22.4 is in between and the +0.5 spread is inside the +/-1 FLAT band — so it's NEUTRAL by construction. NEUTRAL isn't a cop-out; it's the honest label, and it pairs naturally with the right to abstain when nothing else confirms. Don't round an ambiguous tape into a decisive regime just because you want one."
+    },
+    {
+      "id": "CAL-30",
+      "phase": "calibration",
+      "rank": "SPQR",
+      "category": "tenet_mapping",
+      "elo_weight": 1880,
+      "prompt_roman": "The council debates where the system's durable advantage actually lives. THE DATA: individual strategy Sharpes decay over time; the cross-system bridge, capital allocator, and regime tracker have compounded in sophistication and route capital to the right system per regime.",
+      "options": {
+        "A": "The durable edge is ORCHESTRATION — routing capital to the right system at the right time outlasts any individual strategy edge.",
+        "B": "The durable edge is leverage — size up the winners.",
+        "C": "The durable edge is having the most features.",
+        "D": "The durable edge is the single best strategy — protect it above all."
+      },
+      "correct": "A",
+      "tenet": "T5",
+      "stockfish_explanation": "This is the thesis of the whole stack (Tenet 5). Every individual edge decays — carry, ICT, macro, all of them. What DOESN'T decay is the ability to route capital to the system that's appropriate right now: the bridge that gates threats, the allocator that throttles size by regime performance, the tracker that attributes edge. That orchestration layer is meant to grow faster than any single strategy. Betting the farm on one 'best' strategy (D) is exactly the fragility orchestration exists to escape."
+    },
+    {
+      "id": "DIAG-01",
+      "phase": "diagnostic",
+      "rank": "Aedile",
+      "category": "carry_direction",
+      "elo_weight": 1050,
+      "prompt_roman": "The carry engine reads a marginal differential. THE DATA: AUD rate 4.35%, USD rate 5.25%. Differential -90bp against AUD; the MIN_CARRY_SPREAD_BPS floor is 100bp.",
+      "options": {
+        "A": "Short AUDUSD at conviction size.",
+        "B": "Long AUDUSD because the differential will invert.",
+        "C": "Long AUDUSD — AUD is a commodity currency.",
+        "D": "FLAT — the USD out-yields the AUD and the |differential| (90bp) is below the 100bp floor anyway; no carry edge."
+      },
+      "correct": "D",
+      "tenet": "T5",
+      "stockfish_explanation": "Two reasons this is FLAT. First, the USD actually out-yields the AUD here (5.25 vs 4.35), so being long AUDUSD would mean holding the LOWER yielder — negative carry. Second, even the magnitude (90bp) is under the 100bp floor, so the engine wouldn't take it regardless of sign. When the coupon is thin or wrong-way, you don't collect it. The 100bp floor exists precisely to skip these marginal-differential traps."
+    },
+    {
+      "id": "DIAG-02",
+      "phase": "diagnostic",
+      "rank": "Praetor",
+      "category": "carry_direction",
+      "elo_weight": 1240,
+      "prompt_roman": "The engine evaluates a pair where the high-yield currency is the QUOTE. THE DATA: for USDJPY, USD rate 5.25%, JPY rate 0.10%; here the high-yield side is the BASE (USD). Differential +515bp.",
+      "options": {
+        "A": "SHORT USDJPY — long the yen for safety.",
+        "B": "LONG USDJPY — the high-yield USD is the base, so long the pair to earn the +515bp differential.",
+        "C": "FLAT — JPY intervention risk cancels the carry.",
+        "D": "LONG JPY futures instead."
+      },
+      "correct": "B",
+      "tenet": "T5",
+      "stockfish_explanation": "Anchor on the rule: long when the high-yielder is the BASE. In USDJPY the USD is the base and pays 5.25 vs JPY's 0.1, so long USDJPY collects the ~515bp coupon. Being long the yen (A) would be holding the near-zero funder — negative carry. Intervention risk is real but it's a stop-placement and regime concern, not a reason to invert the carry sign. This is why USDJPY is a core carry long in a calm regime."
+    },
+    {
+      "id": "DIAG-03",
+      "phase": "diagnostic",
+      "rank": "Consul",
+      "category": "carry_direction",
+      "elo_weight": 1470,
+      "prompt_roman": "A trader wants to size a carry-DIRECTION trade like a macro conviction trade. THE DATA: NZDJPY carry differential +540bp; the carry engine's fixed per-pair risk is 0.3%; the macro engine would grade this A and want 1.0%.",
+      "options": {
+        "A": "Size at 1.0% — the differential is huge, so conviction is huge.",
+        "B": "Keep carry at its fixed 0.3% floor sizing — carry is the coupon, not a conviction signal; the differential size does not upsize the coupon.",
+        "C": "Size at 5% via the Petroulas gate.",
+        "D": "Size at 2% to reflect the 540bp."
+      },
+      "correct": "B",
+      "tenet": "T5",
+      "stockfish_explanation": "A big differential does NOT mean a big bet. Carry is infrastructure — the coupon on a bond — and it's deliberately sized tiny (0.3%) with wide stops so it survives flushes and stays out of the macro Sharpe. A 540bp differential is why you take the coupon at all, not a reason to lever it. Conviction sizing comes from the macro/Petroulas machinery on a different trade type; don't blur the carry floor into a conviction signal."
+    },
+    {
+      "id": "DIAG-04",
+      "phase": "diagnostic",
+      "rank": "Quaestor",
+      "category": "carry_direction",
+      "elo_weight": 970,
+      "prompt_roman": "Simplest carry read for a new citizen. THE DATA: EUR rate 4.00%, JPY rate 0.10%. Differential +390bp in EUR's favour, above the 100bp floor.",
+      "options": {
+        "A": "FLAT — EURJPY is too volatile.",
+        "B": "Long JPY — funders always rally.",
+        "C": "Short EURJPY — sell the higher yielder.",
+        "D": "Long EURJPY — hold the higher-yield EUR, borrow the low-yield JPY."
+      },
+      "correct": "D",
+      "tenet": "T5",
+      "stockfish_explanation": "Same one move every time: hold the higher yielder, borrow the lower one. EUR pays 4.0, JPY pays ~0.1, EUR is the base — so long EURJPY earns the ~390bp coupon. The floor (100bp) is cleared comfortably. Carry direction never gets more complicated than 'which side pays me to hold it.'"
+    },
+    {
+      "id": "DIAG-05",
+      "phase": "diagnostic",
+      "rank": "Praetor",
+      "category": "carry_direction",
+      "elo_weight": 1310,
+      "prompt_roman": "The differential on a held carry long has decayed toward the floor. THE DATA: AUDCHF carry differential has fallen from +285bp to +85bp after an SNB hike; the 100bp floor now cuts the other way.",
+      "options": {
+        "A": "The pair now fails the 100bp floor; the carry rationale is gone, so the coupon signal goes FLAT (close/refresh per the engine).",
+        "B": "Double the long to average down the yield.",
+        "C": "Flip to a conviction short.",
+        "D": "Hold the long — you were right to be long originally."
+      },
+      "correct": "A",
+      "tenet": "T2",
+      "stockfish_explanation": "Carry is only worth holding while the coupon justifies it. Once the SNB hike compresses AUDCHF's differential to +85bp, it's below the 100bp floor — the reason for the position has evaporated, so the carry signal reads FLAT and the engine stands the coupon down. This is regime-appropriateness (Tenet 2): the pair didn't become 'bad,' the environment changed and the carry rationale expired. Flipping to a conviction short (C) is a different, separately-justified decision — don't smuggle it in here."
+    },
+    {
+      "id": "DIAG-06",
+      "phase": "diagnostic",
+      "rank": "Consul",
+      "category": "carry_direction",
+      "elo_weight": 1540,
+      "prompt_roman": "Two carry candidates compete for the same risk-off caution. THE DATA: NZDJPY differential +540bp; AUDCHF differential +120bp. Both are technically above the 100bp floor, but a risk-off flush is building (VIX rising, term structure flattening toward backwardation).",
+      "options": {
+        "A": "Add to both — a flush is a buying opportunity.",
+        "B": "Both are equal — differential size does not matter for risk.",
+        "C": "NZDJPY carries the larger unwind risk — the highest-differential, JPY-funded pair re-couples and unwinds hardest in risk-off, so it is the first to trim as the flush builds.",
+        "D": "AUDCHF is riskier because CHF is a safe haven."
+      },
+      "correct": "C",
+      "tenet": "T2",
+      "stockfish_explanation": "The fattest coupon is also the most fragile leg. NZDJPY is the highest-carry, yen-funded pair in the G10 — which means it's the poster child for violent unwinds when risk-off hits and the funding currency (JPY) rips higher. As VIX climbs and the term structure tips toward backwardation, that's the first position you trim, not add to. Differential size DOES matter for risk — it's a proxy for how far the pair can fall when carry re-couples."
+    },
+    {
+      "id": "DIAG-07",
+      "phase": "diagnostic",
+      "rank": "Aedile",
+      "category": "carry_mechanics",
+      "elo_weight": 1090,
+      "prompt_roman": "The carry engine sets its protective stop. THE DATA: carry uses a 3xATR(14) stop, versus the tight ~1.5xATR stop the macro/ICT trades use.",
+      "options": {
+        "A": "Carry should have no stop at all.",
+        "B": "A bug — all stops should be uniform.",
+        "C": "Intentional — the wide 3xATR stop lets the tiny carry coupon survive occasional risk-off flushes instead of being shaken out.",
+        "D": "The carry stop should be tighter than macro, not wider."
+      },
+      "correct": "C",
+      "tenet": "T5",
+      "stockfish_explanation": "Carry and conviction trades want opposite stop philosophies. A conviction trade is a precise thesis with a tight invalidation. The carry coupon is a long, patient hold that just needs to not die in a flush — so you give it room with a 3xATR stop. Tight stops on carry would chop you out on normal noise and forfeit the coupon. Different job, different stop. (Leaving it with no stop at all — option A — would let one flush erase months of coupon; that's not patience, it's negligence.)"
+    },
+    {
+      "id": "DIAG-08",
+      "phase": "diagnostic",
+      "rank": "Praetor",
+      "category": "carry_mechanics",
+      "elo_weight": 1280,
+      "prompt_roman": "An analyst wants to fold the carry ledger into the macro signal ledger and report one blended Sharpe. THE DATA: carry is logged to a dedicated carry ledger, deliberately excluded from macro Sharpe statistics.",
+      "options": {
+        "A": "Keep them separate — merging the always-on coupon into the macro stats contaminates the attribution of the macro edge.",
+        "B": "Blend them but only in RISK_ON.",
+        "C": "Delete the carry ledger entirely.",
+        "D": "Blend them — one number is cleaner for reporting."
+      },
+      "correct": "A",
+      "tenet": "T6",
+      "stockfish_explanation": "Attribution is sacred. The carry coupon runs every single day regardless of regime; the macro engine trades rarely and selectively. Blend their ledgers and you smear a smooth always-on income stream over the macro edge's real, lumpy P&L — now you can't tell which engine is actually working. Keeping carry in its own ledger is what lets you honestly say 'the macro edge did X.' Clean books are Tenet 6: research debt is existential risk, and muddy attribution is a form of that debt."
+    },
+    {
+      "id": "DIAG-09",
+      "phase": "diagnostic",
+      "rank": "Consul",
+      "category": "carry_mechanics",
+      "elo_weight": 1490,
+      "prompt_roman": "The carry floor and the carry-heat cap seem to collide. THE DATA: carry engine sizes each pair at 0.3%; four carry pairs open = 1.2% aggregate; Article 2 caps the whole carry complex at 2.5%.",
+      "options": {
+        "A": "The 0.3% sizing violates the 0.75% per-trade cap.",
+        "B": "Carry is exempt from Article 2.",
+        "C": "A conflict — 0.3% x 4 = 1.2% already breaks something.",
+        "D": "No conflict — 1.2% aggregate sits comfortably under the 2.5% carry-complex cap; the per-pair floor and the aggregate cap are consistent."
+      },
+      "correct": "D",
+      "tenet": "T3",
+      "stockfish_explanation": "These two numbers are designed to coexist. The 0.3%/pair coupon sizing is tiny by design; four of them stack to 1.2%, which is well inside the 2.5% carry-complex heat cap — no breach. And 0.3% is obviously under the 0.75% per-trade cap too. The cap isn't there to punish the coupon; it's there to stop the carry complex (which correlates to 1 in a crisis) from quietly ballooning into one oversized bet. At 1.2% you're nowhere near it."
+    },
+    {
+      "id": "DIAG-10",
+      "phase": "diagnostic",
+      "rank": "Dictator",
+      "category": "carry_mechanics",
+      "elo_weight": 1650,
+      "prompt_roman": "The yfinance feed returns an empty OHLCV frame for a carry pair, so ATR would silently fall back to 0.001. THE DATA: a 0.001 ATR would massively oversize the position (units = risk_amount / (3 x 0.001)); the degraded_sentinel exists to flag this.",
+      "options": {
+        "A": "Proceed — 0.001 is a safe conservative ATR.",
+        "B": "Flag degraded and refuse to size on the fallback ATR — a 0.001 ATR silently inflates units into a giant position; fail loud, do not mock the data.",
+        "C": "Use 0.001 but cap the position at 10%.",
+        "D": "Retry once, then use 0.001 if it fails again."
+      },
+      "correct": "B",
+      "tenet": "T3",
+      "stockfish_explanation": "This is a classic silent-oversizing landmine. Position size is risk / stop-distance, and stop-distance is 3xATR — so a bogus 0.001 ATR shrinks the denominator to almost nothing and blows the position up to absurd size. 'Safe conservative' (A) is exactly backwards. The rule is no silent mocking: when the data is missing, flag degraded and stop, say precisely what's needed, and do NOT let a fallback constant masquerade as a real ATR. A system that knows it's unreliable freezes rather than guesses (Tenet 3)."
+    },
+    {
+      "id": "DIAG-11",
+      "phase": "diagnostic",
+      "rank": "Aedile",
+      "category": "cot_interpretation",
+      "elo_weight": 1080,
+      "prompt_roman": "COT positioning on EURUSD is at a mild reading. THE DATA: leveraged-fund net EUR longs sit at the 55th percentile of the trailing 3-year window — neither crowded nor washed out.",
+      "options": {
+        "A": "Strong contrarian short — any long positioning is a sell.",
+        "B": "No extreme signal — the 55th percentile is mid-range; the COT contrarian feature only lights up near the tails.",
+        "C": "Strong confirmation long — the crowd is right.",
+        "D": "Data error — COT cannot sit mid-range."
+      },
+      "correct": "B",
+      "tenet": "T1",
+      "stockfish_explanation": "The COT positioning feature is a TAILS instrument. Its edge is contrarian and it's meant to fire when positioning is stretched to an extreme percentile — a crowded book that's vulnerable to a squeeze. At the 55th percentile there's simply nothing stretched to lean against. Don't manufacture a signal from a mid-range reading; that's reading tea leaves, not statistics."
+    },
+    {
+      "id": "DIAG-12",
+      "phase": "diagnostic",
+      "rank": "Praetor",
+      "category": "cot_interpretation",
+      "elo_weight": 1300,
+      "prompt_roman": "A holiday shortens the CFTC release week. THE DATA: COT is measured Tuesday and normally published Friday (+3 days); a holiday slips publication to Monday, so a naive +3-day stamp would land the row EARLY.",
+      "options": {
+        "A": "Date everything to Tuesday to be safe.",
+        "B": "Drop all holiday weeks from the dataset.",
+        "C": "Ignore it — a one-day slip is noise.",
+        "D": "Recognise the documented bias — the naive +3-day approximation can date a holiday-week row up to a business day EARLY, a small look-ahead the auditor must count."
+      },
+      "correct": "D",
+      "tenet": "T1",
+      "stockfish_explanation": "This is the fine print that separates a careful researcher from a sloppy one. The Tue-measured / Fri-published rule uses a +3-day approximation, but on the ~5 holiday weeks a year the actual release slips to Monday — so a blind +3 stamps the data as available a business day before it really was. That's a tiny, documented look-ahead. You don't ignore it (C) and you don't nuke the data (B); you flag it and have the auditor count it. Honesty about your own leakage is the point."
+    },
+    {
+      "id": "DIAG-13",
+      "phase": "diagnostic",
+      "rank": "Consul",
+      "category": "cot_interpretation",
+      "elo_weight": 1520,
+      "prompt_roman": "COT on the yen future reaches a washed-out extreme. THE DATA: leveraged funds are record NET SHORT the JPY future (1st percentile of the trailing 3-year window); USDJPY has rallied hard for months.",
+      "options": {
+        "A": "Read it as a contrarian USDJPY-DOWN risk building — an extreme short JPY book (JPY-short = USDJPY-long crowded) is squeeze fuel, and the JPY inverse means the reversal is USDJPY lower.",
+        "B": "Irrelevant — COT never applies to USDJPY.",
+        "C": "Add to USDJPY at conviction size.",
+        "D": "Add to USDJPY longs — record JPY shorts confirm the uptrend."
+      },
+      "correct": "A",
+      "tenet": "T1",
+      "stockfish_explanation": "Layer the two rules. Record NET SHORT the yen future = everyone's positioned for USDJPY UP (because JPY-short maps to USDJPY-long). At the 1st percentile that's a maximally crowded book — classic squeeze fuel, so the contrarian read is a building USDJPY-DOWN reversal risk. Piling into more USDJPY longs (D/C) is joining the crowd at the extreme, exactly when the fuel is highest. The inverse mapping is what makes people misread this pair — keep it straight."
+    },
+    {
+      "id": "DIAG-14",
+      "phase": "diagnostic",
+      "rank": "Quaestor",
+      "category": "cot_interpretation",
+      "elo_weight": 990,
+      "prompt_roman": "A citizen asks what COT even measures. THE DATA: the CFTC Commitment-of-Traders report is free, weekly, and shows how different trader categories (e.g. leveraged funds) are net positioned in futures.",
+      "options": {
+        "A": "It is an intraday order-flow feed.",
+        "B": "It is a price forecast published by the CFTC.",
+        "C": "It is a positioning snapshot — who is net long/short — used mainly as a contrarian tell at extremes, not a forecast.",
+        "D": "It is the central bank's interest-rate schedule."
+      },
+      "correct": "C",
+      "tenet": "T1",
+      "stockfish_explanation": "COT isn't a forecast and it isn't rates — it's a weekly census of who's positioned which way in the futures. We use it as a contrarian instrument: when one category (leveraged funds) gets stretched to an extreme, that crowding is vulnerable to unwinding. It's descriptive data, and its statistical value lives in the tails, not the middle."
+    },
+    {
+      "id": "DIAG-15",
+      "phase": "diagnostic",
+      "rank": "Dictator",
+      "category": "cot_interpretation",
+      "elo_weight": 1690,
+      "prompt_roman": "A researcher wants to add a COT 'level' feature dated to the Tuesday measurement to boost backtest Sharpe. THE DATA: dating to Tuesday lifts in-sample Sharpe noticeably; the publish-lag rule requires the Friday stamp; the promotion gate needs IC OOS > 0.15 on properly-lagged data.",
+      "options": {
+        "A": "Ship it and re-lag later.",
+        "B": "Ship the Tuesday-dated feature — the Sharpe lift proves it works.",
+        "C": "Reject it — the lift is look-ahead, not edge; only a Friday-lagged feature clearing IC OOS > 0.15 on honest data may promote.",
+        "D": "Ship it but halve the size."
+      },
+      "correct": "C",
+      "tenet": "T1",
+      "stockfish_explanation": "A Sharpe lift that comes from peeking at the future isn't edge — it's a leak wearing edge's clothes. The Tuesday stamp hands the model information it couldn't have had until Friday, so of course in-sample Sharpe rises. The only legitimate path is to lag it correctly to the Friday publish and then see if it still clears IC OOS > 0.15 in the promotion gate. 'Ship now, re-lag later' (A) is how leaked features slip into live and blow up. Statistical utility on honest data or it doesn't exist."
+    },
+    {
+      "id": "DIAG-16",
+      "phase": "diagnostic",
+      "rank": "Aedile",
+      "category": "regime_id",
+      "elo_weight": 1100,
+      "prompt_roman": "Classify the term structure alone. THE DATA: VIX 17.0, VIX3M 19.5 (spread +2.5).",
+      "options": {
+        "A": "CONTANGO — VIX3M is above spot VIX by more than 1 point, the normal risk-on shape.",
+        "B": "FLAT — the spread is inside the band.",
+        "C": "Undefined without the COT report.",
+        "D": "BACKWARDATION — near-term fear dominates."
+      },
+      "correct": "A",
+      "tenet": "T2",
+      "stockfish_explanation": "Term structure is just the sign of (VIX3M - VIX) with a +/-1 dead band. Here VIX3M (19.5) sits +2.5 above spot VIX (17.0), comfortably past +1, so it's CONTANGO — the normal, upward-sloping, risk-on shape. Backwardation is the inverted, fear-now shape (spot above 3-month). Get the shape right first; the regime label leans on it."
+    },
+    {
+      "id": "DIAG-17",
+      "phase": "diagnostic",
+      "rank": "Praetor",
+      "category": "regime_id",
+      "elo_weight": 1320,
+      "prompt_roman": "VIX is elevated but the curve has not inverted. THE DATA: VIX 27.0 (above the 25 risk-off line) but VIX3M 28.2 (spread +1.2, still CONTANGO).",
+      "options": {
+        "A": "EXTREME_RISK_OFF — 27 is dangerously high.",
+        "B": "RISK_ON — contango always means risk-on.",
+        "C": "RISK_OFF — VIX above 25 is automatically risk-off.",
+        "D": "NEUTRAL — RISK_OFF requires BOTH VIX>=25 AND backwardation; the curve is still in contango, so the risk-off condition is not met."
+      },
+      "correct": "D",
+      "tenet": "T2",
+      "stockfish_explanation": "The regime map is a two-key lock, not a single VIX threshold. RISK_OFF needs VIX>=25 AND the term structure in backwardation — both keys. Here the 27 VIX turns one key, but the curve is still contango (+1.2), so the second key doesn't turn. That leaves NEUTRAL. Elevated-but-not-inverted is a genuinely ambiguous tape; forcing it to RISK_OFF (C) on VIX alone overreacts, and calling it RISK_ON (B) ignores the elevated fear. NEUTRAL is the honest read."
+    },
+    {
+      "id": "DIAG-18",
+      "phase": "diagnostic",
+      "rank": "Consul",
+      "category": "regime_id",
+      "elo_weight": 1500,
+      "prompt_roman": "The regime label must translate into carry action. THE DATA: VIX 31.0, VIX3M 27.5 (backwardation, spread -3.5). Classifier returns RISK_OFF; carry legion currently long AUDJPY, NZDJPY.",
+      "options": {
+        "A": "Hold carry longs — RISK_OFF is not EXTREME_RISK_OFF.",
+        "B": "Carry unwind is active in RISK_OFF — the risk-sentiment engine forces shorts on the carry pairs (short AUDJPY/NZDJPY/USDJPY), overriding macro.",
+        "C": "Add carry longs — the differential widened.",
+        "D": "Do nothing — regime labels are advisory."
+      },
+      "correct": "B",
+      "tenet": "T2",
+      "stockfish_explanation": "You don't need to wait for EXTREME to act. Carry-unwind mode switches on for BOTH RISK_OFF and EXTREME_RISK_OFF. At VIX 31 with an inverted curve you're in RISK_OFF, so the risk-sentiment engine forces shorts on the carry pairs — including short USDJPY, which expresses long-the-JPY-safe-haven — and those forced directions override the macro signal. Holding or adding carry longs into this (A/C) is fighting the regime, and the whole point of Tenet 2 is that regime beats strategy."
+    },
+    {
+      "id": "DIAG-19",
+      "phase": "diagnostic",
+      "rank": "Quaestor",
+      "category": "regime_id",
+      "elo_weight": 960,
+      "prompt_roman": "The simplest possible regime read. THE DATA: VIX 12.5, VIX3M 15.0 (contango, spread +2.5), calm tape.",
+      "options": {
+        "A": "RISK_OFF.",
+        "B": "RISK_ON — VIX well under 20 with a healthy contango.",
+        "C": "EXTREME_RISK_OFF.",
+        "D": "NEUTRAL — VIX is too low to classify."
+      },
+      "correct": "B",
+      "tenet": "T2",
+      "stockfish_explanation": "VIX 12.5 (well under the 20 line) plus a solid +2.5 contango = RISK_ON, no ambiguity. Low VIX isn't 'too calm to trust' (D) — under the map it's the cleanest risk-on reading there is. This is the environment carry is designed to harvest."
+    },
+    {
+      "id": "DIAG-20",
+      "phase": "diagnostic",
+      "rank": "Dictator",
+      "category": "regime_id",
+      "elo_weight": 1700,
+      "prompt_roman": "A rate-regime call, not a VIX call. THE DATA: G10 policy rates have been steadily trending apart for 9 months (clear rate-trending regime); the forex macro edge posted +1.26 in the last comparable trending year and -0.13 in the last range-bound year.",
+      "options": {
+        "A": "Ignore the rate regime — VIX is all that matters.",
+        "B": "Treat trending and range-bound regimes identically.",
+        "C": "Distrust the macro edge — it is regime-fragile, so avoid it entirely.",
+        "D": "Lean INTO the macro edge — it is real and pays specifically in rate-trending regimes, which is the current environment."
+      },
+      "correct": "D",
+      "tenet": "T2",
+      "stockfish_explanation": "Regime-fragile cuts both ways — the skill is knowing WHEN. The macro edge is proven real (permutation p<0.001) but it earns its keep only when rate differentials are trending, printing +1.26 in trending years and going flat-to-negative (-0.13) when rates are range-bound. Nine months of steadily diverging rates IS the trending regime, so this is exactly when you lean in, not away. 'Avoid it entirely' (C) throws away the edge in the one environment it works. That's the whole thesis of Tenet 2."
+    },
+    {
+      "id": "DIAG-21",
+      "phase": "diagnostic",
+      "rank": "Aedile",
+      "category": "confirmation_protocol",
+      "elo_weight": 1110,
+      "prompt_roman": "A signal has a very thin macro backing. THE DATA: direction LONG; real_rate_diff +0.3%; combat veto C-005 RATE_SIGNAL_WEAK fires when |real_rate_diff| < 0.5.",
+      "options": {
+        "A": "C-005 fires — |0.3| is below 0.5, so the rate signal is too weak to sustain the macro edge; veto the trade.",
+        "B": "Trade it at double size to compensate.",
+        "C": "Flip to SHORT.",
+        "D": "Trade it at full size — the sign agrees with the direction."
+      },
+      "correct": "A",
+      "tenet": "T1",
+      "stockfish_explanation": "The sign being right isn't enough — the differential also has to be big enough to actually pay. C-005 exists because trading on wafer-thin rate signals (|diff| < 0.5) historically bled -30R: the edge needs a real differential to sustain it. At +0.3% the macro tailwind is basically noise, so the veto correctly kills it. Note it's not a MACRO_AGAINST (the sign agrees) — it's a MACRO_TOO_WEAK. Different veto, same lesson: no real coupon, no trade."
+    },
+    {
+      "id": "DIAG-22",
+      "phase": "diagnostic",
+      "rank": "Praetor",
+      "category": "confirmation_protocol",
+      "elo_weight": 1290,
+      "prompt_roman": "Two vetoes are evaluated on one signal. THE DATA: direction SHORT; real_rate_diff +1.4% (favours LONG, well past the 0.2 deadband). C-001 MACRO_AGAINST and C-005 both available.",
+      "options": {
+        "A": "Both vetoes cancel out; trade at half size.",
+        "B": "No veto fires — the differential is strong.",
+        "C": "C-001 MACRO_AGAINST fires — a strong +1.4% differential opposing a SHORT is the exact anti-edge the veto guards; the trade is vetoed.",
+        "D": "C-005 fires because the signal is weak."
+      },
+      "correct": "C",
+      "tenet": "T1",
+      "stockfish_explanation": "A strong differential is only your friend if you're on its side. Here the +1.4% rate diff points LONG but the signal wants SHORT — they disagree, and it's far past the 0.2 deadband, so C-001 MACRO_AGAINST fires. C-005 is about a differential too WEAK to matter; that's not this case — +1.4% is plenty strong, it's just pointed against you. This is the costliest veto in the ledger (-158R) precisely because a strong wrong-way macro is so tempting to override."
+    },
+    {
+      "id": "DIAG-23",
+      "phase": "diagnostic",
+      "rank": "Consul",
+      "category": "confirmation_protocol",
+      "elo_weight": 1480,
+      "prompt_roman": "An ICT setup asks to execute. THE DATA: composite ICT score 7.2 (above the 6.0 trade floor) but grade computes to B; the execution-layer invariant is min_grade_to_execute = A.",
+      "options": {
+        "A": "Promote it to A because the score is high.",
+        "B": "Execute — the score cleared the 6.0 floor.",
+        "C": "Do not execute — the execution invariant requires grade A; a B-grade is logged only, not traded.",
+        "D": "Execute at half size for the B."
+      },
+      "correct": "C",
+      "tenet": "T3",
+      "stockfish_explanation": "There are two gates and you have to clear BOTH. A score above 6.0 makes a setup worth logging as a paper signal, but the execution layer has a separate, harder invariant: only grade A (and better) actually trades. A B-grade is data collection, not a live order. You don't half-size it (D) or hand-wave it up to A because the score looks nice (A) — the grade invariant is there to keep the marginal stuff out of the live book."
+    },
+    {
+      "id": "DIAG-24",
+      "phase": "diagnostic",
+      "rank": "Dictator",
+      "category": "confirmation_protocol",
+      "elo_weight": 1660,
+      "prompt_roman": "An over-confirmed ICT setup scores suspiciously high. THE DATA: raw score 9.4, above the over-confirmation penalty threshold of 9.0; the pipeline applies an over-confirmation penalty (slope 0.5) above that line.",
+      "options": {
+        "A": "Apply the over-confirmation penalty — scores above 9.0 get penalised because piling on confirmations empirically degrades expectancy, not improves it.",
+        "B": "Ignore the penalty — more confirmation is always better.",
+        "C": "Reject the setup entirely for being over 9.0.",
+        "D": "The 9.4 is best-in-class — size it up the most."
+      },
+      "correct": "A",
+      "tenet": "T4",
+      "stockfish_explanation": "Counter-intuitive but empirically real: past a point, MORE confirmation makes a setup WORSE, not better. When every signal lines up perfectly (score > 9.0) it usually means the move is already obvious and largely done — you're late. The pipeline bakes this in with an over-confirmation penalty above 9.0. You neither worship the high score (D) nor throw the setup away (C) — you dock it toward reality. This is Tenet 4: premature/excess complexity and confirmation-stacking kills expectancy."
+    },
+    {
+      "id": "DIAG-25",
+      "phase": "diagnostic",
+      "rank": "Praetor",
+      "category": "confirmation_protocol",
+      "elo_weight": 1250,
+      "prompt_roman": "A macro long clears its vetoes but sits atop a scheduled event. THE DATA: real_rate_diff +1.8% (LONG confirmed, no C-001/C-005), grade A; RBA rate decision prints in 15 minutes; spreads widening.",
+      "options": {
+        "A": "Enter at triple size to exploit the RBA volatility.",
+        "B": "Cancel the trade — the RBA invalidates the macro thesis.",
+        "C": "Enter now — the vetoes passed, nothing else matters.",
+        "D": "Hold entry across the RBA print — clearing the macro vetoes does not oblige you to eat binary event risk on the entry bar of a multi-day hold."
+      },
+      "correct": "D",
+      "tenet": "T4",
+      "stockfish_explanation": "Passing the confirmation gates tells you the trade is valid; it doesn't tell you THIS SECOND is the moment to enter. It's a 5-60 day macro hold — nothing about the edge requires being filled on the bar before an RBA coin-flip with blown-out spreads. Wait for the print, let spreads settle, enter into the aftermath. The thesis survives the event (so not option B); you just decline the pointless entry-bar lottery (Tenet 4 — don't bolt on risk you aren't paid for)."
+    },
+    {
+      "id": "DIAG-26",
+      "phase": "diagnostic",
+      "rank": "Aedile",
+      "category": "sizing_conviction",
+      "elo_weight": 1120,
+      "prompt_roman": "Grade-to-size mapping under the constitution. THE DATA: the forex grade-risk table lists B at 0.5%; the trade grades B; Article 1 caps per-trade at 0.75%.",
+      "options": {
+        "A": "Size at 0.75% — always use the max.",
+        "B": "Size at 0.5% — the B-grade table value is below the cap, so it applies directly.",
+        "C": "Size at 0.25% — B-grades are risky.",
+        "D": "Size at 1.0% — B deserves more."
+      },
+      "correct": "B",
+      "tenet": "T3",
+      "stockfish_explanation": "The cap is a ceiling, not a target. The grade table says B = 0.5%, and since 0.5% is under the 0.75% Article 1 cap, you just use it — the cap only bites when the table wants MORE than 0.75% (like A+ at 1.5%). You don't inflate every trade to the max (A), and you don't invent a smaller number (C). Grade sets the size; the constitution only clips it when it tries to go too big."
+    },
+    {
+      "id": "DIAG-27",
+      "phase": "diagnostic",
+      "rank": "Praetor",
+      "category": "sizing_conviction",
+      "elo_weight": 1350,
+      "prompt_roman": "The grade table and the constitution disagree on an A+ trade. THE DATA: grade A+; the forex grade-risk table lists A_plus at 1.5%; RISK_CONSTITUTION Article 1 caps per-trade at 0.75%.",
+      "options": {
+        "A": "Size at 1.5% — the grade table is the sizing authority.",
+        "B": "Size at 0.75% — the constitution overrides the grade table; no grade raises the per-trade cap.",
+        "C": "Average them to 1.125%.",
+        "D": "Size at 1.5% but add a tighter stop."
+      },
+      "correct": "B",
+      "tenet": "T3",
+      "stockfish_explanation": "This is the single most important sizing collision in the stack, so know it cold. The grade table is a research-era artifact that lists A+ at 1.5%, but the ratified constitution caps EVERY trade at 0.75% and explicitly says no grade raises it. Law beats table. So the A+ gets clamped to 0.75%. Tightening the stop (D) doesn't rescue the 1.5% — the cap is on risk, and risk is exactly what the stop defines. When two numbers fight, the constitution wins."
+    },
+    {
+      "id": "DIAG-28",
+      "phase": "diagnostic",
+      "rank": "Consul",
+      "category": "sizing_conviction",
+      "elo_weight": 1460,
+      "prompt_roman": "Conviction sits right at the neutral floor. THE DATA: raw conviction 0.10 exactly; CONVICTION_NEUTRAL_THRESHOLD 0.10 means below 0.10 is NEUTRAL; CONVICTION_FULL_SIZE is 0.70.",
+      "options": {
+        "A": "Half size — split full and neutral.",
+        "B": "Invert direction because conviction is low.",
+        "C": "Full size — 0.10 clears neutral, so go to conviction max.",
+        "D": "This is barely off the NEUTRAL floor — nowhere near the 0.70 full-size level; if traded at all it is a minimum-grade, minimum-size trade, and abstaining is defensible."
+      },
+      "correct": "D",
+      "tenet": "T2",
+      "stockfish_explanation": "Conviction is a scale, not a switch. 0.10 is the very bottom edge of 'not-neutral' — it means the engine barely has an opinion. Full size doesn't arrive until 0.70. So a 0.10 conviction is at most a minimum-size, C-ish trade, and given the right to abstain, standing aside is entirely defensible. Treating a hair above the neutral floor as a green light for max size (C) is exactly the over-eager mistake conviction sizing exists to prevent."
+    },
+    {
+      "id": "DIAG-29",
+      "phase": "diagnostic",
+      "rank": "Dictator",
+      "category": "sizing_conviction",
+      "elo_weight": 1670,
+      "prompt_roman": "Two open carry legs plus a fresh macro trade compete for heat. THE DATA: carry complex currently at 2.3% aggregate heat (cap 2.5%); a new A-grade macro trade in a carry pair wants 0.75%; adding it pushes the carry-complex heat to ~3.05%.",
+      "options": {
+        "A": "It is still in the carry complex — the aggregate 2.5% cap binds, so trim/deny until total carry heat is <= 2.5%, even though the trade itself is within the 0.75% per-trade cap.",
+        "B": "Add it — per-trade 0.75% is the only cap that matters.",
+        "C": "Add it and raise the carry cap to 3.5%.",
+        "D": "Add the full 0.75% — it is a separate macro trade, not carry."
+      },
+      "correct": "A",
+      "tenet": "T3",
+      "stockfish_explanation": "Watch the trap: 'it's a macro trade, not carry.' Article 2 defines the carry COMPLEX by the pairs (GBPUSD/EURUSD/AUDUSD/AUDNZD/USDJPY), and a macro trade IN one of those pairs still adds to the complex's correlated heat — because in a crisis they all move together regardless of why you entered. Per-trade 0.75% is satisfied, but the aggregate 2.5% cap is the binding one here, and 3.05% breaks it. You trim or deny. And D — raising the cap on the fly — is overriding the constitution, which no component may do."
+    },
+    {
+      "id": "DIAG-30",
+      "phase": "diagnostic",
+      "rank": "Quaestor",
+      "category": "sizing_conviction",
+      "elo_weight": 980,
+      "prompt_roman": "The weakest grade sizes the smallest. THE DATA: trade grades C (|rate_diff| < 0.5); the grade-risk table sizes C at 0.25%.",
+      "options": {
+        "A": "Skip it entirely — C never trades.",
+        "B": "0.75% — the per-trade max.",
+        "C": "0.25% — a C-grade weak-signal trade sizes at the table's smallest tier.",
+        "D": "0.5% — same as B-grade."
+      },
+      "correct": "C",
+      "tenet": "T2",
+      "stockfish_explanation": "The grade table scales size to conviction: A+ largest, C smallest at 0.25%. A C-grade means the rate signal is weak (|diff| < 0.5), so you risk the least on it. It's not automatically skipped (A) — a C can still be a legitimate small paper/live trade — it just gets the minimum tier. Size should track how much the evidence actually supports the trade."
+    },
+    {
+      "id": "DIAG-31",
+      "phase": "diagnostic",
+      "rank": "Aedile",
+      "category": "tail_risk_fomc",
+      "elo_weight": 1130,
+      "prompt_roman": "VIX spikes but the curve stays normal. THE DATA: VIX jumps to 33 intraday but VIX3M is 34.5 (still contango, +1.5); no carry positions currently open.",
+      "options": {
+        "A": "Immediately short all carry pairs anyway.",
+        "B": "EXTREME_RISK_OFF — 33 is near the 35 extreme line.",
+        "C": "Not EXTREME yet — the extreme regime needs VIX>=35 AND backwardation; a contango curve at 33 is elevated but not the violent-unwind regime.",
+        "D": "RISK_ON — no carry is open, so risk-on by default."
+      },
+      "correct": "C",
+      "tenet": "T2",
+      "stockfish_explanation": "EXTREME_RISK_OFF is specifically the violent-unwind regime, and it takes two conditions: VIX at or above 35 AND the curve inverted (backwardation). At 33 with the curve still in contango, you're elevated and should be alert, but you're not in the regime where carry pairs re-couple and gap. Jumping the gun to short everything (A) on VIX alone is exactly the overreaction the two-key gate prevents. Respect the definition; don't round 33 up to 'extreme.'"
+    },
+    {
+      "id": "DIAG-32",
+      "phase": "diagnostic",
+      "rank": "Praetor",
+      "category": "tail_risk_fomc",
+      "elo_weight": 1330,
+      "prompt_roman": "A big US data surprise lands mid-session. THE DATA: a hot core-CPI print (USD-positive shock, econ_surprise_z spikes +2.1); an open EURUSD LONG (macro) is now leaning against a fresh USD-strength shock.",
+      "options": {
+        "A": "Recognise the fresh USD-positive shock cuts against a EURUSD long; do not add, and re-check whether the macro thesis / vetoes still hold post-shock.",
+        "B": "Ignore it — CPI does not affect FX.",
+        "C": "Flip to a conviction EURUSD short instantly.",
+        "D": "Add to the EURUSD long — surprises mean-revert."
+      },
+      "correct": "A",
+      "tenet": "T1",
+      "stockfish_explanation": "A hot core-CPI is a hawkish, USD-positive jolt — and being long EURUSD is implicitly short USD, so the shock is now leaning on your position. The disciplined move isn't to double down (D) or to knee-jerk flip to a conviction short (C); it's to stop adding and re-evaluate whether the macro signal and its vetoes still support the trade after the new information. Let the data update the thesis rather than your hopes. And 'CPI doesn't affect FX' (B) is just wrong — inflation surprises are the core driver of the rate differential."
+    },
+    {
+      "id": "DIAG-33",
+      "phase": "diagnostic",
+      "rank": "Consul",
+      "category": "tail_risk_fomc",
+      "elo_weight": 1560,
+      "prompt_roman": "The unwind is already underway when you arrive at the desk. THE DATA: VIX 38, VIX3M 34 (backwardation), carry legion already long AUDJPY/NZDJPY; the risk-sentiment engine has flagged EXTREME_RISK_OFF with carry_unwind_active.",
+      "options": {
+        "A": "Add to the carry longs to lower the average.",
+        "B": "Do nothing — the 3xATR carry stops will handle it.",
+        "C": "Hold and wait for VIX to mean-revert.",
+        "D": "Act on the forced-direction overrides — in EXTREME_RISK_OFF the engine forces shorts on the carry pairs, so the existing carry longs are the wrong side and must be cut/reversed per protocol."
+      },
+      "correct": "D",
+      "tenet": "T2",
+      "stockfish_explanation": "EXTREME_RISK_OFF with carry_unwind_active isn't a warning to think about — it's a forced-direction state. The engine explicitly overrides macro and forces shorts on AUDJPY/NZDJPY/USDJPY, which means your existing carry longs are now on the wrong side of a violent, correlated unwind. Waiting for mean-reversion (C) or averaging down (A) into a 38-VIX backwardated flush is how carry books get wiped. The wide carry stops (B) are for surviving normal flushes, not for standing pat through the regime the overrides exist to escape."
+    },
+    {
+      "id": "DIAG-34",
+      "phase": "diagnostic",
+      "rank": "Dictator",
+      "category": "tail_risk_fomc",
+      "elo_weight": 1710,
+      "prompt_roman": "The daily-loss breaker and an FOMC collide. THE DATA: account already down 1.7% on the day (hard cap: max_daily_loss 2%); an A+ macro setup appears 10 minutes before FOMC; a bad print could gap the account through 2%.",
+      "options": {
+        "A": "Take the A+ — its edge outweighs the daily-loss risk.",
+        "B": "Stand down — with only 0.3% of daily-loss headroom left, entering a gap-prone event trade risks breaching the 2% daily-loss hard cap; abstaining protects the cap.",
+        "C": "Take it at triple size to recover the day.",
+        "D": "Take it and disable the daily-loss cap for the event."
+      },
+      "correct": "B",
+      "tenet": "T3",
+      "stockfish_explanation": "Grade quality doesn't buy you out of a hard constraint. You've got only 0.3% of room before the 2% daily-loss cap, and an FOMC gap can jump you straight through it — so a single bad print ends the day and possibly trips the drawdown ladder. The A+ will still be a valid setup after the print, or tomorrow. Sizing UP to 'recover' (C) is revenge trading, and disabling the cap (D) is overriding the conscience layer — the two things the constitution most forbids. When headroom is thin, you protect the cap, not chase the trade."
+    },
+    {
+      "id": "DIAG-35",
+      "phase": "diagnostic",
+      "rank": "Aedile",
+      "category": "tenet_mapping",
+      "elo_weight": 1140,
+      "prompt_roman": "Map the decision to its tenet. THE DATA: a system posts three consecutive losses and a detected structural break; it flips itself to UNRELIABLE and freezes, alerting the operator.",
+      "options": {
+        "A": "Tenet 1 — statistical utility.",
+        "B": "Tenet 3 — systems must know when they are unreliable; self-freezing on health signals is the intended behaviour.",
+        "C": "Tenet 5 — orchestration.",
+        "D": "Tenet 6 — research debt."
+      },
+      "correct": "B",
+      "tenet": "T3",
+      "stockfish_explanation": "A mature system can say 'I'm currently unreliable' — and prove it with health metrics like consecutive losses and structural breaks, not vibes. Freezing itself and alerting is Tenet 3 working exactly as designed; it's called the most important safety feature in the stack for a reason. This isn't a malfunction to override — it's the machine protecting you from itself."
+    },
+    {
+      "id": "DIAG-36",
+      "phase": "diagnostic",
+      "rank": "Praetor",
+      "category": "tenet_mapping",
+      "elo_weight": 1340,
+      "prompt_roman": "Map the decision to its tenet. THE DATA: an engineer wants to stack three more adaptive sub-models onto a strategy whose edge attribution is still incomplete — nobody yet knows where the current edge comes from.",
+      "options": {
+        "A": "Tenet 5 — orchestration.",
+        "B": "Tenet 1 — statistical utility.",
+        "C": "Tenet 2 — regime appropriateness.",
+        "D": "Tenet 4 — premature complexity kills more systems than lack of edge; do not stack complexity while attribution is incomplete."
+      },
+      "correct": "D",
+      "tenet": "T4",
+      "stockfish_explanation": "This is the textbook Tenet 4 failure: adding models, signals, and adaptive logic BEFORE understanding where the edge actually lives. Most systems die at exactly this stage — not from lack of edge, but from complexity piled on a foundation nobody has mapped yet. The guard is blunt: every new component must answer a measurable question first, and 'we don't know where our edge comes from' means you're not allowed to add three more black boxes. Finish the attribution, then maybe build."
+    },
+    {
+      "id": "DIAG-37",
+      "phase": "diagnostic",
+      "rank": "Consul",
+      "category": "tenet_mapping",
+      "elo_weight": 1470,
+      "prompt_roman": "Map the decision to its tenet. THE DATA: a losing experiment is quietly abandoned with no ledger entry 'to keep the repo tidy'; six weeks later another session re-proposes the identical idea from scratch.",
+      "options": {
+        "A": "Tenet 6 — research debt is existential risk; an unrecorded failed experiment gets rediscovered at cost, exactly as happened here.",
+        "B": "Tenet 3 — reliability.",
+        "C": "Tenet 4 — complexity.",
+        "D": "Tenet 2 — regime appropriateness."
+      },
+      "correct": "A",
+      "tenet": "T6",
+      "stockfish_explanation": "Research that isn't recorded doesn't exist — and the proof is right there: six weeks later someone burns fresh time re-deriving the same dead idea. That re-work is the 'cost' Tenet 6 warns about. Failed experiments must be formally buried in the ledger/graveyard precisely so nobody pays for the same lesson twice. 'Keeping the repo tidy' by deleting the record is how you accumulate the most expensive kind of debt: forgotten knowledge."
+    },
+    {
+      "id": "DIAG-38",
+      "phase": "diagnostic",
+      "rank": "Dictator",
+      "category": "tenet_mapping",
+      "elo_weight": 1680,
+      "prompt_roman": "Map the decision to its tenet — the subtle one. THE DATA: a feature makes perfect economic sense and every trader on the desk agrees it 'should' work, but its out-of-sample IC is 0.04, below the 0.15 promotion bar. The team wants to ship it on the strength of consensus.",
+      "options": {
+        "A": "Tenet 3 — reliability.",
+        "B": "Tenet 5 — orchestration; consensus routes capital.",
+        "C": "Tenet 1 — statistical utility beats narrative coherence; unanimous agreement cannot substitute for an OOS IC that clears 0.15.",
+        "D": "Tenet 2 — regime appropriateness."
+      },
+      "correct": "C",
+      "tenet": "T1",
+      "stockfish_explanation": "The tricky part is that the narrative here is genuinely good AND unanimous — which is exactly when Tenet 1 is hardest to obey. Desk consensus is still narrative; it is not a measured out-of-sample number. IC 0.04 fails the 0.15 gate, full stop. The pd_alignment lesson is the permanent scar tissue: a feature everyone loved on logic actively hurt win rate. A good story that everyone believes is still just a story until the OOS number says otherwise."
+    },
+    {
+      "id": "DIAG-39",
+      "phase": "diagnostic",
+      "rank": "Praetor",
+      "category": "tenet_mapping",
+      "elo_weight": 1300,
+      "prompt_roman": "Map the decision to its tenet. THE DATA: rather than improving any single strategy, the team invests in the capital allocator so it throttles each system's size by that system's recent regime performance.",
+      "options": {
+        "A": "Tenet 6 — research debt.",
+        "B": "Tenet 4 — complexity.",
+        "C": "Tenet 5 — orchestration is the durable edge; investing in the allocator (routing/sizing capital across systems) compounds where individual edges decay.",
+        "D": "Tenet 1 — statistical utility."
+      },
+      "correct": "C",
+      "tenet": "T5",
+      "stockfish_explanation": "The choice to improve the ALLOCATOR rather than any single strategy is Tenet 5 in action. Individual edges decay; the machinery that decides how much capital each system gets, given the current regime, does not — it's the durable layer, and it's supposed to grow in sophistication faster than the strategies it sizes. Note this isn't 'adding complexity for its own sake' (B) — it's investing in the orchestration layer specifically, which the philosophy singles out as the compounding advantage."
+    },
+    {
+      "id": "DIAG-40",
+      "phase": "diagnostic",
+      "rank": "Aedile",
+      "category": "isolation_discipline",
+      "elo_weight": 1090,
+      "prompt_roman": "Someone points at the code layout. THE DATA: `ict/` and `ict-engine/` must never import from `sovereign/`; a test enforces `test_pipeline_does_not_import_sovereign`.",
+      "options": {
+        "A": "The import ban is the enforced isolation boundary — ICT must not reach into sovereign; cross-layer logic goes through the orchestrator, not a direct import.",
+        "B": "ICT should import sovereign for convenience.",
+        "C": "The test only matters in production.",
+        "D": "The test is overly strict — imports are harmless."
+      },
+      "correct": "A",
+      "tenet": "T5",
+      "stockfish_explanation": "The isolation wall isn't a suggestion; it's compiled into a test. `ict/` reaching into `sovereign/` would let intraday and multi-day logic bleed together — the correlation-artifact problem the time-horizon doctrine exists to prevent. Any legitimate cross-layer need goes through the sanctioned bridge/orchestrator, never a raw import. A green isolation test is how we KNOW the wall is intact; calling it 'overly strict' misunderstands why it's there."
+    },
+    {
+      "id": "DIAG-41",
+      "phase": "diagnostic",
+      "rank": "Praetor",
+      "category": "isolation_discipline",
+      "elo_weight": 1310,
+      "prompt_roman": "A candidate cross-system feature is measured. THE DATA: someone found a signal that seems to help across ICT and Forex; its cross-system IC out-of-sample is 0.11; the doctrine's cross-system bar is 0.15.",
+      "options": {
+        "A": "Adopt it in ICT only, ignoring the measurement.",
+        "B": "Adopt it at 0.11 but re-measure next year.",
+        "C": "Adopt it — 0.11 is positive, so it helps.",
+        "D": "Do not adopt it across systems — cross-system IC must exceed 0.15 OOS before crossing the horizon wall; 0.11 fails the bar."
+      },
+      "correct": "D",
+      "tenet": "T1",
+      "stockfish_explanation": "The horizon wall has an explicit price of admission for anything that wants to cross it: cross-system IC > 0.15 out-of-sample. 0.11 is positive but under the bar, so it doesn't earn the right to link two systems that operate on different time scales. A weak cross-system signal is exactly how contamination sneaks in — it looks helpful, clears 'positive,' and manufactures correlation that isn't real edge. Below 0.15, the wall stays up."
+    },
+    {
+      "id": "DIAG-42",
+      "phase": "diagnostic",
+      "rank": "Consul",
+      "category": "isolation_discipline",
+      "elo_weight": 1520,
+      "prompt_roman": "A macro-threat needs to tighten every system, but a dev proposes doing it by copying features. THE DATA: the proposal copies the Forex regime label into the ICT pipeline so ICT 'sees the same regime.' The sanctioned channel for system-wide tightening is the cross-system bridge.",
+      "options": {
+        "A": "Copy the label — it is only one field.",
+        "B": "Route the threat through the cross-system bridge instead — sharing the Forex regime label INTO ICT is prohibited feature-sharing; the bridge carries macro-threat tightening legally.",
+        "C": "Copy the label but rename it.",
+        "D": "Let ICT compute its own Forex-style regime from Forex data."
+      },
+      "correct": "B",
+      "tenet": "T5",
+      "stockfish_explanation": "The goal (tighten everything on a macro threat) is right; the method (copy a Forex feature into ICT) is the forbidden one. Using Forex regime labels inside the ICT pipeline is explicitly banned — it's feature-sharing across the horizon wall, whether you rename it (C) or reconstruct it from Forex data (D). The legal way to make a threat hit all systems at once is the cross-system bridge, which carries macro-threat signals without leaking any system's private features. Same outcome, sanctioned channel."
+    },
+    {
+      "id": "DIAG-43",
+      "phase": "diagnostic",
+      "rank": "Dictator",
+      "category": "isolation_discipline",
+      "elo_weight": 1690,
+      "prompt_roman": "An intraday ICT feature genuinely predicts a multi-day Forex move in a backtest. THE DATA: the cross-system relationship shows OOS IC 0.19 (above 0.15); but it was found by scanning many ICT-into-Forex feature pairs without a pre-registered hypothesis.",
+      "options": {
+        "A": "Adopt immediately — 0.19 clears the 0.15 bar.",
+        "B": "Pause — clearing 0.15 is necessary but not sufficient; an unregistered cross-system relationship found by scanning is a data-mining candidate that must be pre-registered and tested in isolation before it crosses the wall.",
+        "C": "Adopt in both systems and skip the ledger.",
+        "D": "Adopt but only in RISK_OFF."
+      },
+      "correct": "B",
+      "tenet": "T6",
+      "stockfish_explanation": "0.15 is the bar to be ALLOWED to cross the wall, not a license to skip process. This relationship was fished out of many feature pairs with no prereg — that's a multiple-comparisons minefield, and a 0.19 pulled from a big scan can easily be noise that got lucky. The doctrine says: formalize it as a hypothesis, pre-register it, and test it in isolation before it earns cross-system status. Adopting straight off a scan (A/C) is precisely how a spurious correlation gets mistaken for a durable edge. Clearing a threshold and clearing the process are two different gates."
+    },
+    {
+      "id": "DIAG-44",
+      "phase": "diagnostic",
+      "rank": "Aedile",
+      "category": "isolation_discipline",
+      "elo_weight": 1160,
+      "prompt_roman": "Name the two legal cross-system channels. THE DATA: the doctrine sanctions exactly two channels between ICT, Forex, and Equity; everything else is prohibited.",
+      "options": {
+        "A": "Direct imports and a message queue.",
+        "B": "The Oracle and the decision logger.",
+        "C": "Shared feature tables and a common signal ledger.",
+        "D": "The cross-system bridge (macro-threat halt/tighten) and the capital allocator (per-system sizing multipliers) — and nothing else."
+      },
+      "correct": "D",
+      "tenet": "T5",
+      "stockfish_explanation": "Memorize these two, because everything else is contraband. The cross-system bridge carries macro-threat signals that can halt or tighten all systems at once, and the capital allocator hands each system a sizing multiplier based on regime performance and health. Those are the ONLY sanctioned links. Shared feature tables, common signal ledgers, direct imports — all prohibited, because they let time horizons contaminate each other. Two channels, both about orchestration, neither about sharing raw features."
+    },
+    {
+      "id": "DIAG-45",
+      "phase": "diagnostic",
+      "rank": "Praetor",
+      "category": "petroulas_conviction",
+      "elo_weight": 1330,
+      "prompt_roman": "The Petroulas gate gets one confirmation but not the other. THE DATA: composite macro stress 7.5 (>=6), consensus fault 5/6 frameworks, XGBoost confidence 0.70 (>0.65), but Kimi returns magnitude 8 / conviction 5 (conviction below the 7 threshold).",
+      "options": {
+        "A": "Deny conviction sizing — dual-confirmation fails; Kimi's conviction 5 is below the 7 bar, so this reverts to a normal-sized trade.",
+        "B": "Approve at the full 5% — magnitude 8 is enough.",
+        "C": "Approve at 4% as a partial credit.",
+        "D": "Approve conviction sizing — XGBoost and stress both confirm."
+      },
+      "correct": "A",
+      "tenet": "T4",
+      "stockfish_explanation": "'Dual-confirmation' means BOTH keys must turn, and here Kimi only turns one. The fault might be large (magnitude 8), but Kimi isn't confident in the asymmetric thesis (conviction 5, under the 7 bar) — so petroulas_worthy fails and there's no 3-5% tranche. High XGBoost confidence plus macro stress is not a substitute for the structural-fault confirmation; that's the whole point of requiring two independent models to agree. No partial credit (C) — it reverts to a normal 1.5% trade or nothing."
+    },
+    {
+      "id": "DIAG-46",
+      "phase": "diagnostic",
+      "rank": "Consul",
+      "category": "petroulas_conviction",
+      "elo_weight": 1500,
+      "prompt_roman": "The macro backdrop is quiet. THE DATA: composite macro stress 4.5 (below the 6.0 minimum); XGBoost confidence 0.80; a compelling single-name story exists.",
+      "options": {
+        "A": "Approve at 3% base because XGBoost is very confident.",
+        "B": "Escalate to Kimi anyway — the story is too good to pass up.",
+        "C": "Fast-reject at the gate — composite stress 4.5 is below the 6.0 minimum, so the trade never reaches Kimi and sizes normally.",
+        "D": "Approve conviction sizing on XGBoost alone."
+      },
+      "correct": "C",
+      "tenet": "T4",
+      "stockfish_explanation": "Petroulas trades need a systemic backdrop — a real macro fault, not just a good single-name story. The gate fast-rejects anything with composite stress under 6.0 before it ever bothers Kimi: no systemic context, no conviction trade, regardless of how confident XGBoost is (0.80) or how compelling the narrative feels. This is the cheap early exit that keeps the gate from wasting a conviction tranche on an isolated story. Structure first, story second."
+    },
+    {
+      "id": "DIAG-47",
+      "phase": "diagnostic",
+      "rank": "Dictator",
+      "category": "petroulas_conviction",
+      "elo_weight": 1700,
+      "prompt_roman": "Kimi is offline when a genuine fault appears. THE DATA: composite stress 7.8, consensus fault 5/6 frameworks, XGBoost 0.74 — but the Kimi client is unavailable, so no independent fault score exists.",
+      "options": {
+        "A": "Normal 1.5% only — treat missing Kimi as a rejection.",
+        "B": "Full 5% — the frameworks clearly agree.",
+        "C": "Framework-only approval at a reduced base size (capped near the base tranche, ~3% and no higher), because without Kimi's independent confirmation you cannot justify the top of the conviction range.",
+        "D": "Zero — never trade without Kimi."
+      },
+      "correct": "C",
+      "tenet": "T3",
+      "stockfish_explanation": "This is the graceful-degradation case. The frameworks strongly agree and XGBoost is confident, so there's real signal — but the second confirming voice (Kimi) is missing, so you can't honestly claim the top of the 3-5% range. The gate approves on frameworks alone at a REDUCED base size, not the max. Going full 5% (B) pretends you have a confirmation you don't; refusing entirely (D/A) throws away a well-supported trade. Knowing that a missing input means 'size down,' not 'size up,' is Tenet 3 — the system acting on its own reduced reliability."
+    },
+    {
+      "id": "DIAG-48",
+      "phase": "diagnostic",
+      "rank": "Praetor",
+      "category": "petroulas_conviction",
+      "elo_weight": 1290,
+      "prompt_roman": "Two theses reach Kimi; only one is real arithmetic. THE DATA: Thesis A — 'FCF yield 10.5% vs 10yr bond 4.2%, a 6.3pt gap the market ignores.' Thesis B — 'sentiment has turned and momentum is strong.' Both have XGBoost confidence 0.72.",
+      "options": {
+        "A": "Only Thesis A can be petroulas_worthy — it is a specific, falsifiable arithmetic fault; Thesis B is narrative/momentum with no measurable imbalance.",
+        "B": "Only Thesis B — momentum is more reliable.",
+        "C": "Neither — XGBoost 0.72 is too low.",
+        "D": "Both qualify — same XGBoost confidence."
+      },
+      "correct": "A",
+      "tenet": "T4",
+      "stockfish_explanation": "This is the Petroulas test in one screen. Thesis A is a hard, checkable number — a 6.3-point FCF-vs-bond-yield gap you can falsify — which is exactly the kind of structural fault the gate is built for. Thesis B ('sentiment turned, momentum strong') is narrative dressed as analysis; there's no arithmetic imbalance to size a conviction bet on. Same XGBoost confidence doesn't equalize them, because the gate demands a measurable fault, not a feeling. 'AI changes everything' and 'momentum is strong' are the same species of non-answer."
+    },
+    {
+      "id": "DIAG-49",
+      "phase": "diagnostic",
+      "rank": "Consul",
+      "category": "petroulas_conviction",
+      "elo_weight": 1560,
+      "prompt_roman": "A conviction trade wants to exceed the ceiling. THE DATA: fault quality 10/10, composite stress 10/10; a trader argues this deserves 8% given the perfect scores; the Petroulas max is 5%.",
+      "options": {
+        "A": "Size 6.5% — halfway between max and the request.",
+        "B": "Size 3% — ignore the quality scores.",
+        "C": "Size 8% — perfect scores deserve a bigger bet.",
+        "D": "Size at the 5% Petroulas ceiling — even a perfect fault-quality/stress reading caps the conviction tranche at 5%."
+      },
+      "correct": "D",
+      "tenet": "T3",
+      "stockfish_explanation": "The conviction range runs 3% to 5%, and 5% is a hard ceiling — perfect scores get you TO 5%, not past it. The gate scales size within that band by fault quality and stress, but there is no 8% tier, no matter how conclusive the math looks. This is the same discipline as Article 1 for normal trades: even maximum conviction respects a cap, because 'the math is certain' is exactly the feeling that precedes a blow-up. Ceilings exist for the trades you're most sure about."
+    },
+    {
+      "id": "DIAG-50",
+      "phase": "diagnostic",
+      "rank": "Aedile",
+      "category": "risk_constitution",
+      "elo_weight": 1150,
+      "prompt_roman": "The first drawdown rung is touched. THE DATA: peak-to-trough drawdown 3.6%; Article 3 ladder — 3.5% halve new sizes, 5% halt entries, 6.5% flatten.",
+      "options": {
+        "A": "No change — 3.6% is barely anything.",
+        "B": "Halve all new position sizes — 3.6% is past the 3.5% rung; new sizes are cut in half.",
+        "C": "Halt all entries — treat it as the 5% rung.",
+        "D": "Flatten everything immediately."
+      },
+      "correct": "B",
+      "tenet": "T3",
+      "stockfish_explanation": "The ladder acts rung by rung. At 3.5% the response is specific and measured: halve new position sizes — not halt (that's 5%), not flatten (that's 6.5%). 3.6% is just past the first rung, so you scale down new risk and keep going. The point of a graduated ladder is proportional response: you don't ignore the first warning (A), and you don't over-react to it (C/D) either."
+    },
+    {
+      "id": "DIAG-51",
+      "phase": "diagnostic",
+      "rank": "Praetor",
+      "category": "risk_constitution",
+      "elo_weight": 1320,
+      "prompt_roman": "A live edge lacks a confirmed ledger entry. THE DATA: a promising strategy has a pre-registered hypothesis but its ledger verdict is still PROVISIONAL, not CONFIRMED; someone wants to allocate live capital now.",
+      "options": {
+        "A": "Allocate live capital — the hypothesis is pre-registered.",
+        "B": "No live capital — Article 6 requires a CONFIRMED, pre-registered, out-of-sample ledger entry; paper/shadow only until it confirms.",
+        "C": "Allocate at half size as a middle ground.",
+        "D": "Allocate live but tag it as paper."
+      },
+      "correct": "B",
+      "tenet": "T6",
+      "stockfish_explanation": "Article 6 draws a bright line: paper is where hypotheses live, money is where CONFIRMATIONS live. Pre-registered isn't enough — the ledger verdict has to be CONFIRMED out-of-sample before a single dollar of live capital touches it. A PROVISIONAL edge runs in paper/shadow, fully allowed, as long as the records stay source-tagged so a paper result can never masquerade as live evidence. Option D — live capital tagged as paper — is exactly the masquerade the article forbids."
+    },
+    {
+      "id": "DIAG-52",
+      "phase": "diagnostic",
+      "rank": "Consul",
+      "category": "risk_constitution",
+      "elo_weight": 1540,
+      "prompt_roman": "A drift test starts failing after a config edit. THE DATA: `config/risk_constitution.yaml` was changed but the prose RISK_CONSTITUTION.md was not; `tests/test_risk_constitution.py` now fails on the mismatch.",
+      "options": {
+        "A": "Revert the yaml and ignore the prose.",
+        "B": "Delete the drift test.",
+        "C": "Edit the test to pass — it is just a test.",
+        "D": "A failing drift test means prose and machine-twin diverged — amend BOTH together in one commit; never fix the test."
+      },
+      "correct": "D",
+      "tenet": "T3",
+      "stockfish_explanation": "The drift test is a tripwire, not an obstacle. Its whole job is to scream when the human-readable law and the machine-readable twin disagree — which is exactly what happened. The fix is to reconcile prose and yaml together in the same commit so the law stays single-sourced; you never 'fix' the test to make the alarm stop (C), because that just lets the constitution and its enforcement silently drift apart. Editing or deleting the tripwire (C/B) is how the conscience layer rots."
+    },
+    {
+      "id": "DIAG-53",
+      "phase": "diagnostic",
+      "rank": "Dictator",
+      "category": "risk_constitution",
+      "elo_weight": 1720,
+      "prompt_roman": "Two caps could both apply to a set of positions. THE DATA: three carry-pair trades, each risking 0.7% (all under the 0.75% per-trade cap), total carry heat 2.1%; a fourth carry trade at 0.7% would push heat to 2.8%, over the 2.5% carry-complex cap.",
+      "options": {
+        "A": "Deny/trim the fourth — the binding constraint is the aggregate carry-complex cap (2.5%), which 2.8% breaches, even though every individual trade satisfies the per-trade cap.",
+        "B": "Open it — the two caps are independent and per-trade wins.",
+        "C": "Open it and net the risk against an equity hedge.",
+        "D": "Open the fourth — each trade is under 0.75%, so all is well."
+      },
+      "correct": "A",
+      "tenet": "T3",
+      "stockfish_explanation": "Per-trade and aggregate caps are BOTH binding, and here it's the aggregate that bites. Every leg is a well-behaved 0.7% (under 0.75%), but Article 2 treats the carry pairs as one correlated bet, and 2.8% total heat breaks the 2.5% ceiling. Passing the per-trade check does not exempt you from the complex check — 'each trade is small' is the exact rationalization that lets four small correlated bets become one oversized one. You trim the fourth until total carry heat is at or under 2.5%."
+    },
+    {
+      "id": "DIAG-54",
+      "phase": "diagnostic",
+      "rank": "Quaestor",
+      "category": "risk_constitution",
+      "elo_weight": 990,
+      "prompt_roman": "The most basic cap question. THE DATA: a trader wants to risk 1.2% on their single best idea of the month; Article 1 caps per-trade risk at 0.75%.",
+      "options": {
+        "A": "2.0% — match the daily-loss cap.",
+        "B": "1.2% — best ideas deserve more.",
+        "C": "0.75% — no single trade may risk more than the Article 1 per-trade cap, regardless of how good it looks.",
+        "D": "1.0% — a reasonable compromise."
+      },
+      "correct": "C",
+      "tenet": "T3",
+      "stockfish_explanation": "The per-trade cap is 0.75% and it applies to every trade, including — especially — your favorite one. The trades you're most excited about are the ones most likely to tempt you past the line, which is why the line is absolute. Confidence in an idea is not a sizing input. 0.75% and no more."
+    },
+    {
+      "id": "DIAG-55",
+      "phase": "diagnostic",
+      "rank": "Consul",
+      "category": "risk_constitution",
+      "elo_weight": 1450,
+      "prompt_roman": "The deep drawdown rung is hit. THE DATA: peak-to-trough drawdown 6.7%; Article 3 — 6.5% flatten every predictive-layer position; the 8% trailing prop halt sits just above.",
+      "options": {
+        "A": "Do nothing until exactly 8%.",
+        "B": "Halve sizes — treat 6.7% like the first rung.",
+        "C": "Flatten every predictive-layer position — 6.7% is past the 6.5% rung, the last line before the 8% trailing prop halt.",
+        "D": "Halt new entries but keep existing positions."
+      },
+      "correct": "C",
+      "tenet": "T3",
+      "stockfish_explanation": "6.5% is the emergency rung — flatten the entire predictive book. It's deliberately placed 1.5% below the binding 8% trailing prop halt so it can actually fire and save the account before the external line kills it; the original draft put this breaker above 8%, where it was a decorative brake that could never engage. At 6.7% you're past it, so you flatten predictive positions now. Waiting for 8% (A) is trusting the very line the ladder exists to keep you away from."
+    },
+    {
+      "id": "DIAG-56",
+      "phase": "diagnostic",
+      "rank": "Aedile",
+      "category": "state_vector",
+      "elo_weight": 1140,
+      "prompt_roman": "The scribe records dimension 6. THE DATA: S(t) dimension 6 is `rate_diff_z` (the IRP rate-differential z-score); today the external rate feed is unavailable.",
+      "options": {
+        "A": "Default rate_diff_z to 0.0 — it is an optional external-data dimension that falls back to 0.0 when unavailable, without breaking S(t).",
+        "B": "Guess a plausible value from yesterday.",
+        "C": "Drop to a 7-dimension vector.",
+        "D": "Abort the whole state vector — one missing dimension is fatal."
+      },
+      "correct": "A",
+      "tenet": "T1",
+      "stockfish_explanation": "The state vector is locked at exactly 8 dimensions, but two of them — rate_diff_z and cot_z — are explicitly optional because they depend on external feeds. When the feed is down, they default to a clean 0.0 rather than crashing the build or silently fabricating a value (B). You never drop to 7 dims (C) — the schema is frozen and a test guards it. Missing REQUIRED fields raise loudly; missing OPTIONAL ones fall back to 0.0. That's honest handling of absent data."
+    },
+    {
+      "id": "DIAG-57",
+      "phase": "diagnostic",
+      "rank": "Praetor",
+      "category": "state_vector",
+      "elo_weight": 1300,
+      "prompt_roman": "A required dimension is missing from the record. THE DATA: build_state() is called on a record lacking `atr_pct` (a REQUIRED field, dimension 3); rate_diff_z is also absent (optional).",
+      "options": {
+        "A": "The whole build silently returns zeros.",
+        "B": "atr_pct defaults to the last known value.",
+        "C": "Both default to 0.0.",
+        "D": "Missing atr_pct raises a KeyError (required, no silent mocking); the missing optional rate_diff_z defaults to 0.0."
+      },
+      "correct": "D",
+      "tenet": "T3",
+      "stockfish_explanation": "The builder draws a hard line between required and optional. atr_pct is core to the position's state, so its absence raises a KeyError — no silent mocking, no made-up fallback, you fail loud and fix the data. rate_diff_z is external-dependent, so its absence quietly becomes 0.0. Treating a missing REQUIRED field as 0.0 (C/A) would be exactly the silent-mocking failure the system forbids — you'd be trading on a fabricated state and not know it."
+    },
+    {
+      "id": "DIAG-58",
+      "phase": "diagnostic",
+      "rank": "Consul",
+      "category": "state_vector",
+      "elo_weight": 1490,
+      "prompt_roman": "A dev wants to insert a new feature into the middle of S(t). THE DATA: STATE_DIMS is a locked 8-tuple in a fixed order; a test asserts the order can never silently drift; persisted S(t) depends on the order.",
+      "options": {
+        "A": "Insert it in the middle — order does not matter.",
+        "B": "Do not reorder — changing STATE_DIMS is a breaking schema change; any new dimension requires a version bump everywhere S(t) is persisted, not a silent insert.",
+        "C": "Append it and skip the version bump.",
+        "D": "Insert it and update only the training code."
+      },
+      "correct": "B",
+      "tenet": "T6",
+      "stockfish_explanation": "The dimension order is a contract, not a convenience. Everything downstream — the gym, the value scorer, any persisted state — reads S(t) positionally, so inserting a feature in the middle silently reassigns the meaning of every later dimension and corrupts every stored vector. The rule is explicit: changing STATE_DIMS is a breaking schema change that must bump a version marker everywhere S(t) is persisted. A silent insert (A) or an un-versioned append (C) is the kind of undocumented change that becomes expensive research debt later."
+    },
+    {
+      "id": "DIAG-59",
+      "phase": "diagnostic",
+      "rank": "Praetor",
+      "category": "state_vector",
+      "elo_weight": 1260,
+      "prompt_roman": "Compute dimension 8. THE DATA: `drawdown_from_peak` for a LONG position; best price since entry 1.1050, current close 1.1010, entry 1.1000.",
+      "options": {
+        "A": "0.0 — the trade is still in profit versus entry.",
+        "B": "About +0.36% — drawdown_from_peak measures retracement from the BEST excursion (1.1050 -> 1.1010), not from entry, so it is positive even while the trade is green.",
+        "C": "Negative, because price is above entry.",
+        "D": "Undefined without the ATR."
+      },
+      "correct": "B",
+      "tenet": "T1",
+      "stockfish_explanation": "drawdown_from_peak is about giving back GAINS, not about being underwater versus entry. For a long, it's (best_price - close) / best_price = (1.1050 - 1.1010)/1.1050 ~ 0.36%. The trade is still above its 1.1000 entry, but it has retraced from its 1.1050 peak — and that retracement is what this dimension captures. Anchoring it to entry (A/C) misses the point: the state vector wants to know how much of the run-up the position has surrendered, which matters for trailing/exit logic."
+    },
+    {
+      "id": "DIAG-60",
+      "phase": "diagnostic",
+      "rank": "Aedile",
+      "category": "ict_reference",
+      "elo_weight": 1130,
+      "prompt_roman": "An ICT setup forms outside the sanctioned windows. THE DATA: entries are allowed only in high-probability kill zones (London 02:00-05:00, NY_Open 07:00-10:00, NY_PM 13:30-16:00 UTC); this setup triggers during the NY lunch consolidation (12:00-13:30 UTC).",
+      "options": {
+        "A": "Take it at double size to compensate for the timing.",
+        "B": "Take it but only for USDJPY.",
+        "C": "Take it — a good setup is a good setup at any time.",
+        "D": "Skip it — NY lunch is a blocked consolidation window; ICT entries only fire inside the high-probability kill zones."
+      },
+      "correct": "D",
+      "tenet": "T2",
+      "stockfish_explanation": "In ICT, timing isn't a soft preference — kill_zone carries real weight and NY lunch is explicitly a blocked, low-participation consolidation window. A setup that looks perfect but fires at the wrong time is the wrong setup; institutional flow isn't there to fuel it. This is regime-appropriateness at the intraday scale (Tenet 2): the pattern is only tradeable when it appears in the right session, not whenever it happens to print."
+    },
+    {
+      "id": "DIAG-61",
+      "phase": "diagnostic",
+      "rank": "Praetor",
+      "category": "ict_reference",
+      "elo_weight": 1310,
+      "prompt_roman": "The ICT ATR-spike veto is tested. THE DATA: current bar ATR is 3.4x the recent average; the pipeline has a hard ATR-spike veto at 3.0x that must not be auto-mutated.",
+      "options": {
+        "A": "Veto the entry — a >3.0x ATR spike trips the hard veto; violent, disorderly bars are not tradeable setups.",
+        "B": "Trade it at half size.",
+        "C": "Lower the veto to 4.0x so the trade qualifies.",
+        "D": "Trade it — high volatility means a big move."
+      },
+      "correct": "A",
+      "tenet": "T3",
+      "stockfish_explanation": "A 3.4x ATR bar is chaos, not opportunity — spreads blow out, stops get run, and the orderly structure ICT relies on is gone. The pipeline vetoes anything above a 3.0x spike, and that veto is a hard invariant flagged not to auto-mutate. Loosening it to 4.0x just to let this trade through (C) is defeating a safety rail to satisfy a single setup — precisely what a hard invariant exists to stop. When the tape goes violent, you stand aside."
+    },
+    {
+      "id": "DIAG-62",
+      "phase": "diagnostic",
+      "rank": "Consul",
+      "category": "ict_reference",
+      "elo_weight": 1520,
+      "prompt_roman": "A trader wants to lever an ICT signal into the macro book. THE DATA: an ICT sweep fires long on USDJPY intraday; the ICT edge is unproven (permutation p=0.52); the trader wants to use it to justify a multi-day macro USDJPY position.",
+      "options": {
+        "A": "Use it only for the stop, not the entry.",
+        "B": "Use it — a signal is a signal.",
+        "C": "Do not — ICT is an unproven intraday reference layer; it cannot justify a multi-day macro position, and doing so also violates the horizon-isolation wall.",
+        "D": "Use it if inverted."
+      },
+      "correct": "C",
+      "tenet": "T1",
+      "stockfish_explanation": "Two independent reasons this fails. First, evidence: ICT's permutation p is 0.52 — it isn't a proven predictive edge at any horizon, so it can't be the reason for a multi-day bet. Second, isolation: an intraday ICT signal feeding a multi-day macro position is exactly the cross-horizon feature-sharing the doctrine bans. Even option A — 'just the stop' — is fine WITHIN the ICT trade (that's what ICT is for), but here we're talking about justifying a macro trade, which it may not do. Right layer, right horizon, or not at all."
+    },
+    {
+      "id": "DIAG-63",
+      "phase": "diagnostic",
+      "rank": "Dictator",
+      "category": "ict_reference",
+      "elo_weight": 1680,
+      "prompt_roman": "The ICT score gate is proposed for loosening to fire more trades. THE DATA: ICT currently fills only ~2 trades / 90 days because most A-grade setups expire unfilled; a dev proposes lowering min_grade_to_execute from A to B to 'get more trades.'",
+      "options": {
+        "A": "Raise risk-per-trade to compensate for few fills.",
+        "B": "Lower the grade to B — more trades means more edge.",
+        "C": "Do not loosen the grade gate — the bottleneck is FILL RATE, not the score gate; ICT is unproven (p=0.52), so lowering the execution grade just adds unvalidated, lower-quality trades.",
+        "D": "Lower it to C for maximum volume."
+      },
+      "correct": "C",
+      "tenet": "T4",
+      "stockfish_explanation": "This is a diagnosis error dressed as an optimization. The reason ICT barely trades isn't that the grade gate is too strict — it's that A-grade setups expire unfilled (a fill-rate problem). Dropping the execution grade to B or C doesn't fix fills; it just floods the book with lower-quality, still-unproven (p=0.52) trades, which is adding complexity/volume on top of an edge you haven't validated (Tenet 4). Fix the actual bottleneck (fills), don't loosen a quality gate to paper over it. And juicing risk-per-trade (A) to compensate is the opposite of what a system with an unproven edge should do."
+    },
+    {
+      "id": "DIAG-64",
+      "phase": "diagnostic",
+      "rank": "Aedile",
+      "category": "ict_reference",
+      "elo_weight": 1120,
+      "prompt_roman": "State what ICT is actually FOR in the stack. THE DATA: ICT pattern edge is unproven (p=0.52, fails BH); yet the ICT engine is retained and used.",
+      "options": {
+        "A": "It is a structure/reference layer — kill-zone timing and TP/SL placement — retained despite being unproven as a directional predictor.",
+        "B": "It is deleted because it is unproven.",
+        "C": "It feeds the Forex macro engine its direction.",
+        "D": "It is the primary directional predictor for intraday trades."
+      },
+      "correct": "A",
+      "tenet": "T1",
+      "stockfish_explanation": "Hold two facts together: ICT is not a proven directional edge (p=0.52), and it's still useful. What it's genuinely good at is structure — session timing (kill zones) and sensible take-profit/stop reference levels. So it's kept as a reference layer, not thrown away (B) and not promoted to a predictor (D) or leaked into the macro engine (C). Knowing the difference between 'unproven as prediction' and 'useless' is the whole point — it earns its keep for what it actually does, not for a claim it can't support."
+    },
+    {
+      "id": "DIAG-65",
+      "phase": "diagnostic",
+      "rank": "Praetor",
+      "category": "evidence_epistemics",
+      "elo_weight": 1300,
+      "prompt_roman": "A feature is proposed for promotion to LIVE. THE DATA: OOS IC 0.22 (> 0.15), positive marginal contribution in walk-forward, but it DEGRADES on the 6-month holdout window.",
+      "options": {
+        "A": "Promote at half weight.",
+        "B": "Promote and re-check the holdout next quarter.",
+        "C": "Promote — two of three gates pass.",
+        "D": "Reject — all three promotion gates must pass; holdout degradation is disqualifying regardless of a strong IC."
+      },
+      "correct": "D",
+      "tenet": "T1",
+      "stockfish_explanation": "Promotion is a three-gate AND, not a best-of-three. IC > 0.15 and positive marginal contribution are necessary, but the holdout gate — no degradation on the 6-month held-out window — is the one that catches overfitting, and it's failing. A feature that looks great in-sample and on IC but falls apart on untouched data is precisely the kind the holdout is designed to reject. Promoting anyway (C/A) or promising to check later (B) is how overfit features reach live capital. All three, or it doesn't ship."
+    },
+    {
+      "id": "DIAG-66",
+      "phase": "diagnostic",
+      "rank": "Consul",
+      "category": "evidence_epistemics",
+      "elo_weight": 1500,
+      "prompt_roman": "A headline Sharpe looks too good. THE DATA: a strategy reports Sharpe 2.10, but it was UNCOSTED and annualised as if trading daily; the strategy actually trades 4-14 times per year. Properly costed and de-annualised, OOS Sharpe is ~1.08-1.25.",
+      "options": {
+        "A": "Report 2.10 — it is the raw computed number.",
+        "B": "Report the costed, correctly-annualised ~1.08-1.25 — the 2.10 was inflated by ignoring costs and mis-annualising a low-frequency strategy as daily.",
+        "C": "Report 2.10 but footnote the costs.",
+        "D": "Average them to ~1.6."
+      },
+      "correct": "B",
+      "tenet": "T1",
+      "stockfish_explanation": "A headline number built on two errors isn't conservative-or-aggressive, it's just wrong. The 2.10 ignored trading costs AND annualised a strategy that trades a handful of times a year as if it traded daily — both inflate the ratio. The honest figure is the costed, properly-de-annualised ~1.08-1.25. You don't footnote a wrong number (C) or split the difference (D); you report the correct one. Overstating your own edge is a form of self-deception that eventually gets paid for in live size."
+    },
+    {
+      "id": "DIAG-67",
+      "phase": "diagnostic",
+      "rank": "Dictator",
+      "category": "evidence_epistemics",
+      "elo_weight": 1690,
+      "prompt_roman": "A gate proposal is walked back after fresh data. THE DATA: HYP-044 proposed a VIX gate on the carry book; out-of-sample it was REJECTED (p=0.50, effect delta ~0); it has been rolled back. A new session re-proposes the same VIX gate because 'VIX obviously matters for carry.'",
+      "options": {
+        "A": "Re-add the VIX gate — VIX clearly matters for carry.",
+        "B": "Do not re-add it — it was tested OOS and rejected (p=0.50, delta ~0); re-proposing it on intuition ignores recorded evidence and repeats buried work.",
+        "C": "Re-add it at half strength.",
+        "D": "Re-add it only in RISK_OFF."
+      },
+      "correct": "B",
+      "tenet": "T6",
+      "stockfish_explanation": "'VIX obviously matters for carry' is intuition — and this exact intuition was already tested and killed. HYP-044's VIX gate came back p=0.50 with essentially zero effect out-of-sample, and it was rolled back. Re-proposing it because it feels right is precisely the research-debt failure Tenet 6 guards against: the finding was recorded so nobody re-litigates it, yet here we are. Reviving a rejected hypothesis needs NEW evidence and the graveyard sign-off process, not a fresh appeal to intuition. The ledger already answered this."
+    },
+    {
+      "id": "DIAG-68",
+      "phase": "diagnostic",
+      "rank": "Praetor",
+      "category": "evidence_epistemics",
+      "elo_weight": 1290,
+      "prompt_roman": "Two edges are compared for how much to trust them. THE DATA: the forex macro edge has permutation p<0.001; the ICT pattern edge has permutation p=0.52 and fails Benjamini-Hochberg.",
+      "options": {
+        "A": "Trust ICT more — it trades more often.",
+        "B": "Distrust both — p-values are meaningless.",
+        "C": "Trust them equally — both are in production.",
+        "D": "Trust the macro edge as proven (p<0.001) and treat ICT as unproven (p=0.52) — being in production does not make an edge statistically validated."
+      },
+      "correct": "D",
+      "tenet": "T1",
+      "stockfish_explanation": "'It's in production' and 'it's statistically proven' are different claims, and conflating them is the mistake. The macro edge clears the bar convincingly (p<0.001) — that's a real, validated signal. ICT sits at p=0.52 and fails multiple-comparison correction — a coin flip, unproven. Both can be in the stack (ICT as a reference layer), but you calibrate how much you TRUST each to its actual evidence. Trading frequency (A) has nothing to do with validity, and throwing out p-values entirely (B) discards the only honest scorekeeping you have."
+    },
+    {
+      "id": "DIAG-69",
+      "phase": "diagnostic",
+      "rank": "Consul",
+      "category": "evidence_epistemics",
+      "elo_weight": 1560,
+      "prompt_roman": "A single walk-forward window looks damning. THE DATA: the forex macro edge printed -0.13 in the last range-bound year; a reviewer concludes the edge is fake and should be scrapped, ignoring the +0.51 / +1.26 trending years and the p<0.001 permutation test.",
+      "options": {
+        "A": "Do not scrap it — one negative range-bound year is consistent with a REAL but regime-fragile edge; the permutation test (p<0.001) and the trending-year returns show the edge is real and conditional.",
+        "B": "Scrap it and rebuild from scratch.",
+        "C": "Double its size to prove it works.",
+        "D": "Scrap it — a negative year proves it is fake."
+      },
+      "correct": "A",
+      "tenet": "T2",
+      "stockfish_explanation": "A single bad year in the WRONG regime doesn't falsify a regime-conditional edge — it confirms the condition. The macro edge is proven real (p<0.001) but only pays in rate-trending regimes; a -0.13 in a range-bound year is exactly what 'regime-fragile' predicts, sitting right next to +0.51 and +1.26 in trending years. Scrapping on one out-of-regime window (D/B) throws away a real edge because you judged it in the environment it was never meant to work in. The right response is regime-gating, not deletion — and definitely not doubling size (C)."
+    },
+    {
+      "id": "DIAG-70",
+      "phase": "diagnostic",
+      "rank": "Dictator",
+      "category": "evidence_epistemics",
+      "elo_weight": 1700,
+      "prompt_roman": "A cross-AI session hands over a claimed result to be acted on. THE DATA: a prior session's notes claim a hypothesis was CONFIRMED and a rule already wired live; the hypothesis ID and the wiring cannot be found anywhere in the filesystem or ledger.",
+      "options": {
+        "A": "Delete the conflicting ledger to resolve the mismatch.",
+        "B": "Act on it — the prior session confirmed it.",
+        "C": "Verify against the filesystem/ledger first — a claimed confirmation with no findable prereg, ledger entry, or code is unverified and must not drive live action until reconciled.",
+        "D": "Act on it and log it afterwards."
+      },
+      "correct": "C",
+      "tenet": "T6",
+      "stockfish_explanation": "A confident claim from another session is a hypothesis about the repo, not ground truth — and here the evidence doesn't exist on disk. The discipline is to verify against the actual filesystem and ledger before anything touches live capital; a 'CONFIRMED' with no findable prereg, no ledger row, and no wired code is a phantom result, and acting on phantoms is how bad state propagates. You reconcile first, act second. Deleting the conflicting ledger (A) to make the mismatch go away is destroying the very evidence Tenet 6 says to protect."
+    }
+  ]
+}
