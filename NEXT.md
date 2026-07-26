@@ -3017,3 +3017,55 @@ used, abstain flag) in `system_heatmap.json.per_question_log`.
 **Refused to shortcut:** did not mark all-100-correct as "system is flawless" — flagged the 3
 LLM_BOUNDARY abstentions as a real, distinct finding, and flagged `combat_vetoes.py`'s
 disabled-in-prod status even though the arithmetic questions were still answerable.
+
+---
+
+## 2026-07-26 — COLD system heatmap (hardcoded-threshold-blind) + parallel-run coexistence note
+
+**Redirect from Colin mid-session:** a parallel session independently ran its own AlphaZero player
+and wrote `data/cursus_honorum/alphazero_run_01.json` + `_summary.md` — that dir is NOT empty
+anymore and was NOT touched by this session (the earlier `rmdir data/cursus_honorum` this session
+ran was correct at the time — the dir was empty then; it only regained content afterward from the
+parallel run). Colin's actual ask: the first warm heatmap (97/100, see prior entry) let the player
+use any threshold the question text handed over, even ones that only exist as bare Python
+constants with zero config backing — so it wasn't a true test of whether the system's knowledge
+is principled/config-driven vs. hardcoded. This entry is the cold, honest version.
+
+**Shipped (new files only, distinct names, nothing overwritten):**
+`games/cursus_honorum/build_heatmap_cold.py`, `system_heatmap_cold.json`,
+`system_heatmap_cold_summary.md`. Traced every constant a question could rest on to its defining
+file first: `config/risk_constitution.yaml`, `config/parameters.yml`, `config/ict_params.yml`, and
+`sovereign/forex/config/combat_vetoes.yaml` DO externalize their thresholds (risk caps/ladder,
+grade-size table, daily-loss cap, training-sample floor, ICT weights/gates, combat-veto deadbands)
+— genuine config-driven pattern, questions resting on those stayed answered. `sovereign/forex/
+carry_engine.py`, `sovereign/forex/strategy.py`, `sovereign/forex/risk_sentiment.py`, and
+`imbalance_engine/petroulas_gate.py` load NO config at all (grepped for yaml imports/reads — none)
+— every constant in them is a bare module/class attribute. Abstained wherever a question's answer
+genuinely depended on one of those.
+
+**Result: 79/100 correct, 0 wrong, 21 abstained** (`answered_accuracy_excl_abstentions = 1.00` —
+never guessed, never rubber-stamped). Two categories collapse hard once hardcoded numbers are
+withheld: `petroulas_conviction` **0%** (7/7 abstained — every Petroulas gate: composite stress
+6.0, XGBoost 0.65, Kimi magnitude/conviction 7/7, size ceiling 5.0, is a bare constant in
+`petroulas_gate.py`) and `regime_id` **29%** (5/7 abstained — VIX 20/25/35 regime lines + the
+±1.0 term-structure band in `risk_sentiment.py` are equally bare). Smaller footholds: `strategy.py`
+(`CONVICTION_NEUTRAL_THRESHOLD=0.10`, grade-boundary 2.0/1.5/0.60), `carry_engine.py`
+(`MIN_CARRY_SPREAD_BPS=100`, `CARRY_RISK_PER_PAIR=0.003`), and the cross-system IC promotion bar
+`0.15` (documented only in a `latent_feature_search.py` comment, never in config). Full findings
+list with per-question usage: `system_heatmap_cold.json.hardcoded_threshold_findings`.
+
+**Real cleanup finding:** two of the system's highest-stakes decision points — conviction-sized
+Petroulas position sizing and VIX/regime classification (which also drives carry-unwind forced
+overrides) — cannot be tuned or reviewed without editing and redeploying Python source, because
+neither has a config twin. `RISK_CONSTITUTION.md`↔`config/risk_constitution.yaml` and
+`config/ict_params.yml` already show the correct pattern (100% cold accuracy both); it simply
+wasn't applied to carry/regime/sizing/Petroulas. This directly matches CLAUDE.md's "never hardcode
+thresholds" rule and is a legitimate follow-up ticket, not something fixed in this session (no
+execution-path files were touched).
+
+**Refused to shortcut:** did not quietly re-answer the hardcoded-dependent questions from memory of
+the warm run's already-known-correct letters — re-derived provenance per-question from a fresh file
+read and abstained wherever the boundary genuinely required a bare constant, even on a few
+questions (DIAG-18, DIAG-20, DIAG-33, DIAG-43) where the classification was already handed to the
+player in the prompt and only the downstream principle needed applying — those stayed answered
+rather than being swept into a blanket "regime_id/petroulas = abstain everything" shortcut.
