@@ -159,6 +159,23 @@ class PetroulsasGate:
         direction: str,
         entry_price: float
     ) -> PetroulsasDecision:
+        """Run the dual-confirmation gate and broadcast to Firebase (best-effort)."""
+        decision = self._evaluate_inner(symbol, regime_stress, xgb_confidence, direction, entry_price)
+        try:
+            from integration.firebase_state_writer import broadcast_petroulas_decision
+            broadcast_petroulas_decision(decision)
+        except Exception:
+            pass
+        return decision
+
+    def _evaluate_inner(
+        self,
+        symbol: str,
+        regime_stress: RegimeStressOutput,
+        xgb_confidence: float,
+        direction: str,
+        entry_price: float
+    ) -> PetroulsasDecision:
         """Run the dual-confirmation gate.
         
         Fast path: if stress < threshold or XGB confidence < threshold, 

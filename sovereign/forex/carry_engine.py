@@ -178,6 +178,13 @@ class CarryEngine:
                     f.write(json.dumps(asdict(sig)) + '\n')
         logger.info(f'[CarryEngine] Logged {len(signals)} signals → {ledger_file}')
 
+        # Broadcast to Firebase RTDB (best-effort; never breaks carry loop).
+        try:
+            from integration.firebase_state_writer import broadcast_carry_signals
+            broadcast_carry_signals(signals)
+        except Exception:
+            pass
+
     def run_forever(self) -> None:
         """
         Daemon loop: scan every ``SCAN_INTERVAL_HOURS`` hours.

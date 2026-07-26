@@ -527,6 +527,13 @@ def run_reflect(harvests: list[dict], date: Optional[str] = None) -> dict:
     except Exception:
         pass
 
+    # Broadcast to Firebase RTDB (best-effort; never breaks the reflect cycle).
+    try:
+        from integration.firebase_state_writer import broadcast_oracle_reflection
+        broadcast_oracle_reflection(output)
+    except Exception:
+        pass
+
     return output
 
 
