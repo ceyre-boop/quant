@@ -31,6 +31,11 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
+# Ensure repo root is on the path so `integration` is importable regardless
+# of where the script is invoked from.
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
 QUESTION_BANK = Path(__file__).parent / "question_bank.json"
 CATEGORIES_FILE = Path(__file__).parent / "categories.json"
 
