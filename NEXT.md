@@ -2835,3 +2835,40 @@ baseline determinism). Isolation test (`test_pipeline_does_not_import_sovereign`
 Ignition gate untouched, still CLOSED (tick_024_carry_fix_landed=false, hyp_071_net_confirmed=false).
 No frozen execution-path file touched — new files only. Explicit `git add` of the 6 new files only
 (repo has heavy unrelated concurrent dirty state). Pushed to sovereign-v2 (36ec72d).
+
+### 2026-07-25 · session-close skill built from Colin's SESSION_CLOSING_PROTOCOL (4d83465)
+Turned Colin's closing-protocol draft into a real, verified Claude Code skill. Every command
+was run against the live repo before shipping — a protocol full of broken commands is worse
+than none.
+
+- `SESSION_CLOSING_PROTOCOL.md` (repo root) — Colin's 5-level J/T/A/M/C structure kept verbatim;
+  reconciled commands where wrong, with an inline note on each:
+  - **T-3 (risk_constitution test):** PASS text said "1 passed" — selector actually matches
+    10 tests + 1 intentional skip. Corrected the PASS definition; selector itself was fine.
+  - **M-3 (MT5 live-guard check):** real bug — fake account used `trade_mode = 0` commented as
+    `ACCOUNT_TRADE_MODE_REAL`. In `sovereign/execution/mt5/__init__.py`, 0 is actually
+    `ACCOUNT_TRADE_MODE_DEMO` (REAL=2). As drafted, the check would have exercised the DEMO
+    accept-path, never the live-rejection path — a false PASS every time. Fixed to `trade_mode=2`
+    + added `login`/`server` attrs `assert_routable`'s `_attr()` reads. Verified with the real
+    fix: prints `PASS — live rejected: LiveAccountError`.
+  - Everything else (J-6 SHADOW_MODE import, T-1/T-2 isolation+ICT baseline selectors, T-4 shadow
+    log path `data/exec/exit_manager_shadow.jsonl`, T-5 `data/agent/messages_to_colin.json`, T-6
+    param_change_log, A-2 `sovereign_train.py --watch` grep, A-4/A-5/A-6 script paths, M-1 frozen-
+    file grep, M-2 `evaluate_gate()`/`GateStatus.open`/`.reasons` API, M-4 hash check) — all
+    verified correct as Colin wrote them, no changes needed.
+- `.claude/skills/session-close/SKILL.md` — triggers on "close the session", "session close",
+  "end of session", "wrap up", "run the closing protocol", "clocking out". Points to the root
+  protocol file as source of truth rather than duplicating its ~200 lines; instructs top-to-bottom
+  execution, PASS/FAIL judged against each item's own definition, Level-1/2 fails block the close,
+  Level 3-5 fails get ticketed, closing stamp appended to NEXT.md with real tallies.
+
+No execution-path file touched (only read forex_exit_manager/gate/mt5-guard to verify their real
+signatures). Isolation test re-verified green after the change (1 passed, 1 skipped). Explicit
+`git add` of only the 2 new files — repo has heavy concurrent dirty state, never `-A`. Skill file
+lives under `.claude/` which is gitignored wholesale; force-added just that one file
+(`git add -f`) rather than touching the ignore rule. Confirmed discoverable: `session-close`
+appears in the live Skill-tool listing. Pushed to sovereign-v2 (4d83465).
+
+C-1: Yes — infra/governance, not research; closing protocol is now something the next session
+(or Colin) can actually run without hitting a broken command mid-close.
+C-2: None — this is tooling, no parameter/risk/capital decision embedded.
