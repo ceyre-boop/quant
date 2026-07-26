@@ -4,6 +4,47 @@ Per-session ledger: what shipped, push status, verdicts, blockers, refusals. New
 The Obsidian brain (`~/Obsidian/Obsidian/00-BRAIN/NEXT.md`) is the cross-project rollup.
 Standing constraints live in `CLAUDE.md` — not restated here.
 
+## 2026-07-25 — Cursus Honorum: wired game built (2ac057b), pushed
+
+Wired the shipped 100-question bank (`question_bank.json`/`categories.json`, bc629e8) into a
+playable game. **No prior game existed in the repo** — searched `games/`, `dashboard/`, every
+`*.html` for cursus/elo/weakness-heatmap hits, none found — so built fresh rather than wired
+existing, per the ticket's fallback instruction.
+
+- `games/cursus_honorum/index.html` — self-contained offline HTML/JS/CSS, zero deps, zero API
+  calls. `fetch()`s the two local JSON files (must be served over HTTP, not `file://` — browsers
+  block fetch on file URLs; `python3 -m http.server` from the folder works).
+  - Calibration (CAL-01..30 in order) locates a ballpark Elo, then adaptive diagnostic router
+    takes over: weights sampling toward weak categories (heatmap-driven, unseen=weakest) and
+    toward Elo proximity, with ZPD easing (-120 target Elo after 2-loss streak) / hardening
+    (+80 after 3-win streak).
+  - Standard Elo, K=32 <1200 / K=16 >=1200, persisted to `localStorage` key
+    `cursus_honorum_save_v1`. Rank bands from `categories.json.ranks`; rank-up ceremony modal
+    fires on band crossing.
+  - Post-commit-only reveal of the bank's pre-authored `stockfish_explanation` + mapped tenet —
+    no API call, straight from the JSON record, shown win or lose.
+  - Per-category accuracy heatmap (color-coded, persisted) rendered live under the question
+    panel. 30s per-question timer, auto-locks as wrong (no letter) on timeout.
+- `games/cursus_honorum/AUTHOR_MORE.md` — the no-API top-up workflow: a documented prompt Colin
+  pastes into a normal Claude Max session (not this one) that reads the current heatmap from
+  `localStorage`, weights new-question generation toward weak categories, and appends to
+  `question_bank.json` under the same schema/correctness/letter-balance discipline as the
+  original 100. Explicitly: append-only, never edits existing ids.
+
+**Browser-verified** (Browser pane, `localhost:8791`, real click + JS-console state read, not
+just visual): loaded CAL-01, clicked correct option B, confirmed via
+`localStorage.getItem('cursus_honorum_save_v1')` — Elo 1000→1009 (K=32 math correct), rank
+Quaestor→Aedile with ceremony firing, streak 1, `categoryStats.carry_direction` 1/1. Heatmap
+grid renders all 15 categories. Did not exhaustively play through calibration/diagnostic
+transition or the timeout path live — those are direct code-path reads, not screen-verified.
+
+**Freeze-safe**: `games/` only, explicit `git add` of the two new files (never `-A` — repo has
+heavy concurrent dirty state on sovereign-v2). Pushed `sovereign-v2` (2ac057b).
+
+**Refused to shortcut:** did not fabricate or assume a pre-existing game — searched first,
+reported the negative result, then built to spec rather than guessing at wiring into something
+that isn't there.
+
 ### 2026-07-24 · ICT re-scope — DISPATCH_ICT_DAILY_PIPELINE.md shelved (doc-only)
 
 **Docs/backlog reconciliation, no code changed.** Colin clarified ICT's intended role: it
