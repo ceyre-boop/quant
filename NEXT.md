@@ -4,6 +4,35 @@ Per-session ledger: what shipped, push status, verdicts, blockers, refusals. New
 The Obsidian brain (`~/Obsidian/Obsidian/00-BRAIN/NEXT.md`) is the cross-project rollup.
 Standing constraints live in `CLAUDE.md` — not restated here.
 
+## 2026-07-25 — Cowork session close (alta-session-close v1.0)
+
+SESSION CLOSE 2026-07-25 18:45 UTC
+Protocol: alta-session-close v1.0
+J: 5/6* | T: 6/7** | A: 4/6*** | M: 3/4**** | C: 3/3
+Gate: CLOSED (4 blockers intact) | Shadow: GREEN (weekend, no open trades) | Branch: sovereign-v2 | Pushed: YES
+
+*J-1 NOTED: ~30 live data files show modified (background jobs writing normally — not code drift). Two code files (orchestrator.py, alexandrian_library.py) have unstaged changes from another session — not this session's work, not a regression.
+*J-4 NOTED: print() at orchestrator.py:130 is inside a docstring code example, not live execution.
+**T-2 NOTED: ran on test_ict_pipeline.py directly (sandbox collection errors prevent full suite). 4 failed / 17 passed — same 4 pre-existing failures (TestScoreAndGrade ×2, TestRiskEngineGate ×2). No new failures absorbed.
+**T-4 NOTED: Shadow last entry 2026-07-23 (Thursday). Today is Saturday — weekend, no trades open = expected, not a failure.
+***A-3: Tickets TICK-057, TICK-058 filed this session. A-5 skipped (operational session, no arch changes). A-6: watchdog baseline current (2026-07-25T18:27, 54 plists).
+****M-3: MT5 live guard physically unverifiable in Cowork sandbox (Twisted/OpenSSL dep missing). Verified via code review — guard logic unchanged, no frozen files touched (M-1 CLEAN).
+
+Cowork session work (not Claude Code — no code written):
+- AlphaZero/Stockfish game board formally defined (state vector, legal moves, win/loss/draw, Elo benchmark, cost structure)
+- connect_all_plists.sh ran: 54/54 jobs loaded, com.alta.dip_daily caught and killed (ungated XGBoost retrain, 4 days pre-FOMC, no gate/placebo/prereg)
+- TICK-057: wire retrain_loop through training gate before dip_daily can return
+- TICK-058: fix Petrules IWM header parse
+- SESSION_CLOSING_PROTOCOL.md (25 tasks, 5 levels) written to plans/
+- alta-session-close.skill packaged and installed
+- path confirmed: games/cursus_honorum/ is source of truth for question bank (NOT data/cursus_honorum/)
+
+C-1: Yes — dip_daily ungated loop killed before FOMC. Gate closed for correct reasons. Ignition path unchanged and intact.
+C-2: Colin's plate: MT5 demo on Windows VM before Wednesday 2pm FOMC. July 28 unlock sequence in plans/JULY28_UNLOCK_PROMPT.md requires his sign-off before applying TICK-024 or TICK-044.
+C-3: Next session reads CLAUDE.md + this entry. State: observation-only, gross costs (correct), gate closed, 54 jobs running, no side doors. One human action needed before Wednesday.
+
+---
+
 ## 2026-07-25 — Cursus Honorum: wired game built (2ac057b), pushed
 
 Wired the shipped 100-question bank (`question_bank.json`/`categories.json`, bc629e8) into a
@@ -2950,3 +2979,41 @@ validation: 100/100 records complete, unique ids, every category/tenet resolves.
 
 **Refused to shortcut:** did not skip the answer-position rebalance even though every answer was
 already "correct" — an all-B bank is gameable and corrupts the Elo signal, so it was fixed.
+
+---
+
+## 2026-07-26 — System self-play heatmap over the Cursus Honorum bank (housekeeping + diagnostic)
+
+**Housekeeping:** `rmdir data/cursus_honorum` — empty dir from an interrupted run; Colin confirmed
+`games/cursus_honorum/` is single source of truth.
+
+**Shipped (new files only, zero execution-path touch):** `games/cursus_honorum/build_heatmap.py`,
+`system_heatmap.json`, `system_heatmap_summary.md` — an automated "player" that answered all 100
+bank questions by applying the system's actual coded/documented logic (read from
+`carry_engine.py`, `risk_sentiment.py`, `combat_vetoes.py`, `strategy.py`, `state_space.py`,
+`petroulas_gate.py`, `RISK_CONSTITUTION.md`, `TRADING_PHILOSOPHY.md`, the hypothesis ledger)
+BEFORE consulting the bank's answer key — not a rubber-stamp of the key. Every answer is tagged
+with its `provenance`: CODE (69), CONFIG_DISABLED (3 — `combat_vetoes.py` is enabled=false in
+prod, analysis-instrument-only per its own docstring, so these test its arithmetic not its live
+gate), DOC_TENET (14 — the six tenets are documented, not executable), LEDGER_FACT (11 —
+historical/ledger record, not a formula), LLM_BOUNDARY (3, all `petroulas_conviction` — Kimi's
+"is this arithmetic or narrative" call is genuinely delegated to a model in production, not code;
+these were honestly abstained, not guessed). Included a random-baseline control (25% theoretical
++ one seeded uniform-random simulation) per category so accuracy-over-chance is visible, not just
+raw accuracy.
+
+**Result: 97/100 correct, 0 wrong, 3 abstained.** All 14 non-Petroulas categories: 100% (+75pp
+over the 25% baseline). `petroulas_conviction`: 57% (3/7 abstained) — the system's one genuine
+coded-logic gap is judging thesis-is-arithmetic-vs-narrative, which the real architecture already
+routes to an LLM (Kimi) rather than code, so this is a known, deliberate boundary, not a surprise.
+Colin's 8-bucket scheme (EXPECTANCY/SIZING/CARRY/KELLY/SHARPE/EXITS/RECOVERY/TRUST) doesn't exist
+anywhere in this repo or the game itself (checked via grep + the game's own `index.html`, which
+renders off the native 15-category scheme) — reported a best-effort hand-mapped projection with
+that caveat explicit. Under that projection: **EXITS has zero bank questions at all** — the bank
+cannot speak to exit logic, so it can't be compared to Colin's human EXITS 0%; that's a gap in the
+diagnostic tool, not evidence either way. Full per-question audit log (answer, correct?, component
+used, abstain flag) in `system_heatmap.json.per_question_log`.
+
+**Refused to shortcut:** did not mark all-100-correct as "system is flawless" — flagged the 3
+LLM_BOUNDARY abstentions as a real, distinct finding, and flagged `combat_vetoes.py`'s
+disabled-in-prod status even though the arithmetic questions were still answerable.
