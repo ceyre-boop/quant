@@ -4,6 +4,57 @@ Per-session ledger: what shipped, push status, verdicts, blockers, refusals. New
 The Obsidian brain (`~/Obsidian/Obsidian/00-BRAIN/NEXT.md`) is the cross-project rollup.
 Standing constraints live in `CLAUDE.md` — not restated here.
 
+## 2026-07-26 — Dashboard LIVE/audit two-plane split (Firebase RTDB wiring)
+
+Ticket (ad-hoc, pre-FOMC): repoint dashboard LIVE panels from committed repo JSON
+(audit plane) to Firebase RTDB `clawd-trading-7b8de-default-rtdb` (live plane,
+written 09:35 ET by execute_daily.py → FirebaseBroadcaster). Branch: sovereign-v2.
+Commit: 6f00fb6. Pushed: YES (fc870ff..6f00fb6).
+
+SHIPPED:
+- `dashboard/index.html`: new "LIVE (Firebase)" row wired to `account/equity`,
+  `account/pnl`, `session/controls`, `signals/{pair}/latest` (4-pair v015:
+  AUDUSD, EURUSD, GBPUSD, GBPJPY), `session/positions`, `system/health`,
+  `system/regime`, plus newly-wired `oracle/latest_reflection`,
+  `petroulas/decisions`, `carry/rate_differentials`, `mesolimbic/elo`.
+  `alphazero/`, `stockfish/`, `propfirm/mt5` render "pending — gated (static
+  stub)" per spec (still stubs). Every pre-existing panel (Prop Challenge,
+  Carry Paper, Active Signal, Oracle Bias, System Health, Recent Fills,
+  Research Pulse, Petrules Gate, Elo, Self-Play) now carries an explicit
+  "audit/historical" tag — no panel can be mistaken for live during FOMC.
+- Auth: Firebase Web SDK anonymous sign-in (RTDB rules require `auth != null`).
+  Reused the public web config already committed in `trading-dashboard.html`
+  (apiKey etc. — client identifiers, not secrets by Firebase design).
+- `scripts/serve_dashboard.sh`: added a content-level secret scan (private-key
+  markers, service-account JSON, `.env`-style tokens) alongside the unchanged
+  filename guard — additive hardening, not a loosening; "apiKey" is explicitly
+  NOT a blocked marker.
+- `scripts/build_standalone_dashboard.py`: `dashboard_live.html` is baked with
+  no network/auth at view time, so it CANNOT hold live Firebase state —
+  decided it stays AUDIT-ONLY. `strip_live_firebase()` now cuts the three
+  `LIVE:FIREBASE`-marked regions from the standalone build and substitutes a
+  static notice pointing at the served dashboard; hard-fails loudly if the
+  markers ever go missing. Regenerated `dashboard/dashboard_live.html`
+  (gitignored, not committed — build artifact only).
+
+VERIFIED: served `dashboard/index.html` via `scripts/serve_dashboard.sh` +
+Interceptor (real Chrome). LIVE panel badge went CONNECTING → reached real
+Firebase → failed cleanly with `auth/configuration-not-found` (Anonymous
+sign-in not yet enabled on the Firebase project) — this confirms the
+config/init/auth-call wiring is correct; it is not a fabricated "live
+confirmed." Audit panels below rendered unaffected throughout.
+
+COLIN CONSOLE DEPENDENCIES (blocking full live confirmation):
+1. Confirm/replace the Firebase web app config in `dashboard/index.html` if
+   the one reused from `trading-dashboard.html` isn't the intended project.
+2. Enable Anonymous sign-in: Firebase Console → Authentication → Sign-in
+   method → Anonymous → Enable. Without this, every LIVE panel shows
+   "AUTH/CONN FAILED" (fails safe — never silently shows stale data as live).
+
+Freeze-safe: dashboard/serve files only, no execution-path file touched.
+Explicit `git add` of the three specific files (heavy concurrent dirty
+state in the tree — did not touch anything else).
+
 ## 2026-07-25 — Cowork session close (alta-session-close v1.0)
 
 SESSION CLOSE 2026-07-25 18:45 UTC
