@@ -2872,3 +2872,40 @@ appears in the live Skill-tool listing. Pushed to sovereign-v2 (4d83465).
 C-1: Yes — infra/governance, not research; closing protocol is now something the next session
 (or Colin) can actually run without hitting a broken command mid-close.
 C-2: None — this is tooling, no parameter/risk/capital decision embedded.
+
+---
+
+## 2026-07-25 — Cursus Honorum question bank (100 grounded questions + tracking schema)
+
+**Shipped (commit bc629e8, pushed sovereign-v2):** new `games/cursus_honorum/` — a 100-question
+preset bank for Colin's Roman-themed Sovereign-teaching game (Elo = mastery). New files only,
+zero execution-path touch (read philosophy/config/code to ground; edited nothing there).
+
+- `question_bank.json` — 30 CALIBRATION (CAL-01..30, easy->hard, all six ranks, elo_weight
+  monotonic) + 70 DIAGNOSTIC (DIAG-01..70, category-tagged). Each: SPQR-voice scenario + THE
+  DATA block (real bp/VIX/threshold numbers), A/B/C/D, correct letter, mapped tenet (T1-T6),
+  mentor-voice stockfish_explanation.
+- `categories.json` — rank bands, six tenets, 15-category diagnostic registry.
+- `README.md` — structure, calibration-vs-diagnostic split, how the AlphaZero router reads
+  `category`+`elo_weight` and tracks per-category accuracy. Scope boundary noted: Elo
+  engine/router/API/UI are OUT (Colin listed separately) — this is content+schema only.
+
+**Diagnostic category counts:** carry_direction 6, risk_constitution 6, evidence_epistemics 6,
+cot_interpretation 5, regime_id 5, confirmation_protocol 5, sizing_conviction 5, tenet_mapping 5,
+isolation_discipline 5, petroulas_conviction 5, ict_reference 5, carry_mechanics 4,
+tail_risk_fomc 4, state_vector 4.
+
+**Correctness pass — DONE.** Grounded in TRADING_PHILOSOPHY, RISK_CONSTITUTION, parameters.yml,
+ict_params.yml, carry_engine/strategy/risk_sentiment/combat_vetoes/state_space/petroulas_gate.
+Every `correct` re-verified vs cited tenet + scenario numbers. Encoded facts: long high-yield
+BASE / 100bp floor; forex grades (A+ >=2.0&conv>=0.60, A>=1.5, B>=0.5, C<0.5); conviction
+0.10/0.70; C-001 deadband 0.2 / C-005 <0.5; constitution 0.75% per-trade (overrides grade table
+A+ 1.5%), 2.5% carry heat, 3.5/5/6.5 breakers; HYP-045 4-pair (AUDNZD excluded, both RBA-driven);
+ICT unproven p=0.52 = TP/SL reference not predictor; Petroulas XGB>0.65 & Kimi mag>=7/conv>=7
+-> 3-5% cap; COT Tue-measured/Fri-published + JPY inverse. Fixed the initial all-"B" answer-key
+bias -> rebalanced to even 25/25/25/25 across A/B/C/D (per-question permutation; explanation
+letter-refs remapped in lock-step; grade letters like A+ verified untouched). Structural
+validation: 100/100 records complete, unique ids, every category/tenet resolves.
+
+**Refused to shortcut:** did not skip the answer-position rebalance even though every answer was
+already "correct" — an all-B bank is gameable and corrupts the Elo signal, so it was fixed.
