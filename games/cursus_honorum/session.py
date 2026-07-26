@@ -75,10 +75,33 @@ def _load_questions() -> list[dict]:
     return [{"id": k, **v} for k, v in data.items()]
 
 
+
+# Map the bank's 15 semantic category tags → the 8 canonical buckets.
+SEMANTIC_CATEGORY_MAP = {
+    "carry_direction": "CARRY",
+    "carry_mechanics": "CARRY",
+    "cot_interpretation": "CARRY",
+    "sizing_conviction": "SIZING",
+    "petroulas_conviction": "SIZING",
+    "risk_constitution": "RECOVERY",
+    "tail_risk_fomc": "RECOVERY",
+    "regime_id": "SHARPE",
+    "state_vector": "EXITS",
+    "evidence_epistemics": "TRUST",
+    "tenet_mapping": "TRUST",
+    "isolation_discipline": "TRUST",
+    "graveyard_discipline": "TRUST",
+    "confirmation_protocol": "TRUST",
+    "ict_reference": "TRUST",
+}
+
+
 def _get_bucket(q: dict) -> str:
     """Map a question to one of the 8 canonical categories."""
-    cat = q.get("category", q.get("id", "CAL"))
-    prefix = cat.split("-")[0].upper()
+    cat = q.get("category", "")
+    if cat in SEMANTIC_CATEGORY_MAP:
+        return SEMANTIC_CATEGORY_MAP[cat]
+    prefix = (cat or q.get("id", "CAL")).split("-")[0].upper()
     return CATEGORY_MAP.get(prefix, "EXPECTANCY")
 
 
@@ -153,7 +176,7 @@ def run_session(
         category_results[bucket]["total"] += 1
 
         print(f"Q{i}/{total}  [{bucket}]  {q.get('id', '')}")
-        print(f"  {q.get('question', q.get('text', ''))}\n")
+        print(f"  {q.get('question') or q.get('text') or q.get('prompt_roman') or q.get('prompt', '')}\n")
 
         choices = q.get("choices", q.get("options", {}))
         if isinstance(choices, dict):
@@ -164,14 +187,18 @@ def run_session(
                 letter = chr(65 + j)
                 print(f"    {letter}) {text}")
 
-        answer = input("\n  Your answer (A/B/C/D or ? to reveal): ").strip().upper()
+        try:
+            answer = input("\n  Your answer (A/B/C/D or ? to reveal): ").strip().upper()
+        except (EOFError, KeyboardInterrupt):
+            print("\n  Session ended early — scoring the answered questions only.")
+            break
 
         correct_answer = q.get("correct", q.get("answer", "")).strip().upper()
         revealed = answer == "?"
 
         if revealed:
             print(f"  → Correct answer: {correct_answer}")
-            print(f"  → {q.get('explanation', '')}")
+            print(f"  → {q.get('explanation') or q.get('stockfish_explanation', '')}")
             # Treat reveal as wrong
             result = 0.0
         elif answer == correct_answer:
@@ -183,7 +210,7 @@ def run_session(
             category_results[bucket]["correct"] += 1
         else:
             print(f"  ✗ Wrong. Correct: {correct_answer}")
-            print(f"  → {q.get('explanation', '')}")
+            print(f"  → {q.get('explanation') or q.get('stockfish_explanation', '')}")
             result = 0.0
 
         # Elo update per question
