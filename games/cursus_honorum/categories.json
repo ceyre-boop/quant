@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.0.0",
+  "description": "Diagnostic category registry for the Cursus Honorum question bank. Each diagnostic question carries one `category` tag from this list so per-category accuracy can be tracked. The AlphaZero difficulty router reads `category` + `elo_weight` to pick the next item: after calibration locates a ballpark Elo, diagnostic sampling widens where per-category accuracy is HIGH and narrows/re-tests where it DROPS.",
+  "ranks": {
+    "Quaestor": [800, 1000],
+    "Aedile": [1000, 1200],
+    "Praetor": [1200, 1400],
+    "Consul": [1400, 1600],
+    "Dictator": [1600, 1800],
+    "SPQR": [1800, 3000]
+  },
+  "tenets": {
+    "T1": "Statistical Utility Beats Narrative Coherence",
+    "T2": "Regime Appropriateness Beats Strategy Quality",
+    "T3": "Systems Must Know When They Are Unreliable",
+    "T4": "Premature Complexity Kills More Systems Than Lack of Edge",
+    "T5": "Orchestration Is The Durable Edge",
+    "T6": "Research Debt Is Existential Risk"
+  },
+  "categories": {
+    "carry_direction": "Which way to trade a pair given the rate differential; long the high-yield BASE / short the high-yield QUOTE; the 100bp floor.",
+    "carry_mechanics": "How the carry floor is built and sized: 0.3%/pair, 3xATR stops, separate ledger, the coupon-not-signal framing.",
+    "cot_interpretation": "Reading CFTC Commitment-of-Traders positioning: extremes are contrarian, the Tue-measured/Fri-published look-ahead rule, JPY inverse to USDJPY.",
+    "regime_id": "Classifying the current market regime (RISK_ON / RISK_OFF / EXTREME_RISK_OFF / NEUTRAL) from VIX + term structure, and rate-trending vs range.",
+    "confirmation_protocol": "The combat vetoes and gates a signal must clear before it trades (MACRO_AGAINST, RATE_SIGNAL_WEAK, min score/grade, right-to-abstain).",
+    "sizing_conviction": "Turning a conviction score / grade into a position size, and where the RISK_CONSTITUTION cap overrides the grade table.",
+    "tail_risk_fomc": "Behaviour around scheduled macro shocks (FOMC/CPI/RBA) and violent carry unwinds; VIX-extreme and backwardation handling.",
+    "tenet_mapping": "Mapping a decision or component back to which of the six tenets justifies it.",
+    "isolation_discipline": "The ICT<->Sovereign time-horizon wall; no feature sharing; the two legal cross-system channels; the 0.15 IC bar.",
+    "petroulas_conviction": "The dual-confirmation Petroulas gate for conviction-sized (3-5%) structural-fault trades; arithmetic proof over narrative.",
+    "risk_constitution": "The hard capital-preservation laws: 0.75% per-trade, 2.5% carry heat, 3.5/5/6.5 breaker ladder, no-override, unproven-edge gate.",
+    "state_vector": "The locked 8-dimension state vector S(t) and what each dimension means.",
+    "ict_reference": "ICT as an unproven (p=0.52) TP/SL reference layer, NOT a predictive edge; its scoring/gates and anti-edge components.",
+    "evidence_epistemics": "What is actually proven vs assumed: carry real-but-regime-fragile, ICT not proven, promotion gates, the graveyard.",
+    "graveyard_discipline": "Not reviving buried features/hypotheses without new evidence (new hypothesis + N>=200 fresh trades + logged sign-off)."
+  }
+}
