@@ -4,6 +4,29 @@ Per-session ledger: what shipped, push status, verdicts, blockers, refusals. New
 The Obsidian brain (`~/Obsidian/Obsidian/00-BRAIN/NEXT.md`) is the cross-project rollup.
 Standing constraints live in `CLAUDE.md` — not restated here.
 
+## 2026-07-28 — Ignition prep: HYP-071-v2 prereg + BH trust decision, DRAFTS ONLY
+
+Docs-only, no code/ledger/hash touched, no adjudication. Prepared so Colin can open the
+training-gate ignition (`sovereign/training/gate.py`) with two quick calls:
+
+1. `research/HYP-071_v2_prereg.DRAFT.md` — fresh HYP-071 pre-registration (new hash,
+   dated after the 2026-06-30 METRIC_ARTIFACT verdict, reuses none of the 3 locked v1/v2/
+   addendum hashes). Directly targets the ledger's own `reopen_condition`: fixes the
+   asymmetric-forecast-variance flaw (locked EXIT_NOW vs resampled HOLD_AND_TRAIL), not
+   just gross→net costs — Colin picks (a) symmetric resampling or (b) drop the λ·DD term
+   before any run. CONFIRMED requires: metric fix applied, ≥5 CPCV-stable divergences at
+   the ≥0.90 sign-agreement bar (v1/v2 only hit 0.854), ≥70% forward-consistent 2023-24↔
+   2025-26, at least one surviving divergence NOT carry-aligned (the v1/v2 confound),
+   permutation p<0.05 on the forward window, and BH-survival within the ~54-cell family.
+2. `plans/TRUST_DECISION_BRIEF.md` — BH multiple-testing scope: retroactive (whole ledger,
+   14 current CONFIRMED entries incl. HYP-045) vs forward-only. Tradeoff only, no
+   recommendation — Colin's call per his own instruction.
+
+Both files stamped `DRAFT_PENDING_OPERATOR_APPROVAL` — no hash assigned, nothing hashed,
+nothing adjudicated, nothing in `sovereign/training/gate.py` or the hypothesis ledger
+touched. Colin reviews, picks the metric-fix variant + BH scope, then a separate session
+runs the locked prereg and lets the result adjudicate itself.
+
 ## 2026-07-28 — TICK-024 unlock: honest carry-cost model landed, gate flag flipped, ignition still CLOSED
 
 Colin sign-off 2026-07-28 (freeze lifted for this unlock only). Branch: sovereign-v2.
