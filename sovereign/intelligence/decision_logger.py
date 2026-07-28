@@ -423,6 +423,58 @@ def update_outcome(
     return False
 
 
+def find_recorded_outcome(
+    *, pair: str, trade_id: Optional[str] = None, system: Optional[str] = None,
+) -> Optional[dict]:
+    """Return an already-CLOSED decision record for this trade, or None.
+
+    Why this exists (TICK-092). `update_outcome()` returns False for two completely
+    different situations, and callers could not tell them apart:
+
+      (a) no decision record exists      → the entry path really did fail to log
+      (b) a record exists but is CLOSED  → the loop ALREADY worked; nothing to do
+
+    `_update_outcome_in_month` only considers records with `outcome is None`, so a
+    successfully-closed trade re-examined later looks identical to a missing one. That
+    conflation caused `pulse_check` to stamp 13 of 20 closed OANDA trades `unmatchable`
+    with the reason "the entry path likely never called log_forex_decision()" — a
+    statement that was false for all 13 (they carried real WIN/LOSS outcomes). The
+    misleading label is what sent successive sessions hunting a broken entry path that
+    was not broken.
+
+    Matching is by `trade_id` when available, which is exact and immune to the
+    signal-time-vs-fill-time skew `_outcome_entry_match` has to tolerate.
+    Read-only: never mutates a log.
+    """
+    if not trade_id:
+        return None
+    target_pair = _norm_pair(pair)
+    target_tid = str(trade_id).strip()
+    if not LOG_DIR.exists():
+        return None
+    for log_path in sorted(LOG_DIR.glob("decisions_*.jsonl"), reverse=True):
+        try:
+            lines = log_path.read_text().splitlines()
+        except OSError:
+            continue
+        for line in lines:
+            if not line.strip():
+                continue
+            try:
+                obj = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if str(obj.get("trade_id", "")).strip() != target_tid:
+                continue
+            if _norm_pair(obj.get("pair")) != target_pair:
+                continue
+            if system and obj.get("system") != system:
+                continue
+            if obj.get("outcome") not in (None, "OPEN"):
+                return obj
+    return None
+
+
 def _update_outcome_in_month(
     *, month: str, pair: str, entry_timestamp: str, outcome: str,
     r_realized: float, exit_timestamp: Optional[str] = None,

@@ -792,3 +792,40 @@ content, not fixed offset); scanner completes a pass; error JSON cleared.
 - [ ] Only AFTER the above: run the TICK-024 impact study (canonical decade + OOS, per-pair Sharpe deltas) required by its acceptance criteria (NEXT.md:259-260) — this re-bases the 0.6886 anchor and 1.25 OOS Sharpe and may force HYP-045 re-adjudication, so it gets its own review pass
 **status:** ready
 **pre_approved:** false
+
+## TICK-092
+
+**title:** Fix the fabricated "unmatchable" diagnosis in the outcome loop; add total-accounting fence
+
+**description:** `update_outcome()` returns False both when no decision record exists and when
+one exists but is already CLOSED — `_update_outcome_in_month` only inspects records with
+`outcome is None`. `pulse_check._backfill_decision_outcomes()` read the second case as the first
+and stamped **13 of 20** closed OANDA trades `unmatchable` with the reason *"the entry path
+likely never called log_forex_decision()"* — false for all 13, which carry real outcomes
+(10 LOSS / 3 WIN). The sidecar then short-circuited them on every later run, so the wrong verdict
+was self-preserving and successive sessions (and the July-28 strategy synthesis) kept hunting a
+broken entry path that was working. Spec-first: `audit/fills_ledger_spec.md`
+(sha256 `8c71e2e9…`), fences F1 total accounting, F2 no silent skip, F5 net_r real-or-null,
+F6 read-only producer, F7 no false failure verdict.
+
+**Corrections recorded so they are not re-derived:** `data/ledger/oanda_fills.jsonl` is NOT
+empty (24 rows, all with `stop_price > 0`); the no-sane-stop branch is NOT firing
+(`no_stop=0` measured); Oracle is NOT starved of closed outcomes (30 attributed FOREX outcomes
+across 48 records). The loop is *closing* — that is a different claim from the loop being
+*informative*, and only the first is now true.
+
+**Shipped:** truthful `find_recorded_outcome()` in `decision_logger`; `already_closed` bucket +
+self-healing reclassification of prior bad verdicts in `pulse_check`; F1 bucket-sum alarm
+(`OUTCOME_LOOP_UNACCOUNTED`) and F2 `no_stop` alarm; `net_r` wired to the landed TICK-024
+`swap_model.ratediff_financing_rate()`; `scripts/rebuild_fills_ledger.py` (read-only producer);
+12 tests in `tests/test_outcome_loop_accounting.py`.
+
+**Measured after fix:** `seen=23 already_known=16 reclassified=13 unmatchable=7 no_stop=0`,
+buckets summing to 23. Idempotent (second run reclassifies 0).
+
+**Residual (genuine, not fabricated):** 7 trades — ids 47, 51, 72, 83, 93, 105, 231 — have no
+decision record with those trade ids. That is the real entry-path gap, ~1/3 the assumed size.
+Needs its own ticket: determine why `forex_specialist.py:118` did not log them.
+
+**status:** done
+**pre_approved:** false

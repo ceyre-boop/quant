@@ -3407,3 +3407,87 @@ FOMC statement).
 
 Freeze-safe: all new/config files, touches no execution-path file
 (`forex_exit_manager`/`decide_exit` untouched), no orders anywhere in the new code.
+
+## 2026-07-28 — TICK-092: the "broken entry path" was a fabricated diagnosis
+
+Session opened on a pasted 4-session strategy roadmap (swap_model → decade rerun → exit model →
+ignition gate). Verified it against the repo before acting. **Two of its four load-bearing
+premises were already satisfied and two were false**, and the corrections inverted the plan.
+
+### Corrections to the roadmap
+- **"Build swap_model.py next session"** — already built, committed AND applied today
+  (`bed13a2` → `697da48` → `f91fc08`). `tick_024_carry_fix_landed` = PASS.
+- **"Decade rerun to get the real anchor"** — already run. Portfolio Sharpe 0.6886 → **0.6452**,
+  OOS 1.2504 → **1.1919**, still ROBUST. **The edge survived honest costs.** The 9× was the
+  swap-RATE magnitude, not the Sharpe (which moved −4.7%). Caveat stands: OOS 95% CI lower bound
+  1.001 → 0.948, no longer clears 1.0. `GOALS.md` updated — its TICK-024 paragraph stated the
+  fear as a live claim; it is now recorded as the question that was asked and answered.
+- **"There is no exit model"** — FALSE. `sovereign/forex/exit_machine.py` (6-state) +
+  `sovereign/execution/forex_exit_manager.py` at `SHADOW_MODE=True`, 31 shadow decisions logged
+  (23 AMEND_STOP / 5 HOLD / 2 CLOSE / 1 SKIP). Not a build gap — a go-live decision. Untouched
+  (needs an explicit execution-path unlock; freeze respected).
+- **"Ignition gate is downstream of TICK-024"** — FALSE. Gate re-run live: still CLOSED, 3 of 4
+  guards FAIL. HYP-071 was never blocked on cost basis; it died of metric asymmetry (λ·DD only
+  penalises the arm with forecast variance). `Plans/TRUST_DECISION_BRIEF.md` also confirms the
+  BH retro/forward call does **not** gate HYP-071-v2.
+
+### The actual defect (and my own two wrong hypotheses)
+I first diagnosed an empty fills ledger and a silent no-stop skip. **Both were wrong** —
+recorded here so they are not re-derived. `data/ledger/oanda_fills.jsonl` holds 24 rows, all with
+`stop_price > 0`, covering every sidecar trade id; my earlier `wc -l` hit `data/oracle/` and
+`data/agent/` paths that don't exist. Measured `no_stop=0`.
+
+Real defect: `update_outcome()` returns False both when **no record exists** and when a record
+exists but is **already CLOSED** (`_update_outcome_in_month` only inspects `outcome is None`).
+`pulse_check` read the second as the first and stamped **13 of 20** closed trades `unmatchable`
+with *"the entry path likely never called log_forex_decision()"* — false for all 13, which carry
+real outcomes (10 LOSS / 3 WIN). The sidecar then short-circuited them forever, making the false
+verdict **self-preserving**. That fabricated line in the audit trail is what sent the roadmap —
+and my first two hypotheses — chasing a bug that did not exist. The system graded its own
+homework *too harshly*; the false negative was the expensive part.
+
+### Shipped (freeze-safe: no execution-path file touched)
+- `audit/fills_ledger_spec.md` (NEW, spec-first, sha256 `8c71e2e9…`) — F1 total accounting,
+  F2 no silent skip, F3/F4 producer + idempotence, F5 net_r real-or-null, F6 read-only producer,
+  F7 no false failure verdict.
+- `decision_logger.find_recorded_outcome()` — distinguishes already-closed from missing.
+- `pulse_check` — `already_closed` bucket; **self-healing** reclassification of prior bad
+  verdicts (a correction that runs once can't be a regression test); F1 bucket-sum alarm
+  `OUTCOME_LOOP_UNACCOUNTED`; F2 `OUTCOME_LOOP_NO_STOP`; already-closed excluded from the stall
+  count that produced the false URGENT.
+- `net_r` wired to the landed TICK-024 `swap_model.ratediff_financing_rate()`. Verified against
+  the recorded anchor: EURUSD SHORT prices to **+0.0042/yr** (a credit, matching trade #227's
+  measured ~+0.42%/yr), LONG to −0.0245 (a charge). Uncalibrated pairs return null, never a
+  guess — no fallback to the table TICK-024 proved ~9× wrong.
+- `scripts/rebuild_fills_ledger.py` (NEW) — read-only broker → ledger producer, idempotent.
+  Reconstructs from OANDA rather than instrumenting order placement, so it needs no unlock.
+- `tests/test_outcome_loop_accounting.py` — 12 tests, all green.
+
+**Measured after fix:** `seen=23 already_known=16 reclassified=13 unmatchable=7 no_stop=0`;
+buckets sum to 23. Second run reclassifies 0 (idempotent). Gate re-checked: still **CLOSED** —
+this ticket does not open it and must not appear to.
+
+### Verdicts / decisions recorded (Colin, this session)
+1. **HYP-071-v2 metric fix: mechanism (b), pure E[R], λ·DD dropped** — locked into
+   `research/HYP-071_v2_prereg.DRAFT.md` §3 **before any board was computed**. Accepted cost
+   recorded up front: loses downside-risk sensitivity. Mechanism (a) is explicitly NOT a
+   fallback — running it after a null (b) needs its own prereg + hash in the BH family.
+   Hash still unassigned; Colin locks it.
+2. **BH correction: RETROACTIVE** — one family across all 14 CONFIRMED entries. Not started;
+   it can demote HYP-045 (the live v015 4-pair basis) and gets its own session/ticket.
+3. **TICK-024 audit: retroactively approved.** `697da48`'s message claimed a Colin sign-off that
+   did not exist at commit time. Approved on the verified numbers (applied code diff-matched the
+   staged patch; 0.6452 reproduced exactly). The commit-message claim was still false when
+   written — the rule stands: never write a sign-off ahead of the fact.
+
+### Honest limitation — do not read this as "Oracle can now learn"
+The loop is **closing**, not **informative**. Corpus is 30 attributed FOREX outcomes over three
+months (26 LOSS / 4 WIN) from 48 records. Fixing the plumbing does not create statistical power;
+the roadmap's "Oracle compounds in 30–60 days" claim is unsupported at this sample size.
+
+### Blockers / next
+- **7 genuine gaps remain** (trade ids 47, 51, 72, 83, 93, 105, 231) — no decision record with
+  those ids. This is the real entry-path bug at ~1/3 the assumed size. Needs a ticket: why did
+  `forex_specialist.py:118` not log them?
+- Pre-existing, NOT mine: `tests/unit/test_decision_logging.py::test_oanda_fill_in_later_hour_still_closes_decision`
+  fails on unmodified code (verified by stashing). ICT pipeline baseline remains 4F/23P.

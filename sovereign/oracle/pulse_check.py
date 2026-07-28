@@ -617,13 +617,68 @@ CAUSAL_JOURNAL = Path(__file__).resolve().parents[2] / "data" / "agent" / "causa
 _BACKFILL_HEARTBEAT = Path(__file__).resolve().parents[2] / "logs" / ".heartbeat_decision_backfill"
 
 
+# swap_model keys on the yfinance ticker; pulse_check normalises OANDA's "EUR_USD" to
+# "EURUSD". Only these four pairs are calibrated — anything else prices to None, loudly.
+_SWAP_MODEL_PAIRS = {
+    "EURUSD": "EURUSD=X",
+    "GBPUSD": "GBPUSD=X",
+    "USDJPY": "USDJPY=X",
+    "AUDUSD": "AUDUSD=X",
+}
+
+
+def _net_r_from_gross(*, pair: str, side: str, entry: float, stop: float,
+                      gross_r: Optional[float], hold_hours: Optional[float],
+                      open_ts: str) -> tuple[Optional[float], Optional[float], Optional[float]]:
+    """Convert gross R to net R using the TICK-024 corrected financing model.
+
+    Returns ``(net_r, financing_r, financing_rate_annual)``, any of which may be None
+    when the pair is not calibrated or an input is missing. Returning None is the correct
+    outcome in that case — a fabricated cost is exactly what TICK-024 existed to remove.
+
+    Sign convention follows swap_model: a POSITIVE rate is a CREDIT received (OANDA pays
+    to hold short EURUSD), so it ADDS to the return. Financing accrues on notional:
+
+        financing_per_unit = entry * rate_annual * (hold_days / 365)
+        financing_r        = financing_per_unit / risk_per_unit
+        net_r              = gross_r + financing_r
+    """
+    if gross_r is None or hold_hours is None:
+        return None, None, None
+    risk = abs(entry - stop)
+    if entry <= 0 or risk <= 0:
+        return None, None, None
+    yf_pair = _SWAP_MODEL_PAIRS.get(pair.upper())
+    if yf_pair is None:
+        log.info("net_r: %s not calibrated in swap_model — leaving net_r null, not guessed", pair)
+        return None, None, None
+    try:
+        from sovereign.forex.swap_model import ratediff_financing_rate
+        rate = ratediff_financing_rate(yf_pair, side, (open_ts or "")[:10])
+    except Exception as exc:
+        log.warning("net_r: swap_model unavailable for %s (%s) — net_r stays null", pair, exc)
+        return None, None, None
+    if rate is None:
+        log.warning("net_r: swap_model returned None for %s %s — net_r stays null, "
+                    "NOT falling back to the static table TICK-024 proved wrong", pair, side)
+        return None, None, None
+    financing_r = (entry * float(rate) * (hold_hours / 24.0) / 365.0) / risk
+    return round(gross_r + financing_r, 4), round(financing_r, 4), round(float(rate), 6)
+
+
 def _append_causal_journal(trade: dict, *, pair: str, entry: float, close_px: float,
                            stop: float, r_realized: float, outcome: str,
                            direction: float) -> None:
     """One line per closed paper trade — the Stockfish/exit-value data layer.
 
-    gross_r only: TICK-024's swap cascade is not applied yet, so net_r stays null
-    and cost_estimated=True until the cost model lands. Fails SOFT — a journal
+    Carries BOTH gross_r and net_r. TICK-024 landed 2026-07-28 (swap_model.py applied,
+    commits bed13a2..f91fc08), so financing is now modelled from the corrected
+    rate-differential model instead of the static table that was ~9x too small with a
+    sign flip on EURUSD SHORT. net_r is a hard prerequisite for HYP-071-v2, which
+    adjudicates on NET returns and cannot consume nulls (audit/fills_ledger_spec.md F5).
+
+    net_r stays None only when the model legitimately cannot price the pair (it covers
+    EURUSD/GBPUSD/USDJPY/AUDUSD only) — never a fabricated number. Fails SOFT: a journal
     write must never block the outcome backfill."""
     try:
         open_ts = str(trade.get("openTime", ""))
@@ -635,10 +690,15 @@ def _append_causal_journal(trade: dict, *, pair: str, entry: float, close_px: fl
             hold_hours = round((c - o).total_seconds() / 3600.0, 2)
         except Exception:
             pass
+        side = "LONG" if direction >= 0 else "SHORT"
+        net_r, financing_r, fin_rate = _net_r_from_gross(
+            pair=pair, side=side, entry=entry, stop=stop,
+            gross_r=r_realized, hold_hours=hold_hours, open_ts=open_ts,
+        )
         row = {
             "trade_id": str(trade.get("id", "")),
             "pair": pair,
-            "direction": "LONG" if direction >= 0 else "SHORT",
+            "direction": side,
             "entry_price": entry,
             "exit_price": close_px,
             "stop_price": stop,
@@ -646,8 +706,10 @@ def _append_causal_journal(trade: dict, *, pair: str, entry: float, close_px: fl
             "exit_reason": "UNLABELED",  # OANDA close record carries no reason; label downstream
             "outcome": outcome,
             "gross_r": r_realized,
-            "net_r": None,
-            "cost_estimated": True,      # TICK-024 swap cascade not yet applied
+            "net_r": net_r,
+            "financing_r": financing_r,        # credit(+) / cost(-) in R units
+            "financing_rate_annual": fin_rate,  # fraction/yr from swap_model (TICK-024)
+            "cost_estimated": net_r is None,   # False once the corrected model priced it
             "realized_pl_ccy": float(trade.get("realizedPL") or 0.0),
             "oracle_lesson_pending": True,
             "source": "pulse_check_backfill",
@@ -684,7 +746,7 @@ def _backfill_decision_outcomes() -> int:
     """
     try:
         from sovereign.execution.oanda_bridge import OandaBridge
-        from sovereign.intelligence.decision_logger import update_outcome
+        from sovereign.intelligence.decision_logger import find_recorded_outcome, update_outcome
         closed = OandaBridge().get_closed_trades(limit=100)
     except Exception as exc:
         log.warning("backfill: cannot fetch closed trades: %s", exc)
@@ -697,20 +759,57 @@ def _backfill_decision_outcomes() -> int:
     n_backfilled = 0
     n_attempted = 0        # tried to match THIS run
     n_already = 0          # matched on a previous run — not a failure
-    n_unmatchable = 0      # given up on, with a recorded reason
+    # Split prior-vs-new so the F1 bucket sum can't double-count: a trade given up on THIS
+    # run was already counted inside n_attempted, whereas one carried over from a previous
+    # run never enters n_attempted at all.
+    n_unmatchable_prior = 0   # carried over from an earlier run
+    n_unmatchable_new = 0     # given up on this run (subset of n_attempted)
+    n_already_closed = 0      # record exists and already has an outcome (subset of n_attempted)
+    n_reclassified = 0        # prior 'unmatchable' verdicts corrected this run (TICK-092)
+    n_no_stop = 0          # skipped: no sane stop to compute R from (TICK-092 / spec F2)
+    n_error = 0            # raised mid-trade — counted, never swallowed (TICK-092 / spec F1)
+    n_seen = 0             # every trade examined; F1 requires the buckets to sum to this
     failures: list[str] = []
+    no_stop_ids: list[str] = []
 
     for trade in closed:
+        n_seen += 1
         try:
             tid = str(trade.get("id", ""))
             prior = matched.get(tid)
-            if prior and prior.get("state") in ("matched", "unmatchable"):
-                n_already += 1 if prior["state"] == "matched" else 0
-                n_unmatchable += 1 if prior["state"] == "unmatchable" else 0
+            if prior and prior.get("state") in ("matched", "already_closed", "unmatchable"):
+                # Self-heal a mislabelled verdict (TICK-092). Entries stamped "unmatchable"
+                # by the pre-fix code included trades whose decision record was already
+                # CLOSED — the loop had worked, but the sidecar recorded the opposite and
+                # then short-circuited them forever, so the error was self-preserving.
+                # Re-verify once against the record; upgrade when the reason was false.
+                if prior["state"] == "unmatchable":
+                    _pair = str(trade.get("instrument", "")).replace("_", "")
+                    _rec = find_recorded_outcome(pair=_pair, trade_id=tid, system="FOREX")
+                    if _rec is not None:
+                        matched[tid] = {
+                            "state": "already_closed", "pair": _pair,
+                            "outcome": _rec.get("outcome"),
+                            "r_realized": _rec.get("r_realized"),
+                            "resolved_at": now.isoformat(),
+                            "reason": ("RECLASSIFIED: prior 'unmatchable' verdict was wrong — "
+                                       "a closed decision record exists for this trade_id"),
+                            "prior_reason": prior.get("reason"),
+                        }
+                        # Counts as n_already: this branch `continue`s before n_attempted,
+                        # so it must enter the F1 sum directly (unlike the post-attempt case).
+                        n_already += 1
+                        n_reclassified += 1
+                        continue
+                n_already += 1 if prior["state"] in ("matched", "already_closed") else 0
+                n_unmatchable_prior += 1 if prior["state"] == "unmatchable" else 0
                 continue
 
             pair = str(trade.get("instrument", "")).replace("_", "")
             if not pair:
+                # A broker record with no instrument is malformed, not "nothing to do".
+                n_error += 1
+                log.warning("backfill: trade %s has no instrument — cannot match", tid)
                 continue
             fill = fills_by_id.get(str(trade.get("id", "")))
             entry = float(trade.get("price") or (fill or {}).get("fill_price") or 0.0)
@@ -720,8 +819,17 @@ def _backfill_decision_outcomes() -> int:
             direction = 1.0 if units >= 0 else -1.0
 
             risk = abs(entry - stop)
-            # Reject insane/missing stops (e.g. EURUSD stop at 1.0 → 14% risk).
+            # Reject insane/missing stops (e.g. EURUSD stop at 1.0 → 14% risk). Skipping is
+            # still CORRECT — the Oracle must not learn from a fabricated R. What was wrong
+            # (TICK-092) is that this skip was SILENT: it fired before n_attempted incremented,
+            # so n_failed stayed 0 and the loop logged "matched=0 attempted=0", which reads as
+            # "nothing new to match". With data/ledger/oanda_fills.jsonl empty and no writer,
+            # `fill` was always None → stop 0.0 → EVERY closed trade drained through here
+            # unseen. Now counted and surfaced (spec F2); retryable, not terminal — once the
+            # fills ledger is populated these same trades resolve a real stop on the next pulse.
             if entry <= 0 or close_px <= 0 or stop <= 0 or risk <= 0 or risk > 0.5 * entry:
+                n_no_stop += 1
+                no_stop_ids.append(f"{pair}#{tid}")
                 log.info("backfill: skip %s trade %s — no sane stop (entry=%s stop=%s)",
                          pair, trade.get("id"), entry, stop)
                 continue
@@ -746,6 +854,27 @@ def _backfill_decision_outcomes() -> int:
                                        stop=stop, r_realized=r_realized,
                                        outcome=outcome, direction=direction)
             else:
+                # update_outcome() returns False for two different reasons. Ask which,
+                # before writing a verdict into the audit trail (TICK-092): a record that
+                # is already CLOSED means the loop worked — that is not a failure and must
+                # not be recorded as one. Stamping those "the entry path never called
+                # log_forex_decision()" was false for 13 of 20 trades and sent successive
+                # sessions chasing an entry path that was working.
+                closed_rec = find_recorded_outcome(pair=pair, trade_id=tid, system="FOREX")
+                if closed_rec is not None:
+                    matched[tid] = {
+                        "state": "already_closed", "pair": pair,
+                        "outcome": closed_rec.get("outcome"),
+                        "r_realized": closed_rec.get("r_realized"),
+                        "resolved_at": now.isoformat(),
+                        "reason": ("decision record already carries an outcome — the loop "
+                                   "closed this trade on an earlier run; nothing to do"),
+                    }
+                    # Subset of n_attempted (like n_unmatchable_new) — must NOT go into
+                    # n_already, which counts trades that short-circuited before the attempt.
+                    n_already_closed += 1
+                    continue
+
                 failures.append(f"{pair}@{open_time}")
                 first_seen = (prior or {}).get("first_seen") or now.isoformat()
                 age_days = (now - datetime.fromisoformat(first_seen)).days
@@ -753,38 +882,82 @@ def _backfill_decision_outcomes() -> int:
                     matched[tid] = {
                         "state": "unmatchable", "pair": pair,
                         "first_seen": first_seen, "gave_up_at": now.isoformat(),
-                        "reason": (f"no matching decision record after "
-                                   f"{UNMATCHABLE_AFTER_DAYS}d — the entry path "
-                                   f"likely never called log_forex_decision()"),
+                        "reason": (f"no decision record with trade_id={tid} after "
+                                   f"{UNMATCHABLE_AFTER_DAYS}d, and no closed record either "
+                                   f"— the entry path did not call log_forex_decision()"),
                     }
-                    n_unmatchable += 1
+                    n_unmatchable_new += 1
                 else:
                     matched[tid] = {"state": "pending", "pair": pair,
                                     "first_seen": first_seen}
         except Exception as exc:
+            n_error += 1
             log.warning("backfill: trade %s failed: %s", trade.get("id"), exc)
 
     _save_matched(matched)
 
     # Always emit the real metric — a bare "0 matched" said nothing about whether
     # that was healthy (nothing new to match) or broken (everything failed).
-    log.info("OUTCOME_LOOP: matched=%d attempted=%d already_known=%d unmatchable=%d",
-             n_backfilled, n_attempted, n_already, n_unmatchable)
+    # TICK-092 / spec F1: every examined trade lands in exactly one bucket, and the buckets
+    # must sum to n_seen. A future skip path cannot be added without breaking this sum, which
+    # is the point — it makes the NEXT silent drain impossible, not just this one.
+    # n_attempted already contains n_backfilled, n_unmatchable_new and the pending residue,
+    # so it enters the sum whole — only the branches that `continue` before it are added.
+    n_unmatchable = n_unmatchable_prior + n_unmatchable_new
+    accounted = (n_already + n_unmatchable_prior + n_error + n_no_stop + n_attempted)
+    log.info("OUTCOME_LOOP: seen=%d matched=%d attempted=%d already_known=%d "
+             "already_closed=%d reclassified=%d unmatchable=%d (prior=%d new=%d) "
+             "no_stop=%d error=%d",
+             n_seen, n_backfilled, n_attempted, n_already, n_already_closed, n_reclassified,
+             n_unmatchable, n_unmatchable_prior, n_unmatchable_new, n_no_stop, n_error)
+
+    if accounted != n_seen:
+        log.error("OUTCOME_LOOP_UNACCOUNTED: %d of %d closed trades fell through every "
+                  "bucket — spec F1 violated (audit/fills_ledger_spec.md)",
+                  n_seen - accounted, n_seen)
+        _write_messages([{
+            "type": "OUTCOME_LOOP_UNACCOUNTED",
+            "priority": "URGENT",
+            "message": (
+                f"{n_seen - accounted} of {n_seen} closed trades were examined but landed in "
+                f"no terminal bucket. Spec F1 (audit/fills_ledger_spec.md) forbids this — a "
+                f"trade exiting the loop uncounted is how the outcome loop went silently empty."
+            ),
+        }])
+
+    # The drain that hid the empty loop: no sane stop → skipped → invisible. Never silent again.
+    if n_no_stop > 0:
+        log.error("OUTCOME_LOOP_NO_STOP: %d of %d closed trades skipped for missing/insane "
+                  "stop: %s", n_no_stop, n_seen, ", ".join(no_stop_ids[:5]))
+        _write_messages([{
+            "type": "OUTCOME_LOOP_NO_STOP",
+            "priority": "URGENT",
+            "message": (
+                f"{n_no_stop} of {n_seen} closed OANDA trades could not be scored: no sane stop "
+                f"price. Usually means data/ledger/oanda_fills.jsonl is empty or stale — "
+                f"regenerate with `python3 scripts/rebuild_fills_ledger.py`. "
+                f"First: {', '.join(no_stop_ids[:5])}. "
+                "Refusing to fabricate an R is correct; staying quiet about it was not."
+            ),
+        }])
 
     # Alarm ONLY on trades that genuinely failed to match on this run. A backlog
-    # matched weeks ago is not a stall.
-    n_failed = n_attempted - n_backfilled
+    # matched weeks ago is not a stall — and neither is a trade whose decision record
+    # already carries an outcome (n_already_closed), which is the loop having WORKED.
+    # Counting those as failures is what produced the false "entry path is broken" signal.
+    n_failed = n_attempted - n_backfilled - n_already_closed
     if n_failed > 0:
         log.error("OUTCOME_LOOP_STALL: %d of %d closed trades failed to match this run "
-                  "(%d already known, %d unmatchable): %s",
-                  n_failed, n_attempted, n_already, n_unmatchable,
+                  "(%d already known, %d already closed, %d unmatchable): %s",
+                  n_failed, n_attempted, n_already, n_already_closed, n_unmatchable,
                   ", ".join(failures[:5]))
         _write_messages([{
             "type": "OUTCOME_LOOP_STALL",
             "priority": "URGENT",
             "message": (
                 f"{n_failed} of {n_attempted} closed OANDA trades failed to match an open "
-                f"decision this run ({n_already} already matched previously). "
+                f"decision this run ({n_already} already matched previously, "
+                f"{n_already_closed} already carried an outcome). "
                 f"First failures: {', '.join(failures[:5])}. "
                 "Check pair/timestamp/system matching in decision_logger.update_outcome."
             ),

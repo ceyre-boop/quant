@@ -72,6 +72,34 @@ one of:
 selects one at approval time; whichever is selected must be recorded here
 before any run, not chosen post-hoc from whichever gives the better number.**
 
+### LOCKED: mechanism (b) — pure E[R], λ·DD dropped
+
+**Selected by Colin 2026-07-28, before any v2 board was computed.** No board
+has been run under either mechanism; there is no result to have chosen from.
+
+Rationale: (b) eliminates the asymmetric-penalty channel outright rather than
+attempting to balance it. Mechanism (a) would keep λ·DD and neutralise the
+asymmetry by modelling a flat/no-position counterfactual — but that
+counterfactual is itself a modelling choice that could introduce a fresh bias,
+and the failure being corrected is precisely a metric artifact. Removing the
+term is the smaller assumption and directly satisfies the ledger's own reopen
+condition verbatim (*"OR a pure E[R] comparison without the lambda*downside
+penalty"*).
+
+Accepted cost, recorded before results: the value function loses downside-risk
+sensitivity. A cell where EXIT_NOW and HOLD_AND_TRAIL have equal expected
+return but HOLD_AND_TRAIL has materially worse downside will now score as a
+tie. That is a known blind spot of this design, not an oversight — do not
+patch it back in mid-run.
+
+**Mechanism (a) is not a fallback.** If (b) returns NOT_SIGNIFICANT, running
+(a) afterwards on the same data is a second test of the same hypothesis family
+and requires its own fresh prereg and hash, counted in the BH family.
+
+Still `DRAFT_PENDING_OPERATOR_APPROVAL`: the mechanism is locked, the **hash is
+not**. Colin assigns and locks the hash; it must not reuse `c4f29ac3…` (v1),
+`3d500bda…` (v2), or `c1fab807…` (interpretation addendum).
+
 ## 4. Cost basis
 
 NET returns, corrected swap model (TICK-024 landed: `SWAP_RATES_ANNUAL` fix +
