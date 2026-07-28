@@ -18,27 +18,28 @@
 # and only after the impact study (re-run canonical decade + OOS, report
 # per-pair deltas) required by TICK-024's acceptance criteria has been done
 # and reviewed.
-
+#
+# 2026-07-27 regeneration note: the prior version of this file had a corrupt
+# hunk (mismatched @@ header counts vs body — a diff-authoring bug, not drift
+# against HEAD). Regenerated from a real `git diff` against the current
+# sovereign/forex/forex_backtester.py (unmodified in the working tree) and
+# verified with `git apply --check`. Same intended change as before; only the
+# hunk framing was fixed. `sovereign/forex/swap_model.py` is intentionally
+# NOT part of this diff (sketch only, see trailing note) — importing it here
+# is illustrative of the target shape, not something meant to run as-is.
 diff --git a/sovereign/forex/forex_backtester.py b/sovereign/forex/forex_backtester.py
+index 930a450..5755a28 100644
 --- a/sovereign/forex/forex_backtester.py
 +++ b/sovereign/forex/forex_backtester.py
-@@ -1,6 +1,7 @@
- from __future__ import annotations
- 
- import json
-+import functools
- import logging
- import argparse
- from dataclasses import dataclass, asdict
-@@ -13,6 +14,7 @@ import yfinance as yf
- 
+@@ -22,6 +22,7 @@ import yfinance as yf
+
  from sovereign.forex.pair_universe import ALL_PAIRS, PAIR_CONFIG, CB_TO_COUNTRY
  from sovereign.forex.data_fetcher import ForexDataFetcher
 +from sovereign.forex.swap_model import ratediff_financing_rate  # TICK-024 corrected model
  from sovereign.forex.entry_engine import CBEventTrigger, CB_MIN_SURPRISE_BPS
  from sovereign.forex.fast_backtester import simulate_forex_trades, simulate_forex_trades_arrays
  from sovereign.forex.signal_engine import ForexSignalEngine, SignalConfig
-@@ -55,15 +57,20 @@ _DEFAULT_SPREAD = 0.00015     # fallback for pairs without an explicit entry
+@@ -55,6 +56,13 @@ _DEFAULT_SPREAD = 0.00015     # fallback for pairs without an explicit entry
  # by hold_days with a Wednesday-triple / weekend approximation. News-spread widening
  # is intentionally NOT modeled: the array backtest path has no per-trade high-impact-
  # news flag, so a per-trade multiplier would be fabricated rather than measured.
@@ -52,13 +53,7 @@ diff --git a/sovereign/forex/forex_backtester.py b/sovereign/forex/forex_backtes
  SWAP_RATES_ANNUAL = {
      'GBPUSD=X': {'LONG': -0.0012, 'SHORT': -0.0008},
      'EURUSD=X': {'LONG': -0.0015, 'SHORT': -0.0010},
-     'USDJPY=X': {'LONG':  0.0020, 'SHORT': -0.0035},   # positive carry long
-     'AUDUSD=X': {'LONG': -0.0008, 'SHORT': -0.0012},
-     'AUDNZD=X': {'LONG': -0.0003, 'SHORT': -0.0003},   # near-zero carry cross
- }
- _DEFAULT_SWAP = {'LONG': -0.0010, 'SHORT': -0.0010}
- 
-@@ -527,8 +534,15 @@ class ForexBacktester:
+@@ -528,7 +536,6 @@ class ForexBacktester:
          per_side = _calibrated_slippage(pair)
          slip = per_side if per_side is not None else SLIPPAGE_PER_SIDE
          cost_price = spread + 2 * slip
@@ -66,7 +61,7 @@ diff --git a/sovereign/forex/forex_backtester.py b/sovereign/forex/forex_backtes
          for t in trades:
              entry = max(t.get('entry', 0.0), 1e-9)
              spread_frac = cost_price / entry
-             # Swap: signed annual rate / 365, scaled by hold days + weekend triple.
+@@ -536,7 +543,19 @@ class ForexBacktester:
              side = 'LONG' if t.get('direction', 1) >= 0 else 'SHORT'
              hold_days = max(int(t.get('hold_days', 0)), 0)
              swap_days = hold_days + (hold_days // 5) * 2   # ~Wed-triple/weekend uplift
@@ -87,8 +82,6 @@ diff --git a/sovereign/forex/forex_backtester.py b/sovereign/forex/forex_backtes
              t['pnl_pct'] = t.get('pnl_pct', 0.0) - spread_frac + swap_frac
              t['cost_spread_frac'] = round(spread_frac, 6)
              t['cost_swap_frac'] = round(swap_frac, 6)
-             t['risk_adjusted_pnl_pct'] = t['pnl_pct'] * t.get('risk_pct', 1.0)
-         return trades
 
 # NEW FILE (not yet created): sovereign/forex/swap_model.py
 # Thin wrapper promoting research/tsmom_hyp091/financing.py::ratediff_financing
