@@ -775,3 +775,20 @@ sovereign/training/gate.py); dip_daily can then be re-loaded; watchdog rebaselin
 data/agent/petrules_gate_scan.json. iShares changed the CSV preamble format.
 **Acceptance:** universe loader tolerates preamble drift (scan for the header row by
 content, not fixed offset); scanner completes a pass; error JSON cleared.
+
+## TICK-059
+**title:** Write `sovereign/forex/swap_model.py::ratediff_financing_rate` — the missing dependency TICK-024's staged patch imports
+**description:** `research/TICK-024_staged_patch.diff` adds `from sovereign.forex.swap_model import ratediff_financing_rate` to `sovereign/forex/forex_backtester.py`, but that module has never been written — the diff's own trailing note says so verbatim: *"NEW FILE (not yet created) ... NOT written in this staged patch; sketch only."* `git apply --check` passes (it validates hunk framing against the one file the diff edits, not imports), so the patch looks ready and is not. Discovered 2026-07-28 during the July-28 unlock session: TICK-044 landed, TICK-024 was refused for exactly this reason, and `scripts/prove.py --decade` would have died on ImportError before emitting a new anchor. **This ticket is the build that has to precede the TICK-024 apply.** Model (already specified by TICK-091's description and by the diff's sketch): `financing_side(t) = oanda_side_now + sign*(diff(t) - diff_now)` — an anchored differential-tracking rate, where `diff` comes from `sovereign/forex/data_fetcher.py::get_pair_differentials` (line 187, exists) and `oanda_side_now` from `data/research/swap_calibration.json` (exists, generated 2026-07-12). Signature generalizes `research/tsmom_hyp091/financing.py::ratediff_financing` from a full price index to a single `entry_date`: `ratediff_financing_rate(pair: str, side: str, entry_date) -> Optional[float]`. Satisfies TICK-024's own design constraint that today's OANDA snapshot must NOT be pasted flat over 2015-2024 history. **Fail-loud requirement:** the staged diff falls back to the broken `SWAP_RATES_ANNUAL` table when the rate is `None` and explicitly admits *"this staged version omits the raise for brevity"* — the real module and the real call site must raise or emit a loud warning, never silently revert to the table that TICK-024 proved is ~9x too small with a sign flip (CLAUDE.md: no silent mocking). Do NOT hardcode the snapshot; regenerate via `research/swap_calibration.py` before use.
+**depends_on:** []  (all inputs exist: `get_pair_differentials`, `swap_calibration.json`, `research/tsmom_hyp091/financing.py`)
+**blocks:** [TICK-024]
+**acceptance_criteria:**
+- [ ] `sovereign/forex/swap_model.py` exists exposing `ratediff_financing_rate(pair, side, entry_date) -> Optional[float]`
+- [ ] Rate is computed per `entry_date` from the FRED differential, NOT flattened to the 2026 snapshot — assert two entry dates in different rate regimes return different rates
+- [ ] Reproduces `research/tsmom_hyp091/financing.py::ratediff_financing` on a shared case (same pair/side/date → same rate within tolerance)
+- [ ] Returns `None` only for genuinely unlisted pairs; the `forex_backtester` call site raises or logs loudly on `None` rather than silently using `SWAP_RATES_ANNUAL`
+- [ ] Reproduces the `swap_calibration.json` empirical anchor: short `EUR_USD` over 2026-07-03..07-11 earns a **credit** (~+0.42%/yr), i.e. the EURUSD-SHORT sign flip is corrected
+- [ ] Unit tests in `tests/` green; NN#1 isolation test still passes
+- [ ] `git apply research/TICK-024_staged_patch.diff` then `python3 -c "import sovereign.forex.forex_backtester"` succeeds (the probe that would have caught this on 2026-07-28)
+- [ ] Only AFTER the above: run the TICK-024 impact study (canonical decade + OOS, per-pair Sharpe deltas) required by its acceptance criteria (NEXT.md:259-260) — this re-bases the 0.6886 anchor and 1.25 OOS Sharpe and may force HYP-045 re-adjudication, so it gets its own review pass
+**status:** ready
+**pre_approved:** false

@@ -3242,3 +3242,37 @@ modules. No MT5 routing was attempted and no live unlock was touched.
 (scope-limited to TICK-044, with the TICK-024 exclusion stated) and the TICK-044 apply rationale.
 **Hard stops respected**: no merge to master, HYP-071 untouched, `config/parameters.yml` untouched,
 `ict/pipeline.py` / `forex_exit_manager` / `decide_exit` untouched.
+
+### 2026-07-28 · Session close — TICK-059 filed, two corrections to the FOMC framing
+Colin's call: do NOT build `swap_model.py` today. Filed as **TICK-059** (`tickets/backlog.md:779`,
+`status: ready`, `pre_approved: false`, `blocks: [TICK-024]`) with the exact model spec, the
+fail-loud requirement, and the impact study as the trailing acceptance criterion. Verified before
+filing that all three inputs already exist: `data_fetcher.get_pair_differentials` (:187),
+`data/research/swap_calibration.json`, `research/tsmom_hyp091/financing.py`. Nothing was built.
+
+**Correction 1 — FOMC has NOT happened.** The July 2026 FOMC is a two-day meeting, 28-29 July;
+the statement drops **Wednesday 2026-07-29 at 2:00pm ET**, ~24h from this session. This repo already
+says so in three places (NEXT.md:380 the fomc_window_logger window is `2:00pm ET 2026-07-29 ±15m`,
+:403 "Jul 29: `python scripts/fomc_window_logger.py`", :445 "Jul 29 (after FOMC)"), and :119 says
+"before **Wednesday** 2pm FOMC". Consensus is a hold at 3.50-3.75%; CME FedWatch put ~25% on a
+25bp hike. So no briefing "missed" the decision — it does not exist yet. The real consequence is
+forward-looking: the open position is carried **into** tomorrow's print.
+
+**Correction 2 — the open position is EURUSD SHORT, not long.** Queried OANDA practice
+`/v3/accounts/{id}/openTrades` live: `EUR_USD units=-10000 entry=1.14395 unrealizedPL=+50.90
+opened=2026-07-03T17:24:53`. One open trade, matching `equity_curve_live.jsonl` (`open_trade_count: 1`).
+Short EURUSD is **long USD** — so a hawkish hold or the ~25% hike outcome helps it and a dovish
+surprise hurts it. That is the inverse of a long-EURUSD read, and it inverts which FOMC outcome is
+the risk case.
+
+**Worth noting for TICK-059:** this exact trade is the empirical anchor inside
+`swap_calibration.json` — *"trade #227 short EUR_USD earned +1.1122 USD financing over
+2026-07-03..07-11 (~+0.42%/yr on notional) — every day a credit"*. It is still open. And EURUSD
+SHORT is the one leg where TICK-024 found not just a magnitude error but a **sign flip**: the
+backtester models `-0.0010` (a charge) where OANDA pays `+0.0042` (a credit). The only live
+position is sitting on the single worst-modelled leg in the cost table, earning carry the
+backtester books as a cost. That is the concrete argument for TICK-059's priority.
+
+**State at close:** TICK-044 applied + pushed (`4da9b14`). TICK-024 not applied. Gate CLOSED,
+`tick_024_carry_fix_landed` still FAIL. MT5 `ACCOUNT_TRADE_MODE_DEMO` unconfirmed — still needs the
+Windows VM (C-2), and that is now due **before tomorrow 2pm**, not today.
