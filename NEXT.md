@@ -3157,3 +3157,13 @@ read and abstained wherever the boundary genuinely required a bare constant, eve
 questions (DIAG-18, DIAG-20, DIAG-33, DIAG-43) where the classification was already handed to the
 player in the prompt and only the downstream principle needed applying — those stayed answered
 rather than being swept into a blanket "regime_id/petroulas = abstain everything" shortcut.
+
+### 2026-07-27 · Exit-outcome capture wired (the Ferb plan) + push blocker cleared
+Wire (eb6ea30/ea5f947): pulse_check's existing OANDA close-matcher now also appends one line per
+closed paper trade to data/agent/causal_journal.jsonl (gross_r real, net_r=null,
+cost_estimated=true until TICK-024) + writes logs/.heartbeat_decision_backfill. Synthetic close
+verified end-to-end (entry shown, then stripped). update_outcome() was ALREADY auto-called by
+pulse_check — plan item 1 pre-existed. 27/27 outcome-loop tests green; isolation green; no frozen
+file touched. PUSH BLOCKER CLEARED: ict_causal_chain.jsonl hit 100MB (per-scan re-emission bloat)
+inside unpushed history → 5 commits combined into ea5f947 with the blob stripped, file gitignored
+AND untracked (eb6ea30) — stays on disk, never in git again. July-28 unlock now gets real exits.
