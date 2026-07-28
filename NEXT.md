@@ -3181,3 +3181,64 @@ TICK-044's staged patch untouched. Isolation test green (`test_pipeline_does_not
 1 passed). Working tree clean — only the .diff artifact changed, nothing on the frozen execution
 path was touched. Still gated: needs the impact study + Colin sign-off before the 28th unlock
 actually applies it.
+
+### 2026-07-28 · July-28 unlock session — TICK-044 APPLIED, TICK-024 BLOCKED (not applied)
+Ran `plans/JULY28_UNLOCK_PROMPT.md` on Colin's in-session verbal sign-off. **Only one of the two
+staged patches landed.** Both `git apply --check` clean — that check is necessary but not
+sufficient, and it is what made TICK-024 look ready when it is not.
+
+**TICK-024 — NOT APPLIED. Blocked on a missing module, not on drift.**
+`research/TICK-024_staged_patch.diff` adds `from sovereign.forex.swap_model import
+ratediff_financing_rate` to `sovereign/forex/forex_backtester.py`. **`sovereign/forex/swap_model.py`
+does not exist**, and the diff's own trailing note says so: *"NEW FILE (not yet created) ... NOT
+written in this staged patch; sketch only"*. `ratediff_financing_rate` is defined nowhere in the
+repo — the nearest thing is `research/tsmom_hyp091/financing.py::ratediff_financing`, which takes a
+full price index, not a single `entry_date`. `git apply` succeeds because the diff only edits
+`forex_backtester.py`; the very next import of that module raises ImportError, so
+`scripts/prove.py --decade` would have died before producing a new anchor. The whole Step-2 cascade
+(new RECON_TARGET replacing 0.6886, new OOS Sharpe replacing 1.25, HYP-045 re-adjudication) is
+therefore untouched and all prior numbers stand unchanged.
+Second, independent blocker: the impact study TICK-024's own acceptance criteria require
+(NEXT.md:259-260) has still not been run — and cannot be until `swap_model.py` exists.
+**Next action for TICK-024 is a build, not an apply**: write `sovereign/forex/swap_model.py`
+promoting `research/tsmom_hyp091/financing.py::ratediff_financing` to a shared module parameterized
+on `data/research/swap_calibration.json`, generalized to a single `entry_date`. Note the staged
+diff's fallback silently reverts to the broken `SWAP_RATES_ANNUAL` table when the rate is `None`
+("this staged version omits the raise for brevity") — the real module must fail loud per the
+no-silent-mocking constraint. That is its own scoped session: it re-bases the cost model every
+backtest and 15 confirmed / 27 killed ledger entries are keyed to.
+
+**TICK-044 — APPLIED.** `execution/harness.py` only (the plan said risk.py + harness.py; the staged
+diff touches harness.py alone — `execution/risk.py` already exposes everything needed).
+Adds `ExecRecord.effective_risk_frac` from `risk.RiskDecision.detail["effective_risk"]`
+(`execution/risk.py:229`), accumulates `net_return * effective_risk_frac` into `state.daily_pnl_frac`
+for allowed priced fills only, and seeds `AccountState` via
+`execution/daily_pnl_store.reconstruct_daily_state()` instead of starting flat. `DAILY_LOSS_HALT`
+can now actually fire. All dependencies pre-existed — `daily_pnl_store.py`, the
+`daily_pnl_frac`/`consecutive_losses` kwargs on `AccountState`, and the risk `detail` key.
+`FROZEN_HASH` is unaffected: it hashes the `FROZEN` threshold dict in `execution/config.py`, not
+harness source.
+
+**Verification.** `tests/ -k risk` → 2 failed / 135 passed / 2 skipped. Both failures
+(`TestRiskEngineGate::test_daily_loss_limit_vetoes`, `::test_max_positions_hit_vetoes_even_good_setup`)
+reproduce **identically with the patch stashed** — confirmed by stash/re-run, not assumed from the
+CLAUDE.md baseline note. Zero regressions attributable to TICK-044.
+`tests/test_daily_pnl_store.py` 4 passed. NN#1 isolation test passed.
+
+**Step 4 self-play gate — not run, and would not have moved.** `tick_024_carry_fix_landed` stays
+FAIL because TICK-024 did not land. Gate remains CLOSED on all four conditions. Nothing was opened
+manually.
+
+**MT5 — could not be verified on this machine.** `python3 mt5_bridge.py --selftest` aborts:
+*"MetaTrader5 package is not importable on this machine. platform: Darwin (arm64)"*. The pip package
+binds to the terminal by a Windows-only mechanism, so a running Mac terminal does not help.
+`ACCOUNT_TRADE_MODE_DEMO` is **unconfirmed** — per `specs/mt5_bridge.md §8a` Option A this needs the
+Windows 11 ARM VM (C-2 on Colin's plate, NEXT.md:119). The bridge's own refusal is correct behaviour,
+not a bug. Note the path in the request (`sovereign/execution/mt5/mt5_bridge.py`) does not exist —
+the CLI lives at repo root `mt5_bridge.py`; that directory holds only the connector/contract/guard
+modules. No MT5 routing was attempted and no live unlock was touched.
+
+**Logged**: two `data/agent/param_change_log.jsonl` entries — the `actor: colin` Step-1 sign-off
+(scope-limited to TICK-044, with the TICK-024 exclusion stated) and the TICK-044 apply rationale.
+**Hard stops respected**: no merge to master, HYP-071 untouched, `config/parameters.yml` untouched,
+`ict/pipeline.py` / `forex_exit_manager` / `decide_exit` untouched.
