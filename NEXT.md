@@ -3276,3 +3276,23 @@ backtester books as a cost. That is the concrete argument for TICK-059's priorit
 **State at close:** TICK-044 applied + pushed (`4da9b14`). TICK-024 not applied. Gate CLOSED,
 `tick_024_carry_fix_landed` still FAIL. MT5 `ACCOUNT_TRADE_MODE_DEMO` unconfirmed — still needs the
 Windows VM (C-2), and that is now due **before tomorrow 2pm**, not today.
+
+## 2026-07-28 — TICK-024 impact study (before/after honest costs)
+
+Built `sovereign/forex/swap_model.py` (new, committed) — the rate-differential-derived
+`ratediff_financing_rate()` the staged patch imports, reconciled to
+`research/TICK-024_cost_measurement.md` (EURUSD-short = credit, ~9x-corrected magnitude).
+Import verified clean standalone.
+
+Ran the impact study: measured `prove.py` + `holdout_validation_v014.py` on current (broken)
+code, applied `research/TICK-024_staged_patch.diff` in the working tree only, remeasured,
+then reverted (`git checkout -- sovereign/forex/forex_backtester.py`) and reran both scripts
+again to restore `data/proof/` and `data/audit/` to the pre-patch numbers. Nothing committed
+except swap_model.py. Full table: `plans/JULY28_IMPACT_STUDY.md`.
+
+**Headline: edge SURVIVES honest costs.** Portfolio Sharpe 0.6886→0.6452, OOS Sharpe
+1.2504→1.1919 (still ROBUST, decay 2.169→2.247), no sign flips, no verdict changes. One
+caveat: OOS 95% CI lower bound drops from 1.001 to 0.948 (no longer clears 1.0).
+
+**State: TICK-024 measured-then-reverted, NOT applied, NOT pushed.** Go/no-go is Colin's —
+this doc is the sign-off input, not the sign-off. TICK-044 patch untouched throughout.
