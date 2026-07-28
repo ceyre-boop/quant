@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key><string>com.alta.fomc_window_logger</string>
+    <!-- Self-arming FOMC-window logger (built after the 2026-07-28/29 window was missed
+         because arming was a manual step). Fires at 13:55 on every date listed in
+         config/fomc_dates.yml — 5 min before the 2:00pm ET statement — so the MT5 demo
+         connection is already sampling before the print drops.
+
+         StartCalendarInterval times are LOCAL SYSTEM TIME (launchd has no timezone field).
+         These entries assume the host clock is set to America/New_York (the intended host
+         is the Windows VM running the MT5 demo terminal per TICK-056). If the VM is on a
+         different timezone, recompute the Hour/Minute below to 13:55 ET converted to that
+         zone, or change the VM's system timezone to America/New_York.
+
+         The logger itself reads config/fomc_dates.yml to pick the *actual* next meeting
+         center (2:00pm ET) and window — this plist only needs to wake the process up
+         close enough beforehand; it does not hardcode the FOMC time itself. If a date
+         below is ever wrong/missing relative to config/fomc_dates.yml, update BOTH files
+         together.
+
+         Dates below mirror config/fomc_dates.yml (2026 meetings) — see that file's header
+         for the "not yet verified against federalreserve.gov" caveat. Past-dated entries
+         (before this plist is installed) are harmless no-ops. -->
+    <key>ProgramArguments</key>
+    <array>
+        <string>/opt/homebrew/bin/python3</string>
+        <string>/Users/taboost/quant/scripts/fomc_window_logger.py</string>
+    </array>
+    <key>WorkingDirectory</key><string>/Users/taboost/quant</string>
+    <key>StartCalendarInterval</key>
+    <array>
+        <dict><key>Month</key><integer>1</integer><key>Day</key><integer>28</integer><key>Hour</key><integer>13</integer><key>Minute</key><integer>55</integer></dict>
+        <dict><key>Month</key><integer>3</integer><key>Day</key><integer>18</integer><key>Hour</key><integer>13</integer><key>Minute</key><integer>55</integer></dict>
+        <dict><key>Month</key><integer>4</integer><key>Day</key><integer>29</integer><key>Hour</key><integer>13</integer><key>Minute</key><integer>55</integer></dict>
+        <dict><key>Month</key><integer>6</integer><key>Day</key><integer>17</integer><key>Hour</key><integer>13</integer><key>Minute</key><integer>55</integer></dict>
+        <dict><key>Month</key><integer>7</integer><key>Day</key><integer>29</integer><key>Hour</key><integer>13</integer><key>Minute</key><integer>55</integer></dict>
+        <dict><key>Month</key><integer>9</integer><key>Day</key><integer>16</integer><key>Hour</key><integer>13</integer><key>Minute</key><integer>55</integer></dict>
+        <dict><key>Month</key><integer>10</integer><key>Day</key><integer>28</integer><key>Hour</key><integer>13</integer><key>Minute</key><integer>55</integer></dict>
+        <dict><key>Month</key><integer>12</integer><key>Day</key><integer>16</integer><key>Hour</key><integer>13</integer><key>Minute</key><integer>55</integer></dict>
+    </array>
+    <key>StandardOutPath</key><string>/Users/taboost/quant/logs/fomc_window_logger.log</string>
+    <key>StandardErrorPath</key><string>/Users/taboost/quant/logs/fomc_window_logger.err</string>
+    <key>EnvironmentVariables</key><dict><key>PATH</key><string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string></dict>
+</dict>
+</plist>

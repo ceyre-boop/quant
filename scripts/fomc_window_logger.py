@@ -50,8 +50,9 @@ from sovereign.execution.mt5.guard import assert_routable
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 CONFIG_PATH = REPO_ROOT / "config" / "mt5.yml"
+FOMC_DATES_PATH = REPO_ROOT / "config" / "fomc_dates.yml"
 
-DEFAULT_CENTER = "2026-07-29T14:00"      # FOMC statement, 2:00pm ET
+DEFAULT_CENTER = "2026-07-29T14:00"      # fallback only if config/fomc_dates.yml is unreadable
 DEFAULT_TZ = "America/New_York"
 DEFAULT_WINDOW_MIN = 15
 DEFAULT_INTERVAL_SEC = 1.0
@@ -90,6 +91,45 @@ def load_config(path: Path = CONFIG_PATH) -> dict:
         return {}
     with path.open() as f:
         return yaml.safe_load(f) or {}
+
+
+def load_next_fomc_meeting(
+    path: Path = FOMC_DATES_PATH,
+    *,
+    now: Optional[datetime] = None,
+    tz_name: str = DEFAULT_TZ,
+) -> Optional[datetime]:
+    """Self-arming: pick the soonest FOMC meeting in config/fomc_dates.yml that is still
+    in the future. Returns a tz-aware datetime at the meeting's statement time, or None
+    if the config is missing/empty/exhausted (caller falls back to DEFAULT_CENTER).
+
+    No silent guessing: this only reads dates a human already committed to the config
+    file (flagged there as needing verification against federalreserve.gov) — it never
+    invents or extrapolates a meeting date.
+    """
+    if ZoneInfo is None:
+        raise LoggerError("zoneinfo unavailable — need Python 3.9+ for tz handling")
+    if not path.exists():
+        return None
+    with path.open() as f:
+        cfg = yaml.safe_load(f) or {}
+    meetings = cfg.get("meetings") or []
+    tz = ZoneInfo(tz_name)
+    if now is None:
+        now = datetime.now(tz)
+    elif now.tzinfo is None:
+        now = now.replace(tzinfo=tz)
+
+    candidates = []
+    for m in meetings:
+        date_s = m.get("date")
+        time_s = m.get("statement_time_et", "14:00")
+        if not date_s:
+            continue
+        dt = datetime.fromisoformat(f"{date_s}T{time_s}").replace(tzinfo=tz)
+        candidates.append(dt)
+    future = sorted(dt for dt in candidates if dt >= now)
+    return future[0] if future else None
 
 
 # --------------------------------------------------------------------------- #
@@ -286,7 +326,10 @@ def build_connector(cfg: dict) -> Connector:
 
 def parse_args(argv: Optional[list[str]] = None) -> argparse.Namespace:
     p = argparse.ArgumentParser(description="FOMC-window execution logger (no orders)")
-    p.add_argument("--center", default=DEFAULT_CENTER, help="ISO timestamp center (default FOMC 2:00pm ET)")
+    p.add_argument("--center", default=None,
+                    help="ISO timestamp center. Default: next unexpired meeting in "
+                         "config/fomc_dates.yml (self-arming); falls back to a hardcoded date "
+                         "only if that config is missing/exhausted.")
     p.add_argument("--tz", default=DEFAULT_TZ, help="timezone for a naive --center")
     p.add_argument("--window-min", type=int, default=DEFAULT_WINDOW_MIN, help="± minutes around center")
     p.add_argument("--interval-sec", type=float, default=DEFAULT_INTERVAL_SEC, help="sampling period")
@@ -300,7 +343,17 @@ def main(argv: Optional[list[str]] = None, connector: Optional[Connector] = None
     args = parse_args(argv)
     try:
         cfg = load_config()
-        center = parse_center(args.center, args.tz)
+        if args.center is not None:
+            center = parse_center(args.center, args.tz)
+        else:
+            center = load_next_fomc_meeting(tz_name=args.tz)
+            if center is None:
+                print(f"WARNING: no future meeting in {FOMC_DATES_PATH} — "
+                      f"falling back to hardcoded default {DEFAULT_CENTER}. "
+                      f"Populate config/fomc_dates.yml.", file=sys.stderr)
+                center = parse_center(DEFAULT_CENTER, args.tz)
+            else:
+                print(f"Self-armed from {FOMC_DATES_PATH}: next FOMC meeting {center.isoformat()}")
         symbols = [s.strip() for s in args.symbols.split(",") if s.strip()]
 
         date_tag = center.strftime("%Y-%m-%d")
@@ -331,7 +384,10 @@ def main(argv: Optional[list[str]] = None, connector: Optional[Connector] = None
             except Exception:
                 pass
     except (LoggerError, ConnectorError) as e:
-        print(f"ABORT: {e}", file=sys.stderr)
+        # Loud, grep-able marker — self-armed launchd runs have no human watching, so a
+        # missing VM/terminal/MT5 package must be unmistakable in the plist error log,
+        # not a quiet no-op.
+        print(f"FOMC LOGGER FAILURE — window NOT captured: {e}", file=sys.stderr)
         return 1
 
 

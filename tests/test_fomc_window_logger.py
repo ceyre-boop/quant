@@ -114,3 +114,44 @@ def test_dry_run_no_connection(capsys):
     rc = fwl.main(["--dry-run"])
     assert rc == 0
     assert "DRY-RUN" in capsys.readouterr().out
+
+
+def test_load_next_fomc_meeting_picks_soonest_future(tmp_path):
+    cfg = tmp_path / "fomc_dates.yml"
+    cfg.write_text(
+        "meetings:\n"
+        "  - date: \"2026-01-01\"\n"
+        "    statement_time_et: \"14:00\"\n"
+        "  - date: \"2026-09-16\"\n"
+        "    statement_time_et: \"14:00\"\n"
+        "  - date: \"2026-12-16\"\n"
+        "    statement_time_et: \"14:00\"\n"
+    )
+    now = fwl.parse_center("2026-08-01T00:00", "America/New_York")
+    result = fwl.load_next_fomc_meeting(path=cfg, now=now)
+    assert result is not None
+    assert result.date().isoformat() == "2026-09-16"
+    assert result.hour == 14
+
+
+def test_load_next_fomc_meeting_exhausted_returns_none(tmp_path):
+    cfg = tmp_path / "fomc_dates.yml"
+    cfg.write_text(
+        "meetings:\n"
+        "  - date: \"2026-01-01\"\n"
+        "    statement_time_et: \"14:00\"\n"
+    )
+    now = fwl.parse_center("2026-08-01T00:00", "America/New_York")
+    assert fwl.load_next_fomc_meeting(path=cfg, now=now) is None
+
+
+def test_load_next_fomc_meeting_missing_file_returns_none(tmp_path):
+    assert fwl.load_next_fomc_meeting(path=tmp_path / "nope.yml") is None
+
+
+def test_main_self_arms_from_real_config(capsys):
+    """The repo's real config/fomc_dates.yml drives --dry-run when --center is omitted."""
+    rc = fwl.main(["--dry-run"])
+    assert rc == 0
+    out = capsys.readouterr().out
+    assert "DRY-RUN" in out

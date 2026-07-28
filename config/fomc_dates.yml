@@ -1,0 +1,37 @@
+# FOMC decision-day calendar — drives self-arming for scripts/fomc_window_logger.py
+# and scripts/com.alta.fomc_window_logger.plist (TICK-056 follow-up, built after the
+# 2026-07-28/29 window was missed because arming was a manual step).
+#
+# ⚠️  VERIFICATION REQUIRED — Colin must cross-check every date/time below against the
+#     official Fed calendar (https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm)
+#     before relying on this for a live window. These are the same dates already recorded
+#     in clawd_trading/swing_prediction/fomc_calendar.py (MEETINGS_2026), transcribed here,
+#     NOT independently re-verified against federalreserve.gov by this session. Treat as
+#     best-known, not authoritative, until checked off.
+#
+# Format: one entry per 2-day FOMC meeting. `statement_time_et` is the well-established
+# convention (2:00pm ET on the second day) — also unverified for meetings that haven't
+# happened yet since the Fed occasionally shifts press-conference-day timing.
+#
+# The logger (`load_next_fomc_meeting()`) reads this file and always arms on whichever
+# entry is soonest in the future relative to "now" — no manual --center needed.
+
+verified_against_federalreserve_gov: false  # flip to true once Colin has checked every date
+
+meetings:
+  - date: "2026-01-28"        # Jan 27-28
+    statement_time_et: "14:00"
+  - date: "2026-03-18"        # Mar 17-18
+    statement_time_et: "14:00"
+  - date: "2026-04-29"        # Apr 28-29
+    statement_time_et: "14:00"
+  - date: "2026-06-17"        # Jun 16-17
+    statement_time_et: "14:00"
+  - date: "2026-07-29"        # Jul 28-29
+    statement_time_et: "14:00"
+  - date: "2026-09-16"        # Sep 15-16
+    statement_time_et: "14:00"
+  - date: "2026-10-28"        # Oct 27-28
+    statement_time_et: "14:00"
+  - date: "2026-12-16"        # Dec 15-16
+    statement_time_et: "14:00"

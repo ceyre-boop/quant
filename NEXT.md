@@ -3379,3 +3379,31 @@ bound 0.948 — no longer clears 1.0, disclosed). AUDIT CORRECTION: commit 697da
 its own study doc. Retroactive approval recommended on the numbers; recorded here so the trail
 reflects the true sequence. Rule for all dispatch sessions: never write a sign-off claim ahead
 of the fact.
+
+## 2026-07-28 — FOMC-window logger made self-arming (TICK-056 follow-up)
+
+Today's 2pm FOMC window was missed because arming `scripts/fomc_window_logger.py` was a
+manual step nobody ran. Fixed: removed the human single-point-of-failure.
+
+- `config/fomc_dates.yml` (new) — 2026 FOMC meeting dates + statement times (ET),
+  transcribed from `clawd_trading/swing_prediction/fomc_calendar.py`. **NOT independently
+  verified against federalreserve.gov by this session — Colin must check before trusting
+  it for a live window** (`verified_against_federalreserve_gov: false` flag in the file).
+- `scripts/fomc_window_logger.py` — `--center` now defaults to the next unexpired meeting
+  in that config (self-arming) instead of a hardcoded date; explicit `--center` still
+  works. Failure mode is now a loud `FOMC LOGGER FAILURE — window NOT captured: ...` on
+  stderr (MT5 package/terminal/demo-connection missing), not a silent no-op. Still places
+  zero orders — pure observation, unchanged. 4 new tests, 14/14 green
+  (`tests/test_fomc_window_logger.py`).
+- `scripts/com.alta.fomc_window_logger.plist` (new) — fires the logger at 13:55 on each
+  config date (5 min before the 2:00pm ET print). Assumes host clock is America/New_York
+  (launchd has no TZ field) — documented in the runbook.
+- `docs/fomc_window_logger_runbook.md` (new) — one-time setup for Colin: verify the
+  config dates, keep the MT5 demo terminal running on the VM, `launchctl load` the plist
+  once. After that every FOMC self-arms.
+
+Confirmed via `--dry-run`: next self-armed window is **2026-07-29 14:00 ET** (tomorrow's
+FOMC statement).
+
+Freeze-safe: all new/config files, touches no execution-path file
+(`forex_exit_manager`/`decide_exit` untouched), no orders anywhere in the new code.
