@@ -4,6 +4,55 @@ Per-session ledger: what shipped, push status, verdicts, blockers, refusals. New
 The Obsidian brain (`~/Obsidian/Obsidian/00-BRAIN/NEXT.md`) is the cross-project rollup.
 Standing constraints live in `CLAUDE.md` — not restated here.
 
+## 2026-07-28 — TICK-024 unlock: honest carry-cost model landed, gate flag flipped, ignition still CLOSED
+
+Colin sign-off 2026-07-28 (freeze lifted for this unlock only). Branch: sovereign-v2.
+Commits: 697da48, 9cfe70a, f91fc08. Pushed: YES (bed13a2..f91fc08).
+
+1. **TICK-024 applied + committed (697da48).** `research/TICK-024_staged_patch.diff`
+   applied to `sovereign/forex/forex_backtester.py`. Confirmed it now imports/uses
+   `sovereign/forex/swap_model.py::ratediff_financing_rate` (real rate-differential
+   model, committed at bed13a2 — not the static `SWAP_RATES_ANNUAL` fallback table).
+   Import + basic run verified before commit. Committed alone before any gate flip,
+   per Colin's explicit ordering requirement.
+
+2. **Re-baseline — numbers MATCH the impact study (Y).** `scripts/prove.py`:
+   full-decade portfolio Sharpe 0.6886 → **0.6452**. `scripts/holdout_validation_v014.py`:
+   OOS (2023-2024) Sharpe → **1.1919** (decay ratio 2.247, verdict ROBUST). Both match
+   the study's ~0.645 / ~1.19. Rationale logged to `data/agent/param_change_log.jsonl`
+   before commit (9cfe70a).
+
+3. **TICK-044 — already applied+committed by a prior session (4da9b14), verified
+   clean.** `execution/harness.py` already has the intraday `daily_pnl_frac` wiring;
+   `git apply` on the staged diff correctly failed ("already applied"). Ran the
+   risk/harness test slice: 156 passed, 2 pre-existing failures
+   (`TestRiskEngineGate::test_max_positions_hit_vetoes_even_good_setup`,
+   `test_daily_loss_limit_vetoes`) — unrelated to TICK-044, not introduced by this
+   session. No new commit needed for this step.
+
+4. **Gate flag flipped (f91fc08).** `config/training.yml::ignition.tick_024_carry_fix_landed`
+   `false → true`. Rationale logged to `param_change_log.jsonl` first, per CLAUDE.md
+   rule #4. Flipped only after steps 1-3 were committed, as required.
+
+5. **Final gate state — CLOSED, as expected.** `sovereign.training.gate.evaluate_gate()`:
+   `tick_024_carry_fix_landed` now **PASS**. Gate remains **CLOSED** (ignition NOT
+   opened) on three unmet conditions:
+   - `hyp_071_net_confirmed` still `false` (BLOCKER 8.2)
+   - NET-RETURN GUARD: value board still carries a `gross_R_caveat` marker (gross,
+     not net, returns)
+   - HYP-071 REVIVAL GUARD: the 2026-06-30 METRIC_ARTIFACT verdict stands; the
+     2026-07-23 recompute is not a revival — needs a fresh prereg + adjudication.
+   This unlock lands the cost-model cascade only. Ignition still needs Colin's
+   fresh HYP-071 prereg + a TRUST decision — not done here, not attempted.
+
+6. **Isolation test green** (`test_pipeline_does_not_import_sovereign`, 1 passed).
+   **ICT baseline unchanged**: 4 failed / 23 passed on `tests/ -k "ict and pipeline"`
+   — matches the CLAUDE.md-documented pre-existing baseline exactly, nothing newly
+   broken. Pushed all three commits to `origin/sovereign-v2`.
+
+**Not touched / explicitly out of scope this session:** HYP-071 fresh prereg,
+net-board recompute, ignition itself. Those remain Colin's call.
+
 ## 2026-07-27 — Dashboard staleness: prop state rebuilt, heartbeat self-resolved
 
 Ticket (ad-hoc, brief follow-up): two dashboard-health staleness items. Freeze-safe —
