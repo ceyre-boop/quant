@@ -1,0 +1,31 @@
+{
+  "date": "2026-07-27",
+  "direction": "NEUTRAL",
+  "confidence": 0.0,
+  "reasoning": [
+    "regime: NQ and ES diverging (one up, one down/flat) \u2014 rotation underway, regime shifting. Tech-led longs are suspect.",
+    "macro context present (2026-07-27)"
+  ],
+  "inputs_used": [
+    "briefing",
+    "daily_panel",
+    "fred_macro"
+  ],
+  "inputs_missing": [
+    "calendar",
+    "gdelt",
+    "sentiment_board"
+  ],
+  "context_fraction_fresh": 0.5,
+  "generated_at": "2026-07-27T12:27:42+00:00",
+  "realised": {
+    "direction": "NEUTRAL",
+    "correct": null,
+    "scored_at": "2026-07-27T20:30:04+00:00",
+    "proxy": "SPY",
+    "return": -2.6e-05,
+    "neutral_band": 0.0025,
+    "close": 738.911,
+    "prev_close": 738.93
+  }
+}

@@ -613,6 +613,64 @@ def _save_matched(state: dict) -> None:
     tmp.replace(MATCHED_PATH)
 
 
+CAUSAL_JOURNAL = Path(__file__).resolve().parents[2] / "data" / "agent" / "causal_journal.jsonl"
+_BACKFILL_HEARTBEAT = Path(__file__).resolve().parents[2] / "logs" / ".heartbeat_decision_backfill"
+
+
+def _append_causal_journal(trade: dict, *, pair: str, entry: float, close_px: float,
+                           stop: float, r_realized: float, outcome: str,
+                           direction: float) -> None:
+    """One line per closed paper trade — the Stockfish/exit-value data layer.
+
+    gross_r only: TICK-024's swap cascade is not applied yet, so net_r stays null
+    and cost_estimated=True until the cost model lands. Fails SOFT — a journal
+    write must never block the outcome backfill."""
+    try:
+        open_ts = str(trade.get("openTime", ""))
+        close_ts = str(trade.get("closeTime", ""))
+        hold_hours = None
+        try:
+            o = datetime.fromisoformat(open_ts[:19]).replace(tzinfo=timezone.utc)
+            c = datetime.fromisoformat(close_ts[:19]).replace(tzinfo=timezone.utc)
+            hold_hours = round((c - o).total_seconds() / 3600.0, 2)
+        except Exception:
+            pass
+        row = {
+            "trade_id": str(trade.get("id", "")),
+            "pair": pair,
+            "direction": "LONG" if direction >= 0 else "SHORT",
+            "entry_price": entry,
+            "exit_price": close_px,
+            "stop_price": stop,
+            "hold_hours": hold_hours,   # bars not observable from OANDA close record
+            "exit_reason": "UNLABELED",  # OANDA close record carries no reason; label downstream
+            "outcome": outcome,
+            "gross_r": r_realized,
+            "net_r": None,
+            "cost_estimated": True,      # TICK-024 swap cascade not yet applied
+            "realized_pl_ccy": float(trade.get("realizedPL") or 0.0),
+            "oracle_lesson_pending": True,
+            "source": "pulse_check_backfill",
+            "closed_at": close_ts or datetime.now(timezone.utc).isoformat(),
+            "journaled_at": datetime.now(timezone.utc).isoformat(),
+        }
+        CAUSAL_JOURNAL.parent.mkdir(parents=True, exist_ok=True)
+        with CAUSAL_JOURNAL.open("a") as f:
+            f.write(json.dumps(row) + "\n")
+    except Exception as exc:
+        log.warning("causal journal append failed (non-fatal): %s", exc)
+
+
+def _ping_backfill_heartbeat() -> None:
+    """Explicit execution heartbeat for the decision_backfill loop (loop_health
+    prefers a heartbeat file over its pulse fallback). Fails soft."""
+    try:
+        _BACKFILL_HEARTBEAT.parent.mkdir(parents=True, exist_ok=True)
+        _BACKFILL_HEARTBEAT.write_text(datetime.now(timezone.utc).isoformat() + "\n")
+    except Exception as exc:
+        log.warning("backfill heartbeat write failed (non-fatal): %s", exc)
+
+
 def _backfill_decision_outcomes() -> int:
     """Match closed OANDA trades to OPEN decision records and back-fill outcomes.
 
@@ -684,6 +742,9 @@ def _backfill_decision_outcomes() -> int:
                                 "r_realized": r_realized,
                                 "matched_at": now.isoformat()}
                 log.info("backfill: %s %s r=%+.2f", pair, outcome, r_realized)
+                _append_causal_journal(trade, pair=pair, entry=entry, close_px=close_px,
+                                       stop=stop, r_realized=r_realized,
+                                       outcome=outcome, direction=direction)
             else:
                 failures.append(f"{pair}@{open_time}")
                 first_seen = (prior or {}).get("first_seen") or now.isoformat()
@@ -736,6 +797,7 @@ def _backfill_decision_outcomes() -> int:
     except Exception as exc:
         log.warning("backfill: tradovate venue skipped: %s", exc)
 
+    _ping_backfill_heartbeat()
     return n_backfilled
 
 

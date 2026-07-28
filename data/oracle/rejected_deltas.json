@@ -38,6 +38,321 @@
       "status": "REJECTED",
       "p_value": 0.539,
       "date": "2026-06-01"
+    },
+    {
+      "id": "FACT-00003",
+      "subsystem": "ict",
+      "param_delta": {
+        "weights": {
+          "fvg_tap": 2.5
+        }
+      },
+      "status": "REJECTED",
+      "p_value": null,
+      "date": "2026-07-26"
+    },
+    {
+      "id": "FACT-00005",
+      "subsystem": "ict",
+      "param_delta": {
+        "weights": {
+          "displacement": 0.5
+        }
+      },
+      "status": "REJECTED",
+      "p_value": null,
+      "date": "2026-07-26"
+    },
+    {
+      "id": "FACT-00006",
+      "subsystem": "ict",
+      "param_delta": {
+        "weights": {
+          "displacement": 1.5
+        }
+      },
+      "status": "REJECTED",
+      "p_value": null,
+      "date": "2026-07-26"
+    },
+    {
+      "id": "FACT-00007",
+      "subsystem": "ict",
+      "param_delta": {
+        "weights": {
+          "kill_zone": 1.5
+        }
+      },
+      "status": "REJECTED",
+      "p_value": null,
+      "date": "2026-07-26"
+    },
+    {
+      "id": "FACT-00008",
+      "subsystem": "ict",
+      "param_delta": {
+        "weights": {
+          "kill_zone": 2.5
+        }
+      },
+      "status": "REJECTED",
+      "p_value": null,
+      "date": "2026-07-26"
+    },
+    {
+      "id": "FACT-00009",
+      "subsystem": "ict",
+      "param_delta": {
+        "weights": {
+          "market_structure": 0.5
+        }
+      },
+      "status": "REJECTED",
+      "p_value": null,
+      "date": "2026-07-26"
+    },
+    {
+      "id": "FACT-00010",
+      "subsystem": "ict",
+      "param_delta": {
+        "weights": {
+          "pd_alignment": 0.5
+        }
+      },
+      "status": "REJECTED",
+      "p_value": null,
+      "date": "2026-07-26"
+    },
+    {
+      "id": "SEED_SEED-FX-CARRY-002",
+      "subsystem": "forex",
+      "param_delta": {
+        "signal_weights": {
+          "irp_weight": 0.0,
+          "rate_weight": 1.0,
+          "use_momentum_filter": true
+        }
+      },
+      "status": "REJECTED",
+      "p_value": 0.7322,
+      "date": "2026-07-26"
+    },
+    {
+      "id": "SEED_SEED-FX-VALUE-001",
+      "subsystem": "forex",
+      "param_delta": {
+        "signal_weights": {
+          "irp_weight": 1.0,
+          "rate_weight": 0.0,
+          "use_momentum_filter": false
+        }
+      },
+      "status": "REJECTED",
+      "p_value": 0.3862,
+      "date": "2026-07-26"
+    },
+    {
+      "id": "SEED_SEED-FX-BLEND-001",
+      "subsystem": "forex",
+      "param_delta": {
+        "signal_weights": {
+          "irp_weight": 0.3,
+          "rate_weight": 0.7,
+          "use_momentum_filter": false
+        }
+      },
+      "status": "REJECTED",
+      "p_value": 0.5336,
+      "date": "2026-07-26"
+    },
+    {
+      "id": "SEED_SEED-FX-BLEND-002",
+      "subsystem": "forex",
+      "param_delta": {
+        "signal_weights": {
+          "irp_weight": 0.7,
+          "rate_weight": 0.3,
+          "use_momentum_filter": false
+        }
+      },
+      "status": "REJECTED",
+      "p_value": 0.3462,
+      "date": "2026-07-26"
+    },
+    {
+      "id": "SEED_SEED-CARRY-004",
+      "subsystem": "forex",
+      "param_delta": {
+        "research_params": {
+          "base": "carry",
+          "filter": "vix < 30",
+          "action": "flat when filter false"
+        }
+      },
+      "status": "REJECTED",
+      "p_value": 0.4952,
+      "date": "2026-07-26"
+    },
+    {
+      "id": "SEED_SEED-CARRY-006",
+      "subsystem": "forex",
+      "param_delta": {
+        "research_params": {
+          "base": "carry",
+          "entry_filter": "day_of_week == TUESDAY and hour > 20"
+        }
+      },
+      "status": "REJECTED",
+      "p_value": 0.492,
+      "date": "2026-07-26"
+    },
+    {
+      "id": "SEED_SEED-CARRY-007",
+      "subsystem": "forex",
+      "param_delta": {
+        "research_params": {
+          "base": "carry",
+          "signal": "rate_diff_3m and tsmom_6m > 0",
+          "long_pct": 75,
+          "hold_days": 30
+        }
+      },
+      "status": "REJECTED",
+      "p_value": 0.4952,
+      "date": "2026-07-27"
+    },
+    {
+      "id": "SEED_SEED-CARRY-011",
+      "subsystem": "forex",
+      "param_delta": {
+        "research_params": {
+          "base": "carry",
+          "exit_filter": "USDJPY_5d_return < -2%",
+          "action": "flat all long-carry"
+        }
+      },
+      "status": "REJECTED",
+      "p_value": 0.51,
+      "date": "2026-07-27"
+    },
+    {
+      "id": "SEED_SEED-CARRY-012",
+      "subsystem": "forex",
+      "param_delta": {
+        "research_params": {
+          "base": "carry",
+          "filter": "regime_classifier in {STABLE, TRENDING}",
+          "action": "flat when REGIME=CRISIS"
+        }
+      },
+      "status": "REJECTED",
+      "p_value": 0.4972,
+      "date": "2026-07-27"
+    },
+    {
+      "id": "SEED_SEED-MOM-006",
+      "subsystem": "forex",
+      "param_delta": {
+        "research_params": {
+          "base": "tsmom_3m",
+          "sizing": "target_vol / realized_vol_30d"
+        }
+      },
+      "status": "REJECTED",
+      "p_value": 0.4948,
+      "date": "2026-07-27"
+    },
+    {
+      "id": "SEED_SEED-MOM-010",
+      "subsystem": "forex",
+      "param_delta": {
+        "research_params": {
+          "base": "tsmom_3m",
+          "filter": "realized_vol < 75th_percentile_of_2y"
+        }
+      },
+      "status": "REJECTED",
+      "p_value": 0.5096,
+      "date": "2026-07-27"
+    },
+    {
+      "id": "SEED_SEED-MOM-012",
+      "subsystem": "forex",
+      "param_delta": {
+        "research_params": {
+          "base": "tsmom_3m",
+          "filter": "r_squared_60d_linear > 0.5"
+        }
+      },
+      "status": "REJECTED",
+      "p_value": 0.5048,
+      "date": "2026-07-27"
+    },
+    {
+      "id": "SEED_SEED-MOM-015",
+      "subsystem": "forex",
+      "param_delta": {
+        "research_params": {
+          "base": "tsmom_3m",
+          "filter": "vix < 20"
+        }
+      },
+      "status": "REJECTED",
+      "p_value": 0.485,
+      "date": "2026-07-27"
+    },
+    {
+      "id": "SEED_SEED-VOL-005",
+      "subsystem": "forex",
+      "param_delta": {
+        "research_params": {
+          "base": "any_strategy",
+          "filter": "gk_vol < 80th_percentile_2y"
+        }
+      },
+      "status": "REJECTED",
+      "p_value": 0.499,
+      "date": "2026-07-27"
+    },
+    {
+      "id": "SEED_SEED-VOL-006",
+      "subsystem": "forex",
+      "param_delta": {
+        "research_params": {
+          "base": "forex_macro",
+          "filter": "hmm_vol_state == LOW"
+        }
+      },
+      "status": "REJECTED",
+      "p_value": 0.499,
+      "date": "2026-07-27"
+    },
+    {
+      "id": "SEED_SEED-VOL-007",
+      "subsystem": "forex",
+      "param_delta": {
+        "research_params": {
+          "base": "carry",
+          "filter": "vix < vix_5d_avg * 1.5"
+        }
+      },
+      "status": "REJECTED",
+      "p_value": 0.5012,
+      "date": "2026-07-27"
+    },
+    {
+      "id": "SEED_SEED-VOL-008",
+      "subsystem": "forex",
+      "param_delta": {
+        "research_params": {
+          "signal": "std(realized_vol_5d, 30)",
+          "threshold": "high signals risk-off",
+          "action": "flat carry"
+        }
+      },
+      "status": "REJECTED",
+      "p_value": 0.4976,
+      "date": "2026-07-27"
     }
   ]
 }

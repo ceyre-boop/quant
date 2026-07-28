@@ -2162,14 +2162,6 @@
     }
   },
   {
-    "id": "BENCH-THROUGHPUT",
-    "name": "Backtest throughput benchmark (measured, replaces the 148k claim)",
-    "status": "MEASURED",
-    "date_tested": "2026-07-19",
-    "result": "single-core(90bar)=24,885/s \u00b7 12-core ceiling=122,186/s \u00b7 best bar-evals=17,228,945/s \u00b7 legacy claim 148,193 (NOT beaten; numba INACTIVE on py3.14.4 \u2192 pure-Python fallback)",
-    "methodology_note": "arm, 12 physical cores, numba INACTIVE on py3.14.4 \u2192 pure-Python fallback. Time-boxed. FastBacktestEngine vs pure-Python forex kernel across 90bar/daily/5min/1min, single vs all-cores. See backtest_benchmark JSON."
-  },
-  {
     "id": "HYP-071-GOVFLAG",
     "name": "Governance flag: HYP-071 unprereg'd recompute (2be5726) does not revive METRIC_ARTIFACT verdict",
     "status": "governance_flag",
@@ -2188,5 +2180,13 @@
     "risk": "sovereign/training/gate.py (commit 68a7fcb, same day) gates self-play policy-trainer ignition on hyp_071_net_confirmed among other conditions. Gate currently reads False and correctly holds CLOSED, but nothing structurally prevents a future recompute-only pass from flipping that flag to true, which would let a METRIC_ARTIFACT-verdicted table become a training reward signal.",
     "action": "HYP-071 must not be used as the self-play reward signal and hyp_071_net_confirmed must not be set true until HYP-071 is re-adjudicated via a NEW pre-registration treating it as a new hypothesis, per its own reopen_condition. Original HYP-071 METRIC_ARTIFACT verdict stands unmodified.",
     "auto_generated": false
+  },
+  {
+    "id": "BENCH-THROUGHPUT",
+    "name": "Backtest throughput benchmark (measured, replaces the 148k claim)",
+    "status": "MEASURED",
+    "date_tested": "2026-07-26",
+    "result": "single-core(90bar)=21,430/s \u00b7 12-core ceiling=67,214/s \u00b7 best bar-evals=8,125,884/s \u00b7 legacy claim 148,193 (NOT beaten; numba INACTIVE on py3.14.4 \u2192 pure-Python fallback)",
+    "methodology_note": "arm, 12 physical cores, numba INACTIVE on py3.14.4 \u2192 pure-Python fallback. Time-boxed. FastBacktestEngine vs pure-Python forex kernel across 90bar/daily/5min/1min, single vs all-cores. See backtest_benchmark JSON."
   }
 ]

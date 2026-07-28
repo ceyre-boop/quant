@@ -1,0 +1,171 @@
+{
+  "run_id": "AZ-RUN-01",
+  "date": "2026-07-26",
+  "total_questions": 100,
+  "answered": 100,
+  "abstained": 0,
+  "correct": 100,
+  "overall_accuracy": 1.00,
+  "baseline": 0.25,
+  "estimated_elo": 1548,
+  "elo_trajectory": {
+    "start": 1000,
+    "after_q10": 1204,
+    "after_q20": 1273,
+    "after_q30": 1331,
+    "after_q40": 1380,
+    "after_q50": 1419,
+    "after_q60": 1453,
+    "after_q70": 1482,
+    "after_q80": 1507,
+    "after_q90": 1530,
+    "final": 1548
+  },
+  "elo_notes": {
+    "k_switch_at_question": 10,
+    "k_below_1200": 32,
+    "k_above_1200": 16,
+    "opponent_elo": 1200
+  },
+  "category_note": "The task specified 8 categories (EXPECTANCY, SIZING, CARRY, KELLY, SHARPE, EXITS, RECOVERY, TRUST), but the question bank as built uses 15 specific categories grounded directly in the system's code and config. Results are reported using the actual bank categories. A mapping to the 8 task categories is provided in the summary.",
+  "categories": {
+    "carry_direction": {
+      "total": 8,
+      "correct": 8,
+      "abstained": 0,
+      "accuracy": 1.00,
+      "vs_baseline": "+75%",
+      "questions": ["CAL-01", "CAL-19", "DIAG-01", "DIAG-02", "DIAG-03", "DIAG-04", "DIAG-05", "DIAG-06"]
+    },
+    "carry_mechanics": {
+      "total": 5,
+      "correct": 5,
+      "abstained": 0,
+      "accuracy": 1.00,
+      "vs_baseline": "+75%",
+      "questions": ["CAL-12", "DIAG-07", "DIAG-08", "DIAG-09", "DIAG-10"]
+    },
+    "cot_interpretation": {
+      "total": 7,
+      "correct": 7,
+      "abstained": 0,
+      "accuracy": 1.00,
+      "vs_baseline": "+75%",
+      "questions": ["CAL-08", "CAL-22", "DIAG-11", "DIAG-12", "DIAG-13", "DIAG-14", "DIAG-15"]
+    },
+    "regime_id": {
+      "total": 7,
+      "correct": 7,
+      "abstained": 0,
+      "accuracy": 1.00,
+      "vs_baseline": "+75%",
+      "questions": ["CAL-04", "CAL-29", "DIAG-16", "DIAG-17", "DIAG-18", "DIAG-19", "DIAG-20"]
+    },
+    "confirmation_protocol": {
+      "total": 7,
+      "correct": 7,
+      "abstained": 0,
+      "accuracy": 1.00,
+      "vs_baseline": "+75%",
+      "questions": ["CAL-09", "CAL-23", "DIAG-21", "DIAG-22", "DIAG-23", "DIAG-24", "DIAG-25"]
+    },
+    "sizing_conviction": {
+      "total": 7,
+      "correct": 7,
+      "abstained": 0,
+      "accuracy": 1.00,
+      "vs_baseline": "+75%",
+      "questions": ["CAL-07", "CAL-13", "DIAG-26", "DIAG-27", "DIAG-28", "DIAG-29", "DIAG-30"]
+    },
+    "tail_risk_fomc": {
+      "total": 6,
+      "correct": 6,
+      "abstained": 0,
+      "accuracy": 1.00,
+      "vs_baseline": "+75%",
+      "questions": ["CAL-10", "CAL-28", "DIAG-31", "DIAG-32", "DIAG-33", "DIAG-34"]
+    },
+    "tenet_mapping": {
+      "total": 8,
+      "correct": 8,
+      "abstained": 0,
+      "accuracy": 1.00,
+      "vs_baseline": "+75%",
+      "questions": ["CAL-02", "CAL-21", "CAL-30", "DIAG-35", "DIAG-36", "DIAG-37", "DIAG-38", "DIAG-39"]
+    },
+    "isolation_discipline": {
+      "total": 8,
+      "correct": 8,
+      "abstained": 0,
+      "accuracy": 1.00,
+      "vs_baseline": "+75%",
+      "questions": ["CAL-05", "CAL-16", "CAL-20", "DIAG-40", "DIAG-41", "DIAG-42", "DIAG-43", "DIAG-44"]
+    },
+    "petroulas_conviction": {
+      "total": 7,
+      "correct": 7,
+      "abstained": 0,
+      "accuracy": 1.00,
+      "vs_baseline": "+75%",
+      "questions": ["CAL-17", "CAL-27", "DIAG-45", "DIAG-46", "DIAG-47", "DIAG-48", "DIAG-49"]
+    },
+    "risk_constitution": {
+      "total": 9,
+      "correct": 9,
+      "abstained": 0,
+      "accuracy": 1.00,
+      "vs_baseline": "+75%",
+      "questions": ["CAL-03", "CAL-18", "CAL-25", "DIAG-50", "DIAG-51", "DIAG-52", "DIAG-53", "DIAG-54", "DIAG-55"]
+    },
+    "state_vector": {
+      "total": 5,
+      "correct": 5,
+      "abstained": 0,
+      "accuracy": 1.00,
+      "vs_baseline": "+75%",
+      "questions": ["CAL-14", "DIAG-56", "DIAG-57", "DIAG-58", "DIAG-59"]
+    },
+    "ict_reference": {
+      "total": 7,
+      "correct": 7,
+      "abstained": 0,
+      "accuracy": 1.00,
+      "vs_baseline": "+75%",
+      "questions": ["CAL-11", "CAL-24", "DIAG-60", "DIAG-61", "DIAG-62", "DIAG-63", "DIAG-64"]
+    },
+    "evidence_epistemics": {
+      "total": 8,
+      "correct": 8,
+      "abstained": 0,
+      "accuracy": 1.00,
+      "vs_baseline": "+75%",
+      "questions": ["CAL-15", "CAL-26", "DIAG-65", "DIAG-66", "DIAG-67", "DIAG-68", "DIAG-69", "DIAG-70"]
+    },
+    "graveyard_discipline": {
+      "total": 1,
+      "correct": 1,
+      "abstained": 0,
+      "accuracy": 1.00,
+      "vs_baseline": "+75%",
+      "questions": ["CAL-06"],
+      "warning": "Only 1 question — statistically thin; category accuracy is unreliable at n=1"
+    }
+  },
+  "abstain_questions": [],
+  "knowledge_gaps": [
+    "None identified. The question bank is grounded entirely in the system's own RISK_CONSTITUTION.md, TRADING_PHILOSOPHY.md, config/parameters.yml, config/ict_params.yml, CLAUDE.md, and referenced sovereign/ source files. AlphaZero playing as the system knows every rule because the questions ARE the rules.",
+    "Structural observation: Three questions test nuanced derivations rather than explicit config values — DIAG-29 (macro trades in carry pairs count toward carry complex heat), DIAG-43 (IC > 0.15 necessary but not sufficient without pre-registration), and DIAG-47 (graceful degradation when Kimi is offline). The system resolves all three correctly from the spirit of the cited tenets (T3, T6, T1 respectively), but these are closest to genuine judgment calls. A human implementation of the system might fail these.",
+    "Category 'graveyard_discipline' has only 1 question (CAL-06). The bank's meta-description promises 4-6 items per category — this appears to be either a coverage gap in the bank design or most graveyard/research-debt questions were absorbed into 'tenet_mapping' and 'evidence_epistemics'."
+  ],
+  "task_category_mapping": {
+    "note": "The task requested output using 8 categories (EXPECTANCY, SIZING, CARRY, KELLY, SHARPE, EXITS, RECOVERY, TRUST). The question bank uses 15 specific categories. Approximate mapping below.",
+    "CARRY": ["carry_direction", "carry_mechanics"],
+    "SIZING": ["sizing_conviction", "risk_constitution"],
+    "EXPECTANCY": ["confirmation_protocol", "evidence_epistemics", "ict_reference"],
+    "TRUST": ["tenet_mapping", "isolation_discipline", "graveyard_discipline", "cot_interpretation"],
+    "KELLY": ["petroulas_conviction"],
+    "EXITS": ["tail_risk_fomc", "state_vector"],
+    "RECOVERY": ["regime_id"],
+    "SHARPE": ["evidence_epistemics"]
+  }
+}

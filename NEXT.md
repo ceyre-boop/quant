@@ -4,6 +4,43 @@ Per-session ledger: what shipped, push status, verdicts, blockers, refusals. New
 The Obsidian brain (`~/Obsidian/Obsidian/00-BRAIN/NEXT.md`) is the cross-project rollup.
 Standing constraints live in `CLAUDE.md` — not restated here.
 
+## 2026-07-27 — Dashboard staleness: prop state rebuilt, heartbeat self-resolved
+
+Ticket (ad-hoc, brief follow-up): two dashboard-health staleness items. Freeze-safe —
+no execution-path file touched. Branch: sovereign-v2. Commit: 9c25172.
+Pushed: NO — blocked, see below.
+
+1. **PROP CHALLENGE STATE — rebuilt.** Builder is `scripts/sync_dashboard_data.py`
+   (writes `prop_challenge_state.json`, `checklist_state.json`, health JSONs — per
+   `AGENT_DIRECTIVE.md:104` and its own docstring). Ran clean: G2a=PASS, G2b=24/8,
+   health GREEN (reddit YELLOW/cache-stale, oracle_pulse RED/0-new-entries — both
+   pre-existing, unrelated). Regenerated file confirmed valid JSON, timestamp
+   2026-07-27T20:56:44Z. No missing builder, no mocking needed.
+
+2. **EXECUTION HEARTBEAT — self-resolved, not a bug.** `com.alta.execution_harness`
+   IS loaded (`launchctl list` shows it, OnDemand, LastExitStatus 0) — contrary to
+   the plist's own TRACKED-NOT-LOADED comment, someone (operator) already loaded it
+   since that comment was written. `harness.log` shows it fired on schedule every
+   weekday (16:05 ET) including today 2026-07-27T20:05:09, and `heartbeat.json`
+   mtime is 2026-07-27 16:05 local — current as of this session. The "2-day-stale
+   since Friday" read in tonight's brief was accurate only at the moment the brief
+   was generated (before today's 16:05 ET run fired) or from an earlier snapshot —
+   by the time of this check it had already refreshed via the normal weekday
+   schedule. No plist fix needed, nothing to stage before Wednesday's FOMC session;
+   this will keep self-resolving on every weekday close as designed.
+
+**BLOCKER — push rejected, unrelated to this work:** `git push origin HEAD:sovereign-v2`
+was rejected by GitHub — `data/agent/ict_causal_chain.jsonl` is 105MB, over the 100MB
+limit, already committed in history (traced to `[AUTO] Evening data sync 2026-07-24/25/26`
+commits, none of which are mine). Not touched by my 5-file commit, but it blocks *any*
+push on this branch until someone with authorization does a history rewrite (git-lfs
+migration or filter-repo) to strip that blob. Flagging for Colin rather than attempting
+a destructive rewrite unprompted. My commit (9c25172, 5 files: prop_challenge_state.json,
+checklist_state.json, forex_data_status.json, system_health.json, live_snapshot.json)
+is sitting locally on sovereign-v2, ready to push once that's cleared.
+
+Isolation test green: `test_pipeline_does_not_import_sovereign` passed before commit.
+
 ## 2026-07-26 — Dashboard LIVE/audit two-plane split (Firebase RTDB wiring)
 
 Ticket (ad-hoc, pre-FOMC): repoint dashboard LIVE panels from committed repo JSON

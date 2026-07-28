@@ -1,0 +1,153 @@
+{
+  "date": "2026-07-26",
+  "generated_at": "2026-07-26T12:43:03.283799+00:00",
+  "meta_regime": "ROTATION_WARN",
+  "regime_read": "NQ weak vs ES \u2014 rotation OUT of tech. A breadth/rotation warning; tech-led longs are suspect.",
+  "narrative": "Macro backdrop \u2014\n[2026-07-26] US economic state (FRED):\n  Growth: real GDP 2.1% (q/q ann)\n  Inflation: CPI 3.23% YoY | core CPI 2.25% | core PCE 2.89% (Fed target 2%)\n  Labor: unemployment 4.2%\n  Rates: fed funds 3.63% | 10Y 4.71% | 10Y-2Y 0.36% (NORMAL)\n  Consumer: UMich sentiment 44.8 | VIX 18.7\n\n---\nRecent market action shows a weak NQ relative to ES, with both indices trading below their respective 200-day moving averages. The lead-lag regime is currently in a 'rotation warn' state, indicating that tech-led longs are suspect and the market may be shifting towards broader-based moves rather than concentrated gains. This suggests caution on tech-heavy NQ positions as the rotation signal could invalidate any long bias below 28375.00 for NQ. The volume profile indicates accumulation zones around key levels, with the primary points of concentration (POC) at 7453.62 for ES and 29309.40 for NQ. These levels could act as support or resistance in the coming session. Given the geopolitical tensions highlighted by recent news, including U.S. strikes on Iran and Middle Eastern escalations, investors should remain cautious. The upcoming FOMC meeting and key economic releases (PCE, ISM Manufacturing PMI, Nonfarm Payrolls, CPI) will be critical, with potential for significant market movement around these events. Overall, the bias leans towards a long-the-dip strategy with a probability of approximately 65%, which could invalidate if NQ falls below 28375.00.",
+  "big_move_headline": {
+    "headline": "Today's likeliest institutional move: LONG USDJPY (P 70%, ~0.56% range, conf 33%).",
+    "pair": "USDJPY",
+    "direction": "LONG",
+    "p_big": 0.6993,
+    "confidence": 0.328,
+    "expected_magnitude_pct": 0.5614,
+    "session": "LONDON",
+    "drivers": [
+      [
+        "event_risk",
+        0.9
+      ],
+      [
+        "momentum",
+        0.2664
+      ],
+      [
+        "compression",
+        0.1643
+      ]
+    ],
+    "validation_status": "UNVALIDATED \u2014 display only (run scripts/validate_big_move.py)"
+  },
+  "directional_bias": "LONG",
+  "confidence": 75,
+  "regime_call": "ROTATION_WARN",
+  "key_level": null,
+  "synthesis_source": "ollama/qwen2.5",
+  "lead_lag": {
+    "regime": "ROTATION_WARN",
+    "spread_avg": -0.00257,
+    "leader": "NONE",
+    "corr": 0.889,
+    "divergence": false
+  },
+  "volume_profile": {
+    "ES=F": {
+      "symbol": "ES=F",
+      "as_of": "2026-07-26T12:42:22.784403+00:00",
+      "days": 5,
+      "bins": 40,
+      "poc": 7545.87,
+      "value_area_low": 7428.79,
+      "value_area_high": 7549.42,
+      "high_volume_nodes": [
+        7545.87,
+        7439.43,
+        7442.98,
+        7446.53,
+        7453.62
+      ],
+      "price_range": [
+        7419.92,
+        7561.83
+      ],
+      "limitation": "Volume profile = WHERE volume traded (volume-at-price). NOT order-flow delta (buy/sell aggression). True delta needs a CME order-flow feed (Databento/CQG)."
+    },
+    "NQ=F": {
+      "symbol": "NQ=F",
+      "as_of": "2026-07-26T12:42:22.816887+00:00",
+      "days": 5,
+      "bins": 40,
+      "poc": 29309.4,
+      "value_area_low": 28275.02,
+      "value_area_high": 29337.36,
+      "high_volume_nodes": [
+        29309.4,
+        29225.53,
+        29169.62,
+        29141.66,
+        28498.67
+      ],
+      "price_range": [
+        28233.08,
+        29351.33
+      ],
+      "limitation": "Volume profile = WHERE volume traded (volume-at-price). NOT order-flow delta (buy/sell aggression). True delta needs a CME order-flow feed (Databento/CQG)."
+    }
+  },
+  "macro_economic": {
+    "text": "[2026-07-26] US economic state (FRED):\n  Growth: real GDP 2.1% (q/q ann)\n  Inflation: CPI 3.23% YoY | core CPI 2.25% | core PCE 2.89% (Fed target 2%)\n  Labor: unemployment 4.2%\n  Rates: fed funds 3.63% | 10Y 4.71% | 10Y-2Y 0.36% (NORMAL)\n  Consumer: UMich sentiment 44.8 | VIX 18.7",
+    "summary": {
+      "gdp_growth_pct": 2.1,
+      "cpi_yoy_pct": 3.23,
+      "core_cpi_yoy_pct": 2.25,
+      "core_pce_yoy_pct": 2.89,
+      "unemployment_pct": 4.2,
+      "fed_funds_pct": 3.63,
+      "ten_year_pct": 4.71,
+      "yield_curve_10y2y": 0.36,
+      "yield_curve_state": "NORMAL",
+      "consumer_sentiment": 44.8,
+      "vix": 18.7
+    }
+  },
+  "news_count": 9,
+  "event_calendar": [
+    {
+      "event": "FOMC meeting",
+      "date": "2026-07-29",
+      "source": "seed",
+      "action": "reduce size / widen stops into the window",
+      "days_until": 3,
+      "note": "in 3d \u2014 reduce size / widen stops into the window"
+    },
+    {
+      "event": "PCE (Fed's preferred inflation)",
+      "date": "2026-07-31",
+      "source": "cadence_estimate",
+      "action": "8:30 ET \u2014 reduce size into window",
+      "days_until": 5,
+      "note": "in 5d \u2014 8:30 ET \u2014 reduce size into window"
+    },
+    {
+      "event": "ISM Manufacturing PMI",
+      "date": "2026-08-03",
+      "source": "cadence_estimate",
+      "action": "reduce size into the 10:00 ET print",
+      "days_until": 8,
+      "note": "in 8d \u2014 reduce size into the 10:00 ET print"
+    },
+    {
+      "event": "Nonfarm Payrolls",
+      "date": "2026-08-07",
+      "source": "cadence_estimate",
+      "action": "high-impact 8:30 ET \u2014 widen stops / size down",
+      "days_until": 12,
+      "note": "in 12d \u2014 high-impact 8:30 ET \u2014 widen stops / size down"
+    },
+    {
+      "event": "CPI",
+      "date": "2026-08-12",
+      "source": "cadence_estimate",
+      "action": "inflation print 8:30 ET \u2014 reduce size into window",
+      "days_until": 17,
+      "note": "in 17d \u2014 inflation print 8:30 ET \u2014 reduce size into window"
+    }
+  ],
+  "scorecard_summary": "Briefing scorecard: n=16 dir-calls, hit 0.75, regime acc 0.351 \u2014 CALIBRATING \u2014 need ~30-60 samples before the hit-rate/calibration mean anything",
+  "bias": "size to regime: trust direction more in BREADTH, less in CONCENTRATION; ROTATION_WARN = treat tech-led longs as suspect",
+  "provenance": {
+    "source": "oracle_morning_briefing",
+    "verified": false,
+    "note": "Analyst/Oracle journal \u2014 qualitative regime context + a self-scored directional call, NOT a verified data feed or validated edge. Numbers here are never ingested as trading inputs."
+  }
+}
