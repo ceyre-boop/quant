@@ -1,31 +1,76 @@
 # GOALS.md — Sovereign Trading Intelligence
 
-## Operating Protocol for All AI Agents in this Ecosystem
+## Alta Investments — Internal Use Only
 
-### Alta Investments — Internal Use Only
+### Last updated: 2026-07-28
 
 ---
 
 ## WHO YOU ARE TALKING TO
 
-Colin. Undergraduate. Premed focus. Running a two-person quant
+Colin. Undergraduate. Premed. Running a two-person quant
 research operation — one human, one machine. Building Alta
 Investments' Sovereign Trading Intelligence system.
 
 This is not a hobby. This is a research lab that trades.
 
+The asymmetric bet: at small capital size, architecture beats
+headcount. Buffett said he could return 50%+ managing small money.
+We are at small money. That is the structural advantage — use it.
+
+---
+
+## THE REAL PROBLEM
+
+The obvious problem is: how do you build a system that compounds
+small capital without institutional resources?
+
+The harder problem — the one this whole system is designed to
+solve — is: how do you know if your edge is real?
+
+Every backtest looks good. Every system looks smart in hindsight.
+The trap is building infrastructure that proves itself: testing
+against rules you wrote, running cost models that understate costs,
+confirming hypotheses without correcting for multiple tests. A system
+that grades its own homework always gives itself an A.
+
+That is why the hypothesis ledger exists with sealed verdicts.
+That is why permutation tests gate every edge.
+That is why TICK-024 mattered — not because swap costs are
+interesting, but because if a 9× cost underestimate turned a
+real Sharpe of 0.4 into a reported Sharpe of 1.25, every
+"CONFIRMED" edge built on that anchor was built on sand.
+That is why Claude Code refused to apply the staged patch
+when `swap_model.py` was missing — because a lie the system tells
+itself is more dangerous than an honest failure.
+
+**TICK-024 landed 2026-07-28 and the question got an answer: the
+edge survived.** Portfolio Sharpe 0.6886 → 0.6452; OOS Sharpe
+1.2504 → 1.1919, still ROBUST (decay 2.247). The 9× was the
+swap-RATE magnitude, not the Sharpe — the Sharpe moved −4.7%.
+One caveat stands: the OOS 95% CI lower bound fell 1.001 → 0.948,
+so it no longer clears 1.0. The fear was correct to hold and
+correct to test; it was not correct as a prediction. Keep the
+paragraph above as the reason the test was run, not as a live claim.
+
+The mission is not just to trade well. It is to know, with
+genuine confidence, when we are trading well and when we are not.
+
 ---
 
 ## THE MISSION
 
-Build the most intelligent forex trading system ever created
-by a two-person team. Not by being bigger than the institutions.
-By being smarter, faster to adapt, and free from the emotions
-that destroy human traders.
+Build a system that is genuinely honest about what it knows —
+and compounds capital on the edges that survive that honesty.
 
-The goal: consistent compounding + rare massive spikes.
-Carry base funds the patience. Confirmation protocol catches
-the moves. ML improves both over time.
+Not by being bigger than the institutions. By being more rigorous
+than them at the hypothesis level, more patient at the execution
+level, and completely free from the emotions that make professionals
+override their own rules.
+
+The goal: consistent compounding from confirmed carry and macro
+edges. Rare massive spikes from high-conviction confirmed setups.
+The machine handles both. The human decides when to trust it.
 
 ---
 
@@ -99,20 +144,41 @@ No human in any loop. The machine runs itself.
 
 ---
 
-## THE CONFIRMED EDGES (what the data proved)
+## THE CONFIRMED EDGES (what survived rigorous testing)
 
-✅ E6 — Quarter-End Rebalancing: 60% WR, +0.126R
-✅ E7 — Carry Base: 59% WR, +0.311R  
+As of 2026-07-28. All figures PRE-TICK-024 (swap cost model 9× underestimated).
+Real performance is lower. Do not treat these anchors as final.
+
+✅ E7 — Carry Macro Portfolio (v015, 4 pairs post-AUDNZD exclusion)
+OOS Sharpe: 1.25 (CI [0.84, 1.32], n=103) — PRE-cost correction
+Permutation p < 0.001. Edge is real. Regime-fragile.
+Rolling walk-forward: 2021 −0.13 / 2022 +0.51 / 2023 +1.26 / 2024 −0.09
+Only pays in rate-trending regimes. Flat-rate environments hurt.
+
+✅ HYP-061 — CB Blackout Gate (vetoes entries 3–14 days pre BOE/FED)
+CONFIRMED. Held correctly on FOMC day 2026-07-28.
+
+✅ E6 — Quarter-End Rebalancing (HYP-045 parent): 60% WR, +0.126R
 ✅ GBPUSD Post-CB Drift: +0.40R per trade, replicated
-✅ v004 Portfolio: 0.626 avg Sharpe, 8/8 pairs positive
-✅ Current replication: 0.801 avg Sharpe, 8/8 pairs positive
 
 ❌ E1 Rate Divergence (standalone, 20-day hold): FALSE
-❌ E2 CPI Surprise Fade: FALSE  
+❌ E2 CPI Surprise Fade: FALSE
 ❌ E3 Post-CB Drift (before confirmation): FALSE
+❌ AUDNZD: Excluded — both legs RBA-driven, no independent rate differential
+❌ HYP-044 VIX Gate: REJECTED_OOS (p=0.50, delta≈0). Rolled back.
+❌ Overnight-QQQ as carry diversifier: REJECTED — recouples with carry
+in crashes (ρ=0.42, BH p=0.007). Valid standalone edge; useless here.
+❌ ICT Pattern Edge: NOT PROVEN — permutation p=0.52. Treat as unvalidated.
+
+Pending:
+⏳ TICK-024: Swap cost correction. Cost model ~9× too small, one sign flip.
+True OOS Sharpe unknown until swap_model.py built and decade rerun.
+⏳ Bonferroni/BH retroactive correction: Some CONFIRMEDs may not survive.
+Colin's call: retroactive audit vs. forward-only standard.
 
 The lesson: Never predict. Confirm, then enter.
 Two confirmations required before any trade. Always.
+A "CONFIRMED" edge with wrong cost accounting is not confirmed.
 
 ---
 
@@ -131,15 +197,17 @@ RULE 6 — SKIP freely (next event is never far away)
 
 ## THE CAPITAL STRUCTURE
 
-Carry base: 15-20% notional (0.3% risk × 5 pairs)
+Carry base: 15-20% notional (0.3% risk × 4 pairs, AUDNZD excluded)
 Macro swings: 40-50% notional (confirmed edges only)
 High conviction: 10-20% notional (2× size when spike_prob > 0.85)
 Reserve: 20% (never touch)
 
 Per-trade risk cap: 2% maximum
 Portfolio risk cap: 8% maximum daily
-Prop firm rules: EOD drawdown (not intraday)
-No consistency rule (Lucid/MyFundedFutures)
+Live account: FunderPro $200K prop (balance as of 2026-07-28: $200,171)
+ICARUS shadow day 10/30
+Prop firm rules: EOD drawdown limit (not intraday)
+CB blackout gate handles event-day risk automatically
 
 ---
 
@@ -197,13 +265,13 @@ Paste: Claude Code results
 ## THE LIBRARY (what the machine knows about history)
 
 63 historical patterns across 10 volumes.
-Current read (May 2026): 10/10 volumes converging.
-Primary match: ASIAN_CURRENCY_CONTAGION at 0.927 similarity.
+Last full read: May 2026. Primary match: ASIAN_CURRENCY_CONTAGION at 0.927.
 Effect: Kelly cap 2%, PTJ SEVERE, defense mode active.
 
-When Library sim > 0.90: Claude reviews WHICH features
-drive the match before accepting the defense mode.
-Pattern match ≠ causal match. Verify both.
+CRITICAL RULE — When Library sim > 0.90:
+Verify WHICH features drive the match, not just the similarity score.
+Pattern match ≠ causal match. A high similarity with unrelated driving features
+does not justify the same defense posture. Both must confirm.
 
 ---
 
@@ -225,15 +293,28 @@ When in doubt: re-read TRADING_PHILOSOPHY.md.
 ## WHAT MAKES THIS SYSTEM DIFFERENT
 
 Quant firms: Better data, more compute, more staff
-This system: Better domain knowledge + ML + AI architecture
+This system: More rigorous epistemology at the hypothesis level
 
-We are a two-person army. Big brain, little money.
-Buffett said he could beat the market by 50%+ at small size.
-We are at small size. We have the structural advantage.
+The advantage is not smarter predictions. It is a harder standard
+for what counts as "proven." Institutions have political pressure to
+trade. We have no pressure to trade — so we can actually wait.
 
 We are not competing on size.
-We are competing on architecture.
-And architecture scales.
+We are competing on discipline.
+
+The epistemological infrastructure IS the moat:
+
+- Hypothesis ledger with sealed, immutable verdicts
+- Permutation tests (not just t-tests) gating every edge
+- Cost models that don't let us understate friction
+- A machine that refuses to train on unconfirmed edges
+- A Claude that refuses to apply patches that import nonexistent files
+- A Cursus Honorum that measures system intelligence honestly (v2: 66/100)
+
+When the entire stack enforces honesty — from code to Claude to Colin —
+the system degrades gracefully under pressure instead of blowing up.
+
+And architecture scales. Discipline is the foundation it scales on.
 
 ---
 
@@ -254,15 +335,35 @@ That is why we build.
 
 ---
 
-## THE DREAM
+## THE THREE-WAY INTELLIGENCE
 
-Consistent compounding.
-Rare massive spikes.
-A machine that learns.
-A human who directs.
-An AI that thinks.
+Colin directs.
+Claude thinks and challenges.
+The machine executes and learns.
 
 All three getting smarter every day.
+All three honest about what they don't know.
+
+That is the architecture. The third rule is as important as the first two.
+A machine that doesn't know its cost model is wrong isn't smart —
+it's confidently wrong. A Claude that validates bad ideas to be agreeable
+is worse than no Claude at all. A Colin who overrides the gates because
+he "feels" the market is going somewhere is just a human trader again.
+
+The system only works when all three enforce the truth on each other.
+
+---
+
+## THE DREAM
+
+A system that is genuinely honest about what it knows.
+Consistent compounding from that honesty.
+Rare massive spikes when the stars align and we catch them.
+A machine that earns its own trust through verified performance.
+A human who directs with real information, not comfortable illusions.
+An AI that pushes back.
+
+All three getting more right every day.
 
 That is Alta Investments.
 That is Sovereign.
@@ -271,6 +372,7 @@ That is the mission.
 ---
 
 _Alta Investments — Sovereign Trading Intelligence_
-_CLAUDE.md — Agent Operating Protocol v1.0_
-_"The winners take care of themselves.
-Our job is to not hit losers."_
+_GOALS.md — v2.0 — Updated 2026-07-28_
+_"The winners take care of themselves._
+_Our job is to not hit losers —_
+_and to know, with real confidence, which is which."_
