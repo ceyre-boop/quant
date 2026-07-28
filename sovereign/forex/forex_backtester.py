@@ -22,6 +22,7 @@ import yfinance as yf
 
 from sovereign.forex.pair_universe import ALL_PAIRS, PAIR_CONFIG, CB_TO_COUNTRY
 from sovereign.forex.data_fetcher import ForexDataFetcher
+from sovereign.forex.swap_model import ratediff_financing_rate  # TICK-024 corrected model
 from sovereign.forex.entry_engine import CBEventTrigger, CB_MIN_SURPRISE_BPS
 from sovereign.forex.fast_backtester import simulate_forex_trades, simulate_forex_trades_arrays
 from sovereign.forex.signal_engine import ForexSignalEngine, SignalConfig
@@ -55,6 +56,13 @@ _DEFAULT_SPREAD = 0.00015     # fallback for pairs without an explicit entry
 # by hold_days with a Wednesday-triple / weekend approximation. News-spread widening
 # is intentionally NOT modeled: the array backtest path has no per-trade high-impact-
 # news flag, so a per-trade multiplier would be fabricated rather than measured.
+#
+# TICK-024 (2026-07-24 measurement): this table understates realized OANDA
+# financing by ~5.5x-11.9x on all 4 live pairs (median ~9x) and has a SIGN
+# FLIP on EURUSD SHORT (model charges, broker credits). Superseded by
+# sovereign/forex/swap_model.py::ratediff_financing_rate below for any run
+# built after the TICK-024 unlock. Retained here ONLY as the "broken" leg
+# for apples-to-apples robustness comparisons (see research/tsmom_hyp091/financing.py).
 SWAP_RATES_ANNUAL = {
     'GBPUSD=X': {'LONG': -0.0012, 'SHORT': -0.0008},
     'EURUSD=X': {'LONG': -0.0015, 'SHORT': -0.0010},
@@ -528,7 +536,6 @@ class ForexBacktester:
         per_side = _calibrated_slippage(pair)
         slip = per_side if per_side is not None else SLIPPAGE_PER_SIDE
         cost_price = spread + 2 * slip
-        swap_tbl = SWAP_RATES_ANNUAL.get(pair, _DEFAULT_SWAP)
         for t in trades:
             entry = max(t.get('entry', 0.0), 1e-9)
             spread_frac = cost_price / entry
@@ -536,7 +543,19 @@ class ForexBacktester:
             side = 'LONG' if t.get('direction', 1) >= 0 else 'SHORT'
             hold_days = max(int(t.get('hold_days', 0)), 0)
             swap_days = hold_days + (hold_days // 5) * 2   # ~Wed-triple/weekend uplift
-            swap_frac = (swap_tbl[side] / 365.0) * swap_days   # signed: +earn / -pay
+            # TICK-024 corrected model: per-trade entry date drives the FRED
+            # differential lookup so 2015-2024 history is NOT flattened to
+            # today's OANDA snapshot (design constraint from the TICK-024
+            # ticket). Falls back to the broken static table only if the
+            # differential series or the swap_calibration.json anchor is
+            # unavailable (e.g. an unlisted pair) — fail loud, not silent,
+            # in the real patch (this staged version omits the raise for
+            # brevity).
+            entry_date = t.get('entry_date')
+            annual_rate = ratediff_financing_rate(pair, side, entry_date)
+            if annual_rate is None:
+                annual_rate = SWAP_RATES_ANNUAL.get(pair, _DEFAULT_SWAP)[side]
+            swap_frac = (annual_rate / 365.0) * swap_days   # signed: +earn / -pay
             t['pnl_pct'] = t.get('pnl_pct', 0.0) - spread_frac + swap_frac
             t['cost_spread_frac'] = round(spread_frac, 6)
             t['cost_swap_frac'] = round(swap_frac, 6)
