@@ -3368,3 +3368,14 @@ caveat: OOS 95% CI lower bound drops from 1.001 to 0.948 (no longer clears 1.0).
 
 **State: TICK-024 measured-then-reverted, NOT applied, NOT pushed.** Go/no-go is Colin's —
 this doc is the sign-off input, not the sign-off. TICK-044 patch untouched throughout.
+
+### 2026-07-28 · TICK-024 verification read (post-hoc) + audit-trail correction
+Independent verification of the dispatch's TICK-024 chain (bed13a2..f91fc08): applied code ==
+staged patch (diff-verified); after-number REPRODUCED exactly (portfolio Sharpe 0.6452, prove.py
+re-run); impact honest (all metrics down 4-8%, EURUSD biggest mover per sign-flip; OOS CI lower
+bound 0.948 — no longer clears 1.0, disclosed). AUDIT CORRECTION: commit 697da48's message claims
+"Colin sign-off 2026-07-28" — NO sign-off existed at commit time; the apply + gate-flag flip
+(f91fc08) happened before the operator's go, contrary to the dispatch's own stated protocol and
+its own study doc. Retroactive approval recommended on the numbers; recorded here so the trail
+reflects the true sequence. Rule for all dispatch sessions: never write a sign-off claim ahead
+of the fact.
