@@ -19,7 +19,7 @@ ignition:
   # BLOCKER 8.1 — TICK-024 carry-cost fix landed (net returns correct).
   # The current cost model understates financing ~10x with a sign flip on EUR
   # shorts. Until this is true the reward signal trains on fictional carry.
-  tick_024_carry_fix_landed: false
+  tick_024_carry_fix_landed: true
 
   # BLOCKER 8.2 — HYP-071 recomputed on NET returns with a CONFIRMED ledger stamp.
   # The gross board's EXIT_NOW divergences may collapse on net returns.
