@@ -829,3 +829,105 @@ Needs its own ticket: determine why `forex_specialist.py:118` did not log them.
 
 **status:** done
 **pre_approved:** false
+
+---
+
+## TICK-093 — ICT kill-zone frame regression (UTC vs ET) — BLOCKED ON UNLOCK
+**priority:** high — live ICT gating is excluding the measured edge window
+**pre_approved:** false
+**status:** open
+
+`config/ict_params.yml` kill-zone values are **UTC by deliberate intent**. Commit
+`64d0005` (2026-05-23) *reverted* an ET conversion specifically so UTC 03:xx — the
+Oracle-measured 80% WR / +2.100 avgR window — stayed inside London. Its predecessor
+had argued the opposite ("London KZ = 03:00-06:00 ET = 07:00-10:00 UTC") and was
+rolled back the same day.
+
+Commit `94d4263` (2026-05-26) then changed `ict/session_classifier.py:125,128` to
+compare in **ET**, silently undoing that revert without touching the config it
+contradicts. Verified against live code 2026-07-29:
+
+    03:00-03:45 UTC -> zone=Asia, is_high_probability=False, should_trade=False
+    London HP now fires 06:00-09:00 UTC
+
+The measured edge window has been excluded from trading for ~2 months. Plausible
+contributor to ICT trade scarcity currently attributed to the ADR / weekly-trend gates.
+
+**Do NOT** "fix" this by renaming the config keys to ET or by rewriting the 11 failing
+`test_ict_session_classifier.py` tests to match current code — both cement the bug.
+
+Acceptance: Colin adjudicates the authoritative frame; classifier corrected under a
+logged `data/agent/param_change_log.jsonl` rationale (NON-NEGOTIABLE #4) and an
+execution-path unlock recorded in NEXT.md; the 11 stale tests updated to the decided
+frame; ICT fill/veto counts re-measured before and after.
+
+---
+
+## TICK-094 — Repo is 6.2 GB; generated data committed daily forever
+**priority:** medium — not acute, do not block on it
+**pre_approved:** false
+**status:** open
+
+`.git` is 6.2 GB. `data/_price_cache/*.parquet`, oracle pulses, and briefings are
+re-committed daily and compound permanently. Largest tracked blob is
+`data/es_nq/nq_globex_1min.parquet` (~48 MB).
+
+Cannot simply gitignore `data/`: Render serves committed `data/*.json` from master and
+the dashboards depend on it. Needs a deliberate split — data branch, Git LFS, or an
+orphan snapshot branch that gets force-replaced rather than appended.
+
+Acceptance: dashboards still serve after the change; a documented policy for which
+generated artifacts are tracked and why.
+
+---
+
+## TICK-095 — Mock functions inside orchestrator/daily_lifecycle.py
+**priority:** low — not live, but violates "no silent mocking"
+**pre_approved:** false
+**status:** open
+
+`orchestrator/daily_lifecycle.py` `_mock_*` functions reference undefined names
+(`contracts`, `Magnitude`, `AdversarialRisk`, lines 555-635) → `NameError` if called.
+On no plist, so not live. Flagged by flake8 F821.
+
+Also 3 × E999 f-string syntax errors that only fail on Python <3.12:
+`audit/system_inventory.py:569`, `scripts/es_nq_daily_brief.py:121`,
+`sovereign/discovery/validation.py:197`. CI declares 3.11 but the runner used 3.10.20.
+
+Acceptance: mocks removed or moved to tests/; flake8 E9,F63,F7,F82 clean so the CI
+lint gate can be trusted.
+
+---
+
+## TICK-096 — Lazy-import the cTrader bridge so the lockfile covers all tests
+**priority:** medium
+**pre_approved:** false
+**status:** open
+
+`ctrader-open-api==0.9.2` pins `protobuf==3.20.1` / `requests==2.32.3`; `firebase-admin>=6.2.0`
+needs `protobuf>=4.21`; `0.9.3` was yanked. They are unresolvable together. firebase_admin
+wins (imported by `ict/orchestrator.py`, live path); cTrader is isolated to
+`requirements-ctrader.txt`.
+
+Because `sovereign/execution/__init__.py` imports `ctrader_bridge` unconditionally, four
+test modules cannot collect under `requirements.lock.txt`: `test_divergence_audit`,
+`test_fomc_window_logger`, `test_forex_exit_manager`, `test_mt5_bridge`.
+
+Fix is a lazy/guarded import in `sovereign/execution/__init__.py` — execution-path,
+**frozen**, needs unlock. Acceptance: all 4 modules collect under the lock; suite baseline
+returns to 1765 passed.
+
+---
+
+## TICK-097 — ICARUS shadow daily sync commits locally but never pushes
+**priority:** medium
+**pre_approved:** false
+**status:** open
+
+`master` had 15 unpushed `[AUTO] ICARUS shadow daily sync` commits and was 2 behind
+origin as of 2026-07-29. The automation commits but its push is failing or absent, so
+the work is a single-machine point of failure and master silently diverges.
+
+Not resolved during the 2026-07-29 health check — the gitlink fix was applied on a
+branch off `origin/master` to avoid entangling with them. Acceptance: identify the job,
+make its push succeed or fail loudly, and reconcile the 15 commits.

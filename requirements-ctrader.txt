@@ -1,0 +1,14 @@
+# cTrader bridge — OPTIONAL, INSTALL IN A SEPARATE ENVIRONMENT.
+#
+# ctrader-open-api cannot coexist with firebase-admin in one resolved environment:
+#   ctrader-open-api==0.9.2 pins protobuf==3.20.1 and requests==2.32.3
+#   firebase-admin>=6.2.0   requires protobuf>=4.21
+#   ctrader-open-api==0.9.3 was yanked from PyPI
+#
+# Installing this on top of requirements.lock.txt will silently downgrade protobuf
+# and break firebase_admin, which ict/orchestrator.py imports on the live path.
+# Do not do that. Use a dedicated venv for any cTrader work.
+#
+# Only sovereign/execution/ctrader_bridge.py imports this. It is on no plist.
+
+ctrader-open-api==0.9.2

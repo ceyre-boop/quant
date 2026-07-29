@@ -3575,3 +3575,79 @@ forex data-fetcher/entry-engine/signal-engine and data-pipeline calendar mocks.
 2. Ticket the ICT kill-zone frame question (config says UTC, code compares ET).
 3. Pin dependencies + add a lockfile.
 4. Reconcile the 21-failure baseline, then drop `|| true` from the CI pytest step.
+
+---
+
+## 2026-07-29 (cont.) — ICT timezone audit + baseline correction + dependency lock
+
+### 1. ICT timezone audit — ANSWERED: the measurement was keyed on UTC
+Colin asked whether "Oracle confirmed: UTC 03:xx = WR 80%" was measured on UTC or ET
+session boundaries. Evidence is explicit, not inferred:
+
+- `64d0005` (2026-05-23) is a **revert**: "revert kill_zone times — London 02:00-05:00
+  matches confirmed UTC 03:xx edge". Its predecessor had converted the windows to
+  `07:00-10:00 UTC`, reasoning "London KZ = 03:00-06:00 ET = 07:00-10:00 UTC; was
+  incorrectly set to UTC 02:00-05:00 (= 10pm-1am ET, Asian session)". That was rolled
+  back the same day, on the grounds the edge lives at UTC 03:xx.
+- `94d4263` (2026-05-26) then changed the classifier to compare in **ET**, silently
+  undoing the revert without touching the config it contradicts.
+
+**This corrects the previous entry.** I earlier wrote that the values were canonical ICT
+ET windows and the code was "almost certainly right" — that was inference from the
+numbers alone, and the commit history contradicts it. **The classifier change is a real
+regression.** Verified against live code:
+
+    03:00-03:45 UTC -> zone=Asia, is_high_probability=False, should_trade=False
+    London HP now fires 06:00-09:00 UTC
+
+The measured edge window has been excluded from trading since 2026-05-26 (~2 months).
+The config rename is **not** safe — renaming keys to ET would cement the bug. Fix the
+classifier. Filed **TICK-093**; execution-path frozen, needs Colin's unlock.
+
+### 2. Environment — no working interpreter existed
+Found while pinning deps, and it invalidates the earlier baseline:
+- `.venv/` is **Python 3.9.6** and cannot run this codebase (`execute_daily.py:116` uses
+  `float | None`, needs 3.10+). It was never activated; all earlier runs silently used
+  system python.
+- System `python3` is **3.14.4** and runs the code but is **missing 9 of 26 declared
+  dependencies** (numba, torch, shap, structlog, tenacity, pytest-cov, pytest-asyncio,
+  freezegun, responses).
+
+So the "21 failed" figure in the previous entry was measured in an incomplete env.
+
+### 3. Corrected baseline: 19 failed / 1679 passed / 16 skipped
+Measured on Python 3.13 + `requirements.lock.txt`. 1679 not 1765 because 4 modules can't
+collect without ctrader-open-api (below); on an env that has it, 19 failed / 1765 passed.
+Two of the earlier 21 (`test_forex_data_fetcher` fallback ×2) were env artifacts.
+CLAUDE.md updated with the number, the breakdown, and the env-build command.
+
+### 4. Dependency lock shipped — `requirements.lock.txt` (107 pins)
+Generated with `uv pip compile --python-version 3.13`, then **verified by building a
+fresh venv from it and running the suite**. Also found 3 undeclared runtime imports
+(`duckdb`, `twisted`, `ctrader_open_api`) that requirements.txt never listed.
+
+**Unresolvable conflict found and resolved by exclusion:** `ctrader-open-api==0.9.2` pins
+`protobuf==3.20.1`/`requests==2.32.3`; `firebase-admin>=6.2.0` needs `protobuf>=4.21`;
+`0.9.3` was yanked. They cannot coexist. Earlier ad-hoc `pip install`s only appeared to
+work because they force-installed without re-resolving. firebase_admin wins — it's
+imported by `ict/orchestrator.py` on the live path — and cTrader is isolated to
+`requirements-ctrader.txt`. Cost: 4 test modules can't collect (TICK-096).
+
+**Honest limit:** the lock pins `pandas==3.0.5` / `numpy==2.4.6`, current majors. The
+recorded results (v015 Sharpe 0.6886) came from a pandas 2.x-era environment that no
+longer exists here. This buys determinism going forward; it does **not** reproduce
+historical numbers. Re-verifying recorded Sharpe against these pins is its own task.
+
+### 5. origin/master gitlink removed — scheduled workflows unblocked
+Pushed `8601c58..f51dd89`. Applied on a branch off `origin/master` to avoid entangling
+with 15 unpushed `[AUTO] ICARUS shadow daily sync` commits on local master (TICK-097).
+
+### Tickets filed
+TICK-093 (ICT frame regression, high), TICK-094 (6.2 GB repo), TICK-095 (mocks in
+orchestrator + flake8), TICK-096 (lazy cTrader import), TICK-097 (ICARUS never pushes).
+
+### Refused to shortcut
+- Did not touch `ict/session_classifier.py` or any execution-path file.
+- Did not rewrite the 11 stale classifier tests to match code — the code is what's wrong.
+- Did not claim a recollection of the Oracle measurement's frame when asked; went and
+  read the commit history instead.

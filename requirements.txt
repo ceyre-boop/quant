@@ -18,6 +18,21 @@ websocket-client>=1.6.0
 requests>=2.31.0
 yfinance>=0.2.0
 
+# Broker / execution bridges
+# ctrader-open-api is DELIBERATELY NOT LISTED HERE — it is unresolvable against
+# firebase-admin: ctrader-open-api==0.9.2 pins protobuf==3.20.1 and requests==2.32.3,
+# while firebase-admin>=6.2.0 requires protobuf>=4.21; version 0.9.3 was yanked.
+# firebase_admin wins because ict/orchestrator.py (live path) imports it, whereas
+# ctrader_open_api is imported only by sovereign/execution/ctrader_bridge.py, which
+# is on no plist. Install it separately (in its own env) via requirements-ctrader.txt
+# if you need the cTrader bridge. Consequence: tests/test_mt5_bridge.py cannot
+# collect in the locked env, because sovereign/execution/__init__.py imports the
+# bridge unconditionally. Fix is to make that import lazy — see tickets/backlog.md.
+
+# Storage
+# duckdb backs sovereign/sentiment/store.py; imported at package import time.
+duckdb>=0.10.0
+
 # Firebase
 firebase-admin>=6.2.0
 

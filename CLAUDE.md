@@ -113,11 +113,45 @@ cross-project rollup — update it after substantive sessions, not every turn.
 ## TEST COMMANDS
 
 ```bash
+# ENVIRONMENT FIRST — this repo has no single working interpreter by default.
+#   .venv/ is Python 3.9.6 and CANNOT run this codebase (execute_daily.py:116 uses
+#     `float | None`, which needs 3.10+). Do not use it.
+#   System python3 (3.14) runs the code but is missing 9 declared dependencies.
+# Build a correct env from the lockfile before trusting any test result:
+#   uv venv --python 3.13 .venv313 && \
+#     uv pip install --python .venv313/bin/python -r requirements.lock.txt
+#
+# FULL-SUITE BASELINE (measured 2026-07-29, Python 3.13 + requirements.lock.txt):
+#   19 failed / 1679 passed / 16 skipped
+# (1679 not 1765 because 4 modules can't collect without ctrader-open-api — see
+# requirements.lock.txt header. On an env that HAS ctrader: 19 failed / 1765 passed.)
+# An earlier reading of "21 failed" came from the incomplete system-3.14 env; 2 of
+# those were environment artifacts, not real. 19 is the number.
+# Do NOT treat a green suite as the target and do NOT absorb these into your own
+# result. 15 of the 19 were unrecorded before 2026-07-29. Breakdown:
+#   - 11 × tests/unit/test_ict_session_classifier.py — STALE TESTS. Commit 94d4263
+#     changed classify() to compare in ET; the tests still assume the pre-fix UTC
+#     reading. Do NOT "fix" these by rewriting them to match the code — see the
+#     kill-zone frame regression below; the code is what's wrong.
+#   - 4 × test_ict_pipeline (TestScoreAndGrade ×2, TestRiskEngineGate ×2) —
+#     pre-existing, tracked in plans/restoration-ledger.md.
+#   - 4 × forex entry-engine / signal-engine / macro-engine (IndexError),
+#     test_data_pipeline calendar mock, and test_trading_env net-cost guard
+#     (DID NOT RAISE GrossReturnError). Not yet root-caused.
+#
+# OPEN REGRESSION (needs unlock before anyone touches it): config/ict_params.yml
+# kill-zone values are UTC by deliberate intent — commit 64d0005 reverted an
+# ET-conversion specifically to keep UTC 03:xx (the Oracle-measured 80% WR edge)
+# inside the London window. Commit 94d4263 then made the classifier compare in ET,
+# silently undoing that revert. UTC 03:xx now classifies as Asia, is_high_probability
+# False, should_trade False — the measured edge window is excluded from trading.
+# Renaming the config keys to ET would cement the bug. Fix the classifier, not the config.
+
 python3 -m pytest tests/ -q                  # full suite
 python3 -m pytest tests/ -k "not sklearn"    # skip missing-dependency tests
 python3 -m pytest tests/unit/test_*.py -v    # unit tests only
 
-# ICT pipeline suite. BASELINE (re-verified 2026-07-21): `tests/ -k "ict and pipeline"`
+# ICT pipeline subset. BASELINE (re-verified 2026-07-21): `tests/ -k "ict and pipeline"`
 # is 4 failed / 23 passed — the old "must stay 21/21" was stale and made every session
 # think it had broken something. Do NOT treat 21/21 as the target. The 4 pre-existing
 # failures (test_ict_pipeline TestScoreAndGrade ×2, TestRiskEngineGate ×2) are tracked in
