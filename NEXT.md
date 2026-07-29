@@ -3491,3 +3491,87 @@ the roadmap's "Oracle compounds in 30–60 days" claim is unsupported at this sa
   `forex_specialist.py:118` not log them?
 - Pre-existing, NOT mine: `tests/unit/test_decision_logging.py::test_oanda_fill_in_later_hour_still_closes_decision`
   fails on unmodified code (verified by stashing). ICT pipeline baseline remains 4F/23P.
+
+---
+
+## 2026-07-29 — Repo health check + CI restoration (INFRA, no execution-path changes)
+
+Two pushes on `sovereign-v2`: `00640b3` (backlog commit) and `4805acd` (CI fixes).
+Both confirmed pushed; `rev-list --left-right --count` = 0/0 against origin.
+
+### What shipped
+1. **`00640b3`** — committed ~3 weeks of uncommitted work that existed only on this machine:
+   petrules gate (`petrules_gate_scanner.py` + 4 gate modules + test + spec), alexandria health
+   check, 4 launchd plists, 14 research/review docs, 6 skills. Excluded generated data churn,
+   `audit/reports/`, dashboards, `.env.bak`, and `.skill` zip bundles.
+2. **`4805acd`** — CI restoration, see below.
+
+### Root cause: CI has been 100% failing on every scheduled run
+A stray gitlink `quant` (mode 160000) was committed with **no `.gitmodules`** — the repo was once
+nested inside itself. Every Actions checkout cleanup died with
+`fatal: No url found for submodule path 'quant'`. Removed from the index (no working-tree dir
+existed). **Still present on `origin/master`** — needs the same fix there; master is what the
+dashboard deploy and all scheduled workflows run from.
+
+### Two further CI defects fixed
+- CI triggered on `master`/`develop` only. **`sovereign-v2` — the live branch — has never run in
+  CI.** Added to push + PR triggers. First-ever run: `30411020107`.
+- The pytest step ended in `|| true`, so tests could never fail the build. CI reported green
+  while 21 tests failed locally. Added a **blocking** step for the isolation test
+  (NON-NEGOTIABLE #1, currently passing). Full suite left non-blocking with a TODO until the
+  baseline is cleared — flipping it now paints CI red without adding signal.
+
+### Test baseline is worse than CLAUDE.md records
+`pytest tests/ -q` → **21 failed / 1763 passed / 16 skipped** (Python 3.14.4).
+CLAUDE.md documents only the 4 known ICT-pipeline failures. The other 17 are unrecorded.
+
+**Largest cluster (11) = `tests/unit/test_ict_session_classifier.py` — STALE TESTS, not a live bug.**
+Commit `94d4263` ("session classifier ET/UTC bug") changed `classify()` to compare in **ET**
+(`ict/session_classifier.py:125,128`). The tests still assume the pre-fix UTC interpretation, so
+`_utc(2,30)` expects `London` and now gets `Asia`. Verified directly: window table loads
+correctly (London 02:00–05:00) and `utc_time` is correct; only the ET conversion moved.
+
+**Unresolved and worth a ticket — do not let this sit:** `config/ict_params.yml` labels these
+keys `start_utc`/`end_utc` and comments "Kill Zone windows in UTC hours", while the classifier
+compares them as ET. The *values* (02:00–05:00, 07:00–10:00, 13:30–16:00) are the canonical ICT
+**ET** kill zones, so the code is almost certainly right and the config naming is wrong. But the
+same config records "Oracle confirmed (2026-05-22): UTC 03:xx = WR 80% — the edge lives here." If
+that Oracle measurement was in true UTC, the live gate has moved ~4–5h away from where the edge
+was measured. **I did not rewrite the tests to match the code** — doing so is exactly how a real
+bug gets cemented. Needs Colin to adjudicate which frame is authoritative.
+
+Other failures (not investigated in depth): `test_net_cost_guard_refuses_when_gate_closed`
+(DID NOT RAISE `GrossReturnError`), `test_scan_all_pairs_returns_top3` (IndexError), plus
+forex data-fetcher/entry-engine/signal-engine and data-pipeline calendar mocks.
+
+### Other findings — reported, not actioned
+- **`.git` is 6.2 GB.** Generated data (daily `data/_price_cache/*.parquet` churn, oracle pulses,
+  briefings) is committed every day and compounds forever. Cannot simply gitignore: per prior
+  finding, Render serves committed `data/*.json` from master — the dashboard depends on it.
+  Needs a deliberate split (data branch / LFS / orphan snapshot branch), not a quick fix.
+- **23 flake8 E9/F63/F7/F82 errors.** Most F821s are false positives (string annotations —
+  `forex_live_scan.py:56`, `train_core.py:133`, `research/modern/_lib.py:107` are all fine).
+  **Real ones:** `orchestrator/daily_lifecycle.py` `_mock_*` functions reference undefined
+  `contracts`, `Magnitude`, `AdversarialRisk` (lines 555–635) → `NameError` if ever called.
+  Not on any plist, so not live — but note these are mocks living in an orchestrator module,
+  which sits badly against the "no silent mocking" constraint. 3 × E999 f-string syntax errors
+  are Python-3.10-only (`audit/system_inventory.py:569`, `scripts/es_nq_daily_brief.py:121`,
+  `sovereign/discovery/validation.py:197`); CI declares 3.11 but the runner used 3.10.20.
+- **No dependency pinning** — 27 of 45 requirements use `>=`, no lockfile, no `pyproject.toml`.
+  For a system whose backtests must be reproducible, an unpinned `numpy`/`pandas`/`xgboost` means
+  a rebuilt environment can silently change results. This is the highest-value remaining gap.
+- **No pre-commit hooks.** `.git/hooks/post-commit` existed but was non-executable (fixed).
+- Untracked `.env.bak.1784579534` on disk — now gitignored (`.env.bak*`), **not deleted**; check
+  it for live credentials and remove it yourself. No `.env` was ever committed (history verified).
+- `ziBYLWaJ` is a byte-identical copy of `give-me-the-numbers.skill`; safe to delete.
+
+### Refused to shortcut
+- Did not touch `ict/session_classifier.py` or any execution-path file (shadow/execution freeze).
+- Did not rewrite the 11 stale tests to match current code without adjudication (see above).
+- Did not gitignore `data/` to shrink the repo — would have broken the Render dashboard.
+
+### Next
+1. Apply the gitlink removal to `master` (unblocks all scheduled workflows).
+2. Ticket the ICT kill-zone frame question (config says UTC, code compares ET).
+3. Pin dependencies + add a lockfile.
+4. Reconcile the 21-failure baseline, then drop `|| true` from the CI pytest step.
