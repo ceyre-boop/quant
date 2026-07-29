@@ -3651,3 +3651,56 @@ orchestrator + flake8), TICK-096 (lazy cTrader import), TICK-097 (ICARUS never p
 - Did not rewrite the 11 stale classifier tests to match code — the code is what's wrong.
 - Did not claim a recollection of the Oracle measurement's frame when asked; went and
   read the commit history instead.
+
+---
+
+## 2026-07-29 (close) — TICK-097 root-caused and fixed; TICK-098 filed
+
+### ICARUS push failure — root cause found, code fixed, reconcile blocked
+Not a mystery: `logs/daily_digest.log` records it plainly from shadow day 6 onward.
+
+    [icarus-sync] master push: To https://github.com/ceyre-boop/quant.git
+     ! [rejected]        master -> master (non-fast-forward)
+
+Local master diverged when dashboard commits landed on `origin/master` that the standing
+worktree never pulled. `push_master()` in `scripts/icarus_dashboard_sync.py` printed the
+rejection as ordinary stdout and returned normally — so **launchd recorded success every
+single day** while 15 commits piled up on one machine. The job was not broken in a way
+anything could see; that is the actual defect.
+
+**Fixed in code:** fetch + `reset --soft origin/master` before committing (safe precisely
+because the two files are regenerated snapshots and cannot conflict), guarded to refuse and
+exit non-zero if any non-`[AUTO] ICARUS` commit is present so a human commit is never
+silently discarded, and `sys.exit(1)` on push failure so launchd registers it. Syntax and
+ordering verified.
+
+**Blocked:** the reconcile commit and push were denied twice by the permission classifier.
+I stopped rather than working around it. Final snapshot state is **staged and waiting** on
+branch `icarus-reconcile` in `/Users/taboost/quant-master-wt`, applied on top of
+origin/master, data-only, 2 files. Operator commands are in `tickets/backlog.md` under the
+TICK-097 addendum. Until someone runs them, those 15 days of shadow snapshots remain
+single-machine.
+
+Rebasing the 15 was attempted first and conflicts on every commit — they are successive
+rewrites of the same two JSON files. Squashing to final state is the correct resolution;
+their history carries no information.
+
+### TICK-098 filed — pandas 3.x re-verification of the canonical Sharpe
+The lock pins pandas 3.0.5 / numpy 2.4.6. The recorded v015 numbers (1.25 OOS, 0.6886
+full-decade) came from a pandas 2.x environment that no longer exists here. pandas 3.0
+changed default dtypes, groupby/resample edges and NaN handling — enough to move a Sharpe
+with no strategy change. Acceptance requires comparing against the recorded values and
+recording which is authoritative **before** any work consumes the new numbers. Explicitly
+not a silent re-baseline.
+
+### Still on Colin, not me
+1. **`.env.bak.1784579534`** — gitignored, never inspected, never deleted. I do not read
+   credential files. Check and remove it.
+2. **TICK-093 unlock** — every day the ICT classifier gates on ET, the UTC 03:xx window the
+   edge was measured in stays excluded. ~2 months and counting.
+3. **TICK-097 operator commands** — above.
+
+### Scope note
+Deliberately did not audit live execution correctness, data freshness, Oracle state, or the
+paper-trading loop this session. Those are unexamined, not verified-healthy — do not read
+this session's green infrastructure signals as covering them.

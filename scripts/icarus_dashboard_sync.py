@@ -90,13 +90,45 @@ def push_master():
     def g(*args):
         return subprocess.run(["git", "-C", str(MASTER_WT), *args],
                               capture_output=True, text=True)
+
+    # Realign onto origin/master BEFORE committing.
+    #
+    # Why: this worktree only ever regenerates the two snapshot files below. When
+    # a dashboard commit lands on origin/master that this worktree never pulled,
+    # every subsequent push is rejected non-fast-forward. That happened silently
+    # from shadow day 6 and stranded 15 commits on one machine (TICK-097).
+    #
+    # Because the files are regenerated snapshots, divergent [AUTO] history carries
+    # no information — only the newest content does. `reset --soft` moves the branch
+    # onto origin/master while keeping the freshly-written files, which can never
+    # conflict. Guarded: bail out rather than discard anything that is not our own
+    # [AUTO] commit, so a human commit in this worktree is never silently dropped.
+    g("fetch", "origin", "master")
+    divergent = g("log", "--format=%s", "origin/master..HEAD").stdout.split("\n")
+    divergent = [s for s in divergent if s.strip()]
+    foreign = [s for s in divergent if not s.startswith("[AUTO] ICARUS")]
+    if foreign:
+        print("[icarus-sync] master worktree holds non-[AUTO] commits; refusing to "
+              f"realign. Reconcile by hand: {foreign[:3]}", file=sys.stderr)
+        sys.exit(1)
+    if divergent:
+        print(f"[icarus-sync] realigning onto origin/master, "
+              f"folding {len(divergent)} stale [AUTO] commit(s)")
+        g("reset", "--soft", "origin/master")
+
     g("add", "data/icarus_status.json", "data/oracle/daily_digest.json")
     r = g("commit", "-m", "[AUTO] ICARUS shadow daily sync", "--no-verify")
     if "nothing to commit" in (r.stdout + r.stderr):
         print("[icarus-sync] master: no change")
         return
     p = g("push", "origin", "master")
-    print(f"[icarus-sync] master push: {'ok' if p.returncode == 0 else p.stderr[:120]}")
+    if p.returncode != 0:
+        # Must exit non-zero: printing the rejection as ordinary output is what let
+        # this fail unnoticed for weeks while launchd recorded success every day.
+        print(f"[icarus-sync] master push FAILED: {p.stderr.strip()[:300]}",
+              file=sys.stderr)
+        sys.exit(1)
+    print("[icarus-sync] master push: ok")
 
 
 if __name__ == "__main__":

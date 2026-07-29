@@ -931,3 +931,58 @@ the work is a single-machine point of failure and master silently diverges.
 Not resolved during the 2026-07-29 health check — the gitlink fix was applied on a
 branch off `origin/master` to avoid entangling with them. Acceptance: identify the job,
 make its push succeed or fail loudly, and reconcile the 15 commits.
+
+---
+
+## TICK-098 — Re-verify canonical v015 Sharpe under pandas 3.x pins
+**priority:** medium — not urgent, but it is a caveat on the canonical anchor
+**pre_approved:** false
+**status:** open
+
+`requirements.lock.txt` pins `pandas==3.0.5` / `numpy==2.4.6`. The canonical v015 numbers
+(OOS costed Sharpe 1.25, full-decade 0.6886, HYP-045 CI [0.84, 1.32]) were produced in a
+pandas 2.x-era environment that no longer exists on this machine — `.venv/` (3.9.6) cannot
+run the codebase and system 3.14 was missing 9 declared deps.
+
+The lock buys determinism going forward. It does **not** establish that the recorded numbers
+reproduce under it. pandas 3.0 changed default dtypes, groupby/resample edge behaviour, and
+NaN handling — any of which can move a Sharpe without any strategy change.
+
+Acceptance: run `scripts/holdout_validation_v014.py` and the v015 backtest under
+`requirements.lock.txt`; compare against the recorded 0.6886 / 1.25. If they differ,
+record which is authoritative and why in NEXT.md and `plans/restoration-ledger.md` **before**
+any parameter or model work uses the new numbers. Do not silently re-baseline.
+
+---
+
+## TICK-097 addendum — operator commands (persistence denied 2026-07-29)
+
+Root cause confirmed from `logs/daily_digest.log`:
+
+    [icarus-sync] master push: To https://github.com/ceyre-boop/quant.git
+     ! [rejected]        master -> master (non-fast-forward)
+
+`push_master()` printed that as ordinary stdout and returned normally, so launchd recorded
+success every day. Local master diverged when dashboard commits landed on origin/master that
+the standing worktree never pulled. Failing since shadow day 6.
+
+**Code fix applied** (`scripts/icarus_dashboard_sync.py`): fetch + `reset --soft origin/master`
+before committing — safe because the two files are regenerated snapshots and can never
+conflict — guarded to refuse if any non-`[AUTO] ICARUS` commit is present, and `sys.exit(1)`
+on push failure so launchd registers it.
+
+**Still needs an operator** — the reconcile commit/push was blocked by the permission
+classifier. State is staged and waiting on branch `icarus-reconcile` in
+`/Users/taboost/quant-master-wt` (final snapshot content already applied on top of
+origin/master, data-only, 2 files):
+
+```bash
+cd /Users/taboost/quant-master-wt
+git status --short                      # expect: M data/icarus_status.json, M data/oracle/daily_digest.json
+git commit -m "[AUTO] ICARUS shadow sync — squash 15 stuck daily snapshots"
+git push origin icarus-reconcile:master
+git checkout master && git reset --hard origin/master   # drop the 15 stranded commits
+```
+
+The 15 stranded commits are successive snapshots of the same two files; their history carries
+no information, only the final state, which is what the staged commit contains.
