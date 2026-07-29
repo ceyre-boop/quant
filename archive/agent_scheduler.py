@@ -1,3 +1,9 @@
+# RETIRED — 2026-07-20
+# This Python-based scheduler has been superseded by macOS launchd plists
+# (scripts/com.alta.*.plist). It is NOT called by any live path except
+# evening_prep.sh which triggers a TypeError at line 622.
+# Do not add features here. Remove the call from evening_prep.sh.
+# Kept in archive/ for reference only.
 """
 scripts/agent_scheduler.py
 Alta Investments — Sovereign Trading Intelligence

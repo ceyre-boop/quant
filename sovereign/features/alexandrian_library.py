@@ -1,3 +1,9 @@
+# RETIRED — 2026-07-20
+# This is the original V1.0 (372-line) copy of the Alexandrian Library.
+# The canonical implementation is sovereign/risk/alexandrian_library.py (754 lines).
+# This copy is NOT imported by any live path and diverges from the canonical version.
+# Do not add features here. Use sovereign/risk/alexandrian_library.py for all changes.
+# See build_gaps.md D5 for cleanup plan (delete this file or add an import shim).
 """
 Alexandrian Library — Historical Scenario Matching (V1.0)
 

@@ -17,3 +17,9 @@ Written by `com.alta.research_agent` (launchd) per AGENT_DIRECTIVE.md § Researc
 - New patterns flagged: none. No exploratory micro-backtest ran this cycle; the queue holds only operator-gated wiring tasks, so there is nothing new to test autonomously.
 - Candidates queued for operator review: none.
 - Notes: Movers snapshot (50 gainers) captured to `data/research/gapper/movers_recent.json` for tomorrow's scan — single top-gainers snapshot, no lookback. Extreme smallcap gapper ZYBT +1047% @ $8.01 leads; several names are warrants (RNWWW/FGIWW/IVDAW/ACHR.WS) which HYP-093/107 filters exclude. Non-warrant ≥40% gappers: ZYBT, MF, ADVB. Graveyard read clean (27 killed hyps loaded); no re-proposal of any sealed idea. Research loop healthy; RQ-REST-016 remains the one recurring queue error, awaiting operator sign-off — not a new incident.
+
+## 2026-07-21 — nightly pattern update
+- Sessions reviewed: 1 (movers snapshot only — execution.alpaca has no multi-session lookback)
+- New patterns flagged: none
+- Candidates queued for operator review: none (no pattern cleared a first-pass permutation test tonight)
+- Notes: Research queue drained 5 tasks — RQ-REST-019b/033/005/009 all OK: no-op (operator-decision items, not runnable); RQ-REST-017 (cb_decisions.json quarantine/rebuild) produced a data audit: 1201 CB decisions, 71 surprises ≥25bp (BOE 18, ECB 15, BOC/FED/RBA 10 each) — data output, not a tested pattern. Movers snapshot: 50 gainers written to data/research/gapper/movers_recent.json. Recent verdicts show repeated BLOCKED_NO_VALIDATOR on HYP-AUTO entries (2026-07-20/21) — pre-existing, noted for triage.

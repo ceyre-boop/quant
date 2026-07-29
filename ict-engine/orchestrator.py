@@ -1,3 +1,7 @@
+# RETIRED — 2026-07-20
+# This file is a remnant from before the ict-engine/ directory was renamed/moved to ict/.
+# The live orchestrator is ict/orchestrator.py.
+# This file is NOT scheduled and NOT imported by any live path.
 """
 ict-engine/orchestrator.py
 ==========================

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.alta.system_health</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/Users/taboost/quant/.venv/bin/python3</string>
+    <string>/Users/taboost/quant/scripts/health_check.py</string>
+    <string>--strict</string>
+  </array>
+
+  <!-- Hourly, 24/7. Reads all health JSON files in data/health/, prints a summary,
+       exits nonzero if any non-optional job is stale (>2 hours old). -->
+  <key>StartInterval</key>
+  <integer>3600</integer>
+
+  <key>RunAtLoad</key>
+  <true/>
+
+  <key>WorkingDirectory</key>
+  <string>/Users/taboost/quant</string>
+
+  <key>StandardOutPath</key>
+  <string>/Users/taboost/quant/logs/system_health.log</string>
+
+  <key>StandardErrorPath</key>
+  <string>/Users/taboost/quant/logs/system_health.err</string>
+
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>/Users/taboost/quant/.venv/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+  </dict>
+</dict>
+</plist>
