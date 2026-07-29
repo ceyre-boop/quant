@@ -10,13 +10,13 @@ name: CI/CD - Test and Deploy
 
 on:
   push:
-    branches: [master, develop]
+    branches: [master, develop, sovereign-v2]
     paths:
       - '**/*.py'
       - 'requirements.txt'
       - '.github/workflows/ci-cd.yml'
   pull_request:
-    branches: [master]
+    branches: [master, sovereign-v2]
     paths:
       - '**/*.py'
       - 'requirements.txt'
@@ -52,6 +52,16 @@ jobs:
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
       
+      # BLOCKING gate: CLAUDE.md NON-NEGOTIABLE #1 (ICT/sovereign isolation).
+      # This must never be softened with `|| true` — a breach here is a
+      # trading-correctness defect, not a flaky test.
+      - name: Enforce ICT/sovereign isolation (NON-NEGOTIABLE)
+        run: |
+          pytest tests/ -k test_pipeline_does_not_import_sovereign -q
+
+      # Non-blocking until the 21-failure baseline is cleared (see NEXT.md).
+      # TODO: drop `|| true` once the stale session_classifier tests are
+      # reconciled — until then this step reports but does not gate.
       - name: Run tests with pytest
         run: |
           pytest tests/ -v --cov=. --cov-report=xml --cov-report=html --ignore=scripts/ -q || true
