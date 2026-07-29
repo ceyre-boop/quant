@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-28T01:36:08.399436+00:00",
+  "generated_at": "2026-07-29T01:40:09.671603+00:00",
   "status": "DEGRADED",
   "status_reason": "portfolio:OK/REDUCE; undertow_gapper:REDUCE; ict_equities:REDUCE; carry:REDUCE",
   "strategies": {
@@ -46,13 +46,13 @@
       "process_adherence": {
         "decisions_matched_rules_pct": null,
         "status": "INSUFFICIENT_DATA",
-        "reason": "0 entered setups with determinable bias alignment < 20 needed \u2014 INSUFFICIENT_DATA. Journal has 162725 total records ({'VETOED': 157690, 'DISCARDED': 5035}); process score not fabricated from a thin sample.",
-        "n_total": 162725,
+        "reason": "0 entered setups with determinable bias alignment < 20 needed \u2014 INSUFFICIENT_DATA. Journal has 255550 total records ({'VETOED': 247803, 'DISCARDED': 7747}); process score not fabricated from a thin sample.",
+        "n_total": 255550,
         "n_entered": 0,
         "n_evaluable": 0,
         "by_action": {
-          "VETOED": 157690,
-          "DISCARDED": 5035
+          "VETOED": 247803,
+          "DISCARDED": 7747
         },
         "source": "data/agent/ict_causal_chain.jsonl"
       },
@@ -103,7 +103,7 @@
     "drawdown_breaker_tripped": null,
     "drawdown_breaker_status": "UNAVAILABLE",
     "regime_contract_status": "DEGRADED",
-    "regime_contract_age_hours": 0.371,
+    "regime_contract_age_hours": 0.003,
     "kill_switch": "REDUCE",
     "reason": "portfolio drawdown-breaker feed UNAVAILABLE (no unified position/P&L ledger); cannot confirm account safety \u2192 REDUCE (never full TRADE)",
     "sources": [

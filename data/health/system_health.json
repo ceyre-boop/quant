@@ -1,8 +1,10 @@
 {
-  "ts": "2026-07-28T01:23:27.173575+00:00",
-  "overall": "GREEN",
+  "ts": "2026-07-29T01:09:56.215206+00:00",
+  "overall": "YELLOW",
   "red": [],
-  "yellow": [],
+  "yellow": [
+    "forex_data"
+  ],
   "jobs": {
     "reddit": {
       "status": "RETIRED",
@@ -12,7 +14,7 @@
     },
     "forex_scan": {
       "path": "data/agent/forex_proximity.json",
-      "age_minutes": 539.7,
+      "age_minutes": 789.5,
       "max_age_minutes": 1440,
       "optional": false,
       "status": "OK",
@@ -20,15 +22,15 @@
     },
     "forex_data": {
       "path": "data/health/forex_data_status.json",
-      "age_minutes": 266.7,
+      "age_minutes": 1693.2,
       "max_age_minutes": 1440,
       "optional": false,
-      "status": "OK",
-      "detail": "overall=GREEN, degraded=[], fake_data=[]"
+      "status": "STALE",
+      "detail": "overall=GREEN, degraded=[], fake_data=[]; job may have stopped firing"
     },
     "api_health": {
       "path": "data/agent/health.json",
-      "age_minutes": 5.5,
+      "age_minutes": 64.0,
       "max_age_minutes": 1440,
       "optional": true,
       "status": "OK",

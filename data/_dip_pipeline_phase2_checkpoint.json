@@ -1,6 +1,6 @@
 {
   "phase": "phase2",
-  "ts": "2026-07-27T16:24:35.830056+00:00",
+  "ts": "2026-07-29T00:05:52.175410+00:00",
   "retrain": {
     "ran": false,
     "note": "skipped (pass --with-retrain to run harvest+retrain)"
@@ -8,24 +8,24 @@
   "training_gate_open": true,
   "synthesis": {
     "ok": true,
-    "synthesis_source": "ollama/qwen2.5",
-    "directional_bias": "LONG",
-    "confidence": 65
+    "synthesis_source": "deterministic_fallback",
+    "directional_bias": "NEUTRAL",
+    "confidence": 0
   },
   "hypotheses": {
-    "timestamp": "2026-07-27T16:24:35+00:00",
+    "timestamp": "2026-07-29T00:05:52+00:00",
     "generated": 5,
     "by_detector": {
       "inert_component": 2,
       "ledger_retest_gap": 3
     },
     "l1_briefing_context": {
-      "directional_bias": "LONG",
-      "confidence": 65,
+      "directional_bias": "NEUTRAL",
+      "confidence": 0,
       "regime_call": "ROTATION_WARN",
       "key_level": null,
-      "synthesis_source": "ollama/qwen2.5",
-      "generated_at": "2026-07-27T16:24:35.705924+00:00",
+      "synthesis_source": "deterministic_fallback",
+      "generated_at": "2026-07-29T00:05:52.077496+00:00",
       "verified": false,
       "role": "context_only"
     },

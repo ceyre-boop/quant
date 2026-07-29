@@ -353,6 +353,140 @@
       "status": "REJECTED",
       "p_value": 0.4976,
       "date": "2026-07-27"
+    },
+    {
+      "id": "SEED_SEED-COMBO-003",
+      "subsystem": "forex",
+      "param_delta": {
+        "research_params": {
+          "base": "carry",
+          "filter": "sign(weekly_ema_20-50) == sign(carry)"
+        }
+      },
+      "status": "REJECTED",
+      "p_value": 0.4952,
+      "date": "2026-07-28"
+    },
+    {
+      "id": "SEED_SEED-COMBO-004",
+      "subsystem": "forex",
+      "param_delta": {
+        "research_params": {
+          "base": "tsmom_3m",
+          "filter": "regime_classifier == TRENDING"
+        }
+      },
+      "status": "REJECTED",
+      "p_value": 0.51,
+      "date": "2026-07-28"
+    },
+    {
+      "id": "SEED_SEED-COMBO-008",
+      "subsystem": "forex",
+      "param_delta": {
+        "research_params": {
+          "base": "carry",
+          "filter": "abs(dxy_3m_return) < 0.05"
+        }
+      },
+      "status": "REJECTED",
+      "p_value": 0.4972,
+      "date": "2026-07-28"
+    },
+    {
+      "id": "SEED_SEED-COMBO-010",
+      "subsystem": "forex",
+      "param_delta": {
+        "research_params": {
+          "base": "all_strategies",
+          "filter": "NOT(vix > 30 OR baa_spread_spike)"
+        }
+      },
+      "status": "REJECTED",
+      "p_value": 0.4948,
+      "date": "2026-07-28"
+    },
+    {
+      "id": "FACT-00047",
+      "subsystem": "ict",
+      "param_delta": {
+        "min_score_to_trade": 5.5
+      },
+      "status": "REJECTED",
+      "p_value": null,
+      "date": "2026-07-28"
+    },
+    {
+      "id": "FACT-00050",
+      "subsystem": "ict",
+      "param_delta": {
+        "weights": {
+          "fvg_tap": 4.0
+        }
+      },
+      "status": "REJECTED",
+      "p_value": null,
+      "date": "2026-07-28"
+    },
+    {
+      "id": "FACT-00053",
+      "subsystem": "ict",
+      "param_delta": {
+        "weights": {
+          "market_structure": 1.0
+        }
+      },
+      "status": "REJECTED",
+      "p_value": null,
+      "date": "2026-07-28"
+    },
+    {
+      "id": "FACT-00054",
+      "subsystem": "ict",
+      "param_delta": {
+        "weights": {
+          "pd_alignment": 1.0
+        }
+      },
+      "status": "REJECTED",
+      "p_value": null,
+      "date": "2026-07-28"
+    },
+    {
+      "id": "FACT-00056",
+      "subsystem": "forex",
+      "param_delta": {
+        "PAIR_VIX_GATES": {
+          "EURUSD=X": 16.0
+        }
+      },
+      "status": "REJECTED",
+      "p_value": 0.5006,
+      "date": "2026-07-28"
+    },
+    {
+      "id": "FACT-00058",
+      "subsystem": "forex",
+      "param_delta": {
+        "PAIR_VIX_GATES": {
+          "GBPUSD=X": 16.0
+        }
+      },
+      "status": "REJECTED",
+      "p_value": 0.5122,
+      "date": "2026-07-28"
+    },
+    {
+      "id": "FACT-00060",
+      "subsystem": "forex",
+      "param_delta": {
+        "PAIR_VIX_GATES": {
+          "AUDUSD=X": 18.0
+        }
+      },
+      "status": "REJECTED",
+      "p_value": 0.4972,
+      "date": "2026-07-28"
     }
   ]
 }

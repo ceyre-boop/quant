@@ -1,0 +1,31 @@
+{
+  "date": "2026-07-28",
+  "direction": "NEUTRAL",
+  "confidence": 0.0,
+  "reasoning": [
+    "regime: NQ weak vs ES \u2014 rotation OUT of tech. A breadth/rotation warning; tech-led longs are suspect.",
+    "macro context present (2026-07-28)"
+  ],
+  "inputs_used": [
+    "briefing",
+    "daily_panel",
+    "fred_macro",
+    "sentiment_board"
+  ],
+  "inputs_missing": [
+    "calendar",
+    "gdelt"
+  ],
+  "context_fraction_fresh": 0.667,
+  "generated_at": "2026-07-28T12:00:03+00:00",
+  "realised": {
+    "direction": "NEUTRAL",
+    "correct": null,
+    "scored_at": "2026-07-28T20:30:03+00:00",
+    "proxy": "SPY",
+    "return": 0.002219,
+    "neutral_band": 0.0025,
+    "close": 740.73,
+    "prev_close": 739.09
+  }
+}

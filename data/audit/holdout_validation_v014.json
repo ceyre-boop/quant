@@ -1,110 +1,110 @@
 {
-  "audit_date": "2026-06-27",
+  "audit_date": "2026-07-28",
   "system_version": "v014",
   "in_sample": {
     "window": "2015-01-01 \u2192 2022-12-31",
-    "avg_sharpe": 0.5765,
+    "avg_sharpe": 0.5305,
     "n_trades": 318,
-    "sharpe_se": 0.061,
+    "sharpe_se": 0.06,
     "sharpe_ci_95": [
-      0.458,
-      0.695
+      0.413,
+      0.648
     ],
     "pairs": [
       {
         "pair": "EURUSD=X",
-        "sharpe": 0.449,
-        "win_rate": 0.481,
+        "sharpe": 0.412,
+        "win_rate": 0.468,
         "trade_count": 77,
-        "max_drawdown": -0.076,
+        "max_drawdown": -0.077,
         "trades_per_yr": 9.3
       },
       {
         "pair": "GBPUSD=X",
-        "sharpe": 0.786,
+        "sharpe": 0.732,
         "win_rate": 0.5,
         "trade_count": 82,
-        "max_drawdown": -0.05,
+        "max_drawdown": -0.052,
         "trades_per_yr": 9.9
       },
       {
         "pair": "USDJPY=X",
-        "sharpe": 0.547,
+        "sharpe": 0.493,
         "win_rate": 0.429,
         "trade_count": 77,
-        "max_drawdown": -0.049,
+        "max_drawdown": -0.051,
         "trades_per_yr": 9.3
       },
       {
         "pair": "AUDUSD=X",
-        "sharpe": 0.519,
+        "sharpe": 0.48,
         "win_rate": 0.427,
         "trade_count": 82,
-        "max_drawdown": -0.042,
+        "max_drawdown": -0.043,
         "trades_per_yr": 9.9
       }
     ]
   },
   "out_of_sample": {
     "window": "2023-01-01 \u2192 2024-12-31",
-    "avg_sharpe": 1.2504,
+    "avg_sharpe": 1.1919,
     "n_trades": 110,
-    "sharpe_se": 0.127,
+    "sharpe_se": 0.125,
     "sharpe_ci_95": [
-      1.001,
-      1.5
+      0.948,
+      1.436
     ],
     "pairs": [
       {
         "pair": "EURUSD=X",
-        "sharpe": 1.278,
-        "win_rate": 0.5,
+        "sharpe": 1.148,
+        "win_rate": 0.533,
         "trade_count": 30,
-        "max_drawdown": -0.018,
+        "max_drawdown": -0.019,
         "trades_per_yr": 14.5
       },
       {
         "pair": "GBPUSD=X",
-        "sharpe": 1.437,
-        "win_rate": 0.552,
+        "sharpe": 1.355,
+        "win_rate": 0.517,
         "trade_count": 29,
-        "max_drawdown": -0.016,
+        "max_drawdown": -0.017,
         "trades_per_yr": 14.0
       },
       {
         "pair": "USDJPY=X",
-        "sharpe": 1.497,
-        "win_rate": 0.56,
+        "sharpe": 1.512,
+        "win_rate": 0.68,
         "trade_count": 25,
         "max_drawdown": -0.023,
         "trades_per_yr": 12.1
       },
       {
         "pair": "AUDUSD=X",
-        "sharpe": 0.782,
+        "sharpe": 0.753,
         "win_rate": 0.5,
         "trade_count": 26,
-        "max_drawdown": -0.051,
+        "max_drawdown": -0.053,
         "trades_per_yr": 12.6
       }
     ]
   },
   "decay_verdict": {
-    "in_sample_sharpe": 0.5765,
-    "oos_sharpe": 1.2504,
-    "decay_ratio": 2.169,
+    "in_sample_sharpe": 0.5305,
+    "oos_sharpe": 1.1919,
+    "decay_ratio": 2.247,
     "verdict": "ROBUST",
-    "detail": "OOS is 217% of in-sample \u2014 edge holds well."
+    "detail": "OOS is 225% of in-sample \u2014 edge holds well."
   },
   "vix_gate_validation": {
     "window": "2023-01-01 \u2192 2024-12-31",
-    "avg_sharpe_v014": 1.2504,
-    "avg_sharpe_v013": 1.2504,
+    "avg_sharpe_v014": 1.1919,
+    "avg_sharpe_v013": 1.1919,
     "portfolio_delta": 0.0,
     "pairs": {
       "USDJPY=X": {
-        "v014_sharpe_vix13": 1.497,
-        "v013_sharpe_vix15": 1.497,
+        "v014_sharpe_vix13": 1.512,
+        "v013_sharpe_vix15": 1.512,
         "delta": 0.0,
         "v014_trades": 25,
         "v013_trades": 25,
@@ -122,7 +122,7 @@
   },
   "cot_lag_impact": {
     "window": "2015-01-01 \u2192 2022-12-31",
-    "in_sample_sharpe_with_cot": 0.5765,
+    "in_sample_sharpe_with_cot": 0.5305,
     "note": "COT gate halves position size when z > 1.5\u03c3 crowded. A 4-day publication lag means the COT signal fires slightly later than modeled. Expected impact: small (<0.05 Sharpe) since COT is a size modifier, not a direction gate. Full measurement requires patching COTEngine._load_or_fetch() to shift series by 4 days.",
     "estimated_lag_impact": "< -0.05 Sharpe (COT is size gate only, not direction gate)"
   }
