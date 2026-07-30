@@ -1,32 +1,27 @@
 {
-  "generated_at": "2026-07-29T01:39:58.674706+00:00",
+  "generated_at": "2026-07-30T01:37:28.457191+00:00",
   "status": "DEGRADED",
-  "status_reason": "carry:STALE; es_nq:OK; macro:OK; portfolio:UNAVAILABLE",
+  "status_reason": "carry:STALE; es_nq:STALE; macro:OK; portfolio:UNAVAILABLE",
   "strategies": {
     "carry": {
       "status": "STALE",
       "verdict": "STAND_ASIDE",
       "favorable": false,
       "size_multiplier": 0.0,
-      "reason": "forex_proximity.json 13.7h old > 12.0h freshness limit",
+      "reason": "forex_proximity.json 13.3h old > 12.0h freshness limit",
       "source": "data/agent/forex_proximity.json",
-      "source_age_hours": 13.659,
+      "source_age_hours": 13.291,
       "detail": {}
     },
     "es_nq": {
-      "status": "OK",
-      "verdict": "INFO",
+      "status": "STALE",
+      "verdict": "STAND_ASIDE",
       "favorable": false,
       "size_multiplier": 0.0,
-      "reason": "research INFO only \u2014 regime 'ROTATION_WARN'",
+      "reason": "nqes_regime.json 13.3h old > 12.0h freshness limit",
       "source": "data/research/nqes_regime.json",
-      "source_age_hours": 1.569,
-      "detail": {
-        "regime": "ROTATION_WARN",
-        "read": "NQ weak vs ES \u2014 rotation OUT of tech. A breadth/rotation warning; tech-led longs are suspect.",
-        "divergence": false,
-        "contemporaneous_corr": 0.839
-      }
+      "source_age_hours": 13.291,
+      "detail": {}
     },
     "macro": {
       "status": "OK",
@@ -35,13 +30,13 @@
       "size_multiplier": 0.0,
       "reason": "macro backdrop INFO (VIX / curve / credit) \u2014 shared input",
       "source": "data/macro/macro_snapshot.json",
-      "source_age_hours": 0.496,
+      "source_age_hours": 0.988,
       "detail": {
-        "vix": 18.21,
-        "curve_10y2y": 0.542,
-        "curve_10y3m": 0.844,
-        "credit_hyg": 79.42,
-        "dgs10": 4.604
+        "vix": 20.66,
+        "curve_10y2y": 0.536,
+        "curve_10y3m": 0.964,
+        "credit_hyg": 79.24,
+        "dgs10": 4.622
       }
     }
   },

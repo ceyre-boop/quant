@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-07-29T00:05:54.635416+00:00",
+  "generated_at": "2026-07-30T00:38:07.816876+00:00",
   "alive": true,
   "fired_today": false,
   "frozen": null,
-  "scan_age_hours": 12.1,
+  "scan_age_hours": 12.3,
   "n_pairs_scanned": 4,
   "n_would_fire_today": 0,
   "strongest_signal": {
@@ -24,28 +24,28 @@
       "rate_differential": 3.489
     },
     {
-      "pair": "GBPUSD=X",
-      "conviction": 0.387,
-      "direction": "NO_TRADE",
-      "pct_to_trigger": 100.0,
-      "regime": "TRENDING",
-      "rate_differential": -0.6
-    },
-    {
       "pair": "AUDUSD=X",
-      "conviction": 0.117,
+      "conviction": 0.359,
       "direction": "NO_TRADE",
       "pct_to_trigger": 100.0,
       "regime": "TRENDING",
       "rate_differential": 0.13
     },
     {
-      "pair": "EURUSD=X",
-      "conviction": 0.078,
+      "pair": "GBPUSD=X",
+      "conviction": 0.267,
       "direction": "NO_TRADE",
-      "pct_to_trigger": 78.0,
+      "pct_to_trigger": 100.0,
       "regime": "TRENDING",
-      "rate_differential": -2.08
+      "rate_differential": -0.6
+    },
+    {
+      "pair": "EURUSD=X",
+      "conviction": 0.021,
+      "direction": "NO_TRADE",
+      "pct_to_trigger": 21.0,
+      "regime": "TRENDING",
+      "rate_differential": -1.83
     }
   ],
   "last_fill": {
@@ -53,10 +53,10 @@
     "direction": "SHORT",
     "fill_price": 161.323,
     "date": "2026-07-03",
-    "days_ago": 25.3
+    "days_ago": 26.3
   },
   "loops_alive": 7,
   "loops_down": [],
-  "summary_line": "System alive. 4 pairs scanned 12.1h ago \u2014 all NO_TRADE (edge not firing \u2014 correct, not broken). Highest conviction: USDJPY=X 0.439. Last fill: USD_JPY SHORT, 25.3d ago.",
+  "summary_line": "System alive. 4 pairs scanned 12.3h ago \u2014 all NO_TRADE (edge not firing \u2014 correct, not broken). Highest conviction: USDJPY=X 0.439. Last fill: USD_JPY SHORT, 26.3d ago.",
   "note": "Honest proof-of-life: would-be signals + proximity, never a forced trade. Read-only."
 }
