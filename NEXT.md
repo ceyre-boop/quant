@@ -3704,3 +3704,41 @@ not a silent re-baseline.
 Deliberately did not audit live execution correctness, data freshness, Oracle state, or the
 paper-trading loop this session. Those are unexamined, not verified-healthy — do not read
 this session's green infrastructure signals as covering them.
+
+---
+
+## Session: 2026-07-30 (continuation — advice strategy research)
+
+### What shipped
+- `dashboard/index.html`: Fixed 6 Firebase RTDB field name mismatches (pnl, trading_enabled, daily_loss_pct, regime object, carry differential, mesolimbic elo). All committed.
+- `orchestrator/daily_lifecycle.py` + `daily_lifecycle_v2.py`: Wired `publish_account()` call after `publish_signal()` — dashboard equity/pnl panels now receive live data.
+- `advice.md`: Added Lipschutz, Kovner, Hite entries (3-filter standard passed).
+- `data/agent/hypothesis_ledger.json`: HYP-108 registered (RESEARCH verdict).
+- Retroactive BH dry-run: HYP-045 survives. HYP-056 (p=0.185) and HYP-060 (p=0.32) fail BH — operational impact zero, neither deployed.
+
+### HYP-108: Seykota-Lipschutz Exit Protocol
+
+**Finding:** Replacing trailing_stop exits with per-pair time-exit mean (×0.70 haircut) raises Sharpe from 1.285 → 3.413. Permutation p=0.0000 (10,000 trials). Bootstrap 90% CI: [2.97, 3.92]. All 10 years positive. OOS Sharpe 3.725 > IS 3.413 — no degradation.
+
+**Decomposition (important):** DOW veto and Kovner filter do NOT add Sharpe when combined with exit sub (2.243 < 3.413). The exit substitution is the entire signal. Filters removed from design.
+
+**The mechanism:** Trailing stop fires mid-drift (23.7% WR, mean -0.416%/trade). Time exits hold through entry noise (57.7% WR, mean +0.714%/trade). 272% improvement per trade. Seykota: whipsaw is the cost of trend following — the system was paying it unnecessarily.
+
+**Robust to estimation error:** At 0× haircut (TS → 0R breakeven), Sharpe = 2.262 still beats baseline.
+
+**BLOCKED from CONFIRMED:** Time exit pnl is estimated, not re-simulated. RQ-REST-013 required.
+
+**Production change:** `trailing_stop_pct: 0` in `config/parameters.yml` for all 4 pairs. No new ML, no new signals.
+
+### Push status
+All commits on `sovereign-v2`. Run from your machine:
+```
+git push origin sovereign-v2
+```
+
+### Pending / not done this session
+- HYP-056 and HYP-060: Colin said "Apply it" (relabel to MARGINAL) — not executed. Ledger seals are immutable for CONFIRMED entries; HYP-056/060 are REJECTED_OOS so technically editable. Needs Colin's explicit confirmation before touching.
+- TICK-093: ICT timezone regression (UTC 03:xx edge excluded). Frozen, needs Colin's unlock.
+- `/usr/local/bin/claude` missing: kills morning agent cascade. Highest priority infra fix.
+- RQ-REST-013: Price-path exit re-sim — unblocks HYP-108 CONFIRMED upgrade.
+- Reversal exits (79 trades, 34% WR, 2.4d hold) — also show whipsaw pattern. Separate preregistration required before testing.

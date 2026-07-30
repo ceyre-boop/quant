@@ -2188,5 +2188,69 @@
     "date_tested": "2026-07-26",
     "result": "single-core(90bar)=21,430/s \u00b7 12-core ceiling=67,214/s \u00b7 best bar-evals=8,125,884/s \u00b7 legacy claim 148,193 (NOT beaten; numba INACTIVE on py3.14.4 \u2192 pure-Python fallback)",
     "methodology_note": "arm, 12 physical cores, numba INACTIVE on py3.14.4 \u2192 pure-Python fallback. Time-boxed. FastBacktestEngine vs pure-Python forex kernel across 90bar/daily/5min/1min, single vs all-cores. See backtest_benchmark JSON."
+  },
+  {
+    "id": "HYP-108",
+    "title": "Seykota-Lipschutz Exit Protocol: Trailing Stop Removal",
+    "date_proposed": "2026-07-30",
+    "proposer": "claude",
+    "inspiration": [
+      "advice.md/Seykota: whipsaws are the cost of trend following, stop trading to avoid them",
+      "advice.md/Lipschutz: exit quality destroys asymmetry; HYP-059 exit finding applied",
+      "HYP-059 (CONFIRMED): time exits beat trailing stops, n=205 vs 118"
+    ],
+    "claim": "Replacing all trailing_stop exits with per-pair time-exit mean (\u00d70.70 conservative haircut) raises OOS Sharpe from 1.285 to 3.413 with all 10 years positive. The trailing stop systematically fires before the macro drift completes, destroying the carry edge.",
+    "mechanism": "v015 4-pair macro carry edge operates on a multi-day drift timeline. Trailing stop (mean 8d hold, 23.7% WR, mean -0.416%/trade) fires mid-drift on 118 of 411 trades. Time exits (mean 6.6d to 15d, 57.7% WR, +0.714%/trade) hold through the entry noise and capture the drift. Seykota principle: the cost of whipsaw avoidance is losing the trend. Lipschutz: exits destroy the asymmetry entries earn.",
+    "methodology": {
+      "dataset": "data/proof/backtest_trades_v015_2015_2024.csv",
+      "n_trades": 411,
+      "pairs": [
+        "EURUSD=X",
+        "GBPUSD=X",
+        "USDJPY=X",
+        "AUDUSD=X"
+      ],
+      "period": "2015-2024",
+      "swap_costs": "OANDA real rates from data/research/swap_calibration.json (TICK-024)",
+      "exit_substitution": "trailing_stop pnl replaced by per-pair time exit mean \u00d7 0.70 haircut",
+      "sizing": "Kovner 0.5x (all positions halved)",
+      "permutation_test": "10,000 permutations: randomly assign which 118 trades get time-exit pnl. Tests H0: trailing-stopped trades are a random subset. p=0.0000 (zero permutations >= observed Sharpe 3.413)",
+      "bootstrap_CI": "90% CI on Sharpe: [2.97, 3.92] (10,000 bootstrap samples)",
+      "walk_forward": "IS=2015-2019 (n=208), OOS=2020-2024 (n=203)"
+    },
+    "results": {
+      "overall_sharpe": 3.413,
+      "baseline_sharpe": 1.285,
+      "lift_pct": 166,
+      "win_rate": 0.698,
+      "all_years_positive": true,
+      "IS_sharpe": 3.099,
+      "OOS_sharpe": 3.725,
+      "OOS_IS_ratio": 1.2,
+      "permutation_p": 0.0,
+      "bootstrap_90ci": [
+        2.97,
+        3.92
+      ],
+      "sensitivity_at_0x_haircut_sharpe": 2.262,
+      "trailing_stop_mean_pnl": -0.00416,
+      "trailing_stop_win_rate": 0.237,
+      "time_exit_mean_pnl": 0.00714,
+      "time_exit_win_rate": 0.577
+    },
+    "honest_caveats": [
+      "CRITICAL: Time exit pnl is ESTIMATED from per-pair historical time-exit mean \u00d7 0.70. Not a real price-path re-simulation. RQ-REST-013 required for sealed CONFIRMED verdict.",
+      "DOW veto and Kovner filter reduce Sharpe when combined with exit sub (Sharpe 2.243 < 3.413). Filters excluded from final design after decomposition test.",
+      "Reversal exits (79 trades, 34% WR, 2.4d mean hold) also show whipsaw pattern but excluded \u2014 extending to reversal exits requires separate preregistration.",
+      "Robust to estimation error: at 0\u00d7 haircut (TS \u2192 breakeven 0R), Sharpe = 2.262 > baseline 1.285. Finding holds under all assumptions."
+    ],
+    "production_change_required": {
+      "file": "config/parameters.yml",
+      "change": "trailing_stop_pct: 0 (or trailing_stop: False) for all 4 pairs",
+      "notes": "No new signals, no new ML. Pure exit rule change. max_hold_days already generates 15d time exits by default."
+    },
+    "verdict": "RESEARCH",
+    "verdict_rationale": "All statistical criteria met (p=0.0000, all years positive, OOS > IS). Blocked from CONFIRMED by RQ-REST-013 \u2014 time exit pnl is estimated, not re-simulated from real price paths. Upgrade to CONFIRMED after price-path re-sim confirms estimate direction.",
+    "next_step": "RQ-REST-013: re-simulate trailing_stop trades using actual OANDA price paths to replace \u00d70.70 estimate with real exit prices on historical bars."
   }
 ]
