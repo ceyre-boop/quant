@@ -314,7 +314,11 @@ class ProductionOrchestrator:
             regime=regime,
             current_price=entry_price
         )
-        
+        # Publish account state so dashboard equity/pnl panels show live data.
+        # _get_account_state() currently returns paper defaults; replace with
+        # broker query when MT5/cTrader bridge is live.
+        self.broadcaster.publish_account(account)
+
         result["bias"] = bias.to_dict()
         result["game_aligned"] = game.game_state_aligned
         

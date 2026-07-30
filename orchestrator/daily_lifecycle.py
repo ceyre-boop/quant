@@ -414,7 +414,7 @@ class DailyLifecycle:
             try:
                 regime = self._get_default_regime()
                 current_price = market_data.current_price if isinstance(market_data, MarketData) else None
-                
+
                 self.broadcaster.publish_signal(
                     symbol=symbol,
                     bias=bias,
@@ -423,6 +423,9 @@ class DailyLifecycle:
                     regime=regime,
                     current_price=current_price
                 )
+                # Publish account state so dashboard equity/pnl panels show live data.
+                account = self._get_account_state()
+                self.broadcaster.publish_account(account)
                 result["published"] = True
             except Exception as e:
                 logger.error(f"Failed to publish {symbol}: {e}")

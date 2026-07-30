@@ -1599,6 +1599,7 @@ async function initLiveFirebase() {
 
     onValue(ref(db, 'account/equity'), snap => {
       const v = snap.val();
+      // RTDB field is 'equity' (written by publish_account). Falls back gracefully if null.
       document.getElementById('lv-equity').textContent =
         v?.equity != null ? fmtUSD(v.equity) : '—';
     });
@@ -1606,18 +1607,22 @@ async function initLiveFirebase() {
     onValue(ref(db, 'account/pnl'), snap => {
       const v = snap.val();
       const el = document.getElementById('lv-pnl');
-      el.textContent = v?.pnl != null ? fmtUSD(v.pnl, true) : '—';
-      if (v?.pnl != null) el.className = `sval ${v.pnl >= 0 ? 'cg' : 'cr'}`;
+      // RTDB field is 'daily_pnl' (written by firebase_init + publish_account)
+      const pnl = v?.daily_pnl ?? v?.pnl ?? null;
+      el.textContent = pnl != null ? fmtUSD(pnl, true) : '—';
+      if (pnl != null) el.className = `sval ${pnl >= 0 ? 'cg' : 'cr'}`;
     });
 
     onValue(ref(db, 'session/controls'), snap => {
       const v = snap.val() || {};
-      const enabled = v['trading-enabled'];
+      // Controls use snake_case keys (written by publish_controls)
+      const enabled = v['trading_enabled'] ?? v['trading-enabled'];
       const el = document.getElementById('lv-trading-enabled');
       el.textContent = enabled == null ? '—' : (enabled ? 'ENABLED' : 'DISABLED');
       el.className = `sval ${enabled ? 'cg' : 'cr'}`;
+      const dailyLoss = v['daily_loss_pct'] ?? v['daily-loss-pct'];
       document.getElementById('lv-daily-loss').textContent =
-        `daily-loss pct ${v['daily-loss-pct'] ?? '—'}`;
+        `daily-loss pct ${dailyLoss ?? '—'}`;
     });
 
     onValue(ref(db, 'signals'), snap => {
@@ -1645,7 +1650,17 @@ async function initLiveFirebase() {
       if (h) rows.push(lvRow('system/health', h.status || JSON.stringify(h).slice(0, 40)));
       onValue(ref(db, 'system/regime'), rsnap => {
         const r = rsnap.val() || {};
-        const regimeRows = LV_PAIRS.map(p => r[p] ? lvRow(`regime ${p}`, r[p].regime || '—') : null).filter(Boolean);
+        // Regime node structure: {volatility, trend, risk_appetite, momentum, event_risk}
+        // Published by publish_regime() → format_regime_for_ui() — no 'regime' top-level key.
+        // Use volatility as the display label, or join trend+volatility for brevity.
+        const regimeRows = LV_PAIRS.map(p => {
+          const rd = r[p];
+          if (!rd) return null;
+          const label = rd.trend && rd.volatility
+            ? `${rd.trend}/${rd.volatility}`
+            : rd.trend || rd.volatility || rd.regime || JSON.stringify(rd).slice(0, 30);
+          return lvRow(`regime ${p}`, label);
+        }).filter(Boolean);
         document.getElementById('lv-health').innerHTML =
           [...rows, ...regimeRows].join('') || '<div class="live-pending">no health/regime data</div>';
       }, { onlyOnce: true });
@@ -1653,8 +1668,9 @@ async function initLiveFirebase() {
 
     onValue(ref(db, 'oracle/latest_reflection'), snap => {
       const v = snap.val();
+      // RTDB fields: candidate_lesson, system_health_note (written by broadcast_oracle_reflection)
       document.getElementById('lv-oracle').innerHTML = v
-        ? lvRow('latest_reflection', (v.summary || v.lesson || 'wired').toString().slice(0, 60))
+        ? lvRow('latest_reflection', (v.candidate_lesson || v.system_health_note || v.summary || v.lesson || 'wired').toString().slice(0, 60))
         : '<div class="live-pending">pending — wires when oracle activates</div>';
     });
 
@@ -1666,7 +1682,12 @@ async function initLiveFirebase() {
     });
     onValue(ref(db, 'carry/rate_differentials'), snap => {
       const v = snap.val() || {};
-      const rows = Object.keys(v).slice(0, 4).map(k => lvRow(k, v[k]?.diff ?? v[k]));
+      // RTDB field is 'differential_bps' (written by broadcast_carry_signals)
+      const rows = Object.keys(v).slice(0, 4).map(k => {
+        const rd = v[k];
+        const val = rd?.differential_bps != null ? `${rd.differential_bps}bps ${rd.carry_direction || ''}`.trim() : JSON.stringify(rd).slice(0, 30);
+        return lvRow(k, val);
+      });
       if (rows.length) {
         const cur = document.getElementById('lv-petroulas').innerHTML;
         document.getElementById('lv-petroulas').innerHTML = cur + rows.join('');
@@ -1675,7 +1696,13 @@ async function initLiveFirebase() {
 
     onValue(ref(db, 'mesolimbic/elo'), snap => {
       const v = snap.val();
-      const rows = v ? Object.entries(v).map(([k, val]) => lvRow(k, val?.elo ?? val)) : [];
+      // RTDB field structure: {current, peak, games_played, last_game} per player
+      const rows = v ? Object.entries(v).map(([k, val]) => {
+        const display = typeof val === 'object' && val !== null
+          ? `Elo ${val.current ?? '?'} (pk ${val.peak ?? '?'}, ${val.games_played ?? 0}g)`
+          : String(val);
+        return lvRow(k, display);
+      }) : [];
       document.getElementById('lv-mesolimbic').innerHTML =
         rows.length ? rows.join('') : '<div class="live-pending">pending — wires when mesolimbic activates</div>';
     });
