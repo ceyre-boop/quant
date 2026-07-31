@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-30T00:38:07+00:00",
+  "timestamp": "2026-07-31T01:49:20+00:00",
   "session": "OFF_HOURS",
   "context_keys": [
     "high_impact_event_today"
@@ -8,41 +8,12 @@
   "estimates": {
     "GBPUSD": {
       "pair": "GBPUSD",
-      "p_big": 0.6828,
-      "direction": "NEUTRAL",
-      "expected_magnitude_pct": 0.645,
-      "expected_vs_adr": 1.414,
+      "p_big": 0.6602,
+      "direction": "LONG",
+      "expected_magnitude_pct": 0.6418,
+      "expected_vs_adr": 1.394,
       "session": "OFF_HOURS",
-      "confidence": 0.27,
-      "drivers": [
-        [
-          "event_risk",
-          0.9
-        ],
-        [
-          "compression",
-          0.2404
-        ],
-        [
-          "momentum",
-          -0.0387
-        ],
-        [
-          "displacement",
-          -0.0326
-        ]
-      ],
-      "timestamp": "2026-07-30T00:38:06.385311+00:00",
-      "notes": []
-    },
-    "EURUSD": {
-      "pair": "EURUSD",
-      "p_big": 0.6446,
-      "direction": "NEUTRAL",
-      "expected_magnitude_pct": 0.5316,
-      "expected_vs_adr": 1.38,
-      "session": "OFF_HOURS",
-      "confidence": 0.279,
+      "confidence": 0.306,
       "drivers": [
         [
           "event_risk",
@@ -50,57 +21,86 @@
         ],
         [
           "momentum",
-          0.1411
+          0.2433
         ],
         [
           "displacement",
-          -0.0387
+          -0.0442
         ],
         [
           "compression",
           0.0
         ]
       ],
-      "timestamp": "2026-07-30T00:38:06.385311+00:00",
+      "timestamp": "2026-07-31T01:49:19.682290+00:00",
+      "notes": []
+    },
+    "EURUSD": {
+      "pair": "EURUSD",
+      "p_big": 0.6828,
+      "direction": "LONG",
+      "expected_magnitude_pct": 0.5442,
+      "expected_vs_adr": 1.415,
+      "session": "OFF_HOURS",
+      "confidence": 0.34,
+      "drivers": [
+        [
+          "event_risk",
+          0.9
+        ],
+        [
+          "momentum",
+          0.3953
+        ],
+        [
+          "displacement",
+          -0.0755
+        ],
+        [
+          "compression",
+          0.0
+        ]
+      ],
+      "timestamp": "2026-07-31T01:49:19.682290+00:00",
       "notes": []
     },
     "USDJPY": {
       "pair": "USDJPY",
-      "p_big": 0.6813,
-      "direction": "NEUTRAL",
-      "expected_magnitude_pct": 0.5471,
-      "expected_vs_adr": 1.413,
+      "p_big": 0.6909,
+      "direction": "SHORT",
+      "expected_magnitude_pct": 0.7303,
+      "expected_vs_adr": 1.422,
       "session": "OFF_HOURS",
-      "confidence": 0.28,
+      "confidence": 0.295,
       "drivers": [
         [
           "event_risk",
           0.9
         ],
         [
-          "compression",
-          0.2052
-        ],
-        [
           "momentum",
-          0.0807
+          -0.451
         ],
         [
           "displacement",
-          0.0262
+          0.2907
+        ],
+        [
+          "compression",
+          0.0
         ]
       ],
-      "timestamp": "2026-07-30T00:38:06.385311+00:00",
+      "timestamp": "2026-07-31T01:49:19.682290+00:00",
       "notes": []
     },
     "AUDUSD": {
       "pair": "AUDUSD",
-      "p_big": 0.6654,
-      "direction": "NEUTRAL",
-      "expected_magnitude_pct": 0.7389,
-      "expected_vs_adr": 1.399,
+      "p_big": 0.6523,
+      "direction": "LONG",
+      "expected_magnitude_pct": 0.7417,
+      "expected_vs_adr": 1.387,
       "session": "OFF_HOURS",
-      "confidence": 0.272,
+      "confidence": 0.303,
       "drivers": [
         [
           "event_risk",
@@ -108,18 +108,18 @@
         ],
         [
           "momentum",
-          -0.1167
-        ],
-        [
-          "compression",
-          0.1087
+          0.1912
         ],
         [
           "displacement",
-          0.0371
+          -0.0032
+        ],
+        [
+          "compression",
+          0.0
         ]
       ],
-      "timestamp": "2026-07-30T00:38:06.385311+00:00",
+      "timestamp": "2026-07-31T01:49:19.682290+00:00",
       "notes": []
     }
   }
