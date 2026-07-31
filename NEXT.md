@@ -3742,3 +3742,46 @@ git push origin sovereign-v2
 - `/usr/local/bin/claude` missing: kills morning agent cascade. Highest priority infra fix.
 - RQ-REST-013: Price-path exit re-sim — unblocks HYP-108 CONFIRMED upgrade.
 - Reversal exits (79 trades, 34% WR, 2.4d hold) — also show whipsaw pattern. Separate preregistration required before testing.
+
+---
+
+## 2026-07-30 — HYP-108 method falsification (read-only; no verdict altered)
+
+HYP-108 was registered claiming OOS Sharpe 1.285 → 3.413 from replacing trailing-stop exits
+with time exits, permutation p=0.0000, bootstrap CI [2.97, 3.92], all 10 years positive. The
+entry honestly flags that time-exit pnl is estimated and that RQ-REST-013 is needed before a
+sealed verdict.
+
+**That caveat understates it. The test cannot support the claim.** Full write-up and
+reproduction: `research/HYP-108_method_falsification.md`. Three findings:
+
+1. **A placebo unrelated to trailing stops scores higher.** Replacing the 118 *worst trades
+   regardless of exit reason* with the same per-pair time-exit value gives Sharpe **4.948**,
+   against 3.499 for the actual method. Replacing the 118 worst *non-trailing* trades still
+   gives 2.952. The lift is a property of the substitution, not of trailing stops.
+
+2. **p=0.0000 was guaranteed by construction.** The measured null (random 118 replaced) is
+   centred at **2.066** — random replacement alone lifts Sharpe from 1.353, because
+   substituting any trades with a positive constant raises the mean and cuts variance. And a
+   trailing stop fires precisely when price moves against the position, so `trailing_stop` is
+   a label selected on bad outcomes. Replacing an outcome-selected set beats replacing a random
+   set with probability ~1, on any dataset. The same test returns p=0.0000 for the placebo.
+
+3. **29% of the sample becomes a 4-valued constant.** Within the replaced block std collapses
+   0.011641 → 0.001449. Variance collapse supplies ~14% of the lift; the other ~86% is the mean
+   shift, which is itself the artifact of substituting winners' averages for losers' realised
+   outcomes. The bootstrap CI inherits this and is tight around an artifact.
+
+Also note the **direct conflict with the 2026-07-01 ExitConfig sweep**, which tested 180 exit
+configs by real re-simulation and found v015 at the global peak, 0/180 both-regime, 0/180
+FDR-significant, with "disable trail" refuted on Sharpe. Re-simulation beats substitution.
+
+**Recommendation:** treat HYP-108 as *method-blocked*, not promising-pending-confirmation. Do
+not build RQ-REST-013 on the current framing and do not let 3.413 propagate into planning docs
+or the Sharpe target. Additional requirement beyond re-simulation: the per-pair time-exit mean
+is fitted on the same decade it is evaluated on — in-sample leakage independent of everything
+above. The underlying question (do trailing stops truncate the macro drift) is still open and
+worth testing properly.
+
+I did **not** alter the ledger verdict — HYP-108 is registered as RESEARCH, and changing a
+verdict is Colin's call. This is filed as a blocking objection to the method.
