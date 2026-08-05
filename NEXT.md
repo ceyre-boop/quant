@@ -3785,3 +3785,123 @@ worth testing properly.
 
 I did **not** alter the ledger verdict — HYP-108 is registered as RESEARCH, and changing a
 verdict is Colin's call. This is filed as a blocking objection to the method.
+
+[2026-08-03] 07:00 PRE-MARKET: WAIT — GBPUSD blocked by BOE blackout (Aug 3-20), EURUSD/USDJPY/AUDUSD have rate-diff width but unverified momentum/ATR from live pipeline; no open trades; sovereign-v2 push status needs verification before tomorrow's first-live-trade mission.
+
+## 2026-08-04 · RESEARCH PASS — HALTED AT STEP 1 (INCIDENT)
+
+**Routine:** AGENT_DIRECTIVE.md 21:00 ET research routine. **Halted at Step 1 under STANDING RULE 9.**
+Steps 2-5 not run. No research work committed.
+
+- **Step 0 (brain read) — OK.** `get_research_context()` clean, exit 0: 25 graveyard entries,
+  17 confirmed edges, 15 recent verdicts. Graveyard loaded and available to gate hypothesis
+  generation (HYP-090 daily-adaptive and HYP-085 news-sniping families both present as sealed).
+- **Step 1 (movers pull) — FAILED.** `execution.alpaca.movers(top=50)` → **HTTP 401 Unauthorized**
+  on `data.alpaca.markets/v1beta1/screener/stocks/movers?top=50`. Exit 1, first attempt, no retry.
+- **Steps 2-5 — NOT RUN** (Rule 9: do not proceed to the next step).
+
+**Incident note:** `logs/incidents/2026-08-04-research-agent-alpaca-401.md`
+
+**Triage (read-only, no code touched, no secrets printed):** `ALPACA_API_KEY` (len 26, `PKW2…`
+paper prefix) and `ALPACA_SECRET_KEY` (len 44) are both present in `.env` and reach `os.environ`;
+`keys()` reads those exact names and `get()` sends them as `APCA-API-KEY-ID` /
+`APCA-API-SECRET-KEY`. **Not a loading or header defect in `execution/alpaca.py`** — the rejection
+is upstream. The 401 body is an nginx HTML page rather than Alpaca's JSON error envelope,
+consistent with rejection at the edge before reaching the API. I did **not** claim the keys are
+revoked/rotated/expired — that needs the Alpaca dashboard, which is operator-only.
+
+**401 is a new failure mode.** The directive and `alpaca.py` both anticipate **403** (entitlement,
+measured 2026-07-18). 403 = authenticated-but-unentitled; 401 = not authenticated. No subscription
+change explains a 401 and no deferred-pass scheduling works around one. Directive Step 1 has no
+401 guidance — worth adding so the next session doesn't re-derive it. The error contract itself
+behaved correctly: loud, first-attempt, url+status+body preserved, no error-swallow regression.
+
+**Presumed wider blast radius (inferred from a shared credential, NOT measured):** any job calling
+`execution.alpaca` — gapper shadow scans, `execution.signals` movers/news paths,
+`execution.harness` bid/ask capture — should be presumed failing until the credential is restored.
+Those jobs were not run or inspected. Live trading path untouched; no signal/fill/parameter code
+ran, so no frozen-config hash was evaluated.
+
+**Operator actions:** (1) verify Alpaca key `PKW2…` state in the dashboard; (2) if rotated, update
+both vars in `~/quant/.env` (600); (3) re-run Step 1 verbatim, then Steps 2-5; (4) check
+`morning_agent.log` / `eod_agent.log` — this may predate tonight rather than starting here.
+
+**Secondary, logged so it isn't lost (not investigated, not blocking):** `recent_verdicts` is
+dominated by **`BLOCKED_NO_VALIDATOR`** — 11+ auto-hypotheses (`HYP-AUTO-20260803T…`,
+`HYP-AUTO-20260804T…`) with `validator: ""` and null Sharpe/p. Hypotheses are being generated but
+never tested, accumulating without producing evidence either way. Worth triage. Also
+`get_research_context()` returned `date: 2026-08-05` at local 2026-08-04 21:00 EDT — the brain date
+is UTC-derived (21:00 ET = 01:00 UTC+1d); benign for a graveyard read, possibly not for any
+date-keyed write from a 21:00 ET job.
+
+## 2026-08-05 · EOD PASS — HALTED AT STEP 1 (INCIDENT)
+
+**Routine:** AGENT_DIRECTIVE.md 16:05 ET EOD routine. **Halted at Step 1 under STANDING RULE 9
+and STANDING RULE 6.** Steps 2, 2b, 3 not run. No vault write, no brain write-back, no dashboard
+refresh. Only this entry and the incident note committed (ESCALATION clause).
+
+**Incident note:** `logs/incidents/2026-08-05-eod-harness-alpaca-401.md`
+**Same root cause as:** `logs/incidents/2026-08-04-research-agent-alpaca-401.md` (still OPEN).
+
+- **Step 1 (wait for harness) — PRECONDITION UNMET.** `com.alta.execution_harness` fired on
+  schedule at 16:05 ET and **failed**: `LastExitStatus = 256` (exit 1), `logs/harness.err`
+  rewritten 16:05. Same **Alpaca HTTP 401** on
+  `data.alpaca.markets/v1beta1/screener/stocks/movers?top=50`, same nginx HTML body (not
+  Alpaca's JSON envelope) — credential still rejected at the edge. `fill_log.jsonl` has
+  **0 rows for 2026-08-05**; file untouched since Jul 31.
+- **Steps 2 / 2b / 3 — NOT RUN** (Rule 9: do not proceed).
+
+**Frozen-config check PASSED.** `FROZEN_HASH = 66907c79…0612a3`, identical to the hash stamped on
+the last logged fills (2026-07-31). **No drift.** This is a data-supply outage, not a freeze
+breach — no signal, fill, or parameter code ran or changed.
+
+**Blast radius — now MEASURED, not inferred.** The 08-04 note could only infer this from a shared
+credential; today it is measured. `execution.harness` failing; `fill_log.jsonl` stale since
+07-31 (**no fills Aug 3, 4, 5**); yield_frontier shadow wrote
+`{"signals": [], "movers_checked": 0, "note": "no scan output — recorded as 0-signal day"}`;
+hyp107 shadow wrote nothing today; `data/signals/` stale since **07-21**. Live/backtest path
+untouched. **The equities pipeline has been dark for 3 sessions and the prop-challenge
+measurement record has a 3-day hole.**
+
+**Second, independent defect found — why Step 2 was withheld.** `execution.eod --dry-run` (writes
+nothing; explicitly sanctioned by the directive) exits 0 and would have written into the vault:
+*"**0 GO signals.** … **This is a real zero, not a silent failure** — see the signal table below
+for every rejection and its reason."* alongside *"0 GO / 0 NO_GO of **0 scored**."* That is the
+exact inverse of the truth — 0 scored means the universe was never fetched, so nothing was
+rejected and there is no rejection table. **Verified in code (Rule 10):** `execution/eod.py:147-152`
+branches on `n_go == 0` alone and emits that assertion unconditionally, with no guard separating
+*n_scored > 0, all rejected* (genuine zero) from *n_scored == 0* (scan never ran). The note's own
+Information-health section correctly reports 3/6 FRESH — the data to tell them apart is present,
+the conversion section just never consults it. Running Step 2 would have written an affirmative
+false statement into `Trading/Ops/System-EOD-2026-08-05.md`, which tomorrow's morning agent reads
+back as long-term memory. **Reported, not fixed** — `execution/` change needs a plan file and an
+unlock here (Rule 8), and Rule 9 forbids repairing a failing path in-incident.
+
+**Rule 5 deliberately NOT applied.** Today is not a zero-*candidate* day (a valid data point); it
+is a zero-*observation* day. Logging it as an abstention would be the misclassification this halt
+exists to prevent.
+
+**Second simultaneous outage — the agents themselves.** `logs/eod_agent.log` and
+`logs/morning_agent.log` are both saturated with `Credit balance is too low`; the launchd Claude
+agents have been failing on API credit independently of Alpaca. Today's context/bias were written
+**13:02, not 08:00** — a manual/late pass, not the 07:55 job. Two independent outages are live.
+
+**Operator actions:** (1) restore the Alpaca credential (`PKW2…`) — sole blocker, everything else
+is downstream; (2) decide replay-vs-void for Aug 3–5 so they don't silently read as flat days in
+the challenge record; (3) fix `execution/eod.py:147` behind a plan file + unlock; (4) restore
+agent API credit; (5) directive doc correction — the 16:05 section says the harness runs
+`--signals data/decisions`, but the plist runs `execution.harness --live` with **no `--signals`
+flag**, and `execution.signals` writes to `data/signals/` (`signals.py:39`), not `data/decisions/`
+(which holds only a `decision_chain.jsonl` from 07-01); (6) still open from 08-04:
+`BLOCKED_NO_VALIDATOR` verdicts accumulating.
+
+**Incident notes are NOT in the repo — flagged, not unilaterally changed.** `logs/` is
+gitignored and `git ls-files logs/incidents/` returns only `.gitkeep`, so
+`2026-08-05-eod-harness-alpaca-401.md`, `2026-08-04-research-agent-alpaca-401.md` and
+`2026-07-20-*` all exist **on this machine only**. The directive (Rule 9 / ESCALATION) says to
+write incident notes there, and Rule 3 exists precisely because a single-machine record is a
+point of failure — so the incident trail currently contradicts the rule that mandates it. I did
+not `git add -f` them: that would start tracking a gitignored tree and change a repo convention
+mid-incident, which is an operator call. **Operator: either force-add incident notes, or move
+them to a tracked path (e.g. `audit/incidents/`) and amend the directive.** The full detail of
+today's incident is preserved in this NEXT.md entry, which IS tracked and pushed.
