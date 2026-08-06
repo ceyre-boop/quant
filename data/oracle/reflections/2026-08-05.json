@@ -1,0 +1,26 @@
+{
+  "date": "2026-08-05",
+  "generated_at": "2026-08-05T18:25:24.769370+00:00",
+  "input_tokens": 5483,
+  "output_tokens": 898,
+  "estimated_cost_usd": 0.149595,
+  "harvest_days_read": 7,
+  "reflection": {
+    "candidate_lesson": {
+      "lesson_text": "When 30-indicator conviction hits 100% but green_matches (historical library confirmation) is \u22641, the setup is a fresh-but-unlibraried signal that should be sized down, not up \u2014 high live conviction without historical analog is regime novelty, not edge.",
+      "mechanism": "A 100% conviction reading with only 1 historical green_match means the current indicator configuration has almost no precedent in the memory bank. Institutional flow that produces durable moves tends to rhyme with prior accumulation patterns; a configuration the library has never seen is more likely a transient crowding event (many indicators tripping on the same recent price spike) than a repeatable institutional footprint. EURUSD right now: conv=100% but green_matches=1 vs GBPUSD conv=83% with green_matches=4 \u2014 the lower-conviction/higher-match pair is the more trustworthy signal.",
+      "testable_rule": "if consensus_conviction >= 0.95 and green_matches <= 1: size_multiplier *= 0.6  # de-rate unlibraried high-conviction signals; require green_matches >= 3 for full size",
+      "expected_impact": "Win rate +2-4% and Sharpe +0.02-0.04 by avoiding false-confidence entries where live conviction is uncorrelated with historical hit-rate; reduces variance drag on the equity curve.",
+      "evidence_from_harvest": "Live consensus shows EURUSD conv=100%/green_matches=1/hist_hr=73% vs GBPUSD conv=83%/green_matches=4/hist_hr=68% \u2014 conviction and green_matches diverge, and AUDNZD conv=50%/green_matches=0/hist_hr=0% confirms zero-match setups carry zero historical edge.",
+      "evidence_from_reasoning": null,
+      "reasoning_component_targeted": "green_matches",
+      "sample_needed": 40
+    },
+    "retirement_flag": {
+      "lesson_to_review": "L9",
+      "reason": "L9 (validated knowledge has an expiry date) is meta and untethered to any current expiry trigger \u2014 with 0 trades in 7 days and REST_MODE active, it cannot be exercised or falsified; risk of it becoming a permanent placeholder rather than an active gate."
+    },
+    "system_health_note": "System is in an extended zero-trade window (7 days, 0 fills) with regime=UNKNOWN internally but MOMENTUM externally and TV giving no signals \u2014 the gates are working but the pipeline needs the RQ-006 30-trade threshold before any reasoning-grounded lesson can be validated."
+  },
+  "auto_validation": null
+}

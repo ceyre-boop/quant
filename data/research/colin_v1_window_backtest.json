@@ -1,0 +1,35 @@
+{
+  "5yr": {
+    "n": 203,
+    "yrs": 5,
+    "tpy": 40.6,
+    "wr": 0.5270935960591133,
+    "mean_r": 0.4885198805812127,
+    "median": 0.20870096030307528,
+    "p5": 0.006558686035536825,
+    "p95": 0.4856709370470403,
+    "p_pos": 0.9551
+  },
+  "10yr": {
+    "n": 411,
+    "yrs": 10,
+    "tpy": 41.1,
+    "wr": 0.48661800486618007,
+    "mean_r": 0.35555724380370884,
+    "median": 0.14190671709273484,
+    "p5": -0.032606088850192685,
+    "p95": 0.3773030646136515,
+    "p_pos": 0.90355
+  },
+  "1yr_paper": {
+    "account": "Carry paper (OANDA practice)",
+    "generated_at": "2026-08-01T00:04:25.367578+00:00",
+    "status": "OK",
+    "balance": 109481.25,
+    "total_pnl": -176.86,
+    "n_points": 199,
+    "source": "data/agent/equity_curve_live.jsonl",
+    "dashboard_note": "not yet shown \u2014 the dashboard prop panel reads only prop_account_balance.json; add a second panel to surface this."
+  },
+  "20yr": "NOT AVAILABLE \u2014 data only goes back to 2014 (12yr). Needs a new historical FX vendor pull to 2006."
+}

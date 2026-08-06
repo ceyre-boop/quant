@@ -1,0 +1,202 @@
+{
+  "date": "2026-08-03",
+  "generated_at": "2026-08-03T06:31:39.414289+00:00",
+  "sources": {
+    "macro_fred": {
+      "status": "ok",
+      "summary": {
+        "gdp_growth_pct": 1.5,
+        "cpi_yoy_pct": 2.87,
+        "core_cpi_yoy_pct": 1.93,
+        "core_pce_yoy_pct": 2.8,
+        "unemployment_pct": 4.2,
+        "fed_funds_pct": 3.63,
+        "ten_year_pct": 4.68,
+        "yield_curve_10y2y": 0.47,
+        "yield_curve_state": "NORMAL",
+        "consumer_sentiment": 49.5,
+        "vix": 17.09
+      },
+      "snapshot_date": "2026-08-03"
+    },
+    "markets": {
+      "status": "ok",
+      "summary": {
+        "yield_curve": "NORMAL",
+        "risk_regime": "NORMAL",
+        "credit_regime": "NORMAL",
+        "vix": 15.99,
+        "vix_z": -0.67,
+        "dgs10": 4.745,
+        "dgs2": 4.288,
+        "dgs3m": 3.682,
+        "t10y2y": 0.457,
+        "t10y3m": 1.063,
+        "hyg": 79.48,
+        "hyg_z": 1.2
+      },
+      "fetched_at": "2026-08-03T05:52:35.562132+00:00"
+    },
+    "sentiment_reddit": {
+      "status": "ok",
+      "metrics": {
+        "posts_scanned": 0,
+        "n_equity_signals": 0,
+        "n_forex_signals": 0
+      },
+      "last_updated": "2026-07-20T17:50:10.732006+00:00"
+    },
+    "news": {
+      "status": "ok",
+      "count": 12,
+      "by_category": {
+        "GEOPOLITICS": 6,
+        "FED_RATES": 2,
+        "TECH_EARNINGS": 3,
+        "INFLATION": 1
+      },
+      "as_of": "2026-08-02T12:44:05.750951+00:00"
+    },
+    "fx_macro": {
+      "status": "ok",
+      "countries": {
+        "US": {
+          "rate": 4.33,
+          "cpi_yoy": 2.4,
+          "gdp_growth": 2.5,
+          "real_rate": 1.93
+        },
+        "EU": {
+          "rate": 2.5,
+          "cpi_yoy": 2.2,
+          "gdp_growth": 1.2,
+          "real_rate": 0.2999999999999998
+        },
+        "JP": {
+          "rate": 0.841,
+          "cpi_yoy": 3.2,
+          "gdp_growth": 3.570918302272763,
+          "real_rate": -2.359
+        },
+        "UK": {
+          "rate": 3.7303,
+          "cpi_yoy": 3.4194528875379993,
+          "gdp_growth": 4.412065665341114,
+          "real_rate": 0.3108471124620009
+        },
+        "AU": {
+          "rate": 4.46,
+          "cpi_yoy": 2.40176417760265,
+          "gdp_growth": 1.5,
+          "real_rate": 2.05823582239735
+        },
+        "NZ": {
+          "rate": 2.56,
+          "cpi_yoy": 2.525668571816797,
+          "gdp_growth": 0.5,
+          "real_rate": 0.034331428183203005
+        }
+      }
+    },
+    "equities": {
+      "status": "ok",
+      "tickers": {
+        "SPY": {
+          "close": 747.03,
+          "ret_1d_pct": 0.72
+        },
+        "QQQ": {
+          "close": 687.99,
+          "ret_1d_pct": 0.6496
+        },
+        "NVDA": {
+          "close": 200.75,
+          "ret_1d_pct": 2.9276
+        },
+        "AAPL": {
+          "close": 308.91,
+          "ret_1d_pct": -7.3539
+        },
+        "MSFT": {
+          "close": 464.72,
+          "ret_1d_pct": 3.0193
+        },
+        "AMZN": {
+          "close": 271.58,
+          "ret_1d_pct": 15.3206
+        },
+        "TSLA": {
+          "close": 311.21,
+          "ret_1d_pct": 0.7641
+        },
+        "META": {
+          "close": 556.71,
+          "ret_1d_pct": 3.28
+        },
+        "GOOGL": {
+          "close": 356.13,
+          "ret_1d_pct": 6.7344
+        },
+        "AMD": {
+          "close": 476.15,
+          "ret_1d_pct": -1.9036
+        },
+        "TLT": {
+          "close": 82.25,
+          "ret_1d_pct": -0.6643
+        },
+        "GLD": {
+          "close": 371.54,
+          "ret_1d_pct": -1.4901
+        },
+        "HYG": {
+          "close": 79.48,
+          "ret_1d_pct": 0.0126
+        },
+        "IWM": {
+          "close": 291.2,
+          "ret_1d_pct": -0.4751
+        },
+        "XLF": {
+          "close": 56.94,
+          "ret_1d_pct": -0.1053
+        }
+      }
+    },
+    "positioning": {
+      "status": "ok",
+      "n_records": 1201,
+      "latest": {
+        "date": "2026-06-17",
+        "bank": "ECB",
+        "country": "EU",
+        "actual_change_bps": 25,
+        "expected_change_bps": -25.0,
+        "surprise_bps": 50.0
+      }
+    },
+    "vrp_proxy": {
+      "status": "ok",
+      "metrics": {
+        "vix": 15.99,
+        "spy_realized_20d": 12.695,
+        "iv_rv_gap": 3.295
+      }
+    }
+  },
+  "sources_ok": [
+    "macro_fred",
+    "markets",
+    "sentiment_reddit",
+    "news",
+    "fx_macro",
+    "equities",
+    "positioning",
+    "vrp_proxy"
+  ],
+  "sources_null": [],
+  "provenance": {
+    "kind": "research_panel_harvest",
+    "note": "Raw recorded variables across data domains. Relationships are NOT inferred here \u2014 hypothesis testing goes through research_factory (pre-registration + 10k permutation + both-sides + Benjamini-Hochberg). Do NOT treat panel columns as findings or trading inputs."
+  }
+}

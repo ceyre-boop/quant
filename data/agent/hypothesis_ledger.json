@@ -2182,14 +2182,6 @@
     "auto_generated": false
   },
   {
-    "id": "BENCH-THROUGHPUT",
-    "name": "Backtest throughput benchmark (measured, replaces the 148k claim)",
-    "status": "MEASURED",
-    "date_tested": "2026-07-26",
-    "result": "single-core(90bar)=21,430/s \u00b7 12-core ceiling=67,214/s \u00b7 best bar-evals=8,125,884/s \u00b7 legacy claim 148,193 (NOT beaten; numba INACTIVE on py3.14.4 \u2192 pure-Python fallback)",
-    "methodology_note": "arm, 12 physical cores, numba INACTIVE on py3.14.4 \u2192 pure-Python fallback. Time-boxed. FastBacktestEngine vs pure-Python forex kernel across 90bar/daily/5min/1min, single vs all-cores. See backtest_benchmark JSON."
-  },
-  {
     "id": "HYP-108",
     "title": "Seykota-Lipschutz Exit Protocol: Trailing Stop Removal",
     "date_proposed": "2026-07-30",
@@ -2252,5 +2244,13 @@
     "verdict": "RESEARCH",
     "verdict_rationale": "All statistical criteria met (p=0.0000, all years positive, OOS > IS). Blocked from CONFIRMED by RQ-REST-013 \u2014 time exit pnl is estimated, not re-simulated from real price paths. Upgrade to CONFIRMED after price-path re-sim confirms estimate direction.",
     "next_step": "RQ-REST-013: re-simulate trailing_stop trades using actual OANDA price paths to replace \u00d70.70 estimate with real exit prices on historical bars."
+  },
+  {
+    "id": "BENCH-THROUGHPUT",
+    "name": "Backtest throughput benchmark (measured, replaces the 148k claim)",
+    "status": "MEASURED",
+    "date_tested": "2026-08-02",
+    "result": "single-core(90bar)=23,004/s \u00b7 12-core ceiling=73,449/s \u00b7 best bar-evals=10,888,507/s \u00b7 legacy claim 148,193 (NOT beaten; numba INACTIVE on py3.14.4 \u2192 pure-Python fallback)",
+    "methodology_note": "arm, 12 physical cores, numba INACTIVE on py3.14.4 \u2192 pure-Python fallback. Time-boxed. FastBacktestEngine vs pure-Python forex kernel across 90bar/daily/5min/1min, single vs all-cores. See backtest_benchmark JSON."
   }
 ]

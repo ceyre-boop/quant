@@ -1,19 +1,20 @@
 {
-  "headline": "ICARUS shadow day 13: +0.000% \u2014 3/13 green so far",
+  "headline": "Carry-cost model live, ignition docs ready for approval, shadow gapper dormant\u2014execution path clear but HYP-071-v2 gates remain operator's call.",
   "what_happened": [
-    "2026-07-28 \u2014 Ignition prep: HYP-071-v2 prereg + BH trust decision, DRAFTS ONLY",
-    "2026-07-28 \u2014 TICK-024 unlock: honest carry-cost model landed, gate flag flipped, ignition still CLOSED",
-    "2026-07-27 \u2014 Dashboard staleness: prop state rebuilt, heartbeat self-resolved"
+    "TICK-024 (honest carry-cost model) committed and pushed; portfolio Sharpe 0.6886\u21920.6452 matches study, OOS holdout 1.1919 confirms robustness.",
+    "HYP-071-v2 pre-registration draft prepared (fixes asymmetric-forecast-variance flaw, targets reopen_condition) plus BH trust-scope decision brief\u2014both DRAFT_PENDING_OPERATOR_APPROVAL, no hashes assigned.",
+    "Dashboard staleness resolved: prop state rebuilt clean, execution heartbeat confirmed live (fires 16:05 ET daily), both freeze-safe.",
+    "Shadow gapper: 3 signals in 17 trading days (13th, 14th, 27th July), all sub-0.05% daily returns, last signal 2026-07-27, silent since."
   ],
-  "what_it_means": "Template digest (no LLM call) \u2014 see NEXT.md for detail. (LLM fallback: BadRequestError)",
-  "todays_one_thing": "Check the ICARUS calendar; the ladder does the rest.",
+  "what_it_means": "The carry model is now honest and locked in; the system baseline is real. HYP-071-v2's two documents are ready for your approval\u2014one fixes the v1/v2 confound (requires your choice on symmetric resampling vs dropping \u03bb\u00b7DD), the other frames the BH multiple-testing tradeoff (retroactive vs forward-only). Shadow gapper shows signal scarcity and tiny magnitude in live conditions\u2014not a priority until the gates open and real fills are measured.",
+  "todays_one_thing": "Review and approve (or reject) the two HYP-071-v2 draft documents in `research/HYP-071_v2_prereg.DRAFT.md` and `plans/TRUST_DECISION_BRIEF.md`; your decision on (a) symmetric resampling or (b) drop \u03bb\u00b7DD unlocks the ignition gate.",
   "progression": [
     {
       "gate": "G1",
       "label": "30 clean shadow days (ICARUS)",
       "state": "IN_PROGRESS",
-      "pct": 43,
-      "detail": "13/30 days recorded \u00b7 3 green"
+      "pct": 57,
+      "detail": "17/30 days recorded \u00b7 3 green"
     },
     {
       "gate": "G2",
@@ -44,7 +45,7 @@
       "detail": "the actual goal"
     }
   ],
-  "source": "template-fallback",
-  "model": null,
-  "generated_at": "2026-07-30T10:29:18.730574+00:00"
+  "source": "oracle-llm",
+  "model": "claude-haiku-4-5-20251001",
+  "generated_at": "2026-08-05T18:26:52.628986+00:00"
 }

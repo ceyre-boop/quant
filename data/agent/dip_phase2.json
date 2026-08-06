@@ -1,7 +1,7 @@
 {
-  "date": "2026-07-30",
+  "date": "2026-08-05",
   "phase": 2,
-  "completed_at": "2026-07-30T12:30:59.016369+00:00",
+  "completed_at": "2026-08-05T15:44:55.766184+00:00",
   "training_gate_open": true,
   "retrain": {
     "ran": false,
@@ -9,9 +9,9 @@
   },
   "synthesis": {
     "ok": true,
-    "synthesis_source": "deterministic_fallback",
-    "directional_bias": "NEUTRAL",
-    "confidence": 0
+    "synthesis_source": "ollama/qwen2.5",
+    "directional_bias": "LONG",
+    "confidence": 75
   },
   "hypotheses_run": 5,
   "oracle_cycles": 0,

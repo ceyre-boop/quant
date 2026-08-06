@@ -1,0 +1,145 @@
+{
+  "date": "2026-07-31",
+  "generated_at": "2026-07-31T13:49:36.252329+00:00",
+  "meta_regime": "ROTATION_WARN",
+  "regime_read": "NQ weak vs ES \u2014 rotation OUT of tech. A breadth/rotation warning; tech-led longs are suspect.",
+  "narrative": "Macro backdrop \u2014\n[2026-07-31] US economic state (FRED):\n  Growth: real GDP 1.5% (q/q ann)\n  Inflation: CPI 3.23% YoY | core CPI 2.25% | core PCE 3.03% (Fed target 2%)\n  Labor: unemployment 4.2%\n  Rates: fed funds 3.63% | 10Y 4.67% | 10Y-2Y 0.45% (NORMAL)\n  Consumer: UMich sentiment 44.8 | VIX 20.66\n\n---\nRecent market action has seen the NQ (Nasdaq-100) and ES (S&P 500) futures move in tandem, with both indices showing strength relative to their respective 200-day moving averages. The NQ is trading above its SMA200 by 6.86%, while the ES is at 6.15%. However, the lead-lag analysis indicates a rotation warning, suggesting that tech stocks (NQ) are lagging behind broader market indices (ES). This implies caution for tech-led long positions and suggests a potential shift towards more diversified strategies. The contemporaneous correlation of 0.902 further supports this view, indicating strong co-movement but with a recent divergence in performance.\n\nVolume profile analysis reveals that both ES and NQ are trading around their points of concentration (POC), with the ES POC at 7433.96 and the NQ POC at 28020.67. The high volume nodes suggest areas where significant buying or selling pressure is likely to occur, acting as potential support or resistance levels.\n\nThe news highlights strong earnings from Microsoft but weak margins for Stellantis, with broader tech earnings underperforming. This suggests a cautious approach towards tech-heavy indices like the NQ. Additionally, inflation concerns are rising, with key events such as PCE (tomorrow), ISM Manufacturing PMI (next Tuesday), Nonfarm Payrolls (next Friday), and CPI (two weeks from now) all indicating potential volatility.\n\nGiven the current market state and lead-lag regime, we maintain a long-the-dip bias. However, with the rotation warning and upcoming inflation data, our confidence is moderate at 75%. The key level for invalidation remains undefined as of now, but traders should be prepared to reassess positions if either index breaks below their respective POCs.",
+  "big_move_headline": {
+    "headline": "Today's likeliest institutional move: LONG EURUSD (P 68%, ~0.54% range, conf 35%).",
+    "pair": "EURUSD",
+    "direction": "LONG",
+    "p_big": 0.6845,
+    "confidence": 0.349,
+    "expected_magnitude_pct": 0.5445,
+    "session": "OFF_HOURS",
+    "drivers": [
+      [
+        "event_risk",
+        0.9
+      ],
+      [
+        "momentum",
+        0.4066
+      ],
+      [
+        "displacement",
+        -0.0529
+      ]
+    ],
+    "validation_status": "UNVALIDATED \u2014 display only (run scripts/validate_big_move.py)"
+  },
+  "directional_bias": "LONG",
+  "confidence": 75,
+  "regime_call": "ROTATION_WARN",
+  "key_level": null,
+  "synthesis_source": "ollama/qwen2.5",
+  "lead_lag": {
+    "regime": "ROTATION_WARN",
+    "spread_avg": -0.00153,
+    "leader": "NONE",
+    "corr": 0.902,
+    "divergence": false
+  },
+  "volume_profile": {
+    "ES=F": {
+      "symbol": "ES=F",
+      "as_of": "2026-07-31T12:44:33.587142+00:00",
+      "days": 5,
+      "bins": 40,
+      "poc": 7433.96,
+      "value_area_low": 7404.97,
+      "value_area_high": 7477.44,
+      "high_volume_nodes": [
+        7433.96,
+        7472.61,
+        7429.12,
+        7438.79,
+        7453.28
+      ],
+      "price_range": [
+        7330.08,
+        7523.33
+      ],
+      "limitation": "Volume profile = WHERE volume traded (volume-at-price). NOT order-flow delta (buy/sell aggression). True delta needs a CME order-flow feed (Databento/CQG)."
+    },
+    "NQ=F": {
+      "symbol": "NQ=F",
+      "as_of": "2026-07-31T12:44:33.625234+00:00",
+      "days": 5,
+      "bins": 40,
+      "poc": 28020.67,
+      "value_area_low": 27490.94,
+      "value_area_high": 28209.86,
+      "high_volume_nodes": [
+        28020.67,
+        28058.51,
+        28096.34,
+        28172.02,
+        27982.83
+      ],
+      "price_range": [
+        27245.0,
+        28758.5
+      ],
+      "limitation": "Volume profile = WHERE volume traded (volume-at-price). NOT order-flow delta (buy/sell aggression). True delta needs a CME order-flow feed (Databento/CQG)."
+    }
+  },
+  "macro_economic": {
+    "text": "[2026-07-31] US economic state (FRED):\n  Growth: real GDP 1.5% (q/q ann)\n  Inflation: CPI 3.23% YoY | core CPI 2.25% | core PCE 3.03% (Fed target 2%)\n  Labor: unemployment 4.2%\n  Rates: fed funds 3.63% | 10Y 4.67% | 10Y-2Y 0.45% (NORMAL)\n  Consumer: UMich sentiment 44.8 | VIX 20.66",
+    "summary": {
+      "gdp_growth_pct": 1.5,
+      "cpi_yoy_pct": 3.23,
+      "core_cpi_yoy_pct": 2.25,
+      "core_pce_yoy_pct": 3.03,
+      "unemployment_pct": 4.2,
+      "fed_funds_pct": 3.63,
+      "ten_year_pct": 4.67,
+      "yield_curve_10y2y": 0.45,
+      "yield_curve_state": "NORMAL",
+      "consumer_sentiment": 44.8,
+      "vix": 20.66
+    }
+  },
+  "news_count": 13,
+  "event_calendar": [
+    {
+      "event": "PCE (Fed's preferred inflation)",
+      "date": "2026-07-31",
+      "source": "cadence_estimate",
+      "action": "8:30 ET \u2014 reduce size into window",
+      "days_until": 0,
+      "note": "TODAY \u2014 8:30 ET \u2014 reduce size into window"
+    },
+    {
+      "event": "ISM Manufacturing PMI",
+      "date": "2026-08-03",
+      "source": "cadence_estimate",
+      "action": "reduce size into the 10:00 ET print",
+      "days_until": 3,
+      "note": "in 3d \u2014 reduce size into the 10:00 ET print"
+    },
+    {
+      "event": "Nonfarm Payrolls",
+      "date": "2026-08-07",
+      "source": "cadence_estimate",
+      "action": "high-impact 8:30 ET \u2014 widen stops / size down",
+      "days_until": 7,
+      "note": "in 7d \u2014 high-impact 8:30 ET \u2014 widen stops / size down"
+    },
+    {
+      "event": "CPI",
+      "date": "2026-08-12",
+      "source": "cadence_estimate",
+      "action": "inflation print 8:30 ET \u2014 reduce size into window",
+      "days_until": 12,
+      "note": "in 12d \u2014 inflation print 8:30 ET \u2014 reduce size into window"
+    }
+  ],
+  "scorecard_summary": "Briefing scorecard: n=17 dir-calls, hit 0.706, regime acc 0.39 \u2014 CALIBRATING \u2014 need ~30-60 samples before the hit-rate/calibration mean anything",
+  "bias": "size to regime: trust direction more in BREADTH, less in CONCENTRATION; ROTATION_WARN = treat tech-led longs as suspect",
+  "provenance": {
+    "source": "oracle_morning_briefing",
+    "verified": false,
+    "note": "Analyst/Oracle journal \u2014 qualitative regime context + a self-scored directional call, NOT a verified data feed or validated edge. Numbers here are never ingested as trading inputs."
+  }
+}
