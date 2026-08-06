@@ -3905,3 +3905,24 @@ not `git add -f` them: that would start tracking a gitignored tree and change a 
 mid-incident, which is an operator call. **Operator: either force-add incident notes, or move
 them to a tracked path (e.g. `audit/incidents/`) and amend the directive.** The full detail of
 today's incident is preserved in this NEXT.md entry, which IS tracked and pushed.
+
+## 2026-08-05 · 21:00 RESEARCH ROUTINE — HALTED at Step 1 (Alpaca 401, day 3)
+
+Routine halted per STANDING RULE 9. Step 0 (brain read) succeeded — graveyard (24 killed
+hypotheses) and confirmed edges loaded cleanly via `get_research_context()`. Step 1 (movers
+pull) failed with the same **Alpaca HTTP 401** as the 08-04 research incident and today's
+16:05 EOD incident — same endpoint (`data.alpaca.markets/.../screener/stocks/movers`), same
+nginx HTML body, credential still rejected. Steps 2-4 **NOT RUN**.
+
+This is now **day 3** of the same outage across 3 sessions (research 08-04, EOD 08-05, research
+08-05). Full detail: `logs/incidents/2026-08-05-research-agent-alpaca-401-day3.md` (references
+the 08-04 and 08-05-EOD notes rather than re-deriving the blast radius). No new findings beyond
+confirming the outage persists — all operator actions from the 08-05 EOD entry above remain
+open and unaddressed (credential restore is the sole blocker for everything downstream).
+
+**Environment note (unrelated to the outage, may help next session):** this machine had no
+working Python env (`.venv` is 3.9.6, incompatible per CLAUDE.md). Built `.venv313` fresh via
+`uv venv --python 3.13 .venv313 && uv pip install --python .venv313/bin/python -r
+requirements.lock.txt` — succeeded cleanly, worth keeping around instead of rebuilding again.
+
+Nothing else run. Nothing else committed.
