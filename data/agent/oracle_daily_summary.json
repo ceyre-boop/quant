@@ -1,14 +1,14 @@
 {
-  "last_updated": "2026-08-05T18:25:25.530776+00:00",
+  "last_updated": "2026-08-06T14:43:13.287557+00:00",
   "harvest": {
     "trades_closed": 0,
     "win_rate": null,
     "failure_taxonomy": {}
   },
   "reflection": {
-    "candidate_lesson": "When 30-indicator conviction hits 100% but green_matches (historical library confirmation) is \u22641, the setup is a fresh-but-unlibraried signal that should be sized down, not up \u2014 high live conviction without historical analog is regime novelty, not edge.",
-    "mechanism": "A 100% conviction reading with only 1 historical green_match means the current indicator configuration has almost no precedent in the memory bank. Institutional flow that produces durable moves tends to rhyme with prior accumulation patterns; a configuration the library has never seen is more likely a transient crowding event (many indicators tripping on the same recent price spike) than a repeatable institutional footprint. EURUSD right now: conv=100% but green_matches=1 vs GBPUSD conv=83% with green_matches=4 \u2014 the lower-conviction/higher-match pair is the more trustworthy signal.",
-    "testable_rule": "if consensus_conviction >= 0.95 and green_matches <= 1: size_multiplier *= 0.6  # de-rate unlibraried high-conviction signals; require green_matches >= 3 for full size"
+    "candidate_lesson": "When the 30-indicator consensus shows high conviction (conv >= 100%) but green_matches <= 1, the signal is a statistical orphan \u2014 trust the historical hit rate, not the live conviction number.",
+    "mechanism": "Conviction measures live indicator agreement (breadth of bullish votes), while green_matches counts how many times a near-identical live configuration produced a win historically. A 100% conviction with 1 green_match means the system has never actually seen this exact regime pay off \u2014 the confidence is spatial (indicators agreeing right now) not temporal (this pattern working before). Institutional flow can produce broad indicator agreement at exhaustion points, so unanchored conviction is where crowded late-trend entries cluster.",
+    "testable_rule": "if consensus_conviction >= 1.0 and green_matches <= 1: size *= 0.5  # require temporal confirmation, not just live breadth"
   },
   "validation": {
     "verdict": "REJECTED",
@@ -21,8 +21,8 @@
     "codify_error": null
   },
   "cycle": {
-    "cost_usd": 0.149595,
+    "cost_usd": 0.136665,
     "status": "COMPLETE",
-    "date": "2026-08-05"
+    "date": "2026-08-06"
   }
 }

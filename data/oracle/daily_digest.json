@@ -1,20 +1,20 @@
 {
-  "headline": "Carry-cost model live, ignition docs ready for approval, shadow gapper dormant\u2014execution path clear but HYP-071-v2 gates remain operator's call.",
+  "headline": "Carry-cost model live, HYP-071-v2 ignition docs ready for your approval, gapper shadow running cold.",
   "what_happened": [
-    "TICK-024 (honest carry-cost model) committed and pushed; portfolio Sharpe 0.6886\u21920.6452 matches study, OOS holdout 1.1919 confirms robustness.",
-    "HYP-071-v2 pre-registration draft prepared (fixes asymmetric-forecast-variance flaw, targets reopen_condition) plus BH trust-scope decision brief\u2014both DRAFT_PENDING_OPERATOR_APPROVAL, no hashes assigned.",
-    "Dashboard staleness resolved: prop state rebuilt clean, execution heartbeat confirmed live (fires 16:05 ET daily), both freeze-safe.",
-    "Shadow gapper: 3 signals in 17 trading days (13th, 14th, 27th July), all sub-0.05% daily returns, last signal 2026-07-27, silent since."
+    "TICK-024 committed: honest forex carry-cost model now in use; portfolio Sharpe dropped 0.6886\u21920.6452 in-sample, OOS holdout stable at 1.1919\u2014numbers match pre-commit study.",
+    "HYP-071-v2 pre-registration drafted with asymmetric-forecast-variance fix (DRAFT_PENDING_OPERATOR_APPROVAL); BH trust-scope tradeoff memo ready\u2014both files awaiting your gate-open decision.",
+    "Shadow gapper: 3 signals in last 18 days (Jul 13, 14, 27); constitutional day returns 0.000456, 0.000042, 0.000357\u2014live edge detection working but thin.",
+    "Dashboard heartbeat self-resolved; execution harness loaded and firing on schedule (16:05 ET weekdays); no blocker there."
   ],
-  "what_it_means": "The carry model is now honest and locked in; the system baseline is real. HYP-071-v2's two documents are ready for your approval\u2014one fixes the v1/v2 confound (requires your choice on symmetric resampling vs dropping \u03bb\u00b7DD), the other frames the BH multiple-testing tradeoff (retroactive vs forward-only). Shadow gapper shows signal scarcity and tiny magnitude in live conditions\u2014not a priority until the gates open and real fills are measured.",
-  "todays_one_thing": "Review and approve (or reject) the two HYP-071-v2 draft documents in `research/HYP-071_v2_prereg.DRAFT.md` and `plans/TRUST_DECISION_BRIEF.md`; your decision on (a) symmetric resampling or (b) drop \u03bb\u00b7DD unlocks the ignition gate.",
+  "what_it_means": "The honest carry model is in the live codebase with verified OOS robustness\u2014you're trading with real financing costs now, not fallback tables. HYP-071-v2 is prepped to reopen the ledger once you pick your BH scope (retroactive vs forward-only) and symmetric-resampling strategy. Gapper shadow is live but signal sparse\u2014not yet a sizing problem, but watch the 09:31 entry fill behavior when the next batch arrives.",
+  "todays_one_thing": "Review and approve (or reject/revise) the two DRAFT files in `research/` and `plans/` \u2014 HYP-071-v2 pre-reg hash + BH trust scope \u2014 so Colin can flip the training-gate flag and restart hypothesis adjudication.",
   "progression": [
     {
       "gate": "G1",
       "label": "30 clean shadow days (ICARUS)",
       "state": "IN_PROGRESS",
-      "pct": 57,
-      "detail": "17/30 days recorded \u00b7 3 green"
+      "pct": 60,
+      "detail": "18/30 days recorded \u00b7 3 green"
     },
     {
       "gate": "G2",
@@ -47,5 +47,5 @@
   ],
   "source": "oracle-llm",
   "model": "claude-haiku-4-5-20251001",
-  "generated_at": "2026-08-05T18:26:52.628986+00:00"
+  "generated_at": "2026-08-06T14:44:56.450506+00:00"
 }

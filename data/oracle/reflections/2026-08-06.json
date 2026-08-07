@@ -1,0 +1,26 @@
+{
+  "date": "2026-08-06",
+  "generated_at": "2026-08-06T14:43:12.688521+00:00",
+  "input_tokens": 5456,
+  "output_tokens": 731,
+  "estimated_cost_usd": 0.136665,
+  "harvest_days_read": 7,
+  "reflection": {
+    "candidate_lesson": {
+      "lesson_text": "When the 30-indicator consensus shows high conviction (conv >= 100%) but green_matches <= 1, the signal is a statistical orphan \u2014 trust the historical hit rate, not the live conviction number.",
+      "mechanism": "Conviction measures live indicator agreement (breadth of bullish votes), while green_matches counts how many times a near-identical live configuration produced a win historically. A 100% conviction with 1 green_match means the system has never actually seen this exact regime pay off \u2014 the confidence is spatial (indicators agreeing right now) not temporal (this pattern working before). Institutional flow can produce broad indicator agreement at exhaustion points, so unanchored conviction is where crowded late-trend entries cluster.",
+      "testable_rule": "if consensus_conviction >= 1.0 and green_matches <= 1: size *= 0.5  # require temporal confirmation, not just live breadth",
+      "expected_impact": "Win rate +2-4% and Sharpe +0.02-0.04 by de-weighting EURUSD-type signals (conv=100%, green_matches=1) that lack historical analog support.",
+      "evidence_from_harvest": "EURUSD shows conv=100% but green_matches=1 and USDJPY shows conv=100% with green_matches=0 \u2014 both maximally 'confident' yet nearly unanchored historically, while GBPUSD (conv=83%, green_matches=4, hist_hr=68%) and AUDUSD (conv=75%, green_matches=3, hist_hr=68%) have lower conviction but more historical analogs.",
+      "evidence_from_reasoning": null,
+      "reasoning_component_targeted": "green_matches",
+      "sample_needed": 30
+    },
+    "retirement_flag": {
+      "lesson_to_review": null,
+      "reason": null
+    },
+    "system_health_note": "Zero trades in 7 days with regime=UNKNOWN and TradingView showing 0 signals \u2014 system is correctly in observation mode but decision logs are empty, so all lessons must remain harvest-grounded until RQ-006 unblocks at 30+ trades."
+  },
+  "auto_validation": null
+}

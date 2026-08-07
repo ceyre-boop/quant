@@ -1,16 +1,16 @@
 {
-  "date": "2026-08-05",
-  "generated_at": "2026-08-05T17:01:31.452851+00:00",
-  "meta_regime": "BREADTH",
-  "regime_read": "ES & NQ moving together \u2014 broad agreement, more DURABLE directional signal. Trust the direction more.",
-  "narrative": "Macro backdrop \u2014\n[2026-08-05] US economic state (FRED):\n  Growth: real GDP 1.5% (q/q ann)\n  Inflation: CPI 2.87% YoY | core CPI 1.93% | core PCE 2.8% (Fed target 2%)\n  Labor: unemployment 4.2%\n  Rates: fed funds 3.63% | 10Y 4.7% | 10Y-2Y 0.43% (NORMAL)\n  Consumer: UMich sentiment 49.5 | VIX 15.86\n\n---\nRecent market action has seen both ES and NQ moving together, with a strong contemporaneous correlation of 0.932. This suggests that the current regime is BREADTH, indicating broad agreement among market participants on the direction of the trade. The lead-lag analysis shows no clear leader, but there is a slight positive bias at lag -1 and a best correlation of 0.099 at lag 1, which implies some directional signal but not strong enough to warrant high confidence in any specific trade setup. The volume profile for both ES and NQ indicates accumulation zones around the price levels of 7468.7 for ES and 28580.31 for NQ, with these areas acting as key support levels that could invalidate a long bias if broken. The recent move by ES to 7801.8 from its prior day high of 7786.0 suggests buying interest but also hints at potential profit-taking near the session's high. The NQ/ES lead-lag regime classification, while indicating broad agreement, does not provide a clear edge for directional trading due to mixed signals. News items such as geopolitical tensions and earnings reports from tech firms could influence market sentiment, but their impact is likely to be moderate given the current regime. Event calendar highlights include Nonfarm Payrolls on 2026-08-07 and CPI on 2026-08-12, both of which are high-impact events that may require traders to adjust their positions accordingly. Given these factors, a long-the-dip bias is suggested with a probability of ~65%, invalidated below 30,375 for NQ.",
+  "date": "2026-08-06",
+  "generated_at": "2026-08-06T14:38:15.150875+00:00",
+  "meta_regime": "ROTATION_WARN",
+  "regime_read": "NQ weak vs ES \u2014 rotation OUT of tech. A breadth/rotation warning; tech-led longs are suspect.",
+  "narrative": "Macro backdrop \u2014\n[2026-08-06] US economic state (FRED):\n  Growth: real GDP 1.5% (q/q ann)\n  Inflation: CPI 2.87% YoY | core CPI 1.93% | core PCE 2.8% (Fed target 2%)\n  Labor: unemployment 4.2%\n  Rates: fed funds 3.63% | 10Y 4.63% | 10Y-2Y 0.45% (NORMAL)\n  Consumer: UMich sentiment 49.5 | VIX 16.5\n\n---\nRecent market action shows a slight divergence between NQ and ES, with NQ lagging behind. This is consistent with the ROTATION_WARN regime, indicating that tech stocks are under pressure relative to broader markets. The lead-lag analysis suggests that any rotation out of tech could be significant, making it prudent to maintain a cautious stance on tech-heavy positions like NQ. However, the overall market environment remains supportive for ES, which is above its 200-day SMA and showing positive daily returns. News from geopolitical events and corporate earnings have mixed implications but do not provide strong directional cues at this time. The upcoming Nonfarm Payrolls report on August 7th will be a key event, likely to impact market sentiment significantly. Given the ROTATION_WARN regime and the potential for a rotation out of tech, we maintain a long-the-dip bias with a probability of ~65%, invalidated below 30,375 in NQ. The volume profile indicates strong accumulation around key levels, suggesting that any pullback could be bought.",
   "big_move_headline": {
-    "headline": "Today's likeliest institutional move: SHORT USDJPY (P 72%, ~0.91% range, conf 47%).",
+    "headline": "Today's likeliest institutional move: SHORT USDJPY (P 72%, ~0.90% range, conf 44%).",
     "pair": "USDJPY",
     "direction": "SHORT",
     "p_big": 0.7211,
-    "confidence": 0.471,
-    "expected_magnitude_pct": 0.9051,
+    "confidence": 0.444,
+    "expected_magnitude_pct": 0.9025,
     "session": "OFF_HOURS",
     "drivers": [
       [
@@ -19,73 +19,73 @@
       ],
       [
         "momentum",
-        -0.735
+        -0.6676
       ],
       [
         "displacement",
-        -0.0521
+        -0.0234
       ]
     ],
     "validation_status": "UNVALIDATED \u2014 display only (run scripts/validate_big_move.py)"
   },
   "directional_bias": "LONG",
   "confidence": 75,
-  "regime_call": "BREADTH",
+  "regime_call": "ROTATION_WARN",
   "key_level": null,
   "synthesis_source": "ollama/qwen2.5",
   "lead_lag": {
-    "regime": "BREADTH",
-    "spread_avg": -0.00093,
+    "regime": "ROTATION_WARN",
+    "spread_avg": -0.00186,
     "leader": "NONE",
-    "corr": 0.932,
+    "corr": 0.93,
     "divergence": false
   },
   "volume_profile": {
     "ES=F": {
       "symbol": "ES=F",
-      "as_of": "2026-08-05T12:31:31.546076+00:00",
+      "as_of": "2026-08-06T12:33:33.802087+00:00",
       "days": 5,
       "bins": 40,
-      "poc": 7769.96,
-      "value_area_low": 7441.31,
-      "value_area_high": 7779.09,
+      "poc": 7765.02,
+      "value_area_low": 7555.0,
+      "value_area_high": 7812.45,
       "high_volume_nodes": [
-        7769.96,
-        7633.03,
-        7523.48,
-        7468.7,
-        7779.09
+        7765.02,
+        7771.8,
+        7629.52,
+        7812.45,
+        7751.47
       ],
       "price_range": [
-        7436.75,
-        7801.92
+        7544.83,
+        7815.83
       ],
       "limitation": "Volume profile = WHERE volume traded (volume-at-price). NOT order-flow delta (buy/sell aggression). True delta needs a CME order-flow feed (Databento/CQG)."
     },
     "NQ=F": {
       "symbol": "NQ=F",
-      "as_of": "2026-08-05T12:31:31.599055+00:00",
+      "as_of": "2026-08-06T12:33:33.837579+00:00",
       "days": 5,
       "bins": 40,
-      "poc": 28488.32,
-      "value_area_low": 28166.33,
-      "value_area_high": 29914.25,
+      "poc": 29860.77,
+      "value_area_low": 28481.03,
+      "value_area_high": 29986.2,
       "high_volume_nodes": [
-        28488.32,
-        28902.3,
-        28442.32,
-        29868.26,
-        28580.31
+        29860.77,
+        29818.96,
+        28899.13,
+        29526.29,
+        29777.15
       ],
       "price_range": [
-        28143.33,
-        29983.25
+        28376.5,
+        30048.92
       ],
       "limitation": "Volume profile = WHERE volume traded (volume-at-price). NOT order-flow delta (buy/sell aggression). True delta needs a CME order-flow feed (Databento/CQG)."
     }
   },
   "macro_economic": {
-    "text": "[2026-08-05] US economic state (FRED):\n  Growth: real GDP 1.5% (q/q ann)\n  Inflation: CPI 2.87% YoY | core CPI 1.93% | core PCE 2.8% (Fed target 2%)\n  Labor: unemployment 4.2%\n  Rates: fed funds 3.63% | 10Y 4.7% | 10Y-2Y 0.43% (NORMAL)\n  Consumer: UMich sentiment 49.5 | VIX 15.86",
+    "text": "[2026-08-06] US economic state (FRED):\n  Growth: real GDP 1.5% (q/q ann)\n  Inflation: CPI 2.87% YoY | core CPI 1.93% | core PCE 2.8% (Fed target 2%)\n  Labor: unemployment 4.2%\n  Rates: fed funds 3.63% | 10Y 4.63% | 10Y-2Y 0.45% (NORMAL)\n  Consumer: UMich sentiment 49.5 | VIX 16.5",
     "summary": {
       "gdp_growth_pct": 1.5,
       "cpi_yoy_pct": 2.87,
@@ -93,11 +93,11 @@
       "core_pce_yoy_pct": 2.8,
       "unemployment_pct": 4.2,
       "fed_funds_pct": 3.63,
-      "ten_year_pct": 4.7,
-      "yield_curve_10y2y": 0.43,
+      "ten_year_pct": 4.63,
+      "yield_curve_10y2y": 0.45,
       "yield_curve_state": "NORMAL",
       "consumer_sentiment": 49.5,
-      "vix": 15.86
+      "vix": 16.5
     }
   },
   "news_count": 9,
@@ -107,19 +107,19 @@
       "date": "2026-08-07",
       "source": "cadence_estimate",
       "action": "high-impact 8:30 ET \u2014 widen stops / size down",
-      "days_until": 2,
-      "note": "in 2d \u2014 high-impact 8:30 ET \u2014 widen stops / size down"
+      "days_until": 1,
+      "note": "in 1d \u2014 high-impact 8:30 ET \u2014 widen stops / size down"
     },
     {
       "event": "CPI",
       "date": "2026-08-12",
       "source": "cadence_estimate",
       "action": "inflation print 8:30 ET \u2014 reduce size into window",
-      "days_until": 7,
-      "note": "in 7d \u2014 inflation print 8:30 ET \u2014 reduce size into window"
+      "days_until": 6,
+      "note": "in 6d \u2014 inflation print 8:30 ET \u2014 reduce size into window"
     }
   ],
-  "scorecard_summary": "Briefing scorecard: n=20 dir-calls, hit 0.75, regime acc 0.386 \u2014 CALIBRATING \u2014 need ~30-60 samples before the hit-rate/calibration mean anything",
+  "scorecard_summary": "Briefing scorecard: n=21 dir-calls, hit 0.714, regime acc 0.378 \u2014 CALIBRATING \u2014 need ~30-60 samples before the hit-rate/calibration mean anything",
   "bias": "size to regime: trust direction more in BREADTH, less in CONCENTRATION; ROTATION_WARN = treat tech-led longs as suspect",
   "provenance": {
     "source": "oracle_morning_briefing",

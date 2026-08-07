@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-05T18:25:25.530012+00:00",
-  "as_of_date": "2026-08-05",
+  "generated_at": "2026-08-06T14:43:13.287051+00:00",
+  "as_of_date": "2026-08-06",
   "current_lesson": {
     "components": [
       "active",
@@ -46,15 +46,15 @@
     ],
     "component_label": "green_matches",
     "first_seen": "2026-05-29",
-    "last_seen": "2026-08-05",
-    "days_forming": 68,
-    "n_revisions": 46,
-    "n_days_appeared": 46,
+    "last_seen": "2026-08-06",
+    "days_forming": 69,
+    "n_revisions": 47,
+    "n_days_appeared": 47,
     "stable_days": 1,
     "status": "forming",
     "time_to_converge_days": null,
-    "latest_lesson_text": "When 30-indicator conviction hits 100% but green_matches (historical library confirmation) is \u22641, the setup is a fresh-but-unlibraried signal that should be sized down, not up \u2014 high live conviction without historical analog is regime novelty, not edge.",
-    "latest_rule": "if consensus_conviction >= 0.95 and green_matches <= 1: size_multiplier *= 0.6  # de-rate unlibraried high-conviction signals; require green_matches >= 3 for full size",
+    "latest_lesson_text": "When the 30-indicator consensus shows high conviction (conv >= 100%) but green_matches <= 1, the signal is a statistical orphan \u2014 trust the historical hit rate, not the live conviction number.",
+    "latest_rule": "if consensus_conviction >= 1.0 and green_matches <= 1: size *= 0.5  # require temporal confirmation, not just live breadth",
     "history": [
       {
         "date": "2026-05-29",
@@ -239,6 +239,10 @@
       {
         "date": "2026-08-05",
         "rule": "if consensus_conviction >= 0.95 and green_matches <= 1: size_multiplier *= 0.6  # de-rate unlibraried high-conviction signals; require green_matches >= 3 for full size"
+      },
+      {
+        "date": "2026-08-06",
+        "rule": "if consensus_conviction >= 1.0 and green_matches <= 1: size *= 0.5  # require temporal confirmation, not just live breadth"
       }
     ]
   },
@@ -288,15 +292,15 @@
       ],
       "component_label": "green_matches",
       "first_seen": "2026-05-29",
-      "last_seen": "2026-08-05",
-      "days_forming": 68,
-      "n_revisions": 46,
-      "n_days_appeared": 46,
+      "last_seen": "2026-08-06",
+      "days_forming": 69,
+      "n_revisions": 47,
+      "n_days_appeared": 47,
       "stable_days": 1,
       "status": "forming",
       "time_to_converge_days": null,
-      "latest_lesson_text": "When 30-indicator conviction hits 100% but green_matches (historical library confirmation) is \u22641, the setup is a fresh-but-unlibraried signal that should be sized down, not up \u2014 high live conviction without historical analog is regime novelty, not edge.",
-      "latest_rule": "if consensus_conviction >= 0.95 and green_matches <= 1: size_multiplier *= 0.6  # de-rate unlibraried high-conviction signals; require green_matches >= 3 for full size",
+      "latest_lesson_text": "When the 30-indicator consensus shows high conviction (conv >= 100%) but green_matches <= 1, the signal is a statistical orphan \u2014 trust the historical hit rate, not the live conviction number.",
+      "latest_rule": "if consensus_conviction >= 1.0 and green_matches <= 1: size *= 0.5  # require temporal confirmation, not just live breadth",
       "history": [
         {
           "date": "2026-05-29",
@@ -481,6 +485,10 @@
         {
           "date": "2026-08-05",
           "rule": "if consensus_conviction >= 0.95 and green_matches <= 1: size_multiplier *= 0.6  # de-rate unlibraried high-conviction signals; require green_matches >= 3 for full size"
+        },
+        {
+          "date": "2026-08-06",
+          "rule": "if consensus_conviction >= 1.0 and green_matches <= 1: size *= 0.5  # require temporal confirmation, not just live breadth"
         }
       ]
     }

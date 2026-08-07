@@ -1,14 +1,14 @@
 {
-  "generated_at": "2026-08-05T23:53:07.299159+00:00",
+  "generated_at": "2026-08-07T00:15:44.792419+00:00",
   "alive": true,
-  "fired_today": true,
+  "fired_today": false,
   "frozen": null,
-  "scan_age_hours": 11.4,
+  "scan_age_hours": 11.7,
   "n_pairs_scanned": 3,
   "n_would_fire_today": 2,
   "strongest_signal": {
     "pair": "USDJPY=X",
-    "conviction": 0.409,
+    "conviction": 0.402,
     "direction": "NO_TRADE",
     "pct_to_trigger": 100.0,
     "regime": "TRENDING",
@@ -17,7 +17,7 @@
   "pairs": [
     {
       "pair": "USDJPY=X",
-      "conviction": 0.409,
+      "conviction": 0.402,
       "direction": "NO_TRADE",
       "pct_to_trigger": 100.0,
       "regime": "TRENDING",
@@ -25,7 +25,7 @@
     },
     {
       "pair": "GBPUSD=X",
-      "conviction": 0.377,
+      "conviction": 0.384,
       "direction": "LONG",
       "pct_to_trigger": 100.0,
       "regime": "TRENDING",
@@ -33,7 +33,7 @@
     },
     {
       "pair": "AUDUSD=X",
-      "conviction": 0.358,
+      "conviction": 0.251,
       "direction": "LONG",
       "pct_to_trigger": 100.0,
       "regime": "TRENDING",
@@ -45,10 +45,10 @@
     "direction": "LONG",
     "fill_price": 0.70513,
     "date": "2026-08-05",
-    "days_ago": 0.5
+    "days_ago": 1.5
   },
   "loops_alive": 7,
   "loops_down": [],
-  "summary_line": "\ud83d\udfe2 TRADE FIRED today: AUD_USD LONG @ 0.70513. 3 pairs scanned 11.4h ago \u2014 2 signalling (GBPUSD=X LONG, AUDUSD=X LONG). Highest conviction: USDJPY=X 0.409. ",
+  "summary_line": "System alive. 3 pairs scanned 11.7h ago \u2014 2 signalling (GBPUSD=X LONG, AUDUSD=X LONG). Highest conviction: USDJPY=X 0.402. Last fill: AUD_USD LONG, 1.5d ago.",
   "note": "Honest proof-of-life: would-be signals + proximity, never a forced trade. Read-only."
 }

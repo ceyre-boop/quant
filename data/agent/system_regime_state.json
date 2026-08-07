@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-06T00:58:14.875546+00:00",
+  "generated_at": "2026-08-07T01:49:02.737364+00:00",
   "status": "DEGRADED",
   "status_reason": "carry:STALE; es_nq:STALE; macro:OK; portfolio:UNAVAILABLE",
   "strategies": {
@@ -8,9 +8,9 @@
       "verdict": "STAND_ASIDE",
       "favorable": false,
       "size_multiplier": 0.0,
-      "reason": "forex_proximity.json 12.4h old > 12.0h freshness limit",
+      "reason": "forex_proximity.json 13.3h old > 12.0h freshness limit",
       "source": "data/agent/forex_proximity.json",
-      "source_age_hours": 12.445,
+      "source_age_hours": 13.258,
       "detail": {}
     },
     "es_nq": {
@@ -18,9 +18,9 @@
       "verdict": "STAND_ASIDE",
       "favorable": false,
       "size_multiplier": 0.0,
-      "reason": "nqes_regime.json 12.4h old > 12.0h freshness limit",
+      "reason": "nqes_regime.json 13.3h old > 12.0h freshness limit",
       "source": "data/research/nqes_regime.json",
-      "source_age_hours": 12.445,
+      "source_age_hours": 13.258,
       "detail": {}
     },
     "macro": {
@@ -30,13 +30,13 @@
       "size_multiplier": 0.0,
       "reason": "macro backdrop INFO (VIX / curve / credit) \u2014 shared input",
       "source": "data/macro/macro_snapshot.json",
-      "source_age_hours": 1.192,
+      "source_age_hours": 1.661,
       "detail": {
-        "vix": 15.81,
-        "curve_10y2y": 0.467,
-        "curve_10y3m": 0.892,
-        "credit_hyg": 79.52,
-        "dgs10": 4.617
+        "vix": 15.15,
+        "curve_10y2y": 0.52,
+        "curve_10y3m": 0.938,
+        "credit_hyg": 79.46,
+        "dgs10": 4.67
       }
     }
   },
