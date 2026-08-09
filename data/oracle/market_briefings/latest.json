@@ -1,16 +1,16 @@
 {
-  "date": "2026-08-07",
-  "generated_at": "2026-08-07T14:28:34.819025+00:00",
+  "date": "2026-08-08",
+  "generated_at": "2026-08-08T13:30:59.147629+00:00",
   "meta_regime": "BREADTH",
   "regime_read": "ES & NQ moving together \u2014 broad agreement, more DURABLE directional signal. Trust the direction more.",
-  "narrative": "Macro backdrop \u2014\n[2026-08-07] US economic state (FRED):\n  Growth: real GDP 1.5% (q/q ann)\n  Inflation: CPI 2.87% YoY | core CPI 1.93% | core PCE 2.8% (Fed target 2%)\n  Labor: unemployment 4.2%\n  Rates: fed funds 3.63% | 10Y 4.63% | 10Y-2Y 0.44% (NORMAL)\n  Consumer: UMich sentiment 49.5 | VIX 15.81\n\n---\nRecent market action has seen both ES and NQ moving together, indicating a broad agreement in the current direction. The lead-lag analysis shows that the best lag is -1 day with a correlation of -0.078, suggesting that ES leads NQ slightly but not strongly enough to warrant aggressive directional bets. However, given the high contemporaneous correlation (0.932), we should trust this direction more and consider long-the-dip strategies in both indices. The volume profile for ES shows a point of convergence (POC) at 7765.82, indicating accumulation zone support. For NQ, the POC is at 29526.29 with significant high-volume nodes around this level, reinforcing the idea that the market is consolidating near these levels. The event calendar highlights a Nonfarm Payrolls report today and an inflation print next week, both of which could significantly impact market sentiment. Given the current regime of breadth and the mixed signals from lead-lag analysis, we maintain a long-the-dip bias with a probability of ~75%, invalidated below 30,375 for NQ.",
+  "narrative": "Macro backdrop \u2014\n[2026-08-08] US economic state (FRED):\n  Growth: real GDP 1.5% (q/q ann)\n  Inflation: CPI 2.87% YoY | core CPI 1.93% | core PCE 2.8% (Fed target 2%)\n  Labor: unemployment 4.1%\n  Rates: fed funds 3.63% | 10Y 4.69% | 10Y-2Y 0.46% (NORMAL)\n  Consumer: UMich sentiment 49.5 | VIX 15.15\n\n---\nRecent market action in the ES/NQ futures pair has been characterized by a strong move together, indicative of a BREADTH regime. This is evidenced by the lead-lag analysis showing contemporaneous correlation at 0.933 and the best lag being -1 day with a correlation of -0.077, suggesting that both indices are moving in tandem. The market is currently trading above its respective SMAs200, indicating bullish momentum. The daily return for ES is 0.58% and NQ at 1.18%, pointing to a broader agreement on the direction of the markets rather than a concentrated move by one index over the other. This suggests that traders should trust the current directional signal more as it appears durable.\n\nVolume profile analysis indicates key accumulation zones for both ES (7625.77-7812.5) and NQ (28899.13-29986.2). The price of control (POC) for ES is at 7765.82, while for NQ it's at 29526.29. These levels represent areas where significant volume has traded and could act as support or resistance in the near term.\n\nThe recent news highlights a mixed economic picture with unexpected job losses but falling unemployment rates, which could impact market sentiment around Fed rate hikes. Additionally, geopolitical tensions, particularly regarding Iran, are adding volatility to the markets. The upcoming CPI report on August 12th is expected to provide further clarity on inflation trends and may influence market direction.\n\nGiven the current BREADTH regime and the strong move together in ES/NQ, we have a LONG bias with a confidence level of 75%. However, traders should be cautious as the lead-lag relationship is not perfectly clean. The key invalidation levels for NQ are below 29300, which would suggest a shift towards a ROTATION regime and a potential short opportunity.",
   "big_move_headline": {
-    "headline": "Today's likeliest institutional move: SHORT USDJPY (P 65%, ~0.88% range, conf 30%).",
+    "headline": "Today's likeliest institutional move: SHORT USDJPY (P 66%, ~0.89% range, conf 37%).",
     "pair": "USDJPY",
     "direction": "SHORT",
-    "p_big": 0.6524,
-    "confidence": 0.3,
-    "expected_magnitude_pct": 0.8835,
+    "p_big": 0.6641,
+    "confidence": 0.37,
+    "expected_magnitude_pct": 0.8945,
     "session": "OFF_HOURS",
     "drivers": [
       [
@@ -19,11 +19,11 @@
       ],
       [
         "momentum",
-        -0.192
+        -0.2691
       ],
       [
         "displacement",
-        0.0127
+        -0.157
       ]
     ],
     "validation_status": "UNVALIDATED \u2014 display only (run scripts/validate_big_move.py)"
@@ -35,26 +35,26 @@
   "synthesis_source": "ollama/qwen2.5",
   "lead_lag": {
     "regime": "BREADTH",
-    "spread_avg": -0.00136,
+    "spread_avg": -0.00128,
     "leader": "NONE",
-    "corr": 0.932,
+    "corr": 0.933,
     "divergence": false
   },
   "volume_profile": {
     "ES=F": {
       "symbol": "ES=F",
-      "as_of": "2026-08-07T12:43:10.469833+00:00",
+      "as_of": "2026-08-08T12:35:33.855042+00:00",
       "days": 5,
       "bins": 40,
       "poc": 7765.82,
-      "value_area_low": 7599.1,
+      "value_area_low": 7625.77,
       "value_area_high": 7812.5,
       "high_volume_nodes": [
         7765.82,
-        7752.48,
-        7732.47,
         7772.49,
-        7739.14
+        7779.16,
+        7752.48,
+        7759.15
       ],
       "price_range": [
         7549.08,
@@ -64,18 +64,18 @@
     },
     "NQ=F": {
       "symbol": "NQ=F",
-      "as_of": "2026-08-07T12:43:10.533606+00:00",
+      "as_of": "2026-08-08T12:35:33.921141+00:00",
       "days": 5,
       "bins": 40,
       "poc": 29526.29,
-      "value_area_low": 28481.03,
+      "value_area_low": 28899.13,
       "value_area_high": 29986.2,
       "high_volume_nodes": [
         29526.29,
-        29568.1,
-        29860.77,
-        29484.48,
-        29818.96
+        29818.96,
+        29735.34,
+        29777.15,
+        29860.77
       ],
       "price_range": [
         28376.5,
@@ -85,41 +85,33 @@
     }
   },
   "macro_economic": {
-    "text": "[2026-08-07] US economic state (FRED):\n  Growth: real GDP 1.5% (q/q ann)\n  Inflation: CPI 2.87% YoY | core CPI 1.93% | core PCE 2.8% (Fed target 2%)\n  Labor: unemployment 4.2%\n  Rates: fed funds 3.63% | 10Y 4.63% | 10Y-2Y 0.44% (NORMAL)\n  Consumer: UMich sentiment 49.5 | VIX 15.81",
+    "text": "[2026-08-08] US economic state (FRED):\n  Growth: real GDP 1.5% (q/q ann)\n  Inflation: CPI 2.87% YoY | core CPI 1.93% | core PCE 2.8% (Fed target 2%)\n  Labor: unemployment 4.1%\n  Rates: fed funds 3.63% | 10Y 4.69% | 10Y-2Y 0.46% (NORMAL)\n  Consumer: UMich sentiment 49.5 | VIX 15.15",
     "summary": {
       "gdp_growth_pct": 1.5,
       "cpi_yoy_pct": 2.87,
       "core_cpi_yoy_pct": 1.93,
       "core_pce_yoy_pct": 2.8,
-      "unemployment_pct": 4.2,
+      "unemployment_pct": 4.1,
       "fed_funds_pct": 3.63,
-      "ten_year_pct": 4.63,
-      "yield_curve_10y2y": 0.44,
+      "ten_year_pct": 4.69,
+      "yield_curve_10y2y": 0.46,
       "yield_curve_state": "NORMAL",
       "consumer_sentiment": 49.5,
-      "vix": 15.81
+      "vix": 15.15
     }
   },
-  "news_count": 14,
+  "news_count": 11,
   "event_calendar": [
-    {
-      "event": "Nonfarm Payrolls",
-      "date": "2026-08-07",
-      "source": "cadence_estimate",
-      "action": "high-impact 8:30 ET \u2014 widen stops / size down",
-      "days_until": 0,
-      "note": "TODAY \u2014 high-impact 8:30 ET \u2014 widen stops / size down"
-    },
     {
       "event": "CPI",
       "date": "2026-08-12",
       "source": "cadence_estimate",
       "action": "inflation print 8:30 ET \u2014 reduce size into window",
-      "days_until": 5,
-      "note": "in 5d \u2014 inflation print 8:30 ET \u2014 reduce size into window"
+      "days_until": 4,
+      "note": "in 4d \u2014 inflation print 8:30 ET \u2014 reduce size into window"
     }
   ],
-  "scorecard_summary": "Briefing scorecard: n=22 dir-calls, hit 0.682, regime acc 0.391 \u2014 CALIBRATING \u2014 need ~30-60 samples before the hit-rate/calibration mean anything",
+  "scorecard_summary": "Briefing scorecard: n=23 dir-calls, hit 0.696, regime acc 0.383 \u2014 CALIBRATING \u2014 need ~30-60 samples before the hit-rate/calibration mean anything",
   "bias": "size to regime: trust direction more in BREADTH, less in CONCENTRATION; ROTATION_WARN = treat tech-led longs as suspect",
   "provenance": {
     "source": "oracle_morning_briefing",
