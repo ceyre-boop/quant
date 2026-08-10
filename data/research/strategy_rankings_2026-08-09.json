@@ -1,0 +1,74 @@
+[
+  {
+    "name": "v015 4-Pair Carry Portfolio — LIVE",
+    "pe": "N/A (forex, not equities)",
+    "sharpe": 1.25,
+    "trades": 103,
+    "rating": "1 — CONFIRMED, LIVE",
+    "notes": "The only strategy actually deployed. OOS Sharpe 1.25 (decay 2.17 ROBUST, perm p<0.001, re-measured 2026-06-07). Built on HYP-045 AUDNZD exclusion (OOS Sharpe 1.08, CI[0.84,1.32], p=0.0033), HYP-059 exit-mechanism finding (time exits carry +141.9R, trailing stop is -49.0R over same 318 trades), HYP-062 cost-robustness (breakeven spread multiplier 12.46x vs live 1x), HYP-063 FDR-survival (12/26 edges survive Benjamini-Hochberg)."
+  },
+  {
+    "name": "CB-Blackout Veto (HYP-061)",
+    "pe": "",
+    "sharpe": "",
+    "trades": 101,
+    "rating": "2 — Confirmed effect, NOT wired, data conflict flagged",
+    "notes": "Strong internal numbers (dSharpe +0.13, perm p=0.005) but sits on the ICT base strategy which is itself NOT proven (p=0.52) — this is loser-avoidance, not proof of an edge. Ledger's own status field says REJECTED while the same record's data and HYP-063's meta-analysis call it a deployed edge. Unresolved ledger bug, not resolved here."
+  },
+  {
+    "name": "ICT Micro-Gates (Tue/Thu veto, day-of-month bias, rate-trend gate)",
+    "pe": "",
+    "sharpe": "",
+    "trades": "",
+    "rating": "3 — Confirmed gates on an unproven base",
+    "notes": "HYP-050, HYP-051, HYP-052. Individually statistically clean, but all sit on top of the ICT pattern edge, which fails standalone significance (p=0.52). Not tradable on their own."
+  },
+  {
+    "name": "HYP-093 Parabolic Gapper Fade (Undertow)",
+    "pe": "",
+    "sharpe": "",
+    "trades": 559,
+    "rating": "4 — Real but too small to trade",
+    "notes": "VALID_BUT_BELOW_FLOOR. boot_p=0.0312, DSR=0.987, but expected return/day (+0.00023) is below the constitutional floor (0.0005). A real, proven, currently un-tradable edge — not insufficient data, just below the size threshold."
+  },
+  {
+    "name": "V3 / V4 Carry Exit Variants",
+    "pe": "",
+    "sharpe": 0.098,
+    "trades": "",
+    "rating": "5 — REJECTED",
+    "notes": "Real price-path re-simulation (RQ-REST-013) showed the current live exit rule already beats both proposals (trail_wide_2.0 Sharpe 0.126 vs V3's time-exit fix at 0.097-0.098). V4 grid search failed OOS significance after correction (p=0.0175 vs Sidak threshold 0.0019) and blew the drawdown cap (2.03x vs 1.25x). Do not ship."
+  },
+  {
+    "name": "v007 Per-Pair Hold Overrides (HYP-046a/b/c)",
+    "pe": "",
+    "sharpe": "",
+    "trades": "",
+    "rating": "5 — REJECTED live despite ledger CONFIRMED",
+    "notes": "Ledger marks these CONFIRMED individually, but they were rolled back live 2026-06-07 for failing walk-forward. Repo CLAUDE.md is the source of truth here, not the ledger entry."
+  },
+  {
+    "name": "Overnight-QQQ Standalone Edge",
+    "pe": "",
+    "sharpe": 0.574,
+    "trades": "",
+    "rating": "5 — REJECTED as diversifier",
+    "notes": "Real standalone edge (net Sharpe 0.574), but re-couples with carry in a crash (rho=0.42, BH p=0.007) — correlated return-stacking, not a second independent edge."
+  },
+  {
+    "name": "ICT Rejection Block (NQ)",
+    "pe": "",
+    "sharpe": "",
+    "trades": "",
+    "rating": "5 — REJECTED",
+    "notes": "p=0.774 on 30-day NQ backtest. No edge."
+  },
+  {
+    "name": "JJ-style High-Frequency Profile (5 trades/wk, 55% WR target)",
+    "pe": "",
+    "sharpe": "",
+    "trades": 0,
+    "rating": "6 — UNTESTED, spec only",
+    "notes": "Monte Carlo projects 75%/94% pass probability IF this edge is real. Zero real trades logged. Blocked on NQ intraday data (Databento/Polygon key needed). Do not size capital against this."
+  }
+]

@@ -1,42 +1,43 @@
 {
-  "generated_at": "2026-08-08T23:36:00.731190+00:00",
+  "generated_at": "2026-08-10T01:35:54.958622+00:00",
   "status": "DEGRADED",
-  "status_reason": "carry:STALE; es_nq:OK; macro:STALE; portfolio:UNAVAILABLE",
+  "status_reason": "carry:STALE; es_nq:STALE; macro:OK; portfolio:UNAVAILABLE",
   "strategies": {
     "carry": {
       "status": "STALE",
       "verdict": "STAND_ASIDE",
       "favorable": false,
       "size_multiplier": 0.0,
-      "reason": "forex_proximity.json 35.4h old > 12.0h freshness limit",
+      "reason": "forex_proximity.json 61.4h old > 12.0h freshness limit",
       "source": "data/agent/forex_proximity.json",
-      "source_age_hours": 35.42,
+      "source_age_hours": 61.419,
       "detail": {}
     },
     "es_nq": {
-      "status": "OK",
-      "verdict": "INFO",
-      "favorable": false,
-      "size_multiplier": 0.0,
-      "reason": "research INFO only \u2014 regime 'BREADTH'",
-      "source": "data/research/nqes_regime.json",
-      "source_age_hours": 11.007,
-      "detail": {
-        "regime": "BREADTH",
-        "read": "ES & NQ moving together \u2014 broad agreement, more DURABLE directional signal. Trust the direction more.",
-        "divergence": false,
-        "contemporaneous_corr": 0.933
-      }
-    },
-    "macro": {
       "status": "STALE",
       "verdict": "STAND_ASIDE",
       "favorable": false,
       "size_multiplier": 0.0,
-      "reason": "macro_snapshot.json 17.0h old > 12.0h freshness limit",
-      "source": "data/macro/macro_snapshot.json",
-      "source_age_hours": 17.032,
+      "reason": "nqes_regime.json 12.9h old > 12.0h freshness limit",
+      "source": "data/research/nqes_regime.json",
+      "source_age_hours": 12.867,
       "detail": {}
+    },
+    "macro": {
+      "status": "OK",
+      "verdict": "INFO",
+      "favorable": false,
+      "size_multiplier": 0.0,
+      "reason": "macro backdrop INFO (VIX / curve / credit) \u2014 shared input",
+      "source": "data/macro/macro_snapshot.json",
+      "source_age_hours": 0.988,
+      "detail": {
+        "vix": 14.9,
+        "curve_10y2y": 0.49,
+        "curve_10y3m": 0.95,
+        "credit_hyg": 79.61,
+        "dgs10": 4.66
+      }
     }
   },
   "portfolio": {

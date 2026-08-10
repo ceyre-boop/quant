@@ -1,6 +1,56 @@
 {
-  "timestamp": "2026-08-10T01:36:29+00:00",
-  "pairs": {
+  "timestamp": "2026-08-10T01:36:33+00:00",
+  "new_entries_since_last": 0,
+  "new_outcomes_since_last": 0,
+  "outcomes_backfilled": 0,
+  "decisions_expired": 0,
+  "loops_down": [],
+  "anomalies": [
+    {
+      "type": "REST_MODE_EXPIRED",
+      "priority": "URGENT",
+      "message": "HYP-046 (Displacement Gate >= 1.5 improves London trade qua) validated and unimplemented for 76 days. Implement it or explicitly reject it. Validated knowledge has an expiry date."
+    },
+    {
+      "type": "REST_MODE_EXPIRED",
+      "priority": "URGENT",
+      "message": "HYP-063 () validated and unimplemented for 49 days. Implement it or explicitly reject it. Validated knowledge has an expiry date."
+    }
+  ],
+  "running_stats": {},
+  "live_prices": {
+    "GBPUSD": {
+      "current": 1.34858,
+      "high_today": 1.3494,
+      "low_today": 1.34851,
+      "bars_today": 32
+    },
+    "EURUSD": {
+      "current": 1.15553,
+      "high_today": 1.1562,
+      "low_today": 1.15553,
+      "bars_today": 32
+    },
+    "USDJPY": {
+      "current": 158.183,
+      "high_today": 158.189,
+      "low_today": 157.819,
+      "bars_today": 32
+    },
+    "AUDUSD": {
+      "current": 0.70636,
+      "high_today": 0.70721,
+      "low_today": 0.70607,
+      "bars_today": 32
+    },
+    "AUDNZD": {
+      "current": 1.19998,
+      "high_today": 1.20054,
+      "low_today": 1.19866,
+      "bars_today": 32
+    }
+  },
+  "indicator_consensus": {
     "GBPUSD": {
       "bullish": 12,
       "bearish": 1,
@@ -263,5 +313,142 @@
         "order_block": 0
       }
     }
-  }
+  },
+  "g2_progress": {
+    "ict_fills": 1,
+    "forex_fills": 0,
+    "total": 24,
+    "target": 8,
+    "g2a_status": "PASS",
+    "g2a_signals": 20,
+    "g2a_win_rate": 0.6364,
+    "latest_fill": "2026-05-26 GBPUSD LONG COMMITMENT_FAILURE -0.94R",
+    "total_closed": 24,
+    "pct_complete": 3.0,
+    "win_rate": 0.125,
+    "avg_r": null,
+    "first_trade_date": "2026-05-28",
+    "latest_trade_date": "2026-07-06",
+    "estimated_g2_completion": "2026-06-21",
+    "last_updated": "2026-08-10T01:36:30+00:00"
+  },
+  "big_move": {
+    "GBPUSD": {
+      "pair": "GBPUSD",
+      "p_big": 0.7226,
+      "direction": "NEUTRAL",
+      "expected_magnitude_pct": 0.6924,
+      "expected_vs_adr": 1.45,
+      "session": "OFF_HOURS",
+      "confidence": 0.259,
+      "drivers": [
+        [
+          "event_risk",
+          0.9
+        ],
+        [
+          "compression",
+          0.4507
+        ],
+        [
+          "displacement",
+          -0.023
+        ],
+        [
+          "momentum",
+          -0.0102
+        ]
+      ],
+      "timestamp": "2026-08-10T01:36:31.898864+00:00",
+      "notes": []
+    },
+    "EURUSD": {
+      "pair": "EURUSD",
+      "p_big": 0.662,
+      "direction": "NEUTRAL",
+      "expected_magnitude_pct": 0.5742,
+      "expected_vs_adr": 1.396,
+      "session": "OFF_HOURS",
+      "confidence": 0.26,
+      "drivers": [
+        [
+          "event_risk",
+          0.9
+        ],
+        [
+          "compression",
+          0.1513
+        ],
+        [
+          "displacement",
+          -0.0662
+        ],
+        [
+          "momentum",
+          0.031
+        ]
+      ],
+      "timestamp": "2026-08-10T01:36:31.898864+00:00",
+      "notes": []
+    },
+    "USDJPY": {
+      "pair": "USDJPY",
+      "p_big": 0.719,
+      "direction": "LONG",
+      "expected_magnitude_pct": 0.9511,
+      "expected_vs_adr": 1.447,
+      "session": "OFF_HOURS",
+      "confidence": 0.297,
+      "drivers": [
+        [
+          "event_risk",
+          0.9
+        ],
+        [
+          "compression",
+          0.3951
+        ],
+        [
+          "displacement",
+          0.1001
+        ],
+        [
+          "momentum",
+          0.0657
+        ]
+      ],
+      "timestamp": "2026-08-10T01:36:31.898864+00:00",
+      "notes": []
+    },
+    "AUDUSD": {
+      "pair": "AUDUSD",
+      "p_big": 0.6541,
+      "direction": "NEUTRAL",
+      "expected_magnitude_pct": 0.8264,
+      "expected_vs_adr": 1.389,
+      "session": "OFF_HOURS",
+      "confidence": 0.253,
+      "drivers": [
+        [
+          "event_risk",
+          0.9
+        ],
+        [
+          "compression",
+          0.1032
+        ],
+        [
+          "momentum",
+          0.05
+        ],
+        [
+          "displacement",
+          -0.0396
+        ]
+      ],
+      "timestamp": "2026-08-10T01:36:31.898864+00:00",
+      "notes": []
+    }
+  },
+  "big_move_outcomes_backfilled": 12
 }

@@ -1,0 +1,142 @@
+{
+  "id": "BENCH-THROUGHPUT",
+  "generated_at": "2026-08-09T07:01:00.702169+00:00",
+  "environment": {
+    "cpu": "arm",
+    "physical_cores": 12,
+    "numba": "NOT INSTALLED \u2014 @njit kernels run as pure-Python fallback",
+    "numba_active": false,
+    "python": "3.14.4",
+    "platform": "macOS-26.3.1-arm64-arm-64bit-Mach-O"
+  },
+  "legacy_claim_backtests_per_sec": 148193,
+  "headline": {
+    "single_core_90bar": 22413.1,
+    "parallel_ceiling": 73792.4,
+    "best_bar_evals_per_sec": 8509115.0,
+    "numba_active": false,
+    "beats_legacy_claim": false
+  },
+  "matrix": [
+    {
+      "tier": "90bar",
+      "kernel": "nojit_fallback_1core",
+      "n_bars": 90,
+      "n_backtests": 33620,
+      "cores": 1,
+      "backtests_per_sec": 22413.1,
+      "ms_per_backtest": 0.044617,
+      "bar_evals_per_sec": 2017180.0
+    },
+    {
+      "tier": "90bar",
+      "kernel": "nojit_fallback_12core",
+      "n_bars": 90,
+      "n_backtests": 309750,
+      "cores": 12,
+      "backtests_per_sec": 73792.4,
+      "ms_per_backtest": 0.013552,
+      "bar_evals_per_sec": 6641314.0
+    },
+    {
+      "tier": "90bar",
+      "kernel": "pure_python_forex",
+      "n_bars": 90,
+      "n_backtests": 7631,
+      "cores": 1,
+      "backtests_per_sec": 5087.0,
+      "ms_per_backtest": 0.196581,
+      "bar_evals_per_sec": 457827.0
+    },
+    {
+      "tier": "daily",
+      "kernel": "nojit_fallback_1core",
+      "n_bars": 2175,
+      "n_backtests": 1452,
+      "cores": 1,
+      "backtests_per_sec": 967.9,
+      "ms_per_backtest": 1.033133,
+      "bar_evals_per_sec": 2105247.0
+    },
+    {
+      "tier": "daily",
+      "kernel": "nojit_fallback_12core",
+      "n_bars": 2175,
+      "n_backtests": 17419,
+      "cores": 12,
+      "backtests_per_sec": 3912.2,
+      "ms_per_backtest": 0.255608,
+      "bar_evals_per_sec": 8509115.0
+    },
+    {
+      "tier": "daily",
+      "kernel": "pure_python_forex",
+      "n_bars": 2175,
+      "n_backtests": 272,
+      "cores": 1,
+      "backtests_per_sec": 181.1,
+      "ms_per_backtest": 5.521819,
+      "bar_evals_per_sec": 393892.0
+    },
+    {
+      "tier": "5min",
+      "kernel": "nojit_fallback_1core",
+      "n_bars": 166941,
+      "n_backtests": 19,
+      "cores": 1,
+      "backtests_per_sec": 12.6,
+      "ms_per_backtest": 79.284917,
+      "bar_evals_per_sec": 2105583.0
+    },
+    {
+      "tier": "5min",
+      "kernel": "nojit_fallback_12core",
+      "n_bars": 166941,
+      "n_backtests": 250,
+      "cores": 12,
+      "backtests_per_sec": 46.0,
+      "ms_per_backtest": 21.731593,
+      "bar_evals_per_sec": 7681949.0
+    },
+    {
+      "tier": "5min",
+      "kernel": "pure_python_forex",
+      "n_bars": 166941,
+      "n_backtests": 4,
+      "cores": 1,
+      "backtests_per_sec": 2.4,
+      "ms_per_backtest": 417.546646,
+      "bar_evals_per_sec": 399814.0
+    },
+    {
+      "tier": "1min",
+      "kernel": "nojit_fallback_1core",
+      "n_bars": 2970637,
+      "n_backtests": 3,
+      "cores": 1,
+      "backtests_per_sec": 0.8,
+      "ms_per_backtest": 1253.028597,
+      "bar_evals_per_sec": 2370766.0
+    },
+    {
+      "tier": "1min",
+      "kernel": "nojit_fallback_12core",
+      "n_bars": 2970637,
+      "n_backtests": 48,
+      "cores": 12,
+      "backtests_per_sec": 2.9,
+      "ms_per_backtest": 349.965548,
+      "bar_evals_per_sec": 8488370.0
+    },
+    {
+      "tier": "1min",
+      "kernel": "pure_python_forex",
+      "n_bars": 2970637,
+      "n_backtests": 1,
+      "cores": 1,
+      "backtests_per_sec": 0.2,
+      "ms_per_backtest": 5555.999625,
+      "bar_evals_per_sec": 534672.0
+    }
+  ]
+}

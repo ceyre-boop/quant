@@ -1,9 +1,9 @@
 {
-  "date": "2026-08-08",
-  "generated_at": "2026-08-08T13:30:59.147629+00:00",
+  "date": "2026-08-09",
+  "generated_at": "2026-08-09T14:40:13.177139+00:00",
   "meta_regime": "BREADTH",
   "regime_read": "ES & NQ moving together \u2014 broad agreement, more DURABLE directional signal. Trust the direction more.",
-  "narrative": "Macro backdrop \u2014\n[2026-08-08] US economic state (FRED):\n  Growth: real GDP 1.5% (q/q ann)\n  Inflation: CPI 2.87% YoY | core CPI 1.93% | core PCE 2.8% (Fed target 2%)\n  Labor: unemployment 4.1%\n  Rates: fed funds 3.63% | 10Y 4.69% | 10Y-2Y 0.46% (NORMAL)\n  Consumer: UMich sentiment 49.5 | VIX 15.15\n\n---\nRecent market action in the ES/NQ futures pair has been characterized by a strong move together, indicative of a BREADTH regime. This is evidenced by the lead-lag analysis showing contemporaneous correlation at 0.933 and the best lag being -1 day with a correlation of -0.077, suggesting that both indices are moving in tandem. The market is currently trading above its respective SMAs200, indicating bullish momentum. The daily return for ES is 0.58% and NQ at 1.18%, pointing to a broader agreement on the direction of the markets rather than a concentrated move by one index over the other. This suggests that traders should trust the current directional signal more as it appears durable.\n\nVolume profile analysis indicates key accumulation zones for both ES (7625.77-7812.5) and NQ (28899.13-29986.2). The price of control (POC) for ES is at 7765.82, while for NQ it's at 29526.29. These levels represent areas where significant volume has traded and could act as support or resistance in the near term.\n\nThe recent news highlights a mixed economic picture with unexpected job losses but falling unemployment rates, which could impact market sentiment around Fed rate hikes. Additionally, geopolitical tensions, particularly regarding Iran, are adding volatility to the markets. The upcoming CPI report on August 12th is expected to provide further clarity on inflation trends and may influence market direction.\n\nGiven the current BREADTH regime and the strong move together in ES/NQ, we have a LONG bias with a confidence level of 75%. However, traders should be cautious as the lead-lag relationship is not perfectly clean. The key invalidation levels for NQ are below 29300, which would suggest a shift towards a ROTATION regime and a potential short opportunity.",
+  "narrative": "Macro backdrop \u2014\n[2026-08-09] US economic state (FRED):\n  Growth: real GDP 1.5% (q/q ann)\n  Inflation: CPI 2.87% YoY | core CPI 1.93% | core PCE 2.8% (Fed target 2%)\n  Labor: unemployment 4.1%\n  Rates: fed funds 3.63% | 10Y 4.69% | 10Y-2Y 0.46% (NORMAL)\n  Consumer: UMich sentiment 49.5 | VIX 15.15\n\n---\nRecent market action has seen both ES and NQ moving together, indicating a broad agreement in the current direction. The lead-lag analysis shows that there is no clear leader, with the best correlation observed at -3 days, suggesting a more durable directional signal. This regime of breadth implies trust in the current trend for both indices. However, the recent move has been driven by geopolitical tensions and earnings reports, particularly Q2 2026 earnings for NQ, which could be a key catalyst. The volume profile indicates an accumulation zone around the POC (Point of Control) levels, with significant trading activity at these points. This suggests that traders are accumulating positions, potentially setting up for a continuation of the current trend. The upcoming FOMC inflation print on August 12th is a critical event to watch, as it could impact the market's direction. Given the current regime and the recent positive momentum, we maintain a long bias with a probability of approximately 65%, invalidated below 30,375 for NQ.",
   "big_move_headline": {
     "headline": "Today's likeliest institutional move: SHORT USDJPY (P 66%, ~0.89% range, conf 37%).",
     "pair": "USDJPY",
@@ -43,49 +43,49 @@
   "volume_profile": {
     "ES=F": {
       "symbol": "ES=F",
-      "as_of": "2026-08-08T12:35:33.855042+00:00",
+      "as_of": "2026-08-09T12:43:53.737081+00:00",
       "days": 5,
       "bins": 40,
-      "poc": 7765.82,
-      "value_area_low": 7625.77,
-      "value_area_high": 7812.5,
+      "poc": 7767.86,
+      "value_area_low": 7731.31,
+      "value_area_high": 7781.57,
       "high_volume_nodes": [
-        7765.82,
-        7772.49,
-        7779.16,
-        7752.48,
-        7759.15
+        7767.86,
+        7772.43,
+        7754.16,
+        7758.72,
+        7735.88
       ],
       "price_range": [
-        7549.08,
+        7633.08,
         7815.83
       ],
       "limitation": "Volume profile = WHERE volume traded (volume-at-price). NOT order-flow delta (buy/sell aggression). True delta needs a CME order-flow feed (Databento/CQG)."
     },
     "NQ=F": {
       "symbol": "NQ=F",
-      "as_of": "2026-08-08T12:35:33.921141+00:00",
+      "as_of": "2026-08-09T12:43:53.787885+00:00",
       "days": 5,
       "bins": 40,
-      "poc": 29526.29,
-      "value_area_low": 28899.13,
-      "value_area_high": 29986.2,
+      "poc": 29526.56,
+      "value_area_low": 29499.77,
+      "value_area_high": 29874.8,
       "high_volume_nodes": [
-        29526.29,
-        29818.96,
-        29735.34,
-        29777.15,
-        29860.77
+        29526.56,
+        29767.65,
+        29553.35,
+        29821.22,
+        29740.86
       ],
       "price_range": [
-        28376.5,
+        28977.42,
         30048.92
       ],
       "limitation": "Volume profile = WHERE volume traded (volume-at-price). NOT order-flow delta (buy/sell aggression). True delta needs a CME order-flow feed (Databento/CQG)."
     }
   },
   "macro_economic": {
-    "text": "[2026-08-08] US economic state (FRED):\n  Growth: real GDP 1.5% (q/q ann)\n  Inflation: CPI 2.87% YoY | core CPI 1.93% | core PCE 2.8% (Fed target 2%)\n  Labor: unemployment 4.1%\n  Rates: fed funds 3.63% | 10Y 4.69% | 10Y-2Y 0.46% (NORMAL)\n  Consumer: UMich sentiment 49.5 | VIX 15.15",
+    "text": "[2026-08-09] US economic state (FRED):\n  Growth: real GDP 1.5% (q/q ann)\n  Inflation: CPI 2.87% YoY | core CPI 1.93% | core PCE 2.8% (Fed target 2%)\n  Labor: unemployment 4.1%\n  Rates: fed funds 3.63% | 10Y 4.69% | 10Y-2Y 0.46% (NORMAL)\n  Consumer: UMich sentiment 49.5 | VIX 15.15",
     "summary": {
       "gdp_growth_pct": 1.5,
       "cpi_yoy_pct": 2.87,
@@ -100,15 +100,15 @@
       "vix": 15.15
     }
   },
-  "news_count": 11,
+  "news_count": 15,
   "event_calendar": [
     {
       "event": "CPI",
       "date": "2026-08-12",
       "source": "cadence_estimate",
       "action": "inflation print 8:30 ET \u2014 reduce size into window",
-      "days_until": 4,
-      "note": "in 4d \u2014 inflation print 8:30 ET \u2014 reduce size into window"
+      "days_until": 3,
+      "note": "in 3d \u2014 inflation print 8:30 ET \u2014 reduce size into window"
     }
   ],
   "scorecard_summary": "Briefing scorecard: n=23 dir-calls, hit 0.696, regime acc 0.383 \u2014 CALIBRATING \u2014 need ~30-60 samples before the hit-rate/calibration mean anything",
