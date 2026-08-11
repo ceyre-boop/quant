@@ -1,27 +1,32 @@
 {
-  "generated_at": "2026-08-10T01:35:54.958622+00:00",
+  "generated_at": "2026-08-11T01:58:17.618981+00:00",
   "status": "DEGRADED",
-  "status_reason": "carry:STALE; es_nq:STALE; macro:OK; portfolio:UNAVAILABLE",
+  "status_reason": "carry:STALE; es_nq:OK; macro:OK; portfolio:UNAVAILABLE",
   "strategies": {
     "carry": {
       "status": "STALE",
       "verdict": "STAND_ASIDE",
       "favorable": false,
       "size_multiplier": 0.0,
-      "reason": "forex_proximity.json 61.4h old > 12.0h freshness limit",
+      "reason": "forex_proximity.json 13.6h old > 12.0h freshness limit",
       "source": "data/agent/forex_proximity.json",
-      "source_age_hours": 61.419,
+      "source_age_hours": 13.6,
       "detail": {}
     },
     "es_nq": {
-      "status": "STALE",
-      "verdict": "STAND_ASIDE",
+      "status": "OK",
+      "verdict": "INFO",
       "favorable": false,
       "size_multiplier": 0.0,
-      "reason": "nqes_regime.json 12.9h old > 12.0h freshness limit",
+      "reason": "research INFO only \u2014 regime 'BREADTH'",
       "source": "data/research/nqes_regime.json",
-      "source_age_hours": 12.867,
-      "detail": {}
+      "source_age_hours": 0.998,
+      "detail": {
+        "regime": "BREADTH",
+        "read": "ES & NQ moving together \u2014 broad agreement, more DURABLE directional signal. Trust the direction more.",
+        "divergence": false,
+        "contemporaneous_corr": 0.93
+      }
     },
     "macro": {
       "status": "OK",
@@ -30,13 +35,13 @@
       "size_multiplier": 0.0,
       "reason": "macro backdrop INFO (VIX / curve / credit) \u2014 shared input",
       "source": "data/macro/macro_snapshot.json",
-      "source_age_hours": 0.988,
+      "source_age_hours": 0.998,
       "detail": {
-        "vix": 14.9,
-        "curve_10y2y": 0.49,
-        "curve_10y3m": 0.95,
-        "credit_hyg": 79.61,
-        "dgs10": 4.66
+        "vix": 15.46,
+        "curve_10y2y": 0.529,
+        "curve_10y3m": 0.981,
+        "credit_hyg": 79.48,
+        "dgs10": 4.699
       }
     }
   },

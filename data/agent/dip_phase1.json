@@ -1,10 +1,10 @@
 {
-  "date": "2026-08-09",
+  "date": "2026-08-11",
   "phase": 1,
-  "completed_at": "2026-08-09T10:05:21.452384+00:00",
+  "completed_at": "2026-08-11T00:58:23.499552+00:00",
   "regime": "BREADTH",
   "macro_events_today": {
-    "as_of": "2026-08-09T10:05:21.447807+00:00",
+    "as_of": "2026-08-11T00:58:23.496661+00:00",
     "horizon_days": 21,
     "events": [
       {
@@ -12,8 +12,16 @@
         "date": "2026-08-12",
         "source": "cadence_estimate",
         "action": "inflation print 8:30 ET \u2014 reduce size into window",
-        "days_until": 3,
-        "note": "in 3d \u2014 inflation print 8:30 ET \u2014 reduce size into window"
+        "days_until": 2,
+        "note": "in 2d \u2014 inflation print 8:30 ET \u2014 reduce size into window"
+      },
+      {
+        "event": "PCE (Fed's preferred inflation)",
+        "date": "2026-08-31",
+        "source": "cadence_estimate",
+        "action": "8:30 ET \u2014 reduce size into window",
+        "days_until": 21,
+        "note": "in 21d \u2014 8:30 ET \u2014 reduce size into window"
       }
     ],
     "provenance_note": "FOMC dates are a maintained seed (verify vs Fed calendar); CPI/PCE/NFP/ISM are cadence ESTIMATES, not verified release dates."

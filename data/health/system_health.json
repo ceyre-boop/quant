@@ -1,10 +1,9 @@
 {
-  "ts": "2026-08-10T01:35:35.079906+00:00",
+  "ts": "2026-08-11T01:58:17.117799+00:00",
   "overall": "YELLOW",
   "red": [],
   "yellow": [
-    "forex_data",
-    "forex_scan"
+    "forex_data"
   ],
   "jobs": {
     "reddit": {
@@ -15,15 +14,15 @@
     },
     "forex_scan": {
       "path": "data/agent/forex_proximity.json",
-      "age_minutes": 3684.8,
+      "age_minutes": 816.0,
       "max_age_minutes": 1440,
       "optional": false,
-      "status": "STALE",
-      "detail": "pairs_scored=4, verdict='NO_TRADE_TODAY \u2014 USDJPY=X closest at 100%'; job may have stopped firing"
+      "status": "OK",
+      "detail": "pairs_scored=4, verdict='NO_TRADE_TODAY \u2014 USDJPY=X closest at 100%'"
     },
     "forex_data": {
       "path": "data/health/forex_data_status.json",
-      "age_minutes": 18998.8,
+      "age_minutes": 20461.5,
       "max_age_minutes": 1440,
       "optional": false,
       "status": "STALE",
@@ -31,7 +30,7 @@
     },
     "api_health": {
       "path": "data/agent/health.json",
-      "age_minutes": 119.1,
+      "age_minutes": 59.8,
       "max_age_minutes": 1440,
       "optional": true,
       "status": "OK",

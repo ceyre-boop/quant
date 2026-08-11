@@ -1,18 +1,16 @@
 {
-  "multiplier": 1.075,
-  "components": {
-    "confidence": 1.075
-  },
-  "effect_applied": true,
+  "multiplier": 1.0,
+  "components": {},
+  "effect_applied": false,
   "verified": false,
-  "reason": "continuous multiplier \u2014 context only, not a veto",
-  "computed_at": "2026-08-09T14:40:13.184392+00:00",
+  "reason": "deterministic_fallback \u2014 no real synthesis this run; multiplier neutralised",
+  "computed_at": "2026-08-11T00:58:26.207061+00:00",
   "inputs": {
-    "confidence": 75.0,
-    "directional_bias": "LONG",
-    "synthesis_source": "ollama/qwen2.5",
+    "confidence": 0,
+    "directional_bias": "NEUTRAL",
+    "synthesis_source": "deterministic_fallback",
     "regime_call": "BREADTH",
     "carry_direction": null
   },
-  "date": "2026-08-09"
+  "date": "2026-08-10"
 }
