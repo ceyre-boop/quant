@@ -1,14 +1,14 @@
 {
-  "generated_at": "2026-08-11T00:58:27.980471+00:00",
+  "generated_at": "2026-08-12T00:02:50.666634+00:00",
   "alive": true,
   "fired_today": false,
   "frozen": null,
-  "scan_age_hours": 12.6,
+  "scan_age_hours": 11.9,
   "n_pairs_scanned": 4,
   "n_would_fire_today": 1,
   "strongest_signal": {
     "pair": "USDJPY=X",
-    "conviction": 0.546,
+    "conviction": 0.418,
     "direction": "NO_TRADE",
     "pct_to_trigger": 100.0,
     "regime": "TRENDING",
@@ -17,35 +17,35 @@
   "pairs": [
     {
       "pair": "USDJPY=X",
-      "conviction": 0.546,
+      "conviction": 0.418,
       "direction": "NO_TRADE",
       "pct_to_trigger": 100.0,
       "regime": "TRENDING",
       "rate_differential": 3.489
     },
     {
-      "pair": "GBPUSD=X",
-      "conviction": 0.243,
-      "direction": "LONG",
+      "pair": "EURUSD=X",
+      "conviction": 0.19,
+      "direction": "NO_TRADE",
       "pct_to_trigger": 100.0,
       "regime": "TRENDING",
-      "rate_differential": -0.6
+      "rate_differential": -1.83
     },
     {
       "pair": "AUDUSD=X",
-      "conviction": 0.096,
-      "direction": "NO_TRADE",
-      "pct_to_trigger": 96.0,
+      "conviction": 0.173,
+      "direction": "LONG",
+      "pct_to_trigger": 100.0,
       "regime": "TRENDING",
       "rate_differential": 0.13
     },
     {
-      "pair": "EURUSD=X",
-      "conviction": 0.063,
+      "pair": "GBPUSD=X",
+      "conviction": 0.065,
       "direction": "NO_TRADE",
-      "pct_to_trigger": 63.0,
+      "pct_to_trigger": 65.0,
       "regime": "TRENDING",
-      "rate_differential": -1.83
+      "rate_differential": -0.6
     }
   ],
   "last_fill": {
@@ -53,10 +53,10 @@
     "direction": "LONG",
     "fill_price": 0.70513,
     "date": "2026-08-05",
-    "days_ago": 5.5
+    "days_ago": 6.5
   },
   "loops_alive": 7,
   "loops_down": [],
-  "summary_line": "System alive. 4 pairs scanned 12.6h ago \u2014 1 signalling (GBPUSD=X LONG). Highest conviction: USDJPY=X 0.546. Last fill: AUD_USD LONG, 5.5d ago.",
+  "summary_line": "System alive. 4 pairs scanned 11.9h ago \u2014 1 signalling (AUDUSD=X LONG). Highest conviction: USDJPY=X 0.418. Last fill: AUD_USD LONG, 6.5d ago.",
   "note": "Honest proof-of-life: would-be signals + proximity, never a forced trade. Read-only."
 }

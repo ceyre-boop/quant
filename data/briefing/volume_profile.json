@@ -1,47 +1,15 @@
 {
-  "as_of": "2026-08-11T00:58:25.091870+00:00",
+  "as_of": "2026-08-11T13:00:31.706009+00:00",
   "instruments": {
     "ES=F": {
       "symbol": "ES=F",
-      "as_of": "2026-08-11T00:58:25.129865+00:00",
-      "days": 5,
-      "bins": 40,
-      "poc": 7775.06,
-      "value_area_low": 7733.18,
-      "value_area_high": 7786.08,
-      "high_volume_nodes": [
-        7775.06,
-        7777.26,
-        7766.24,
-        7768.44,
-        7772.85
-      ],
-      "price_range": [
-        7727.67,
-        7815.83
-      ],
-      "limitation": "Volume profile = WHERE volume traded (volume-at-price). NOT order-flow delta (buy/sell aggression). True delta needs a CME order-flow feed (Databento/CQG)."
+      "poc": null,
+      "error": "insufficient intraday data"
     },
     "NQ=F": {
       "symbol": "NQ=F",
-      "as_of": "2026-08-11T00:58:25.243206+00:00",
-      "days": 5,
-      "bins": 40,
-      "poc": 29765.82,
-      "value_area_low": 29510.11,
-      "value_area_high": 29857.14,
-      "high_volume_nodes": [
-        29765.82,
-        29747.55,
-        29510.11,
-        29820.61,
-        29802.34
-      ],
-      "price_range": [
-        29318.33,
-        30048.92
-      ],
-      "limitation": "Volume profile = WHERE volume traded (volume-at-price). NOT order-flow delta (buy/sell aggression). True delta needs a CME order-flow feed (Databento/CQG)."
+      "poc": null,
+      "error": "insufficient intraday data"
     }
   }
 }
