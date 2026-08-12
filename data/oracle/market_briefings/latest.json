@@ -1,39 +1,91 @@
 {
-  "date": "2026-08-11",
-  "generated_at": "2026-08-11T17:51:24.716860+00:00",
-  "meta_regime": "NO_DATA",
-  "regime_read": "ES=F/NQ=F fetch failed",
-  "narrative": "Macro backdrop \u2014\n[2026-08-11] US economic state (FRED):\n  Growth: real GDP 1.5% (q/q ann)\n  Inflation: CPI 2.87% YoY | core CPI 1.93% | core PCE 2.8% (Fed target 2%)\n  Labor: unemployment 4.1%\n  Rates: fed funds 3.63% | 10Y 4.65% | 10Y-2Y 0.47% (NORMAL)\n  Consumer: UMich sentiment 49.5 | VIX 14.9\n\n---\nRecent market action shows a slight uptrend in both ES and NQ, with ES slightly outperforming. The daily returns for ES are at 0.15%, while NQ has seen a more significant increase of 0.35%. However, the weekly return for NQ is negative (-0.07%), indicating some rotation risk. The lead-lag regime data is currently unavailable, which adds uncertainty to our analysis. News headlines suggest geopolitical tensions and supply chain issues, particularly regarding memory chips, which could impact tech stocks (NQ) more significantly than broader market indices (ES). The upcoming FOMC inflation print on 12th August at 8:30 ET will be a critical event, potentially influencing both markets. Given the mixed signals and the lack of clear lead-lag regime, our bias remains neutral with a probability of ~50%. We should maintain a cautious approach, closely monitoring key levels and news developments.",
+  "date": "2026-08-12",
+  "generated_at": "2026-08-12T15:21:59.662789+00:00",
+  "meta_regime": "BREADTH",
+  "regime_read": "ES & NQ moving together \u2014 broad agreement, more DURABLE directional signal. Trust the direction more.",
+  "narrative": "Macro backdrop \u2014\n[2026-08-12] US economic state (FRED):\n  Growth: real GDP 1.5% (q/q ann)\n  Inflation: CPI 2.87% YoY | core CPI 1.93% | core PCE 2.8% (Fed target 2%)\n  Labor: unemployment 4.1%\n  Rates: fed funds 3.63% | 10Y 4.72% | 10Y-2Y 0.48% (NORMAL)\n  Consumer: UMich sentiment 49.5 | VIX 15.46\n\n---\nRecent market action shows a strong move higher in both ES and NQ, with the S&P 500 futures (ES) up by 0.2% and Nasdaq-100 futures (NQ) up by 0.58%. The lead-lag analysis indicates that ES and NQ are moving together, suggesting a broad agreement in market sentiment. This regime of 'BREADTH' implies a more durable directional signal, which we should trust more for our trading decisions. However, the mixed signals from the recent news items, particularly the geopolitical tensions between US and Iran, introduce some uncertainty. The FOMC inflation print is due today at 8:30 ET, which could impact market sentiment. Given the current regime and the lack of strong divergence or lead-lag signals, we maintain a long bias with a probability of ~75%. This bias can be invalidated if either ES falls below 7740 or NQ drops below 29600.",
   "big_move_headline": {
-    "headline": "No directional big-move call today \u2014 drivers are mixed/neutral.",
+    "headline": "Today's likeliest institutional move: LONG USDJPY (P 69%, ~0.94% range, conf 29%).",
+    "pair": "USDJPY",
+    "direction": "LONG",
+    "p_big": 0.6868,
+    "confidence": 0.294,
+    "expected_magnitude_pct": 0.9391,
+    "session": "NY_AM",
+    "drivers": [
+      [
+        "event_risk",
+        0.9
+      ],
+      [
+        "compression",
+        0.1764
+      ],
+      [
+        "momentum",
+        0.161
+      ]
+    ],
     "validation_status": "UNVALIDATED \u2014 display only (run scripts/validate_big_move.py)"
   },
-  "directional_bias": "NEUTRAL",
-  "confidence": 50,
-  "regime_call": "ROTATION_WARN",
+  "directional_bias": "LONG",
+  "confidence": 75,
+  "regime_call": "BREADTH",
   "key_level": null,
   "synthesis_source": "ollama/qwen2.5",
   "lead_lag": {
-    "regime": "NO_DATA",
-    "spread_avg": null,
-    "leader": null,
-    "corr": null,
-    "divergence": null
+    "regime": "BREADTH",
+    "spread_avg": -0.00071,
+    "leader": "NONE",
+    "corr": 0.934,
+    "divergence": false
   },
   "volume_profile": {
     "ES=F": {
       "symbol": "ES=F",
-      "poc": null,
-      "error": "insufficient intraday data"
+      "as_of": "2026-08-12T09:07:10.032391+00:00",
+      "days": 5,
+      "bins": 40,
+      "poc": 7775.88,
+      "value_area_low": 7748.81,
+      "value_area_high": 7784.34,
+      "high_volume_nodes": [
+        7775.88,
+        7777.57,
+        7774.19,
+        7779.26,
+        7782.65
+      ],
+      "price_range": [
+        7727.67,
+        7795.33
+      ],
+      "limitation": "Volume profile = WHERE volume traded (volume-at-price). NOT order-flow delta (buy/sell aggression). True delta needs a CME order-flow feed (Databento/CQG)."
     },
     "NQ=F": {
       "symbol": "NQ=F",
-      "poc": null,
-      "error": "insufficient intraday data"
+      "as_of": "2026-08-12T09:07:10.073348+00:00",
+      "days": 5,
+      "bins": 40,
+      "poc": 29769.83,
+      "value_area_low": 29631.43,
+      "value_area_high": 29832.73,
+      "high_volume_nodes": [
+        29769.83,
+        29744.66,
+        29757.24,
+        29782.41,
+        29794.99
+      ],
+      "price_range": [
+        29474.17,
+        29977.42
+      ],
+      "limitation": "Volume profile = WHERE volume traded (volume-at-price). NOT order-flow delta (buy/sell aggression). True delta needs a CME order-flow feed (Databento/CQG)."
     }
   },
   "macro_economic": {
-    "text": "[2026-08-11] US economic state (FRED):\n  Growth: real GDP 1.5% (q/q ann)\n  Inflation: CPI 2.87% YoY | core CPI 1.93% | core PCE 2.8% (Fed target 2%)\n  Labor: unemployment 4.1%\n  Rates: fed funds 3.63% | 10Y 4.65% | 10Y-2Y 0.47% (NORMAL)\n  Consumer: UMich sentiment 49.5 | VIX 14.9",
+    "text": "[2026-08-12] US economic state (FRED):\n  Growth: real GDP 1.5% (q/q ann)\n  Inflation: CPI 2.87% YoY | core CPI 1.93% | core PCE 2.8% (Fed target 2%)\n  Labor: unemployment 4.1%\n  Rates: fed funds 3.63% | 10Y 4.72% | 10Y-2Y 0.48% (NORMAL)\n  Consumer: UMich sentiment 49.5 | VIX 15.46",
     "summary": {
       "gdp_growth_pct": 1.5,
       "cpi_yoy_pct": 2.87,
@@ -41,41 +93,41 @@
       "core_pce_yoy_pct": 2.8,
       "unemployment_pct": 4.1,
       "fed_funds_pct": 3.63,
-      "ten_year_pct": 4.65,
-      "yield_curve_10y2y": 0.47,
+      "ten_year_pct": 4.72,
+      "yield_curve_10y2y": 0.48,
       "yield_curve_state": "NORMAL",
       "consumer_sentiment": 49.5,
-      "vix": 14.9
+      "vix": 15.46
     }
   },
-  "news_count": 12,
+  "news_count": 14,
   "event_calendar": [
     {
       "event": "CPI",
       "date": "2026-08-12",
       "source": "cadence_estimate",
       "action": "inflation print 8:30 ET \u2014 reduce size into window",
-      "days_until": 1,
-      "note": "in 1d \u2014 inflation print 8:30 ET \u2014 reduce size into window"
+      "days_until": 0,
+      "note": "TODAY \u2014 inflation print 8:30 ET \u2014 reduce size into window"
     },
     {
       "event": "PCE (Fed's preferred inflation)",
       "date": "2026-08-31",
       "source": "cadence_estimate",
       "action": "8:30 ET \u2014 reduce size into window",
-      "days_until": 20,
-      "note": "in 20d \u2014 8:30 ET \u2014 reduce size into window"
+      "days_until": 19,
+      "note": "in 19d \u2014 8:30 ET \u2014 reduce size into window"
     },
     {
       "event": "ISM Manufacturing PMI",
       "date": "2026-09-01",
       "source": "cadence_estimate",
       "action": "reduce size into the 10:00 ET print",
-      "days_until": 21,
-      "note": "in 21d \u2014 reduce size into the 10:00 ET print"
+      "days_until": 20,
+      "note": "in 20d \u2014 reduce size into the 10:00 ET print"
     }
   ],
-  "scorecard_summary": "Briefing scorecard: n=23 dir-calls, hit 0.696, regime acc 0.396 \u2014 CALIBRATING \u2014 need ~30-60 samples before the hit-rate/calibration mean anything",
+  "scorecard_summary": "Briefing scorecard: n=23 dir-calls, hit 0.696, regime acc 0.388 \u2014 CALIBRATING \u2014 need ~30-60 samples before the hit-rate/calibration mean anything",
   "bias": "size to regime: trust direction more in BREADTH, less in CONCENTRATION; ROTATION_WARN = treat tech-led longs as suspect",
   "provenance": {
     "source": "oracle_morning_briefing",

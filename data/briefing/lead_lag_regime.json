@@ -1,6 +1,30 @@
 {
-  "as_of": "2026-08-11T13:00:31.115943+00:00",
-  "regime": "NO_DATA",
-  "read": "ES=F/NQ=F fetch failed",
-  "note": "regime input, not an edge"
+  "as_of": "2026-08-12T12:36:50.150916+00:00",
+  "lookback_days": 20,
+  "nq_last": 29850.8,
+  "es_last": 7773.5,
+  "nq_es_return_spread_avg": -0.00069,
+  "spread_1d": 0.00423,
+  "spread_5d": 0.00098,
+  "spread_20d": -0.00069,
+  "nq_es_cumulative_spread": -0.0137,
+  "contemporaneous_corr": 0.935,
+  "lead_lag": {
+    "by_lag": {
+      "-3": -0.129,
+      "-2": 0.051,
+      "-1": -0.047,
+      "0": 0.873,
+      "1": -0.046,
+      "2": 0.045,
+      "3": -0.082
+    },
+    "best_lag": -3,
+    "best_corr": -0.129,
+    "leader": "NONE"
+  },
+  "divergence": false,
+  "regime": "BREADTH",
+  "read": "ES & NQ moving together \u2014 broad agreement, more DURABLE directional signal. Trust the direction more.",
+  "note": "Regime INPUT, not an edge. ES/NQ research only \u2014 no execution path (CME futures; OANDA is forex-only)."
 }

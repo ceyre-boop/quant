@@ -1,0 +1,226 @@
+{
+  "report_date": "2026-08-06",
+  "spec_version": 2,
+  "spec_sha256": "6800b9a709327b21c5474a125be8b9952b66c60b51f680bba8ff2d961109a0c3",
+  "analyzer_commit": "f659a49",
+  "records_total": 37,
+  "records_normal": 36,
+  "records_today": 2,
+  "parse_problems": [],
+  "watchdog": {
+    "heartbeat_today": true,
+    "job_loaded": true,
+    "plist_matches_tracked": true,
+    "shadow_mode_true": true
+  },
+  "l1": {
+    "passed": 32,
+    "failed": [
+      {
+        "trade_id": "130",
+        "bar_date": "2026-07-06",
+        "line": 17,
+        "problems": [
+          "action AMEND_STOP expected HOLD"
+        ]
+      }
+    ],
+    "boundary": 3,
+    "ambiguous": 0,
+    "pass_rate": 0.9696969696969697,
+    "continuity_violations": [
+      {
+        "trade_id": "105",
+        "bar_date": "2026-06-28",
+        "class": "C3",
+        "detail": "hold_count 2\u21923",
+        "incident": "INC-2026-06-30 manual+launchd double-step pre-guard (param_change_log 2026-06-30T22:32Z); standing hold_count +1 offset"
+      },
+      {
+        "trade_id": "123",
+        "bar_date": "2026-06-28",
+        "class": "C3",
+        "detail": "hold_count 1\u21922",
+        "incident": "INC-2026-06-30 manual+launchd double-step pre-guard (param_change_log 2026-06-30T22:32Z); standing hold_count +1 offset"
+      },
+      {
+        "trade_id": "130",
+        "bar_date": "2026-07-06",
+        "class": "C3",
+        "detail": "hold_count 5\u21921",
+        "incident": "param_change_log launchagent_restoration 2026-07-02T04:40:43Z"
+      },
+      {
+        "trade_id": "227",
+        "bar_date": "2026-07-06",
+        "class": "C3",
+        "detail": "hold_count 1\u21921",
+        "incident": "param_change_log launchagent_restoration 2026-07-02T04:40:43Z"
+      },
+      {
+        "trade_id": "227",
+        "bar_date": "2026-07-23",
+        "class": "C5",
+        "detail": "hold_count 12\u21921",
+        "incident": null
+      }
+    ],
+    "action_unverifiable": 0
+  },
+  "l2": {
+    "status": "OK",
+    "scored": 16,
+    "matched": 14,
+    "match_rate": 0.875,
+    "mismatches": [
+      {
+        "trade_id": "105",
+        "bar_date": "2026-06-28",
+        "class": "C2",
+        "detail": "no yfinance bar at shifted date 2026-06-27"
+      },
+      {
+        "trade_id": "105",
+        "bar_date": "2026-06-28",
+        "class": "C2",
+        "detail": "no yfinance bar at shifted date 2026-06-27"
+      },
+      {
+        "trade_id": "105",
+        "bar_date": "2026-06-29",
+        "class": "C2",
+        "detail": "no yfinance bar at shifted date 2026-06-28"
+      },
+      {
+        "trade_id": "177",
+        "bar_date": "2026-06-29",
+        "class": "C1",
+        "detail": "substituting OANDA close reproduces it (\u0394close=6.66e-01, \u0394atr=6.70e-04)"
+      },
+      {
+        "trade_id": "227",
+        "bar_date": "2026-07-06",
+        "class": "C2",
+        "detail": "no yfinance bar at shifted date 2026-07-05"
+      },
+      {
+        "trade_id": "227",
+        "bar_date": "2026-07-12",
+        "class": "C2",
+        "detail": "no yfinance bar at shifted date 2026-07-11"
+      },
+      {
+        "trade_id": "227",
+        "bar_date": "2026-07-13",
+        "class": "C2",
+        "detail": "no yfinance bar at shifted date 2026-07-12"
+      },
+      {
+        "trade_id": "227",
+        "bar_date": "2026-07-14",
+        "class": "C5",
+        "detail": "yf HOLD vs logged TRAILING_ATR"
+      },
+      {
+        "trade_id": "268",
+        "bar_date": "2026-08-02",
+        "class": "C2",
+        "detail": "no yfinance bar at shifted date 2026-08-01"
+      },
+      {
+        "trade_id": "268",
+        "bar_date": "2026-08-03",
+        "class": "C2",
+        "detail": "no yfinance bar at shifted date 2026-08-02"
+      }
+    ],
+    "shifts": {
+      "AUD_NZD": 1,
+      "AUD_USD": 1,
+      "EUR_USD": -1,
+      "GBP_USD": -1,
+      "USD_JPY": 1
+    },
+    "seed_modes": {
+      "105": "ENTRY",
+      "123": "ENTRY",
+      "130": "ENTRY",
+      "177": "ENTRY",
+      "227": "ENTRY",
+      "268": "ENTRY",
+      "273": "ENTRY"
+    },
+    "delta_stats": {
+      "EUR_USD": {
+        "dclose_p50": 0.0011577944564820086,
+        "dclose_p90": 0.005914052352905319,
+        "dclose_rel_p50": 0.0010129258074941896,
+        "datr_p50": 0.0007950469953112325,
+        "n": 7
+      },
+      "USD_JPY": {
+        "dclose_p50": 0.1569974365234259,
+        "dclose_p90": 0.6659958496093736,
+        "dclose_rel_p50": 0.0009694550988207399,
+        "datr_p50": 0.0007166504378981597,
+        "n": 3
+      },
+      "AUD_NZD": {
+        "dclose_p50": 0.0027589648818968637,
+        "dclose_p90": 0.0038200209426879628,
+        "dclose_rel_p50": 0.002270491368810889,
+        "datr_p50": 0.0005049484754128981,
+        "n": 4
+      },
+      "GBP_USD": {
+        "dclose_p50": 0.002343532257080172,
+        "dclose_p90": 0.002343532257080172,
+        "dclose_rel_p50": 0.0017400486012089011,
+        "datr_p50": 0.0016045589022451838,
+        "n": 1
+      },
+      "AUD_USD": {
+        "dclose_p50": 0.0010499880027771136,
+        "dclose_p90": 0.0010499880027771136,
+        "dclose_rel_p50": 0.0014878252037311024,
+        "datr_p50": 0.0007437283521100572,
+        "n": 1
+      }
+    },
+    "cache_revisions": 4
+  },
+  "taxonomy": {
+    "C1": 1,
+    "C2": 8,
+    "C3": 4,
+    "C4": 1,
+    "C5": 2
+  },
+  "gate": {
+    "gates": {
+      "l1_pass_rate_100": [
+        "FAIL",
+        "0.9697 (32/33)"
+      ],
+      "c5_zero": [
+        "FAIL",
+        "2"
+      ],
+      "l2_match": [
+        "FAIL",
+        "0.8750 (14/16)"
+      ],
+      "coverage": [
+        "PASS",
+        "25 weekdays / 36 records"
+      ],
+      "no_live_records": [
+        "PASS",
+        "0"
+      ]
+    },
+    "overall": "NO-GO",
+    "c5": 2,
+    "live_records": 0
+  }
+}

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Should We Trade Live Today?</title>
+<style>
+  body { font-family: -apple-system, 'Segoe UI', sans-serif; background:#FCFCFB; color:#0B0B0B;
+         max-width:760px; margin:0 auto; padding:24px 20px 60px; line-height:1.6; }
+  h1 { font-size:20px; font-weight:500; margin-bottom:4px; }
+  .updated { color:#898781; font-size:13px; margin-bottom:24px; }
+  .verdict-box { background:#FAEEDA; border-radius:16px; padding:28px 24px; margin-bottom:28px; }
+  .verdict-text { font-size:28px; font-weight:600; color:#854F0B; margin-bottom:10px; }
+  .verdict-why { font-size:16px; color:#3a3a38; }
+  h2 { font-size:16px; font-weight:500; margin:32px 0 12px; border-bottom:1px solid #E1E0D9; padding-bottom:8px; }
+  .gate-row, .strat-row { display:flex; align-items:center; gap:12px; padding:10px 0;
+                            border-bottom:1px solid #F0EFE8; font-size:14px; }
+  .gate-icon { font-size:18px; font-weight:700; width:20px; }
+  .gate-q { flex:1; }
+  .gate-val { font-size:13px; font-weight:500; text-align:right; }
+  .strat-name { width:130px; font-weight:500; }
+  .strat-pill { padding:2px 10px; border-radius:8px; font-size:11px; font-weight:600; }
+  .strat-reason { flex:1; color:#6B6A63; font-size:13px; }
+  table { width:100%; border-collapse:collapse; font-size:14px; margin-top:8px; }
+  th, td { text-align:right; padding:8px 6px; border-bottom:1px solid #F0EFE8; }
+  th:first-child, td:first-child { text-align:left; }
+  .paper-note { background:#F9F9F7; border-radius:12px; padding:16px; font-size:14px; color:#3a3a38; }
+  .footer { margin-top:40px; font-size:12px; color:#B4B3A8; }
+</style>
+</head>
+<body>
+
+<h1>Should We Trade Live Today?</h1>
+<p class="updated">Checked: August 01, 2026 at 00:20 UTC</p>
+
+<div class="verdict-box">
+  <div class="verdict-text">NOT YET — WE ARE STILL COLLECTING PROOF</div>
+  <div class="verdict-why">4 of 6 checks are green. The rest aren't broken — they just don't have enough real data yet to say yes.</div>
+</div>
+
+<h2>The 5 questions we ask every single day</h2>
+
+        <div class="gate-row">
+          <span class="gate-icon" style="color:#0F6E56">✓</span>
+          <span class="gate-q">Would this pass a funded account, if we ran it 5,000 times?</span>
+          <span class="gate-val" style="color:#0F6E56">74.4% (5,000 sims)</span>
+        </div>
+        <div class="gate-row">
+          <span class="gate-icon" style="color:#0F6E56">✓</span>
+          <span class="gate-q">Are the trade signals actually correct, checked against real data?</span>
+          <span class="gate-val" style="color:#0F6E56">PASS — 20 signals, WR 63.6%</span>
+        </div>
+        <div class="gate-row">
+          <span class="gate-icon" style="color:#0F6E56">✓</span>
+          <span class="gate-q">Did the orders actually place correctly when tested?</span>
+          <span class="gate-val" style="color:#0F6E56">24/8</span>
+        </div>
+        <div class="gate-row">
+          <span class="gate-icon" style="color:#854F0B">…</span>
+          <span class="gate-q">Does our real win rate match what the backtest predicted?</span>
+          <span class="gate-val" style="color:#854F0B">collecting</span>
+        </div>
+        <div class="gate-row">
+          <span class="gate-icon" style="color:#0F6E56">✓</span>
+          <span class="gate-q">Is there a big danger warning flashing anywhere in the markets?</span>
+          <span class="gate-val" style="color:#0F6E56">0.00 NORMAL</span>
+        </div>
+        <div class="gate-row">
+          <span class="gate-icon" style="color:#854F0B">…</span>
+          <span class="gate-q">Have we survived enough real days without blowing up?</span>
+          <span class="gate-val" style="color:#854F0B">collecting</span>
+        </div>
+
+<h2>Each strategy, one line each</h2>
+
+        <div class="strat-row">
+          <span class="strat-name">Undertow Gapper</span>
+          <span class="strat-pill" style="background:#854F0B22;color:#854F0B">REDUCE</span>
+          <span class="strat-reason">edge health INSUFFICIENT_DATA — cannot confirm live edge → REDUCE floor</span>
+        </div>
+        <div class="strat-row">
+          <span class="strat-name">Ict Equities</span>
+          <span class="strat-pill" style="background:#854F0B22;color:#854F0B">REDUCE</span>
+          <span class="strat-reason">edge health UNAVAILABLE — cannot confirm live edge → REDUCE floor</span>
+        </div>
+        <div class="strat-row">
+          <span class="strat-name">Carry</span>
+          <span class="strat-pill" style="background:#854F0B22;color:#854F0B">REDUCE</span>
+          <span class="strat-reason">edge health UNAVAILABLE — cannot confirm live edge → REDUCE floor</span>
+        </div>
+<p style="font-size:12px;color:#898781;margin-top:8px;">"REDUCE" doesn't mean broken — it means we don't have enough real trades yet to be sure it's healthy, so size stays small until we do.</p>
+
+<h2>What the carry strategy actually makes (real backtest, real math)</h2>
+<table>
+<tr><th>Test period</th><th>Typical year</th><th>Bad year</th><th>Great year</th><th>% of years green</th></tr>
+
+        <tr><td>5-year test</td>
+        <td>+20.9%</td>
+        <td>+0.7%</td>
+        <td>+48.6%</td>
+        <td>96%</td></tr>
+        <tr><td>10-year test</td>
+        <td>+14.2%</td>
+        <td>-3.3%</td>
+        <td>+37.7%</td>
+        <td>90%</td></tr>
+</table>
+<p style="font-size:12px;color:#898781;margin-top:8px;">At 1% risk per trade, on the real sealed trade log. Not a guess — this is what actually would have happened.</p>
+
+<div class="paper-note">
+  <strong>Practice account right now:</strong> Right now, practicing with fake money, we're at $-177 total (out of 199 data points).
+</div>
+
+<div class="footer">
+  Auto-generated from real files in the repo — data/agent/prop_challenge_state.json,
+  data/agent/system_health_verdict.json, data/research/colin_v1_window_backtest.json,
+  data/agent/carry_paper_account.json. Nothing on this page is invented. A missing
+  number means the underlying data doesn't exist yet, not that everything is fine.
+</div>
+
+</body>
+</html>

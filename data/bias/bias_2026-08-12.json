@@ -1,0 +1,23 @@
+{
+  "date": "2026-08-12",
+  "direction": "NEUTRAL",
+  "confidence": 25.0,
+  "reasoning": [
+    "briefing directional_bias=NEUTRAL conf=50.0",
+    "regime: ES=F/NQ=F fetch failed",
+    "macro context present (2026-08-12)"
+  ],
+  "inputs_used": [
+    "briefing",
+    "daily_panel",
+    "fred_macro"
+  ],
+  "inputs_missing": [
+    "calendar",
+    "gdelt",
+    "sentiment_board"
+  ],
+  "context_fraction_fresh": 0.5,
+  "generated_at": "2026-08-12T12:08:28+00:00",
+  "realised": null
+}

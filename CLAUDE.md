@@ -46,6 +46,46 @@ instruction-following degrades as it grows. Detail lives in the files this point
 
 ---
 
+## ICM: Interpretable Context Methodology (Repo Structure as AI Architecture)
+
+**Repo structure encodes agent orchestration. Hypothesis research, Oracle cycles, and all multi-stage workflows use the five-layer ICM pattern.**
+
+Read: `research/CONTEXT.md` (Layer 1 research router), `oracle/CONTEXT.md` (Layer 1 Oracle workflow), or any `research/HYP-*/CONTEXT.md` (Layer 2 stage definition).
+
+**Five Layers:**
+- **Layer 0** — `CLAUDE.md` (global identity, this file)
+- **Layer 1** — `research/CONTEXT.md`, `oracle/CONTEXT.md` (workflow routing, "where do I go?")
+- **Layer 2** — `research/HYP-*/CONTEXT.md`, `oracle/XX-stage/CONTEXT.md` (stage definition, "what do I do?")
+- **Layer 3** — `_config/` + `shared/` (reference material: factory rules, stable across all runs)
+- **Layer 4** — `research/HYP-*/output/`, `oracle/XX-stage/output/` (working artifacts, unique per run)
+
+**For researchers:**
+1. Read `research/CONTEXT.md` (Layer 1) to understand the research landscape
+2. Pick or create a hypothesis folder `research/HYP-NNN/`
+3. Read its `CONTEXT.md` (Layer 2) — it defines inputs, process, outputs, and review gate
+4. Reference files in `_config/` and `shared/` (Layer 3) — do not repeat their content
+5. Write outputs to `output/` (Layer 4) — machine-readable (JSON) + human-readable (markdown)
+
+**For the Oracle:**
+1. Read `oracle/CONTEXT.md` (Layer 1) to understand the three-stage cycle
+2. Each of three stages is in `oracle/00-harvest/`, `oracle/01-reflect/`, `oracle/02-test/`
+3. Each stage reads Layer 3 rules and produces Layer 4 outputs
+4. Outputs feed into the next stage (stage N output → stage N+1 input)
+
+**For live trading:**
+- Reference material (Layer 3): `_config/trading_philosophy.md`, `_config/risk_constitution.md`, `_config/gate_functions.md`, `_config/sizing_model.md`
+- Hypothesis ledger: `data/hypotheses_ledger.jsonl` (what's LIVE? what failed? what's in research?)
+- Decision logs: `data/agent/decision_logs/live/*.jsonl` (every trade, every entry/exit)
+- Oracle ledger: `data/agent/oracle_ledger.jsonl` (daily reflections, changes applied)
+
+**Non-negotiable:**
+- Spec-first: write Layer 2 CONTEXT.md before running any stage
+- Reference, don't repeat: Layer 2 CONTEXT.md references Layer 3, not restate it
+- Output + ledger: every hypothesis that runs gets a verdict logged (no ambiguous "pending" entries)
+- Closed loop: every decision_logger.log() entry must receive update_outcome() on trade close
+
+---
+
 ## Workflow: plan → build
 
 A plan → build separation: scope in chat, ticket it, **plan** in-session before touching code,

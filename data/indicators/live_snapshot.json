@@ -1,10 +1,10 @@
 {
-  "timestamp": "2026-08-12T00:02:46+00:00",
+  "timestamp": "2026-08-12T15:04:54+00:00",
   "pairs": {
     "GBPUSD": {
-      "bullish": 14,
+      "bullish": 12,
       "bearish": 0,
-      "neutral": 16,
+      "neutral": 18,
       "direction": "LONG",
       "conviction": 1.0,
       "hit_rate": 0.6831,
@@ -27,8 +27,8 @@
         "aroon": 0,
         "vwap_dev": 0,
         "rsi": 1,
-        "macd": 1,
-        "stochastic": 1,
+        "macd": 0,
+        "stochastic": 0,
         "cci": 0,
         "williams_r": 1,
         "roc": 1,
@@ -158,20 +158,20 @@
       }
     },
     "AUDUSD": {
-      "bullish": 13,
+      "bullish": 15,
       "bearish": 2,
-      "neutral": 15,
+      "neutral": 13,
       "direction": "LONG",
-      "conviction": 0.917,
+      "conviction": 1.0,
       "hit_rate": 0.6818,
       "matching_green": 3,
       "matching_green_short": 0,
       "top_bullish": [
+        "ichimoku",
         "parabolic_sar",
         "rsi",
-        "stochastic",
-        "cci",
-        "williams_r"
+        "macd",
+        "stochastic"
       ],
       "top_bearish": [
         "supertrend",
@@ -181,12 +181,12 @@
         "adx": 0,
         "ema_cross": 0,
         "supertrend": -1,
-        "ichimoku": 0,
+        "ichimoku": 1,
         "parabolic_sar": 1,
         "aroon": -1,
         "vwap_dev": 0,
         "rsi": 1,
-        "macd": 0,
+        "macd": 1,
         "stochastic": 1,
         "cci": 1,
         "williams_r": 1,
@@ -211,31 +211,32 @@
       }
     },
     "AUDNZD": {
-      "bullish": 3,
-      "bearish": 4,
-      "neutral": 23,
-      "direction": "FLAT",
-      "conviction": 0.083,
+      "bullish": 7,
+      "bearish": 3,
+      "neutral": 20,
+      "direction": "NEUTRAL",
+      "conviction": 0.333,
       "hit_rate": 0.0,
       "matching_green": 0,
       "matching_green_short": 0,
       "top_bullish": [
+        "parabolic_sar",
         "aroon",
         "macd",
-        "fvg"
+        "donchian",
+        "hist_vol"
       ],
       "top_bearish": [
         "ema_cross",
         "supertrend",
-        "ichimoku",
-        "parabolic_sar"
+        "ichimoku"
       ],
       "snapshot": {
         "adx": 0,
         "ema_cross": -1,
         "supertrend": -1,
         "ichimoku": -1,
-        "parabolic_sar": -1,
+        "parabolic_sar": 1,
         "aroon": 1,
         "vwap_dev": 0,
         "rsi": 0,
@@ -248,8 +249,8 @@
         "bollinger_bands": 0,
         "atr_ratio": 0,
         "keltner": 0,
-        "donchian": 0,
-        "hist_vol": 0,
+        "donchian": 1,
+        "hist_vol": 1,
         "obv": 0,
         "vol_trend": 0,
         "vwap_ratio": 0,
@@ -257,7 +258,7 @@
         "cmf": 0,
         "fvg": 1,
         "bos": 0,
-        "session_hl": 0,
+        "session_hl": 1,
         "displacement": 0,
         "liq_sweep": 0,
         "order_block": 0

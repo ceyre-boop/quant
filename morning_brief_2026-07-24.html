@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Morning · July 24</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400&family=Lexend+Deca:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Lexend Deca', -apple-system, 'Helvetica Neue', sans-serif;
+  color: #2E2C27;
+  background: #FCFCFB;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Bands ── */
+.band-top {
+  background: #F9F9F7;
+  border-bottom: 1px solid #E1E1DF;
+  padding: 44px 0 36px;
+}
+.band-bottom {
+  background: #FCFCFB;
+  padding: 44px 0 64px;
+}
+.inner { max-width: 860px; margin: 0 auto; padding: 0 44px; }
+
+/* ── Day-date ── */
+.day-date {
+  font-family: 'Lexend Deca', sans-serif;
+  font-size: 12.5px;
+  color: #6B6A63;
+  letter-spacing: 0.05em;
+  margin-bottom: 10px;
+}
+
+/* ── Headline ── */
+.headline {
+  font-family: 'Fraunces', Georgia, 'Times New Roman', serif;
+  font-size: 40px;
+  font-weight: 400;
+  color: #2E2C27;
+  line-height: 1.14;
+  margin-bottom: 32px;
+  max-width: 680px;
+}
+
+/* ── Terrain ── */
+.terrain { width: 100%; display: block; margin-bottom: 32px; }
+
+/* ── Acts ── */
+.acts {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0;
+}
+.act { position: relative; }
+.act:not(:first-child) { padding-left: 28px; }
+.act:not(:last-child) { padding-right: 28px; }
+.act:not(:first-child)::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 1px;
+  background: #E4E3DC;
+}
+.act-time {
+  font-family: 'Lexend Deca', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  color: #2E2C27;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  margin-bottom: 7px;
+}
+.act-sentence {
+  font-family: 'Lexend Deca', sans-serif;
+  font-size: 13.5px;
+  color: #6B6A63;
+  line-height: 1.6;
+}
+
+/* ── Lists ── */
+.section-label {
+  font-family: 'Lexend Deca', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #2E2C27;
+  margin-bottom: 20px;
+}
+.item-list { list-style: none; }
+.item-list li {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  gap: 0 4px;
+  padding-bottom: 24px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid #E4E3DC;
+}
+.item-list li:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+  margin-bottom: 0;
+}
+.item-num {
+  font-family: 'Lexend Deca', sans-serif;
+  font-size: 12px;
+  color: #B4B3A8;
+  padding-top: 1px;
+}
+.item-body {}
+.item-title {
+  font-family: 'Lexend Deca', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #2E2C27;
+  text-decoration: none;
+  display: block;
+  margin-bottom: 4px;
+}
+.item-title:hover { text-decoration: underline; }
+.item-sentence {
+  font-family: 'Lexend Deca', sans-serif;
+  font-size: 13.5px;
+  color: #6B6A63;
+  line-height: 1.6;
+}
+.item-sentence a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.quiet {
+  font-family: 'Lexend Deca', sans-serif;
+  font-size: 14px;
+  color: #6B6A63;
+  line-height: 1.6;
+}
+.section-gap { margin-bottom: 40px; }
+
+/* ── Button ── */
+.btn-wrap { margin-top: 10px; }
+.btn {
+  display: inline-block;
+  background: #C6613F;
+  color: #FCFCFB;
+  font-family: 'Lexend Deca', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 9px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  border: 1px solid #C6613F;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.btn:hover { background: #AE5133; border-color: #AE5133; }
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  .headline { font-size: 30px; }
+  .inner { padding: 0 24px; }
+  .acts { grid-template-columns: 1fr; }
+  .act { padding: 0 0 20px 0 !important; }
+  .act:not(:first-child)::before {
+    width: 100%; height: 1px;
+    left: 0; right: 0;
+    top: -1px; bottom: auto;
+  }
+  .act:last-child { padding-bottom: 0 !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── TOP BAND ── -->
+<div class="band-top">
+  <div class="inner">
+    <div class="day-date">Friday · July 24 2026</div>
+    <div class="headline">The whole day is yours, Colin. FOMC week starts Monday.</div>
+
+    <!-- Terrain: flat calm water — open day. Clay sun, birds for room to breathe -->
+    <svg class="terrain" viewBox="0 0 840 160" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <!-- Flat terrain stroke — still water, very gentle undulation -->
+      <path
+        d="M0,108 C60,106 130,110 210,107 C290,104 370,109 460,106 C540,103 620,108 700,105 C760,103 810,106 840,105"
+        fill="none" stroke="#2E2C27" stroke-width="2" stroke-linecap="round"/>
+
+      <!-- Clay sun — open creative day (top right) -->
+      <circle cx="774" cy="46" r="14" fill="none" stroke="#C6613F" stroke-width="1.6"/>
+      <line x1="774" y1="26" x2="774" y2="22" stroke="#C6613F" stroke-width="1.6" stroke-linecap="round"/>
+      <line x1="774" y1="66" x2="774" y2="70" stroke="#C6613F" stroke-width="1.6" stroke-linecap="round"/>
+      <line x1="754" y1="46" x2="750" y2="46" stroke="#C6613F" stroke-width="1.6" stroke-linecap="round"/>
+      <line x1="794" y1="46" x2="798" y2="46" stroke="#C6613F" stroke-width="1.6" stroke-linecap="round"/>
+      <line x1="760" y1="32" x2="757" y2="29" stroke="#C6613F" stroke-width="1.6" stroke-linecap="round"/>
+      <line x1="788" y1="60" x2="791" y2="63" stroke="#C6613F" stroke-width="1.6" stroke-linecap="round"/>
+      <line x1="788" y1="32" x2="791" y2="29" stroke="#C6613F" stroke-width="1.6" stroke-linecap="round"/>
+      <line x1="760" y1="60" x2="757" y2="63" stroke="#C6613F" stroke-width="1.6" stroke-linecap="round"/>
+
+      <!-- Birds — room to breathe, centre-left -->
+      <path d="M100,44 C104,40 108,42 112,40" fill="none" stroke="#6B6A63" stroke-width="1.3" stroke-linecap="round"/>
+      <path d="M118,48 C122,44 126,46 130,44" fill="none" stroke="#6B6A63" stroke-width="1.3" stroke-linecap="round"/>
+      <path d="M82,55 C86,51 90,53 94,51" fill="none" stroke="#B4B3A8" stroke-width="1.1" stroke-linecap="round"/>
+
+      <!-- Second flock, far right under the sun -->
+      <path d="M660,62 C664,58 668,60 672,58" fill="none" stroke="#B4B3A8" stroke-width="1.1" stroke-linecap="round"/>
+      <path d="M678,56 C682,52 686,54 690,52" fill="none" stroke="#B4B3A8" stroke-width="1.1" stroke-linecap="round"/>
+    </svg>
+
+    <!-- Acts -->
+    <div class="acts">
+      <div class="act">
+        <div class="act-time">Morning – Noon</div>
+        <div class="act-sentence">No meetings today — the morning opens without anything pulling on it.</div>
+      </div>
+      <div class="act">
+        <div class="act-time">Noon – 4 PM</div>
+        <div class="act-sentence">Three Dispatch tickets are queued: Ollama synthesizer, DIP orchestrator, MT5 bridge connector.</div>
+      </div>
+      <div class="act">
+        <div class="act-time">4 PM onward</div>
+        <div class="act-sentence">Weekend tonight. FOMC opens Monday — July 28 is the shadow go-date and natural decision point.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── BOTTOM BAND ── -->
+<div class="band-bottom">
+  <div class="inner">
+
+    <!-- NEEDS ATTENTION -->
+    <div class="section-gap">
+      <div class="section-label">Needs attention</div>
+      <div class="quiet">Nothing needs you this morning.</div>
+    </div>
+
+    <!-- RESOLVED -->
+    <div class="section-label">Resolved</div>
+    <ul class="item-list">
+
+      <li>
+        <div class="item-num">1</div>
+        <div class="item-body">
+          <span class="item-title">Ollama fired in today's briefing</span>
+          <div class="item-sentence">
+            Today's <span style="font-family:monospace;font-size:12.5px;color:#6B6A63">daily_briefing.json</span> shows <span style="font-family:monospace;font-size:12.5px;color:#6B6A63">synthesis_source: "ollama/qwen2.5"</span> — the synthesizer is running on local inference for the first time. The Dispatch ticket did its job.
+          </div>
+        </div>
+      </li>
+
+      <li>
+        <div class="item-num">2</div>
+        <div class="item-body">
+          <span class="item-title">Market rotation read was correct</span>
+          <div class="item-sentence">
+            The ROTATION_WARN the system flagged yesterday was reading a real move — Nasdaq closed −2.15%, S&P −1.21% Thursday, driven by Alphabet, Tesla, and rising oil. The lead-lag divergence was real.
+          </div>
+        </div>
+      </li>
+
+      <li>
+        <div class="item-num">3</div>
+        <div class="item-body">
+          <span class="item-title">No personal threads waiting on you</span>
+          <div class="item-sentence">
+            Eight unread email threads scanned — all newsletters and marketing (Trade Ideas, Zacks, Spotify, Apple News). No one is blocked on a reply from you.
+          </div>
+          <div class="btn-wrap">
+            <a class="btn" href="https://claude.ai/new?q=I+want+to+start+a+clean+build+session+for+the+Alta+Investments+Sovereign+system.+Today+is+Friday+July+24+2026.+I+have+a+completely+open+day+with+no+meetings.+Three+Dispatch+tickets+are+queued%3A+(1)+DISPATCH_OLLAMA_SYNTHESIZER.md+in+tickets%2F+%E2%80%94+Ollama+already+fired+in+today%27s+briefing+so+this+may+be+partly+done%2C+verify+and+close+it%3B+(2)+DIP+orchestrator+ticket+(daily+intelligence+pipeline+master+orchestrator)%3B+(3)+MT5+bridge+connector+layer.+The+continuous+harvester+also+stopped+June+29+and+needs+a+restart+diagnostic.+Start+by+reading+NEXT.md+and+the+three+ticket+files+in+tickets%2F%2C+then+propose+which+to+tackle+first+given+the+open+day.&surface=cowork" target="_blank">Start the build session</a>
+          </div>
+        </div>
+      </li>
+
+    </ul>
+
+  </div>
+</div>
+
+</body>
+</html>

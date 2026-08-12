@@ -1,0 +1,29 @@
+{
+  "report_date": "2026-08-10",
+  "spec_version": 1,
+  "spec_sha256": "3599b77f1b95aaad19a762be75c27c16df8f3bd46db13e20e7ad4b63ab0f176e",
+  "gate": "PASS",
+  "i1_oracle_contamination": {
+    "count": 0,
+    "records": []
+  },
+  "i2_rogue_oanda_writes": {
+    "count": 0,
+    "fills": []
+  },
+  "i3_forbidden_pairs": {
+    "count": 0,
+    "hits": []
+  },
+  "soft": {
+    "unknown_pairs": [],
+    "fills_present": [
+      "data/ledger/oanda_fills.jsonl",
+      "data/execution/fills.jsonl"
+    ],
+    "fills_stale": [
+      "data/ledger/oanda_fills.jsonl",
+      "data/execution/fills.jsonl"
+    ]
+  }
+}

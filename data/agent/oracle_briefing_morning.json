@@ -1,14 +1,15 @@
 {
-  "generated_at": "2026-08-11T17:51:25.775400+00:00",
-  "briefing": "Session open 2026-08-11T17:51Z. Scanner: AUDUSD=X LONG (PLACED, risk 0.12%). 2 open position(s). All monitored loops alive. NQ/ES regime: NO_DATA (ES=F/NQ=F fetch failed). Forex macro is a swing edge (~1 trade/pair/month) \u2014 a no-signal day is the strategy working, not failing. Watching for rate-differential divergence to widen past threshold.",
+  "generated_at": "2026-08-12T13:37:47.642223+00:00",
+  "briefing": "Session open 2026-08-12T13:37Z. Scanner: AUDUSD=X LONG (PLACED, risk 0.12%); GBPUSD=X LONG (PLACED, risk 0.25%). 2 open position(s). All monitored loops alive. NQ/ES regime: BREADTH (ES & NQ moving together \u2014 broad agreement, more DURABLE directional signal. Trus). Forex macro is a swing edge (~1 trade/pair/month) \u2014 a no-signal day is the strategy working, not failing. Watching for rate-differential divergence to widen past threshold.",
   "scan_verdicts": [
+    "PLACED",
     "PLACED"
   ],
   "open_positions": 2,
   "loops_down": [],
   "nqes_regime": {
-    "regime": "NO_DATA",
-    "nq_last": null,
-    "es_last": null
+    "regime": "BREADTH",
+    "nq_last": 29850.8,
+    "es_last": 7773.5
   }
 }
