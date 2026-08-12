@@ -1,0 +1,39 @@
+{
+  "version": "1.0",
+  "locked": true,
+  "locked_on": "2026-07-09",
+  "spec": "Political-Alpha-V2-Claude-Code-Spec.md §2 (Track B) + §6",
+  "note": "Maps individual equity tickers to sector ETF buckets for congressional-trade aggregation. Bucket labels match cluster_rules.json instrument names. A congressional trade whose ticker is NOT a key here is EXCLUDED, not assigned (spec §2). KNOWN COVERAGE GAP: mega-cap tech (AAPL/MSFT/NVDA/GOOGL/AMZN/META) — the most-traded names by Congress — have no sector-ETF bucket in this universe (no XLK), so they are excluded. This structurally limits Track B power; documented in summary_report.md.",
+  "map": {
+    "XOM": "XLE", "CVX": "XLE", "COP": "XLE", "SLB": "XLE", "EOG": "XLE",
+    "OXY": "XLE", "PSX": "XLE", "VLO": "XLE", "MPC": "XLE", "KMI": "XLE",
+    "WMB": "XLE", "HAL": "XLE", "DVN": "XLE", "HES": "XLE", "BKR": "XLE",
+    "FANG": "XLE", "OKE": "XLE", "XLE": "XLE",
+
+    "JPM": "XLF", "BAC": "XLF", "WFC": "XLF", "GS": "XLF", "MS": "XLF",
+    "C": "XLF", "BLK": "XLF", "SCHW": "XLF", "AXP": "XLF", "SPGI": "XLF",
+    "BX": "XLF", "USB": "XLF", "PNC": "XLF", "TFC": "XLF", "COF": "XLF",
+    "CB": "XLF", "MMC": "XLF", "V": "XLF", "MA": "XLF", "XLF": "XLF",
+
+    "BA": "XLI", "LMT": "XLI", "RTX": "XLI", "GE": "XLI", "HON": "XLI",
+    "CAT": "XLI", "DE": "XLI", "UPS": "XLI", "UNP": "XLI", "MMM": "XLI",
+    "GD": "XLI", "NOC": "XLI", "EMR": "XLI", "ETN": "XLI", "LHX": "XLI",
+    "CSX": "XLI", "FDX": "XLI", "GEV": "XLI", "XLI": "XLI",
+
+    "JNJ": "XLV", "UNH": "XLV", "PFE": "XLV", "MRK": "XLV", "ABBV": "XLV",
+    "LLY": "XLV", "TMO": "XLV", "ABT": "XLV", "DHR": "XLV", "BMY": "XLV",
+    "AMGN": "XLV", "CVS": "XLV", "MDT": "XLV", "GILD": "XLV", "ISRG": "XLV",
+    "VRTX": "XLV", "REGN": "XLV", "HCA": "XLV", "MRNA": "XLV", "XLV": "XLV",
+
+    "BABA": "KWEB", "JD": "KWEB", "BIDU": "KWEB", "PDD": "KWEB", "NTES": "KWEB",
+    "TCEHY": "KWEB", "NIO": "KWEB", "LI": "KWEB", "XPEV": "KWEB", "BILI": "KWEB",
+    "TCOM": "KWEB", "KWEB": "KWEB",
+
+    "NUE": "SLX", "X": "SLX", "STLD": "SLX", "CLF": "SLX", "RS": "SLX",
+    "MT": "SLX", "AA": "SLX", "FCX": "SLX", "CMC": "SLX", "SLX": "SLX",
+
+    "GLD": "GLD", "IAU": "GLD", "NEM": "GLD", "GOLD": "GLD", "AEM": "GLD", "WPM": "GLD",
+
+    "TLT": "TLT", "IEF": "TLT", "GOVT": "TLT", "SHY": "TLT"
+  }
+}

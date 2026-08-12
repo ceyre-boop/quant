@@ -41,45 +41,34 @@ Research Task
 
 ---
 
-## Current Hypotheses
+## Hypothesis Registry
 
-### Active (IN_RESEARCH)
+Master reference: `data/hypotheses_ledger.jsonl` (canonical, machine-readable)
 
-- **HYP-093** — Yield Frontier (Gapper Fade)
-  - Status: mechanism_validation stage
-  - Folder: `research/HYP-093/`
-  - Assigned: colin
-  - Next: Validate that gappers fade >0.3% median by 10:30 ET
+### LIVE (1 hypothesis)
 
-- **HYP-071** — Staged Exit Rule (L2 Exit Value Function)
-  - Status: hypothesis_testing stage (provisional pass on gross-R)
-  - Folder: `research/HYP-071/`
-  - Blocker: Step 2 recompute needed; awaiting Colin seal
-  - Next: Finalize net-return backtest
+| ID | Title | System | Status | Evidence |
+|---|---|---|---|---|
+| **HYP-045** | Rate Differential Edge (Forex Carry) | Forex | live_monitor | OOS Sharpe 1.25, p<0.001 ✅ |
 
-### LIVE
+### IN_RESEARCH (2 hypotheses)
 
-- **HYP-045** — Rate Differential Edge (Forex Carry)
-  - Status: live_monitor
-  - System: Forex v015 (4-pair portfolio: GBPUSD, EURUSD, AUDUSD, GBPJPY)
-  - Evidence: OOS Sharpe 1.25, permutation p<0.001, CONFIRMED
-  - Ledger: `data/hypotheses_ledger.jsonl` line ~1400
+| ID | Title | System | Stage | Folder |
+|---|---|---|---|---|
+| **HYP-093** | Yield Frontier (Gapper Fade) | Yield | mechanism_validation | `research/HYP-093/` |
+| **HYP-071** | Staged Exit Rule (L2 Exit Value Function) | Forex | hypothesis_testing | `research/HYP-071/` |
 
-### GRAVEYARD (Do NOT revisit without new theory)
+### GRAVEYARD (5 hypotheses — Do NOT revisit without new theory)
 
-- **HYP-089** — 12-month TSMOM
-  - Verdict: NOT_SIGNIFICANT (Sharpe 0.277 < 0.30 gate)
-  - Closed: 2026-07-12
+| ID | Title | Verdict | Reason | Closed |
+|---|---|---|---|---|
+| **HYP-092** | Gapper fade (read null, map real) | NOT_SIGNIFICANT | p=0.594, no edge | 2026-07-12 |
+| **HYP-091** | TSMOM (corrected financing) | NOT_SIGNIFICANT | OOS -0.35, too weak | 2026-07-12 |
+| **HYP-090** | MODERN (daily adaptive params) | NOT_SIGNIFICANT | Random placebo better | 2026-07-11 |
+| **HYP-089** | 12-month TSMOM | NOT_SIGNIFICANT | Sharpe 0.277 < 0.30 gate | 2026-07-12 |
+| **HYP-085** | Political Alpha (news-driven) | NOT_SIGNIFICANT | p=0.3637 | 2026-07-08 |
 
-- **HYP-090** — MODERN (daily adaptive params)
-  - Verdict: NOT_SIGNIFICANT (random placebo better)
-  - Closed: 2026-07-11
-
-- **HYP-085** — Political Alpha (news-driven)
-  - Verdict: NOT_SIGNIFICANT (p=0.3637)
-  - Closed: 2026-07-08
-
-(See `data/hypotheses_ledger.jsonl` for full graveyard.)
+All graveyard hypotheses have `research/HYP-*/` folders with historical outputs.
 
 ---
 

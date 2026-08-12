@@ -1,0 +1,64 @@
+{
+  "version": "1.0",
+  "locked": true,
+  "locked_on": "2026-07-09",
+  "spec": "Political-Alpha-V2-Claude-Code-Spec.md §2 (Track A) + §6",
+  "instrument_universe": ["XLE", "XLF", "XLV", "XLI", "KWEB", "SLX", "GLD", "TLT", "DX-Y.NYB"],
+  "match": {
+    "case_insensitive": true,
+    "mode": "substring",
+    "note": "A cluster matches if statement_text (lowercased) contains >=1 term from required_any AND (required_any_secondary is empty OR contains >=1 of it) AND contains NONE of exclude_if. Priority order resolves multi-matches: first cluster in priority_order that matches wins. Each event is assigned to at most one cluster; an event matching no cluster is UNCLUSTERED (excluded from testing, not forced)."
+  },
+  "priority_order": ["tariff_china", "tariff_broad", "energy_environment", "dollar_fed", "defense_conflict", "deregulation", "personal_attack"],
+  "clusters": {
+    "tariff_china": {
+      "required_any": ["china", "chinese", "ccp", "beijing", "fentanyl", "xi jinping"],
+      "required_any_secondary": [],
+      "exclude_if": [],
+      "instruments": ["KWEB", "SLX", "XLI", "DX-Y.NYB"],
+      "note": "China-specific trade/tech actions. KWEB is the direct China-tech proxy; SLX/XLI capture supply-chain/industrial spillover; DXY captures the FX leg. China alone triggers (population is trade-dominated); no secondary required."
+    },
+    "tariff_broad": {
+      "required_any": ["tariff", "reciprocal", "import duty", "trade war", "steel", "aluminum", "aluminium", "section 232", "customs duty", "countervailing"],
+      "required_any_secondary": [],
+      "exclude_if": ["china", "chinese", "ccp", "beijing"],
+      "instruments": ["SLX", "XLI", "DX-Y.NYB"],
+      "note": "Non-China tariff/metals actions. Steel/aluminum tariffs are protective for domestic producers (SLX); XLI captures industrial exposure; DXY the FX leg."
+    },
+    "energy_environment": {
+      "required_any": ["drill", "oil ", "crude", "lng", "pipeline", "opec", "petroleum", " coal", "offshore lease", "fossil fuel", "natural gas", "energy dominance", "energy independence", "energy emergency", "paris accord", "paris agreement", "paris climate", "climate", "green new deal"],
+      "required_any_secondary": [],
+      "exclude_if": [],
+      "instruments": ["XLE", "DX-Y.NYB"],
+      "note": "Energy-policy specific terms ONLY. Deliberately excludes bare 'energy'/'gas'/'gasoline' because macro-brag posts ('energy prices down, cut rates') must route by priority to their primary theme (fed/tariff), not be grabbed here on an incidental mention. Trailing/leading spaces on 'oil '/' coal' avoid substring false-positives (foil, coalition)."
+    },
+    "dollar_fed": {
+      "required_any": ["federal reserve", "the fed", "fed chairman", "fed chair", "jerome powell", "powell", "interest rate", "rate cut", "cut rates", "basis points", "monetary policy", "the dollar", "currency manipulation", "devalue"],
+      "required_any_secondary": [],
+      "exclude_if": [],
+      "instruments": ["DX-Y.NYB", "TLT", "GLD"],
+      "note": "Fed / rates / dollar. Uses 'the fed'/'powell'/'interest rate' not bare 'fed' (matches 'federal', 'defense', etc.). DXY + TLT (rates->bonds) + GLD (real-rate/dollar hedge)."
+    },
+    "defense_conflict": {
+      "required_any": ["nato", "ukraine", "russia", " iran", "israel", "hamas", "hezbollah", "troops", "warship", "missile", "defense spending", "arms deal", "military strike", "war in "],
+      "required_any_secondary": [],
+      "exclude_if": [],
+      "instruments": ["XLI", "GLD"],
+      "note": "Geopolitics/defense. Precise terms only — bare 'war' is excluded because it matches 'trade war'. XLI captures defense-industrial; GLD the safe-haven bid. Lower priority than tariff/energy so a 'trade war' post routes to tariff, not here."
+    },
+    "deregulation": {
+      "required_any": ["deregulat", "repeal", "rollback", "roll back", "red tape", "sec rule", "epa rule", "regulatory relief", "cut regulation", "cut red tape", "ten-to-one", "10-to-1", "unleash"],
+      "required_any_secondary": [],
+      "exclude_if": [],
+      "instruments": ["XLF", "XLE"],
+      "note": "Deregulation actions. Precise terms (not bare 'regulation', which is too broad). XLF (financial dereg) + XLE (energy/EPA dereg)."
+    },
+    "personal_attack": {
+      "required_any": ["crooked", "witch hunt", "radical left", "fake news", "sleepy", "thug", "disgrace", "incompetent", "lunatic", "marxist", "communist", "so-called judge", "deranged", "loser", "corrupt", "sleazebag", "biden", "kamala", " harris", "pelosi", "schiff", "comey", "adam schiff", "crazy nancy"],
+      "required_any_secondary": [],
+      "exclude_if": ["tariff", "china", "chinese", "steel", "aluminum", "oil ", "drill", "crude", "pipeline", "powell", "interest rate", "the fed", "federal reserve", "nato", "ukraine", "deregulat", "energy dominance", "the dollar"],
+      "instruments": ["KWEB", "SLX", "XLE", "XLI", "DX-Y.NYB", "GLD"],
+      "note": "NEGATIVE CONTROL. Attack language targeting a named individual with NO policy content (exclude_if strips any policy mention). Spec §7 illustrative config showed instruments=[], but §4 and §7-Phase-4 test #4 REQUIRE testing personal_attack x instrument to check for classification contamination. Resolved toward a functional control: assigned the active themed instruments so the control directly tests whether no-policy tweets move the same instruments themed clusters do. If any personal_attack x instrument pair shows corrected p<0.05, the classification is contaminated (do not suppress)."
+    }
+  }
+}
