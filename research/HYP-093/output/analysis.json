@@ -1,0 +1,15 @@
+{
+  "hypothesis_id": "HYP-093",
+  "stage": "mechanism_validation",
+  "verdict": "WEAK",
+  "p_value": 0.001953125,
+  "median_fade_pct": -0.95,
+  "sample_size": 10,
+  "ready_to_backtest": false,
+  "blockers": [
+    "Sample size 10, need 50+",
+    "P-value 0.0020, need <0.05",
+    "No control group",
+    "Synthetic data only"
+  ]
+}

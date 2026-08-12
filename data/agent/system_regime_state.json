@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-12T16:36:24.439899+00:00",
+  "generated_at": "2026-08-12T17:06:24.565195+00:00",
   "status": "DEGRADED",
   "status_reason": "carry:OK; es_nq:OK; macro:OK; portfolio:UNAVAILABLE",
   "strategies": {
@@ -10,7 +10,7 @@
       "size_multiplier": 0.0,
       "reason": "rate differentials NARROWING on all 4 pairs; none widening",
       "source": "data/agent/forex_proximity.json",
-      "source_age_hours": 4.147,
+      "source_age_hours": 4.647,
       "detail": {
         "per_pair": {
           "USDJPY=X": {
@@ -45,7 +45,7 @@
       "size_multiplier": 0.0,
       "reason": "research INFO only \u2014 regime 'BREADTH'",
       "source": "data/research/nqes_regime.json",
-      "source_age_hours": 3.993,
+      "source_age_hours": 4.493,
       "detail": {
         "regime": "BREADTH",
         "read": "ES & NQ moving together \u2014 broad agreement, more DURABLE directional signal. Trust the direction more.",
@@ -60,7 +60,7 @@
       "size_multiplier": 0.0,
       "reason": "macro backdrop INFO (VIX / curve / credit) \u2014 shared input",
       "source": "data/macro/macro_snapshot.json",
-      "source_age_hours": 1.258,
+      "source_age_hours": 1.758,
       "detail": {
         "vix": 14.87,
         "curve_10y2y": 0.51,
