@@ -1,41 +1,41 @@
 {
-  "checked_at": "2026-08-12T15:05:04.251069+00:00",
+  "checked_at": "2026-08-12T20:07:43.549904+00:00",
   "market_hours": true,
   "frozen": null,
   "down": [],
   "loops": {
     "ict_scanner": {
       "status": "ALIVE",
-      "last": "2026-08-12T14:39:02.777368+00:00",
-      "silence_hours": 0.4,
+      "last": "2026-08-12T20:03:26.668225+00:00",
+      "silence_hours": 0.1,
       "threshold": 0.5,
       "kind": "periodic"
     },
     "forex_scan": {
       "status": "ALIVE",
       "last": "2026-08-12T12:08:28.195623+00:00",
-      "silence_hours": 2.9,
+      "silence_hours": 8.0,
       "threshold": 30,
       "kind": "periodic",
-      "effective_silence_hours": 2.9
+      "effective_silence_hours": 8.0
     },
     "pulse_check": {
       "status": "ALIVE",
-      "last": "2026-08-12T15:05:04+00:00",
+      "last": "2026-08-12T20:07:43+00:00",
       "silence_hours": 0.0,
       "threshold": 3,
       "kind": "periodic"
     },
     "decision_backfill": {
       "status": "ALIVE",
-      "last": "2026-08-12T15:04:59.988047+00:00",
+      "last": "2026-08-12T20:07:42.024938+00:00",
       "silence_hours": 0.0,
       "threshold": 3,
       "kind": "periodic"
     },
     "big_move": {
       "status": "ALIVE",
-      "last": "2026-08-12T15:05:04+00:00",
+      "last": "2026-08-12T20:07:43+00:00",
       "silence_hours": 0.0,
       "threshold": 3,
       "kind": "periodic"
@@ -43,17 +43,17 @@
     "oracle_reflection": {
       "status": "ALIVE",
       "last": "2026-08-12T06:30:40.459129+00:00",
-      "silence_hours": 8.6,
+      "silence_hours": 13.6,
       "threshold": 26,
       "kind": "periodic"
     },
     "morning_briefing": {
       "status": "ALIVE",
-      "last": "2026-08-12T15:04:39.256517+00:00",
-      "silence_hours": 0.0,
+      "last": "2026-08-12T15:21:59.669070+00:00",
+      "silence_hours": 4.8,
       "threshold": 26,
       "kind": "periodic",
-      "effective_silence_hours": 0.0
+      "effective_silence_hours": 4.8
     },
     "edge_pipeline": {
       "status": "EVENT_DRIVEN",
