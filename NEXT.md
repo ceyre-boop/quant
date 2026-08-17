@@ -3926,3 +3926,42 @@ working Python env (`.venv` is 3.9.6, incompatible per CLAUDE.md). Built `.venv3
 requirements.lock.txt` — succeeded cleanly, worth keeping around instead of rebuilding again.
 
 Nothing else run. Nothing else committed.
+
+---
+
+## 2026-08-16 · RESEARCH PASS (21:00 routine, AGENT_DIRECTIVE)
+
+**Alpaca credential outage is RESOLVED.** `execution.alpaca.movers(top=50)` returned 50 gainers
+cleanly — no 401, no entitlement error. The 3-day outage logged 08-04/08-05 is closed; the
+operator actions listed in those entries that were blocked on credential restore can proceed.
+
+Routine ran end-to-end:
+- **Step 0 brain read** — graveyard (27 killed hypotheses) + confirmed edges loaded. No sealed
+  idea re-proposed.
+- **Step 1 movers** — 50 gainers → `data/research/gapper/movers_recent.json`. 15 warrants/
+  rights/units (excluded by HYP-093/107 filters), 35 common, 1 sub-$1. Eight non-derivative
+  ≥$1 ≥40% gappers led by WETO +128% @ $8.22. Snapshot only, no fade test.
+- **Step 2 queue** (`--max 5`) — exactly one QUEUED task existed: RQ-006 ICT walk-forward
+  stability. Returned ERROR (`ok:false`, F-20260816210048): `extract_live_edge.py --days 30
+  --min-trades 20` found **1 trade, needs 20+**. This is a data-sufficiency refusal by design
+  (script exited 0; the walk-forward declined to grade on n=1), not a crash — logged per
+  STANDING RULE 6, not repaired per RULE 9. Root cause is the known ICT fill-rate bottleneck
+  (~98% of setups expire unfilled). Expect this task to keep returning ERROR until fill rate
+  is addressed. Queue now holds no QUEUED tasks.
+- **Step 3** — `research/weekly_pattern_update.md` appended.
+- **Step 4** — no candidates flagged. Nothing was tested tonight, so nothing cleared a
+  first-pass permutation test. No autonomous prereg (operator-gated, STANDING RULE 4).
+
+**Refused to shortcut:** did not rewrite or relax RQ-006's `--min-trades 20` threshold to make
+the walk-forward produce a number; n=1 cannot be graded and lowering the bar would manufacture
+a verdict. Did not re-run the queue hoping for different output (RULE 5).
+
+**Open for operator:** (1) the research queue is now empty — it needs new tasks or it will
+no-op nightly; (2) ICT fill rate is the binding constraint on RQ-006 and every ICT walk-forward
+downstream of it; (3) re-check the 08-04/08-05 outage entries now that Alpaca is live again.
+
+**Note:** `AGENT_DIRECTIVE.md` no longer exists at repo root — archived to
+`archive/AGENT_DIRECTIVE.md` by commit 7ed778d ("Archive 36 obsolete root files"). This pass
+was run from the archived copy. If the 21:00 routine is still meant to be live, the file should
+be restored to root; if it was archived deliberately, the `com.alta.research_agent` launchd job
+is pointing at a directive the repo considers obsolete.
