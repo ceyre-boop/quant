@@ -1,0 +1,26 @@
+{
+  "date": "2026-08-16",
+  "generated_at": "2026-08-16T06:31:04.028360+00:00",
+  "input_tokens": 4644,
+  "output_tokens": 882,
+  "estimated_cost_usd": 0.13581,
+  "harvest_days_read": 7,
+  "reflection": {
+    "candidate_lesson": {
+      "lesson_text": "When the 30-indicator consensus reports conv=100% but green_matches \u2265 3 with hist_hr ~68%, only take the signal if there is at least one green historical match; conv=100% with green_matches=0 (like EURUSD/USDJPY today) is untested conviction and should be sized at zero.",
+      "mechanism": "Conviction measures live indicator agreement, but hist_hr and green_matches measure whether that exact fingerprint has ever paid out. High live agreement with no historical analogue means the setup is novel \u2014 novelty in systematic macro is unpriced risk, not edge. Institutions crowd into repeatable patterns; a pattern with zero prior matches has no crowd behind it to complete the move.",
+      "testable_rule": "if consensus.conv >= 0.90 and consensus.green_matches == 0: size = 0  # require green_matches >= 1 and hist_hr >= 0.60 to trade a high-conviction signal",
+      "expected_impact": "Filters false-positive high-conviction entries (EURUSD conv=58%/hr=0%, USDJPY conv=42%/hr=0% today would be blocked); expected win-rate lift by removing untested setups, contributing toward +0.02-0.03 Sharpe by cutting variance-heavy losers.",
+      "evidence_from_harvest": "Live consensus shows GBPUSD (conv=100%, green_matches=5, hist_hr=68%) and AUDUSD (conv=100%, green_matches=3, hist_hr=68%) as historically validated, while EURUSD/USDJPY/AUDNZD show conv with green_matches=0 and hist_hr=0% \u2014 the divergence isolates conviction from historical payoff.",
+      "evidence_from_reasoning": null,
+      "reasoning_component_targeted": "green_matches",
+      "sample_needed": 30
+    },
+    "retirement_flag": {
+      "lesson_to_review": "L-L-009",
+      "reason": "L-L-009 asserts validated knowledge expires and REST_MODE is a gate not a destination \u2014 with 0 trades across the last 7 days, the system may be resting past the intended gate window and should re-verify whether current freeze conditions are still valid."
+    },
+    "system_health_note": "Regime=UNKNOWN with zero trades for 7 days and TradingView showing 0 signals \u2014 the system is correctly refusing to trade an unconfirmed regime, but prolonged inactivity means the Sharpe gap can only close once BREADTH/MOMENTUM regime confirmation and live signals return."
+  },
+  "auto_validation": null
+}

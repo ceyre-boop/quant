@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-06T14:43:13.287051+00:00",
-  "as_of_date": "2026-08-06",
+  "generated_at": "2026-08-16T06:31:04.499299+00:00",
+  "as_of_date": "2026-08-16",
   "current_lesson": {
     "components": [
       "active",
@@ -46,15 +46,15 @@
     ],
     "component_label": "green_matches",
     "first_seen": "2026-05-29",
-    "last_seen": "2026-08-06",
-    "days_forming": 69,
-    "n_revisions": 47,
-    "n_days_appeared": 47,
+    "last_seen": "2026-08-16",
+    "days_forming": 79,
+    "n_revisions": 48,
+    "n_days_appeared": 48,
     "stable_days": 1,
     "status": "forming",
     "time_to_converge_days": null,
-    "latest_lesson_text": "When the 30-indicator consensus shows high conviction (conv >= 100%) but green_matches <= 1, the signal is a statistical orphan \u2014 trust the historical hit rate, not the live conviction number.",
-    "latest_rule": "if consensus_conviction >= 1.0 and green_matches <= 1: size *= 0.5  # require temporal confirmation, not just live breadth",
+    "latest_lesson_text": "When the 30-indicator consensus reports conv=100% but green_matches \u2265 3 with hist_hr ~68%, only take the signal if there is at least one green historical match; conv=100% with green_matches=0 (like EURUSD/USDJPY today) is untested conviction and should be sized at zero.",
+    "latest_rule": "if consensus.conv >= 0.90 and consensus.green_matches == 0: size = 0  # require green_matches >= 1 and hist_hr >= 0.60 to trade a high-conviction signal",
     "history": [
       {
         "date": "2026-05-29",
@@ -243,6 +243,10 @@
       {
         "date": "2026-08-06",
         "rule": "if consensus_conviction >= 1.0 and green_matches <= 1: size *= 0.5  # require temporal confirmation, not just live breadth"
+      },
+      {
+        "date": "2026-08-16",
+        "rule": "if consensus.conv >= 0.90 and consensus.green_matches == 0: size = 0  # require green_matches >= 1 and hist_hr >= 0.60 to trade a high-conviction signal"
       }
     ]
   },
@@ -292,15 +296,15 @@
       ],
       "component_label": "green_matches",
       "first_seen": "2026-05-29",
-      "last_seen": "2026-08-06",
-      "days_forming": 69,
-      "n_revisions": 47,
-      "n_days_appeared": 47,
+      "last_seen": "2026-08-16",
+      "days_forming": 79,
+      "n_revisions": 48,
+      "n_days_appeared": 48,
       "stable_days": 1,
       "status": "forming",
       "time_to_converge_days": null,
-      "latest_lesson_text": "When the 30-indicator consensus shows high conviction (conv >= 100%) but green_matches <= 1, the signal is a statistical orphan \u2014 trust the historical hit rate, not the live conviction number.",
-      "latest_rule": "if consensus_conviction >= 1.0 and green_matches <= 1: size *= 0.5  # require temporal confirmation, not just live breadth",
+      "latest_lesson_text": "When the 30-indicator consensus reports conv=100% but green_matches \u2265 3 with hist_hr ~68%, only take the signal if there is at least one green historical match; conv=100% with green_matches=0 (like EURUSD/USDJPY today) is untested conviction and should be sized at zero.",
+      "latest_rule": "if consensus.conv >= 0.90 and consensus.green_matches == 0: size = 0  # require green_matches >= 1 and hist_hr >= 0.60 to trade a high-conviction signal",
       "history": [
         {
           "date": "2026-05-29",
@@ -489,6 +493,10 @@
         {
           "date": "2026-08-06",
           "rule": "if consensus_conviction >= 1.0 and green_matches <= 1: size *= 0.5  # require temporal confirmation, not just live breadth"
+        },
+        {
+          "date": "2026-08-16",
+          "rule": "if consensus.conv >= 0.90 and consensus.green_matches == 0: size = 0  # require green_matches >= 1 and hist_hr >= 0.60 to trade a high-conviction signal"
         }
       ]
     }

@@ -1,57 +1,27 @@
 {
-  "generated_at": "2026-08-16T01:36:45.521751+00:00",
+  "generated_at": "2026-08-17T01:39:18.766299+00:00",
   "status": "DEGRADED",
-  "status_reason": "carry:OK; es_nq:OK; macro:OK; portfolio:UNAVAILABLE",
+  "status_reason": "carry:STALE; es_nq:STALE; macro:OK; portfolio:UNAVAILABLE",
   "strategies": {
     "carry": {
-      "status": "OK",
+      "status": "STALE",
       "verdict": "STAND_ASIDE",
       "favorable": false,
       "size_multiplier": 0.0,
-      "reason": "rate differentials NARROWING on all 4 pairs; none widening",
+      "reason": "forex_proximity.json 33.5h old > 12.0h freshness limit",
       "source": "data/agent/forex_proximity.json",
-      "source_age_hours": 9.447,
-      "detail": {
-        "per_pair": {
-          "USDJPY=X": {
-            "differential_trend": "NARROWING",
-            "rate_differential": 3.489,
-            "regime": "TRENDING"
-          },
-          "GBPUSD=X": {
-            "differential_trend": "NARROWING",
-            "rate_differential": -0.6,
-            "regime": "TRENDING"
-          },
-          "AUDUSD=X": {
-            "differential_trend": "NARROWING",
-            "rate_differential": 0.13,
-            "regime": "TRENDING"
-          },
-          "EURUSD=X": {
-            "differential_trend": "NARROWING",
-            "rate_differential": -1.83,
-            "regime": "TRENDING"
-          }
-        },
-        "vix": 14.25,
-        "vix_extreme": false
-      }
+      "source_age_hours": 33.489,
+      "detail": {}
     },
     "es_nq": {
-      "status": "OK",
-      "verdict": "INFO",
+      "status": "STALE",
+      "verdict": "STAND_ASIDE",
       "favorable": false,
       "size_multiplier": 0.0,
-      "reason": "research INFO only \u2014 regime 'BREADTH'",
+      "reason": "nqes_regime.json 13.2h old > 12.0h freshness limit",
       "source": "data/research/nqes_regime.json",
-      "source_age_hours": 9.448,
-      "detail": {
-        "regime": "BREADTH",
-        "read": "ES & NQ moving together \u2014 broad agreement, more DURABLE directional signal. Trust the direction more.",
-        "divergence": false,
-        "contemporaneous_corr": 0.932
-      }
+      "source_age_hours": 13.153,
+      "detail": {}
     },
     "macro": {
       "status": "OK",
@@ -60,7 +30,7 @@
       "size_multiplier": 0.0,
       "reason": "macro backdrop INFO (VIX / curve / credit) \u2014 shared input",
       "source": "data/macro/macro_snapshot.json",
-      "source_age_hours": 0.429,
+      "source_age_hours": 0.909,
       "detail": {
         "vix": 14.25,
         "curve_10y2y": 0.526,

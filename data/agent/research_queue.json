@@ -75,14 +75,16 @@
     {
       "id": "RQ-006",
       "priority": 6,
-      "status": "QUEUED",
+      "status": "ERROR",
       "name": "ICT walk-forward stability",
       "description": "Re-run pipeline after every 10 new paper trades. Blocked until 30+ trades collected.",
       "hypothesis_id": "HYP-015",
       "script": "scripts/run_live_pipeline.py",
       "needs_network": false,
       "estimated_minutes": 5,
-      "blocked_until": "30_paper_trades"
+      "blocked_until": "30_paper_trades",
+      "updated_at": "2026-08-16T21:00:48",
+      "last_result": "ERROR: s walk-forward \u2192 GO/NO-GO\n\n=================================================================\n  STEP 1 \u2014 EXTRACT LIVE EDGE  (30-day window)\n=================================================================\n\n  \u25b6  Extracting TP distribution\n  $ /Users/taboost/quant/.venv313/bin/python scripts/extract_live_edge.py --days 30 --min-trades 20 --out logs/live_edge.json --log logs/ict_paper_trade_log.csv\n\n\n  \u274c Only 1 trades found (need 20+).\n     Continue paper trading and re-run when you have more data."
     },
     {
       "id": "RQ-007",

@@ -2249,8 +2249,8 @@
     "id": "BENCH-THROUGHPUT",
     "name": "Backtest throughput benchmark (measured, replaces the 148k claim)",
     "status": "MEASURED",
-    "date_tested": "2026-08-09",
-    "result": "single-core(90bar)=22,413/s \u00b7 12-core ceiling=73,792/s \u00b7 best bar-evals=8,509,115/s \u00b7 legacy claim 148,193 (NOT beaten; numba INACTIVE on py3.14.4 \u2192 pure-Python fallback)",
+    "date_tested": "2026-08-16",
+    "result": "single-core(90bar)=21,822/s \u00b7 12-core ceiling=99,893/s \u00b7 best bar-evals=15,334,294/s \u00b7 legacy claim 148,193 (NOT beaten; numba INACTIVE on py3.14.4 \u2192 pure-Python fallback)",
     "methodology_note": "arm, 12 physical cores, numba INACTIVE on py3.14.4 \u2192 pure-Python fallback. Time-boxed. FastBacktestEngine vs pure-Python forex kernel across 90bar/daily/5min/1min, single vs all-cores. See backtest_benchmark JSON."
   }
 ]

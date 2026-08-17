@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-08-16T01:09:40.116946+00:00",
-  "alive": true,
+  "generated_at": "2026-08-17T00:43:13.097474+00:00",
+  "alive": false,
   "fired_today": false,
   "frozen": null,
-  "scan_age_hours": 9.0,
+  "scan_age_hours": 32.6,
   "n_pairs_scanned": 4,
   "n_would_fire_today": 2,
   "strongest_signal": {
@@ -53,10 +53,12 @@
     "direction": "LONG",
     "fill_price": 0.70513,
     "date": "2026-08-05",
-    "days_ago": 10.5
+    "days_ago": 11.5
   },
-  "loops_alive": 7,
-  "loops_down": [],
-  "summary_line": "System alive. 4 pairs scanned 9.0h ago \u2014 2 signalling (GBPUSD=X LONG, AUDUSD=X LONG). Highest conviction: USDJPY=X 0.561. Last fill: AUD_USD LONG, 10.5d ago.",
+  "loops_alive": 6,
+  "loops_down": [
+    "forex_scan"
+  ],
+  "summary_line": "System alive. 4 pairs scanned 32.6h ago \u2014 2 signalling (GBPUSD=X LONG, AUDUSD=X LONG). Highest conviction: USDJPY=X 0.561. Last fill: AUD_USD LONG, 11.5d ago.",
   "note": "Honest proof-of-life: would-be signals + proximity, never a forced trade. Read-only."
 }

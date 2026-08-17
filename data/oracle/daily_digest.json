@@ -1,12 +1,14 @@
 {
-  "headline": "ICARUS shadow day 25: +0.000% \u2014 3/25 green so far",
+  "headline": "TICK-024 carry-cost model live (Sharpe 0.6452 baseline locked), HYP-071-v2 ignition docs ready for your approval, shadow_gapper dark-pooled but alive.",
   "what_happened": [
-    "2026-07-28 \u2014 Ignition prep: HYP-071-v2 prereg + BH trust decision, DRAFTS ONLY",
-    "2026-07-28 \u2014 TICK-024 unlock: honest carry-cost model landed, gate flag flipped, ignition still CLOSED",
-    "2026-07-27 \u2014 Dashboard staleness: prop state rebuilt, heartbeat self-resolved"
+    "TICK-024 staged patch applied & committed (697da48): forex backtester now uses real `ratediff_financing_rate` model, not static swap table. Full-decade Sharpe dropped 0.6886\u21920.6452; OOS holdout 2023\u201324 Sharpe 1.1919 (decay ratio 2.247, ROBUST). Numbers match impact study.",
+    "HYP-071-v2 pre-registration DRAFT + BH trust-scope brief both pending your sign-off. v2 fixes asymmetric-forecast-variance flaw (locked EXIT_NOW vs resampled HOLD_AND_TRAIL). You choose: (a) symmetric resampling or (b) drop \u03bb\u00b7DD term before run.",
+    "Shadow_gapper edge: 3 live signals (7/13, 7/14, 7/27) with +0.456%, +0.042%, +0.357% constitutional daily returns. 9-week dark run post-validation shows signal dropout (0 signals past 7/14 until 7/27). Execution friction unresolved on HYP-107 honest reconstruction (\u00b15% gross median, likely eaten by spreads/halts).",
+    "HYP-105/106 retracted (look-ahead leakage in ML features); HYP-107 honest rebuild confirmed real +5.4% gross median skew (n=57) on microcap gappers but execution unresolved. Needs live 09:31 shadow + realistic fill model.",
+    "Dashboard health: prop_challenge_state rebuilt clean; execution heartbeat auto-resolved (harness loaded, firing on schedule, 2026-07-27 16:05 ET current)."
   ],
-  "what_it_means": "Template digest (no LLM call) \u2014 see NEXT.md for detail. (LLM fallback: AuthenticationError)",
-  "todays_one_thing": "Check the ICARUS calendar; the ladder does the rest.",
+  "what_it_means": "You now have a production-grade carry model and a fork in the road on HYP-071-v2: approve the parameterization choice and gate opens. Shadow_gapper is real but under-monetized\u2014the low signal frequency + execution friction (spreads/halts on 1\u201315% microcap asks) means current live P&L is truthful but small. Your immediate decision on HYP-071 unblocks ignition; then focus on HYP-107 forward shadow @ 09:31 to quantify realistic fill slippage before sizing any gapper trade.",
+  "todays_one_thing": "Review and approve (or edit) both DRAFT files in `plans/` and `research/`: choose symmetric resampling vs drop \u03bb\u00b7DD for HYP-071-v2, and decide BH scope (retroactive full ledger vs forward-only). Once signed, trigger ignition gate and run the full v2 audit.",
   "progression": [
     {
       "gate": "G1",
@@ -44,7 +46,7 @@
       "detail": "the actual goal"
     }
   ],
-  "source": "template-fallback",
-  "model": null,
-  "generated_at": "2026-08-15T16:09:47.435537+00:00"
+  "source": "oracle-llm",
+  "model": "claude-haiku-4-5-20251001",
+  "generated_at": "2026-08-16T10:15:21.906605+00:00"
 }
