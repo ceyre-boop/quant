@@ -3965,3 +3965,29 @@ downstream of it; (3) re-check the 08-04/08-05 outage entries now that Alpaca is
 was run from the archived copy. If the 21:00 routine is still meant to be live, the file should
 be restored to root; if it was archived deliberately, the `com.alta.research_agent` launchd job
 is pointing at a directive the repo considers obsolete.
+
+## 2026-08-17 · 21:00 RESEARCH ROUTINE (AGENT_DIRECTIVE)
+
+Ran from `archive/AGENT_DIRECTIVE.md` — the file is still archived (commit 7ed778d,
+2026-08-12) and the root-vs-archive ambiguity flagged 2026-08-16 remains unresolved.
+Operator: decide whether to restore it to root or repoint `com.alta.research_agent`.
+
+- **Step 0 brain read** — 27 killed hypotheses (graveyard), 17 confirmed edges loaded
+  cleanly via `get_research_context()`. No sealed idea re-proposed.
+- **Step 1 movers** — 50 gainers pulled cleanly via `execution.alpaca.movers(top=50)`,
+  no 401/entitlement error (the 08-04/08-05 outage remains resolved). ~23/50 are
+  warrants/rights/units (excluded by filters). Non-derivative ≥$1 ≥40% gappers: SIC
+  +243.92% ($49.83), IPST +235.89% ($7.39), WETO +199.15% ($24.59), TRUG +58.84%
+  ($1.54), WFF +40.28% ($2.02). Snapshot only, no fade test.
+- **Step 2 queue** (`--max 5`) — 0 QUEUED tasks. Queue remains empty (open since 08-16).
+- **Step 3** — `research/weekly_pattern_update.md` appended.
+- **Step 4** — no candidates flagged (nothing was tested, queue empty).
+
+**Refused to shortcut:** did not invent a queue task to fill the empty run, did not
+re-run hoping for a different (non-empty) queue state (RULE 5).
+
+**Open for operator (carried forward, still unaddressed):** (1) research queue empty
+— needs new tasks or continues no-op nightly; (2) ICT fill-rate bottleneck still binds
+RQ-006 and downstream ICT walk-forwards; (3) `AGENT_DIRECTIVE.md` root-vs-archive
+status (flagged 08-16, still unresolved); (4) `BLOCKED_NO_VALIDATOR` verdicts still
+accumulating in `auto_hypothesis_results` (10 more since 08-16, no validator attached).

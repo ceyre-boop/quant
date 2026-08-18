@@ -31,3 +31,12 @@ Written by `com.alta.research_agent` (launchd) per AGENT_DIRECTIVE.md § Researc
 - Notes: Queue held exactly one QUEUED task, RQ-006 (ICT walk-forward stability). It returned `ERROR` (logged `ok:false` as F-20260816210048): `extract_live_edge.py --days 30 --min-trades 20` found **1 paper trade, needs 20+**. That is a data-sufficiency refusal by design, not a crash — the script exited 0 and the walk-forward correctly declined to grade on n=1. Recorded per STANDING RULE 6 (degraded source logged explicitly), not repaired per RULE 9. Root cause is the known ICT fill-rate bottleneck (~98% of setups expire unfilled → ~2 fills/90d), so this task will keep returning ERROR until fill rate is addressed; it is not a new incident. Queue is now empty of QUEUED tasks.
 - Movers: 50 gainers written to `data/research/gapper/movers_recent.json`. 15 are warrants/rights/units (HYP-093/107 filters exclude these); 35 common. Only 1 sub-$1 common name. Non-derivative, ≥$1, ≥40% gappers: WETO +128% @ $8.22, CAPR +58% @ $6.65, BANL +56% @ $10.93, HHS +53% @ $4.30, UMAL +51% @ $27.71, VWAV +45% @ $1.78, ETON +44% @ $58.86, DAAQ +44% @ $10.42. Top raw mover AACBR +1233% @ $0.012 is a right, excluded. Snapshot only — no fade test run.
 - Graveyard read clean (27 killed hypotheses + confirmed edges loaded); no sealed idea re-proposed.
+
+## 2026-08-17 — nightly pattern update
+- Sessions reviewed: 1 (21:00 research routine, run from archive/AGENT_DIRECTIVE.md — file archived to archive/ by commit 7ed778d 2026-08-12; launchd job still points at the archived path, unresolved since flagged 2026-08-16)
+- Step 0 brain read: 27 killed hypotheses (graveyard), 17 confirmed edges loaded cleanly. No sealed idea re-proposed.
+- Step 1 movers: 50 gainers pulled cleanly, no Alpaca error (credential outage from 08-04/08-05 remains resolved). Heavy warrant/rights/unit noise (~23 of 50 tickers ending W/.WS/.RT, excluded by HYP-093/107 filters). Non-derivative ≥$1 ≥40% gappers: SIC +243.92% ($49.83), IPST +235.89% ($7.39), WETO +199.15% ($24.59), TRUG +58.84% ($1.54), WFF +40.28% ($2.02). Snapshot only, no fade test run.
+- Step 2 queue (`--max 5`): 0 QUEUED tasks — queue is empty (still open from 2026-08-16, needs new tasks or continues to no-op nightly).
+- New patterns flagged: none
+- Candidates queued for operator review: none
+- Notes: BLOCKED_NO_VALIDATOR verdicts continue accumulating in auto_hypothesis_results (10 new since 08-16, all HYP-AUTO-* with no validator attached) — still open per 2026-08-05/08-16 NEXT.md entries, unaddressed.
