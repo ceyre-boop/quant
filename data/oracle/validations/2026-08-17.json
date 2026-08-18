@@ -1,0 +1,9 @@
+{
+  "date": "2026-08-17",
+  "generated_at": "2026-08-17T06:34:52.179797+00:00",
+  "candidate_lesson": "When the 30-indicator consensus shows dir=LONG at conv=100% but green_matches \u2264 1, the historical hit rate is unreliable (small-sample) and the signal should be sized down or gated until green_matches \u2265 3.",
+  "testable_rule": "if consensus.dir in ('LONG','SHORT') and consensus.conv >= 0.99 and consensus.green_matches <= 1: size_multiplier *= 0.5  # compare realized R vs green_matches >= 3 cohort",
+  "verdict": "REJECTED",
+  "reason": "Rule filters only 0 trades \u2014 insufficient sample",
+  "trades_available": 662
+}

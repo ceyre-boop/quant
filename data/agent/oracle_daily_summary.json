@@ -1,14 +1,14 @@
 {
-  "last_updated": "2026-08-16T06:31:04.499823+00:00",
+  "last_updated": "2026-08-17T06:34:52.198533+00:00",
   "harvest": {
     "trades_closed": 0,
     "win_rate": null,
     "failure_taxonomy": {}
   },
   "reflection": {
-    "candidate_lesson": "When the 30-indicator consensus reports conv=100% but green_matches \u2265 3 with hist_hr ~68%, only take the signal if there is at least one green historical match; conv=100% with green_matches=0 (like EURUSD/USDJPY today) is untested conviction and should be sized at zero.",
-    "mechanism": "Conviction measures live indicator agreement, but hist_hr and green_matches measure whether that exact fingerprint has ever paid out. High live agreement with no historical analogue means the setup is novel \u2014 novelty in systematic macro is unpriced risk, not edge. Institutions crowd into repeatable patterns; a pattern with zero prior matches has no crowd behind it to complete the move.",
-    "testable_rule": "if consensus.conv >= 0.90 and consensus.green_matches == 0: size = 0  # require green_matches >= 1 and hist_hr >= 0.60 to trade a high-conviction signal"
+    "candidate_lesson": "When the 30-indicator consensus shows dir=LONG at conv=100% but green_matches \u2264 1, the historical hit rate is unreliable (small-sample) and the signal should be sized down or gated until green_matches \u2265 3.",
+    "mechanism": "green_matches counts how many times a similar live indicator configuration recurred in the historical memory bank. A conv=100% reading with green_matches=1 (EURUSD hist_hr=73%) rests on a single analog \u2014 that 73% is an artifact of one lucky path, not a stable base rate. Institutional flow that produces durable directional edges leaves repeated footprints; a one-off configuration is more likely regime-noise than a reproducible setup, so trusting the printed hist_hr overstates true expectancy.",
+    "testable_rule": "if consensus.dir in ('LONG','SHORT') and consensus.conv >= 0.99 and consensus.green_matches <= 1: size_multiplier *= 0.5  # compare realized R vs green_matches >= 3 cohort"
   },
   "validation": {
     "verdict": "REJECTED",
@@ -21,8 +21,8 @@
     "codify_error": null
   },
   "cycle": {
-    "cost_usd": 0.13581,
+    "cost_usd": 0.139245,
     "status": "COMPLETE",
-    "date": "2026-08-16"
+    "date": "2026-08-17"
   }
 }

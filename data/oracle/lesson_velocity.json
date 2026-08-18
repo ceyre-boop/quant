@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-16T06:31:04.499299+00:00",
-  "as_of_date": "2026-08-16",
+  "generated_at": "2026-08-17T06:34:52.198045+00:00",
+  "as_of_date": "2026-08-17",
   "current_lesson": {
     "components": [
       "active",
@@ -46,15 +46,15 @@
     ],
     "component_label": "green_matches",
     "first_seen": "2026-05-29",
-    "last_seen": "2026-08-16",
-    "days_forming": 79,
-    "n_revisions": 48,
-    "n_days_appeared": 48,
+    "last_seen": "2026-08-17",
+    "days_forming": 80,
+    "n_revisions": 49,
+    "n_days_appeared": 49,
     "stable_days": 1,
     "status": "forming",
     "time_to_converge_days": null,
-    "latest_lesson_text": "When the 30-indicator consensus reports conv=100% but green_matches \u2265 3 with hist_hr ~68%, only take the signal if there is at least one green historical match; conv=100% with green_matches=0 (like EURUSD/USDJPY today) is untested conviction and should be sized at zero.",
-    "latest_rule": "if consensus.conv >= 0.90 and consensus.green_matches == 0: size = 0  # require green_matches >= 1 and hist_hr >= 0.60 to trade a high-conviction signal",
+    "latest_lesson_text": "When the 30-indicator consensus shows dir=LONG at conv=100% but green_matches \u2264 1, the historical hit rate is unreliable (small-sample) and the signal should be sized down or gated until green_matches \u2265 3.",
+    "latest_rule": "if consensus.dir in ('LONG','SHORT') and consensus.conv >= 0.99 and consensus.green_matches <= 1: size_multiplier *= 0.5  # compare realized R vs green_matches >= 3 cohort",
     "history": [
       {
         "date": "2026-05-29",
@@ -247,6 +247,10 @@
       {
         "date": "2026-08-16",
         "rule": "if consensus.conv >= 0.90 and consensus.green_matches == 0: size = 0  # require green_matches >= 1 and hist_hr >= 0.60 to trade a high-conviction signal"
+      },
+      {
+        "date": "2026-08-17",
+        "rule": "if consensus.dir in ('LONG','SHORT') and consensus.conv >= 0.99 and consensus.green_matches <= 1: size_multiplier *= 0.5  # compare realized R vs green_matches >= 3 cohort"
       }
     ]
   },
@@ -296,15 +300,15 @@
       ],
       "component_label": "green_matches",
       "first_seen": "2026-05-29",
-      "last_seen": "2026-08-16",
-      "days_forming": 79,
-      "n_revisions": 48,
-      "n_days_appeared": 48,
+      "last_seen": "2026-08-17",
+      "days_forming": 80,
+      "n_revisions": 49,
+      "n_days_appeared": 49,
       "stable_days": 1,
       "status": "forming",
       "time_to_converge_days": null,
-      "latest_lesson_text": "When the 30-indicator consensus reports conv=100% but green_matches \u2265 3 with hist_hr ~68%, only take the signal if there is at least one green historical match; conv=100% with green_matches=0 (like EURUSD/USDJPY today) is untested conviction and should be sized at zero.",
-      "latest_rule": "if consensus.conv >= 0.90 and consensus.green_matches == 0: size = 0  # require green_matches >= 1 and hist_hr >= 0.60 to trade a high-conviction signal",
+      "latest_lesson_text": "When the 30-indicator consensus shows dir=LONG at conv=100% but green_matches \u2264 1, the historical hit rate is unreliable (small-sample) and the signal should be sized down or gated until green_matches \u2265 3.",
+      "latest_rule": "if consensus.dir in ('LONG','SHORT') and consensus.conv >= 0.99 and consensus.green_matches <= 1: size_multiplier *= 0.5  # compare realized R vs green_matches >= 3 cohort",
       "history": [
         {
           "date": "2026-05-29",
@@ -497,6 +501,10 @@
         {
           "date": "2026-08-16",
           "rule": "if consensus.conv >= 0.90 and consensus.green_matches == 0: size = 0  # require green_matches >= 1 and hist_hr >= 0.60 to trade a high-conviction signal"
+        },
+        {
+          "date": "2026-08-17",
+          "rule": "if consensus.dir in ('LONG','SHORT') and consensus.conv >= 0.99 and consensus.green_matches <= 1: size_multiplier *= 0.5  # compare realized R vs green_matches >= 3 cohort"
         }
       ]
     }

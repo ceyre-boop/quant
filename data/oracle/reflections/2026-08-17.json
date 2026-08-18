@@ -1,0 +1,26 @@
+{
+  "date": "2026-08-17",
+  "generated_at": "2026-08-17T06:34:51.900950+00:00",
+  "input_tokens": 4583,
+  "output_tokens": 940,
+  "estimated_cost_usd": 0.139245,
+  "harvest_days_read": 7,
+  "reflection": {
+    "candidate_lesson": {
+      "lesson_text": "When the 30-indicator consensus shows dir=LONG at conv=100% but green_matches \u2264 1, the historical hit rate is unreliable (small-sample) and the signal should be sized down or gated until green_matches \u2265 3.",
+      "mechanism": "green_matches counts how many times a similar live indicator configuration recurred in the historical memory bank. A conv=100% reading with green_matches=1 (EURUSD hist_hr=73%) rests on a single analog \u2014 that 73% is an artifact of one lucky path, not a stable base rate. Institutional flow that produces durable directional edges leaves repeated footprints; a one-off configuration is more likely regime-noise than a reproducible setup, so trusting the printed hist_hr overstates true expectancy.",
+      "testable_rule": "if consensus.dir in ('LONG','SHORT') and consensus.conv >= 0.99 and consensus.green_matches <= 1: size_multiplier *= 0.5  # compare realized R vs green_matches >= 3 cohort",
+      "expected_impact": "Reduces variance drag from thin-analog entries; expected Sharpe +0.02\u20130.04 by suppressing low-confidence high-conviction traps (EURUSD-type green_matches=1 signals) without cutting the green_matches=5 GBPUSD cohort.",
+      "evidence_from_harvest": "Live consensus shows GBPUSD (green_matches=5, hist_hr=68%) and AUDUSD (green_matches=3, hist_hr=68%) as well-supported LONGs, while EURUSD prints identical conv=100% but green_matches=1 hist_hr=73% \u2014 an inflated rate on a single analog. USDJPY/AUDNZD with green_matches=0 correctly show hist_hr=0%, confirming green_matches is the reliability axis, not conviction.",
+      "evidence_from_reasoning": null,
+      "reasoning_component_targeted": "green_matches",
+      "sample_needed": 40
+    },
+    "retirement_flag": {
+      "lesson_to_review": "L-L-009",
+      "reason": "L-L-009 states validated knowledge has an expiry date and REST_MODE is a gate not a destination \u2014 with 7 consecutive zero-trade days the system may be stuck in a REST/UNRELIABLE gate past its useful expiry; worth confirming the gate is releasing appropriately."
+    },
+    "system_health_note": "Regime=UNKNOWN with 0 trades over 7 days and internal-only MOMENTUM sizing at 75% \u2014 the system is correctly refusing to trade under low external confirmation, but prolonged flatness risks missing the BREADTH-durable directional window flagged in the briefing."
+  },
+  "auto_validation": null
+}
