@@ -1,14 +1,14 @@
 {
-  "last_updated": "2026-08-17T06:34:52.198533+00:00",
+  "last_updated": "2026-08-18T06:31:23.717870+00:00",
   "harvest": {
     "trades_closed": 0,
     "win_rate": null,
     "failure_taxonomy": {}
   },
   "reflection": {
-    "candidate_lesson": "When the 30-indicator consensus shows dir=LONG at conv=100% but green_matches \u2264 1, the historical hit rate is unreliable (small-sample) and the signal should be sized down or gated until green_matches \u2265 3.",
-    "mechanism": "green_matches counts how many times a similar live indicator configuration recurred in the historical memory bank. A conv=100% reading with green_matches=1 (EURUSD hist_hr=73%) rests on a single analog \u2014 that 73% is an artifact of one lucky path, not a stable base rate. Institutional flow that produces durable directional edges leaves repeated footprints; a one-off configuration is more likely regime-noise than a reproducible setup, so trusting the printed hist_hr overstates true expectancy.",
-    "testable_rule": "if consensus.dir in ('LONG','SHORT') and consensus.conv >= 0.99 and consensus.green_matches <= 1: size_multiplier *= 0.5  # compare realized R vs green_matches >= 3 cohort"
+    "candidate_lesson": "When the 30-indicator consensus shows conv=100% but green_matches < 4 AND hist_hr is populated, the historical-memory analog is too thin to trust the live conviction \u2014 gate entries on green_matches >= 4 to require historical confirmation, not just live agreement.",
+    "mechanism": "Live indicator agreement measures present-tense crowding; green_matches counts how many times this exact multi-indicator fingerprint previously resolved profitably. A 100% live consensus with only 3 historical analogs (AUDUSD case) is a fresh, unvalidated configuration \u2014 institutions have not yet been observed reacting to this pattern, so the 68% hist_hr is a small-sample mirage that regresses toward base rate when traded at size.",
+    "testable_rule": "if consensus_conviction >= 1.00 and green_matches < 4: reduce_size_multiplier(0.5) or skip; only full-size when green_matches >= 5 AND hist_hr >= 0.65"
   },
   "validation": {
     "verdict": "REJECTED",
@@ -21,8 +21,8 @@
     "codify_error": null
   },
   "cycle": {
-    "cost_usd": 0.139245,
+    "cost_usd": 0.13899,
     "status": "COMPLETE",
-    "date": "2026-08-17"
+    "date": "2026-08-18"
   }
 }

@@ -1,20 +1,20 @@
 {
-  "headline": "TICK-024 carry-cost model live and re-baselined; HYP-071-v2 & BH trust scope ready for your decision; gapper shadow dormant.",
+  "headline": "TICK-024 carry-cost model live and rebaselined; HYP-071-v2 pre-registration ready for your gate call; shadow_gapper quiet since mid-July.",
   "what_happened": [
-    "TICK-024 (honest swap financing) committed & pushed; portfolio Sharpe dropped 0.6886\u21920.6452 (decade) and OOS holdout 1.1919 (matches impact study, ROBUST verdict).",
-    "HYP-071-v2 pre-registration DRAFT ready: fixes asymmetric-forecast-variance flaw locked in v1; awaits your pick on symmetric resampling vs dropping \u03bb\u00b7DD term before any run.",
-    "TRUST_DECISION_BRIEF DRAFT prepared: retroactive (whole ledger, 14 CONFIRMED) vs forward-only multiple-testing scope\u2014tradeoff only, no recommendation per your instruction.",
-    "Shadow gapper: 3 signals total since 2026-07-13; last live 2026-07-27 (+0.0357%); zero signals last 9 trading days."
+    "TICK-024 (honest carry-cost via ratediff_financing_rate) committed & pushed; portfolio Sharpe rebaselined 0.6886\u21920.6452 (matches impact study), OOS holdout 1.1919 robust.",
+    "HYP-105/106 retracted for look-ahead leakage; HYP-107 reconstructed honestly: +5.4% gross median on 57 holdout events (p=0.0005), real signal but execution unresolved vs microcap spreads/halts.",
+    "HYP-071-v2 pre-registration DRAFT ready with two symmetric-resampling repair paths for asymmetric-forecast-variance flaw; TRUST_DECISION_BRIEF drafted (retroactive vs forward-only BH scope, your call).",
+    "Dashboard health self-resolved (execution heartbeat live, no bug); no code/ledger touched, ignition gate still CLOSED."
   ],
-  "what_it_means": "You've landed real carry costs in the backtester and taken the Sharpe hit honestly\u2014this is your new true baseline (0.6452 decade, 1.1919 OOS). HYP-071-v2 and the BH scope decision are both doc-only and waiting on you; nothing hashes or gates until you pick. Gapper shadow is dormant\u2014no actionable signals for weeks, so forward work on HYP-105/106/107 realism (halt model, spread fill) has room to breathe.",
-  "todays_one_thing": "Approve or reject the two DRAFT files (HYP-071-v2 pre-registration & TRUST_DECISION_BRIEF) so the ignition gate can open on your next call; both are freeze-safe and ready.",
+  "what_it_means": "You have a rebaselined honest carry model in production and two credible microcap long edges (HYP-107 real but tight; HYP-105/106 look-ahead artifact). The path to next gate ignition is clear: approve HYP-071-v2 pre-reg (pick symmetric resampling or drop the \u03bb\u00b7DD term), decide your BH multiple-testing scope, then trigger training-gate calls. Shadow_gapper dormancy over 3+ weeks suggests either no recent \u2265100% gappers or signal quality too low to sustain small-sample trades.",
+  "todays_one_thing": "Review HYP-071_v2_prereg.DRAFT.md and TRUST_DECISION_BRIEF.md, commit to your BH scope choice, then open sovereign/training/gate.py with your two parameter calls\u2014this unblocks the ignition sequence.",
   "progression": [
     {
       "gate": "G1",
       "label": "30 clean shadow days (ICARUS)",
       "state": "IN_PROGRESS",
-      "pct": 83,
-      "detail": "25/30 days recorded \u00b7 3 green"
+      "pct": 87,
+      "detail": "26/30 days recorded \u00b7 3 green"
     },
     {
       "gate": "G2",
@@ -47,5 +47,5 @@
   ],
   "source": "oracle-llm",
   "model": "claude-haiku-4-5-20251001",
-  "generated_at": "2026-08-17T10:26:30.257392+00:00"
+  "generated_at": "2026-08-18T15:05:49.582299+00:00"
 }

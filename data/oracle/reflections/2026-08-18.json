@@ -1,0 +1,26 @@
+{
+  "date": "2026-08-18",
+  "generated_at": "2026-08-18T06:31:23.530811+00:00",
+  "input_tokens": 4571,
+  "output_tokens": 939,
+  "estimated_cost_usd": 0.13899,
+  "harvest_days_read": 7,
+  "reflection": {
+    "candidate_lesson": {
+      "lesson_text": "When the 30-indicator consensus shows conv=100% but green_matches < 4 AND hist_hr is populated, the historical-memory analog is too thin to trust the live conviction \u2014 gate entries on green_matches >= 4 to require historical confirmation, not just live agreement.",
+      "mechanism": "Live indicator agreement measures present-tense crowding; green_matches counts how many times this exact multi-indicator fingerprint previously resolved profitably. A 100% live consensus with only 3 historical analogs (AUDUSD case) is a fresh, unvalidated configuration \u2014 institutions have not yet been observed reacting to this pattern, so the 68% hist_hr is a small-sample mirage that regresses toward base rate when traded at size.",
+      "testable_rule": "if consensus_conviction >= 1.00 and green_matches < 4: reduce_size_multiplier(0.5) or skip; only full-size when green_matches >= 5 AND hist_hr >= 0.65",
+      "expected_impact": "Filters low-analog 100%-conviction entries; expected win-rate lift of +3-5pp on consensus-driven trades and Sharpe +0.02-0.03 by cutting variance from unvalidated fingerprints.",
+      "evidence_from_harvest": "Live consensus shows GBPUSD conv=100% with green_matches=5 (hist_hr=68%) vs AUDUSD conv=100% with green_matches=3 (hist_hr=68%) \u2014 identical hist_hr but AUDUSD rests on far fewer analogs; EURUSD/AUDNZD show conv 50-58% with green_matches=0 and hist_hr=0%, confirming that low green_matches carries no reliable historical edge regardless of live agreement.",
+      "evidence_from_reasoning": null,
+      "reasoning_component_targeted": "green_matches",
+      "sample_needed": 40
+    },
+    "retirement_flag": {
+      "lesson_to_review": "L-L-009",
+      "reason": "L-L-009 states validated knowledge has an expiry date; with 0 trades in the last 7 days and REST_MODE-like inactivity, we cannot confirm whether prior gates (e.g. VIX 13 in L-L-008) are still calibrated to the current BREADTH/MOMENTUM regime \u2014 the freeze itself may be decaying edge that needs a re-validation trade batch."
+    },
+    "system_health_note": "System is signal-rich but trade-starved (0 trades in 7 days, Regime=UNKNOWN internally vs MOMENTUM/BREADTH externally) \u2014 the decision logger has no closed entries to mine, so this lesson is harvest/consensus-derived and must be validated once live trades resume."
+  },
+  "auto_validation": null
+}

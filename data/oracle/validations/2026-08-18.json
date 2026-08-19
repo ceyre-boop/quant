@@ -1,0 +1,9 @@
+{
+  "date": "2026-08-18",
+  "generated_at": "2026-08-18T06:31:23.697804+00:00",
+  "candidate_lesson": "When the 30-indicator consensus shows conv=100% but green_matches < 4 AND hist_hr is populated, the historical-memory analog is too thin to trust the live conviction \u2014 gate entries on green_matches >= 4 to require historical confirmation, not just live agreement.",
+  "testable_rule": "if consensus_conviction >= 1.00 and green_matches < 4: reduce_size_multiplier(0.5) or skip; only full-size when green_matches >= 5 AND hist_hr >= 0.65",
+  "verdict": "REJECTED",
+  "reason": "Rule filters only 0 trades \u2014 insufficient sample",
+  "trades_available": 662
+}

@@ -1,0 +1,31 @@
+{
+  "date": "2026-08-18",
+  "direction": "NEUTRAL",
+  "confidence": 0.0,
+  "reasoning": [
+    "regime: ES & NQ moving together \u2014 broad agreement, more DURABLE directional signal. Trust the direction more.",
+    "macro context present (2026-08-18)"
+  ],
+  "inputs_used": [
+    "briefing",
+    "daily_panel",
+    "fred_macro"
+  ],
+  "inputs_missing": [
+    "calendar",
+    "gdelt",
+    "sentiment_board"
+  ],
+  "context_fraction_fresh": 0.5,
+  "generated_at": "2026-08-18T12:02:11+00:00",
+  "realised": {
+    "direction": "BEARISH",
+    "correct": null,
+    "scored_at": "2026-08-18T20:41:37+00:00",
+    "proxy": "SPY",
+    "return": -0.006846,
+    "neutral_band": 0.0025,
+    "close": 767.38,
+    "prev_close": 772.67
+  }
+}

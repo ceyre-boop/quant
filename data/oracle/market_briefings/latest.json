@@ -1,31 +1,11 @@
 {
-  "date": "2026-08-17",
-  "generated_at": "2026-08-17T17:05:50.520831+00:00",
+  "date": "2026-08-18",
+  "generated_at": "2026-08-18T16:10:58.679641+00:00",
   "meta_regime": "BREADTH",
   "regime_read": "ES & NQ moving together \u2014 broad agreement, more DURABLE directional signal. Trust the direction more.",
-  "narrative": "Macro backdrop \u2014\n[2026-08-17] US economic state (FRED):\n  Growth: real GDP 1.5% (q/q ann)\n  Inflation: CPI 2.95% YoY | core CPI 2.15% | core PCE 2.8% (Fed target 2%)\n  Labor: unemployment 4.1%\n  Rates: fed funds 3.63% | 10Y 4.63% | 10Y-2Y 0.51% (NORMAL)\n  Consumer: UMich sentiment 49.5 | VIX 14.63\n\n---\nRecent market action in the ES/NQ pair has been characterized by a strong and durable directional move, with both indices moving together. The lead-lag regime is currently classified as 'Breadth,' indicating broad agreement among participants. This suggests that the current direction should be trusted more, and traders are advised to maintain their positions or consider adding to them if they have not already done so. The daily return for ES is -0.2%, while NQ has a daily return of 0.21%, reflecting a slight divergence in performance but still within the bounds of the broader trend.\n\nVolume profile data is currently insufficient, indicating that there may be limited intraday trading activity to identify key levels or points of control (POC). This suggests that traders should remain cautious and avoid making significant bets based on volume alone. The session VWAP for ES is 7813.8, while NQ's is 30275.83, which are close to their recent price action but do not indicate any clear accumulation or distribution zones.\n\nThe lead-lag regime remains in 'Breadth,' with no significant lead-lag relationship observed between ES and NQ over the past 20 days. This implies that both indices are moving together, providing a more durable directional signal rather than a fleeting one. The contemporaneous correlation of 0.933 further supports this view.\n\nThe upcoming event calendar includes key economic releases such as PCE (Fed's preferred inflation) on August 31st and Nonfarm Payrolls on September 4th, both of which are high-impact events that could significantly impact market sentiment. Traders should consider reducing their position size or widening stop losses in the lead-up to these events, especially given the high-impact nature of NFP.\n\nIn summary, the current meta-regime suggests a long-the-dip bias with a probability of approximately 65%, invalidated below 30,375 for NQ. While there is broad agreement among participants, traders should remain cautious and be prepared to adjust their positions as economic data releases approach.",
+  "narrative": "Macro backdrop \u2014\n[2026-08-18] US economic state (FRED):\n  Growth: real GDP 1.5% (q/q ann)\n  Inflation: CPI 2.95% YoY | core CPI 2.15% | core PCE 2.8% (Fed target 2%)\n  Labor: unemployment 4.1%\n  Rates: fed funds 3.63% | 10Y 4.68% | 10Y-2Y 0.53% (NORMAL)\n  Consumer: UMich sentiment 49.5 | VIX 14.25\n\n---\nRecent market action in ES and NQ has been characterized by a strong move together, indicative of a BREADTH regime. The lead-lag analysis shows that both indices are moving in tandem with a contemporaneous correlation of 0.929, suggesting broad agreement among participants. This implies a more durable directional signal, and traders should trust the direction more. However, there is some divergence noted, which could be a potential area for caution if it persists or widens further.\n\nVolume profile analysis indicates that both ES and NQ are trading in their accumulation zones, with key levels around 7803.47 for ES and 30203.16 for NQ. The price of control (POC) is a critical level where significant volume has been traded, acting as the line in the sand. Traders should be cautious near these levels as they can act as support or resistance.\n\nThe event calendar highlights several key events coming up, including PCE inflation data on 2026-08-31 and Nonfarm Payrolls on 2026-09-04. These high-impact releases will likely drive significant market volatility, so traders should consider reducing their position size or widening stop losses in the lead-up to these events.\n\nGiven the current BREADTH regime and the recent move together, a long-the-dip bias is suggested with a probability of ~75%. However, this bias can be invalidated if either index breaks below 30,375 for NQ or 7800 for ES. Traders should maintain a high level of vigilance as news and events could introduce additional volatility.",
   "big_move_headline": {
-    "headline": "Today's likeliest institutional move: LONG AUDUSD (P 73%, ~0.81% range, conf 37%).",
-    "pair": "AUDUSD",
-    "direction": "LONG",
-    "p_big": 0.7278,
-    "confidence": 0.374,
-    "expected_magnitude_pct": 0.8129,
-    "session": "OFF_HOURS",
-    "drivers": [
-      [
-        "event_risk",
-        0.9
-      ],
-      [
-        "compression",
-        0.31
-      ],
-      [
-        "momentum",
-        0.2568
-      ]
-    ],
+    "headline": "No directional big-move call today \u2014 drivers are mixed/neutral.",
     "validation_status": "UNVALIDATED \u2014 display only (run scripts/validate_big_move.py)"
   },
   "directional_bias": "LONG",
@@ -35,25 +15,57 @@
   "synthesis_source": "ollama/qwen2.5",
   "lead_lag": {
     "regime": "BREADTH",
-    "spread_avg": 0.0004,
+    "spread_avg": -0.00048,
     "leader": "NONE",
-    "corr": 0.933,
-    "divergence": false
+    "corr": 0.929,
+    "divergence": true
   },
   "volume_profile": {
     "ES=F": {
       "symbol": "ES=F",
-      "poc": null,
-      "error": "insufficient intraday data"
+      "as_of": "2026-08-18T13:03:43.854976+00:00",
+      "days": 5,
+      "bins": 40,
+      "poc": 7803.47,
+      "value_area_low": 7769.1,
+      "value_area_high": 7826.39,
+      "high_volume_nodes": [
+        7803.47,
+        7823.53,
+        7794.88,
+        7814.93,
+        7826.39
+      ],
+      "price_range": [
+        7721.83,
+        7836.42
+      ],
+      "limitation": "Volume profile = WHERE volume traded (volume-at-price). NOT order-flow delta (buy/sell aggression). True delta needs a CME order-flow feed (Databento/CQG)."
     },
     "NQ=F": {
       "symbol": "NQ=F",
-      "poc": null,
-      "error": "insufficient intraday data"
+      "as_of": "2026-08-18T13:03:46.307466+00:00",
+      "days": 5,
+      "bins": 40,
+      "poc": 30203.16,
+      "value_area_low": 30061.36,
+      "value_area_high": 30250.43,
+      "high_volume_nodes": [
+        30203.16,
+        30234.67,
+        30218.92,
+        30187.41,
+        30092.87
+      ],
+      "price_range": [
+        29691.08,
+        30321.33
+      ],
+      "limitation": "Volume profile = WHERE volume traded (volume-at-price). NOT order-flow delta (buy/sell aggression). True delta needs a CME order-flow feed (Databento/CQG)."
     }
   },
   "macro_economic": {
-    "text": "[2026-08-17] US economic state (FRED):\n  Growth: real GDP 1.5% (q/q ann)\n  Inflation: CPI 2.95% YoY | core CPI 2.15% | core PCE 2.8% (Fed target 2%)\n  Labor: unemployment 4.1%\n  Rates: fed funds 3.63% | 10Y 4.63% | 10Y-2Y 0.51% (NORMAL)\n  Consumer: UMich sentiment 49.5 | VIX 14.63",
+    "text": "[2026-08-18] US economic state (FRED):\n  Growth: real GDP 1.5% (q/q ann)\n  Inflation: CPI 2.95% YoY | core CPI 2.15% | core PCE 2.8% (Fed target 2%)\n  Labor: unemployment 4.1%\n  Rates: fed funds 3.63% | 10Y 4.68% | 10Y-2Y 0.53% (NORMAL)\n  Consumer: UMich sentiment 49.5 | VIX 14.25",
     "summary": {
       "gdp_growth_pct": 1.5,
       "cpi_yoy_pct": 2.95,
@@ -61,41 +73,41 @@
       "core_pce_yoy_pct": 2.8,
       "unemployment_pct": 4.1,
       "fed_funds_pct": 3.63,
-      "ten_year_pct": 4.63,
-      "yield_curve_10y2y": 0.51,
+      "ten_year_pct": 4.68,
+      "yield_curve_10y2y": 0.53,
       "yield_curve_state": "NORMAL",
       "consumer_sentiment": 49.5,
-      "vix": 14.63
+      "vix": 14.25
     }
   },
-  "news_count": 12,
+  "news_count": 8,
   "event_calendar": [
     {
       "event": "PCE (Fed's preferred inflation)",
       "date": "2026-08-31",
       "source": "cadence_estimate",
       "action": "8:30 ET \u2014 reduce size into window",
-      "days_until": 14,
-      "note": "in 14d \u2014 8:30 ET \u2014 reduce size into window"
+      "days_until": 13,
+      "note": "in 13d \u2014 8:30 ET \u2014 reduce size into window"
     },
     {
       "event": "ISM Manufacturing PMI",
       "date": "2026-09-01",
       "source": "cadence_estimate",
       "action": "reduce size into the 10:00 ET print",
-      "days_until": 15,
-      "note": "in 15d \u2014 reduce size into the 10:00 ET print"
+      "days_until": 14,
+      "note": "in 14d \u2014 reduce size into the 10:00 ET print"
     },
     {
       "event": "Nonfarm Payrolls",
       "date": "2026-09-04",
       "source": "cadence_estimate",
       "action": "high-impact 8:30 ET \u2014 widen stops / size down",
-      "days_until": 18,
-      "note": "in 18d \u2014 high-impact 8:30 ET \u2014 widen stops / size down"
+      "days_until": 17,
+      "note": "in 17d \u2014 high-impact 8:30 ET \u2014 widen stops / size down"
     }
   ],
-  "scorecard_summary": "Briefing scorecard: n=25 dir-calls, hit 0.72, regime acc 0.404 \u2014 CALIBRATING \u2014 need ~30-60 samples before the hit-rate/calibration mean anything",
+  "scorecard_summary": "Briefing scorecard: n=26 dir-calls, hit 0.692, regime acc 0.415 \u2014 CALIBRATING \u2014 need ~30-60 samples before the hit-rate/calibration mean anything",
   "bias": "size to regime: trust direction more in BREADTH, less in CONCENTRATION; ROTATION_WARN = treat tech-led longs as suspect",
   "provenance": {
     "source": "oracle_morning_briefing",
