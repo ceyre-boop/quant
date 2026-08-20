@@ -1,14 +1,14 @@
 {
-  "generated_at": "2026-08-18T22:21:03.536753+00:00",
+  "generated_at": "2026-08-19T23:44:32.022204+00:00",
   "alive": true,
   "fired_today": false,
   "frozen": null,
-  "scan_age_hours": 9.3,
+  "scan_age_hours": 11.7,
   "n_pairs_scanned": 4,
   "n_would_fire_today": 2,
   "strongest_signal": {
     "pair": "USDJPY=X",
-    "conviction": 0.397,
+    "conviction": 0.326,
     "direction": "NO_TRADE",
     "pct_to_trigger": 100.0,
     "regime": "TRENDING",
@@ -17,7 +17,7 @@
   "pairs": [
     {
       "pair": "USDJPY=X",
-      "conviction": 0.397,
+      "conviction": 0.326,
       "direction": "NO_TRADE",
       "pct_to_trigger": 100.0,
       "regime": "TRENDING",
@@ -25,27 +25,27 @@
     },
     {
       "pair": "GBPUSD=X",
-      "conviction": 0.247,
+      "conviction": 0.224,
       "direction": "LONG",
       "pct_to_trigger": 100.0,
       "regime": "TRENDING",
       "rate_differential": -0.6
     },
     {
-      "pair": "EURUSD=X",
-      "conviction": 0.175,
-      "direction": "NO_TRADE",
-      "pct_to_trigger": 100.0,
-      "regime": "TRENDING",
-      "rate_differential": -1.83
-    },
-    {
       "pair": "AUDUSD=X",
-      "conviction": 0.105,
+      "conviction": 0.112,
       "direction": "LONG",
       "pct_to_trigger": 100.0,
       "regime": "TRENDING",
       "rate_differential": 0.13
+    },
+    {
+      "pair": "EURUSD=X",
+      "conviction": 0.097,
+      "direction": "NO_TRADE",
+      "pct_to_trigger": 97.0,
+      "regime": "TRENDING",
+      "rate_differential": -1.83
     }
   ],
   "last_fill": {
@@ -53,10 +53,10 @@
     "direction": "LONG",
     "fill_price": 0.70513,
     "date": "2026-08-05",
-    "days_ago": 13.4
+    "days_ago": 14.5
   },
   "loops_alive": 7,
   "loops_down": [],
-  "summary_line": "System alive. 4 pairs scanned 9.3h ago \u2014 2 signalling (GBPUSD=X LONG, AUDUSD=X LONG). Highest conviction: USDJPY=X 0.397. Last fill: AUD_USD LONG, 13.4d ago.",
+  "summary_line": "System alive. 4 pairs scanned 11.7h ago \u2014 2 signalling (GBPUSD=X LONG, AUDUSD=X LONG). Highest conviction: USDJPY=X 0.326. Last fill: AUD_USD LONG, 14.5d ago.",
   "note": "Honest proof-of-life: would-be signals + proximity, never a forced trade. Read-only."
 }

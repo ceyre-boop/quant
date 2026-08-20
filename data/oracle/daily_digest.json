@@ -1,20 +1,19 @@
 {
-  "headline": "TICK-024 carry-cost model live and rebaselined; HYP-071-v2 pre-registration ready for your gate call; shadow_gapper quiet since mid-July.",
+  "headline": "ICARUS shadow day 27: +0.000% \u2014 3/27 green so far",
   "what_happened": [
-    "TICK-024 (honest carry-cost via ratediff_financing_rate) committed & pushed; portfolio Sharpe rebaselined 0.6886\u21920.6452 (matches impact study), OOS holdout 1.1919 robust.",
-    "HYP-105/106 retracted for look-ahead leakage; HYP-107 reconstructed honestly: +5.4% gross median on 57 holdout events (p=0.0005), real signal but execution unresolved vs microcap spreads/halts.",
-    "HYP-071-v2 pre-registration DRAFT ready with two symmetric-resampling repair paths for asymmetric-forecast-variance flaw; TRUST_DECISION_BRIEF drafted (retroactive vs forward-only BH scope, your call).",
-    "Dashboard health self-resolved (execution heartbeat live, no bug); no code/ledger touched, ignition gate still CLOSED."
+    "2026-07-28 \u2014 Ignition prep: HYP-071-v2 prereg + BH trust decision, DRAFTS ONLY",
+    "2026-07-28 \u2014 TICK-024 unlock: honest carry-cost model landed, gate flag flipped, ignition still CLOSED",
+    "2026-07-27 \u2014 Dashboard staleness: prop state rebuilt, heartbeat self-resolved"
   ],
-  "what_it_means": "You have a rebaselined honest carry model in production and two credible microcap long edges (HYP-107 real but tight; HYP-105/106 look-ahead artifact). The path to next gate ignition is clear: approve HYP-071-v2 pre-reg (pick symmetric resampling or drop the \u03bb\u00b7DD term), decide your BH multiple-testing scope, then trigger training-gate calls. Shadow_gapper dormancy over 3+ weeks suggests either no recent \u2265100% gappers or signal quality too low to sustain small-sample trades.",
-  "todays_one_thing": "Review HYP-071_v2_prereg.DRAFT.md and TRUST_DECISION_BRIEF.md, commit to your BH scope choice, then open sovereign/training/gate.py with your two parameter calls\u2014this unblocks the ignition sequence.",
+  "what_it_means": "Template digest (no LLM call) \u2014 see NEXT.md for detail. (LLM fallback: BadRequestError)",
+  "todays_one_thing": "Check the ICARUS calendar; the ladder does the rest.",
   "progression": [
     {
       "gate": "G1",
       "label": "30 clean shadow days (ICARUS)",
       "state": "IN_PROGRESS",
-      "pct": 87,
-      "detail": "26/30 days recorded \u00b7 3 green"
+      "pct": 90,
+      "detail": "27/30 days recorded \u00b7 3 green"
     },
     {
       "gate": "G2",
@@ -45,7 +44,7 @@
       "detail": "the actual goal"
     }
   ],
-  "source": "oracle-llm",
-  "model": "claude-haiku-4-5-20251001",
-  "generated_at": "2026-08-18T15:05:49.582299+00:00"
+  "source": "template-fallback",
+  "model": null,
+  "generated_at": "2026-08-19T10:15:11.549627+00:00"
 }

@@ -1,0 +1,43 @@
+{
+  "timestamp": "2026-08-19T23:44:32+00:00",
+  "new_entries_since_last": 2,
+  "new_outcomes_since_last": 0,
+  "outcomes_backfilled": 0,
+  "decisions_expired": 2,
+  "loops_down": [],
+  "anomalies": [
+    {
+      "type": "REST_MODE_EXPIRED",
+      "priority": "URGENT",
+      "message": "HYP-046 (Displacement Gate >= 1.5 improves London trade qua) validated and unimplemented for 85 days. Implement it or explicitly reject it. Validated knowledge has an expiry date."
+    },
+    {
+      "type": "REST_MODE_EXPIRED",
+      "priority": "URGENT",
+      "message": "HYP-063 () validated and unimplemented for 58 days. Implement it or explicitly reject it. Validated knowledge has an expiry date."
+    }
+  ],
+  "running_stats": {},
+  "live_prices": {},
+  "indicator_consensus": {},
+  "g2_progress": {
+    "ict_fills": 1,
+    "forex_fills": 0,
+    "total": 24,
+    "target": 8,
+    "g2a_status": "PASS",
+    "g2a_signals": 20,
+    "g2a_win_rate": 0.6364,
+    "latest_fill": "2026-05-26 GBPUSD LONG COMMITMENT_FAILURE -0.94R",
+    "total_closed": 0,
+    "pct_complete": 0.0,
+    "win_rate": null,
+    "avg_r": null,
+    "first_trade_date": null,
+    "latest_trade_date": null,
+    "estimated_g2_completion": null,
+    "last_updated": "2026-08-19T23:44:31+00:00"
+  },
+  "big_move": {},
+  "big_move_outcomes_backfilled": 0
+}
