@@ -1,6 +1,6 @@
 {
   "date": "2026-08-19",
-  "generated_at": "2026-08-19T06:46:18.427091+00:00",
+  "generated_at": "2026-08-20T07:19:32.167252+00:00",
   "labels": {
     "A191RL1Q225SBEA": {
       "label": "Real GDP growth (q/q ann)",
@@ -136,15 +136,15 @@
       "y10": 0.4
     },
     "DGS10": {
-      "date": "2026-08-17",
-      "value": 4.72,
+      "date": "2026-08-18",
+      "value": 4.71,
       "y1": 4.3,
       "y2": 3.86,
       "y5": 1.24,
       "y10": 1.58
     },
     "DGS2": {
-      "date": "2026-08-17",
+      "date": "2026-08-18",
       "value": 4.19,
       "y1": 3.75,
       "y2": 4.06,
@@ -152,8 +152,8 @@
       "y10": 0.76
     },
     "T10Y2Y": {
-      "date": "2026-08-18",
-      "value": 0.52,
+      "date": "2026-08-19",
+      "value": 0.46,
       "y1": 0.55,
       "y2": -0.2,
       "y5": 1.02,
@@ -180,7 +180,7 @@
       "value": 49.5,
       "y1": 58.2,
       "y2": 67.9,
-      "y5": null,
+      "y5": 70.3,
       "y10": 89.8
     },
     "DTWEXBGS": {
@@ -192,12 +192,8 @@
       "y10": 110.8163
     },
     "VIXCLS": {
-      "date": "2026-08-17",
-      "value": 15.19,
-      "y1": 15.57,
-      "y2": 14.65,
-      "y5": 21.67,
-      "y10": 11.34
+      "value": null,
+      "err": "TimeoutError"
     }
   },
   "summary": {
@@ -207,11 +203,11 @@
     "core_pce_yoy_pct": 2.8,
     "unemployment_pct": 4.1,
     "fed_funds_pct": 3.63,
-    "ten_year_pct": 4.72,
-    "yield_curve_10y2y": 0.52,
+    "ten_year_pct": 4.71,
+    "yield_curve_10y2y": 0.46,
     "yield_curve_state": "NORMAL",
     "consumer_sentiment": 49.5,
-    "vix": 15.19
+    "vix": null
   },
   "provenance": {
     "source": "fred_economic",

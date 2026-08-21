@@ -1,12 +1,12 @@
 {
   "status": "FAILED",
-  "error": "ConnectionError: HTTPSConnectionPool(host='www.reddit.com', port=443): Max retries exceeded with url: /r/Forex/hot.json?limit=50&raw_json=1 (Caused by NameResolutionError(\"HTTPSConnection(host='www.reddit.com', port=443): Failed to resolve 'www.reddit.com' ([Errno 8] nodename nor servname provided, or not known)\"))",
-  "ts": "2026-08-19T16:49:13.911192+00:00",
+  "error": "403",
+  "ts": "2026-08-20T23:35:24.648510+00:00",
   "posts": 0,
   "failed_subreddits": {
-    "wallstreetbets": "ConnectionError: HTTPSConnectionPool(host='www.reddit.com', port=443): Max retries exceeded with url: /r/wallstreetbets/hot.json?limit=100&raw_json=1 (Caused by NameResolutionError(\"HTTPSConnection(host='www.reddit.com', port=443): Failed to resolve 'www.reddit.com' ([Errno 8] nodename nor servname provided, or not known)\"))",
-    "Forex": "ConnectionError: HTTPSConnectionPool(host='www.reddit.com', port=443): Max retries exceeded with url: /r/Forex/hot.json?limit=50&raw_json=1 (Caused by NameResolutionError(\"HTTPSConnection(host='www.reddit.com', port=443): Failed to resolve 'www.reddit.com' ([Errno 8] nodename nor servname provided, or not known)\"))",
-    "investing": "ConnectionError: HTTPSConnectionPool(host='www.reddit.com', port=443): Max retries exceeded with url: /r/investing/hot.json?limit=50&raw_json=1 (Caused by NameResolutionError(\"HTTPSConnection(host='www.reddit.com', port=443): Failed to resolve 'www.reddit.com' ([Errno 8] nodename nor servname provided, or not known)\"))",
-    "stocks": "ConnectionError: HTTPSConnectionPool(host='www.reddit.com', port=443): Max retries exceeded with url: /r/stocks/hot.json?limit=50&raw_json=1 (Caused by NameResolutionError(\"HTTPSConnection(host='www.reddit.com', port=443): Failed to resolve 'www.reddit.com' ([Errno 8] nodename nor servname provided, or not known)\"))"
+    "wallstreetbets": "403",
+    "Forex": "403",
+    "investing": "403",
+    "stocks": "403"
   }
 }

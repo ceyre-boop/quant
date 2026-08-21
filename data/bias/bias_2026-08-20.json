@@ -1,0 +1,31 @@
+{
+  "date": "2026-08-20",
+  "direction": "NEUTRAL",
+  "confidence": 0.0,
+  "reasoning": [
+    "regime: ES=F/NQ=F fetch failed",
+    "macro context present (2026-08-19)"
+  ],
+  "inputs_used": [
+    "briefing",
+    "daily_panel",
+    "fred_macro"
+  ],
+  "inputs_missing": [
+    "calendar",
+    "gdelt",
+    "sentiment_board"
+  ],
+  "context_fraction_fresh": 0.5,
+  "generated_at": "2026-08-20T12:04:40+00:00",
+  "realised": {
+    "direction": "BEARISH",
+    "correct": null,
+    "scored_at": "2026-08-20T20:42:26+00:00",
+    "proxy": "SPY",
+    "return": -0.008218,
+    "neutral_band": 0.0025,
+    "close": 762.74,
+    "prev_close": 769.06
+  }
+}

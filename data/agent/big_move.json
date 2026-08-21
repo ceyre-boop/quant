@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-08-19T11:04:03+00:00",
-  "session": "LONDON",
+  "timestamp": "2026-08-21T01:21:23+00:00",
+  "session": "OFF_HOURS",
   "context_keys": [
     "high_impact_event_today"
   ],
@@ -8,40 +8,11 @@
   "estimates": {
     "GBPUSD": {
       "pair": "GBPUSD",
-      "p_big": 0.6973,
+      "p_big": 0.6729,
       "direction": "LONG",
-      "expected_magnitude_pct": 0.5415,
-      "expected_vs_adr": 1.428,
-      "session": "LONDON",
-      "confidence": 0.313,
-      "drivers": [
-        [
-          "event_risk",
-          0.9
-        ],
-        [
-          "compression",
-          0.2611
-        ],
-        [
-          "displacement",
-          0.1148
-        ],
-        [
-          "momentum",
-          0.1085
-        ]
-      ],
-      "timestamp": "2026-08-19T11:04:02.645798+00:00",
-      "notes": []
-    },
-    "EURUSD": {
-      "pair": "EURUSD",
-      "p_big": 0.6981,
-      "direction": "LONG",
-      "expected_magnitude_pct": 0.5071,
-      "expected_vs_adr": 1.428,
-      "session": "LONDON",
+      "expected_magnitude_pct": 0.5487,
+      "expected_vs_adr": 1.406,
+      "session": "OFF_HOURS",
       "confidence": 0.359,
       "drivers": [
         [
@@ -49,29 +20,58 @@
           0.9
         ],
         [
-          "compression",
-          0.2108
+          "momentum",
+          0.3281
         ],
         [
           "displacement",
-          0.1996
+          0.0585
+        ],
+        [
+          "compression",
+          0.0
+        ]
+      ],
+      "timestamp": "2026-08-21T01:21:22.738977+00:00",
+      "notes": []
+    },
+    "EURUSD": {
+      "pair": "EURUSD",
+      "p_big": 0.6855,
+      "direction": "LONG",
+      "expected_magnitude_pct": 0.5484,
+      "expected_vs_adr": 1.417,
+      "session": "OFF_HOURS",
+      "confidence": 0.385,
+      "drivers": [
+        [
+          "event_risk",
+          0.9
         ],
         [
           "momentum",
-          0.1888
+          0.4137
+        ],
+        [
+          "displacement",
+          0.0649
+        ],
+        [
+          "compression",
+          0.0
         ]
       ],
-      "timestamp": "2026-08-19T11:04:02.645798+00:00",
+      "timestamp": "2026-08-21T01:21:22.738977+00:00",
       "notes": []
     },
     "USDJPY": {
       "pair": "USDJPY",
-      "p_big": 0.779,
+      "p_big": 0.7308,
       "direction": "NEUTRAL",
-      "expected_magnitude_pct": 1.0368,
-      "expected_vs_adr": 1.501,
-      "session": "LONDON",
-      "confidence": 0.281,
+      "expected_magnitude_pct": 1.0499,
+      "expected_vs_adr": 1.458,
+      "session": "OFF_HOURS",
+      "confidence": 0.264,
       "drivers": [
         [
           "event_risk",
@@ -79,47 +79,47 @@
         ],
         [
           "compression",
-          0.7491
-        ],
-        [
-          "displacement",
-          -0.0951
+          0.471
         ],
         [
           "momentum",
-          -0.016
+          -0.041
+        ],
+        [
+          "displacement",
+          -0.0083
         ]
       ],
-      "timestamp": "2026-08-19T11:04:02.645798+00:00",
+      "timestamp": "2026-08-21T01:21:22.738977+00:00",
       "notes": []
     },
     "AUDUSD": {
       "pair": "AUDUSD",
-      "p_big": 0.6784,
-      "direction": "NEUTRAL",
-      "expected_magnitude_pct": 0.7943,
-      "expected_vs_adr": 1.411,
-      "session": "LONDON",
-      "confidence": 0.251,
+      "p_big": 0.6677,
+      "direction": "LONG",
+      "expected_magnitude_pct": 0.7881,
+      "expected_vs_adr": 1.401,
+      "session": "OFF_HOURS",
+      "confidence": 0.336,
       "drivers": [
         [
           "event_risk",
           0.9
         ],
         [
-          "compression",
-          0.2162
+          "momentum",
+          0.2004
         ],
         [
           "displacement",
-          -0.0497
+          0.1063
         ],
         [
-          "momentum",
-          0.045
+          "compression",
+          0.0624
         ]
       ],
-      "timestamp": "2026-08-19T11:04:02.645798+00:00",
+      "timestamp": "2026-08-21T01:21:22.738977+00:00",
       "notes": []
     }
   }
