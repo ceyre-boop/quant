@@ -1,14 +1,14 @@
 {
-  "generated_at": "2026-08-21T01:21:23.798724+00:00",
+  "generated_at": "2026-08-22T01:37:40.558255+00:00",
   "alive": true,
-  "fired_today": true,
+  "fired_today": false,
   "frozen": null,
-  "scan_age_hours": 13.0,
+  "scan_age_hours": 13.4,
   "n_pairs_scanned": 4,
   "n_would_fire_today": 1,
   "strongest_signal": {
     "pair": "USDJPY=X",
-    "conviction": 0.389,
+    "conviction": 0.538,
     "direction": "NO_TRADE",
     "pct_to_trigger": 100.0,
     "regime": "TRENDING",
@@ -17,7 +17,7 @@
   "pairs": [
     {
       "pair": "USDJPY=X",
-      "conviction": 0.389,
+      "conviction": 0.538,
       "direction": "NO_TRADE",
       "pct_to_trigger": 100.0,
       "regime": "TRENDING",
@@ -25,7 +25,7 @@
     },
     {
       "pair": "GBPUSD=X",
-      "conviction": 0.171,
+      "conviction": 0.214,
       "direction": "LONG",
       "pct_to_trigger": 100.0,
       "regime": "TRENDING",
@@ -33,17 +33,17 @@
     },
     {
       "pair": "AUDUSD=X",
-      "conviction": 0.087,
+      "conviction": 0.051,
       "direction": "NO_TRADE",
-      "pct_to_trigger": 87.0,
+      "pct_to_trigger": 51.0,
       "regime": "TRENDING",
       "rate_differential": 0.13
     },
     {
       "pair": "EURUSD=X",
-      "conviction": 0.044,
+      "conviction": 0.049,
       "direction": "NO_TRADE",
-      "pct_to_trigger": 44.0,
+      "pct_to_trigger": 49.0,
       "regime": "TRENDING",
       "rate_differential": -1.83
     }
@@ -53,10 +53,10 @@
     "direction": "LONG",
     "fill_price": 1.36398,
     "date": "2026-08-20",
-    "days_ago": 0.5
+    "days_ago": 1.6
   },
   "loops_alive": 7,
   "loops_down": [],
-  "summary_line": "\ud83d\udfe2 TRADE FIRED today: GBP_USD LONG @ 1.36398. 4 pairs scanned 13.0h ago \u2014 1 signalling (GBPUSD=X LONG). Highest conviction: USDJPY=X 0.389. ",
+  "summary_line": "System alive. 4 pairs scanned 13.4h ago \u2014 1 signalling (GBPUSD=X LONG). Highest conviction: USDJPY=X 0.538. Last fill: GBP_USD LONG, 1.6d ago.",
   "note": "Honest proof-of-life: would-be signals + proximity, never a forced trade. Read-only."
 }

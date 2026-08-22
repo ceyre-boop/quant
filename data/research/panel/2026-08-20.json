@@ -1,23 +1,23 @@
 {
   "date": "2026-08-20",
-  "generated_at": "2026-08-20T07:32:53.810106+00:00",
+  "generated_at": "2026-08-21T06:35:39.001753+00:00",
   "sources": {
     "macro_fred": {
       "status": "ok",
       "summary": {
-        "gdp_growth_pct": 1.5,
-        "cpi_yoy_pct": 2.95,
-        "core_cpi_yoy_pct": 2.15,
-        "core_pce_yoy_pct": 2.8,
-        "unemployment_pct": 4.1,
-        "fed_funds_pct": 3.63,
-        "ten_year_pct": 4.71,
-        "yield_curve_10y2y": 0.46,
+        "gdp_growth_pct": null,
+        "cpi_yoy_pct": null,
+        "core_cpi_yoy_pct": null,
+        "core_pce_yoy_pct": null,
+        "unemployment_pct": null,
+        "fed_funds_pct": null,
+        "ten_year_pct": null,
+        "yield_curve_10y2y": null,
         "yield_curve_state": "NORMAL",
-        "consumer_sentiment": 49.5,
+        "consumer_sentiment": null,
         "vix": null
       },
-      "snapshot_date": "2026-08-19"
+      "snapshot_date": "2026-08-20"
     },
     "markets": {
       "status": "ok",
@@ -25,17 +25,17 @@
         "yield_curve": "NORMAL",
         "risk_regime": "NORMAL",
         "credit_regime": "NORMAL",
-        "vix": 14.89,
-        "vix_z": -0.98,
-        "dgs10": 4.653,
+        "vix": 16.01,
+        "vix_z": -0.64,
+        "dgs10": 4.696,
         "dgs2": 4.17,
-        "dgs3m": 3.7,
-        "t10y2y": 0.483,
-        "t10y3m": 0.953,
-        "hyg": 79.71,
-        "hyg_z": 1.65
+        "dgs3m": 3.703,
+        "t10y2y": 0.526,
+        "t10y3m": 0.993,
+        "hyg": 79.56,
+        "hyg_z": 1.51
       },
-      "fetched_at": "2026-08-20T03:01:58.035663+00:00"
+      "fetched_at": "2026-08-21T05:22:09.064514+00:00"
     },
     "sentiment_reddit": {
       "status": "ok",
@@ -48,9 +48,13 @@
     },
     "news": {
       "status": "ok",
-      "count": 0,
-      "by_category": {},
-      "as_of": "2026-08-19T13:18:52.796341+00:00"
+      "count": 6,
+      "by_category": {
+        "FED_RATES": 2,
+        "TECH_EARNINGS": 3,
+        "GEOPOLITICS": 1
+      },
+      "as_of": "2026-08-20T12:56:46.591480+00:00"
     },
     "fx_macro": {
       "status": "ok",
@@ -94,61 +98,8 @@
       }
     },
     "equities": {
-      "status": "ok",
-      "tickers": {
-        "SPY": {
-          "close": 769.06,
-          "ret_1d_pct": 0.2098
-        },
-        "QQQ": {
-          "close": 716.08,
-          "ret_1d_pct": -0.1993
-        },
-        "NVDA": {
-          "close": 217.56,
-          "ret_1d_pct": -0.9921
-        },
-        "AAPL": {
-          "close": 316.83,
-          "ret_1d_pct": 2.1933
-        },
-        "MSFT": {
-          "close": 484.31,
-          "ret_1d_pct": 0.5564
-        },
-        "AMZN": {
-          "close": 265.84,
-          "ret_1d_pct": 2.4629
-        },
-        "META": {
-          "close": 546.03,
-          "ret_1d_pct": 0.4341
-        },
-        "GOOGL": {
-          "close": 344.72,
-          "ret_1d_pct": 0.1511
-        },
-        "AMD": {
-          "close": 466.42,
-          "ret_1d_pct": -3.7098
-        },
-        "TLT": {
-          "close": 83.02,
-          "ret_1d_pct": 1.6654
-        },
-        "GLD": {
-          "close": 413.84,
-          "ret_1d_pct": 3.8364
-        },
-        "HYG": {
-          "close": 79.71,
-          "ret_1d_pct": 0.2263
-        },
-        "IWM": {
-          "close": 301.72,
-          "ret_1d_pct": 0.4963
-        }
-      }
+      "status": "null",
+      "tickers": {}
     },
     "positioning": {
       "status": "ok",
@@ -165,9 +116,9 @@
     "vrp_proxy": {
       "status": "ok",
       "metrics": {
-        "vix": 14.89,
-        "spy_realized_20d": 13.595,
-        "iv_rv_gap": 1.295
+        "vix": 16.01,
+        "spy_realized_20d": NaN,
+        "iv_rv_gap": NaN
       }
     }
   },
@@ -177,11 +128,12 @@
     "sentiment_reddit",
     "news",
     "fx_macro",
-    "equities",
     "positioning",
     "vrp_proxy"
   ],
-  "sources_null": [],
+  "sources_null": [
+    "equities"
+  ],
   "provenance": {
     "kind": "research_panel_harvest",
     "note": "Raw recorded variables across data domains. Relationships are NOT inferred here \u2014 hypothesis testing goes through research_factory (pre-registration + 10k permutation + both-sides + Benjamini-Hochberg). Do NOT treat panel columns as findings or trading inputs."
