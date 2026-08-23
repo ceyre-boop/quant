@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-08-22T01:37:39+00:00",
+  "timestamp": "2026-08-22T21:13:33+00:00",
   "session": "OFF_HOURS",
   "context_keys": [
     "high_impact_event_today"
@@ -8,12 +8,12 @@
   "estimates": {
     "GBPUSD": {
       "pair": "GBPUSD",
-      "p_big": 0.6732,
+      "p_big": 0.6592,
       "direction": "LONG",
-      "expected_magnitude_pct": 0.5487,
-      "expected_vs_adr": 1.406,
+      "expected_magnitude_pct": 0.5507,
+      "expected_vs_adr": 1.393,
       "session": "OFF_HOURS",
-      "confidence": 0.364,
+      "confidence": 0.31,
       "drivers": [
         [
           "event_risk",
@@ -21,18 +21,18 @@
         ],
         [
           "momentum",
-          0.3298
-        ],
-        [
-          "displacement",
-          0.0738
+          0.2143
         ],
         [
           "compression",
+          0.0149
+        ],
+        [
+          "displacement",
           0.0
         ]
       ],
-      "timestamp": "2026-08-22T01:37:38.975024+00:00",
+      "timestamp": "2026-08-22T21:13:33.098925+00:00",
       "notes": []
     },
     "EURUSD": {
@@ -61,7 +61,7 @@
           0.0
         ]
       ],
-      "timestamp": "2026-08-22T01:37:38.975024+00:00",
+      "timestamp": "2026-08-22T21:13:33.098925+00:00",
       "notes": []
     },
     "USDJPY": {
@@ -90,36 +90,36 @@
           -0.022
         ]
       ],
-      "timestamp": "2026-08-22T01:37:38.975024+00:00",
+      "timestamp": "2026-08-22T21:13:33.098925+00:00",
       "notes": []
     },
     "AUDUSD": {
       "pair": "AUDUSD",
-      "p_big": 0.6721,
+      "p_big": 0.6627,
       "direction": "LONG",
-      "expected_magnitude_pct": 0.7853,
-      "expected_vs_adr": 1.405,
+      "expected_magnitude_pct": 0.8052,
+      "expected_vs_adr": 1.396,
       "session": "OFF_HOURS",
-      "confidence": 0.444,
+      "confidence": 0.323,
       "drivers": [
         [
           "event_risk",
           0.9
         ],
         [
-          "displacement",
-          0.3668
-        ],
-        [
           "momentum",
-          0.3222
+          0.2599
         ],
         [
           "compression",
           0.0
+        ],
+        [
+          "displacement",
+          0.0
         ]
       ],
-      "timestamp": "2026-08-22T01:37:38.975024+00:00",
+      "timestamp": "2026-08-22T21:13:33.098925+00:00",
       "notes": []
     }
   }

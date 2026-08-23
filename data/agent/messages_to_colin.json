@@ -1,6 +1,33 @@
 {
   "messages": [
     {
+      "id": "pulse-20260822T2113",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] REST_MODE_EXPIRED: HYP-063 () validated and unimplemented for 61 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
+      "timestamp": "2026-08-22T21:13:34+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20260822T2113",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] REST_MODE_EXPIRED: HYP-046 (Displacement Gate >= 1.5 improves London trade qua) validated and unimplemented for 88 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
+      "timestamp": "2026-08-22T21:13:34+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "invariant-2026-08-22-fills_stale",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "[INVARIANT] FILLS_STALE: all fills ledgers stale (data/ledger/oanda_fills.jsonl, data/execution/fills.jsonl) \u2014 recent writes unverifiable (2026-08-22)",
+      "timestamp": "2026-08-22T13:35:21.224787+00:00",
+      "read": false,
+      "source": "invariant_guard"
+    },
+    {
       "id": "pulse-20260822T0137",
       "priority": "URGENT",
       "emoji": "\ud83d\udd34",
@@ -422,34 +449,7 @@
       "timestamp": "2026-08-18T22:21:03+00:00",
       "read": false,
       "source": "oracle_pulse"
-    },
-    {
-      "id": "audit-2026-08-18-price_source_drift",
-      "priority": "IMPORTANT",
-      "emoji": "\ud83d\udfe1",
-      "text": "[AUDIT] PRICE_SOURCE_DRIFT: AUD_NZD median |\u0394close|/close 0.00227 (2026-08-18)",
-      "timestamp": "2026-08-18T13:38:51.195856+00:00",
-      "read": false,
-      "source": "shadow_audit"
-    },
-    {
-      "id": "audit-2026-08-18-unexplained_divergence",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[AUDIT] UNEXPLAINED_DIVERGENCE: C5 count 2 (2026-08-18)",
-      "timestamp": "2026-08-18T13:38:51.195842+00:00",
-      "read": false,
-      "source": "shadow_audit"
-    },
-    {
-      "id": "audit-2026-08-18-l1_determinism_fail",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[AUDIT] L1_DETERMINISM_FAIL: 1 record(s) not reproducible (2026-08-18)",
-      "timestamp": "2026-08-18T13:38:51.195785+00:00",
-      "read": false,
-      "source": "shadow_audit"
     }
   ],
-  "last_updated": "2026-08-22T01:37:40+00:00"
+  "last_updated": "2026-08-22T21:13:34+00:00"
 }

@@ -1,27 +1,32 @@
 {
-  "generated_at": "2026-08-22T01:26:28.319911+00:00",
+  "generated_at": "2026-08-22T22:12:41.225131+00:00",
   "status": "DEGRADED",
-  "status_reason": "carry:STALE; es_nq:STALE; macro:OK; portfolio:UNAVAILABLE",
+  "status_reason": "carry:STALE; es_nq:OK; macro:OK; portfolio:UNAVAILABLE",
   "strategies": {
     "carry": {
       "status": "STALE",
       "verdict": "STAND_ASIDE",
       "favorable": false,
       "size_multiplier": 0.0,
-      "reason": "forex_proximity.json 13.2h old > 12.0h freshness limit",
+      "reason": "forex_proximity.json 34.0h old > 12.0h freshness limit",
       "source": "data/agent/forex_proximity.json",
-      "source_age_hours": 13.243,
+      "source_age_hours": 34.013,
       "detail": {}
     },
     "es_nq": {
-      "status": "STALE",
-      "verdict": "STAND_ASIDE",
+      "status": "OK",
+      "verdict": "INFO",
       "favorable": false,
       "size_multiplier": 0.0,
-      "reason": "nqes_regime.json 12.9h old > 12.0h freshness limit",
+      "reason": "research INFO only \u2014 regime 'NO_DATA'",
       "source": "data/research/nqes_regime.json",
-      "source_age_hours": 12.94,
-      "detail": {}
+      "source_age_hours": 9.545,
+      "detail": {
+        "regime": "NO_DATA",
+        "read": "ES=F/NQ=F fetch failed",
+        "divergence": null,
+        "contemporaneous_corr": null
+      }
     },
     "macro": {
       "status": "OK",
@@ -30,7 +35,7 @@
       "size_multiplier": 0.0,
       "reason": "macro backdrop INFO (VIX / curve / credit) \u2014 shared input",
       "source": "data/macro/macro_snapshot.json",
-      "source_age_hours": 0.807,
+      "source_age_hours": 0.971,
       "detail": {
         "vix": 15.13,
         "curve_10y2y": 0.568,

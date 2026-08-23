@@ -1,0 +1,142 @@
+{
+  "date": "2026-08-21",
+  "generated_at": "2026-08-22T06:33:36.505460+00:00",
+  "sources": {
+    "macro_fred": {
+      "status": "ok",
+      "summary": {
+        "gdp_growth_pct": null,
+        "cpi_yoy_pct": null,
+        "core_cpi_yoy_pct": null,
+        "core_pce_yoy_pct": null,
+        "unemployment_pct": null,
+        "fed_funds_pct": null,
+        "ten_year_pct": null,
+        "yield_curve_10y2y": null,
+        "yield_curve_state": "NORMAL",
+        "consumer_sentiment": null,
+        "vix": null
+      },
+      "snapshot_date": "2026-08-21"
+    },
+    "markets": {
+      "status": "ok",
+      "summary": {
+        "yield_curve": "NORMAL",
+        "risk_regime": "NORMAL",
+        "credit_regime": "NORMAL",
+        "vix": 15.13,
+        "vix_z": -0.91,
+        "dgs10": 4.738,
+        "dgs2": 4.17,
+        "dgs3m": 3.71,
+        "t10y2y": 0.568,
+        "t10y3m": 1.028,
+        "hyg": 79.61,
+        "hyg_z": 1.55
+      },
+      "fetched_at": "2026-08-22T01:38:07.711021+00:00"
+    },
+    "sentiment_reddit": {
+      "status": "ok",
+      "metrics": {
+        "posts_scanned": 0,
+        "n_equity_signals": 0,
+        "n_forex_signals": 0
+      },
+      "last_updated": "2026-07-20T17:50:10.732006+00:00"
+    },
+    "news": {
+      "status": "ok",
+      "count": 10,
+      "by_category": {
+        "TECH_EARNINGS": 3,
+        "GEOPOLITICS": 4,
+        "FED_RATES": 1,
+        "INFLATION": 2
+      },
+      "as_of": "2026-08-21T12:30:06.400689+00:00"
+    },
+    "fx_macro": {
+      "status": "ok",
+      "countries": {
+        "US": {
+          "rate": 4.33,
+          "cpi_yoy": 2.4,
+          "gdp_growth": 2.5,
+          "real_rate": 1.93
+        },
+        "EU": {
+          "rate": 2.5,
+          "cpi_yoy": 2.2,
+          "gdp_growth": 1.2,
+          "real_rate": 0.2999999999999998
+        },
+        "JP": {
+          "rate": 0.841,
+          "cpi_yoy": 3.2,
+          "gdp_growth": 3.570918302272763,
+          "real_rate": -2.359
+        },
+        "UK": {
+          "rate": 3.7303,
+          "cpi_yoy": 3.4194528875379993,
+          "gdp_growth": 4.412065665341114,
+          "real_rate": 0.3108471124620009
+        },
+        "AU": {
+          "rate": 4.46,
+          "cpi_yoy": 2.40176417760265,
+          "gdp_growth": 1.5,
+          "real_rate": 2.05823582239735
+        },
+        "NZ": {
+          "rate": 2.56,
+          "cpi_yoy": 2.525668571816797,
+          "gdp_growth": 0.5,
+          "real_rate": 0.034331428183203005
+        }
+      }
+    },
+    "equities": {
+      "status": "null",
+      "tickers": {}
+    },
+    "positioning": {
+      "status": "ok",
+      "n_records": 1201,
+      "latest": {
+        "date": "2026-06-17",
+        "bank": "ECB",
+        "country": "EU",
+        "actual_change_bps": 25,
+        "expected_change_bps": -25.0,
+        "surprise_bps": 50.0
+      }
+    },
+    "vrp_proxy": {
+      "status": "ok",
+      "metrics": {
+        "vix": 15.13,
+        "spy_realized_20d": NaN,
+        "iv_rv_gap": NaN
+      }
+    }
+  },
+  "sources_ok": [
+    "macro_fred",
+    "markets",
+    "sentiment_reddit",
+    "news",
+    "fx_macro",
+    "positioning",
+    "vrp_proxy"
+  ],
+  "sources_null": [
+    "equities"
+  ],
+  "provenance": {
+    "kind": "research_panel_harvest",
+    "note": "Raw recorded variables across data domains. Relationships are NOT inferred here \u2014 hypothesis testing goes through research_factory (pre-registration + 10k permutation + both-sides + Benjamini-Hochberg). Do NOT treat panel columns as findings or trading inputs."
+  }
+}
