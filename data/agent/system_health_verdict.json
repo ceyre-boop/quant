@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-08-22T23:49:37.869437+00:00",
+  "generated_at": "2026-08-24T01:34:28.019124+00:00",
   "status": "DEGRADED",
-  "status_reason": "portfolio:FAIL/HALT; undertow_gapper:HALT; ict_equities:HALT; carry:HALT",
+  "status_reason": "portfolio:OK/REDUCE; undertow_gapper:REDUCE; ict_equities:REDUCE; carry:REDUCE",
   "strategies": {
     "undertow_gapper": {
-      "kill_switch": "HALT",
-      "reason": "HALT: edge health INSUFFICIENT_DATA \u2014 cannot confirm live edge \u2192 REDUCE floor",
+      "kill_switch": "REDUCE",
+      "reason": "edge health INSUFFICIENT_DATA \u2014 cannot confirm live edge \u2192 REDUCE floor",
       "edge_health": {
         "live_expectancy_R": null,
         "backtest_expectancy_R": 0.01596,
@@ -31,8 +31,8 @@
       }
     },
     "ict_equities": {
-      "kill_switch": "HALT",
-      "reason": "HALT: edge health UNAVAILABLE \u2014 cannot confirm live edge \u2192 REDUCE floor",
+      "kill_switch": "REDUCE",
+      "reason": "edge health UNAVAILABLE \u2014 cannot confirm live edge \u2192 REDUCE floor",
       "edge_health": {
         "live_expectancy_R": null,
         "backtest_expectancy_R": null,
@@ -46,12 +46,12 @@
       "process_adherence": {
         "decisions_matched_rules_pct": null,
         "status": "INSUFFICIENT_DATA",
-        "reason": "0 entered setups with determinable bias alignment < 20 needed \u2014 INSUFFICIENT_DATA. Journal has 258456 total records ({'VETOED': 250706, 'DISCARDED': 7750}); process score not fabricated from a thin sample.",
-        "n_total": 258456,
+        "reason": "0 entered setups with determinable bias alignment < 20 needed \u2014 INSUFFICIENT_DATA. Journal has 258544 total records ({'VETOED': 250794, 'DISCARDED': 7750}); process score not fabricated from a thin sample.",
+        "n_total": 258544,
         "n_entered": 0,
         "n_evaluable": 0,
         "by_action": {
-          "VETOED": 250706,
+          "VETOED": 250794,
           "DISCARDED": 7750
         },
         "source": "data/agent/ict_causal_chain.jsonl"
@@ -70,8 +70,8 @@
       }
     },
     "carry": {
-      "kill_switch": "HALT",
-      "reason": "HALT: edge health UNAVAILABLE \u2014 cannot confirm live edge \u2192 REDUCE floor",
+      "kill_switch": "REDUCE",
+      "reason": "edge health UNAVAILABLE \u2014 cannot confirm live edge \u2192 REDUCE floor",
       "edge_health": {
         "live_expectancy_R": null,
         "backtest_expectancy_R": null,
@@ -98,14 +98,14 @@
     }
   },
   "portfolio": {
-    "data_integrity": "FAIL",
+    "data_integrity": "OK",
     "consecutive_breaker_hits": null,
     "drawdown_breaker_tripped": null,
     "drawdown_breaker_status": "UNAVAILABLE",
     "regime_contract_status": "DEGRADED",
-    "regime_contract_age_hours": 1.616,
-    "kill_switch": "HALT",
-    "reason": "regime contract 1.6h old > 1.5h \u2014 stale shared regime read is a data-integrity FAIL",
+    "regime_contract_age_hours": 0.182,
+    "kill_switch": "REDUCE",
+    "reason": "portfolio drawdown-breaker feed UNAVAILABLE (no unified position/P&L ledger); cannot confirm account safety \u2192 REDUCE (never full TRADE)",
     "sources": [
       "data/agent/system_regime_state.json"
     ]
