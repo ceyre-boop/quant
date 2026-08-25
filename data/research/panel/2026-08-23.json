@@ -1,6 +1,6 @@
 {
   "date": "2026-08-23",
-  "generated_at": "2026-08-23T08:00:07.264155+00:00",
+  "generated_at": "2026-08-24T07:00:13.258184+00:00",
   "sources": {
     "macro_fred": {
       "status": "ok",
@@ -35,7 +35,7 @@
         "hyg": 79.61,
         "hyg_z": 1.55
       },
-      "fetched_at": "2026-08-22T21:14:25.105494+00:00"
+      "fetched_at": "2026-08-24T02:37:03.497708+00:00"
     },
     "sentiment_reddit": {
       "status": "ok",
@@ -48,9 +48,13 @@
     },
     "news": {
       "status": "ok",
-      "count": 0,
-      "by_category": {},
-      "as_of": "2026-08-22T12:39:59.612648+00:00"
+      "count": 7,
+      "by_category": {
+        "GEOPOLITICS": 5,
+        "TECH_EARNINGS": 1,
+        "FED_RATES": 1
+      },
+      "as_of": "2026-08-23T13:01:46.199797+00:00"
     },
     "fx_macro": {
       "status": "ok",
@@ -108,9 +112,21 @@
           "close": 214.72,
           "ret_1d_pct": -0.9822
         },
+        "AAPL": {
+          "close": 309.35,
+          "ret_1d_pct": -0.6264
+        },
+        "MSFT": {
+          "close": 483.24,
+          "ret_1d_pct": 0.4344
+        },
         "AMZN": {
           "close": 258.63,
           "ret_1d_pct": -0.569
+        },
+        "TSLA": {
+          "close": 362.86,
+          "ret_1d_pct": 5.1372
         },
         "META": {
           "close": 549.9,
@@ -119,6 +135,10 @@
         "GOOGL": {
           "close": 344.82,
           "ret_1d_pct": 1.2182
+        },
+        "AMD": {
+          "close": 473.25,
+          "ret_1d_pct": 0.8073
         },
         "TLT": {
           "close": 82.05,

@@ -1,14 +1,14 @@
 {
-  "generated_at": "2026-08-24T01:34:23.920259+00:00",
+  "generated_at": "2026-08-24T23:44:21.179824+00:00",
   "alive": true,
-  "fired_today": false,
+  "fired_today": true,
   "frozen": null,
-  "scan_age_hours": 61.4,
+  "scan_age_hours": 11.7,
   "n_pairs_scanned": 4,
-  "n_would_fire_today": 1,
+  "n_would_fire_today": 2,
   "strongest_signal": {
     "pair": "USDJPY=X",
-    "conviction": 0.538,
+    "conviction": 0.432,
     "direction": "NO_TRADE",
     "pct_to_trigger": 100.0,
     "regime": "TRENDING",
@@ -17,46 +17,46 @@
   "pairs": [
     {
       "pair": "USDJPY=X",
-      "conviction": 0.538,
+      "conviction": 0.432,
       "direction": "NO_TRADE",
       "pct_to_trigger": 100.0,
       "regime": "TRENDING",
       "rate_differential": 3.489
     },
     {
-      "pair": "GBPUSD=X",
-      "conviction": 0.214,
+      "pair": "AUDUSD=X",
+      "conviction": 0.282,
       "direction": "LONG",
       "pct_to_trigger": 100.0,
-      "regime": "TRENDING",
-      "rate_differential": -0.6
-    },
-    {
-      "pair": "AUDUSD=X",
-      "conviction": 0.051,
-      "direction": "NO_TRADE",
-      "pct_to_trigger": 51.0,
       "regime": "TRENDING",
       "rate_differential": 0.13
     },
     {
+      "pair": "GBPUSD=X",
+      "conviction": 0.269,
+      "direction": "LONG",
+      "pct_to_trigger": 100.0,
+      "regime": "TRENDING",
+      "rate_differential": -0.599
+    },
+    {
       "pair": "EURUSD=X",
-      "conviction": 0.049,
+      "conviction": 0.147,
       "direction": "NO_TRADE",
-      "pct_to_trigger": 49.0,
+      "pct_to_trigger": 100.0,
       "regime": "TRENDING",
       "rate_differential": -1.83
     }
   ],
   "last_fill": {
-    "pair": "GBP_USD",
+    "pair": "AUD_USD",
     "direction": "LONG",
-    "fill_price": 1.36398,
-    "date": "2026-08-20",
-    "days_ago": 3.6
+    "fill_price": 0.71639,
+    "date": "2026-08-24",
+    "days_ago": 0.5
   },
   "loops_alive": 7,
   "loops_down": [],
-  "summary_line": "System alive. 4 pairs scanned 61.4h ago \u2014 1 signalling (GBPUSD=X LONG). Highest conviction: USDJPY=X 0.538. Last fill: GBP_USD LONG, 3.6d ago.",
+  "summary_line": "\ud83d\udfe2 TRADE FIRED today: AUD_USD LONG @ 0.71639. 4 pairs scanned 11.7h ago \u2014 2 signalling (AUDUSD=X LONG, GBPUSD=X LONG). Highest conviction: USDJPY=X 0.432. ",
   "note": "Honest proof-of-life: would-be signals + proximity, never a forced trade. Read-only."
 }
