@@ -1,0 +1,213 @@
+{
+  "date": "2026-08-25",
+  "generated_at": "2026-08-25T12:11:38+00:00",
+  "fields": {
+    "fred_macro": {
+      "name": "fred_macro",
+      "value": {
+        "metrics": {
+          "A191RL1Q225SBEA": {
+            "value": null,
+            "err": "URLError"
+          },
+          "CPIAUCSL": {
+            "value": null,
+            "err": "URLError"
+          },
+          "CPILFESL": {
+            "value": null,
+            "err": "URLError"
+          },
+          "PCEPILFE": {
+            "value": null,
+            "err": "URLError"
+          },
+          "UNRATE": {
+            "value": null,
+            "err": "URLError"
+          },
+          "PAYEMS": {
+            "value": null,
+            "err": "URLError"
+          },
+          "ICSA": {
+            "value": null,
+            "err": "URLError"
+          },
+          "FEDFUNDS": {
+            "value": null,
+            "err": "URLError"
+          },
+          "DGS10": {
+            "value": null,
+            "err": "URLError"
+          },
+          "DGS2": {
+            "value": null,
+            "err": "URLError"
+          },
+          "T10Y2Y": {
+            "value": null,
+            "err": "URLError"
+          },
+          "MORTGAGE30US": {
+            "value": null,
+            "err": "URLError"
+          },
+          "RSAFS": {
+            "value": null,
+            "err": "URLError"
+          },
+          "UMCSENT": {
+            "value": null,
+            "err": "URLError"
+          },
+          "DTWEXBGS": {
+            "value": null,
+            "err": "URLError"
+          },
+          "VIXCLS": {
+            "value": null,
+            "err": "URLError"
+          }
+        },
+        "summary": {
+          "gdp_growth_pct": null,
+          "cpi_yoy_pct": null,
+          "core_cpi_yoy_pct": null,
+          "core_pce_yoy_pct": null,
+          "unemployment_pct": null,
+          "fed_funds_pct": null,
+          "ten_year_pct": null,
+          "yield_curve_10y2y": null,
+          "yield_curve_state": "NORMAL",
+          "consumer_sentiment": null,
+          "vix": null
+        },
+        "date": "2026-08-24"
+      },
+      "status": "FRESH",
+      "source": "/Users/taboost/quant/data/macro/fred_economic_latest.json",
+      "age_seconds": 19763.175395,
+      "detail": "16 series"
+    },
+    "sentiment_board": {
+      "name": "sentiment_board",
+      "value": {
+        "rows": 11716,
+        "latest_date": "2026-08-24",
+        "rebuild_age_hours": 24.42
+      },
+      "status": "FRESH",
+      "source": "/Users/taboost/quant/data/sentiment.db",
+      "age_seconds": 87909.314899,
+      "detail": "rebuilt 24.4h ago, data through 2026-08-24"
+    },
+    "gdelt": {
+      "name": "gdelt",
+      "value": null,
+      "status": "UNAVAILABLE",
+      "source": "/Users/taboost/quant/data/sentiment.db",
+      "age_seconds": null,
+      "detail": "0 rows \u2014 never ingested (burst-throttled free tier)"
+    },
+    "reddit": {
+      "name": "reddit",
+      "value": null,
+      "status": "RETIRED",
+      "source": "/Users/taboost/quant/data/cache/reddit_sentiment.json",
+      "age_seconds": 3089956.662574,
+      "detail": "RETIRED 2026-07-20. Reddit blocks unauthenticated JSON: old.reddit.com 403 and www.reddit.com 403, tested live with a browser User-Agent. No REDDIT_CLIENT_ID exists anywhere in the repo, so no request this system can make will succeed. The endpoint fix in 9bc2849 (old.reddit + raw_json=1) was correct code against a door that is shut. Reviving this source requires a registered OAuth app and oauth.reddit.com \u2014 not a code change here."
+    },
+    "briefing": {
+      "name": "briefing",
+      "value": {
+        "date": "2026-08-25",
+        "regime_read": "ES=F/NQ=F fetch failed",
+        "narrative": "Macro backdrop \u2014\n[2026-08-24] US economic state (FRED):\n  Growth: real GDP n/a (q/q ann)\n  Inflation: CPI n/a YoY | core CPI n/a | core PCE n/a (Fed target 2%)\n  Labor: unemployment n/a\n  Rates: fed funds n/a | 10Y n/a | 10Y-2Y n/a (NORMAL)\n  Consumer: UMich sentiment n/a | VIX n/a\n\n---\nRecent market movements have been difficult to discern due to the lack of real-time data for both ES and NQ futures. The volume profile is currently insufficient, indicating that we may not yet be in a strong accumulation or distribution zone. The lead-lag regime between ES and NQ is also unclear with no data available, which suggests caution when making size decisions based on historical relationships. The event calendar highlights several key releases: PCE (Fed's preferred inflation) on 2026-08-31, ISM Manufacturing PMI on 2026-09-01, Nonfarm Payrolls on 2026-09-04, and CPI on 2026-09-12. These events will likely drive significant market volatility in the coming weeks, necessitating a flexible approach to sizing and risk management. Given the current state of data, our directional bias remains neutral, with a probability of ~50%. This neutrality is maintained until clearer signals emerge or specific key levels are tested.",
+        "directional_bias": "NEUTRAL",
+        "confidence": 50,
+        "news_count": 0,
+        "event_calendar": [
+          {
+            "event": "PCE (Fed's preferred inflation)",
+            "date": "2026-08-31",
+            "source": "cadence_estimate",
+            "action": "8:30 ET \u2014 reduce size into window",
+            "days_until": 6,
+            "note": "in 6d \u2014 8:30 ET \u2014 reduce size into window"
+          },
+          {
+            "event": "ISM Manufacturing PMI",
+            "date": "2026-09-01",
+            "source": "cadence_estimate",
+            "action": "reduce size into the 10:00 ET print",
+            "days_until": 7,
+            "note": "in 7d \u2014 reduce size into the 10:00 ET print"
+          },
+          {
+            "event": "Nonfarm Payrolls",
+            "date": "2026-09-04",
+            "source": "cadence_estimate",
+            "action": "high-impact 8:30 ET \u2014 widen stops / size down",
+            "days_until": 10,
+            "note": "in 10d \u2014 high-impact 8:30 ET \u2014 widen stops / size down"
+          },
+          {
+            "event": "CPI",
+            "date": "2026-09-12",
+            "source": "cadence_estimate",
+            "action": "inflation print 8:30 ET \u2014 reduce size into window",
+            "days_until": 18,
+            "note": "in 18d \u2014 inflation print 8:30 ET \u2014 reduce size into window"
+          }
+        ]
+      },
+      "status": "FRESH",
+      "source": "/Users/taboost/quant/data/oracle/market_briefings/latest.json",
+      "age_seconds": 5024.181722,
+      "detail": "briefing for 2026-08-25"
+    },
+    "daily_panel": {
+      "name": "daily_panel",
+      "value": null,
+      "status": "UNAVAILABLE",
+      "source": "/Users/taboost/quant/data/research/panel/2026-08-25.json",
+      "age_seconds": null,
+      "detail": "no panel for 2026-08-25"
+    },
+    "calendar": {
+      "name": "calendar",
+      "value": null,
+      "status": "UNAVAILABLE",
+      "source": "/Users/taboost/quant/data/cache/forex_factory_calendar.json",
+      "age_seconds": null,
+      "detail": "ForexFactory 403 Forbidden \u2014 no cached calendar"
+    }
+  },
+  "health": {
+    "n_sources": 6,
+    "n_fresh": 3,
+    "fraction_fresh": 0.5,
+    "by_status": {
+      "FRESH": [
+        "fred_macro",
+        "sentiment_board",
+        "briefing"
+      ],
+      "UNAVAILABLE": [
+        "gdelt",
+        "daily_panel",
+        "calendar"
+      ],
+      "RETIRED": [
+        "reddit"
+      ]
+    },
+    "n_retired": 1,
+    "retired": [
+      "reddit"
+    ]
+  },
+  "note": "Every field carries an explicit status. SILENT_NULL means the source succeeded but returned nothing \u2014 treat it as absent data, never as a zero reading."
+}

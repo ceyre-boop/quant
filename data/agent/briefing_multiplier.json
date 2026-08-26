@@ -1,18 +1,19 @@
 {
-  "multiplier": 1.075,
+  "multiplier": 0.9,
   "components": {
-    "confidence": 1.075
+    "confidence": 1.0,
+    "regime_rotation_haircut": 0.9
   },
   "effect_applied": true,
   "verified": false,
   "reason": "continuous multiplier \u2014 context only, not a veto",
-  "computed_at": "2026-08-24T12:30:52.727164+00:00",
+  "computed_at": "2026-08-25T13:16:22.200283+00:00",
   "inputs": {
-    "confidence": 75.0,
-    "directional_bias": "LONG",
+    "confidence": 50.0,
+    "directional_bias": "NEUTRAL",
     "synthesis_source": "ollama/qwen2.5",
-    "regime_call": "BREADTH",
+    "regime_call": "ROTATION_WARN",
     "carry_direction": null
   },
-  "date": "2026-08-24"
+  "date": "2026-08-25"
 }

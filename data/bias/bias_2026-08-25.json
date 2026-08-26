@@ -1,0 +1,32 @@
+{
+  "date": "2026-08-25",
+  "direction": "NEUTRAL",
+  "confidence": 25.0,
+  "reasoning": [
+    "briefing directional_bias=NEUTRAL conf=50.0",
+    "regime: ES=F/NQ=F fetch failed",
+    "macro context present (2026-08-24)"
+  ],
+  "inputs_used": [
+    "briefing",
+    "fred_macro",
+    "sentiment_board"
+  ],
+  "inputs_missing": [
+    "calendar",
+    "daily_panel",
+    "gdelt"
+  ],
+  "context_fraction_fresh": 0.5,
+  "generated_at": "2026-08-25T12:11:38+00:00",
+  "realised": {
+    "direction": "BULLISH",
+    "correct": null,
+    "scored_at": "2026-08-25T20:33:29+00:00",
+    "proxy": "SPY",
+    "return": 0.003327,
+    "neutral_band": 0.0025,
+    "close": 766.01,
+    "prev_close": 763.47
+  }
+}
