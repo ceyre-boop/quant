@@ -1,14 +1,15 @@
 {
-  "generated_at": "2026-08-25T13:01:07.501423+00:00",
-  "briefing": "Session open 2026-08-25T13:01Z. No qualifying forex setup today (rate differentials within normal range). No open positions. All monitored loops alive. NQ/ES regime: NO_DATA (ES=F/NQ=F fetch failed). Forex macro is a swing edge (~1 trade/pair/month) \u2014 a no-signal day is the strategy working, not failing. Watching for rate-differential divergence to widen past threshold.",
+  "generated_at": "2026-08-26T19:03:52.881281+00:00",
+  "briefing": "Session open 2026-08-26T19:03Z. Scanner: USDJPY=X SHORT (PLACED, risk 0.75%). 1 denied by risk gate. 3 open position(s). All monitored loops alive. NQ/ES regime: BREADTH (ES & NQ moving together \u2014 broad agreement, more DURABLE directional signal. Trus). Forex macro is a swing edge (~1 trade/pair/month) \u2014 a no-signal day is the strategy working, not failing. Watching for rate-differential divergence to widen past threshold.",
   "scan_verdicts": [
-    "NO_SIGNALS"
+    "PLACED",
+    "DENIED"
   ],
-  "open_positions": 0,
+  "open_positions": 3,
   "loops_down": [],
   "nqes_regime": {
-    "regime": "NO_DATA",
-    "nq_last": null,
-    "es_last": null
+    "regime": "BREADTH",
+    "nq_last": 29315.0,
+    "es_last": 7695.5
   }
 }
