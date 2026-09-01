@@ -107,6 +107,12 @@ data/exec/
 data/sentiment.db
 data/sentiment/
 
+# Fundamentals harvest pipeline DuckDB (runtime data, rebuilt from sources) — never commit.
+# data/cache/fundamentals/ is already covered by the broader data/cache/ rule above.
+# data/fundamentals/ (the static JSON panel artifacts app/ reads) is NOT ignored — those
+# are the committed "warm" tier, same pattern as the other data/*.json dashboards read.
+data/fundamentals.db
+
 # TICK-025: runtime DEGRADED sentinels (fail-loud yfinance/data-fetch fallback flags) — never commit
 /sentinel/*
 !/sentinel/.gitkeep
@@ -146,3 +152,7 @@ node_modules
 _site/
 app/node_modules/
 app/dist/
+
+# Harvester single-instance lock (runtime artifact)
+data/fundamentals.harvest.lock
+data/fundamentals.db

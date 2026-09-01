@@ -589,7 +589,7 @@ def build_panel(ticker: str, warm_only: bool = False) -> dict:
         "ticker": ticker,
         "cik": cik,
         "name": name,
-        "generated_at": _now().isoformat() + "Z",
+        "generated_at": _now().isoformat(),
         "capabilities": caps,
         "partial": partial,
         "sections": sections,

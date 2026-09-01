@@ -22,6 +22,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import fcntl
 import json
 import logging
 import os
@@ -354,6 +355,33 @@ def main() -> None:
     if args.report:
         print_report()
         return
+
+    # Single-instance guard. DuckDB is single-writer, so two harvesters racing
+    # (a manual run while the 03:15 launchd job fires, or two terminals) makes
+    # the loser die on "Could not set lock" partway through — leaving the store
+    # half-updated and the JSON artifacts missing. This is not hypothetical: it
+    # happened during development, and this repo has a documented history of
+    # parallel sessions contending on shared files.
+    #
+    # Fail loudly and immediately with the owning PID rather than crashing deep
+    # in a fetch loop.
+    lock_path = ROOT / "data" / "fundamentals.harvest.lock"
+    lock_path.parent.mkdir(parents=True, exist_ok=True)
+    lock_file = open(lock_path, "w")
+    try:
+        fcntl.flock(lock_file, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except OSError:
+        prior = ""
+        try:
+            prior = lock_path.read_text().strip()
+        except OSError:
+            pass
+        log.error("another harvest is already running%s — refusing to start a "
+                  "second writer. Wait for it, or remove %s if it is stale.",
+                  f" (pid {prior})" if prior else "", lock_path)
+        sys.exit(1)
+    lock_file.write(str(os.getpid()))
+    lock_file.flush()
 
     tickers = [t.upper() for t in args.ticker] if args.ticker else load_watchlist()
     if args.limit:
