@@ -14,7 +14,7 @@ export function Panel({
           {right}
         </header>
       )}
-      <div className={`min-h-0 flex-1 ${dense ? '' : 'p-3'}`}>{children}</div>
+      <div className={`min-h-0 flex-1 max-w-full overflow-x-auto ${dense ? '' : 'p-3'}`}>{children}</div>
     </section>
   )
 }

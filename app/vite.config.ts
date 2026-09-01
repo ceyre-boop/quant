@@ -18,6 +18,9 @@ export default defineConfig({
     proxy: {
       // Local dev talks to scripts/live_signals_server.py on :8765, so the app
       // uses same-origin relative paths in both dev and prod.
+      // Only the dev server proxies. When live_signals_server.py serves the
+      // built app it already owns these routes at the root, so lib/api.ts drops
+      // the /api prefix outside dev.
       '/api':  { target: 'http://localhost:8765', changeOrigin: true, rewrite: p => p.replace(/^\/api/, '') },
       '/data': { target: 'http://localhost:8765', changeOrigin: true },
     },

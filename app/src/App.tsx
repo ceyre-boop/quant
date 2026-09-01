@@ -6,6 +6,7 @@ import CalendarPanel from './panels/Calendar'
 import Oracle from './panels/Oracle'
 import Connections from './panels/Connections'
 import SymbolSearch from './components/SymbolSearch'
+import ErrorBoundary from './components/ErrorBoundary'
 
 /**
  * A research terminal, not an alerting system. Everything here is pull: you open
@@ -43,19 +44,20 @@ export default function App() {
   const openReplay = (day: string) => { setReplayDay(day); setTab('signals') }
 
   return (
-    <div className="h-full flex flex-col bg-bg">
-      <nav className="flex items-center gap-4 px-3 h-11 border-b border-line shrink-0">
-        <div className="flex items-center gap-2 pr-2">
+    <div className="h-full flex flex-col bg-bg overflow-x-hidden">
+      <nav className="flex items-center gap-3 px-3 h-11 border-b border-line shrink-0 overflow-x-auto">
+        <div className="hidden sm:flex items-center gap-2 pr-2 shrink-0">
           <span className="w-2 h-2 rounded-sm bg-accent" />
           <span className="text-[12px] font-semibold tracking-[0.18em] uppercase">
             Sovereign <span className="text-faint">//</span> Quant
           </span>
         </div>
 
-        <div className="flex items-center gap-0.5">
+        <div className="flex items-center gap-0.5 shrink-0">
           {TABS.map(t => (
             <button
               key={t.id}
+              data-tab={t.id}
               onClick={() => setTab(t.id)}
               className={`px-3 py-1.5 rounded text-[12px] transition-colors ${
                 tab === t.id
@@ -70,21 +72,21 @@ export default function App() {
         <SymbolSearch value={ticker} onChange={setTicker} />
       </nav>
 
-      <main className="flex-1 min-h-0 p-2">
+      <main data-panel={tab} className="flex-1 min-h-0 p-2">
         {tab === 'terminal' && (
           <div className="h-full grid grid-cols-1 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] gap-2">
             <div className="bg-surface border border-line rounded-md overflow-hidden min-h-[360px]">
-              <Chart symbol={ticker} />
+              <ErrorBoundary label="chart"><Chart symbol={ticker} /></ErrorBoundary>
             </div>
             <div className="min-h-0 overflow-y-auto">
-              <Fundamentals ticker={ticker} />
+              <ErrorBoundary label="fundamentals"><Fundamentals ticker={ticker} /></ErrorBoundary>
             </div>
           </div>
         )}
-        {tab === 'signals'     && <Signals replayDay={replayDay} />}
-        {tab === 'calendar'    && <CalendarPanel onOpenReplay={openReplay} />}
-        {tab === 'oracle'      && <Oracle />}
-        {tab === 'connections' && <Connections />}
+        {tab === 'signals'     && <ErrorBoundary label="signals"><Signals replayDay={replayDay} /></ErrorBoundary>}
+        {tab === 'calendar'    && <ErrorBoundary label="calendar"><CalendarPanel onOpenReplay={openReplay} /></ErrorBoundary>}
+        {tab === 'oracle'      && <ErrorBoundary label="oracle"><Oracle /></ErrorBoundary>}
+        {tab === 'connections' && <ErrorBoundary label="connections"><Connections /></ErrorBoundary>}
       </main>
     </div>
   )

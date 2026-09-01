@@ -890,6 +890,7 @@ class Handler(BaseHTTPRequestHandler):
             # Tier A of the front end's three-tier load. Tier B (static, SEC-only) runs
             # entirely in the browser and needs no route at all.
             try:
+                import urllib.parse as _up
                 _qs = dict(_up.parse_qsl(self.path.split('?')[1] if '?' in self.path else ''))
                 ticker = (_qs.get('ticker', '') or '').strip().upper()
                 if not ticker:
@@ -1139,9 +1140,17 @@ class Handler(BaseHTTPRequestHandler):
                 self._send_json(500, {'error': traceback.format_exc()})
 
         else:
-            # Static dashboard files (HTML/assets) served from repo root.
+            # Static files served from repo root.
+            #
+            # The terminal is a Vite build now: `cd app && bun run build` emits
+            # _site/index.html plus _site/assets/*. Serve that when it exists so
+            # local dev matches what GitHub Pages actually publishes, and fall
+            # back to the legacy root index.html when it has not been built yet.
             if path == '/':
-                self._send_static('index.html')
+                self._send_static('_site/index.html' if os.path.isfile('_site/index.html')
+                                  else 'index.html')
+            elif path.startswith('/assets/') and os.path.isdir('_site/assets'):
+                self._send_static('_site' + path)
             elif path in ('/ict', '/ict/'):
                 self._send_static('ict/index.html')
             elif path in ('/scalp_calendar', '/scalp_calendar/'):

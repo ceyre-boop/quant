@@ -1,241 +1,186 @@
-// Real-Chrome QA harness for the SOVEREIGN dashboard.
-// Drives the installed Google Chrome (headless) against a running dashboard, captures every
-// console error / uncaught throw / failed request, asserts the rendered DOM, and screenshots
-// desktop + 375px mobile for every tab + the ICT page.
-//
-// Usage: node scripts/qa/dashboard_qa.mjs [baseUrl]   (default http://localhost:8765)
-import puppeteer from 'puppeteer-core';
-import { mkdirSync, writeFileSync } from 'fs';
+/**
+ * Front-end QA for the research terminal.
+ *
+ * Rewritten for the Vite app (app/). The previous version drove the old
+ * single-file dashboard and asserted on panels that no longer exist — its
+ * hypothesis-filter and prop-challenge checks were the first things to break.
+ *
+ * Run against a served build:
+ *   cd app && bun run build
+ *   python3 scripts/live_signals_server.py      # serves _site + the API
+ *   node scripts/qa/dashboard_qa.mjs
+ *
+ * The backend being asleep or absent is NOT a failure — the terminal is designed
+ * to degrade to committed data and to the browser-direct SEC path. What IS a
+ * failure is a panel that sits on "loading" forever, or a JS error.
+ */
+import puppeteer from 'puppeteer-core'
+import { mkdirSync, writeFileSync } from 'node:fs'
 
-const BASE = process.argv[2] || 'http://localhost:8765';
-const CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
-const SHOTS = new URL('./shots/', import.meta.url).pathname;
-mkdirSync(SHOTS, { recursive: true });
+const BASE = process.env.QA_BASE || 'http://localhost:8765'
+const CHROME = process.env.CHROME_PATH ||
+  '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+const SHOTS = new URL('./shots/', import.meta.url).pathname
+mkdirSync(SHOTS, { recursive: true })
 
-const BENIGN = [/favicon/i, /tradingview/i, /tv\.js/i, /s3\.tradingview/i, /telemetry/i]; // harmless 3rd-party (TV embed) noise
-const sleep = ms => new Promise(r => setTimeout(r, ms));
-const report = { base: BASE, views: {}, ok: true };
+const sleep = ms => new Promise(r => setTimeout(r, ms))
+const report = { ok: true, base: BASE, at: new Date().toISOString(), views: {}, http4xx: [] }
 
-function record(view, errors, failures) {
-  const realErrors = errors.filter(e => !BENIGN.some(rx => rx.test(e)));
-  report.views[view] = { consoleErrors: realErrors, assertionFailures: failures };
-  if (realErrors.length || failures.length) report.ok = false;
-}
+// Expected when the backend is asleep or a ticker isn't warm. Not failures.
+const BENIGN = [
+  /favicon/i,
+  /net::ERR_CONNECTION_REFUSED/,
+  /Failed to load resource.*\/(data|api)\//,
+  /the server responded with a status of 40[34]/,
+]
 
-// attach error collectors to a page; returns the live arrays
-const http4xx = []; // global list of 4xx/5xx URLs seen across the run
+const http4xx = []
 function wire(page) {
-  const errs = [], reqfail = [];
-  page.on('console', m => { if (m.type() === 'error') errs.push('console: ' + m.text()); });
-  page.on('pageerror', e => errs.push('pageerror: ' + (e?.message || e)));
-  page.on('requestfailed', r => {
-    const u = r.url();
-    if (!/favicon/i.test(u)) reqfail.push('reqfail: ' + u + ' (' + (r.failure()?.errorText) + ')');
-  });
-  page.on('response', r => { if (r.status() >= 400) http4xx.push(r.status() + ' ' + r.url()); });
-  return { errs, reqfail };
+  const errs = []
+  page.on('console', m => { if (m.type() === 'error') errs.push('console: ' + m.text()) })
+  page.on('pageerror', e => errs.push('pageerror: ' + (e?.message || e)))
+  page.on('response', r => { if (r.status() >= 400) http4xx.push(r.status() + ' ' + r.url()) })
+  return errs
 }
 
-async function shot(page, name) { await page.screenshot({ path: SHOTS + name + '.png', fullPage: true }); }
+function record(view, errs, failures) {
+  const real = errs.filter(e => !BENIGN.some(rx => rx.test(e)))
+  report.views[view] = { consoleErrors: real, assertionFailures: failures }
+  if (real.length || failures.length) report.ok = false
+  errs.length = 0
+}
 
-// ---- assertion helpers run in the browser ----
-const A = {
-  noLoading: () => [...document.querySelectorAll('.rp-empty,.tab-panel.active *')]
-      .some(el => /Loading…|Loading\.\.\./.test(el.textContent) && el.offsetParent !== null)
-      ? 'still shows Loading…' : null,
-};
+const shot = (page, name) => page.screenshot({ path: SHOTS + name + '.png', fullPage: true })
+
+/** The one assertion that matters everywhere: nothing stuck on "loading". */
+const notStuck = () => {
+  const out = []
+  const main = document.querySelector('main')
+  if (!main) return ['no <main>']
+  const txt = main.innerText || ''
+  if (/^\s*loading\b/im.test(txt) && txt.trim().split('\n').length < 3) {
+    out.push('panel appears stuck on loading')
+  }
+  return out
+}
 
 async function evalAsserts(page, fn) {
-  try { return await page.evaluate(fn); } catch (e) { return ['evaluate threw: ' + e.message]; }
+  try { return await page.evaluate(fn) } catch (e) { return ['evaluate threw: ' + e.message] }
 }
 
 async function run() {
-  const browser = await puppeteer.launch({ executablePath: CHROME, headless: 'new',
-    args: ['--no-sandbox', '--disable-dev-shm-usage'] });
+  const browser = await puppeteer.launch({
+    executablePath: CHROME, headless: 'new',
+    args: ['--no-sandbox', '--disable-dev-shm-usage'],
+  })
+  const page = await browser.newPage()
+  await page.setViewport({ width: 1440, height: 900 })
+  const errs = wire(page)
 
-  // ============ DESKTOP ============
-  const page = await browser.newPage();
-  await page.setViewport({ width: 1440, height: 900 });
-  const collect = wire(page);
+  await page.goto(BASE + '/', { waitUntil: 'networkidle2', timeout: 30000 }).catch(() => {})
+  await sleep(2000)
 
-  await page.goto(BASE + '/', { waitUntil: 'networkidle2', timeout: 30000 }).catch(() => {});
-  await sleep(1500);
-
-  // helper to click a tab and settle
-  const tab = async name => { await page.click(`.hdr-tab[data-tab="${name}"]`).catch(()=>{}); await sleep(2500); };
-
-  // TRADE (default active) — pass-probability cockpit + de-stale checks
-  await sleep(2500); // let /prop-challenge + /next-move land
-  await shot(page, 'trade');
-  let f = await evalAsserts(page, () => {
-    const out = [];
-    if (!document.querySelector('#tab-trade.active')) out.push('TRADE tab not active by default');
-    const cards = document.querySelectorAll('#forex-grid .forex-card').length;
-    if (cards !== 4) out.push('forex grid should have 4 cards (AUDNZD excluded), found ' + cards);
-    const bodyTxt = document.getElementById('tab-trade').textContent;
-    if (/AUD\/NZD/.test(bodyTxt)) out.push('AUDNZD card still present (HYP-045 excluded it)');
-    // stale FRAMING (not honest legacy labels): v013-as-current / the uncosted achievement banner
-    if (/v013 current/.test(bodyTxt)) out.push('"v013 current" still shown');
-    if (/INSTITUTIONAL GRADE ACHIEVED/.test(bodyTxt)) out.push('false "INSTITUTIONAL GRADE ACHIEVED" banner still shown');
-    if (/1\.8552/.test(bodyTxt)) out.push('uncosted 1.8552 headline still shown');
-    if (!/v015/.test(bodyTxt)) out.push('v015 not shown');
-    // pass probability must be a real number, not the "—" placeholder or "Loading"
-    const pass = (document.getElementById('ph-prob-pass') || {}).textContent || '';
-    if (!/\d+\.\d%|\d+%/.test(pass)) out.push('P(pass) not populated: "' + pass + '"');
-    if (/Loading/.test((document.getElementById('ph-caveat') || {}).textContent || '')) out.push('pass-prob caveat stuck on Loading');
-    // control panel present
-    if (!document.querySelector('.ctl-section')) out.push('control panel missing');
-    if (!document.getElementById('nbm-body')) out.push('Next Best Move card missing');
-    if (!document.querySelector('[data-ctl="run-queue"]')) out.push('Run Queue button missing');
-    return out;
-  });
-  record('trade', collect.errs.splice(0), f);
-
-  // CONTROL: token gating — without a token the status should read "locked"; the Next Best Move
-  // card should render the queued Oracle prompt (read-only, no token needed).
-  const ctlCheck = await evalAsserts(page, async () => {
-    const out = [];
-    localStorage.removeItem('sq_ctl_token');
-    const nbm = (document.getElementById('nbm-body') || {}).textContent || '';
-    if (/Loading/.test(nbm)) out.push('Next Best Move stuck on Loading');
-    // try an action without a token → must NOT spawn a job; status flips to an error/lock hint
-    const runBtn = document.querySelector('[data-ctl="checklist"]');
-    if (runBtn) runBtn.click();
-    await new Promise(r => setTimeout(r, 400));
-    const st = (document.getElementById('ctl-status') || {}).textContent || '';
-    if (!/token/i.test(st)) out.push('no-token action did not warn about token: "' + st + '"');
-    return out;
-  });
-  if (ctlCheck.length) { report.views['trade'].assertionFailures.push(...ctlCheck); report.ok = false; }
-
-  // SIGNALS — default TradingView embed mode
-  await tab('signals'); await sleep(5000); await shot(page, 'signals');
-  f = await evalAsserts(page, () => {
-    const out = [];
-    if (!document.querySelector('#tab-signals')) out.push('no signals panel');
-    if (!document.getElementById('sigmode-tv')) out.push('mode toggle missing');
-    if (document.getElementById('sig-tv').classList.contains('hidden')) out.push('TV mode not active by default');
-    if (!document.querySelector('#tv_chart iframe')) out.push('TradingView embed iframe did not load');
-    return out;
-  });
-  record('signals', collect.errs.splice(0), f);
-  // click the free QQQ proxy (futures are gated in the free widget) and screenshot a real chart
-  await page.click('#sig-tv-symbols .tvsym[data-sym="NASDAQ:QQQ"]').catch(()=>{}); await sleep(6000); await shot(page, 'signals-qqq');
-  // switch to Replay Cockpit, load a day, screenshot, then start playback
-  await page.click('#sigmode-replay').catch(()=>{}); await sleep(6000); await shot(page, 'signals-replay');
-  let rf = await evalAsserts(page, () => {
-    const out = [];
-    if (!document.getElementById('replay-cockpit')) out.push('replay cockpit missing');
-    if (!document.getElementById('rp-orders')) out.push('LIVE ORDERS panel missing');
-    if (document.getElementById('sig-bridge') && document.getElementById('sig-bridge').offsetParent) out.push('Bridge State still visible');
-    const st = (document.getElementById('rp-status')||{}).textContent || '';
-    if (!/ready|trades|bars/.test(st)) out.push('replay did not load: ' + st);
-    return out;
-  });
-  record('replay', collect.errs.splice(0), rf);
-  // press PLAY, let a few bars animate, screenshot a mid-play frame
-  await page.click('#rp-play').catch(()=>{}); await sleep(8000); await shot(page, 'signals-replay-playing');
-
-  // RESEARCH — the card that kept breaking
-  await tab('research'); await sleep(2500); await shot(page, 'research');
-  f = await evalAsserts(page, () => {
-    const out = [];
-    const cards = ['rp-health','rp-messages','rp-usage','rp-hyp','rp-queue','rp-gates','rp-reflection','rp-fills','rp-versions','rp-regime','rp-indicators'];
-    for (const id of cards) {
-      const el = document.getElementById(id);
-      if (!el) { out.push(id + ' MISSING'); continue; }
-      if (/Loading…|Loading\.\.\./.test(el.textContent)) out.push(id + ' stuck on Loading');
-    }
-    const rows = document.querySelectorAll('#rp-hyp tbody tr').length;
-    if (rows < 1) out.push('ledger has no rows');
-    if (/[>\s]\?\s*</.test(document.getElementById('rp-hyp')?.innerHTML || '')) out.push('ledger has ? status icon');
-    return out;
-  });
-  record('research', collect.errs.splice(0), f);
-
-  // RESEARCH filter interaction: click REJECTED, count must change & be >0
-  const filterCheck = await evalAsserts(page, async () => {
-    const out = [];
-    const before = document.querySelectorAll('#rp-hyp tbody tr').length;
-    const btn = document.querySelector('#hyp-filter .sig-tb-btn[data-status="REJECTED"]');
-    if (!btn) return ['REJECTED filter button missing'];
-    btn.click();
-    await new Promise(r => setTimeout(r, 300));
-    const after = document.querySelectorAll('#rp-hyp tbody tr').length;
-    if (after < 1) out.push('REJECTED filter shows 0 rows');
-    if (after === before && before > after) out.push('filter did not change rows');
-    // reset to ALL
-    document.querySelector('#hyp-filter .sig-tb-btn[data-status="ALL"]')?.click();
-    return out;
-  });
-  if (filterCheck.length) { report.views['research'].assertionFailures.push(...filterCheck); report.ok = false; }
-
-  // TRADES
-  await tab('trades'); await shot(page, 'trades');
-  f = await evalAsserts(page, () => {
-    const out = [];
-    if (!document.querySelector('#tab-trades')) out.push('no trades panel');
-    return out;
-  });
-  record('trades', collect.errs.splice(0), f);
-
-  // CALENDAR
-  await tab('calendar'); await sleep(6000); await shot(page, 'calendar');
-  f = await evalAsserts(page, () => {
-    const out = [];
-    if (!document.getElementById('tab-calendar')) out.push('calendar tab missing');
-    if (!document.querySelector('#cal-grid table')) out.push('calendar grid did not render');
-    const title = (document.getElementById('cal-title')||{}).textContent || '';
-    if (!/\d{4}/.test(title)) out.push('calendar title missing: ' + title);
-    return out;
-  });
-  record('calendar', collect.errs.splice(0), f);
-
-  // CHAT
-  await tab('chat'); await shot(page, 'chat');
-  f = await evalAsserts(page, () => {
-    const out = [];
-    if (!document.getElementById('chat-input')) out.push('chat input missing');
-    const chips = document.querySelectorAll('#chat-chips button').length;
-    if (chips < 1) out.push('chat chips missing');
-    return out;
-  });
-  record('chat', collect.errs.splice(0), f);
-
-  // ============ ICT PAGE ============
-  await page.goto(BASE + '/ict/', { waitUntil: 'networkidle2', timeout: 30000 }).catch(() => {});
-  await sleep(2500); await shot(page, 'ict');
-  f = await evalAsserts(page, () => {
-    const out = [];
-    const sb = document.getElementById('sc-bridge');
-    if (!sb) out.push('sc-bridge missing');
-    const card = sb?.closest('.state-card');
-    // live cross-state is NORMAL/0.00 -> cards should NOT be in alert(red)
-    if (card && card.classList.contains('alert')) out.push('Bridge card still RED on NORMAL state');
-    const tsub = document.getElementById('sc-threat-sub')?.textContent || '';
-    if (/CRITICAL/.test(tsub)) out.push('threat subtext stuck on CRITICAL: ' + tsub);
-    if (/Loading…/.test(document.getElementById('oracle-text')?.textContent || '')) out.push('oracle text stuck Loading');
-    return out;
-  });
-  record('ict', collect.errs.splice(0), f);
-
-  // ============ MOBILE 375 ============
-  await page.setViewport({ width: 375, height: 800, isMobile: true });
-  for (const v of [['/', 'home'], ['/ict/', 'ict']]) {
-    await page.goto(BASE + v[0], { waitUntil: 'networkidle2', timeout: 30000 }).catch(() => {});
-    await sleep(2000);
-    await shot(page, v[1] + '-mobile');
-    const ov = await evalAsserts(page, () => {
-      const sw = document.documentElement.scrollWidth, cw = document.documentElement.clientWidth;
-      return sw > cw + 2 ? ['horizontal overflow: scrollWidth ' + sw + ' > ' + cw] : [];
-    });
-    record('mobile' + (v[1] === 'home' ? '' : '-ict'), collect.errs.splice(0), ov);
+  const go = async name => {
+    await page.click(`[data-tab="${name}"]`).catch(() => {})
+    await sleep(2200)
   }
 
-  report.http4xx = [...new Set(http4xx)];
-  await browser.close();
-  writeFileSync(new URL('./report.json', import.meta.url), JSON.stringify(report, null, 2));
-  console.log(JSON.stringify(report, null, 2));
-  process.exit(report.ok ? 0 : 1);
+  // ---- Terminal: chart + fundamentals, same ticker ----
+  await sleep(2500)
+  await shot(page, 'terminal')
+  record('terminal', errs, await evalAsserts(page, () => {
+    const out = []
+    if (!document.querySelector('[data-panel="terminal"]')) out.push('terminal not the default panel')
+    if (!document.querySelector('#tv_chart')) out.push('TradingView container missing')
+    const btns = [...document.querySelectorAll('button')]
+    if (!btns.some(b => /Open on TradingView/i.test(b.textContent)))
+      out.push('TradingView link-out button missing')
+    const txt = document.querySelector('main')?.innerText || ''
+    // Fundamentals must render SOMETHING honest, warm or partial.
+    if (!/Earnings|Insider|Institutional|Short interest|Could not load/i.test(txt))
+      out.push('fundamentals sections did not render')
+    return out
+  }))
+
+  // ---- Signals + replay cockpit ----
+  await go('signals')
+  await shot(page, 'signals')
+  record('signals', errs, await evalAsserts(page, () => {
+    const out = []
+    const btns = [...document.querySelectorAll('button')]
+    if (!btns.some(b => /Replay cockpit/i.test(b.textContent))) out.push('replay mode toggle missing')
+    return out
+  }))
+
+  // Switch into the cockpit and confirm the island actually mounted a chart.
+  await page.evaluate(() => {
+    const b = [...document.querySelectorAll('button')].find(x => /Replay cockpit/i.test(x.textContent))
+    b?.click()
+  })
+  await sleep(3000)
+  await shot(page, 'replay')
+  record('replay', errs, await evalAsserts(page, () => {
+    const out = []
+    const btns = [...document.querySelectorAll('button')]
+    if (!btns.some(b => /Play day/i.test(b.textContent))) out.push('replay Play control missing')
+    // lightweight-charts renders into a canvas; no canvas means the island failed.
+    if (!document.querySelector('main canvas')) out.push('replay chart canvas not created')
+    return out
+  }))
+
+  // ---- Calendar ----
+  await go('calendar')
+  await shot(page, 'calendar')
+  record('calendar', errs, await evalAsserts(page, () => {
+    const out = []
+    const txt = document.querySelector('main')?.innerText || ''
+    if (!/Month|unavailable|offline|snapshot/i.test(txt)) out.push('calendar rendered neither grid nor an honest empty state')
+    return out
+  }))
+
+  // ---- Oracle ----
+  await go('oracle')
+  await shot(page, 'oracle')
+  record('oracle', errs, await evalAsserts(page, () => {
+    const out = []
+    if (!document.querySelector('main input')) out.push('oracle input missing')
+    return out
+  }))
+
+  // ---- Connections: the reduced Research tab ----
+  await go('connections')
+  await shot(page, 'connections')
+  record('connections', errs, [
+    ...(await evalAsserts(page, () => {
+      const out = []
+      const txt = document.querySelector('main')?.innerText || ''
+      for (const k of ['oanda', 'sec_edgar', 'alpha_vantage', 'finra'])
+        if (!txt.includes(k)) out.push('connections missing integration: ' + k)
+      if (!/keyless/i.test(txt)) out.push('keyless integrations not distinguished')
+      return out
+    })),
+    ...(await evalAsserts(page, notStuck)),
+  ])
+
+  // ---- Mobile ----
+  await page.setViewport({ width: 390, height: 844 })
+  await page.click('[data-tab="terminal"]').catch(() => {})
+  await sleep(2000)
+  await shot(page, 'terminal-mobile')
+  record('mobile', errs, await evalAsserts(page, () => {
+    const out = []
+    if (document.documentElement.scrollWidth > window.innerWidth + 2)
+      out.push('horizontal overflow at 390px')
+    return out
+  }))
+
+  await browser.close()
+  report.http4xx = [...new Set(http4xx)]
+  writeFileSync(new URL('./report.json', import.meta.url), JSON.stringify(report, null, 2))
+
+  console.log(JSON.stringify(report, null, 2))
+  console.log(report.ok ? '\nQA PASS' : '\nQA FAIL')
+  process.exit(report.ok ? 0 : 1)
 }
-run().catch(e => { console.error('HARNESS CRASH:', e); process.exit(2); });
+
+run().catch(e => { console.error(e); process.exit(1) })

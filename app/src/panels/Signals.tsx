@@ -30,9 +30,26 @@ export default function Signals({ replayDay }: { replayDay: string | null }) {
 }
 
 /* ── Live signal status ────────────────────────────────────────────────────── */
+/**
+ * Shape confirmed against the live GET /data payload, not assumed:
+ *   { ticker: "EURUSD=X", label: "EUR/USD", price: 1.16,
+ *     signal: 0, conviction: 0.0, size_mult: 1.0, price_history: [...] }
+ * `signal` is NUMERIC (-1 short / 0 flat / +1 long). An earlier version treated
+ * it as a string and called .toUpperCase() on it, which threw and — with no
+ * boundary — unmounted the whole terminal.
+ */
 type SignalRow = {
-  pair?: string; symbol?: string; direction?: string; signal?: string
-  score?: number; conviction?: number; price?: number; note?: string
+  ticker?: string; label?: string
+  price?: number; signal?: number | string
+  conviction?: number; size_mult?: number
+}
+
+function direction(sig: number | string | undefined): 'LONG' | 'SHORT' | 'FLAT' {
+  if (typeof sig === 'number') return sig > 0 ? 'LONG' : sig < 0 ? 'SHORT' : 'FLAT'
+  const s = String(sig ?? '').toUpperCase()
+  if (s.includes('LONG') || s.includes('BUY')) return 'LONG'
+  if (s.includes('SHORT') || s.includes('SELL')) return 'SHORT'
+  return 'FLAT'
 }
 
 function LiveSignals() {
@@ -59,7 +76,7 @@ function LiveSignals() {
         <Empty
           reason={IS_REMOTE ? 'Live server unavailable.' : 'Backend offline.'}
           hint={IS_REMOTE
-            ? 'Free tier sleeps after ~15 minutes idle; the first request wakes it (30–50s).'
+            ? 'Free tier sleeps after ~15 minutes idle; the first request wakes it (30-50s).'
             : 'Start it with: python3 scripts/live_signals_server.py'}
         />
       </Card>
@@ -73,33 +90,32 @@ function LiveSignals() {
       </div>
       <Card title="Signals" right={<Pill tone="up">live</Pill>} className="min-h-0">
         {!rows?.length ? <Empty reason="No active signals." /> : (
-          <div className="overflow-y-auto max-h-full">
-            <table className="w-full text-[11px]">
-              <thead>
-                <tr className="text-faint uppercase tracking-wider text-[10px]">
-                  <th className="text-left font-medium py-1">Instrument</th>
-                  <th className="text-left font-medium">Signal</th>
-                  <th className="text-right font-medium">Score</th>
-                  <th className="text-right font-medium">Price</th>
-                </tr>
-              </thead>
-              <tbody className="num">
-                {rows.map((r, i) => {
-                  const dir = (r.direction ?? r.signal ?? '').toUpperCase()
-                  const tone = dir.includes('LONG') || dir.includes('BUY') ? 'text-up'
-                    : dir.includes('SHORT') || dir.includes('SELL') ? 'text-down' : 'text-muted'
-                  return (
-                    <tr key={i} className="border-t border-line-soft">
-                      <td className="py-1">{r.pair ?? r.symbol ?? '—'}</td>
-                      <td className={tone}>{dir || '—'}</td>
-                      <td className="text-right text-muted">{num(r.score ?? r.conviction)}</td>
-                      <td className="text-right">{num(r.price, 4)}</td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
+          <table className="w-full text-[11px]">
+            <thead>
+              <tr className="text-faint uppercase tracking-wider text-[10px]">
+                <th className="text-left font-medium py-1">Pair</th>
+                <th className="text-left font-medium">Signal</th>
+                <th className="text-right font-medium">Conv</th>
+                <th className="text-right font-medium">Size</th>
+                <th className="text-right font-medium">Price</th>
+              </tr>
+            </thead>
+            <tbody className="num">
+              {rows.map((r, i) => {
+                const dir = direction(r.signal)
+                const tone = dir === 'LONG' ? 'text-up' : dir === 'SHORT' ? 'text-down' : 'text-faint'
+                return (
+                  <tr key={r.ticker ?? i} className="border-t border-line-soft">
+                    <td className="py-1">{r.label ?? r.ticker ?? '—'}</td>
+                    <td className={tone}>{dir}</td>
+                    <td className="text-right text-muted">{num(r.conviction)}</td>
+                    <td className="text-right text-muted">{num(r.size_mult, 1)}x</td>
+                    <td className="text-right">{num(r.price, 4)}</td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
         )}
       </Card>
     </div>
