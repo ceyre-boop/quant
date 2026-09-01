@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-27T16:56:40",
+  "timestamp": "2026-09-01T13:33:24",
   "overall": "RED",
   "components": {
     "duckdb": {
@@ -15,8 +15,8 @@
       "detail": "yfinance 1.3.0 installed"
     },
     "ict_scanner": {
-      "status": "GREEN",
-      "detail": "outside session hours \u2014 last run 1.0h ago"
+      "status": "YELLOW",
+      "detail": "in session but log is 188.7h old \u2014 scanner may be stuck"
     },
     "backtest_engine": {
       "status": "GREEN",
@@ -24,7 +24,7 @@
     },
     "alpaca": {
       "status": "GREEN",
-      "detail": "paper account equity=$105,791"
+      "detail": "paper account equity=$103,530"
     },
     "fred": {
       "status": "GREEN",
@@ -32,7 +32,7 @@
     },
     "alpha_vantage": {
       "status": "GREEN",
-      "detail": "latest bar 2026-07-24"
+      "detail": "latest bar 2026-08-31"
     },
     "tiingo": {
       "status": "GREEN",
@@ -40,11 +40,11 @@
     },
     "news_api": {
       "status": "GREEN",
-      "detail": "65 business articles"
+      "detail": "69 business articles"
     },
     "oanda": {
       "status": "GREEN",
-      "detail": "NAV=$109,631 practice"
+      "detail": "NAV=$109,613 practice"
     },
     "firebase": {
       "status": "GREEN",
@@ -64,17 +64,16 @@
     },
     "reddit": {
       "status": "YELLOW",
-      "detail": "cache 10264m old \u2014 needs refresh"
+      "detail": "cache 61901m old \u2014 needs refresh"
     },
     "decision_logs": {
       "status": "YELLOW",
-      "detail": "WARNING: 2 trades >7d old missing outcome backfill (EURUSD=X, USD_CAD...)"
+      "detail": "WARNING: 9 trades >7d old missing outcome backfill (GBPUSD=X, GBPUSD=X, AUDUSD=X...)"
     },
     "oracle_pulse": {
       "status": "RED",
-      "detail": "0 new entries, 2 anomalies",
-      "last_pulse": "2026-08-24T23:44:21+00:00"
+      "detail": "0 new entries, 2 anomalies"
     }
   },
-  "last_checked": "2026-07-27T16:56:40"
+  "last_checked": "2026-09-01T13:33:24"
 }

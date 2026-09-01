@@ -4147,3 +4147,38 @@ the nightly pass keeps no-op'ing; (2) ICT fill-rate bottleneck still binds RQ-00
 (3) `BLOCKED_NO_VALIDATOR` verdicts still accumulating in `auto_hypothesis_results`
 with no validator attached — open since 08-05, four nights flagged, unaddressed;
 (4) NEW — blackout watchdog above; (5) NEW — plist reload + rebaseline above.
+
+---
+
+## 2026-09-01 · MORNING PASS
+Context: 3/6 FRESH (50%) | Bias: NEUTRAL conf 0.000 | Candidates GO: 2 NO-GO: 18 (10 symbols)
+Dashboard: challenge overall=WAIT, G1 GREEN / G2a GREEN / G2b GREEN 30/8 / G3 YELLOW (collecting), running WR 19.2% on 26 closed
+
+**GO list (HYP-107 LONG, 09:31→10:30):** HUBCZ metric 0.412 · FLYE metric 0.331.
+HYP-093 produced zero GO. Written to `data/signals/signals_2026-09-01.json`.
+
+**Ran off-schedule.** Invoked manually at 13:31 ET, not 08:00. The 09:31→10:30 entry
+window for both GO candidates had already closed when the scan ran — these are a
+logged record, not actionable intent for today's session. Do not backfill them as
+if they were live at the open.
+
+**Degraded sources (RULE 6 — logged, not propagated):**
+- `calendar` UNAVAILABLE — ForexFactory 403 Forbidden, no cached calendar.
+- `gdelt` UNAVAILABLE — 0 rows, never ingested (burst-throttled free tier).
+- `sentiment_board` STALE 122.9h — data only through 2026-08-27.
+- `reddit` RETIRED (2026-07-20, no OAuth app) — expected, not a new failure.
+Bias explicitly reported `missing: calendar, gdelt` and floored confidence at 0.000.
+
+**Directive/reality drift (not an incident — all four steps exited 0):**
+- Directive Step 3 says the GO/NO-GO list lands in `data/decisions/signals_{date}.json`.
+  `execution.signals` actually writes `data/signals/signals_{date}.json`. The Step 5
+  `git add data/decisions/` line therefore stages nothing. Staged `data/signals/` here.
+- Directive Step 5 also stages `data/agent/dashboard_state.json`, which TICK-051 already
+  established has no writer. Not staged.
+- `~/quant/AGENT_DIRECTIVE.md` does not exist; the file is at `archive/AGENT_DIRECTIVE.md`
+  (matches what `run_agent.sh` prompts for).
+
+**Carried forward — Oracle loop (NN#2 / RULE 7):** `sync_dashboard_data.py` reports
+`decision_logs` YELLOW: 9 trades >7d old still missing `update_outcome()` backfill.
+`oracle_pulse` RED: 0 new entries, 2 anomalies. Not repaired here (RULE 9 — prior
+incidents, not this pass's work).

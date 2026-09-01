@@ -1,0 +1,391 @@
+{
+  "date": "2026-09-01",
+  "generated_at": "2026-09-01T17:33:10+00:00",
+  "frozen_hash": "66907c7906d7212ebcf3b5ec6772bb30c380207a153be5b675deb965790612a3",
+  "n_candidates": 10,
+  "n_go": 2,
+  "n_no_go": 18,
+  "signals": [
+    {
+      "signal_id": "2026-09-01:HUBCZ:HYP-107",
+      "date": "2026-09-01",
+      "ticker": "HUBCZ",
+      "hypothesis": "HYP-107",
+      "side": "LONG",
+      "decision": "GO",
+      "reason": "pass",
+      "rank": 1,
+      "rank_metric": 0.412193,
+      "entry_et": "09:31",
+      "exit_et": "10:30",
+      "features": {
+        "overnight_gap": 0.3529411764705881,
+        "log_vol": 3.3012470886362113,
+        "first_min_vol": 2000
+      },
+      "frozen_hash": "66907c7906d7212ebcf3b5ec6772bb30c380207a153be5b675deb965790612a3"
+    },
+    {
+      "signal_id": "2026-09-01:ISRL:HYP-107",
+      "date": "2026-09-01",
+      "ticker": "ISRL",
+      "hypothesis": "HYP-107",
+      "side": "LONG",
+      "decision": "NO_GO",
+      "reason": "gap_above_og_max_1.0008",
+      "rank": null,
+      "rank_metric": null,
+      "entry_et": "09:31",
+      "exit_et": "10:30",
+      "features": {
+        "overnight_gap": 1.000806451612903,
+        "log_vol": 2.303196057420489,
+        "first_min_vol": 200
+      },
+      "frozen_hash": "66907c7906d7212ebcf3b5ec6772bb30c380207a153be5b675deb965790612a3"
+    },
+    {
+      "signal_id": "2026-09-01:BIAF:HYP-107",
+      "date": "2026-09-01",
+      "ticker": "BIAF",
+      "hypothesis": "HYP-107",
+      "side": "LONG",
+      "decision": "NO_GO",
+      "reason": "gap_above_og_max_0.6930",
+      "rank": null,
+      "rank_metric": null,
+      "entry_et": "09:31",
+      "exit_et": "10:30",
+      "features": {
+        "overnight_gap": 0.692982456140351,
+        "log_vol": 6.133845680142737,
+        "first_min_vol": 1360960
+      },
+      "frozen_hash": "66907c7906d7212ebcf3b5ec6772bb30c380207a153be5b675deb965790612a3"
+    },
+    {
+      "signal_id": "2026-09-01:SSM:HYP-107",
+      "date": "2026-09-01",
+      "ticker": "SSM",
+      "hypothesis": "HYP-107",
+      "side": "LONG",
+      "decision": "NO_GO",
+      "reason": "mna_headline",
+      "rank": null,
+      "rank_metric": null,
+      "entry_et": "09:31",
+      "exit_et": "10:30",
+      "features": {
+        "overnight_gap": 0.39925373134328357,
+        "log_vol": 5.098408347104957,
+        "first_min_vol": 125431
+      },
+      "frozen_hash": "66907c7906d7212ebcf3b5ec6772bb30c380207a153be5b675deb965790612a3"
+    },
+    {
+      "signal_id": "2026-09-01:FLYE:HYP-107",
+      "date": "2026-09-01",
+      "ticker": "FLYE",
+      "hypothesis": "HYP-107",
+      "side": "LONG",
+      "decision": "GO",
+      "reason": "pass",
+      "rank": 2,
+      "rank_metric": 0.330765,
+      "entry_et": "09:31",
+      "exit_et": "10:30",
+      "features": {
+        "overnight_gap": 0.32352941176470584,
+        "log_vol": 4.553008705727363,
+        "first_min_vol": 35727
+      },
+      "frozen_hash": "66907c7906d7212ebcf3b5ec6772bb30c380207a153be5b675deb965790612a3"
+    },
+    {
+      "signal_id": "2026-09-01:GPRO:HYP-107",
+      "date": "2026-09-01",
+      "ticker": "GPRO",
+      "hypothesis": "HYP-107",
+      "side": "LONG",
+      "decision": "NO_GO",
+      "reason": "logvol_above_max_7.1593",
+      "rank": null,
+      "rank_metric": null,
+      "entry_et": "09:31",
+      "exit_et": "10:30",
+      "features": {
+        "overnight_gap": 0.5407441223464964,
+        "log_vol": 7.159336811699597,
+        "first_min_vol": 14432341
+      },
+      "frozen_hash": "66907c7906d7212ebcf3b5ec6772bb30c380207a153be5b675deb965790612a3"
+    },
+    {
+      "signal_id": "2026-09-01:RDAC:HYP-107",
+      "date": "2026-09-01",
+      "ticker": "RDAC",
+      "hypothesis": "HYP-107",
+      "side": "LONG",
+      "decision": "NO_GO",
+      "reason": "gap_below_floor_0.0746",
+      "rank": null,
+      "rank_metric": null,
+      "entry_et": "09:31",
+      "exit_et": "10:30",
+      "features": {
+        "overnight_gap": 0.07456140350877205,
+        "log_vol": 3.4787107555127594,
+        "first_min_vol": 3010
+      },
+      "frozen_hash": "66907c7906d7212ebcf3b5ec6772bb30c380207a153be5b675deb965790612a3"
+    },
+    {
+      "signal_id": "2026-09-01:OLOX:HYP-107",
+      "date": "2026-09-01",
+      "ticker": "OLOX",
+      "hypothesis": "HYP-107",
+      "side": "LONG",
+      "decision": "NO_GO",
+      "reason": "gap_below_floor_0.0276",
+      "rank": null,
+      "rank_metric": null,
+      "entry_et": "09:31",
+      "exit_et": "10:30",
+      "features": {
+        "overnight_gap": 0.02760427160991341,
+        "log_vol": 2.2095150145426308,
+        "first_min_vol": 161
+      },
+      "frozen_hash": "66907c7906d7212ebcf3b5ec6772bb30c380207a153be5b675deb965790612a3"
+    },
+    {
+      "signal_id": "2026-09-01:PETZ:HYP-107",
+      "date": "2026-09-01",
+      "ticker": "PETZ",
+      "hypothesis": "HYP-107",
+      "side": "LONG",
+      "decision": "NO_GO",
+      "reason": "gap_below_floor_0.1739",
+      "rank": null,
+      "rank_metric": null,
+      "entry_et": "09:31",
+      "exit_et": "10:30",
+      "features": {
+        "overnight_gap": 0.17391304347826098,
+        "log_vol": 4.473778834646724,
+        "first_min_vol": 29769
+      },
+      "frozen_hash": "66907c7906d7212ebcf3b5ec6772bb30c380207a153be5b675deb965790612a3"
+    },
+    {
+      "signal_id": "2026-09-01:LIDR:HYP-107",
+      "date": "2026-09-01",
+      "ticker": "LIDR",
+      "hypothesis": "HYP-107",
+      "side": "LONG",
+      "decision": "NO_GO",
+      "reason": "logvol_above_max_6.2895",
+      "rank": null,
+      "rank_metric": null,
+      "entry_et": "09:31",
+      "exit_et": "10:30",
+      "features": {
+        "overnight_gap": 0.36956521739130443,
+        "log_vol": 6.289483933325965,
+        "first_min_vol": 1947528
+      },
+      "frozen_hash": "66907c7906d7212ebcf3b5ec6772bb30c380207a153be5b675deb965790612a3"
+    },
+    {
+      "signal_id": "2026-09-01:HUBCZ:HYP-093",
+      "date": "2026-09-01",
+      "ticker": "HUBCZ",
+      "hypothesis": "HYP-093",
+      "side": "SHORT",
+      "decision": "NO_GO",
+      "reason": "missing_measure_window",
+      "rank": null,
+      "rank_metric": null,
+      "entry_et": "10:30",
+      "exit_et": "15:45",
+      "features": {
+        "gain_1025": null,
+        "price_1025": null,
+        "cum_vol_1025": null
+      },
+      "frozen_hash": "66907c7906d7212ebcf3b5ec6772bb30c380207a153be5b675deb965790612a3"
+    },
+    {
+      "signal_id": "2026-09-01:ISRL:HYP-093",
+      "date": "2026-09-01",
+      "ticker": "ISRL",
+      "hypothesis": "HYP-093",
+      "side": "SHORT",
+      "decision": "NO_GO",
+      "reason": "missing_measure_window",
+      "rank": null,
+      "rank_metric": null,
+      "entry_et": "10:30",
+      "exit_et": "15:45",
+      "features": {
+        "gain_1025": null,
+        "price_1025": null,
+        "cum_vol_1025": null
+      },
+      "frozen_hash": "66907c7906d7212ebcf3b5ec6772bb30c380207a153be5b675deb965790612a3"
+    },
+    {
+      "signal_id": "2026-09-01:BIAF:HYP-093",
+      "date": "2026-09-01",
+      "ticker": "BIAF",
+      "hypothesis": "HYP-093",
+      "side": "SHORT",
+      "decision": "NO_GO",
+      "reason": "below_gain_min_0.4452",
+      "rank": null,
+      "rank_metric": null,
+      "entry_et": "10:30",
+      "exit_et": "15:45",
+      "features": {
+        "gain_1025": 0.4451754385964912,
+        "price_1025": 6.59,
+        "cum_vol_1025": 16067922
+      },
+      "frozen_hash": "66907c7906d7212ebcf3b5ec6772bb30c380207a153be5b675deb965790612a3"
+    },
+    {
+      "signal_id": "2026-09-01:SSM:HYP-093",
+      "date": "2026-09-01",
+      "ticker": "SSM",
+      "hypothesis": "HYP-093",
+      "side": "SHORT",
+      "decision": "NO_GO",
+      "reason": "mna_headline",
+      "rank": null,
+      "rank_metric": null,
+      "entry_et": "10:30",
+      "exit_et": "15:45",
+      "features": {
+        "gain_1025": 0.441007462686567,
+        "price_1025": 3.8619,
+        "cum_vol_1025": 8786610
+      },
+      "frozen_hash": "66907c7906d7212ebcf3b5ec6772bb30c380207a153be5b675deb965790612a3"
+    },
+    {
+      "signal_id": "2026-09-01:FLYE:HYP-093",
+      "date": "2026-09-01",
+      "ticker": "FLYE",
+      "hypothesis": "HYP-093",
+      "side": "SHORT",
+      "decision": "NO_GO",
+      "reason": "below_price_min_1.8988",
+      "rank": null,
+      "rank_metric": null,
+      "entry_et": "10:30",
+      "exit_et": "15:45",
+      "features": {
+        "gain_1025": 0.39617647058823513,
+        "price_1025": 1.8988,
+        "cum_vol_1025": 36931622
+      },
+      "frozen_hash": "66907c7906d7212ebcf3b5ec6772bb30c380207a153be5b675deb965790612a3"
+    },
+    {
+      "signal_id": "2026-09-01:GPRO:HYP-093",
+      "date": "2026-09-01",
+      "ticker": "GPRO",
+      "hypothesis": "HYP-093",
+      "side": "SHORT",
+      "decision": "NO_GO",
+      "reason": "below_price_min_1.5992",
+      "rank": null,
+      "rank_metric": null,
+      "entry_et": "10:30",
+      "exit_et": "15:45",
+      "features": {
+        "gain_1025": 0.8251540744122345,
+        "price_1025": 1.5992,
+        "cum_vol_1025": 117841739
+      },
+      "frozen_hash": "66907c7906d7212ebcf3b5ec6772bb30c380207a153be5b675deb965790612a3"
+    },
+    {
+      "signal_id": "2026-09-01:RDAC:HYP-093",
+      "date": "2026-09-01",
+      "ticker": "RDAC",
+      "hypothesis": "HYP-093",
+      "side": "SHORT",
+      "decision": "NO_GO",
+      "reason": "below_gain_min_0.4803",
+      "rank": null,
+      "rank_metric": null,
+      "entry_et": "10:30",
+      "exit_et": "15:45",
+      "features": {
+        "gain_1025": 0.48026315789473695,
+        "price_1025": 6.75,
+        "cum_vol_1025": 2226981
+      },
+      "frozen_hash": "66907c7906d7212ebcf3b5ec6772bb30c380207a153be5b675deb965790612a3"
+    },
+    {
+      "signal_id": "2026-09-01:OLOX:HYP-093",
+      "date": "2026-09-01",
+      "ticker": "OLOX",
+      "hypothesis": "HYP-093",
+      "side": "SHORT",
+      "decision": "NO_GO",
+      "reason": "below_qual_gain_1.0500",
+      "rank": null,
+      "rank_metric": null,
+      "entry_et": "10:30",
+      "exit_et": "15:45",
+      "features": {
+        "gain_1025": 0.05782792665726366,
+        "price_1025": 1.05,
+        "cum_vol_1025": 536604
+      },
+      "frozen_hash": "66907c7906d7212ebcf3b5ec6772bb30c380207a153be5b675deb965790612a3"
+    },
+    {
+      "signal_id": "2026-09-01:PETZ:HYP-093",
+      "date": "2026-09-01",
+      "ticker": "PETZ",
+      "hypothesis": "HYP-093",
+      "side": "SHORT",
+      "decision": "NO_GO",
+      "reason": "below_qual_gain_1.3750",
+      "rank": null,
+      "rank_metric": null,
+      "entry_et": "10:30",
+      "exit_et": "15:45",
+      "features": {
+        "gain_1025": 0.19565217391304368,
+        "price_1025": 1.375,
+        "cum_vol_1025": 1034409
+      },
+      "frozen_hash": "66907c7906d7212ebcf3b5ec6772bb30c380207a153be5b675deb965790612a3"
+    },
+    {
+      "signal_id": "2026-09-01:LIDR:HYP-093",
+      "date": "2026-09-01",
+      "ticker": "LIDR",
+      "hypothesis": "HYP-093",
+      "side": "SHORT",
+      "decision": "NO_GO",
+      "reason": "below_qual_gain_1.4750",
+      "rank": null,
+      "rank_metric": null,
+      "entry_et": "10:30",
+      "exit_et": "15:45",
+      "features": {
+        "gain_1025": 0.28260869565217406,
+        "price_1025": 1.475,
+        "cum_vol_1025": 27342061
+      },
+      "frozen_hash": "66907c7906d7212ebcf3b5ec6772bb30c380207a153be5b675deb965790612a3"
+    }
+  ],
+  "note": "NO_GO rows are retained with reasons so a zero-signal day is auditable. Rank is a descriptive ordering of a binary pass, NOT a conviction score \u2014 nothing downstream sizes on it."
+}

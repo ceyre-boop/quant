@@ -1,16 +1,24 @@
 {
-  "ts": "2026-07-27T20:56:44.579143+00:00",
+  "ts": "2026-09-01T17:33:40.389607+00:00",
   "overall": "GREEN",
   "stale_hours": 24.0,
   "degraded_pairs": [],
   "fake_data_pairs": [],
   "pairs": {
+    "EURUSD=X": {
+      "status": "OK",
+      "source": "yfinance",
+      "reason": "yfinance returned an empty OHLCV frame",
+      "last_failure": "2026-08-06T12:26:35.347006+00:00",
+      "age_hours": 629.12,
+      "sentinel": "sentinel/DEGRADED_yfinance_EURUSD.txt"
+    },
     "GBPUSD=X": {
       "status": "OK",
       "source": "yfinance",
       "reason": "yfinance returned an empty OHLCV frame",
       "last_failure": "2026-07-20T12:23:49.675628+00:00",
-      "age_hours": 176.55,
+      "age_hours": 1037.16,
       "sentinel": "sentinel/DEGRADED_yfinance_GBPUSD.txt"
     }
   },

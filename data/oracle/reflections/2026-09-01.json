@@ -1,0 +1,26 @@
+{
+  "date": "2026-09-01",
+  "generated_at": "2026-09-01T06:32:00.932900+00:00",
+  "input_tokens": 4578,
+  "output_tokens": 983,
+  "estimated_cost_usd": 0.142395,
+  "harvest_days_read": 7,
+  "reflection": {
+    "candidate_lesson": {
+      "lesson_text": "When the 30-indicator consensus shows high conviction (>90%) but green_matches=0 and hist_hr=0%, treat the signal as UNVALIDATED and freeze entries \u2014 high live conviction without any historical analog match is a novel unmemorized state, not an edge.",
+      "mechanism": "green_matches counts how many times the current live indicator configuration has appeared in historical memory with a positive outcome. Zero matches means the ensemble has never seen this exact bull-alignment succeed before; conviction% only measures cross-sectional agreement of indicators right now, not the forward payoff of that agreement. Institutionally, a broad indicator stack lining up long with no historical precedent usually reflects a late-cycle crowded positioning snapshot rather than a repeatable inefficiency \u2014 the crowd is aligned, which is precisely when mean-reversion risk is highest.",
+      "testable_rule": "if consensus_conviction > 0.90 and green_matches == 0 and hist_hr == 0.0: block_entry() # only trade conviction>0.90 when green_matches >= 3 (see GBPUSD hist_hr=68%, AUDUSD hist_hr=68%)",
+      "expected_impact": "Filters out unvalidated high-conviction entries (EURUSD-type states); expected win-rate lift of +3-5% on consensus-driven trades and Sharpe contribution ~+0.02 by removing negative-expectancy novel states.",
+      "evidence_from_harvest": "Live consensus shows EURUSD LONG at conv=92% but green_matches=0 / hist_hr=0%, versus GBPUSD LONG conv=100% green_matches=5 hist_hr=68% and AUDUSD LONG conv=100% green_matches=3 hist_hr=68%. The two pairs with historical matches carry a 68% memorized hit rate; the pair with identical directional conviction but zero matches has no validated edge \u2014 same conviction, opposite reliability.",
+      "evidence_from_reasoning": null,
+      "reasoning_component_targeted": "green_matches",
+      "sample_needed": 40
+    },
+    "retirement_flag": {
+      "lesson_to_review": "L-L-009",
+      "reason": "L-L-009 states validated knowledge has an expiry date; with 7 consecutive zero-trade days and regime=UNKNOWN, prior REST_MODE/gating thresholds may be over-freezing and should be re-checked for decay against current low-VIX (14.4) conditions."
+    },
+    "system_health_note": "System is in a legitimate no-trade posture (0 trades/7d, regime UNKNOWN, TV shows 0 signals, sizing throttled to 75%) \u2014 consensus memory is stale (as-of 2026-08-24) so any entry now would be on unrefreshed historical matches, warranting caution before deploying capital."
+  },
+  "auto_validation": null
+}
