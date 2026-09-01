@@ -12,6 +12,11 @@ eggs/
 .eggs/
 lib/
 lib64/
+# `lib/` above is the Python packaging convention and is UNROOTED, so it also
+# swallowed app/src/lib/ — the terminal's api/format/fundamentals modules. They
+# existed on disk so local builds passed, while a clean CI checkout failed with
+# "Cannot find module '../lib/api'". Un-ignore the front-end one explicitly.
+!app/src/lib/
 parts/
 sdist/
 var/
