@@ -1,0 +1,1994 @@
+{
+ "schema_version": 1,
+ "ticker": "AMZN",
+ "cik": 1018724,
+ "name": null,
+ "generated_at": "2026-09-01T04:50:11.112386+00:00",
+ "capabilities": [
+  "borrow",
+  "earnings",
+  "estimates",
+  "insider",
+  "institutions",
+  "short_interest",
+  "short_volume"
+ ],
+ "partial": true,
+ "sections": {
+  "earnings": {
+   "as_of": "2026-07-30",
+   "staleness_days": 33,
+   "sources": [
+    "yahoo"
+   ],
+   "gaps": [],
+   "rows": [
+    {
+     "fiscal_end": "2026-10-29",
+     "report_date": "2026-10-29",
+     "report_time": "amc",
+     "eps_estimate": 1.95,
+     "eps_actual": null,
+     "eps_surprise": null,
+     "eps_surprise_pct": null,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": null,
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2026-07-30",
+     "report_date": "2026-07-30",
+     "report_time": "amc",
+     "eps_estimate": 1.83,
+     "eps_actual": 5.75,
+     "eps_surprise": 3.92,
+     "eps_surprise_pct": 215.02,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": 12.526539278131633,
+      "d0_pct": 15.320588778032107,
+      "d1_pct": 20.602967734043265,
+      "d5_pct": 16.552021650245496,
+      "d0_excess_spy": 14.600607810526679,
+      "gap_over_atr": 4.348146921157517
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2026-04-29",
+     "report_date": "2026-04-29",
+     "report_time": "amc",
+     "eps_estimate": 1.64,
+     "eps_actual": 2.78,
+     "eps_surprise": 1.14,
+     "eps_surprise_pct": 69.02,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": 3.8511270353317695,
+      "d0_pct": 0.7679398373068747,
+      "d1_pct": 1.9844894507033306,
+      "d5_pct": 3.090786427428238,
+      "d0_excess_spy": -0.22702290541354309,
+      "gap_over_atr": 1.508002318291204
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2026-02-05",
+     "report_date": "2026-02-05",
+     "report_time": "amc",
+     "eps_estimate": 1.95,
+     "eps_actual": 1.95,
+     "eps_surprise": 0.0,
+     "eps_surprise_pct": 0.22,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": -8.976606616376415,
+      "d0_pct": -5.554804877440455,
+      "d1_pct": -6.27329519401253,
+      "d5_pct": -10.732412274126213,
+      "d0_excess_spy": -7.473284274990088,
+      "gap_over_atr": -3.148775757840876
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2025-10-30",
+     "report_date": "2025-10-30",
+     "report_time": "amc",
+     "eps_estimate": 1.56,
+     "eps_actual": 1.95,
+     "eps_surprise": 0.3899999999999999,
+     "eps_surprise_pct": 25.2,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": 12.22292265034608,
+      "d0_pct": 9.584492754129247,
+      "d1_pct": 13.972897471221678,
+      "d5_pct": 9.669749166624042,
+      "d0_excess_spy": 9.256472453069886,
+      "gap_over_atr": 4.968536147388321
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2025-07-31",
+     "report_date": "2025-07-31",
+     "report_time": "amc",
+     "eps_estimate": 1.32,
+     "eps_actual": 1.68,
+     "eps_surprise": 0.3599999999999999,
+     "eps_surprise_pct": 27.19,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": -7.218826129778377,
+      "d0_pct": -8.269617085933035,
+      "d1_pct": -9.59378354419349,
+      "d5_pct": -4.878047985635847,
+      "d0_excess_spy": -6.630576757713614,
+      "gap_over_atr": -4.672377989295225
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2025-05-01",
+     "report_date": "2025-05-01",
+     "report_time": "amc",
+     "eps_estimate": 1.36,
+     "eps_actual": 1.59,
+     "eps_surprise": 0.22999999999999998,
+     "eps_surprise_pct": 16.77,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": 0.6519482192744119,
+      "d0_pct": -0.11566836184702112,
+      "d1_pct": -2.024180287328936,
+      "d5_pct": 1.5036806815143189,
+      "d0_excess_spy": -1.6000882048804232,
+      "gap_over_atr": 0.11849071135034173
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2025-02-06",
+     "report_date": "2025-02-06",
+     "report_time": "amc",
+     "eps_estimate": 1.48,
+     "eps_actual": 1.86,
+     "eps_surprise": 0.3800000000000001,
+     "eps_surprise_pct": 25.29,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": -2.6504215477636928,
+      "d0_pct": -4.053095448794508,
+      "d1_pct": -2.3824487701638475,
+      "d5_pct": -4.249888656138534,
+      "d0_excess_spy": -3.137739246471305,
+      "gap_over_atr": -1.1868377656804856
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2024-10-31",
+     "report_date": "2024-10-31",
+     "report_time": "amc",
+     "eps_estimate": 1.14,
+     "eps_actual": 1.43,
+     "eps_surprise": 0.29000000000000004,
+     "eps_surprise_pct": 25.22,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": 6.759660148118307,
+      "d0_pct": 6.185621865256041,
+      "d1_pct": 5.0321916255113175,
+      "d5_pct": 11.684549083940542,
+      "d0_excess_spy": 5.763568665150176,
+      "gap_over_atr": 3.1626518194782753
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2024-08-01",
+     "report_date": "2024-08-01",
+     "report_time": "unknown",
+     "eps_estimate": 1.02,
+     "eps_actual": 1.26,
+     "eps_surprise": 0.24,
+     "eps_surprise_pct": 23.76,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": -9.409467395582539,
+      "d0_pct": -8.78470841762542,
+      "d1_pct": -12.522411112396926,
+      "d5_pct": -9.3062444728651,
+      "d0_excess_spy": -6.922866983813515,
+      "gap_over_atr": -3.475123174049763
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2024-04-30",
+     "report_date": "2024-04-30",
+     "report_time": "amc",
+     "eps_estimate": 0.83,
+     "eps_actual": 0.98,
+     "eps_surprise": 0.15000000000000002,
+     "eps_surprise_pct": 17.67,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": 3.7942853655133835,
+      "d0_pct": 2.285714285714291,
+      "d1_pct": 5.554286411830356,
+      "d5_pct": 7.428571428571429,
+      "d0_excess_spy": 2.610429383355284,
+      "gap_over_atr": 1.3751676064425307
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2024-02-01",
+     "report_date": "2024-02-01",
+     "report_time": "amc",
+     "eps_estimate": 0.8,
+     "eps_actual": 1.0,
+     "eps_surprise": 0.19999999999999996,
+     "eps_surprise_pct": 24.38,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": 6.221750212241628,
+      "d0_pct": 7.866649218561839,
+      "d1_pct": 6.92491139115361,
+      "d5_pct": 9.52410741160623,
+      "d0_excess_spy": 6.813911326498001,
+      "gap_over_atr": 3.1041526864082223
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2023-10-26",
+     "report_date": "2023-10-26",
+     "report_time": "amc",
+     "eps_estimate": 0.58,
+     "eps_actual": 0.94,
+     "eps_surprise": 0.36,
+     "eps_surprise_pct": 62.22,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": 5.5448668314289185,
+      "d0_pct": 6.832816082460003,
+      "d1_pct": 10.989384504959364,
+      "d5_pct": 15.915368785867079,
+      "d0_excess_spy": 7.286093302801588,
+      "gap_over_atr": 1.7546638296128128
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2023-08-03",
+     "report_date": "2023-08-03",
+     "report_time": "amc",
+     "eps_estimate": 0.34,
+     "eps_actual": 0.65,
+     "eps_surprise": 0.31,
+     "eps_surprise_pct": 91.19,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": 9.425175355925951,
+      "d0_pct": 8.269337801006271,
+      "d1_pct": 10.32503078153737,
+      "d5_pct": 7.3694823753948535,
+      "d0_excess_spy": 8.721614513389241,
+      "gap_over_atr": 3.7587004934385404
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2023-04-27",
+     "report_date": "2023-04-27",
+     "report_time": "amc",
+     "eps_estimate": 0.21,
+     "eps_actual": 0.31,
+     "eps_surprise": 0.1,
+     "eps_surprise_pct": 44.29,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": -1.9031108574926736,
+      "d0_pct": -3.9792412663683385,
+      "d1_pct": -7.075210949424726,
+      "d5_pct": -3.788013152681613,
+      "d0_excess_spy": -4.832758150637673,
+      "gap_over_atr": -0.6713768924445331
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2023-02-02",
+     "report_date": "2023-02-02",
+     "report_time": "amc",
+     "eps_estimate": 0.17,
+     "eps_actual": 0.03,
+     "eps_surprise": -0.14,
+     "eps_surprise_pct": -82.2,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": -6.775308898910359,
+      "d0_pct": -8.431497620839846,
+      "d1_pct": -9.503146761950198,
+      "d5_pct": -13.550617797820719,
+      "d0_excess_spy": -7.368588486822803,
+      "gap_over_atr": -1.980583310535678
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2022-10-27",
+     "report_date": "2022-10-27",
+     "report_time": "amc",
+     "eps_estimate": 0.21,
+     "eps_actual": 0.28,
+     "eps_surprise": 0.07000000000000003,
+     "eps_surprise_pct": 35.53,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": -11.760990924692116,
+      "d0_pct": -6.804249715805744,
+      "d1_pct": -7.678439720047425,
+      "d5_pct": -18.00648512292119,
+      "d0_excess_spy": -9.183316447205215,
+      "gap_over_atr": -2.6076518953657897
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2022-07-28",
+     "report_date": "2022-07-28",
+     "report_time": "amc",
+     "eps_estimate": 0.12,
+     "eps_actual": -0.2,
+     "eps_surprise": -0.32,
+     "eps_surprise_pct": -273.3,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": 10.320571837725744,
+      "d0_pct": 10.36146409505072,
+      "d1_pct": 10.721295993806645,
+      "d5_pct": 15.145571195079643,
+      "d0_excess_spy": 8.903591609179195,
+      "gap_over_atr": 2.6245181153102437
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2022-04-28",
+     "report_date": "2022-04-28",
+     "report_time": "amc",
+     "eps_estimate": 0.42,
+     "eps_actual": -0.38,
+     "eps_surprise": -0.8,
+     "eps_surprise_pct": -190.58,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": -10.19906976115934,
+      "d0_pct": -14.049437774923401,
+      "d1_pct": -13.898328837193008,
+      "d5_pct": -20.625670885904967,
+      "d0_excess_spy": -10.353872535958086,
+      "gap_over_atr": -2.7261603554051193
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2022-02-03",
+     "report_date": "2022-02-03",
+     "report_time": "amc",
+     "eps_estimate": 0.18,
+     "eps_actual": 1.39,
+     "eps_surprise": 1.21,
+     "eps_surprise_pct": 657.12,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": 12.07169192535007,
+      "d0_pct": 13.535901735711864,
+      "d1_pct": 13.749092108373539,
+      "d5_pct": 10.405809011801793,
+      "d0_excess_spy": 13.065680939738812,
+      "gap_over_atr": 2.89017686282981
+     },
+     "source": "yahoo"
+    }
+   ]
+  },
+  "insider": {
+   "as_of": "2026-08-27",
+   "staleness_days": 5,
+   "sources": [
+    "sec_edgar"
+   ],
+   "gaps": [],
+   "summary": {
+    "buys_180d": 0,
+    "sells_180d": 63,
+    "net_shares_180d": -1476012.0,
+    "net_value_usd_180d": -416381702.0135001,
+    "counts_only": false
+   },
+   "rows": [
+    {
+     "owner_name": "BEZOS JEFFREY P",
+     "owner_title": "Executive Chair",
+     "txn_date": "2026-08-25",
+     "filing_date": "2026-08-27",
+     "code": "G",
+     "shares": -184943.0,
+     "price": 0.0,
+     "value_usd": -0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "BEZOS JEFFREY P",
+     "owner_title": "Executive Chair",
+     "txn_date": "2026-08-26",
+     "filing_date": "2026-08-27",
+     "code": "G",
+     "shares": -230637.0,
+     "price": 0.0,
+     "value_usd": -0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Zapolsky David",
+     "owner_title": "Senior Vice President",
+     "txn_date": "2026-08-21",
+     "filing_date": "2026-08-25",
+     "code": "S",
+     "shares": -2133.0,
+     "price": 259.6335,
+     "value_usd": -553798.2555000001,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Jassy Andrew R",
+     "owner_title": "President and CEO",
+     "txn_date": "2026-08-21",
+     "filing_date": "2026-08-25",
+     "code": "S",
+     "shares": -7514.0,
+     "price": 259.6068,
+     "value_usd": -1950685.4952000002,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Reynolds Shelley",
+     "owner_title": "Vice President",
+     "txn_date": "2026-08-21",
+     "filing_date": "2026-08-25",
+     "code": "S",
+     "shares": -888.0,
+     "price": 260.3252,
+     "value_usd": -231168.7776,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Herrington Douglas J",
+     "owner_title": "CEO Worldwide Amazon Stores",
+     "txn_date": "2026-08-21",
+     "filing_date": "2026-08-25",
+     "code": "M",
+     "shares": 2840.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Garman Matthew S",
+     "owner_title": "CEO Amazon Web Services",
+     "txn_date": "2026-08-21",
+     "filing_date": "2026-08-25",
+     "code": "S",
+     "shares": -5240.0,
+     "price": 259.5702,
+     "value_usd": -1360147.848,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Garman Matthew S",
+     "owner_title": "CEO Amazon Web Services",
+     "txn_date": "2026-08-21",
+     "filing_date": "2026-08-25",
+     "code": "M",
+     "shares": 1480.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Zapolsky David",
+     "owner_title": "Senior Vice President",
+     "txn_date": "2026-08-21",
+     "filing_date": "2026-08-25",
+     "code": "M",
+     "shares": 9900.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Reynolds Shelley",
+     "owner_title": "Vice President",
+     "txn_date": "2026-08-21",
+     "filing_date": "2026-08-25",
+     "code": "S",
+     "shares": -675.0,
+     "price": 257.7656,
+     "value_usd": -173991.78,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Herrington Douglas J",
+     "owner_title": "CEO Worldwide Amazon Stores",
+     "txn_date": "2026-08-21",
+     "filing_date": "2026-08-25",
+     "code": "M",
+     "shares": 5565.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Jassy Andrew R",
+     "owner_title": "President and CEO",
+     "txn_date": "2026-08-21",
+     "filing_date": "2026-08-25",
+     "code": "S",
+     "shares": -1811.0,
+     "price": 260.3925,
+     "value_usd": -471570.81749999995,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Herrington Douglas J",
+     "owner_title": "CEO Worldwide Amazon Stores",
+     "txn_date": "2026-08-21",
+     "filing_date": "2026-08-25",
+     "code": "S",
+     "shares": -2412.0,
+     "price": 260.3251,
+     "value_usd": -627904.1412000001,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Herrington Douglas J",
+     "owner_title": "CEO Worldwide Amazon Stores",
+     "txn_date": "2026-08-21",
+     "filing_date": "2026-08-25",
+     "code": "S",
+     "shares": -1825.0,
+     "price": 257.7656,
+     "value_usd": -470422.22000000003,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Olsavsky Brian T",
+     "owner_title": "Senior Vice President and CFO",
+     "txn_date": "2026-08-21",
+     "filing_date": "2026-08-25",
+     "code": "M",
+     "shares": 5530.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Zapolsky David",
+     "owner_title": "Senior Vice President",
+     "txn_date": "2026-08-21",
+     "filing_date": "2026-08-25",
+     "code": "S",
+     "shares": -1119.0,
+     "price": 260.449,
+     "value_usd": -291442.43100000004,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Zapolsky David",
+     "owner_title": "Senior Vice President",
+     "txn_date": "2026-08-21",
+     "filing_date": "2026-08-25",
+     "code": "S",
+     "shares": -1138.0,
+     "price": 257.7019,
+     "value_usd": -293264.7622,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Jassy Andrew R",
+     "owner_title": "President and CEO",
+     "txn_date": "2026-08-21",
+     "filing_date": "2026-08-25",
+     "code": "S",
+     "shares": -3197.0,
+     "price": 257.6343,
+     "value_usd": -823656.8571,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Zapolsky David",
+     "owner_title": "Senior Vice President",
+     "txn_date": "2026-08-21",
+     "filing_date": "2026-08-25",
+     "code": "M",
+     "shares": 5530.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Jassy Andrew R",
+     "owner_title": "President and CEO",
+     "txn_date": "2026-08-21",
+     "filing_date": "2026-08-25",
+     "code": "M",
+     "shares": 50000.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Garman Matthew S",
+     "owner_title": "CEO Amazon Web Services",
+     "txn_date": "2026-08-21",
+     "filing_date": "2026-08-25",
+     "code": "M",
+     "shares": 4860.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Herrington Douglas J",
+     "owner_title": "CEO Worldwide Amazon Stores",
+     "txn_date": "2026-08-21",
+     "filing_date": "2026-08-25",
+     "code": "S",
+     "shares": -2125.0,
+     "price": 258.5805,
+     "value_usd": -549483.5624999999,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Garman Matthew S",
+     "owner_title": "CEO Amazon Web Services",
+     "txn_date": "2026-08-21",
+     "filing_date": "2026-08-25",
+     "code": "M",
+     "shares": 7836.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Garman Matthew S",
+     "owner_title": "CEO Amazon Web Services",
+     "txn_date": "2026-08-21",
+     "filing_date": "2026-08-25",
+     "code": "S",
+     "shares": -2159.0,
+     "price": 257.5954,
+     "value_usd": -556148.4686,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Garman Matthew S",
+     "owner_title": "CEO Amazon Web Services",
+     "txn_date": "2026-08-21",
+     "filing_date": "2026-08-25",
+     "code": "S",
+     "shares": -1951.0,
+     "price": 260.3396,
+     "value_usd": -507922.55960000004,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Jassy Andrew R",
+     "owner_title": "President and CEO",
+     "txn_date": "2026-08-21",
+     "filing_date": "2026-08-25",
+     "code": "S",
+     "shares": -7478.0,
+     "price": 258.6654,
+     "value_usd": -1934299.8612,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Olsavsky Brian T",
+     "owner_title": "Senior Vice President and CFO",
+     "txn_date": "2026-08-21",
+     "filing_date": "2026-08-25",
+     "code": "S",
+     "shares": -6172.0,
+     "price": 260.31,
+     "value_usd": -1606633.32,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Garman Matthew S",
+     "owner_title": "CEO Amazon Web Services",
+     "txn_date": "2026-08-21",
+     "filing_date": "2026-08-25",
+     "code": "S",
+     "shares": -5191.0,
+     "price": 258.6595,
+     "value_usd": -1342701.4645,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Reynolds Shelley",
+     "owner_title": "Vice President",
+     "txn_date": "2026-08-21",
+     "filing_date": "2026-08-25",
+     "code": "M",
+     "shares": 543.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Zapolsky David",
+     "owner_title": "Senior Vice President",
+     "txn_date": "2026-08-21",
+     "filing_date": "2026-08-25",
+     "code": "S",
+     "shares": -1782.0,
+     "price": 258.6357,
+     "value_usd": -460888.8174,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Herrington Douglas J",
+     "owner_title": "CEO Worldwide Amazon Stores",
+     "txn_date": "2026-08-21",
+     "filing_date": "2026-08-25",
+     "code": "M",
+     "shares": 7500.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Garman Matthew S",
+     "owner_title": "CEO Amazon Web Services",
+     "txn_date": "2026-08-21",
+     "filing_date": "2026-08-25",
+     "code": "M",
+     "shares": 4000.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Reynolds Shelley",
+     "owner_title": "Vice President",
+     "txn_date": "2026-08-21",
+     "filing_date": "2026-08-25",
+     "code": "S",
+     "shares": -780.0,
+     "price": 258.5812,
+     "value_usd": -201693.336,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Reynolds Shelley",
+     "owner_title": "Vice President",
+     "txn_date": "2026-08-21",
+     "filing_date": "2026-08-25",
+     "code": "M",
+     "shares": 1800.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Olsavsky Brian T",
+     "owner_title": "Senior Vice President and CFO",
+     "txn_date": "2026-08-21",
+     "filing_date": "2026-08-25",
+     "code": "M",
+     "shares": 9900.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Zapolsky David",
+     "owner_title": "Senior Vice President",
+     "txn_date": "2026-08-24",
+     "filing_date": "2026-08-25",
+     "code": "S",
+     "shares": -9258.0,
+     "price": 259.77,
+     "value_usd": -2404950.6599999997,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Herrington Douglas J",
+     "owner_title": "CEO Worldwide Amazon Stores",
+     "txn_date": "2026-08-15",
+     "filing_date": "2026-08-19",
+     "code": "M",
+     "shares": 9352.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Herrington Douglas J",
+     "owner_title": "CEO Worldwide Amazon Stores",
+     "txn_date": "2026-08-17",
+     "filing_date": "2026-08-19",
+     "code": "S",
+     "shares": -1441.0,
+     "price": 262.0454,
+     "value_usd": -377607.42139999993,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Herrington Douglas J",
+     "owner_title": "CEO Worldwide Amazon Stores",
+     "txn_date": "2026-08-17",
+     "filing_date": "2026-08-19",
+     "code": "S",
+     "shares": -1900.0,
+     "price": 262.8153,
+     "value_usd": -499349.06999999995,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Herrington Douglas J",
+     "owner_title": "CEO Worldwide Amazon Stores",
+     "txn_date": "2026-08-17",
+     "filing_date": "2026-08-19",
+     "code": "S",
+     "shares": -400.0,
+     "price": 265.0925,
+     "value_usd": -106036.99999999999,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Herrington Douglas J",
+     "owner_title": "CEO Worldwide Amazon Stores",
+     "txn_date": "2026-08-06",
+     "filing_date": "2026-08-10",
+     "code": "G",
+     "shares": -22000.0,
+     "price": 0.0,
+     "value_usd": -0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Herrington Douglas J",
+     "owner_title": "CEO Worldwide Amazon Stores",
+     "txn_date": "2026-08-03",
+     "filing_date": "2026-08-05",
+     "code": "S",
+     "shares": -1000.0,
+     "price": 278.39,
+     "value_usd": -278390.0,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "BEZOS JEFFREY P",
+     "owner_title": "Executive Chair",
+     "txn_date": "2026-08-03",
+     "filing_date": "2026-08-05",
+     "code": "S",
+     "shares": -1209649.0,
+     "price": 286.4083,
+     "value_usd": -346453513.6867,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Herrington Douglas J",
+     "owner_title": "CEO Worldwide Amazon Stores",
+     "txn_date": "2026-07-01",
+     "filing_date": "2026-07-02",
+     "code": "S",
+     "shares": -1000.0,
+     "price": 239.77,
+     "value_usd": -239770.0,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Herrington Douglas J",
+     "owner_title": "CEO Worldwide Amazon Stores",
+     "txn_date": "2026-06-01",
+     "filing_date": "2026-06-03",
+     "code": "S",
+     "shares": -1000.0,
+     "price": 266.19,
+     "value_usd": -266190.0,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Herrington Douglas J",
+     "owner_title": "CEO Worldwide Amazon Stores",
+     "txn_date": "2026-05-21",
+     "filing_date": "2026-05-26",
+     "code": "S",
+     "shares": -4200.0,
+     "price": 261.8781,
+     "value_usd": -1099888.02,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Garman Matthew S",
+     "owner_title": "CEO Amazon Web Services",
+     "txn_date": "2026-05-21",
+     "filing_date": "2026-05-26",
+     "code": "M",
+     "shares": 4000.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Jassy Andrew R",
+     "owner_title": "President and CEO",
+     "txn_date": "2026-05-21",
+     "filing_date": "2026-05-26",
+     "code": "S",
+     "shares": -5667.0,
+     "price": 263.9465,
+     "value_usd": -1495784.8155,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Jassy Andrew R",
+     "owner_title": "President and CEO",
+     "txn_date": "2026-05-21",
+     "filing_date": "2026-05-26",
+     "code": "S",
+     "shares": -3600.0,
+     "price": 264.9745,
+     "value_usd": -953908.2,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Jassy Andrew R",
+     "owner_title": "President and CEO",
+     "txn_date": "2026-05-21",
+     "filing_date": "2026-05-26",
+     "code": "S",
+     "shares": -5227.0,
+     "price": 263.1028,
+     "value_usd": -1375238.3356,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Zapolsky David",
+     "owner_title": "Senior Vice President",
+     "txn_date": "2026-05-21",
+     "filing_date": "2026-05-26",
+     "code": "M",
+     "shares": 9920.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Reynolds Shelley",
+     "owner_title": "Vice President",
+     "txn_date": "2026-05-21",
+     "filing_date": "2026-05-26",
+     "code": "S",
+     "shares": -300.0,
+     "price": 263.99,
+     "value_usd": -79197.0,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Herrington Douglas J",
+     "owner_title": "CEO Worldwide Amazon Stores",
+     "txn_date": "2026-05-21",
+     "filing_date": "2026-05-26",
+     "code": "M",
+     "shares": 2860.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Zapolsky David",
+     "owner_title": "Senior Vice President",
+     "txn_date": "2026-05-21",
+     "filing_date": "2026-05-26",
+     "code": "M",
+     "shares": 5530.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Garman Matthew S",
+     "owner_title": "CEO Amazon Web Services",
+     "txn_date": "2026-05-21",
+     "filing_date": "2026-05-26",
+     "code": "M",
+     "shares": 7836.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Herrington Douglas J",
+     "owner_title": "CEO Worldwide Amazon Stores",
+     "txn_date": "2026-05-21",
+     "filing_date": "2026-05-26",
+     "code": "S",
+     "shares": -800.0,
+     "price": 263.8538,
+     "value_usd": -211083.03999999998,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Olsavsky Brian T",
+     "owner_title": "Senior Vice President and CFO",
+     "txn_date": "2026-05-21",
+     "filing_date": "2026-05-26",
+     "code": "M",
+     "shares": 5530.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Reynolds Shelley",
+     "owner_title": "Vice President",
+     "txn_date": "2026-05-21",
+     "filing_date": "2026-05-26",
+     "code": "S",
+     "shares": -463.0,
+     "price": 263.2466,
+     "value_usd": -121883.1758,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Garman Matthew S",
+     "owner_title": "CEO Amazon Web Services",
+     "txn_date": "2026-05-21",
+     "filing_date": "2026-05-26",
+     "code": "S",
+     "shares": -2534.0,
+     "price": 264.9465,
+     "value_usd": -671374.431,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Garman Matthew S",
+     "owner_title": "CEO Amazon Web Services",
+     "txn_date": "2026-05-21",
+     "filing_date": "2026-05-26",
+     "code": "S",
+     "shares": -4554.0,
+     "price": 263.1801,
+     "value_usd": -1198522.1753999998,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Zapolsky David",
+     "owner_title": "Senior Vice President",
+     "txn_date": "2026-05-21",
+     "filing_date": "2026-05-26",
+     "code": "S",
+     "shares": -1014.0,
+     "price": 265.12,
+     "value_usd": -268831.68,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Garman Matthew S",
+     "owner_title": "CEO Amazon Web Services",
+     "txn_date": "2026-05-21",
+     "filing_date": "2026-05-26",
+     "code": "M",
+     "shares": 1500.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Herrington Douglas J",
+     "owner_title": "CEO Worldwide Amazon Stores",
+     "txn_date": "2026-05-21",
+     "filing_date": "2026-05-26",
+     "code": "M",
+     "shares": 5565.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Garman Matthew S",
+     "owner_title": "CEO Amazon Web Services",
+     "txn_date": "2026-05-21",
+     "filing_date": "2026-05-26",
+     "code": "S",
+     "shares": -3689.0,
+     "price": 264.0309,
+     "value_usd": -974009.9900999999,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Zapolsky David",
+     "owner_title": "Senior Vice President",
+     "txn_date": "2026-05-21",
+     "filing_date": "2026-05-26",
+     "code": "S",
+     "shares": -1600.0,
+     "price": 261.9554,
+     "value_usd": -419128.64,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Zapolsky David",
+     "owner_title": "Senior Vice President",
+     "txn_date": "2026-05-21",
+     "filing_date": "2026-05-26",
+     "code": "S",
+     "shares": -1921.0,
+     "price": 263.1658,
+     "value_usd": -505541.50179999997,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Reynolds Shelley",
+     "owner_title": "Vice President",
+     "txn_date": "2026-05-21",
+     "filing_date": "2026-05-26",
+     "code": "M",
+     "shares": 1820.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Jassy Andrew R",
+     "owner_title": "President and CEO",
+     "txn_date": "2026-05-21",
+     "filing_date": "2026-05-26",
+     "code": "S",
+     "shares": -5206.0,
+     "price": 261.9528,
+     "value_usd": -1363726.2768,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Herrington Douglas J",
+     "owner_title": "CEO Worldwide Amazon Stores",
+     "txn_date": "2026-05-21",
+     "filing_date": "2026-05-26",
+     "code": "S",
+     "shares": -1370.0,
+     "price": 263.1154,
+     "value_usd": -360468.09800000006,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Jassy Andrew R",
+     "owner_title": "President and CEO",
+     "txn_date": "2026-05-21",
+     "filing_date": "2026-05-26",
+     "code": "M",
+     "shares": 50000.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Zapolsky David",
+     "owner_title": "Senior Vice President",
+     "txn_date": "2026-05-21",
+     "filing_date": "2026-05-26",
+     "code": "S",
+     "shares": -1644.0,
+     "price": 264.1187,
+     "value_usd": -434211.1428,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Jassy Andrew R",
+     "owner_title": "President and CEO",
+     "txn_date": "2026-05-21",
+     "filing_date": "2026-05-26",
+     "code": "S",
+     "shares": -300.0,
+     "price": 265.6148,
+     "value_usd": -79684.44,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Garman Matthew S",
+     "owner_title": "CEO Amazon Web Services",
+     "txn_date": "2026-05-21",
+     "filing_date": "2026-05-26",
+     "code": "S",
+     "shares": -4257.0,
+     "price": 261.9279,
+     "value_usd": -1115027.0703,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Reynolds Shelley",
+     "owner_title": "Vice President",
+     "txn_date": "2026-05-21",
+     "filing_date": "2026-05-26",
+     "code": "M",
+     "shares": 543.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Olsavsky Brian T",
+     "owner_title": "Senior Vice President and CFO",
+     "txn_date": "2026-05-21",
+     "filing_date": "2026-05-26",
+     "code": "M",
+     "shares": 9920.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Zapolsky David",
+     "owner_title": "Senior Vice President",
+     "txn_date": "2026-05-22",
+     "filing_date": "2026-05-26",
+     "code": "S",
+     "shares": -9270.0,
+     "price": 268.53,
+     "value_usd": -2489273.0999999996,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Zapolsky David",
+     "owner_title": "Senior Vice President",
+     "txn_date": "2026-05-21",
+     "filing_date": "2026-05-26",
+     "code": "S",
+     "shares": -1.0,
+     "price": 265.72,
+     "value_usd": -265.72,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Garman Matthew S",
+     "owner_title": "CEO Amazon Web Services",
+     "txn_date": "2026-05-21",
+     "filing_date": "2026-05-26",
+     "code": "S",
+     "shares": -433.0,
+     "price": 265.6412,
+     "value_usd": -115022.63960000001,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Reynolds Shelley",
+     "owner_title": "Vice President",
+     "txn_date": "2026-05-21",
+     "filing_date": "2026-05-26",
+     "code": "S",
+     "shares": -1600.0,
+     "price": 261.8269,
+     "value_usd": -418923.04000000004,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Garman Matthew S",
+     "owner_title": "CEO Amazon Web Services",
+     "txn_date": "2026-05-21",
+     "filing_date": "2026-05-26",
+     "code": "M",
+     "shares": 4860.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Herrington Douglas J",
+     "owner_title": "CEO Worldwide Amazon Stores",
+     "txn_date": "2026-05-21",
+     "filing_date": "2026-05-26",
+     "code": "M",
+     "shares": 7500.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Herrington Douglas J",
+     "owner_title": "CEO Worldwide Amazon Stores",
+     "txn_date": "2026-05-15",
+     "filing_date": "2026-05-19",
+     "code": "M",
+     "shares": 9353.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Garman Matthew S",
+     "owner_title": "CEO Amazon Web Services",
+     "txn_date": "2026-05-15",
+     "filing_date": "2026-05-19",
+     "code": "S",
+     "shares": -1935.0,
+     "price": 263.5705,
+     "value_usd": -510008.9175,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Ng Andrew Y.",
+     "owner_title": "",
+     "txn_date": "2026-05-15",
+     "filing_date": "2026-05-19",
+     "code": "M",
+     "shares": 1984.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Garman Matthew S",
+     "owner_title": "CEO Amazon Web Services",
+     "txn_date": "2026-05-15",
+     "filing_date": "2026-05-19",
+     "code": "S",
+     "shares": -3389.0,
+     "price": 261.7887,
+     "value_usd": -887201.9043,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Garman Matthew S",
+     "owner_title": "CEO Amazon Web Services",
+     "txn_date": "2026-05-15",
+     "filing_date": "2026-05-19",
+     "code": "M",
+     "shares": 13500.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Herrington Douglas J",
+     "owner_title": "CEO Worldwide Amazon Stores",
+     "txn_date": "2026-05-15",
+     "filing_date": "2026-05-19",
+     "code": "S",
+     "shares": -2098.0,
+     "price": 262.725,
+     "value_usd": -551197.05,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "NOOYI INDRA K",
+     "owner_title": "",
+     "txn_date": "2026-05-15",
+     "filing_date": "2026-05-19",
+     "code": "M",
+     "shares": 1602.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Garman Matthew S",
+     "owner_title": "CEO Amazon Web Services",
+     "txn_date": "2026-05-15",
+     "filing_date": "2026-05-19",
+     "code": "S",
+     "shares": -6151.0,
+     "price": 262.8454,
+     "value_usd": -1616762.0554,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Herrington Douglas J",
+     "owner_title": "CEO Worldwide Amazon Stores",
+     "txn_date": "2026-05-15",
+     "filing_date": "2026-05-19",
+     "code": "S",
+     "shares": -600.0,
+     "price": 263.5733,
+     "value_usd": -158143.98,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Herrington Douglas J",
+     "owner_title": "CEO Worldwide Amazon Stores",
+     "txn_date": "2026-05-15",
+     "filing_date": "2026-05-19",
+     "code": "S",
+     "shares": -1044.0,
+     "price": 261.7441,
+     "value_usd": -273260.8404,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Jassy Andrew R",
+     "owner_title": "President and CEO",
+     "txn_date": "2026-05-04",
+     "filing_date": "2026-05-06",
+     "code": "S",
+     "shares": -31352.0,
+     "price": 275.0,
+     "value_usd": -8621800.0,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Herrington Douglas J",
+     "owner_title": "CEO Worldwide Amazon Stores",
+     "txn_date": "2026-05-04",
+     "filing_date": "2026-05-05",
+     "code": "S",
+     "shares": -27500.0,
+     "price": 275.0,
+     "value_usd": -7562500.0,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Herrington Douglas J",
+     "owner_title": "CEO Worldwide Amazon Stores",
+     "txn_date": "2026-05-01",
+     "filing_date": "2026-05-05",
+     "code": "S",
+     "shares": -1000.0,
+     "price": 265.65,
+     "value_usd": -265650.0,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "BEZOS JEFFREY P",
+     "owner_title": "Executive Chair",
+     "txn_date": "2026-05-04",
+     "filing_date": "2026-05-05",
+     "code": "G",
+     "shares": -220200.0,
+     "price": 0.0,
+     "value_usd": -0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "BEZOS JEFFREY P",
+     "owner_title": "Executive Chair",
+     "txn_date": "2026-05-01",
+     "filing_date": "2026-05-05",
+     "code": "G",
+     "shares": -1033597.0,
+     "price": 0.0,
+     "value_usd": -0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "RUBINSTEIN JONATHAN",
+     "owner_title": "",
+     "txn_date": "2026-04-30",
+     "filing_date": "2026-05-04",
+     "code": "S",
+     "shares": -3706.0,
+     "price": 273.02,
+     "value_usd": -1011812.1199999999,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "RUBINSTEIN JONATHAN",
+     "owner_title": "",
+     "txn_date": "2026-04-24",
+     "filing_date": "2026-04-28",
+     "code": "S",
+     "shares": -3849.0,
+     "price": 260.0,
+     "value_usd": -1000740.0,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Jassy Andrew R",
+     "owner_title": "President and CEO",
+     "txn_date": "2026-04-17",
+     "filing_date": "2026-04-21",
+     "code": "S",
+     "shares": -31000.0,
+     "price": 255.0,
+     "value_usd": -7905000.0,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Herrington Douglas J",
+     "owner_title": "CEO Worldwide Amazon Stores",
+     "txn_date": "2026-04-14",
+     "filing_date": "2026-04-16",
+     "code": "S",
+     "shares": -20500.0,
+     "price": 245.0,
+     "value_usd": -5022500.0,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Herrington Douglas J",
+     "owner_title": "CEO Worldwide Amazon Stores",
+     "txn_date": "2026-04-01",
+     "filing_date": "2026-04-03",
+     "code": "S",
+     "shares": -1000.0,
+     "price": 210.5,
+     "value_usd": -210500.0,
+     "is_open_market": true
+    }
+   ]
+  },
+  "institutions": {
+   "as_of": null,
+   "staleness_days": null,
+   "sources": [],
+   "gaps": [
+    "institutions unavailable from free: no 13F dataset ingested yet"
+   ],
+   "period_end": null,
+   "filing_date_max": null,
+   "n_holders": null,
+   "d_holders_qoq": null,
+   "total_shares": null,
+   "d_shares_qoq": null,
+   "top_buyers": [],
+   "top_sellers": [],
+   "rows": []
+  },
+  "short": {
+   "as_of": "2026-08-31",
+   "staleness_days": 1,
+   "sources": [
+    "finra",
+    "nasdaq"
+   ],
+   "gaps": [],
+   "interest": [
+    {
+     "settlement_date": "2026-08-14",
+     "shares_short": 95300129.0,
+     "days_to_cover": 2.265238
+    },
+    {
+     "settlement_date": "2026-07-31",
+     "shares_short": 98434174.0,
+     "days_to_cover": 1.929276
+    },
+    {
+     "settlement_date": "2026-07-15",
+     "shares_short": 106566350.0,
+     "days_to_cover": 2.757302
+    },
+    {
+     "settlement_date": "2026-06-30",
+     "shares_short": 100349673.0,
+     "days_to_cover": 1.229239
+    },
+    {
+     "settlement_date": "2026-06-15",
+     "shares_short": 98953140.0,
+     "days_to_cover": 2.252948
+    },
+    {
+     "settlement_date": "2026-05-29",
+     "shares_short": 92450944.0,
+     "days_to_cover": 2.42621
+    },
+    {
+     "settlement_date": "2026-05-15",
+     "shares_short": 104283766.0,
+     "days_to_cover": 2.618865
+    },
+    {
+     "settlement_date": "2026-04-30",
+     "shares_short": 90907743.0,
+     "days_to_cover": 1.796308
+    },
+    {
+     "settlement_date": "2026-04-15",
+     "shares_short": 93006528.0,
+     "days_to_cover": 2.033941
+    },
+    {
+     "settlement_date": "2026-03-31",
+     "shares_short": 87641036.0,
+     "days_to_cover": 1.937788
+    },
+    {
+     "settlement_date": "2026-03-13",
+     "shares_short": 84780941.0,
+     "days_to_cover": 1.863335
+    },
+    {
+     "settlement_date": "2026-02-27",
+     "shares_short": 81891881.0,
+     "days_to_cover": 1.761292
+    },
+    {
+     "settlement_date": "2026-02-13",
+     "shares_short": 86971840.0,
+     "days_to_cover": 1.103959
+    },
+    {
+     "settlement_date": "2026-01-30",
+     "shares_short": 71847643.0,
+     "days_to_cover": 1.769827
+    },
+    {
+     "settlement_date": "2026-01-15",
+     "shares_short": 78078171.0,
+     "days_to_cover": 1.8451
+    },
+    {
+     "settlement_date": "2025-12-31",
+     "shares_short": 73419039.0,
+     "days_to_cover": 2.178891
+    },
+    {
+     "settlement_date": "2025-12-15",
+     "shares_short": 76073227.0,
+     "days_to_cover": 2.049837
+    },
+    {
+     "settlement_date": "2025-11-28",
+     "shares_short": 73266891.0,
+     "days_to_cover": 1.486561
+    },
+    {
+     "settlement_date": "2025-11-14",
+     "shares_short": 70637060.0,
+     "days_to_cover": 1.580097
+    },
+    {
+     "settlement_date": "2025-10-31",
+     "shares_short": 70120761.0,
+     "days_to_cover": 1.21695
+    },
+    {
+     "settlement_date": "2025-10-15",
+     "shares_short": 74507966.0,
+     "days_to_cover": 1.654521
+    },
+    {
+     "settlement_date": "2025-09-30",
+     "shares_short": 76984980.0,
+     "days_to_cover": 1.496322
+    },
+    {
+     "settlement_date": "2025-09-15",
+     "shares_short": 69908794.0,
+     "days_to_cover": 1.78452
+    },
+    {
+     "settlement_date": "2025-08-29",
+     "shares_short": 68648147.0,
+     "days_to_cover": 2.373962
+    },
+    {
+     "settlement_date": "2025-08-15",
+     "shares_short": 75684758.0,
+     "days_to_cover": 1.433123
+    }
+   ],
+   "short_volume": [
+    {
+     "date": "2026-08-31",
+     "short_pct": 0.411680235887711
+    },
+    {
+     "date": "2026-08-28",
+     "short_pct": 0.2928184225806556
+    },
+    {
+     "date": "2026-08-27",
+     "short_pct": 0.28252424548123206
+    },
+    {
+     "date": "2026-08-26",
+     "short_pct": 0.29408710854573333
+    },
+    {
+     "date": "2026-08-25",
+     "short_pct": 0.31034326603100093
+    },
+    {
+     "date": "2026-08-24",
+     "short_pct": 0.26081005792702255
+    },
+    {
+     "date": "2026-08-21",
+     "short_pct": 0.27532642676432517
+    },
+    {
+     "date": "2026-08-20",
+     "short_pct": 0.2014793851748359
+    },
+    {
+     "date": "2026-08-19",
+     "short_pct": 0.2988235298200134
+    },
+    {
+     "date": "2026-08-18",
+     "short_pct": 0.20641147035712246
+    },
+    {
+     "date": "2026-08-17",
+     "short_pct": 0.32642645072641624
+    },
+    {
+     "date": "2026-08-14",
+     "short_pct": 0.4404567985139675
+    },
+    {
+     "date": "2026-08-13",
+     "short_pct": 0.31061038412271036
+    },
+    {
+     "date": "2026-08-12",
+     "short_pct": 0.32763639669192574
+    },
+    {
+     "date": "2026-08-11",
+     "short_pct": 0.41838062781420987
+    },
+    {
+     "date": "2026-08-10",
+     "short_pct": 0.501243492901832
+    },
+    {
+     "date": "2026-08-07",
+     "short_pct": 0.38845542654867116
+    },
+    {
+     "date": "2026-08-06",
+     "short_pct": 0.3160651986656274
+    },
+    {
+     "date": "2026-08-05",
+     "short_pct": 0.38826565920114303
+    },
+    {
+     "date": "2026-08-04",
+     "short_pct": 0.4738728412178719
+    },
+    {
+     "date": "2026-08-03",
+     "short_pct": 0.41201183053505974
+    },
+    {
+     "date": "2026-07-31",
+     "short_pct": 0.38636977476339346
+    },
+    {
+     "date": "2026-07-30",
+     "short_pct": 0.35487937488962046
+    },
+    {
+     "date": "2026-07-29",
+     "short_pct": 0.2982071647601943
+    },
+    {
+     "date": "2026-07-28",
+     "short_pct": 0.2439952070917828
+    },
+    {
+     "date": "2026-07-27",
+     "short_pct": 0.16247753860305844
+    },
+    {
+     "date": "2026-07-24",
+     "short_pct": 0.19505747094794285
+    },
+    {
+     "date": "2026-07-23",
+     "short_pct": 0.2746832064914208
+    },
+    {
+     "date": "2026-07-22",
+     "short_pct": 0.38581125257384175
+    },
+    {
+     "date": "2026-07-21",
+     "short_pct": 0.3572079091162503
+    },
+    {
+     "date": "2026-07-20",
+     "short_pct": 0.2824465349850573
+    },
+    {
+     "date": "2026-07-17",
+     "short_pct": 0.3845164311858182
+    },
+    {
+     "date": "2026-07-16",
+     "short_pct": 0.4006767713756207
+    },
+    {
+     "date": "2026-07-15",
+     "short_pct": 0.3469480478437293
+    },
+    {
+     "date": "2026-07-14",
+     "short_pct": 0.2843478220758897
+    },
+    {
+     "date": "2026-07-13",
+     "short_pct": 0.2953557322966234
+    },
+    {
+     "date": "2026-07-10",
+     "short_pct": 0.3655766273773158
+    },
+    {
+     "date": "2026-07-09",
+     "short_pct": 0.3245740969483315
+    },
+    {
+     "date": "2026-07-08",
+     "short_pct": 0.3108278617928205
+    },
+    {
+     "date": "2026-07-07",
+     "short_pct": 0.3425507317416935
+    },
+    {
+     "date": "2026-07-06",
+     "short_pct": 0.2937082085716032
+    },
+    {
+     "date": "2026-07-02",
+     "short_pct": 0.3243681971278577
+    },
+    {
+     "date": "2026-07-01",
+     "short_pct": 0.22983679419310632
+    },
+    {
+     "date": "2026-06-30",
+     "short_pct": 0.29414229803698283
+    },
+    {
+     "date": "2026-06-29",
+     "short_pct": 0.20904704676249183
+    },
+    {
+     "date": "2026-06-26",
+     "short_pct": 0.2125023340531908
+    },
+    {
+     "date": "2026-06-25",
+     "short_pct": 0.16502152550798257
+    },
+    {
+     "date": "2026-06-24",
+     "short_pct": 0.29564923312221186
+    },
+    {
+     "date": "2026-06-23",
+     "short_pct": 0.2375955036247045
+    },
+    {
+     "date": "2026-06-22",
+     "short_pct": 0.28630445611627325
+    },
+    {
+     "date": "2026-06-18",
+     "short_pct": 0.2646971360358727
+    },
+    {
+     "date": "2026-06-17",
+     "short_pct": 0.3116226131954064
+    },
+    {
+     "date": "2026-06-16",
+     "short_pct": 0.2923265674294287
+    },
+    {
+     "date": "2026-06-15",
+     "short_pct": 0.24722272629484918
+    },
+    {
+     "date": "2026-06-12",
+     "short_pct": 0.2701528615292865
+    },
+    {
+     "date": "2026-06-11",
+     "short_pct": 0.22411865296204278
+    },
+    {
+     "date": "2026-06-10",
+     "short_pct": 0.24517042508782064
+    },
+    {
+     "date": "2026-06-09",
+     "short_pct": 0.26118262046302887
+    },
+    {
+     "date": "2026-06-08",
+     "short_pct": 0.2667372696941161
+    },
+    {
+     "date": "2026-06-05",
+     "short_pct": 0.2804695777738179
+    },
+    {
+     "date": "2026-06-04",
+     "short_pct": 0.29151218689135205
+    },
+    {
+     "date": "2026-06-03",
+     "short_pct": 0.3040201944913322
+    }
+   ],
+   "borrow": null
+  }
+ }
+}
