@@ -1,0 +1,1422 @@
+{
+ "schema_version": 1,
+ "ticker": "NFLX",
+ "cik": 1065280,
+ "name": null,
+ "generated_at": "2026-09-01T04:50:11.226533+00:00",
+ "capabilities": [
+  "borrow",
+  "earnings",
+  "estimates",
+  "insider",
+  "institutions",
+  "short_interest",
+  "short_volume"
+ ],
+ "partial": true,
+ "sections": {
+  "earnings": {
+   "as_of": "2026-07-16",
+   "staleness_days": 47,
+   "sources": [
+    "yahoo"
+   ],
+   "gaps": [],
+   "rows": [
+    {
+     "fiscal_end": "2026-10-20",
+     "report_date": "2026-10-20",
+     "report_time": "amc",
+     "eps_estimate": 0.82,
+     "eps_actual": null,
+     "eps_surprise": null,
+     "eps_surprise_pct": null,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": null,
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2026-07-16",
+     "report_date": "2026-07-16",
+     "report_time": "amc",
+     "eps_estimate": 0.79,
+     "eps_actual": 0.8,
+     "eps_surprise": 0.010000000000000009,
+     "eps_surprise_pct": 1.45,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": -11.93005420205202,
+      "d0_pct": -7.262947729257152,
+      "d1_pct": -9.078682096206714,
+      "d5_pct": -5.729660018370064,
+      "d0_excess_spy": -6.27323212746993,
+      "gap_over_atr": -3.562248453936285
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2026-04-16",
+     "report_date": "2026-04-16",
+     "report_time": "amc",
+     "eps_estimate": 1.32,
+     "eps_actual": 1.23,
+     "eps_surprise": -0.09000000000000008,
+     "eps_surprise_pct": -6.93,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": -10.594673041978087,
+      "d0_pct": -9.722611808071646,
+      "d1_pct": -12.023377840611694,
+      "d5_pct": -14.24065158525284,
+      "d0_excess_spy": -10.931180321094047,
+      "gap_over_atr": -4.0042084740884025
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2026-01-20",
+     "report_date": "2026-01-20",
+     "report_time": "amc",
+     "eps_estimate": 0.55,
+     "eps_actual": 0.56,
+     "eps_surprise": 0.010000000000000009,
+     "eps_surprise_pct": 1.43,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": -5.432048335002282,
+      "d0_pct": -2.177402566312825,
+      "d1_pct": -4.26312299980861,
+      "d5_pct": -3.002524275087315,
+      "d0_excess_spy": -3.3315108822288053,
+      "gap_over_atr": -2.5139234851685144
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2025-10-21",
+     "report_date": "2025-10-21",
+     "report_time": "amc",
+     "eps_estimate": 0.7,
+     "eps_actual": 0.59,
+     "eps_surprise": -0.10999999999999999,
+     "eps_surprise_pct": -15.79,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": -7.930882548258911,
+      "d0_pct": -10.06807176344754,
+      "d1_pct": -10.292021393403317,
+      "d5_pct": -11.353769305576067,
+      "d0_excess_spy": -9.548178669760855,
+      "gap_over_atr": -3.508554317780124
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2025-07-17",
+     "report_date": "2025-07-17",
+     "report_time": "amc",
+     "eps_estimate": 0.71,
+     "eps_actual": 0.72,
+     "eps_surprise": 0.010000000000000009,
+     "eps_surprise_pct": 1.95,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": -2.527920666799155,
+      "d0_pct": -5.095863366074482,
+      "d1_pct": -3.2099298710283386,
+      "d5_pct": -7.352234183258632,
+      "d0_excess_spy": -5.022625840822547,
+      "gap_over_atr": -1.0863226420677499
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2025-04-17",
+     "report_date": "2025-04-17",
+     "report_time": "amc",
+     "eps_estimate": 0.57,
+     "eps_actual": 0.66,
+     "eps_surprise": 0.09000000000000008,
+     "eps_surprise_pct": 16.37,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": 1.1685158948788077,
+      "d0_pct": 1.5292426142407889,
+      "d1_pct": 6.917561720721177,
+      "d5_pct": 14.115700864509972,
+      "d0_excess_spy": 3.9095106374453015,
+      "gap_over_atr": 0.2631216075614548
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2025-01-21",
+     "report_date": "2025-01-21",
+     "report_time": "amc",
+     "eps_estimate": 0.42,
+     "eps_actual": 0.43,
+     "eps_surprise": 0.010000000000000009,
+     "eps_surprise_pct": 1.78,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": 14.758300457844364,
+      "d0_pct": 9.69436980385241,
+      "d1_pct": 13.243948848458697,
+      "d5_pct": 12.472403450456927,
+      "d0_excess_spy": 9.132224920831323,
+      "gap_over_atr": 5.366475386852762
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2024-10-17",
+     "report_date": "2024-10-17",
+     "report_time": "amc",
+     "eps_estimate": 0.51,
+     "eps_actual": 0.54,
+     "eps_surprise": 0.030000000000000027,
+     "eps_surprise_pct": 5.32,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": 7.269687477186149,
+      "d0_pct": 11.087036453117594,
+      "d1_pct": 12.276596259294447,
+      "d5_pct": 9.747695759736374,
+      "d0_excess_spy": 10.70237922577293,
+      "gap_over_atr": 3.3968662289092024
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2024-07-18",
+     "report_date": "2024-07-18",
+     "report_time": "amc",
+     "eps_estimate": 0.48,
+     "eps_actual": 0.49,
+     "eps_surprise": 0.010000000000000009,
+     "eps_surprise_pct": 2.47,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": 2.7370025392557062,
+      "d0_pct": -1.5084616941612339,
+      "d1_pct": 0.6935791546112791,
+      "d5_pct": -1.8148168098206408,
+      "d0_excess_spy": -0.8444036677992539,
+      "gap_over_atr": 1.199402084903939
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2024-04-18",
+     "report_date": "2024-04-18",
+     "report_time": "amc",
+     "eps_estimate": 0.45,
+     "eps_actual": 0.53,
+     "eps_surprise": 0.08000000000000002,
+     "eps_surprise_pct": 16.66,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": -6.990306560309656,
+      "d0_pct": -9.09328839201413,
+      "d1_pct": -9.165357530403362,
+      "d5_pct": -8.079465862407986,
+      "d0_excess_spy": -8.220453380912472,
+      "gap_over_atr": -2.9013302754553694
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2024-01-23",
+     "report_date": "2024-01-23",
+     "report_time": "amc",
+     "eps_estimate": 0.22,
+     "eps_actual": 0.21,
+     "eps_surprise": -0.010000000000000009,
+     "eps_surprise_pct": -4.8,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": 9.256587074129863,
+      "d0_pct": 10.703178756681098,
+      "d1_pct": 14.183544448014818,
+      "d5_pct": 14.612237691616482,
+      "d0_excess_spy": 10.593862807151734,
+      "gap_over_atr": 3.879097003246147
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2023-10-18",
+     "report_date": "2023-10-18",
+     "report_time": "amc",
+     "eps_estimate": 0.35,
+     "eps_actual": 0.37,
+     "eps_surprise": 0.020000000000000018,
+     "eps_surprise_pct": 6.74,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": 16.91267694034806,
+      "d0_pct": 16.054763975038245,
+      "d1_pct": 15.820795725652538,
+      "d5_pct": 16.566049557456974,
+      "d0_excess_spy": 16.933404372605942,
+      "gap_over_atr": 5.670978932420025
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2023-07-19",
+     "report_date": "2023-07-19",
+     "report_time": "amc",
+     "eps_estimate": 0.29,
+     "eps_actual": 0.33,
+     "eps_surprise": 0.040000000000000036,
+     "eps_surprise_pct": 15.36,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": -6.40507167284291,
+      "d0_pct": -8.41097674990725,
+      "d1_pct": -10.488073429669242,
+      "d5_pct": -13.48855227367033,
+      "d0_excess_spy": -7.747527837283663,
+      "gap_over_atr": -2.4011920051096176
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2023-04-18",
+     "report_date": "2023-04-18",
+     "report_time": "amc",
+     "eps_estimate": 0.29,
+     "eps_actual": 0.29,
+     "eps_surprise": 0.0,
+     "eps_surprise_pct": 0.46,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": -2.843864333036683,
+      "d0_pct": -3.1705085139084432,
+      "d1_pct": -2.502244864247871,
+      "d5_pct": -3.760854940330338,
+      "d0_excess_spy": -3.1536144727012716,
+      "gap_over_atr": -0.8624505828823448
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2023-01-19",
+     "report_date": "2023-01-19",
+     "report_time": "amc",
+     "eps_estimate": 0.05,
+     "eps_actual": 0.01,
+     "eps_surprise": -0.04,
+     "eps_surprise_pct": -75.18,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": 6.653371962711208,
+      "d0_pct": 8.461590220709558,
+      "d1_pct": 13.18640060024283,
+      "d5_pct": 14.24726289000593,
+      "d0_excess_spy": 6.598686257790498,
+      "gap_over_atr": 1.8783261474891781
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2022-10-18",
+     "report_date": "2022-10-18",
+     "report_time": "amc",
+     "eps_estimate": 0.21,
+     "eps_actual": 0.31,
+     "eps_surprise": 0.1,
+     "eps_surprise_pct": 45.21,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": 10.022417641557047,
+      "d0_pct": 13.086441789163628,
+      "d1_pct": 11.334383011214522,
+      "d5_pct": 23.98073139208652,
+      "d0_excess_spy": 13.795089661394533,
+      "gap_over_atr": 1.8428888380547228
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2022-07-19",
+     "report_date": "2022-07-19",
+     "report_time": "amc",
+     "eps_estimate": 0.29,
+     "eps_actual": 0.32,
+     "eps_surprise": 0.030000000000000027,
+     "eps_surprise_pct": 8.75,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": 3.243561598714395,
+      "d0_pct": 7.345132098767415,
+      "d1_pct": 11.035066060025823,
+      "d5_pct": 12.458459142696787,
+      "d0_excess_spy": 6.707815946622819,
+      "gap_over_atr": 0.7127670454687185
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2022-04-19",
+     "report_date": "2022-04-19",
+     "report_time": "amc",
+     "eps_estimate": 0.29,
+     "eps_actual": 0.35,
+     "eps_surprise": 0.06,
+     "eps_surprise_pct": 20.97,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": -29.66351964994208,
+      "d0_pct": -35.11660755113309,
+      "d1_pct": -37.40282704072242,
+      "d5_pct": -45.916640203829864,
+      "d0_excess_spy": -35.042453074342845,
+      "gap_over_atr": -7.499722650657407
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2022-01-20",
+     "report_date": "2022-01-20",
+     "report_time": "amc",
+     "eps_estimate": 0.08,
+     "eps_actual": 0.13,
+     "eps_surprise": 0.05,
+     "eps_surprise_pct": 61.49,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": -21.213972126928805,
+      "d0_pct": -21.790458626053024,
+      "d1_pct": -23.826857705001604,
+      "d5_pct": -24.37579882536598,
+      "d0_excess_spy": -19.827394493166196,
+      "gap_over_atr": -6.863364998438013
+     },
+     "source": "yahoo"
+    }
+   ]
+  },
+  "insider": {
+   "as_of": "2026-08-10",
+   "staleness_days": 22,
+   "sources": [
+    "sec_edgar"
+   ],
+   "gaps": [],
+   "summary": {
+    "buys_180d": 0,
+    "sells_180d": 11,
+    "net_shares_180d": -600295.0,
+    "net_value_usd_180d": -49056047.6792,
+    "counts_only": false
+   },
+   "rows": [
+    {
+     "owner_name": "Neumann Spencer Adam",
+     "owner_title": "Chief Financial Officer",
+     "txn_date": "2026-08-10",
+     "filing_date": "2026-08-10",
+     "code": "S",
+     "shares": -9248.0,
+     "price": 75.7901,
+     "value_usd": -700906.8448,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "BARTON RICHARD N",
+     "owner_title": "",
+     "txn_date": "2026-08-05",
+     "filing_date": "2026-08-06",
+     "code": "S",
+     "shares": -2160.0,
+     "price": 75.1,
+     "value_usd": -162216.0,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Peters Gregory K",
+     "owner_title": "Co-CEO",
+     "txn_date": "2026-08-06",
+     "filing_date": "2026-08-06",
+     "code": "S",
+     "shares": -27312.0,
+     "price": 73.543,
+     "value_usd": -2008606.4160000002,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "BARTON RICHARD N",
+     "owner_title": "",
+     "txn_date": "2026-08-05",
+     "filing_date": "2026-08-06",
+     "code": "M",
+     "shares": 2160.0,
+     "price": 20.107,
+     "value_usd": 43431.119999999995,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Willems Cletus R",
+     "owner_title": "Chief Global Affairs Officer",
+     "txn_date": "2026-08-03",
+     "filing_date": "2026-08-04",
+     "code": "M",
+     "shares": 3160.0,
+     "price": null,
+     "value_usd": null,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Peters Gregory K",
+     "owner_title": "Co-CEO",
+     "txn_date": "2026-08-03",
+     "filing_date": "2026-08-04",
+     "code": "F",
+     "shares": -6979.0,
+     "price": 71.71,
+     "value_usd": -500464.08999999997,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "HYMAN DAVID A",
+     "owner_title": "Chief Legal Officer",
+     "txn_date": "2026-08-03",
+     "filing_date": "2026-08-04",
+     "code": "M",
+     "shares": 2940.0,
+     "price": null,
+     "value_usd": null,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "SARANDOS THEODORE A",
+     "owner_title": "Co-CEO",
+     "txn_date": "2026-08-03",
+     "filing_date": "2026-08-04",
+     "code": "M",
+     "shares": 14018.0,
+     "price": null,
+     "value_usd": null,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "HYMAN DAVID A",
+     "owner_title": "Chief Legal Officer",
+     "txn_date": "2026-08-03",
+     "filing_date": "2026-08-04",
+     "code": "F",
+     "shares": -1504.0,
+     "price": 71.71,
+     "value_usd": -107851.84,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Peters Gregory K",
+     "owner_title": "Co-CEO",
+     "txn_date": "2026-08-03",
+     "filing_date": "2026-08-04",
+     "code": "F",
+     "shares": -7189.0,
+     "price": 71.71,
+     "value_usd": -515523.18999999994,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Peters Gregory K",
+     "owner_title": "Co-CEO",
+     "txn_date": "2026-08-03",
+     "filing_date": "2026-08-04",
+     "code": "F",
+     "shares": -12908.0,
+     "price": 71.71,
+     "value_usd": -925632.6799999999,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "SARANDOS THEODORE A",
+     "owner_title": "Co-CEO",
+     "txn_date": "2026-08-04",
+     "filing_date": "2026-08-04",
+     "code": "S",
+     "shares": -27312.0,
+     "price": 73.3532,
+     "value_usd": -2003422.5984,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Willems Cletus R",
+     "owner_title": "Chief Global Affairs Officer",
+     "txn_date": "2026-08-03",
+     "filing_date": "2026-08-04",
+     "code": "M",
+     "shares": 1460.0,
+     "price": null,
+     "value_usd": null,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Willems Cletus R",
+     "owner_title": "Chief Global Affairs Officer",
+     "txn_date": "2026-08-03",
+     "filing_date": "2026-08-04",
+     "code": "M",
+     "shares": 1537.0,
+     "price": null,
+     "value_usd": null,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Willems Cletus R",
+     "owner_title": "Chief Global Affairs Officer",
+     "txn_date": "2026-08-03",
+     "filing_date": "2026-08-04",
+     "code": "F",
+     "shares": -1550.0,
+     "price": 71.71,
+     "value_usd": -111150.49999999999,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Peters Gregory K",
+     "owner_title": "Co-CEO",
+     "txn_date": "2026-08-03",
+     "filing_date": "2026-08-04",
+     "code": "M",
+     "shares": 14440.0,
+     "price": null,
+     "value_usd": null,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Willems Cletus R",
+     "owner_title": "Chief Global Affairs Officer",
+     "txn_date": "2026-08-03",
+     "filing_date": "2026-08-04",
+     "code": "F",
+     "shares": -754.0,
+     "price": 71.71,
+     "value_usd": -54069.34,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "HYMAN DAVID A",
+     "owner_title": "Chief Legal Officer",
+     "txn_date": "2026-08-03",
+     "filing_date": "2026-08-04",
+     "code": "F",
+     "shares": -2709.0,
+     "price": 71.71,
+     "value_usd": -194262.38999999998,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "SARANDOS THEODORE A",
+     "owner_title": "Co-CEO",
+     "txn_date": "2026-08-03",
+     "filing_date": "2026-08-04",
+     "code": "S",
+     "shares": -81891.0,
+     "price": 72.8985,
+     "value_usd": -5969731.0635,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "HYMAN DAVID A",
+     "owner_title": "Chief Legal Officer",
+     "txn_date": "2026-08-04",
+     "filing_date": "2026-08-04",
+     "code": "S",
+     "shares": -5723.0,
+     "price": 72.8463,
+     "value_usd": -416899.3749,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Neumann Spencer Adam",
+     "owner_title": "Chief Financial Officer",
+     "txn_date": "2026-08-03",
+     "filing_date": "2026-08-04",
+     "code": "M",
+     "shares": 8780.0,
+     "price": null,
+     "value_usd": null,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "HYMAN DAVID A",
+     "owner_title": "Chief Legal Officer",
+     "txn_date": "2026-08-03",
+     "filing_date": "2026-08-04",
+     "code": "M",
+     "shares": 5440.0,
+     "price": null,
+     "value_usd": null,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "HYMAN DAVID A",
+     "owner_title": "Chief Legal Officer",
+     "txn_date": "2026-08-03",
+     "filing_date": "2026-08-04",
+     "code": "F",
+     "shares": -1464.0,
+     "price": 71.71,
+     "value_usd": -104983.43999999999,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "HYMAN DAVID A",
+     "owner_title": "Chief Legal Officer",
+     "txn_date": "2026-08-03",
+     "filing_date": "2026-08-04",
+     "code": "M",
+     "shares": 3020.0,
+     "price": null,
+     "value_usd": null,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Neumann Spencer Adam",
+     "owner_title": "Chief Financial Officer",
+     "txn_date": "2026-08-03",
+     "filing_date": "2026-08-04",
+     "code": "M",
+     "shares": 4890.0,
+     "price": null,
+     "value_usd": null,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Neumann Spencer Adam",
+     "owner_title": "Chief Financial Officer",
+     "txn_date": "2026-08-03",
+     "filing_date": "2026-08-04",
+     "code": "M",
+     "shares": 4748.0,
+     "price": null,
+     "value_usd": null,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Neumann Spencer Adam",
+     "owner_title": "Chief Financial Officer",
+     "txn_date": "2026-08-03",
+     "filing_date": "2026-08-04",
+     "code": "F",
+     "shares": -4371.0,
+     "price": 71.71,
+     "value_usd": -313444.41,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Neumann Spencer Adam",
+     "owner_title": "Chief Financial Officer",
+     "txn_date": "2026-08-03",
+     "filing_date": "2026-08-04",
+     "code": "F",
+     "shares": -2435.0,
+     "price": 71.71,
+     "value_usd": -174613.84999999998,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Neumann Spencer Adam",
+     "owner_title": "Chief Financial Officer",
+     "txn_date": "2026-08-03",
+     "filing_date": "2026-08-04",
+     "code": "F",
+     "shares": -2364.0,
+     "price": 71.71,
+     "value_usd": -169522.43999999997,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "SARANDOS THEODORE A",
+     "owner_title": "Co-CEO",
+     "txn_date": "2026-08-03",
+     "filing_date": "2026-08-04",
+     "code": "M",
+     "shares": 25930.0,
+     "price": null,
+     "value_usd": null,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "SARANDOS THEODORE A",
+     "owner_title": "Co-CEO",
+     "txn_date": "2026-08-03",
+     "filing_date": "2026-08-04",
+     "code": "M",
+     "shares": 14440.0,
+     "price": null,
+     "value_usd": null,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Peters Gregory K",
+     "owner_title": "Co-CEO",
+     "txn_date": "2026-08-03",
+     "filing_date": "2026-08-04",
+     "code": "M",
+     "shares": 25930.0,
+     "price": null,
+     "value_usd": null,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "SARANDOS THEODORE A",
+     "owner_title": "Co-CEO",
+     "txn_date": "2026-08-03",
+     "filing_date": "2026-08-04",
+     "code": "F",
+     "shares": -12908.0,
+     "price": 71.71,
+     "value_usd": -925632.6799999999,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "SARANDOS THEODORE A",
+     "owner_title": "Co-CEO",
+     "txn_date": "2026-08-03",
+     "filing_date": "2026-08-04",
+     "code": "F",
+     "shares": -7189.0,
+     "price": 71.71,
+     "value_usd": -515523.18999999994,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "SARANDOS THEODORE A",
+     "owner_title": "Co-CEO",
+     "txn_date": "2026-08-03",
+     "filing_date": "2026-08-04",
+     "code": "F",
+     "shares": -6979.0,
+     "price": 71.71,
+     "value_usd": -500464.08999999997,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Willems Cletus R",
+     "owner_title": "Chief Global Affairs Officer",
+     "txn_date": "2026-08-03",
+     "filing_date": "2026-08-04",
+     "code": "F",
+     "shares": -717.0,
+     "price": 71.71,
+     "value_usd": -51416.06999999999,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "SARANDOS THEODORE A",
+     "owner_title": "Co-CEO",
+     "txn_date": "2026-08-03",
+     "filing_date": "2026-08-04",
+     "code": "S",
+     "shares": -23959.0,
+     "price": 73.4768,
+     "value_usd": -1760430.6512,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Peters Gregory K",
+     "owner_title": "Co-CEO",
+     "txn_date": "2026-08-03",
+     "filing_date": "2026-08-04",
+     "code": "M",
+     "shares": 14018.0,
+     "price": null,
+     "value_usd": null,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "SMITH BRADFORD L",
+     "owner_title": "",
+     "txn_date": "2026-06-17",
+     "filing_date": "2026-06-18",
+     "code": "M",
+     "shares": 6460.0,
+     "price": 9.667,
+     "value_usd": 62448.82,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "SMITH BRADFORD L",
+     "owner_title": "",
+     "txn_date": "2026-06-17",
+     "filing_date": "2026-06-18",
+     "code": "M",
+     "shares": 6620.0,
+     "price": 9.437,
+     "value_usd": 62472.939999999995,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "SMITH BRADFORD L",
+     "owner_title": "",
+     "txn_date": "2026-06-17",
+     "filing_date": "2026-06-18",
+     "code": "M",
+     "shares": 6420.0,
+     "price": 9.738,
+     "value_usd": 62517.96,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "SMITH BRADFORD L",
+     "owner_title": "",
+     "txn_date": "2026-06-17",
+     "filing_date": "2026-06-18",
+     "code": "M",
+     "shares": 6090.0,
+     "price": 10.263,
+     "value_usd": 62501.67,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "SMITH BRADFORD L",
+     "owner_title": "",
+     "txn_date": "2026-06-17",
+     "filing_date": "2026-06-18",
+     "code": "M",
+     "shares": 5070.0,
+     "price": 12.33,
+     "value_usd": 62513.1,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "SMITH BRADFORD L",
+     "owner_title": "",
+     "txn_date": "2026-06-17",
+     "filing_date": "2026-06-18",
+     "code": "M",
+     "shares": 5330.0,
+     "price": 11.722,
+     "value_usd": 62478.259999999995,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "SMITH BRADFORD L",
+     "owner_title": "",
+     "txn_date": "2026-06-17",
+     "filing_date": "2026-06-18",
+     "code": "S",
+     "shares": -22190.0,
+     "price": 77.2089,
+     "value_usd": -1713265.491,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "SMITH BRADFORD L",
+     "owner_title": "",
+     "txn_date": "2026-06-17",
+     "filing_date": "2026-06-18",
+     "code": "S",
+     "shares": -13800.0,
+     "price": 78.0097,
+     "value_usd": -1076533.8599999999,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "HASTINGS REED",
+     "owner_title": "",
+     "txn_date": "2026-06-01",
+     "filing_date": "2026-06-02",
+     "code": "M",
+     "shares": 386700.0,
+     "price": 10.263,
+     "value_usd": 3968702.1,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "HASTINGS REED",
+     "owner_title": "",
+     "txn_date": "2026-06-01",
+     "filing_date": "2026-06-02",
+     "code": "S",
+     "shares": -332917.0,
+     "price": 85.8459,
+     "value_usd": -28579559.4903,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "HASTINGS REED",
+     "owner_title": "",
+     "txn_date": "2026-06-01",
+     "filing_date": "2026-06-02",
+     "code": "S",
+     "shares": -53783.0,
+     "price": 86.7277,
+     "value_usd": -4664475.8891,
+     "is_open_market": true
+    }
+   ]
+  },
+  "institutions": {
+   "as_of": null,
+   "staleness_days": null,
+   "sources": [],
+   "gaps": [
+    "institutions unavailable from free: no 13F dataset ingested yet"
+   ],
+   "period_end": null,
+   "filing_date_max": null,
+   "n_holders": null,
+   "d_holders_qoq": null,
+   "total_shares": null,
+   "d_shares_qoq": null,
+   "top_buyers": [],
+   "top_sellers": [],
+   "rows": []
+  },
+  "short": {
+   "as_of": "2026-08-31",
+   "staleness_days": 1,
+   "sources": [
+    "finra",
+    "nasdaq"
+   ],
+   "gaps": [],
+   "interest": [
+    {
+     "settlement_date": "2026-08-14",
+     "shares_short": 90512500.0,
+     "days_to_cover": 3.036324
+    },
+    {
+     "settlement_date": "2026-07-31",
+     "shares_short": 92202002.0,
+     "days_to_cover": 1.644203
+    },
+    {
+     "settlement_date": "2026-07-15",
+     "shares_short": 99746573.0,
+     "days_to_cover": 2.554295
+    },
+    {
+     "settlement_date": "2026-06-30",
+     "shares_short": 104117446.0,
+     "days_to_cover": 1.759227
+    },
+    {
+     "settlement_date": "2026-06-15",
+     "shares_short": 101027252.0,
+     "days_to_cover": 2.781215
+    },
+    {
+     "settlement_date": "2026-05-29",
+     "shares_short": 101569951.0,
+     "days_to_cover": 3.408317
+    },
+    {
+     "settlement_date": "2026-05-15",
+     "shares_short": 98015366.0,
+     "days_to_cover": 2.765141
+    },
+    {
+     "settlement_date": "2026-04-30",
+     "shares_short": 95064296.0,
+     "days_to_cover": 1.926785
+    },
+    {
+     "settlement_date": "2026-04-15",
+     "shares_short": 77980436.0,
+     "days_to_cover": 2.427496
+    },
+    {
+     "settlement_date": "2026-03-31",
+     "shares_short": 80364680.0,
+     "days_to_cover": 2.055717
+    },
+    {
+     "settlement_date": "2026-03-13",
+     "shares_short": 81067589.0,
+     "days_to_cover": 1.734518
+    },
+    {
+     "settlement_date": "2026-02-27",
+     "shares_short": 89634663.0,
+     "days_to_cover": 1.597048
+    },
+    {
+     "settlement_date": "2026-02-13",
+     "shares_short": 82928240.0,
+     "days_to_cover": 1.737703
+    },
+    {
+     "settlement_date": "2026-01-30",
+     "shares_short": 76008839.0,
+     "days_to_cover": 1.238949
+    },
+    {
+     "settlement_date": "2026-01-15",
+     "shares_short": 70320999.0,
+     "days_to_cover": 1.68496
+    },
+    {
+     "settlement_date": "2025-12-31",
+     "shares_short": 67751366.0,
+     "days_to_cover": 2.024778
+    },
+    {
+     "settlement_date": "2025-12-15",
+     "shares_short": 73585254.0,
+     "days_to_cover": 1.270263
+    },
+    {
+     "settlement_date": "2025-11-28",
+     "shares_short": 75214504.0,
+     "days_to_cover": 2.141255
+    },
+    {
+     "settlement_date": "2025-11-14",
+     "shares_short": 14650481.0,
+     "days_to_cover": 3.660794
+    },
+    {
+     "settlement_date": "2025-10-31",
+     "shares_short": 6743885.0,
+     "days_to_cover": 1.215748
+    },
+    {
+     "settlement_date": "2025-10-15",
+     "shares_short": 6050487.0,
+     "days_to_cover": 1.921646
+    },
+    {
+     "settlement_date": "2025-09-30",
+     "shares_short": 6428320.0,
+     "days_to_cover": 2.186796
+    },
+    {
+     "settlement_date": "2025-09-15",
+     "shares_short": 6955599.0,
+     "days_to_cover": 2.390403
+    },
+    {
+     "settlement_date": "2025-08-29",
+     "shares_short": 6611028.0,
+     "days_to_cover": 2.663516
+    },
+    {
+     "settlement_date": "2025-08-15",
+     "shares_short": 6648890.0,
+     "days_to_cover": 2.251782
+    }
+   ],
+   "short_volume": [
+    {
+     "date": "2026-08-31",
+     "short_pct": 0.49417943981699
+    },
+    {
+     "date": "2026-08-28",
+     "short_pct": 0.5355070700839205
+    },
+    {
+     "date": "2026-08-27",
+     "short_pct": 0.6112026913626789
+    },
+    {
+     "date": "2026-08-26",
+     "short_pct": 0.4647008162751827
+    },
+    {
+     "date": "2026-08-25",
+     "short_pct": 0.5349377064690268
+    },
+    {
+     "date": "2026-08-24",
+     "short_pct": 0.41231420565931887
+    },
+    {
+     "date": "2026-08-21",
+     "short_pct": 0.5365958922102626
+    },
+    {
+     "date": "2026-08-20",
+     "short_pct": 0.5320201721197091
+    },
+    {
+     "date": "2026-08-19",
+     "short_pct": 0.5016109765690201
+    },
+    {
+     "date": "2026-08-18",
+     "short_pct": 0.5125034558320667
+    },
+    {
+     "date": "2026-08-17",
+     "short_pct": 0.5549492997651959
+    },
+    {
+     "date": "2026-08-14",
+     "short_pct": 0.5441770290759805
+    },
+    {
+     "date": "2026-08-13",
+     "short_pct": 0.5922693577648649
+    },
+    {
+     "date": "2026-08-12",
+     "short_pct": 0.4360302514552763
+    },
+    {
+     "date": "2026-08-11",
+     "short_pct": 0.4268796836315394
+    },
+    {
+     "date": "2026-08-10",
+     "short_pct": 0.4599952995268964
+    },
+    {
+     "date": "2026-08-07",
+     "short_pct": 0.3734594324195784
+    },
+    {
+     "date": "2026-08-06",
+     "short_pct": 0.41365236085755874
+    },
+    {
+     "date": "2026-08-05",
+     "short_pct": 0.4526293851140898
+    },
+    {
+     "date": "2026-08-04",
+     "short_pct": 0.3761345855597007
+    },
+    {
+     "date": "2026-08-03",
+     "short_pct": 0.4158089292953449
+    },
+    {
+     "date": "2026-07-31",
+     "short_pct": 0.4392374432563847
+    },
+    {
+     "date": "2026-07-30",
+     "short_pct": 0.531682327129342
+    },
+    {
+     "date": "2026-07-29",
+     "short_pct": 0.3152053559375341
+    },
+    {
+     "date": "2026-07-28",
+     "short_pct": 0.35020559397473144
+    },
+    {
+     "date": "2026-07-27",
+     "short_pct": 0.24320887153219042
+    },
+    {
+     "date": "2026-07-24",
+     "short_pct": 0.24836849607789083
+    },
+    {
+     "date": "2026-07-23",
+     "short_pct": 0.2999647922004085
+    },
+    {
+     "date": "2026-07-22",
+     "short_pct": 0.2879515978237374
+    },
+    {
+     "date": "2026-07-21",
+     "short_pct": 0.28771850745737154
+    },
+    {
+     "date": "2026-07-20",
+     "short_pct": 0.25333966397527347
+    },
+    {
+     "date": "2026-07-17",
+     "short_pct": 0.3280834329273227
+    },
+    {
+     "date": "2026-07-16",
+     "short_pct": 0.34717239692407154
+    },
+    {
+     "date": "2026-07-15",
+     "short_pct": 0.2986516583935692
+    },
+    {
+     "date": "2026-07-14",
+     "short_pct": 0.2948740434533677
+    },
+    {
+     "date": "2026-07-13",
+     "short_pct": 0.2543003266186088
+    },
+    {
+     "date": "2026-07-10",
+     "short_pct": 0.28550009184674585
+    },
+    {
+     "date": "2026-07-09",
+     "short_pct": 0.343176518476011
+    },
+    {
+     "date": "2026-07-08",
+     "short_pct": 0.2788835122494455
+    },
+    {
+     "date": "2026-07-07",
+     "short_pct": 0.36285161627892387
+    },
+    {
+     "date": "2026-07-06",
+     "short_pct": 0.4652980801854073
+    },
+    {
+     "date": "2026-07-02",
+     "short_pct": 0.47607418053099726
+    },
+    {
+     "date": "2026-07-01",
+     "short_pct": 0.21058754994957699
+    },
+    {
+     "date": "2026-06-30",
+     "short_pct": 0.3137566011590454
+    },
+    {
+     "date": "2026-06-29",
+     "short_pct": 0.4176907961819674
+    },
+    {
+     "date": "2026-06-26",
+     "short_pct": 0.3451663193797928
+    },
+    {
+     "date": "2026-06-25",
+     "short_pct": 0.26917171813484025
+    },
+    {
+     "date": "2026-06-24",
+     "short_pct": 0.26671207383550627
+    },
+    {
+     "date": "2026-06-23",
+     "short_pct": 0.32503299950660164
+    },
+    {
+     "date": "2026-06-22",
+     "short_pct": 0.36453936937014525
+    },
+    {
+     "date": "2026-06-18",
+     "short_pct": 0.2288140677488749
+    },
+    {
+     "date": "2026-06-17",
+     "short_pct": 0.2753358238782503
+    },
+    {
+     "date": "2026-06-16",
+     "short_pct": 0.38450926872441793
+    },
+    {
+     "date": "2026-06-15",
+     "short_pct": 0.3369438617945738
+    },
+    {
+     "date": "2026-06-12",
+     "short_pct": 0.3756930847773315
+    },
+    {
+     "date": "2026-06-11",
+     "short_pct": 0.29414352026887647
+    },
+    {
+     "date": "2026-06-10",
+     "short_pct": 0.4242260177118126
+    },
+    {
+     "date": "2026-06-09",
+     "short_pct": 0.355392539852918
+    },
+    {
+     "date": "2026-06-08",
+     "short_pct": 0.2934053886596413
+    },
+    {
+     "date": "2026-06-05",
+     "short_pct": 0.352811685385121
+    },
+    {
+     "date": "2026-06-04",
+     "short_pct": 0.2749375777227514
+    },
+    {
+     "date": "2026-06-03",
+     "short_pct": 0.3333055404077545
+    }
+   ],
+   "borrow": null
+  }
+ }
+}

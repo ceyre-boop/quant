@@ -1,22 +1,55 @@
 {
  "schema_version": 1,
- "generated_at": "2026-09-01T04:46:38.473764+00:00",
+ "generated_at": "2026-09-01T04:50:10.864888+00:00",
  "tickers": {
-  "AAPL": {
+  "SPY": {
    "partial": true,
    "sections": {
     "earnings": {
-     "rows": 20,
-     "gaps": []
+     "rows": 0,
+     "gaps": [
+      "SPY is an ETF \u2014 it has no earnings, no Form 4 and no 13F filed under its own ticker"
+     ]
     },
     "insider": {
-     "rows": 35,
-     "gaps": []
+     "rows": 0,
+     "gaps": [
+      "SPY is an ETF \u2014 it has no earnings, no Form 4 and no 13F filed under its own ticker"
+     ]
     },
     "institutions": {
      "rows": 0,
      "gaps": [
-      "institutions unavailable from free: no 13F dataset ingested yet"
+      "SPY is an ETF \u2014 it has no earnings, no Form 4 and no 13F filed under its own ticker"
+     ]
+    },
+    "short": {
+     "rows": 0,
+     "gaps": [
+      "short_interest: last harvest failed \u2014 short_interest unavailable from nasdaq: Short interest is not available. Short interest is only supported for Nasdaq Listed stocks"
+     ]
+    }
+   }
+  },
+  "QQQ": {
+   "partial": true,
+   "sections": {
+    "earnings": {
+     "rows": 0,
+     "gaps": [
+      "QQQ is an ETF \u2014 it has no earnings, no Form 4 and no 13F filed under its own ticker"
+     ]
+    },
+    "insider": {
+     "rows": 0,
+     "gaps": [
+      "QQQ is an ETF \u2014 it has no earnings, no Form 4 and no 13F filed under its own ticker"
+     ]
+    },
+    "institutions": {
+     "rows": 0,
+     "gaps": [
+      "QQQ is an ETF \u2014 it has no earnings, no Form 4 and no 13F filed under its own ticker"
      ]
     },
     "short": {
@@ -45,6 +78,215 @@
     "short": {
      "rows": 0,
      "gaps": []
+    }
+   }
+  },
+  "AAPL": {
+   "partial": true,
+   "sections": {
+    "earnings": {
+     "rows": 20,
+     "gaps": []
+    },
+    "insider": {
+     "rows": 35,
+     "gaps": []
+    },
+    "institutions": {
+     "rows": 0,
+     "gaps": [
+      "institutions unavailable from free: no 13F dataset ingested yet"
+     ]
+    },
+    "short": {
+     "rows": 0,
+     "gaps": []
+    }
+   }
+  },
+  "TSLA": {
+   "partial": true,
+   "sections": {
+    "earnings": {
+     "rows": 20,
+     "gaps": []
+    },
+    "insider": {
+     "rows": 44,
+     "gaps": []
+    },
+    "institutions": {
+     "rows": 0,
+     "gaps": [
+      "institutions unavailable from free: no 13F dataset ingested yet"
+     ]
+    },
+    "short": {
+     "rows": 0,
+     "gaps": []
+    }
+   }
+  },
+  "NVDA": {
+   "partial": true,
+   "sections": {
+    "earnings": {
+     "rows": 20,
+     "gaps": []
+    },
+    "insider": {
+     "rows": 81,
+     "gaps": []
+    },
+    "institutions": {
+     "rows": 0,
+     "gaps": [
+      "institutions unavailable from free: no 13F dataset ingested yet"
+     ]
+    },
+    "short": {
+     "rows": 0,
+     "gaps": []
+    }
+   }
+  },
+  "AMZN": {
+   "partial": true,
+   "sections": {
+    "earnings": {
+     "rows": 20,
+     "gaps": []
+    },
+    "insider": {
+     "rows": 101,
+     "gaps": []
+    },
+    "institutions": {
+     "rows": 0,
+     "gaps": [
+      "institutions unavailable from free: no 13F dataset ingested yet"
+     ]
+    },
+    "short": {
+     "rows": 0,
+     "gaps": []
+    }
+   }
+  },
+  "GOOGL": {
+   "partial": true,
+   "sections": {
+    "earnings": {
+     "rows": 20,
+     "gaps": []
+    },
+    "insider": {
+     "rows": 173,
+     "gaps": []
+    },
+    "institutions": {
+     "rows": 0,
+     "gaps": [
+      "institutions unavailable from free: no 13F dataset ingested yet"
+     ]
+    },
+    "short": {
+     "rows": 0,
+     "gaps": []
+    }
+   }
+  },
+  "META": {
+   "partial": true,
+   "sections": {
+    "earnings": {
+     "rows": 20,
+     "gaps": []
+    },
+    "insider": {
+     "rows": 111,
+     "gaps": []
+    },
+    "institutions": {
+     "rows": 0,
+     "gaps": [
+      "institutions unavailable from free: no 13F dataset ingested yet"
+     ]
+    },
+    "short": {
+     "rows": 0,
+     "gaps": []
+    }
+   }
+  },
+  "NFLX": {
+   "partial": true,
+   "sections": {
+    "earnings": {
+     "rows": 20,
+     "gaps": []
+    },
+    "insider": {
+     "rows": 49,
+     "gaps": []
+    },
+    "institutions": {
+     "rows": 0,
+     "gaps": [
+      "institutions unavailable from free: no 13F dataset ingested yet"
+     ]
+    },
+    "short": {
+     "rows": 0,
+     "gaps": []
+    }
+   }
+  },
+  "AMD": {
+   "partial": true,
+   "sections": {
+    "earnings": {
+     "rows": 20,
+     "gaps": []
+    },
+    "insider": {
+     "rows": 162,
+     "gaps": []
+    },
+    "institutions": {
+     "rows": 0,
+     "gaps": [
+      "institutions unavailable from free: no 13F dataset ingested yet"
+     ]
+    },
+    "short": {
+     "rows": 0,
+     "gaps": []
+    }
+   }
+  },
+  "CRM": {
+   "partial": true,
+   "sections": {
+    "earnings": {
+     "rows": 20,
+     "gaps": []
+    },
+    "insider": {
+     "rows": 85,
+     "gaps": []
+    },
+    "institutions": {
+     "rows": 0,
+     "gaps": [
+      "institutions unavailable from free: no 13F dataset ingested yet"
+     ]
+    },
+    "short": {
+     "rows": 0,
+     "gaps": [
+      "short_interest: last harvest failed \u2014 short_interest unavailable from nasdaq: Short interest is not available. Short interest is only supported for Nasdaq Listed stocks"
+     ]
     }
    }
   }

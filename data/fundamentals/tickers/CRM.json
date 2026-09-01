@@ -1,0 +1,1693 @@
+{
+ "schema_version": 1,
+ "ticker": "CRM",
+ "cik": 1108524,
+ "name": null,
+ "generated_at": "2026-09-01T04:50:11.306242+00:00",
+ "capabilities": [
+  "borrow",
+  "earnings",
+  "estimates",
+  "insider",
+  "institutions",
+  "short_interest",
+  "short_volume"
+ ],
+ "partial": true,
+ "sections": {
+  "earnings": {
+   "as_of": "2026-08-26",
+   "staleness_days": 6,
+   "sources": [
+    "yahoo"
+   ],
+   "gaps": [],
+   "rows": [
+    {
+     "fiscal_end": "2026-12-02",
+     "report_date": "2026-12-02",
+     "report_time": "unknown",
+     "eps_estimate": 3.43,
+     "eps_actual": null,
+     "eps_surprise": null,
+     "eps_surprise_pct": null,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": null,
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2026-08-26",
+     "report_date": "2026-08-26",
+     "report_time": "amc",
+     "eps_estimate": 3.27,
+     "eps_actual": 5.9,
+     "eps_surprise": 2.6300000000000003,
+     "eps_surprise_pct": 80.36,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": 11.881144107919607,
+      "d0_pct": 22.58049267441564,
+      "d1_pct": 24.501510591953757,
+      "d5_pct": null,
+      "d0_excess_spy": 21.925214063290486,
+      "gap_over_atr": 3.1071552222029006
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2026-05-27",
+     "report_date": "2026-05-27",
+     "report_time": "amc",
+     "eps_estimate": 3.13,
+     "eps_actual": 3.88,
+     "eps_surprise": 0.75,
+     "eps_surprise_pct": 24.07,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": 0.5182796447610105,
+      "d0_pct": -0.7548850089334147,
+      "d1_pct": 7.655913479371068,
+      "d5_pct": 6.332040922197879,
+      "d0_excess_spy": -1.3065404591996455,
+      "gap_over_atr": 0.1278574446642221
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2026-02-25",
+     "report_date": "2026-02-25",
+     "report_time": "amc",
+     "eps_estimate": 3.05,
+     "eps_actual": 3.81,
+     "eps_surprise": 0.7600000000000002,
+     "eps_surprise_pct": 24.85,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": 2.6127741887019162,
+      "d0_pct": 4.026076255907762,
+      "d1_pct": 1.5853941518293668,
+      "d5_pct": 5.0273790819548525,
+      "d0_excess_spy": 4.581516851087464,
+      "gap_over_atr": 0.5185792033842557
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2025-12-03",
+     "report_date": "2025-12-03",
+     "report_time": "amc",
+     "eps_estimate": 2.86,
+     "eps_actual": 3.25,
+     "eps_surprise": 0.3900000000000001,
+     "eps_surprise_pct": 13.57,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": 2.081937498026498,
+      "d0_pct": 3.6611953118597995,
+      "d1_pct": 9.152985083690023,
+      "d5_pct": 9.898628000159038,
+      "d0_excess_spy": 3.588084140576364,
+      "gap_over_atr": 0.7206557796343962
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2025-09-03",
+     "report_date": "2025-09-03",
+     "report_time": "amc",
+     "eps_estimate": 2.78,
+     "eps_actual": 2.91,
+     "eps_surprise": 0.13000000000000034,
+     "eps_surprise_pct": 4.7,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": -6.391114785834318,
+      "d0_pct": -4.8508547896470855,
+      "d1_pct": -2.2187628891987665,
+      "d5_pct": -3.9656903660133747,
+      "d0_excess_spy": -5.686596698558755,
+      "gap_over_atr": -2.5143847788025324
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2025-05-28",
+     "report_date": "2025-05-28",
+     "report_time": "amc",
+     "eps_estimate": 2.55,
+     "eps_actual": 2.58,
+     "eps_surprise": 0.03000000000000025,
+     "eps_surprise_pct": 1.31,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": -4.506757416375173,
+      "d0_pct": -3.300360610024311,
+      "d1_pct": -3.8619004127275036,
+      "d5_pct": -3.2206586857131625,
+      "d0_excess_spy": -3.695100950200325,
+      "gap_over_atr": -2.0134339571198065
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2025-02-26",
+     "report_date": "2025-02-26",
+     "report_time": "amc",
+     "eps_estimate": 2.61,
+     "eps_actual": 2.78,
+     "eps_surprise": 0.16999999999999993,
+     "eps_surprise_pct": 6.43,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": -3.5759576723863873,
+      "d0_pct": -4.044510206900509,
+      "d1_pct": -3.0846259339945226,
+      "d5_pct": -6.92415309571267,
+      "d0_excess_spy": -2.448319776466823,
+      "gap_over_atr": -1.2115517278792631
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2024-12-03",
+     "report_date": "2024-12-03",
+     "report_time": "amc",
+     "eps_estimate": 2.45,
+     "eps_actual": 2.41,
+     "eps_surprise": -0.040000000000000036,
+     "eps_surprise_pct": -1.47,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": 10.67495569642749,
+      "d0_pct": 10.994781174512891,
+      "d1_pct": 9.036602863015354,
+      "d5_pct": 7.06635305955694,
+      "d0_excess_spy": 10.37382769357038,
+      "gap_over_atr": 3.6850335284930633
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2024-08-28",
+     "report_date": "2024-08-28",
+     "report_time": "amc",
+     "eps_estimate": 2.36,
+     "eps_actual": 2.56,
+     "eps_surprise": 0.20000000000000018,
+     "eps_surprise_pct": 8.63,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": 4.677487892866683,
+      "d0_pct": -0.7300054752473417,
+      "d1_pct": -2.3174971577631487,
+      "d5_pct": -5.766702598591289,
+      "d0_excess_spy": -0.7389590475313734,
+      "gap_over_atr": 1.8352671298528485
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2024-05-29",
+     "report_date": "2024-05-29",
+     "report_time": "amc",
+     "eps_estimate": 2.37,
+     "eps_actual": 2.44,
+     "eps_surprise": 0.06999999999999984,
+     "eps_surprise_pct": 2.75,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": -17.752743570994888,
+      "d0_pct": -19.7371333385166,
+      "d1_pct": -13.68823847439521,
+      "d5_pct": -10.625138476237817,
+      "d0_excess_spy": -19.073763181449387,
+      "gap_over_atr": -8.712620861351661
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2024-02-28",
+     "report_date": "2024-02-28",
+     "report_time": "amc",
+     "eps_estimate": 2.27,
+     "eps_actual": 2.29,
+     "eps_surprise": 0.020000000000000018,
+     "eps_surprise_pct": 0.96,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": 0.07672915727319207,
+      "d0_pct": 3.0189874377765324,
+      "d1_pct": 5.70771474670877,
+      "d5_pct": 0.8840192518209777,
+      "d0_excess_spy": 2.6594929544016432,
+      "gap_over_atr": 0.03587754319038419
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2023-11-29",
+     "report_date": "2023-11-29",
+     "report_time": "amc",
+     "eps_estimate": 2.06,
+     "eps_actual": 2.11,
+     "eps_surprise": 0.04999999999999982,
+     "eps_surprise_pct": 2.52,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": 8.1180796408743,
+      "d0_pct": 9.355323300180206,
+      "d1_pct": 12.87171396173532,
+      "d5_pct": 8.03125657035424,
+      "d0_excess_spy": 8.961577319537572,
+      "gap_over_atr": 4.748601988214549
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2023-08-30",
+     "report_date": "2023-08-30",
+     "report_time": "amc",
+     "eps_estimate": 1.9,
+     "eps_actual": 2.12,
+     "eps_surprise": 0.2200000000000002,
+     "eps_surprise_pct": 11.45,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": 6.026789024599055,
+      "d0_pct": 2.985497408936344,
+      "d1_pct": 3.018045803474534,
+      "d5_pct": 4.520089994501464,
+      "d0_excess_spy": 3.1318364364121054,
+      "gap_over_atr": 2.716697231684221
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2023-05-31",
+     "report_date": "2023-05-31",
+     "report_time": "amc",
+     "eps_estimate": 1.61,
+     "eps_actual": 1.69,
+     "eps_surprise": 0.07999999999999985,
+     "eps_surprise_pct": 4.84,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": -6.786643088338396,
+      "d0_pct": -4.691561803763966,
+      "d1_pct": -4.633362824459308,
+      "d5_pct": -6.200199570584431,
+      "d0_excess_spy": -5.641663793165296,
+      "gap_over_atr": -3.1277075526730247
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2023-03-01",
+     "report_date": "2023-03-01",
+     "report_time": "amc",
+     "eps_estimate": 1.36,
+     "eps_actual": 1.68,
+     "eps_surprise": 0.31999999999999984,
+     "eps_surprise_pct": 23.43,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": 15.398857528413634,
+      "d0_pct": 11.496856607506768,
+      "d1_pct": 11.401246415529599,
+      "d5_pct": 6.794140844043062,
+      "d0_excess_spy": 10.719127621295877,
+      "gap_over_atr": 5.630325430397543
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2022-11-30",
+     "report_date": "2022-11-30",
+     "report_time": "amc",
+     "eps_estimate": 1.22,
+     "eps_actual": 1.4,
+     "eps_surprise": 0.17999999999999994,
+     "eps_surprise_pct": 14.55,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": -7.925115100307134,
+      "d0_pct": -8.268330733229334,
+      "d1_pct": -9.790953161563964,
+      "d5_pct": -18.79562877827613,
+      "d0_excess_spy": -8.194746599016666,
+      "gap_over_atr": -1.9373038534169504
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2022-08-24",
+     "report_date": "2022-08-24",
+     "report_time": "amc",
+     "eps_estimate": 1.03,
+     "eps_actual": 1.19,
+     "eps_surprise": 0.15999999999999992,
+     "eps_surprise_pct": 15.75,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": -6.349643366800494,
+      "d0_pct": -3.38869564517148,
+      "d1_pct": -8.210654536037776,
+      "d5_pct": -14.710291948002629,
+      "d0_excess_spy": -4.800448044021843,
+      "gap_over_atr": -2.141651131264604
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2022-05-31",
+     "report_date": "2022-05-31",
+     "report_time": "amc",
+     "eps_estimate": 0.94,
+     "eps_actual": 0.98,
+     "eps_surprise": 0.040000000000000036,
+     "eps_surprise_pct": 3.73,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": 11.08960834030297,
+      "d0_pct": 9.878932406633002,
+      "d1_pct": 17.57363170118067,
+      "d5_pct": 18.06664750113056,
+      "d0_excess_spy": 10.687785335006529,
+      "gap_over_atr": 2.2951241613820064
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2022-03-01",
+     "report_date": "2022-03-01",
+     "report_time": "amc",
+     "eps_estimate": 0.75,
+     "eps_actual": 0.84,
+     "eps_surprise": 0.08999999999999997,
+     "eps_surprise_pct": 11.85,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": 3.451580609380045,
+      "d0_pct": 0.7180812888998078,
+      "d1_pct": -1.981904065175466,
+      "d5_pct": -2.7430684782811188,
+      "d0_excess_spy": -1.1215399632520384,
+      "gap_over_atr": 0.8384704654827321
+     },
+     "source": "yahoo"
+    }
+   ]
+  },
+  "insider": {
+   "as_of": "2026-08-28",
+   "staleness_days": 4,
+   "sources": [
+    "sec_edgar"
+   ],
+   "gaps": [],
+   "summary": {
+    "buys_180d": 0,
+    "sells_180d": 0,
+    "net_shares_180d": null,
+    "net_value_usd_180d": null,
+    "counts_only": false
+   },
+   "rows": [
+    {
+     "owner_name": "Harris Parker",
+     "owner_title": "Co-Founder and CTO, Slack",
+     "txn_date": "2026-08-28",
+     "filing_date": "2026-08-28",
+     "code": "G",
+     "shares": -16000.0,
+     "price": 0.0,
+     "value_usd": -0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Roos John Victor",
+     "owner_title": "",
+     "txn_date": "2026-08-22",
+     "filing_date": "2026-08-24",
+     "code": "M",
+     "shares": 441.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Kirk David Blair",
+     "owner_title": "",
+     "txn_date": "2026-08-22",
+     "filing_date": "2026-08-24",
+     "code": "M",
+     "shares": 441.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Conway Craig",
+     "owner_title": "",
+     "txn_date": "2026-08-22",
+     "filing_date": "2026-08-24",
+     "code": "M",
+     "shares": 441.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "KROES NEELIE",
+     "owner_title": "",
+     "txn_date": "2026-08-22",
+     "filing_date": "2026-08-24",
+     "code": "M",
+     "shares": 441.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Niles Sabastian",
+     "owner_title": "President and CLO",
+     "txn_date": "2026-08-22",
+     "filing_date": "2026-08-24",
+     "code": "F",
+     "shares": -920.0,
+     "price": 209.17,
+     "value_usd": -192436.4,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Chang Amy",
+     "owner_title": "",
+     "txn_date": "2026-08-22",
+     "filing_date": "2026-08-24",
+     "code": "M",
+     "shares": 441.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Milano Miguel",
+     "owner_title": "President and COO",
+     "txn_date": "2026-08-22",
+     "filing_date": "2026-08-24",
+     "code": "F",
+     "shares": -678.0,
+     "price": 209.17,
+     "value_usd": -141817.25999999998,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "KROES NEELIE",
+     "owner_title": "",
+     "txn_date": "2026-08-22",
+     "filing_date": "2026-08-24",
+     "code": "F",
+     "shares": -67.0,
+     "price": 209.17,
+     "value_usd": -14014.39,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "MUNOZ OSCAR",
+     "owner_title": "",
+     "txn_date": "2026-08-22",
+     "filing_date": "2026-08-24",
+     "code": "M",
+     "shares": 441.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Niles Sabastian",
+     "owner_title": "President and CLO",
+     "txn_date": "2026-08-22",
+     "filing_date": "2026-08-24",
+     "code": "M",
+     "shares": 1662.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "SACHIN J. MEHRA",
+     "owner_title": "",
+     "txn_date": "2026-08-22",
+     "filing_date": "2026-08-24",
+     "code": "M",
+     "shares": 441.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Milano Miguel",
+     "owner_title": "President and COO",
+     "txn_date": "2026-08-22",
+     "filing_date": "2026-08-24",
+     "code": "M",
+     "shares": 1662.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "ALBER LAURA",
+     "owner_title": "",
+     "txn_date": "2026-08-22",
+     "filing_date": "2026-08-24",
+     "code": "M",
+     "shares": 441.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "DONALD ARNOLD W",
+     "owner_title": "",
+     "txn_date": "2026-08-22",
+     "filing_date": "2026-08-24",
+     "code": "M",
+     "shares": 441.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Tallapragada Srinivas",
+     "owner_title": "Chief Eng/Cust Success Officer",
+     "txn_date": "2026-07-22",
+     "filing_date": "2026-07-23",
+     "code": "M",
+     "shares": 1786.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Tallapragada Srinivas",
+     "owner_title": "Chief Eng/Cust Success Officer",
+     "txn_date": "2026-07-22",
+     "filing_date": "2026-07-23",
+     "code": "F",
+     "shares": -886.0,
+     "price": 163.0,
+     "value_usd": -144418.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Harris Parker",
+     "owner_title": "Co-Founder and CTO, Slack",
+     "txn_date": "2026-07-22",
+     "filing_date": "2026-07-23",
+     "code": "M",
+     "shares": 1786.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Harris Parker",
+     "owner_title": "Co-Founder and CTO, Slack",
+     "txn_date": "2026-07-22",
+     "filing_date": "2026-07-23",
+     "code": "F",
+     "shares": -886.0,
+     "price": 163.0,
+     "value_usd": -144418.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Milano Miguel",
+     "owner_title": "President and CRO",
+     "txn_date": "2026-06-22",
+     "filing_date": "2026-06-23",
+     "code": "F",
+     "shares": -601.0,
+     "price": 150.12,
+     "value_usd": -90222.12000000001,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Niles Sabastian",
+     "owner_title": "President and CLO",
+     "txn_date": "2026-06-22",
+     "filing_date": "2026-06-23",
+     "code": "M",
+     "shares": 1016.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Harris Parker",
+     "owner_title": "Co-Founder and CTO, Slack",
+     "txn_date": "2026-06-22",
+     "filing_date": "2026-06-23",
+     "code": "F",
+     "shares": -630.0,
+     "price": 150.12,
+     "value_usd": -94575.6,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Milano Miguel",
+     "owner_title": "President and CRO",
+     "txn_date": "2026-06-22",
+     "filing_date": "2026-06-23",
+     "code": "F",
+     "shares": -400.0,
+     "price": 150.12,
+     "value_usd": -60048.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Milano Miguel",
+     "owner_title": "President and CRO",
+     "txn_date": "2026-06-22",
+     "filing_date": "2026-06-23",
+     "code": "M",
+     "shares": 1016.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Milano Miguel",
+     "owner_title": "President and CRO",
+     "txn_date": "2026-06-22",
+     "filing_date": "2026-06-23",
+     "code": "M",
+     "shares": 1525.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Niles Sabastian",
+     "owner_title": "President and CLO",
+     "txn_date": "2026-06-22",
+     "filing_date": "2026-06-23",
+     "code": "M",
+     "shares": 1017.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Niles Sabastian",
+     "owner_title": "President and CLO",
+     "txn_date": "2026-06-22",
+     "filing_date": "2026-06-23",
+     "code": "F",
+     "shares": -563.0,
+     "price": 150.12,
+     "value_usd": -84517.56,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Washington Robin L",
+     "owner_title": "President and COFO",
+     "txn_date": "2026-06-22",
+     "filing_date": "2026-06-23",
+     "code": "M",
+     "shares": 1831.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Tallapragada Srinivas",
+     "owner_title": "Chief Eng/Cust Success Officer",
+     "txn_date": "2026-06-22",
+     "filing_date": "2026-06-23",
+     "code": "M",
+     "shares": 1831.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Niles Sabastian",
+     "owner_title": "President and CLO",
+     "txn_date": "2026-06-22",
+     "filing_date": "2026-06-23",
+     "code": "F",
+     "shares": -562.0,
+     "price": 150.12,
+     "value_usd": -84367.44,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Tallapragada Srinivas",
+     "owner_title": "Chief Eng/Cust Success Officer",
+     "txn_date": "2026-06-22",
+     "filing_date": "2026-06-23",
+     "code": "F",
+     "shares": -908.0,
+     "price": 150.12,
+     "value_usd": -136308.96,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Harris Parker",
+     "owner_title": "Co-Founder and CTO, Slack",
+     "txn_date": "2026-06-22",
+     "filing_date": "2026-06-23",
+     "code": "M",
+     "shares": 1271.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Harris Parker",
+     "owner_title": "Co-Founder and CTO, Slack",
+     "txn_date": "2026-06-22",
+     "filing_date": "2026-06-23",
+     "code": "F",
+     "shares": -631.0,
+     "price": 150.12,
+     "value_usd": -94725.72,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Tallapragada Srinivas",
+     "owner_title": "Chief Eng/Cust Success Officer",
+     "txn_date": "2026-06-22",
+     "filing_date": "2026-06-23",
+     "code": "F",
+     "shares": -756.0,
+     "price": 150.12,
+     "value_usd": -113490.72,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Tallapragada Srinivas",
+     "owner_title": "Chief Eng/Cust Success Officer",
+     "txn_date": "2026-06-22",
+     "filing_date": "2026-06-23",
+     "code": "M",
+     "shares": 1523.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Harris Parker",
+     "owner_title": "Co-Founder and CTO, Slack",
+     "txn_date": "2026-06-22",
+     "filing_date": "2026-06-23",
+     "code": "M",
+     "shares": 1269.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Washington Robin L",
+     "owner_title": "President and COFO",
+     "txn_date": "2026-06-22",
+     "filing_date": "2026-06-23",
+     "code": "F",
+     "shares": -908.0,
+     "price": 150.12,
+     "value_usd": -136308.96,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "MUNOZ OSCAR",
+     "owner_title": "",
+     "txn_date": "2026-05-22",
+     "filing_date": "2026-05-26",
+     "code": "M",
+     "shares": 442.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "SACHIN J. MEHRA",
+     "owner_title": "",
+     "txn_date": "2026-05-22",
+     "filing_date": "2026-05-26",
+     "code": "M",
+     "shares": 442.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Conway Craig",
+     "owner_title": "",
+     "txn_date": "2026-05-22",
+     "filing_date": "2026-05-26",
+     "code": "M",
+     "shares": 442.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "KROES NEELIE",
+     "owner_title": "",
+     "txn_date": "2026-05-22",
+     "filing_date": "2026-05-26",
+     "code": "F",
+     "shares": -67.0,
+     "price": 180.07,
+     "value_usd": -12064.689999999999,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "ALBER LAURA",
+     "owner_title": "",
+     "txn_date": "2026-05-22",
+     "filing_date": "2026-05-26",
+     "code": "M",
+     "shares": 442.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Niles Sabastian",
+     "owner_title": "President and CLO",
+     "txn_date": "2026-05-22",
+     "filing_date": "2026-05-26",
+     "code": "M",
+     "shares": 1663.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Kirk David Blair",
+     "owner_title": "",
+     "txn_date": "2026-05-22",
+     "filing_date": "2026-05-26",
+     "code": "M",
+     "shares": 442.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Milano Miguel",
+     "owner_title": "President and CRO",
+     "txn_date": "2026-05-22",
+     "filing_date": "2026-05-26",
+     "code": "F",
+     "shares": -680.0,
+     "price": 180.07,
+     "value_usd": -122447.59999999999,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "DONALD ARNOLD W",
+     "owner_title": "",
+     "txn_date": "2026-05-22",
+     "filing_date": "2026-05-26",
+     "code": "M",
+     "shares": 442.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Niles Sabastian",
+     "owner_title": "President and CLO",
+     "txn_date": "2026-05-22",
+     "filing_date": "2026-05-26",
+     "code": "F",
+     "shares": -920.0,
+     "price": 180.07,
+     "value_usd": -165664.4,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "WEBB MAYNARD G JR",
+     "owner_title": "",
+     "txn_date": "2026-05-22",
+     "filing_date": "2026-05-26",
+     "code": "M",
+     "shares": 442.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "KROES NEELIE",
+     "owner_title": "",
+     "txn_date": "2026-05-22",
+     "filing_date": "2026-05-26",
+     "code": "M",
+     "shares": 442.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Roos John Victor",
+     "owner_title": "",
+     "txn_date": "2026-05-22",
+     "filing_date": "2026-05-26",
+     "code": "M",
+     "shares": 442.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Chang Amy",
+     "owner_title": "",
+     "txn_date": "2026-05-22",
+     "filing_date": "2026-05-26",
+     "code": "M",
+     "shares": 442.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Milano Miguel",
+     "owner_title": "President and CRO",
+     "txn_date": "2026-05-22",
+     "filing_date": "2026-05-26",
+     "code": "M",
+     "shares": 1663.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Tallapragada Srinivas",
+     "owner_title": "Chief Eng/Cust Success Officer",
+     "txn_date": "2026-04-22",
+     "filing_date": "2026-04-23",
+     "code": "F",
+     "shares": -13781.0,
+     "price": 189.8,
+     "value_usd": -2615633.8000000003,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Harris Parker",
+     "owner_title": "Co-Founder and CTO, Slack",
+     "txn_date": "2026-04-22",
+     "filing_date": "2026-04-23",
+     "code": "F",
+     "shares": -886.0,
+     "price": 189.8,
+     "value_usd": -168162.80000000002,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Harris Parker",
+     "owner_title": "Co-Founder and CTO, Slack",
+     "txn_date": "2026-04-22",
+     "filing_date": "2026-04-23",
+     "code": "M",
+     "shares": 1785.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Tallapragada Srinivas",
+     "owner_title": "Chief Eng/Cust Success Officer",
+     "txn_date": "2026-04-22",
+     "filing_date": "2026-04-23",
+     "code": "F",
+     "shares": -886.0,
+     "price": 189.8,
+     "value_usd": -168162.80000000002,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Tallapragada Srinivas",
+     "owner_title": "Chief Eng/Cust Success Officer",
+     "txn_date": "2026-04-22",
+     "filing_date": "2026-04-23",
+     "code": "M",
+     "shares": 1785.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Harris Parker",
+     "owner_title": "Co-Founder and CTO, Slack",
+     "txn_date": "2026-04-22",
+     "filing_date": "2026-04-23",
+     "code": "F",
+     "shares": -13781.0,
+     "price": 189.8,
+     "value_usd": -2615633.8000000003,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Benioff Marc",
+     "owner_title": "Chair and CEO",
+     "txn_date": "2026-04-22",
+     "filing_date": "2026-04-23",
+     "code": "F",
+     "shares": -22560.0,
+     "price": 189.8,
+     "value_usd": -4281888.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Harris Parker",
+     "owner_title": "Co-Founder and CTO, Slack",
+     "txn_date": "2026-03-22",
+     "filing_date": "2026-03-24",
+     "code": "A",
+     "shares": 27790.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Tallapragada Srinivas",
+     "owner_title": "Chief Eng/Cust Success Officer",
+     "txn_date": "2026-03-22",
+     "filing_date": "2026-03-24",
+     "code": "A",
+     "shares": 27790.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Milano Miguel",
+     "owner_title": "President and CRO",
+     "txn_date": "2026-03-22",
+     "filing_date": "2026-03-24",
+     "code": "A",
+     "shares": 16084.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Milano Miguel",
+     "owner_title": "President and CRO",
+     "txn_date": "2026-03-22",
+     "filing_date": "2026-03-24",
+     "code": "M",
+     "shares": 6103.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Harris Parker",
+     "owner_title": "Co-Founder and CTO, Slack",
+     "txn_date": "2026-03-22",
+     "filing_date": "2026-03-24",
+     "code": "M",
+     "shares": 1270.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Niles Sabastian",
+     "owner_title": "President and CLO",
+     "txn_date": "2026-03-22",
+     "filing_date": "2026-03-24",
+     "code": "M",
+     "shares": 4068.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Milano Miguel",
+     "owner_title": "President and CRO",
+     "txn_date": "2026-03-22",
+     "filing_date": "2026-03-24",
+     "code": "F",
+     "shares": -248.0,
+     "price": 195.38,
+     "value_usd": -48454.24,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Harris Parker",
+     "owner_title": "Co-Founder and CTO, Slack",
+     "txn_date": "2026-03-22",
+     "filing_date": "2026-03-24",
+     "code": "F",
+     "shares": -2408.0,
+     "price": 195.38,
+     "value_usd": -470475.04,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Niles Sabastian",
+     "owner_title": "President and CLO",
+     "txn_date": "2026-03-22",
+     "filing_date": "2026-03-24",
+     "code": "F",
+     "shares": -1871.0,
+     "price": 195.38,
+     "value_usd": -365555.98,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Tallapragada Srinivas",
+     "owner_title": "Chief Eng/Cust Success Officer",
+     "txn_date": "2026-03-22",
+     "filing_date": "2026-03-24",
+     "code": "M",
+     "shares": 1523.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Tallapragada Srinivas",
+     "owner_title": "Chief Eng/Cust Success Officer",
+     "txn_date": "2026-03-22",
+     "filing_date": "2026-03-24",
+     "code": "M",
+     "shares": 1003.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Niles Sabastian",
+     "owner_title": "President and CLO",
+     "txn_date": "2026-03-22",
+     "filing_date": "2026-03-24",
+     "code": "A",
+     "shares": 16084.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Milano Miguel",
+     "owner_title": "President and CRO",
+     "txn_date": "2026-03-22",
+     "filing_date": "2026-03-24",
+     "code": "M",
+     "shares": 1015.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Milano Miguel",
+     "owner_title": "President and CRO",
+     "txn_date": "2026-03-22",
+     "filing_date": "2026-03-24",
+     "code": "F",
+     "shares": -2040.0,
+     "price": 195.38,
+     "value_usd": -398575.2,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Tallapragada Srinivas",
+     "owner_title": "Chief Eng/Cust Success Officer",
+     "txn_date": "2026-03-22",
+     "filing_date": "2026-03-24",
+     "code": "F",
+     "shares": -3555.0,
+     "price": 195.38,
+     "value_usd": -694575.9,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Tallapragada Srinivas",
+     "owner_title": "Chief Eng/Cust Success Officer",
+     "txn_date": "2026-03-22",
+     "filing_date": "2026-03-24",
+     "code": "F",
+     "shares": -527.0,
+     "price": 195.38,
+     "value_usd": -102965.26,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Niles Sabastian",
+     "owner_title": "President and CLO",
+     "txn_date": "2026-03-22",
+     "filing_date": "2026-03-24",
+     "code": "M",
+     "shares": 1015.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Tallapragada Srinivas",
+     "owner_title": "Chief Eng/Cust Success Officer",
+     "txn_date": "2026-03-22",
+     "filing_date": "2026-03-24",
+     "code": "M",
+     "shares": 7323.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Harris Parker",
+     "owner_title": "Co-Founder and CTO, Slack",
+     "txn_date": "2026-03-22",
+     "filing_date": "2026-03-24",
+     "code": "F",
+     "shares": -440.0,
+     "price": 195.38,
+     "value_usd": -85967.2,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Harris Parker",
+     "owner_title": "Co-Founder and CTO, Slack",
+     "txn_date": "2026-03-22",
+     "filing_date": "2026-03-24",
+     "code": "M",
+     "shares": 1003.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Harris Parker",
+     "owner_title": "Co-Founder and CTO, Slack",
+     "txn_date": "2026-03-22",
+     "filing_date": "2026-03-24",
+     "code": "F",
+     "shares": -347.0,
+     "price": 195.38,
+     "value_usd": -67796.86,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Niles Sabastian",
+     "owner_title": "President and CLO",
+     "txn_date": "2026-03-22",
+     "filing_date": "2026-03-24",
+     "code": "F",
+     "shares": -410.0,
+     "price": 195.38,
+     "value_usd": -80105.8,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Washington Robin L",
+     "owner_title": "President and COFO",
+     "txn_date": "2026-03-22",
+     "filing_date": "2026-03-24",
+     "code": "M",
+     "shares": 7323.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Harris Parker",
+     "owner_title": "Co-Founder and CTO, Slack",
+     "txn_date": "2026-03-22",
+     "filing_date": "2026-03-24",
+     "code": "M",
+     "shares": 5086.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Tallapragada Srinivas",
+     "owner_title": "Chief Eng/Cust Success Officer",
+     "txn_date": "2026-03-22",
+     "filing_date": "2026-03-24",
+     "code": "F",
+     "shares": -347.0,
+     "price": 195.38,
+     "value_usd": -67796.86,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Washington Robin L",
+     "owner_title": "President and COFO",
+     "txn_date": "2026-03-22",
+     "filing_date": "2026-03-24",
+     "code": "F",
+     "shares": -2864.0,
+     "price": 195.38,
+     "value_usd": -559568.32,
+     "is_open_market": false
+    }
+   ]
+  },
+  "institutions": {
+   "as_of": null,
+   "staleness_days": null,
+   "sources": [],
+   "gaps": [
+    "institutions unavailable from free: no 13F dataset ingested yet"
+   ],
+   "period_end": null,
+   "filing_date_max": null,
+   "n_holders": null,
+   "d_holders_qoq": null,
+   "total_shares": null,
+   "d_shares_qoq": null,
+   "top_buyers": [],
+   "top_sellers": [],
+   "rows": []
+  },
+  "short": {
+   "as_of": "2026-08-31",
+   "staleness_days": 1,
+   "sources": [
+    "finra"
+   ],
+   "gaps": [
+    "short_interest: last harvest failed \u2014 short_interest unavailable from nasdaq: Short interest is not available. Short interest is only supported for Nasdaq Listed stocks"
+   ],
+   "interest": [],
+   "short_volume": [
+    {
+     "date": "2026-08-31",
+     "short_pct": 0.47993398575127844
+    },
+    {
+     "date": "2026-08-28",
+     "short_pct": 0.4482896451379701
+    },
+    {
+     "date": "2026-08-27",
+     "short_pct": 0.44403642927142467
+    },
+    {
+     "date": "2026-08-26",
+     "short_pct": 0.3771159956801099
+    },
+    {
+     "date": "2026-08-25",
+     "short_pct": 0.34065301480474314
+    },
+    {
+     "date": "2026-08-24",
+     "short_pct": 0.4650034644871631
+    },
+    {
+     "date": "2026-08-21",
+     "short_pct": 0.5275802816465192
+    },
+    {
+     "date": "2026-08-20",
+     "short_pct": 0.660722967064695
+    },
+    {
+     "date": "2026-08-19",
+     "short_pct": 0.5401431638649831
+    },
+    {
+     "date": "2026-08-18",
+     "short_pct": 0.47238778157441025
+    },
+    {
+     "date": "2026-08-17",
+     "short_pct": 0.5007133922303203
+    },
+    {
+     "date": "2026-08-14",
+     "short_pct": 0.6555550552504744
+    },
+    {
+     "date": "2026-08-13",
+     "short_pct": 0.47468314801526246
+    },
+    {
+     "date": "2026-08-12",
+     "short_pct": 0.4415325413550796
+    },
+    {
+     "date": "2026-08-11",
+     "short_pct": 0.510339077677433
+    },
+    {
+     "date": "2026-08-10",
+     "short_pct": 0.6075638776583625
+    },
+    {
+     "date": "2026-08-07",
+     "short_pct": 0.5387293205989383
+    },
+    {
+     "date": "2026-08-06",
+     "short_pct": 0.6190839331641914
+    },
+    {
+     "date": "2026-08-05",
+     "short_pct": 0.6113389377188523
+    },
+    {
+     "date": "2026-08-04",
+     "short_pct": 0.4551511419671436
+    },
+    {
+     "date": "2026-08-03",
+     "short_pct": 0.5673469572697599
+    },
+    {
+     "date": "2026-07-31",
+     "short_pct": 0.5663187126344009
+    },
+    {
+     "date": "2026-07-30",
+     "short_pct": 0.6757126258834966
+    },
+    {
+     "date": "2026-07-29",
+     "short_pct": 0.44753017832002434
+    },
+    {
+     "date": "2026-07-28",
+     "short_pct": 0.4429664331491941
+    },
+    {
+     "date": "2026-07-27",
+     "short_pct": 0.5083724051347839
+    },
+    {
+     "date": "2026-07-24",
+     "short_pct": 0.3371299742351351
+    },
+    {
+     "date": "2026-07-23",
+     "short_pct": 0.5691698050472593
+    },
+    {
+     "date": "2026-07-22",
+     "short_pct": 0.5418799512566006
+    },
+    {
+     "date": "2026-07-21",
+     "short_pct": 0.5670878774336624
+    },
+    {
+     "date": "2026-07-20",
+     "short_pct": 0.41786930315946597
+    },
+    {
+     "date": "2026-07-17",
+     "short_pct": 0.5005272092520829
+    },
+    {
+     "date": "2026-07-16",
+     "short_pct": 0.5390706423071584
+    },
+    {
+     "date": "2026-07-15",
+     "short_pct": 0.3835741905723364
+    },
+    {
+     "date": "2026-07-14",
+     "short_pct": 0.6323852144488792
+    },
+    {
+     "date": "2026-07-13",
+     "short_pct": 0.5106651525059522
+    },
+    {
+     "date": "2026-07-10",
+     "short_pct": 0.49566975102153077
+    },
+    {
+     "date": "2026-07-09",
+     "short_pct": 0.37648438048177907
+    },
+    {
+     "date": "2026-07-08",
+     "short_pct": 0.4595064898038347
+    },
+    {
+     "date": "2026-07-07",
+     "short_pct": 0.3389325238284591
+    },
+    {
+     "date": "2026-07-06",
+     "short_pct": 0.41605117681419856
+    },
+    {
+     "date": "2026-07-02",
+     "short_pct": 0.4805471244851684
+    },
+    {
+     "date": "2026-07-01",
+     "short_pct": 0.46582344541326837
+    },
+    {
+     "date": "2026-06-30",
+     "short_pct": 0.3741665724739816
+    },
+    {
+     "date": "2026-06-29",
+     "short_pct": 0.38291620607123994
+    },
+    {
+     "date": "2026-06-26",
+     "short_pct": 0.3862000880376062
+    },
+    {
+     "date": "2026-06-25",
+     "short_pct": 0.35449283301788015
+    },
+    {
+     "date": "2026-06-24",
+     "short_pct": 0.2583979759748795
+    },
+    {
+     "date": "2026-06-23",
+     "short_pct": 0.35341473840256693
+    },
+    {
+     "date": "2026-06-22",
+     "short_pct": 0.3262596582373771
+    },
+    {
+     "date": "2026-06-18",
+     "short_pct": 0.4397590369559359
+    },
+    {
+     "date": "2026-06-17",
+     "short_pct": 0.509723510884046
+    },
+    {
+     "date": "2026-06-16",
+     "short_pct": 0.4776865391861816
+    },
+    {
+     "date": "2026-06-15",
+     "short_pct": 0.46611498180680483
+    },
+    {
+     "date": "2026-06-12",
+     "short_pct": 0.5327490899107283
+    },
+    {
+     "date": "2026-06-11",
+     "short_pct": 0.5529255921975008
+    },
+    {
+     "date": "2026-06-10",
+     "short_pct": 0.4614231803652977
+    },
+    {
+     "date": "2026-06-09",
+     "short_pct": 0.3433306095108199
+    },
+    {
+     "date": "2026-06-08",
+     "short_pct": 0.409693976161031
+    },
+    {
+     "date": "2026-06-05",
+     "short_pct": 0.5083825809766402
+    },
+    {
+     "date": "2026-06-04",
+     "short_pct": 0.5716835439409794
+    },
+    {
+     "date": "2026-06-03",
+     "short_pct": 0.644118616020816
+    }
+   ],
+   "borrow": null
+  }
+ }
+}

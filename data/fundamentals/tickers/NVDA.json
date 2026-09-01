@@ -1,0 +1,1774 @@
+{
+ "schema_version": 1,
+ "ticker": "NVDA",
+ "cik": 1045810,
+ "name": null,
+ "generated_at": "2026-09-01T04:50:11.074035+00:00",
+ "capabilities": [
+  "borrow",
+  "earnings",
+  "estimates",
+  "insider",
+  "institutions",
+  "short_interest",
+  "short_volume"
+ ],
+ "partial": true,
+ "sections": {
+  "earnings": {
+   "as_of": "2026-08-26",
+   "staleness_days": 6,
+   "sources": [
+    "yahoo"
+   ],
+   "gaps": [],
+   "rows": [
+    {
+     "fiscal_end": "2026-11-17",
+     "report_date": "2026-11-17",
+     "report_time": "unknown",
+     "eps_estimate": 2.47,
+     "eps_actual": null,
+     "eps_surprise": null,
+     "eps_surprise_pct": null,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": null,
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2026-08-26",
+     "report_date": "2026-08-26",
+     "report_time": "amc",
+     "eps_estimate": 2.09,
+     "eps_actual": 2.22,
+     "eps_surprise": 0.13000000000000034,
+     "eps_surprise_pct": 6.16,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": 6.295906094476389,
+      "d0_pct": 8.73795275466771,
+      "d1_pct": 3.7632353581201095,
+      "d5_pct": null,
+      "d0_excess_spy": 8.082674143542555,
+      "gap_over_atr": 2.1010740293575925
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2026-05-20",
+     "report_date": "2026-05-20",
+     "report_time": "amc",
+     "eps_estimate": 1.77,
+     "eps_actual": 1.87,
+     "eps_surprise": 0.10000000000000009,
+     "eps_surprise_pct": 5.54,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": -0.5280386307444096,
+      "d0_pct": -1.7720529342800773,
+      "d1_pct": -3.642546805022484,
+      "d5_pct": -5.517519919318992,
+      "d0_excess_spy": -1.9703626412784003,
+      "gap_over_atr": -0.14203272852230947
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2026-02-25",
+     "report_date": "2026-02-25",
+     "report_time": "amc",
+     "eps_estimate": 1.54,
+     "eps_actual": 1.62,
+     "eps_surprise": 0.08000000000000007,
+     "eps_surprise_pct": 5.32,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": -0.6596406740833061,
+      "d0_pct": -5.456125128938172,
+      "d1_pct": -9.393534130968417,
+      "d5_pct": -6.2487223221823545,
+      "d0_excess_spy": -4.90068453375847,
+      "gap_over_atr": -0.1988428723588027
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2025-11-19",
+     "report_date": "2025-11-19",
+     "report_time": "amc",
+     "eps_estimate": 1.26,
+     "eps_actual": 1.3,
+     "eps_surprise": 0.040000000000000036,
+     "eps_surprise_pct": 3.46,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": 5.055754053064621,
+      "d0_pct": -3.152479491810023,
+      "d1_pct": -4.096075066826732,
+      "d5_pct": -5.104012467506969,
+      "d0_excess_spy": -1.628253979606764,
+      "gap_over_atr": 1.183631705227816
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2025-08-27",
+     "report_date": "2025-08-27",
+     "report_time": "amc",
+     "eps_estimate": 1.01,
+     "eps_actual": 1.05,
+     "eps_surprise": 0.040000000000000036,
+     "eps_surprise_pct": 4.1,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": -0.42951473187300415,
+      "d0_pct": -0.7874492767115715,
+      "d1_pct": -4.085910340501209,
+      "d5_pct": -8.028635099683745,
+      "d0_excess_spy": -1.1415896676695736,
+      "gap_over_atr": -0.16069198335050222
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2025-05-28",
+     "report_date": "2025-05-28",
+     "report_time": "amc",
+     "eps_estimate": 0.75,
+     "eps_actual": 0.81,
+     "eps_surprise": 0.06000000000000005,
+     "eps_surprise_pct": 8.02,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": 5.518880332426779,
+      "d0_pct": 3.24902081606282,
+      "d1_pct": 0.2373765521950011,
+      "d5_pct": 3.8424508778133193,
+      "d0_excess_spy": 2.8542804758868057,
+      "gap_over_atr": 1.7510002691564812
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2025-02-26",
+     "report_date": "2025-02-26",
+     "report_time": "amc",
+     "eps_estimate": 0.85,
+     "eps_actual": 0.89,
+     "eps_surprise": 0.040000000000000036,
+     "eps_surprise_pct": 5.25,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": 2.8336389817896546,
+      "d0_pct": -8.47806014389847,
+      "d1_pct": -4.844607456954475,
+      "d5_pct": -15.775441253080412,
+      "d0_excess_spy": -6.881869713464783,
+      "gap_over_atr": 0.6423762710167368
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2024-11-20",
+     "report_date": "2024-11-20",
+     "report_time": "amc",
+     "eps_estimate": 0.75,
+     "eps_actual": 0.81,
+     "eps_surprise": 0.06000000000000005,
+     "eps_surprise_pct": 8.52,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": 2.371654485120711,
+      "d0_pct": 0.5346485588869188,
+      "d1_pct": -2.700666569257526,
+      "d5_pct": -5.23682186689387,
+      "d0_excess_spy": -0.0021817391920420093,
+      "gap_over_atr": 0.7651494994919054
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2024-08-28",
+     "report_date": "2024-08-28",
+     "report_time": "amc",
+     "eps_estimate": 0.64,
+     "eps_actual": 0.68,
+     "eps_surprise": 0.040000000000000036,
+     "eps_surprise_pct": 5.66,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": -3.383488559309633,
+      "d0_pct": -6.384845341526102,
+      "d1_pct": -4.967755619336645,
+      "d5_pct": -18.135497706079594,
+      "d0_excess_spy": -6.393798913810134,
+      "gap_over_atr": -0.6127008813426598
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2024-05-22",
+     "report_date": "2024-05-22",
+     "report_time": "amc",
+     "eps_estimate": 0.56,
+     "eps_actual": 0.61,
+     "eps_surprise": 0.04999999999999993,
+     "eps_surprise_pct": 9.74,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": 7.45445303547061,
+      "d0_pct": 9.319649223007008,
+      "d1_pct": 12.13165370406113,
+      "d5_pct": 15.463935501361714,
+      "d0_excess_spy": 10.050071243723002,
+      "gap_over_atr": 2.2565130616348505
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2024-02-21",
+     "report_date": "2024-02-21",
+     "report_time": "amc",
+     "eps_estimate": 0.46,
+     "eps_actual": 0.52,
+     "eps_surprise": 0.06,
+     "eps_surprise_pct": 11.4,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": 11.194275240312578,
+      "d0_pct": 16.40088017558281,
+      "d1_pct": 16.814384041050733,
+      "d5_pct": 17.251599728167765,
+      "d0_excess_spy": 14.33133034316527,
+      "gap_over_atr": 2.9899273611770187
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2023-11-21",
+     "report_date": "2023-11-21",
+     "report_time": "amc",
+     "eps_estimate": 0.34,
+     "eps_actual": 0.4,
+     "eps_surprise": 0.06,
+     "eps_surprise_pct": 18.73,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": -0.18420441595659032,
+      "d0_pct": -2.4587550754171072,
+      "d1_pct": -4.340860277471414,
+      "d5_pct": -6.3551172730689,
+      "d0_excess_spy": -2.8448384346547284,
+      "gap_over_atr": -0.06433952015742142
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2023-08-23",
+     "report_date": "2023-08-23",
+     "report_time": "amc",
+     "eps_estimate": 0.21,
+     "eps_actual": 0.27,
+     "eps_surprise": 0.060000000000000026,
+     "eps_surprise_pct": 29.35,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": 6.5795025040933375,
+      "d0_pct": 0.09974757871253903,
+      "d1_pct": -2.3304175788266934,
+      "d5_pct": 4.7520977150598664,
+      "d0_excess_spy": 1.485654661252589,
+      "gap_over_atr": 1.6978382515136259
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2023-05-24",
+     "report_date": "2023-05-24",
+     "report_time": "amc",
+     "eps_estimate": 0.09,
+     "eps_actual": 0.11,
+     "eps_surprise": 0.020000000000000004,
+     "eps_surprise_pct": 18.8,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": 26.147746005220142,
+      "d0_pct": 24.369635894280005,
+      "d1_pct": 27.532906573082627,
+      "d5_pct": 28.780534176285897,
+      "d0_excess_spy": 23.503646064727544,
+      "gap_over_atr": 9.02616861641793
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2023-02-22",
+     "report_date": "2023-02-22",
+     "report_time": "amc",
+     "eps_estimate": 0.08,
+     "eps_actual": 0.09,
+     "eps_surprise": 0.009999999999999995,
+     "eps_surprise_pct": 9.45,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": 12.942087604779417,
+      "d0_pct": 14.021392926965937,
+      "d1_pct": 12.200056005506067,
+      "d5_pct": 12.334969170779386,
+      "d0_excess_spy": 13.48945257675427,
+      "gap_over_atr": 2.5556620033112734
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2022-11-16",
+     "report_date": "2022-11-16",
+     "report_time": "amc",
+     "eps_estimate": 0.07,
+     "eps_actual": 0.06,
+     "eps_surprise": -0.010000000000000009,
+     "eps_surprise_pct": -17.32,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": -1.225642342516664,
+      "d0_pct": -1.4644865108131455,
+      "d1_pct": -3.148959493956782,
+      "d5_pct": 2.262731702100673,
+      "d0_excess_spy": -1.158500435378973,
+      "gap_over_atr": -0.24869236190970895
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2022-08-24",
+     "report_date": "2022-08-24",
+     "report_time": "amc",
+     "eps_estimate": 0.05,
+     "eps_actual": 0.05,
+     "eps_surprise": 0.0,
+     "eps_surprise_pct": -1.49,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": -2.1948685211945818,
+      "d0_pct": 4.012309719215956,
+      "d1_pct": -5.585877867667977,
+      "d5_pct": -19.074438648983172,
+      "d0_excess_spy": 2.600557320365593,
+      "gap_over_atr": -0.47796703206593155
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2022-05-25",
+     "report_date": "2022-05-25",
+     "report_time": "amc",
+     "eps_estimate": 0.13,
+     "eps_actual": 0.14,
+     "eps_surprise": 0.010000000000000009,
+     "eps_surprise_pct": 4.86,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": -5.531670469940353,
+      "d0_pct": 5.160526839456536,
+      "d1_pct": 10.81590810748434,
+      "d5_pct": 10.279816746217252,
+      "d0_excess_spy": 3.1623884447685713,
+      "gap_over_atr": -0.721115957583663
+     },
+     "source": "yahoo"
+    },
+    {
+     "fiscal_end": "2022-02-16",
+     "report_date": "2022-02-16",
+     "report_time": "amc",
+     "eps_estimate": 0.12,
+     "eps_actual": 0.13,
+     "eps_surprise": 0.010000000000000009,
+     "eps_surprise_pct": 7.97,
+     "rev_estimate": null,
+     "rev_actual": null,
+     "guide_eps_low": null,
+     "guide_eps_high": null,
+     "reaction": {
+      "gap_pct": -3.3231508786818797,
+      "d0_pct": -7.559125398155708,
+      "d1_pct": -10.821921149252567,
+      "d5_pct": -8.879333559674052,
+      "d0_excess_spy": -5.422983791675162,
+      "gap_over_atr": -0.5648162810618206
+     },
+     "source": "yahoo"
+    }
+   ]
+  },
+  "insider": {
+   "as_of": "2026-08-12",
+   "staleness_days": 20,
+   "sources": [
+    "sec_edgar"
+   ],
+   "gaps": [],
+   "summary": {
+    "buys_180d": 0,
+    "sells_180d": 45,
+    "net_shares_180d": -2812857.0,
+    "net_value_usd_180d": -574327497.5314,
+    "counts_only": false
+   },
+   "rows": [
+    {
+     "owner_name": "NORA JOHNSON SUZANNE M",
+     "owner_title": "",
+     "txn_date": "2026-08-10",
+     "filing_date": "2026-08-12",
+     "code": "A",
+     "shares": 1262.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "NORA JOHNSON SUZANNE M",
+     "owner_title": "",
+     "txn_date": "2026-08-10",
+     "filing_date": "2026-08-12",
+     "code": "A",
+     "shares": 1148.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "COXE TENCH",
+     "owner_title": "",
+     "txn_date": "2026-08-05",
+     "filing_date": "2026-08-07",
+     "code": "G",
+     "shares": -500000.0,
+     "price": 0.0,
+     "value_usd": -0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "COXE TENCH",
+     "owner_title": "",
+     "txn_date": "2026-07-01",
+     "filing_date": "2026-07-06",
+     "code": "G",
+     "shares": -500000.0,
+     "price": 0.0,
+     "value_usd": -0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "SEAWELL A BROOKE",
+     "owner_title": "",
+     "txn_date": "2026-06-25",
+     "filing_date": "2026-06-29",
+     "code": "A",
+     "shares": 1211.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "STEVENS MARK A",
+     "owner_title": "",
+     "txn_date": "2026-06-25",
+     "filing_date": "2026-06-29",
+     "code": "A",
+     "shares": 1211.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Neal Stephen C",
+     "owner_title": "",
+     "txn_date": "2026-06-25",
+     "filing_date": "2026-06-29",
+     "code": "A",
+     "shares": 1211.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "LORA MELISSA",
+     "owner_title": "",
+     "txn_date": "2026-06-25",
+     "filing_date": "2026-06-29",
+     "code": "A",
+     "shares": 1211.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Shah Aarti S.",
+     "owner_title": "",
+     "txn_date": "2026-06-25",
+     "filing_date": "2026-06-29",
+     "code": "A",
+     "shares": 1211.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "JONES HARVEY C",
+     "owner_title": "",
+     "txn_date": "2026-06-25",
+     "filing_date": "2026-06-29",
+     "code": "A",
+     "shares": 1211.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "HUDSON DAWN E",
+     "owner_title": "",
+     "txn_date": "2026-06-25",
+     "filing_date": "2026-06-29",
+     "code": "A",
+     "shares": 1211.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Dabiri John",
+     "owner_title": "",
+     "txn_date": "2026-06-25",
+     "filing_date": "2026-06-29",
+     "code": "A",
+     "shares": 1211.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "COXE TENCH",
+     "owner_title": "",
+     "txn_date": "2026-06-25",
+     "filing_date": "2026-06-29",
+     "code": "A",
+     "shares": 1211.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "STEVENS MARK A",
+     "owner_title": "",
+     "txn_date": "2026-06-18",
+     "filing_date": "2026-06-23",
+     "code": "S",
+     "shares": -319385.0,
+     "price": 209.6952,
+     "value_usd": -66973501.452,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Teter Timothy S.",
+     "owner_title": "EVP, General Counsel and Sec",
+     "txn_date": "2026-06-17",
+     "filing_date": "2026-06-23",
+     "code": "F",
+     "shares": -35742.0,
+     "price": 207.41,
+     "value_usd": -7413248.22,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "STEVENS MARK A",
+     "owner_title": "",
+     "txn_date": "2026-06-18",
+     "filing_date": "2026-06-23",
+     "code": "S",
+     "shares": -565615.0,
+     "price": 210.4372,
+     "value_usd": -119026436.87799999,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Shoquist Debora",
+     "owner_title": "EVP, Operations",
+     "txn_date": "2026-06-17",
+     "filing_date": "2026-06-23",
+     "code": "F",
+     "shares": -35012.0,
+     "price": 207.41,
+     "value_usd": -7261838.92,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Puri Ajay K",
+     "owner_title": "EVP, Worldwide Field Ops",
+     "txn_date": "2026-06-17",
+     "filing_date": "2026-06-23",
+     "code": "F",
+     "shares": -36927.0,
+     "price": 207.41,
+     "value_usd": -7659029.07,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Kress Colette",
+     "owner_title": "EVP & Chief Financial Officer",
+     "txn_date": "2026-06-17",
+     "filing_date": "2026-06-23",
+     "code": "F",
+     "shares": -40746.0,
+     "price": 207.41,
+     "value_usd": -8451127.86,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "HUANG JEN HSUN",
+     "owner_title": "President and CEO",
+     "txn_date": "2026-06-17",
+     "filing_date": "2026-06-23",
+     "code": "F",
+     "shares": -45723.0,
+     "price": 207.41,
+     "value_usd": -9483407.43,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "HUANG JEN HSUN",
+     "owner_title": "President and CEO",
+     "txn_date": "2026-06-16",
+     "filing_date": "2026-06-18",
+     "code": "G",
+     "shares": -400000.0,
+     "price": 0.0,
+     "value_usd": -0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "GAWEL SCOTT",
+     "owner_title": "Principal Accounting Officer",
+     "txn_date": "2026-06-08",
+     "filing_date": "2026-06-10",
+     "code": "A",
+     "shares": 45643.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "GAWEL SCOTT",
+     "owner_title": "Principal Accounting Officer",
+     "txn_date": "2026-06-08",
+     "filing_date": "2026-06-10",
+     "code": "A",
+     "shares": 13866.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Neal Stephen C",
+     "owner_title": "",
+     "txn_date": "2026-06-03",
+     "filing_date": "2026-06-05",
+     "code": "S",
+     "shares": -15500.0,
+     "price": 215.7331,
+     "value_usd": -3343863.0500000003,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "STEVENS MARK A",
+     "owner_title": "",
+     "txn_date": "2026-06-02",
+     "filing_date": "2026-06-04",
+     "code": "S",
+     "shares": -500000.0,
+     "price": 222.3774,
+     "value_usd": -111188700.0,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "STEVENS MARK A",
+     "owner_title": "",
+     "txn_date": "2026-06-04",
+     "filing_date": "2026-06-04",
+     "code": "S",
+     "shares": -100000.0,
+     "price": 217.655,
+     "value_usd": -21765500.0,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "STEVENS MARK A",
+     "owner_title": "",
+     "txn_date": "2026-06-04",
+     "filing_date": "2026-06-04",
+     "code": "S",
+     "shares": -400000.0,
+     "price": 220.371,
+     "value_usd": -88148400.0,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "STEVENS MARK A",
+     "owner_title": "",
+     "txn_date": "2026-06-04",
+     "filing_date": "2026-06-04",
+     "code": "G",
+     "shares": -307500.0,
+     "price": 0.0,
+     "value_usd": -0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Dabiri John",
+     "owner_title": "",
+     "txn_date": "2026-05-27",
+     "filing_date": "2026-05-29",
+     "code": "S",
+     "shares": -625.0,
+     "price": 214.0,
+     "value_usd": -133750.0,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "STEVENS MARK A",
+     "owner_title": "",
+     "txn_date": "2026-03-20",
+     "filing_date": "2026-03-24",
+     "code": "S",
+     "shares": -100000.0,
+     "price": 172.6068,
+     "value_usd": -17260680.0,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "STEVENS MARK A",
+     "owner_title": "",
+     "txn_date": "2026-03-20",
+     "filing_date": "2026-03-24",
+     "code": "S",
+     "shares": -121682.0,
+     "price": 174.5685,
+     "value_usd": -21241844.217,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Shah Aarti S.",
+     "owner_title": "",
+     "txn_date": "2026-03-19",
+     "filing_date": "2026-03-20",
+     "code": "S",
+     "shares": -202.0,
+     "price": 177.7335,
+     "value_usd": -35902.167,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Kress Colette",
+     "owner_title": "EVP & Chief Financial Officer",
+     "txn_date": "2026-03-20",
+     "filing_date": "2026-03-20",
+     "code": "S",
+     "shares": -1316.0,
+     "price": 174.7468,
+     "value_usd": -229966.7888,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Kress Colette",
+     "owner_title": "EVP & Chief Financial Officer",
+     "txn_date": "2026-03-20",
+     "filing_date": "2026-03-20",
+     "code": "S",
+     "shares": -3307.0,
+     "price": 173.6291,
+     "value_usd": -574191.4336999999,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Puri Ajay K",
+     "owner_title": "EVP, Worldwide Field Ops",
+     "txn_date": "2026-03-18",
+     "filing_date": "2026-03-20",
+     "code": "S",
+     "shares": -270134.0,
+     "price": 182.2978,
+     "value_usd": -49244833.9052,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Robertson Donald F Jr",
+     "owner_title": "Principal Accounting Officer",
+     "txn_date": "2026-03-20",
+     "filing_date": "2026-03-20",
+     "code": "S",
+     "shares": -400.0,
+     "price": 172.97,
+     "value_usd": -69188.0,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "HUANG JEN HSUN",
+     "owner_title": "President and CEO",
+     "txn_date": "2026-03-18",
+     "filing_date": "2026-03-20",
+     "code": "G",
+     "shares": -29481301.0,
+     "price": 0.0,
+     "value_usd": -0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "HUANG JEN HSUN",
+     "owner_title": "President and CEO",
+     "txn_date": "2026-03-18",
+     "filing_date": "2026-03-20",
+     "code": "G",
+     "shares": 58962602.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Puri Ajay K",
+     "owner_title": "EVP, Worldwide Field Ops",
+     "txn_date": "2026-03-18",
+     "filing_date": "2026-03-20",
+     "code": "S",
+     "shares": -19881.0,
+     "price": 181.312,
+     "value_usd": -3604663.8720000004,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Teter Timothy S.",
+     "owner_title": "EVP, General Counsel and Sec",
+     "txn_date": "2026-03-18",
+     "filing_date": "2026-03-20",
+     "code": "F",
+     "shares": -66506.0,
+     "price": 181.93,
+     "value_usd": -12099436.58,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Robertson Donald F Jr",
+     "owner_title": "Principal Accounting Officer",
+     "txn_date": "2026-03-20",
+     "filing_date": "2026-03-20",
+     "code": "S",
+     "shares": -2100.0,
+     "price": 175.7948,
+     "value_usd": -369169.08,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Robertson Donald F Jr",
+     "owner_title": "Principal Accounting Officer",
+     "txn_date": "2026-03-20",
+     "filing_date": "2026-03-20",
+     "code": "S",
+     "shares": -600.0,
+     "price": 177.3117,
+     "value_usd": -106387.02,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Shoquist Debora",
+     "owner_title": "EVP, Operations",
+     "txn_date": "2026-03-18",
+     "filing_date": "2026-03-20",
+     "code": "F",
+     "shares": -65140.0,
+     "price": 181.93,
+     "value_usd": -11850920.200000001,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Shah Aarti S.",
+     "owner_title": "",
+     "txn_date": "2026-03-19",
+     "filing_date": "2026-03-20",
+     "code": "S",
+     "shares": -8516.0,
+     "price": 176.2743,
+     "value_usd": -1501151.9388000001,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Kress Colette",
+     "owner_title": "EVP & Chief Financial Officer",
+     "txn_date": "2026-03-20",
+     "filing_date": "2026-03-20",
+     "code": "S",
+     "shares": -471.0,
+     "price": 177.5122,
+     "value_usd": -83608.24620000001,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Kress Colette",
+     "owner_title": "EVP & Chief Financial Officer",
+     "txn_date": "2026-03-20",
+     "filing_date": "2026-03-20",
+     "code": "S",
+     "shares": -715.0,
+     "price": 172.0119,
+     "value_usd": -122988.5085,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Puri Ajay K",
+     "owner_title": "EVP, Worldwide Field Ops",
+     "txn_date": "2026-03-18",
+     "filing_date": "2026-03-20",
+     "code": "S",
+     "shares": -9985.0,
+     "price": 182.9386,
+     "value_usd": -1826641.921,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Kress Colette",
+     "owner_title": "EVP & Chief Financial Officer",
+     "txn_date": "2026-03-18",
+     "filing_date": "2026-03-20",
+     "code": "F",
+     "shares": -76535.0,
+     "price": 181.93,
+     "value_usd": -13924012.55,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Robertson Donald F Jr",
+     "owner_title": "Principal Accounting Officer",
+     "txn_date": "2026-03-20",
+     "filing_date": "2026-03-20",
+     "code": "S",
+     "shares": -500.0,
+     "price": 173.778,
+     "value_usd": -86889.0,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Kress Colette",
+     "owner_title": "EVP & Chief Financial Officer",
+     "txn_date": "2026-03-20",
+     "filing_date": "2026-03-20",
+     "code": "S",
+     "shares": -765.0,
+     "price": 173.6281,
+     "value_usd": -132825.49649999998,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Robertson Donald F Jr",
+     "owner_title": "Principal Accounting Officer",
+     "txn_date": "2026-03-18",
+     "filing_date": "2026-03-20",
+     "code": "F",
+     "shares": -4575.0,
+     "price": 181.93,
+     "value_usd": -832329.75,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Kress Colette",
+     "owner_title": "EVP & Chief Financial Officer",
+     "txn_date": "2026-03-20",
+     "filing_date": "2026-03-20",
+     "code": "S",
+     "shares": -4225.0,
+     "price": 174.731,
+     "value_usd": -738238.475,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Kress Colette",
+     "owner_title": "EVP & Chief Financial Officer",
+     "txn_date": "2026-03-20",
+     "filing_date": "2026-03-20",
+     "code": "S",
+     "shares": -18020.0,
+     "price": 175.7773,
+     "value_usd": -3167506.946,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Kress Colette",
+     "owner_title": "EVP & Chief Financial Officer",
+     "txn_date": "2026-03-20",
+     "filing_date": "2026-03-20",
+     "code": "S",
+     "shares": -4212.0,
+     "price": 176.8336,
+     "value_usd": -744823.1231999999,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Kress Colette",
+     "owner_title": "EVP & Chief Financial Officer",
+     "txn_date": "2026-03-20",
+     "filing_date": "2026-03-20",
+     "code": "S",
+     "shares": -1907.0,
+     "price": 177.5115,
+     "value_usd": -338514.4305,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Kress Colette",
+     "owner_title": "EVP & Chief Financial Officer",
+     "txn_date": "2026-03-20",
+     "filing_date": "2026-03-20",
+     "code": "S",
+     "shares": -2396.0,
+     "price": 172.7091,
+     "value_usd": -413811.0036,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Puri Ajay K",
+     "owner_title": "EVP, Worldwide Field Ops",
+     "txn_date": "2026-03-18",
+     "filing_date": "2026-03-20",
+     "code": "F",
+     "shares": -69529.0,
+     "price": 181.93,
+     "value_usd": -12649410.97,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Robertson Donald F Jr",
+     "owner_title": "Principal Accounting Officer",
+     "txn_date": "2026-03-20",
+     "filing_date": "2026-03-20",
+     "code": "S",
+     "shares": -600.0,
+     "price": 174.8467,
+     "value_usd": -104908.02,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Kress Colette",
+     "owner_title": "EVP & Chief Financial Officer",
+     "txn_date": "2026-03-20",
+     "filing_date": "2026-03-20",
+     "code": "S",
+     "shares": -1051.0,
+     "price": 174.7333,
+     "value_usd": -183644.69830000002,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Shah Aarti S.",
+     "owner_title": "",
+     "txn_date": "2026-03-19",
+     "filing_date": "2026-03-20",
+     "code": "S",
+     "shares": -10282.0,
+     "price": 177.0565,
+     "value_usd": -1820494.933,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Kress Colette",
+     "owner_title": "EVP & Chief Financial Officer",
+     "txn_date": "2026-03-20",
+     "filing_date": "2026-03-20",
+     "code": "S",
+     "shares": -999.0,
+     "price": 176.8343,
+     "value_usd": -176657.4657,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Kress Colette",
+     "owner_title": "EVP & Chief Financial Officer",
+     "txn_date": "2026-03-20",
+     "filing_date": "2026-03-20",
+     "code": "S",
+     "shares": -453.0,
+     "price": 177.5117,
+     "value_usd": -80412.8001,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Kress Colette",
+     "owner_title": "EVP & Chief Financial Officer",
+     "txn_date": "2026-03-20",
+     "filing_date": "2026-03-20",
+     "code": "S",
+     "shares": -230.0,
+     "price": 171.9681,
+     "value_usd": -39552.663,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Kress Colette",
+     "owner_title": "EVP & Chief Financial Officer",
+     "txn_date": "2026-03-20",
+     "filing_date": "2026-03-20",
+     "code": "S",
+     "shares": -2339.0,
+     "price": 172.7095,
+     "value_usd": -403967.5205,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "HUANG JEN HSUN",
+     "owner_title": "President and CEO",
+     "txn_date": "2026-03-18",
+     "filing_date": "2026-03-20",
+     "code": "F",
+     "shares": -437908.0,
+     "price": 181.93,
+     "value_usd": -79668602.44,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Kress Colette",
+     "owner_title": "EVP & Chief Financial Officer",
+     "txn_date": "2026-03-20",
+     "filing_date": "2026-03-20",
+     "code": "S",
+     "shares": -10264.0,
+     "price": 172.7096,
+     "value_usd": -1772691.3344,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Kress Colette",
+     "owner_title": "EVP & Chief Financial Officer",
+     "txn_date": "2026-03-20",
+     "filing_date": "2026-03-20",
+     "code": "S",
+     "shares": -3876.0,
+     "price": 175.8248,
+     "value_usd": -681496.9248,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Kress Colette",
+     "owner_title": "EVP & Chief Financial Officer",
+     "txn_date": "2026-03-20",
+     "filing_date": "2026-03-20",
+     "code": "S",
+     "shares": -4156.0,
+     "price": 175.7857,
+     "value_usd": -730565.3692,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Kress Colette",
+     "owner_title": "EVP & Chief Financial Officer",
+     "txn_date": "2026-03-20",
+     "filing_date": "2026-03-20",
+     "code": "S",
+     "shares": -734.0,
+     "price": 173.6275,
+     "value_usd": -127442.58499999999,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Kress Colette",
+     "owner_title": "EVP & Chief Financial Officer",
+     "txn_date": "2026-03-20",
+     "filing_date": "2026-03-20",
+     "code": "S",
+     "shares": -1034.0,
+     "price": 176.8288,
+     "value_usd": -182840.9792,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "HUANG JEN HSUN",
+     "owner_title": "President and CEO",
+     "txn_date": "2026-03-18",
+     "filing_date": "2026-03-20",
+     "code": "G",
+     "shares": -29481301.0,
+     "price": 0.0,
+     "value_usd": -0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Robertson Donald F Jr",
+     "owner_title": "Principal Accounting Officer",
+     "txn_date": "2026-03-20",
+     "filing_date": "2026-03-20",
+     "code": "S",
+     "shares": -1196.0,
+     "price": 172.5777,
+     "value_usd": -206402.92919999998,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Kress Colette",
+     "owner_title": "EVP & Chief Financial Officer",
+     "txn_date": "2026-03-20",
+     "filing_date": "2026-03-20",
+     "code": "S",
+     "shares": -180.0,
+     "price": 171.9951,
+     "value_usd": -30959.118000000002,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "SEAWELL A BROOKE",
+     "owner_title": "",
+     "txn_date": "2026-03-17",
+     "filing_date": "2026-03-19",
+     "code": "G",
+     "shares": -530.0,
+     "price": 0.0,
+     "value_usd": -0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Dabiri John",
+     "owner_title": "",
+     "txn_date": "2026-03-13",
+     "filing_date": "2026-03-17",
+     "code": "S",
+     "shares": -3004.0,
+     "price": 184.9,
+     "value_usd": -555439.6,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Puri Ajay K",
+     "owner_title": "EVP, Worldwide Field Ops",
+     "txn_date": "2026-03-09",
+     "filing_date": "2026-03-11",
+     "code": "A",
+     "shares": 47048.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Shoquist Debora",
+     "owner_title": "EVP, Operations",
+     "txn_date": "2026-03-09",
+     "filing_date": "2026-03-11",
+     "code": "A",
+     "shares": 47048.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Puri Ajay K",
+     "owner_title": "EVP, Worldwide Field Ops",
+     "txn_date": "2026-03-10",
+     "filing_date": "2026-03-11",
+     "code": "S",
+     "shares": -24940.0,
+     "price": 183.114,
+     "value_usd": -4566863.16,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Teter Timothy S.",
+     "owner_title": "EVP, General Counsel and Sec",
+     "txn_date": "2026-03-09",
+     "filing_date": "2026-03-11",
+     "code": "A",
+     "shares": 47048.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    },
+    {
+     "owner_name": "Puri Ajay K",
+     "owner_title": "EVP, Worldwide Field Ops",
+     "txn_date": "2026-03-10",
+     "filing_date": "2026-03-11",
+     "code": "S",
+     "shares": -275060.0,
+     "price": 182.4663,
+     "value_usd": -50189180.478,
+     "is_open_market": true
+    },
+    {
+     "owner_name": "Kress Colette",
+     "owner_title": "EVP & Chief Financial Officer",
+     "txn_date": "2026-03-09",
+     "filing_date": "2026-03-11",
+     "code": "A",
+     "shares": 47048.0,
+     "price": 0.0,
+     "value_usd": 0.0,
+     "is_open_market": false
+    }
+   ]
+  },
+  "institutions": {
+   "as_of": null,
+   "staleness_days": null,
+   "sources": [],
+   "gaps": [
+    "institutions unavailable from free: no 13F dataset ingested yet"
+   ],
+   "period_end": null,
+   "filing_date_max": null,
+   "n_holders": null,
+   "d_holders_qoq": null,
+   "total_shares": null,
+   "d_shares_qoq": null,
+   "top_buyers": [],
+   "top_sellers": [],
+   "rows": []
+  },
+  "short": {
+   "as_of": "2026-08-31",
+   "staleness_days": 1,
+   "sources": [
+    "finra",
+    "nasdaq"
+   ],
+   "gaps": [],
+   "interest": [
+    {
+     "settlement_date": "2026-08-14",
+     "shares_short": 285956804.0,
+     "days_to_cover": 2.517647
+    },
+    {
+     "settlement_date": "2026-07-31",
+     "shares_short": 292667375.0,
+     "days_to_cover": 2.304254
+    },
+    {
+     "settlement_date": "2026-07-15",
+     "shares_short": 324052767.0,
+     "days_to_cover": 2.470397
+    },
+    {
+     "settlement_date": "2026-06-30",
+     "shares_short": 310126785.0,
+     "days_to_cover": 1.988126
+    },
+    {
+     "settlement_date": "2026-06-15",
+     "shares_short": 299666309.0,
+     "days_to_cover": 1.78415
+    },
+    {
+     "settlement_date": "2026-05-29",
+     "shares_short": 284722716.0,
+     "days_to_cover": 1.580501
+    },
+    {
+     "settlement_date": "2026-05-15",
+     "shares_short": 296966425.0,
+     "days_to_cover": 1.943416
+    },
+    {
+     "settlement_date": "2026-04-30",
+     "shares_short": 282926089.0,
+     "days_to_cover": 1.878553
+    },
+    {
+     "settlement_date": "2026-04-15",
+     "shares_short": 283335701.0,
+     "days_to_cover": 1.961456
+    },
+    {
+     "settlement_date": "2026-03-31",
+     "shares_short": 280872588.0,
+     "days_to_cover": 1.507173
+    },
+    {
+     "settlement_date": "2026-03-13",
+     "shares_short": 229229350.0,
+     "days_to_cover": 1.302247
+    },
+    {
+     "settlement_date": "2026-02-27",
+     "shares_short": 248340872.0,
+     "days_to_cover": 1.305053
+    },
+    {
+     "settlement_date": "2026-02-13",
+     "shares_short": 254311707.0,
+     "days_to_cover": 1.398896
+    },
+    {
+     "settlement_date": "2026-01-30",
+     "shares_short": 257091247.0,
+     "days_to_cover": 1.567054
+    },
+    {
+     "settlement_date": "2026-01-15",
+     "shares_short": 261838673.0,
+     "days_to_cover": 1.626643
+    },
+    {
+     "settlement_date": "2025-12-31",
+     "shares_short": 256762405.0,
+     "days_to_cover": 1.661284
+    },
+    {
+     "settlement_date": "2025-12-15",
+     "shares_short": 264294883.0,
+     "days_to_cover": 1.542297
+    },
+    {
+     "settlement_date": "2025-11-28",
+     "shares_short": 232898275.0,
+     "days_to_cover": 1.0
+    },
+    {
+     "settlement_date": "2025-11-14",
+     "shares_short": 237153736.0,
+     "days_to_cover": 1.224441
+    },
+    {
+     "settlement_date": "2025-10-31",
+     "shares_short": 238599888.0,
+     "days_to_cover": 1.352904
+    },
+    {
+     "settlement_date": "2025-10-15",
+     "shares_short": 210957056.0,
+     "days_to_cover": 1.228879
+    },
+    {
+     "settlement_date": "2025-09-30",
+     "shares_short": 226771413.0,
+     "days_to_cover": 1.164861
+    },
+    {
+     "settlement_date": "2025-09-15",
+     "shares_short": 217485473.0,
+     "days_to_cover": 1.262567
+    },
+    {
+     "settlement_date": "2025-08-29",
+     "shares_short": 196695074.0,
+     "days_to_cover": 1.021495
+    },
+    {
+     "settlement_date": "2025-08-15",
+     "shares_short": 205241302.0,
+     "days_to_cover": 1.35748
+    }
+   ],
+   "short_volume": [
+    {
+     "date": "2026-08-31",
+     "short_pct": 0.38078201554200114
+    },
+    {
+     "date": "2026-08-28",
+     "short_pct": 0.3994626770752278
+    },
+    {
+     "date": "2026-08-27",
+     "short_pct": 0.32551184705610053
+    },
+    {
+     "date": "2026-08-26",
+     "short_pct": 0.394843999271967
+    },
+    {
+     "date": "2026-08-25",
+     "short_pct": 0.42638920739745384
+    },
+    {
+     "date": "2026-08-24",
+     "short_pct": 0.4199059723709309
+    },
+    {
+     "date": "2026-08-21",
+     "short_pct": 0.36715990100784424
+    },
+    {
+     "date": "2026-08-20",
+     "short_pct": 0.38313501995379007
+    },
+    {
+     "date": "2026-08-19",
+     "short_pct": 0.34019764885441073
+    },
+    {
+     "date": "2026-08-18",
+     "short_pct": 0.39225083440587416
+    },
+    {
+     "date": "2026-08-17",
+     "short_pct": 0.38266713960774257
+    },
+    {
+     "date": "2026-08-14",
+     "short_pct": 0.4057578046700254
+    },
+    {
+     "date": "2026-08-13",
+     "short_pct": 0.33345465038488437
+    },
+    {
+     "date": "2026-08-12",
+     "short_pct": 0.30408888851479743
+    },
+    {
+     "date": "2026-08-11",
+     "short_pct": 0.2915574518887252
+    },
+    {
+     "date": "2026-08-10",
+     "short_pct": 0.3937553140881115
+    },
+    {
+     "date": "2026-08-07",
+     "short_pct": 0.37134219923511796
+    },
+    {
+     "date": "2026-08-06",
+     "short_pct": 0.33318495455457897
+    },
+    {
+     "date": "2026-08-05",
+     "short_pct": 0.34940486345249433
+    },
+    {
+     "date": "2026-08-04",
+     "short_pct": 0.3250651063742522
+    },
+    {
+     "date": "2026-08-03",
+     "short_pct": 0.39412314259068265
+    },
+    {
+     "date": "2026-07-31",
+     "short_pct": 0.33982741798873833
+    },
+    {
+     "date": "2026-07-30",
+     "short_pct": 0.27732853733064455
+    },
+    {
+     "date": "2026-07-29",
+     "short_pct": 0.36201208080252273
+    },
+    {
+     "date": "2026-07-28",
+     "short_pct": 0.36548257369703346
+    },
+    {
+     "date": "2026-07-27",
+     "short_pct": 0.3506494298410127
+    },
+    {
+     "date": "2026-07-24",
+     "short_pct": 0.34042098298046697
+    },
+    {
+     "date": "2026-07-23",
+     "short_pct": 0.3750179125139029
+    },
+    {
+     "date": "2026-07-22",
+     "short_pct": 0.42985859248482744
+    },
+    {
+     "date": "2026-07-21",
+     "short_pct": 0.33513007033537295
+    },
+    {
+     "date": "2026-07-20",
+     "short_pct": 0.30311723037651844
+    },
+    {
+     "date": "2026-07-17",
+     "short_pct": 0.4180290641562948
+    },
+    {
+     "date": "2026-07-16",
+     "short_pct": 0.4569388319210941
+    },
+    {
+     "date": "2026-07-15",
+     "short_pct": 0.44221801166019337
+    },
+    {
+     "date": "2026-07-14",
+     "short_pct": 0.3516323224185547
+    },
+    {
+     "date": "2026-07-13",
+     "short_pct": 0.33426303068848606
+    },
+    {
+     "date": "2026-07-10",
+     "short_pct": 0.4017716263431609
+    },
+    {
+     "date": "2026-07-09",
+     "short_pct": 0.34949647526643574
+    },
+    {
+     "date": "2026-07-08",
+     "short_pct": 0.38121020615287055
+    },
+    {
+     "date": "2026-07-07",
+     "short_pct": 0.421936090511941
+    },
+    {
+     "date": "2026-07-06",
+     "short_pct": 0.34681011657459165
+    },
+    {
+     "date": "2026-07-02",
+     "short_pct": 0.32193911299857114
+    },
+    {
+     "date": "2026-07-01",
+     "short_pct": 0.4625196603751072
+    },
+    {
+     "date": "2026-06-30",
+     "short_pct": 0.4807072272493543
+    },
+    {
+     "date": "2026-06-29",
+     "short_pct": 0.3872972660316051
+    },
+    {
+     "date": "2026-06-26",
+     "short_pct": 0.36097714688728877
+    },
+    {
+     "date": "2026-06-25",
+     "short_pct": 0.30945023093155205
+    },
+    {
+     "date": "2026-06-24",
+     "short_pct": 0.30542352266220485
+    },
+    {
+     "date": "2026-06-23",
+     "short_pct": 0.3512332817623386
+    },
+    {
+     "date": "2026-06-22",
+     "short_pct": 0.320742379549314
+    },
+    {
+     "date": "2026-06-18",
+     "short_pct": 0.2918620260119571
+    },
+    {
+     "date": "2026-06-17",
+     "short_pct": 0.34796959936279465
+    },
+    {
+     "date": "2026-06-16",
+     "short_pct": 0.37185136450414397
+    },
+    {
+     "date": "2026-06-15",
+     "short_pct": 0.3219364696896766
+    },
+    {
+     "date": "2026-06-12",
+     "short_pct": 0.3350541777614369
+    },
+    {
+     "date": "2026-06-11",
+     "short_pct": 0.2983446788068741
+    },
+    {
+     "date": "2026-06-10",
+     "short_pct": 0.37715841474637224
+    },
+    {
+     "date": "2026-06-09",
+     "short_pct": 0.4039035364387302
+    },
+    {
+     "date": "2026-06-08",
+     "short_pct": 0.33470085237892844
+    },
+    {
+     "date": "2026-06-05",
+     "short_pct": 0.33986236338881887
+    },
+    {
+     "date": "2026-06-04",
+     "short_pct": 0.3932275292085824
+    },
+    {
+     "date": "2026-06-03",
+     "short_pct": 0.4177599274766516
+    }
+   ],
+   "borrow": null
+  }
+ }
+}

@@ -269,7 +269,9 @@ def _build_earnings(ticker: str, provider, warm_only: bool) -> dict:
     gap: Optional[str] = None
     if events is None:
         if warm_only:
-            return _empty_section("warm_only: no cached earnings data")
+            return _empty_section(
+                _last_fetch_note(ticker, "earnings")
+                or f"earnings: not harvested for {ticker} yet — run scripts/harvest_fundamentals.py")
         try:
             events = provider.earnings_history(ticker, limit=EARNINGS_CAP)
         except SectionUnavailable as e:
@@ -338,7 +340,9 @@ def _build_insider(ticker: str, cik: Optional[int], provider, warm_only: bool,
     txns = _store_insider(ticker, since)
     if txns is None:
         if warm_only:
-            return {**_empty_section("warm_only: no cached insider data"),
+            return {**_empty_section(
+                        _last_fetch_note(ticker, "insider")
+                        or f"insider: not harvested for {ticker} yet — run scripts/harvest_fundamentals.py"),
                     "summary": None}
         if cik is None:
             return {**_empty_section(f"{ticker} could not be resolved to a CIK"),
@@ -479,6 +483,44 @@ def _build_institutions(ticker: str, provider, warm_only: bool) -> dict:
 
 # ── short section ───────────────────────────────────────────────────────
 
+def _last_fetch_note(ticker: str, section: str) -> Optional[str]:
+    """Why is this section empty in the warm store?
+
+    warm_only mode skips the live fetch, so the SectionUnavailable that would
+    have explained the emptiness is never raised — and the artifact ships an
+    empty section with no reason, which is precisely the failure the
+    SectionUnavailable/empty-list distinction exists to prevent. CRM shipped a
+    blank short-interest panel this way.
+
+    The harvester already records every attempt in fund_fetch_log, including the
+    error text, so the reason is recoverable rather than re-derived.
+    """
+    con = _ro_connect()
+    if con is None:
+        return None
+    try:
+        with con:
+            row = con.execute(
+                """
+                SELECT ok, rows, error FROM fund_fetch_log
+                WHERE ticker = ? AND section = ?
+                ORDER BY fetched_at DESC LIMIT 1
+                """,
+                [ticker.upper(), section],
+            ).fetchone()
+    except duckdb.Error:
+        return None
+    if not row:
+        return f"{section}: not harvested for {ticker.upper()} yet"
+    ok, rows, error = row
+    if error:
+        return f"{section}: last harvest failed — {error}"
+    if not rows:
+        return (f"{section}: last harvest returned no rows for {ticker.upper()} "
+                "— the source does not cover this instrument")
+    return None
+
+
 def _build_short(ticker: str, provider, warm_only: bool) -> dict:
     since_interest = date.today() - timedelta(days=400)  # bimonthly prints: keep well over a year
     since_volume = date.today() - timedelta(days=SHORT_VOLUME_DAYS)
@@ -487,6 +529,10 @@ def _build_short(ticker: str, provider, warm_only: bool) -> dict:
     sources: set[str] = set()
 
     interest_rows = _store_short_interest(ticker, since_interest)
+    if not interest_rows and warm_only:
+        note = _last_fetch_note(ticker, "short_interest")
+        if note:
+            gaps.append(note)
     if not interest_rows and not warm_only:
         try:
             live = provider.short_interest(ticker, since_interest)

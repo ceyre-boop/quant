@@ -1,0 +1,305 @@
+{
+ "schema_version": 1,
+ "ticker": "SPY",
+ "cik": 884394,
+ "name": null,
+ "generated_at": "2026-09-01T04:50:10.891991+00:00",
+ "capabilities": [
+  "borrow",
+  "short_interest",
+  "short_volume"
+ ],
+ "partial": true,
+ "sections": {
+  "earnings": {
+   "as_of": null,
+   "staleness_days": null,
+   "sources": [],
+   "gaps": [
+    "SPY is an ETF \u2014 it has no earnings, no Form 4 and no 13F filed under its own ticker"
+   ],
+   "rows": []
+  },
+  "insider": {
+   "as_of": null,
+   "staleness_days": null,
+   "sources": [],
+   "gaps": [
+    "SPY is an ETF \u2014 it has no earnings, no Form 4 and no 13F filed under its own ticker"
+   ],
+   "rows": [],
+   "summary": null
+  },
+  "institutions": {
+   "as_of": null,
+   "staleness_days": null,
+   "sources": [],
+   "gaps": [
+    "SPY is an ETF \u2014 it has no earnings, no Form 4 and no 13F filed under its own ticker"
+   ],
+   "rows": []
+  },
+  "short": {
+   "as_of": "2026-08-31",
+   "staleness_days": 1,
+   "sources": [
+    "finra"
+   ],
+   "gaps": [
+    "short_interest: last harvest failed \u2014 short_interest unavailable from nasdaq: Short interest is not available. Short interest is only supported for Nasdaq Listed stocks"
+   ],
+   "interest": [],
+   "short_volume": [
+    {
+     "date": "2026-08-31",
+     "short_pct": 0.6107965725009924
+    },
+    {
+     "date": "2026-08-28",
+     "short_pct": 0.6600395301909909
+    },
+    {
+     "date": "2026-08-27",
+     "short_pct": 0.5357817012243933
+    },
+    {
+     "date": "2026-08-26",
+     "short_pct": 0.5323263915387075
+    },
+    {
+     "date": "2026-08-25",
+     "short_pct": 0.6315352381861044
+    },
+    {
+     "date": "2026-08-24",
+     "short_pct": 0.6723162536136215
+    },
+    {
+     "date": "2026-08-21",
+     "short_pct": 0.55698841559919
+    },
+    {
+     "date": "2026-08-20",
+     "short_pct": 0.5599427896295384
+    },
+    {
+     "date": "2026-08-19",
+     "short_pct": 0.501980559709145
+    },
+    {
+     "date": "2026-08-18",
+     "short_pct": 0.5937437805847677
+    },
+    {
+     "date": "2026-08-17",
+     "short_pct": 0.7359469331744823
+    },
+    {
+     "date": "2026-08-14",
+     "short_pct": 0.6388983488991093
+    },
+    {
+     "date": "2026-08-13",
+     "short_pct": 0.6783603342339338
+    },
+    {
+     "date": "2026-08-12",
+     "short_pct": 0.6959256587644811
+    },
+    {
+     "date": "2026-08-11",
+     "short_pct": 0.6537835833695137
+    },
+    {
+     "date": "2026-08-10",
+     "short_pct": 0.6801215938847278
+    },
+    {
+     "date": "2026-08-07",
+     "short_pct": 0.7415851217194015
+    },
+    {
+     "date": "2026-08-06",
+     "short_pct": 0.6393440460386083
+    },
+    {
+     "date": "2026-08-05",
+     "short_pct": 0.6822167355029659
+    },
+    {
+     "date": "2026-08-04",
+     "short_pct": 0.5822723192736905
+    },
+    {
+     "date": "2026-08-03",
+     "short_pct": 0.501575657756543
+    },
+    {
+     "date": "2026-07-31",
+     "short_pct": 0.4804770837168028
+    },
+    {
+     "date": "2026-07-30",
+     "short_pct": 0.5202819267312967
+    },
+    {
+     "date": "2026-07-29",
+     "short_pct": 0.608982001434748
+    },
+    {
+     "date": "2026-07-28",
+     "short_pct": 0.6175213048963535
+    },
+    {
+     "date": "2026-07-27",
+     "short_pct": 0.5425656035263763
+    },
+    {
+     "date": "2026-07-24",
+     "short_pct": 0.5624214870385155
+    },
+    {
+     "date": "2026-07-23",
+     "short_pct": 0.49678516551039503
+    },
+    {
+     "date": "2026-07-22",
+     "short_pct": 0.5107378996314235
+    },
+    {
+     "date": "2026-07-21",
+     "short_pct": 0.557748933948235
+    },
+    {
+     "date": "2026-07-20",
+     "short_pct": 0.5243333454523385
+    },
+    {
+     "date": "2026-07-17",
+     "short_pct": 0.5621428221120782
+    },
+    {
+     "date": "2026-07-16",
+     "short_pct": 0.5740728651680113
+    },
+    {
+     "date": "2026-07-15",
+     "short_pct": 0.49452946540584486
+    },
+    {
+     "date": "2026-07-14",
+     "short_pct": 0.6027823171256305
+    },
+    {
+     "date": "2026-07-13",
+     "short_pct": 0.6152812400987444
+    },
+    {
+     "date": "2026-07-10",
+     "short_pct": 0.627769360533758
+    },
+    {
+     "date": "2026-07-09",
+     "short_pct": 0.5299742249358615
+    },
+    {
+     "date": "2026-07-08",
+     "short_pct": 0.5885691284726466
+    },
+    {
+     "date": "2026-07-07",
+     "short_pct": 0.5703474354284406
+    },
+    {
+     "date": "2026-07-06",
+     "short_pct": 0.6459473684723762
+    },
+    {
+     "date": "2026-07-02",
+     "short_pct": 0.5018495267165874
+    },
+    {
+     "date": "2026-07-01",
+     "short_pct": 0.5214720402773046
+    },
+    {
+     "date": "2026-06-30",
+     "short_pct": 0.42597427053678855
+    },
+    {
+     "date": "2026-06-29",
+     "short_pct": 0.3911001403301632
+    },
+    {
+     "date": "2026-06-26",
+     "short_pct": 0.4746979707997188
+    },
+    {
+     "date": "2026-06-25",
+     "short_pct": 0.5243638161328656
+    },
+    {
+     "date": "2026-06-24",
+     "short_pct": 0.49780614113692995
+    },
+    {
+     "date": "2026-06-23",
+     "short_pct": 0.6272688075077412
+    },
+    {
+     "date": "2026-06-22",
+     "short_pct": 0.5544305927335932
+    },
+    {
+     "date": "2026-06-18",
+     "short_pct": 0.736536216010011
+    },
+    {
+     "date": "2026-06-17",
+     "short_pct": 0.5959654343182972
+    },
+    {
+     "date": "2026-06-16",
+     "short_pct": 0.4994722880149829
+    },
+    {
+     "date": "2026-06-15",
+     "short_pct": 0.4285251184459092
+    },
+    {
+     "date": "2026-06-12",
+     "short_pct": 0.483319667864235
+    },
+    {
+     "date": "2026-06-11",
+     "short_pct": 0.42882492484531837
+    },
+    {
+     "date": "2026-06-10",
+     "short_pct": 0.4194399864147039
+    },
+    {
+     "date": "2026-06-09",
+     "short_pct": 0.4082386698748238
+    },
+    {
+     "date": "2026-06-08",
+     "short_pct": 0.33907231044231556
+    },
+    {
+     "date": "2026-06-05",
+     "short_pct": 0.514226104695596
+    },
+    {
+     "date": "2026-06-04",
+     "short_pct": 0.4912145047063969
+    },
+    {
+     "date": "2026-06-03",
+     "short_pct": 0.5931224654747181
+    }
+   ],
+   "borrow": null
+  }
+ }
+}
