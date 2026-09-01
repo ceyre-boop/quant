@@ -95,6 +95,61 @@ decision_logger.update_outcome(trade_id, outcome)   # exit — REQUIRED
 
 ---
 
+## The research terminal
+
+The front end is a **research terminal**, not a strategy-discovery dashboard: one place to
+look at everything, pulled from the sources already wired up. It is a *pull* surface — you
+open it and browse. Nothing alerts, nothing recommends a trade. Judgment stays with you.
+
+```bash
+cd app && bun install && bun run build     # builds to _site/
+python3 scripts/live_signals_server.py     # serves _site + the API on :8765
+open http://localhost:8765
+```
+
+Panels: **Terminal** (TradingView chart and the fundamentals for the same ticker, side by
+side), **Signals**, **Calendar** (day-click opens the replay cockpit), **Oracle**,
+**Connections** (key management and data-connection status).
+
+The chart is a TradingView embed plus a link-out to your real account, where your indicators
+live — charting is deliberately not rebuilt. The replay cockpit is kept verbatim as a
+framework-free island (`app/src/islands/replay.ts`).
+
+Front-end QA drives the real app in headless Chrome:
+
+```bash
+node scripts/qa/dashboard_qa.mjs     # screenshots to scripts/qa/shots/
+```
+
+It gates on assertion failures and on HTTP failures classified **by URL** — a blanket filter
+on 5xx would hide the bugs it exists to catch. Known-degraded conditions are reported with
+their reason rather than suppressed.
+
+### Fundamentals and filings
+
+`sovereign/fundamentals/` — earnings history, estimates vs actuals, price reaction per print,
+insider Form 4, institutional 13F, and short interest. All free sources, behind a provider
+interface so a paid key (FMP/Finnhub) drops in without a rewrite.
+
+**Stated honestly, because the panel does too:** there is no good free source for *forward*
+analyst consensus or management guidance. Those columns render greyed rather than implying a
+number. Three categories are structurally lagged — 13F ~45 days, official short interest
+~8 days, Form 4 T+2 — so every section carries its own `as_of` and staleness.
+
+A section that could not be fetched is never rendered as "no data": `SectionUnavailable` and
+an empty result are different things, enforced at the type level.
+
+```bash
+.venv313/bin/python scripts/harvest_fundamentals.py --watchlist --emit-json
+```
+
+Warm watchlist artifacts land in `data/fundamentals/` and are committed, so GitHub Pages
+serves them with no backend. `data/fundamentals/cik_map.json` is required, not optional:
+`www.sec.gov/files` is not CORS-open, so without the baked map the browser cannot resolve a
+ticker at all.
+
+---
+
 ## Scheduling
 
 Jobs run under **macOS launchd** — not cron, not Windows Task Scheduler. Plists live in
