@@ -8,6 +8,7 @@
  * to a live price without saying when they are from is actively misleading.
  */
 import { fetchStatic, fetchJSON, apiPath, backendAwake } from './api'
+import { lookup, loadSymbols, KIND_LABEL } from './symbols'
 
 export type Section<T> = {
   as_of: string | null
@@ -216,7 +217,30 @@ export async function loadPanel(ticker: string, cikMap: Record<string, number>):
   }
 
   if (cik == null) {
-    return { state: 'error', reason: `${ticker} is not in the SEC ticker map. Check the symbol.` }
+    // Absent from the SEC map is NOT an error. FX pairs, futures and indices have
+    // no issuer and never file, so there is nothing to look up — that is a fact
+    // about the instrument, not a failed lookup. Saying "check the symbol" here
+    // made a working tool look broken.
+    //
+    // Await the index rather than reading a possibly-cold cache: getting this
+    // wrong would tell the user a symbol "was not found" purely because the
+    // lookup table had not finished loading yet.
+    await loadSymbols()
+    const sym = lookup(ticker)
+    const reason = sym && sym.kind !== 'equity'
+      ? `${ticker} is ${KIND_LABEL[sym.kind]} — no issuer files with the SEC, so there are no `
+        + 'earnings, insider or 13F records. The chart and price data still work.'
+      : `${ticker} was not found. Search by ticker (NVDA) or company name (NVIDIA).`
+
+    return {
+      state: 'partial',
+      panel: {
+        schema_version: 1, ticker, cik: null, name: sym?.name ?? null,
+        generated_at: new Date().toISOString(),
+        capabilities: [], partial: true, sections: {},
+      },
+      reason,
+    }
   }
   try {
     const p = await loadFromSEC(ticker, cik)

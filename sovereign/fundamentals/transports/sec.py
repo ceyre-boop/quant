@@ -34,6 +34,8 @@ UA = {"User-Agent": "Alta Research colineyre222@gmail.com"}
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 CIK_MAP_PATH = REPO_ROOT / "data" / "fundamentals" / "cik_map.json"
+# Ticker + CIK + company NAME, for search-by-name in the browser.
+SYMBOL_INDEX_PATH = REPO_ROOT / "data" / "fundamentals" / "symbol_index.json"
 
 _SOURCE = "sec_edgar"
 
@@ -104,6 +106,12 @@ def load_cik_map(refresh: bool = False) -> dict[str, int]:
     Caches to data/fundamentals/cik_map.json as a flat {"AAPL": 320193, ...}
     object — this same file doubles as the browser-consumable resolver so the
     front end can map tickers to CIKs with zero network calls of its own.
+
+    Writes a SECOND artifact, symbol_index.json, carrying the company NAME
+    alongside each ticker. An earlier version discarded `title` from the SEC
+    payload, so the terminal could resolve "NVDA" but not "NVIDIA" — every
+    lookup by company name failed even though the name was sitting in the
+    response we already downloaded. Names are how people actually search.
     """
     if not refresh and CIK_MAP_PATH.exists():
         return json.loads(CIK_MAP_PATH.read_text())
@@ -111,14 +119,37 @@ def load_cik_map(refresh: bool = False) -> dict[str, int]:
     raw = _get("https://www.sec.gov/files/company_tickers.json")
     payload: dict[str, Any] = json.loads(raw)
     flat: dict[str, int] = {}
+    named: list[list[Any]] = []
     for row in payload.values():
         ticker = row.get("ticker")
         cik = row.get("cik_str")
         if ticker and cik is not None:
-            flat[ticker.upper()] = int(cik)
+            t = ticker.upper()
+            flat[t] = int(cik)
+            named.append([t, int(cik), (row.get("title") or "").strip()])
 
     CIK_MAP_PATH.parent.mkdir(parents=True, exist_ok=True)
     CIK_MAP_PATH.write_text(json.dumps(flat, sort_keys=True))
+
+    # Column-oriented so 10k+ rows stay small over the wire: three parallel
+    # arrays rather than 10k repeated JSON keys.
+    named.sort(key=lambda r: r[0])
+
+    # FX and futures have no issuer and so are absent from the SEC file by
+    # definition. They are still traded here daily, so they ship in the same
+    # index — otherwise searching "EURUSD" or "NQ" reads as a broken tool.
+    from sovereign.fundamentals.instruments import NON_SEC
+
+    SYMBOL_INDEX_PATH.write_text(json.dumps({
+        "schema_version": 2,
+        "t": [r[0] for r in named],
+        "c": [r[1] for r in named],
+        "n": [r[2] for r in named],
+        "non_sec": [
+            {"t": sym, "n": meta["name"], "kind": meta["kind"], "tv": meta["tv"]}
+            for sym, meta in sorted(NON_SEC.items())
+        ],
+    }))
     return flat
 
 

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { lookup, loadSymbols } from '../lib/symbols'
 
 /**
  * TradingView embed — ported verbatim from index.html:1836-1860.
@@ -32,9 +33,22 @@ export default function Chart({ symbol }: { symbol?: string }) {
     return SYMBOLS.find(s => s.label === saved) ?? SYMBOLS[0]
   })
 
-  // An explicitly selected ticker (from the fundamentals search) overrides the
-  // futures buttons — same symbol drives chart and fundamentals.
-  const shown = symbol ? symbol.toUpperCase() : active.proxy
+  // An explicitly selected symbol overrides the futures buttons — one symbol
+  // drives chart and fundamentals together.
+  //
+  // FX and futures need their exchange-qualified TradingView symbol (EURUSD is
+  // FX:EURUSD, NQ is CME_MINI:NQ1!); a bare ticker renders an empty chart or the
+  // wrong instrument. Equities are correct as the bare ticker.
+  // lookup() reads a module-level cache and is NOT reactive, so the index
+  // finishing its load must force a re-render — otherwise an FX symbol renders
+  // once with the bare ticker (wrong chart) and never corrects itself.
+  const [indexReady, setIndexReady] = useState(false)
+  useEffect(() => { loadSymbols().then(() => setIndexReady(true)) }, [])
+
+  const picked = symbol && indexReady ? lookup(symbol) : null
+  const shown = symbol
+    ? (picked?.tv ?? symbol.toUpperCase())
+    : active.proxy
 
   useEffect(() => {
     let cancelled = false
@@ -56,7 +70,7 @@ export default function Chart({ symbol }: { symbol?: string }) {
   }, [shown])
 
   const openReal = () => {
-    const real = symbol ? symbol.toUpperCase() : active.fut
+    const real = symbol ? (picked?.tv ?? symbol.toUpperCase()) : active.fut
     window.open(`https://www.tradingview.com/chart/?symbol=${encodeURIComponent(real)}`, '_blank')
   }
 
