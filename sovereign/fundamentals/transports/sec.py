@@ -12,7 +12,7 @@ import time
 import urllib.error
 import urllib.request
 import xml.etree.ElementTree as ET
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any, Optional
 
@@ -176,12 +176,31 @@ def recent_filings(
 ) -> list[dict]:
     """Flatten filings.recent's parallel arrays into per-filing dicts.
 
-    Keys: form, filing_date (date), accession, primary_document, report_date.
+    Keys: form, filing_date (date), accepted_at (datetime, UTC), items (list),
+          accession, primary_document, report_date.
+
+    `accepted_at` is the EDGAR ACCEPTANCE INSTANT and is the only correct
+    knowable_at for a filing. Using `filing_date` instead is a real leak, not a
+    rounding error:
+
+      AAPL earnings 8-K   acceptanceDateTime 2026-07-30T20:30:28Z = 16:30 ET,
+                          one minute AFTER the close. filingDate alone claims it
+                          was knowable at 00:00 that morning — a full trading
+                          day early, and it inverts the entry: today's close
+                          instead of tomorrow's open.
+      AAPL Form 4s        accepted ~22:30Z (18:30 ET). A date-only knowable_at
+                          overstates knowledge by ~22 hours.
+
+    `items` carries the 8-K item numbers (2.02 results, 5.02 departure, 1.01
+    material agreement...), which is the filter that removes most 8-K noise.
+    Both fields were present in the payload and previously discarded.
     """
     sub = submissions(cik)
     recent = sub.get("filings", {}).get("recent", {})
     forms_arr = recent.get("form", [])
     filing_dates = recent.get("filingDate", [])
+    accepted = recent.get("acceptanceDateTime", [])
+    items_arr = recent.get("items", [])
     accessions = recent.get("accessionNumber", [])
     primary_docs = recent.get("primaryDocument", [])
     report_dates = recent.get("reportDate", [])
@@ -193,14 +212,39 @@ def recent_filings(
         fdate = _parse_date(filing_dates[i]) if i < len(filing_dates) else None
         if since is not None and fdate is not None and fdate < since:
             continue
+        raw_items = items_arr[i] if i < len(items_arr) else ""
         out.append({
             "form": form,
             "filing_date": fdate,
+            "accepted_at": _parse_accepted(accepted[i] if i < len(accepted) else None,
+                                           fallback_date=fdate),
+            "items": [s.strip() for s in (raw_items or "").split(",") if s.strip()],
             "accession": accessions[i] if i < len(accessions) else None,
             "primary_document": primary_docs[i] if i < len(primary_docs) else None,
             "report_date": _parse_date(report_dates[i]) if i < len(report_dates) else None,
         })
     return out
+
+
+def _parse_accepted(s: Optional[str], fallback_date: Optional[date]) -> Optional[datetime]:
+    """EDGAR acceptance instant as tz-aware UTC.
+
+    On a missing or unparseable value we fall back to the END of the filing day
+    (23:59:59Z), never the start. A filing we cannot time precisely must be
+    assumed LATE, not early — assuming early is the leak. Returning None instead
+    would be worse still, since the point-in-time layer refuses NULL knowable_at
+    rows entirely and the filing would silently vanish.
+    """
+    if s:
+        try:
+            dt = datetime.fromisoformat(str(s).replace("Z", "+00:00"))
+            return dt if dt.tzinfo else dt.replace(tzinfo=timezone.utc)
+        except ValueError:
+            pass
+    if fallback_date is None:
+        return None
+    return datetime(fallback_date.year, fallback_date.month, fallback_date.day,
+                    23, 59, 59, tzinfo=timezone.utc)
 
 
 def _parse_date(s: Optional[str]) -> Optional[date]:
@@ -255,7 +299,8 @@ def _xml_bool(elem: Optional[ET.Element], tag: str) -> bool:
     return s.strip().lower() in ("1", "true")
 
 
-def _parse_form4_xml(xml_text: str, ticker: str, accession: str, filing_date: Optional[date]) -> list[InsiderTxn]:
+def _parse_form4_xml(xml_text: str, ticker: str, accession: str, filing_date: Optional[date],
+                     accepted_at: Optional[datetime] = None) -> list[InsiderTxn]:
     root = ET.fromstring(xml_text)
 
     owner_el = root.find("reportingOwner")
@@ -299,10 +344,14 @@ def _parse_form4_xml(xml_text: str, ticker: str, accession: str, filing_date: Op
 
         txns.append(InsiderTxn(
             source=_SOURCE,
-            # published_ts is the FILING date, never the transaction date: a
-            # trade on the 3rd disclosed on the 5th was not knowable until the
-            # 5th, and keying on the 3rd poisons any backtest that consumes this.
-            published_ts=datetime.combine(filing_date, datetime.min.time()) if filing_date else None,
+            # published_ts is the EDGAR ACCEPTANCE INSTANT, never the transaction
+            # date and no longer the filing DATE. A trade on the 3rd disclosed on
+            # the 5th was not knowable until the 5th — but Form 4s are typically
+            # accepted ~18:30 ET, so midnight-of-the-filing-date overstated
+            # knowledge by ~22 hours and made same-day intraday reads leak.
+            published_ts=(accepted_at
+                          or (datetime.combine(filing_date, datetime.max.time())
+                              .replace(tzinfo=timezone.utc) if filing_date else None)),
             ticker=ticker.upper(),
             accession=accession,
             line_no=i,
@@ -348,7 +397,8 @@ def form4_transactions(
             # One bad filing shouldn't kill the whole batch; skip and continue.
             continue
         try:
-            out.extend(_parse_form4_xml(xml_text, ticker, accession, f["filing_date"]))
+            out.extend(_parse_form4_xml(xml_text, ticker, accession,
+                                        f["filing_date"], f.get("accepted_at")))
         except ET.ParseError:
             continue
     return out

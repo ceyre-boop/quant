@@ -69,10 +69,12 @@ FACTS: dict[str, FactSpec] = {
         name="insider",
         table="fund_insider_txn",
         entity_col="ticker",
-        # filing_date IS the publication instant for a Form 4 — not stored twice,
-        # matching the existing rule in fundamentals/panel.py.
         valid_col="txn_date",
-        published_col="filing_date",
+        # published_ts, NOT filing_date. filing_date is a DATE, so using it as
+        # knowable_at claimed a Form 4 was public at midnight when EDGAR
+        # accepted it at ~18:30 ET — ~22 hours of overstated knowledge, and a
+        # measured leak on same-day reads. published_ts is the acceptance instant.
+        published_col="published_ts",
         identity=("accession", "line_no"),
         notes="The one fact that was already as-of-ready before this layer existed.",
     ),
@@ -81,7 +83,8 @@ FACTS: dict[str, FactSpec] = {
         table="fund_institution_holding",
         entity_col="ticker",
         valid_col="period_end",
-        published_col="filing_date",
+        # Same reason as insider: an instant, not a filing DAY.
+        published_col="published_ts",
         identity=("period_end", "filer_cik", "cusip"),
         notes=(
             "13F is filed ~45 days after quarter end, so reading on period_end "
@@ -121,6 +124,35 @@ FACTS: dict[str, FactSpec] = {
             "revision path no free source will sell us. Identity excludes "
             "snapshot_date on purpose: successive snapshots of the same "
             "(ticker, period) ARE the vintages."
+        ),
+    ),
+
+    # ── Spec tables (Phase 0.5): these use event_date / knowable_at directly ──
+    "filings": FactSpec(
+        name="filings",
+        table="filings",
+        entity_col="ticker",
+        valid_col="event_date",
+        published_col="knowable_at",
+        identity=("accession_no",),
+        notes=(
+            "knowable_at is the EDGAR ACCEPTANCE INSTANT. An 8-K accepted at "
+            "16:30 ET was not knowable that morning; using the filing DAY "
+            "instead claims a full extra trading day of knowledge and inverts "
+            "the entry from tomorrow's open to today's close."
+        ),
+    ),
+    "prices": FactSpec(
+        name="prices",
+        table="prices",
+        entity_col="ticker",
+        valid_col="event_date",
+        published_col="knowable_at",
+        identity=("ticker", "event_date"),
+        notes=(
+            "knowable_at is the SESSION CLOSE, not ingest time. This is what "
+            "makes price_reaction computable inside an as-of view rather than "
+            "stored and re-read — see that fact's blocked_reason."
         ),
     ),
 

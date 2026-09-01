@@ -114,7 +114,11 @@ CREATE TABLE IF NOT EXISTS fund_insider_txn (
     is_officer     BOOLEAN,
     is_ten_pct     BOOLEAN,
     txn_date       DATE,
-    filing_date    DATE,           -- the only date that gates knowability
+    filing_date    DATE,           -- the FILING DAY (kept for display/audit)
+    -- The EDGAR ACCEPTANCE INSTANT. This, not filing_date, gates knowability.
+    -- Form 4s are typically accepted ~18:30 ET, so a date-only knowable_at
+    -- overstated knowledge by ~22 hours and leaked on same-day reads.
+    published_ts   TIMESTAMP,
     code           VARCHAR,        -- P purchase, S sale, A grant, M option, F tax
     shares         DOUBLE,
     price          DOUBLE,
@@ -131,7 +135,8 @@ CREATE TABLE IF NOT EXISTS fund_institution_holding (
     cusip         VARCHAR,
     ticker        VARCHAR,
     filer_name    VARCHAR,
-    filing_date   DATE,
+    filing_date   DATE,           -- filing day (display/audit)
+    published_ts  TIMESTAMP,      -- EDGAR acceptance instant; gates knowability
     shares        DOUBLE,
     value_usd     DOUBLE,
     is_amendment  BOOLEAN,
@@ -184,6 +189,50 @@ CREATE TABLE IF NOT EXISTS fund_borrow (
     fee_rate           DOUBLE,
     source             VARCHAR,
     PRIMARY KEY (date, ticker)
+);
+-- ── Spec tables (Phase 0.5) ────────────────────────────────────────────────
+-- These two use the spec's vocabulary directly: event_date = when it happened
+-- in the world, knowable_at = when it became available to us.
+
+-- Every filing EDGAR has accepted for a watched issuer. `knowable_at` is the
+-- ACCEPTANCE INSTANT, never the filing day: an 8-K accepted 16:30 ET was not
+-- knowable that morning, and that single distinction decides whether entry is
+-- today's close or tomorrow's open.
+CREATE TABLE IF NOT EXISTS filings (
+    accession_no      VARCHAR,
+    cik               VARCHAR,
+    ticker            VARCHAR,
+    form_type         VARCHAR,       -- 8-K, 4, 13F-HR, S-1, 10-Q, 10-K
+    item_numbers      VARCHAR[],     -- 8-K items: 2.02 results, 5.02 departure...
+    period_of_report  DATE,
+    event_date        TIMESTAMP,     -- when it happened
+    knowable_at       TIMESTAMP,     -- EDGAR acceptance timestamp
+    raw_text_path     VARCHAR,       -- original document on disk; never discarded
+    source_url        VARCHAR,
+    source            VARCHAR DEFAULT 'edgar',
+    ingested_at       TIMESTAMP
+);
+
+-- Daily bars. knowable_at is the SESSION CLOSE, not ingest time: a bar for day
+-- D is not knowable until D closes, and using ingest time would make every
+-- historical bar appear knowable at whatever moment we happened to fetch it.
+--
+-- This table is also what unblocks price_reaction. That fact had to be marked
+-- NOT point-in-time because a derived value is only knowable when its latest
+-- INPUT was, and prices had no as-of-filterable home. With this, the reaction
+-- can be computed inside an as-of view instead of stored and re-read.
+CREATE TABLE IF NOT EXISTS prices (
+    ticker       VARCHAR,
+    event_date   DATE,
+    open         DOUBLE,
+    high         DOUBLE,
+    low          DOUBLE,
+    close        DOUBLE,
+    volume       DOUBLE,
+    adj_close    DOUBLE,
+    knowable_at  TIMESTAMP,
+    source       VARCHAR,
+    ingested_at  TIMESTAMP
 );
 -- Append-only: every fetch attempt (success or failure) is a row, never upserted, so the
 -- harvest history can never be silently overwritten by a later run.
@@ -342,13 +391,15 @@ def upsert_reactions(rows: Iterable[PriceReaction]) -> int:
 
 def upsert_insider(rows: Iterable[InsiderTxn]) -> int:
     cols = ["accession", "line_no", "ticker", "issuer_cik", "owner_name", "owner_title",
-             "is_director", "is_officer", "is_ten_pct", "txn_date", "filing_date", "code",
+             "is_director", "is_officer", "is_ten_pct", "txn_date", "filing_date",
+             "published_ts", "code",
              "shares", "price", "value_usd", "shares_after", "is_open_market", "source",
              "fetched_at"]
     now = _now()
     data = [
         (r.accession, r.line_no, r.ticker, None, r.owner_name, r.owner_title,
-         r.is_director, r.is_officer, r.is_ten_pct, r.txn_date, r.filing_date, r.code,
+         r.is_director, r.is_officer, r.is_ten_pct, r.txn_date, r.filing_date,
+         r.published_ts, r.code,
          r.shares, r.price, r.value_usd, r.shares_after, r.is_open_market, r.source, now)
         for r in rows
     ]
@@ -358,10 +409,12 @@ def upsert_insider(rows: Iterable[InsiderTxn]) -> int:
 
 def upsert_holdings(rows: Iterable[InstitutionalPosition]) -> int:
     cols = ["period_end", "filer_cik", "cusip", "ticker", "filer_name", "filing_date",
+            "published_ts",
              "shares", "value_usd", "is_amendment", "source", "fetched_at"]
     now = _now()
     data = [
         (r.period_end, r.filer_cik, r.cusip, r.ticker, r.filer_name, r.filing_date,
+         r.published_ts,
          r.shares, r.value_usd, r.is_amendment, r.source, now)
         for r in rows
     ]
