@@ -1,3 +1,21 @@
+<!--
+  SUPERSEDED 2026-09-01 — this file is no longer deployed.
+
+  The dashboard was rebuilt as a research terminal: app/ (Vite + React + TS +
+  Tailwind), which builds to _site/ and is what .github/workflows/deploy.yml now
+  publishes to GitHub Pages. Editing this file changes nothing that ships.
+
+  Kept for reference because two features were ported FROM here and the originals
+  are the spec:
+    - TradingView embed + link-out   -> app/src/panels/Chart.tsx
+    - Replay cockpit (lines ~1871-2026, LightweightCharts, timer-driven)
+                                     -> app/src/islands/replay.ts (moved verbatim)
+    - Calendar (~2027-2143)          -> app/src/panels/Calendar.tsx
+
+  Deliberately NOT carried over: the funded-challenge panel and the 13 Research
+  analysis cards. Note the prop DATA pipeline is still live and must stay --
+  sovereign/intelligence/allocation_engine.py reads prop_challenge_state.json.
+-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
