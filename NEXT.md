@@ -3991,3 +3991,66 @@ re-run hoping for a different (non-empty) queue state (RULE 5).
 RQ-006 and downstream ICT walk-forwards; (3) `AGENT_DIRECTIVE.md` root-vs-archive
 status (flagged 08-16, still unresolved); (4) `BLOCKED_NO_VALIDATOR` verdicts still
 accumulating in `auto_hypothesis_results` (10 more since 08-16, no validator attached).
+
+---
+
+## 2026-08-31 · RESEARCH PASS (21:00 ET)
+
+**Headline: the research agent was dark for 8 scheduled nights (08-19 → 08-30) and
+never said so.** Every run since 2026-08-18 died on an account-level API usage limit
+(`400 ... regain access on 2026-09-01 at 00:00 UTC`, job exit 1) before reaching its
+first tool call — so no incident note, no NEXT.md line, no commit was produced on any
+of them. Tonight's run started 21:00 EDT = 01:00 UTC 09-01, one hour past the reset;
+the blackout ended at the quota boundary, not from a repair. Missed firings:
+08-19, 08-20, 08-23, 08-24, 08-25, 08-26, 08-27, 08-30.
+Incident: `logs/incidents/2026-08-31-research-agent-api-limit-blackout.md`.
+
+**The real defect is invisibility, not the quota.** STANDING RULES 3/5/6/9 all assume
+the agent gets far enough to write something. A quota-blocked agent fails identically
+to a quiet night, and the only evidence is a gap in a file nobody diffs.
+**Operator decision needed:** add a non-Claude watchdog asserting
+`research/weekly_pattern_update.md` gained a section on each scheduled night. It must
+not itself be a Claude agent, or it inherits the same failure mode. Not built tonight
+— outside the routine's authority.
+
+**Routine result:**
+- **Step 0 brain read** — clean. 25 graveyard + 17 confirmed edges via
+  `get_research_context()`. No sealed idea re-proposed. Graveyard 25, unchanged from
+  08-18; the 27→25 drop flagged then has not moved and remains un-investigated
+  (STANDING RULE 10 — a lead, not a fact).
+- **Step 1 movers** — 50 gainers, clean, no 401. 28/50 derivative-like, 26 sub-$1;
+  noisiest snapshot of the recent nights. HYP-093 fade band (non-deriv, ≥$1, ≥40%):
+  **AEHL +83.33% ($6.49), NCRA +49.74% ($2.83)** — only 2, vs 5–9 on 08-16/17/18.
+  HYP-107 band (30–40%): YDDL, USDE, TP. Snapshot only, no fade test run.
+- **Step 2 queue** (`--max 5`) — 0 QUEUED. Empty since 08-16, though only 3 of the
+  intervening nights were awake to observe it. `findings.jsonl` last gained a row
+  2026-08-16: **15 days with no new test executed.** A fortnight of empty-queue
+  nights is a supply problem, not a result.
+- **Step 3** — `research/weekly_pattern_update.md` appended. The 08-18 section was
+  sitting uncommitted in the working tree; committed tonight.
+- **Step 4** — no candidates flagged. Nothing was tested, so nothing could clear a
+  first-pass permutation test. No autonomous prereg (STANDING RULE 4).
+
+**Fixed tonight — carried item (3), open since 08-16:** the stale directive path.
+`com.alta.research_agent.plist` (installed), `scripts/com.alta.research_agent.plist`
+and `scripts/run_agent.sh` all invoked `~/quant/AGENT_DIRECTIVE.md`, which 7ed778d
+moved to `archive/` on 08-12. All three now point at `~/quant/archive/AGENT_DIRECTIVE.md`;
+`run_agent.sh` fixed for all three routines (morning/eod/research), `bash -n` clean,
+`plutil -lint` OK on the plist. **Operator action:** the installed plist needs
+`launchctl unload && load` to take effect — deliberately not run from inside the live
+job, and `python3 scripts/plist_watchdog.py --rebaseline "research_agent directive path"`
+after. Backup at `/tmp/research_agent.plist.bak-20260831`. Note the repo copy and the
+installed copy have *also* diverged in invocation style (repo uses
+`scripts/run_agent.sh research`, installed inlines the `claude --print` call) — not
+reconciled tonight; both are correct in isolation.
+
+**Refused to shortcut:** did not invent a queue task to fill an empty run; did not
+re-run the scanner hoping for a different queue state (RULE 5); did not repair the
+two ERROR queue tasks (RULE 9 — they are prior incidents, not tonight's work); did not
+reload launchd from inside the running job.
+
+**Open for operator (carried forward):** (1) research queue empty — needs new tasks or
+the nightly pass keeps no-op'ing; (2) ICT fill-rate bottleneck still binds RQ-006;
+(3) `BLOCKED_NO_VALIDATOR` verdicts still accumulating in `auto_hypothesis_results`
+with no validator attached — open since 08-05, four nights flagged, unaddressed;
+(4) NEW — blackout watchdog above; (5) NEW — plist reload + rebaseline above.

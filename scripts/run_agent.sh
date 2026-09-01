@@ -106,9 +106,9 @@ fi
 # --------------------------------------------------------------------------
 ROUTINE="${1:-}"
 case "$ROUTINE" in
-  morning)  PROMPT="Read ~/quant/AGENT_DIRECTIVE.md and execute the 08:00 morning routine" ;;
-  eod)      PROMPT="Read ~/quant/AGENT_DIRECTIVE.md and execute the 16:05 EOD routine" ;;
-  research) PROMPT="Read ~/quant/AGENT_DIRECTIVE.md and execute the 21:00 research routine" ;;
+  morning)  PROMPT="Read ~/quant/archive/AGENT_DIRECTIVE.md and execute the 08:00 morning routine" ;;
+  eod)      PROMPT="Read ~/quant/archive/AGENT_DIRECTIVE.md and execute the 16:05 EOD routine" ;;
+  research) PROMPT="Read ~/quant/archive/AGENT_DIRECTIVE.md and execute the 21:00 research routine" ;;
   *)
     log "FATAL: unknown routine '${ROUTINE}'. Expected one of: morning, eod, research"
     exit 2
