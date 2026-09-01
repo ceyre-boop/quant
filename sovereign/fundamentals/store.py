@@ -227,13 +227,48 @@ def init() -> None:
 
 # ── generic upsert plumbing ─────────────────────────────────────────────────────────────
 
+def _pit_fact_for(table: str) -> "str | None":
+    """The point-in-time fact backed by this table, if any."""
+    from sovereign.pit.spec import FACTS
+
+    for name, spec in FACTS.items():
+        if spec.table == table and spec.is_point_in_time:
+            return name
+    return None
+
+
 def _upsert_rows(con: "duckdb.DuckDBPyConnection", table: str, columns: Sequence[str],
                   rows: Iterable[Sequence[Any]]) -> int:
-    """INSERT OR REPLACE a batch of already-ordered row tuples. Empty input is a no-op —
-    callers pass a possibly-empty section result straight through without a guard of their own."""
+    """Write a batch of already-ordered row tuples. Empty input is a no-op.
+
+    POINT-IN-TIME TABLES ARE APPEND-ONLY.
+
+    These tables used to be written with INSERT OR REPLACE on a primary key that
+    excluded the publication instant, so a revision overwrote the observation it
+    revised: a restatement erased the originally-reported figure, and a 13F-A
+    overwrote the original 13F along with its earlier filing_date. "What did I
+    know on March 3" is unanswerable once a row has been overwritten, whatever
+    timestamps it carries.
+
+    So for any table registered as a point-in-time fact we delegate to
+    sovereign.pit.store.append(), which inserts a NEW VINTAGE when the
+    publication instant differs and no-ops when the identical vintage is
+    re-observed (keeping re-harvests idempotent).
+
+    Operational tables that carry no knowability claim — fund_symbol,
+    fund_fetch_log and the derived/blocked facts — keep the old behaviour,
+    because for them "latest wins" is the correct semantics.
+    """
     rows = list(rows)
     if not rows:
         return 0
+
+    fact = _pit_fact_for(table)
+    if fact is not None:
+        from sovereign.pit.store import append
+
+        return append(fact, [dict(zip(columns, r)) for r in rows], con=con)
+
     placeholders = ", ".join(["?"] * len(columns))
     cols = ", ".join(columns)
     con.executemany(
