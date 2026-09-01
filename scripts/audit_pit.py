@@ -13,11 +13,19 @@ Three checks per point-in-time fact:
       is silently contributing nothing — fund_short_interest holds 250 such rows
       today because Nasdaq supplies no publication date.
 
-  PUBLISHED BEFORE THE EVENT (violation)
-      published < valid means we recorded a filing that predates the thing it
-      describes. That is impossible, so it is a data or mapping bug — most
-      likely a valid/published column swapped in the spec, which would invert
-      the whole temporal contract for that fact.
+  PUBLISHED BEFORE THE EVENT (violation only above a threshold)
+      What this really detects is a SWAPPED event/published mapping, which would
+      invert the temporal contract for a whole fact.
+
+      A few such rows are legitimate and must not fail the run: an 8-K can
+      announce something scheduled for the NEXT day, so its acceptance instant
+      precedes its period-of-report. Six AMZN annual-meeting 8-Ks do exactly
+      this (accepted ~18:00 ET on day D-1, reportDate day D). That is knowing
+      about an event before it happens — an announcement, the opposite of a leak.
+
+      So: a swap would make ~100% of rows trip this. Legitimate forward
+      announcements are a rounding error. Violation above SWAP_RATIO, reported
+      as a warning below it.
 
   DUPLICATE VINTAGE (violation)
       The same identity at the same publication instant appearing twice. Writes
@@ -43,6 +51,11 @@ import duckdb  # noqa: E402
 
 from sovereign.pit.spec import FACTS, FactSpec  # noqa: E402
 from sovereign.pit.store import DB_PATH  # noqa: E402
+
+#: Fraction of rows with published < event above which we call it a SWAP rather
+#: than legitimate forward announcements. A genuine column swap trips ~100% of
+#: rows; real announcements are a fraction of a percent.
+SWAP_RATIO = 0.05
 
 
 def _table_exists(con, table: str) -> bool:
@@ -100,7 +113,13 @@ def run(db: Path) -> tuple[list[dict], int, int]:
         ]
     finally:
         con.close()
-    violations = sum(r["published_before_valid"] + r["duplicate_vintage"] for r in results)
+    violations = 0
+    for r in results:
+        r["forward_ratio"] = (r["published_before_valid"] / r["rows"]) if r["rows"] else 0.0
+        r["swap_suspected"] = r["forward_ratio"] > SWAP_RATIO
+        violations += r["duplicate_vintage"]
+        if r["swap_suspected"]:
+            violations += r["published_before_valid"]
     warnings = sum(r["null_published"] for r in results)
     return results, violations, warnings
 
@@ -113,7 +132,7 @@ def render(results: list[dict], violations: int, warnings: int) -> None:
         if not r["present"]:
             print(f"{r['fact']:<16} {'-':>7} {'-':>9} {'-':>10} {'-':>12}  (no table yet)")
             continue
-        bad = r["published_before_valid"] + r["duplicate_vintage"]
+        bad = r["duplicate_vintage"] + (r["published_before_valid"] if r.get("swap_suspected") else 0)
         status = "VIOLATION" if bad else ("warn" if r["null_published"] else "ok")
         print(f"{r['fact']:<16} {r['rows']:>7} {r['null_published']:>9} "
               f"{r['published_before_valid']:>10} {r['duplicate_vintage']:>12}  {status}")
@@ -122,6 +141,14 @@ def render(results: list[dict], violations: int, warnings: int) -> None:
     if blocked:
         print(f"\nblocked facts (cannot be read as-of): {', '.join(blocked)}")
         print("  each names its fix in sovereign/pit/spec.py")
+
+    fwd = [r for r in results if r["published_before_valid"] and not r.get("swap_suspected")]
+    if fwd:
+        print()
+        for r in fwd:
+            print(f"{r['fact']}: {r['published_before_valid']} row(s) published BEFORE their event "
+                  f"({r['forward_ratio']*100:.2f}%) — forward announcements, not a leak.")
+        print("  (a swapped event/published mapping would trip ~100%, not a fraction of a percent)")
 
     if warnings:
         print(f"\n{warnings} row(s) have no publication instant. These are stored but the")

@@ -112,6 +112,16 @@ ALLOWLIST = {
     # now route through sovereign.pit.store.append(), so it no longer issues a
     # raw SELECT against a point-in-time table. That is the debt being paid off,
     # which is exactly what this list is for.
+    #
+    # ── newly discovered when the scan widened beyond sovereign/ + scripts/ ──
+    # scripts/migrate_acceptance_ts.py: the one-time backfill that adds
+    # published_ts to fund_insider_txn / fund_institution_holding and fills it
+    # from EDGAR acceptanceDateTime (see sovereign/pit/spec.py's insider and
+    # institutions repoint). Like scripts/migrate_pit.py it does schema
+    # surgery — SELECTs to find what needs backfilling and UPDATEs to set the
+    # new column — and is not a research read path. Pre-existing debt as of
+    # this scan, not new code introduced by widening it.
+    "scripts/migrate_acceptance_ts.py",
 }
 
 #: Table names declared anywhere in the spec (point-in-time AND blocked —
@@ -153,6 +163,39 @@ def _selects_any_pit_table(text: str) -> bool:
     )
 
 
+#: Directories scanned for a bypass. Originally just sovereign/ and scripts/
+#: (where the fundamentals harvesters live); widened to every layer that can
+#: plausibly hold a research or execution read path, since a raw SELECT
+#: against a PIT table is exactly as dangerous wherever it is written.
+SCANNED_ROOT_DIRS = (
+    "sovereign/",
+    "scripts/",
+    "research/",
+    "backtester/",
+    "training/",
+    "ict/",
+    "execution/",
+    "experience/",
+)
+
+#: Append-only is the other half of the point-in-time contract (see
+#: sovereign/pit/store.py's module docstring): a DELETE, UPDATE, or
+#: INSERT OR REPLACE against a PIT table destroys a vintage that the reader
+#: promised would survive. Nothing previously guarded that outside
+#: sovereign/pit/ itself.
+_DESTRUCTIVE_PATTERNS = {
+    "DELETE FROM": lambda t: re.compile(rf"DELETE\s+FROM\s+{re.escape(t)}\b", re.IGNORECASE),
+    "UPDATE": lambda t: re.compile(rf"UPDATE\s+{re.escape(t)}\b", re.IGNORECASE),
+    "INSERT OR REPLACE INTO": lambda t: re.compile(
+        rf"INSERT\s+OR\s+REPLACE\s+INTO\s+{re.escape(t)}\b", re.IGNORECASE
+    ),
+}
+
+
+def _destructive_hits(text: str, table: str) -> list[str]:
+    return [label for label, mk in _DESTRUCTIVE_PATTERNS.items() if mk(table).search(text)]
+
+
 def test_no_file_outside_pit_selects_a_pit_table_unless_allowlisted():
     assert PIT_TABLES, "spec.py declared no facts — fixture is broken"
     offenders = []
@@ -164,7 +207,7 @@ def test_no_file_outside_pit_selects_a_pit_table_unless_allowlisted():
             continue
         if rel in ALLOWLIST:
             continue
-        if not (rel.startswith("sovereign/") or rel.startswith("scripts/")):
+        if not rel.startswith(SCANNED_ROOT_DIRS):
             continue
         try:
             text = py.read_text()
@@ -173,6 +216,8 @@ def test_no_file_outside_pit_selects_a_pit_table_unless_allowlisted():
         for table in PIT_TABLES:
             if _selects_pit_table(text, table):
                 offenders.append(f"{rel} selects {table!r} directly")
+            for label in _destructive_hits(text, table):
+                offenders.append(f"{rel} issues {label} {table!r} outside sovereign/pit/ — breaks append-only")
         # A runtime-interpolated table name is the scan's blind spot, and it is
         # also exactly what a bypass looks like. Flag it unless the file is
         # already known debt — otherwise "FROM {table}" is a free pass.
@@ -183,11 +228,13 @@ def test_no_file_outside_pit_selects_a_pit_table_unless_allowlisted():
                 f"through sovereign.pit.view() or allowlist it explicitly"
             )
     assert not offenders, (
-        "Files bypass sovereign.pit and read a PIT-registered table with raw "
-        "SQL:\n  " + "\n  ".join(offenders) +
-        "\nEither route the read through sovereign.pit.view(), or — if this is "
-        "truly pre-existing debt not yet migrated — add it to ALLOWLIST in "
-        "this test with a comment, never silently."
+        "Files bypass sovereign.pit — either a raw SELECT against a PIT table, "
+        "or a destructive statement (DELETE/UPDATE/INSERT OR REPLACE) that "
+        "breaks the append-only contract:\n  " + "\n  ".join(offenders) +
+        "\nEither route the read through sovereign.pit.view() / the write "
+        "through sovereign.pit.store.append(), or — if this is truly "
+        "pre-existing debt not yet migrated — add it to ALLOWLIST in this "
+        "test with a comment, never silently."
     )
 
 

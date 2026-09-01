@@ -12,7 +12,7 @@ leaked, not that the fixture is wrong.
 """
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 import duckdb
@@ -48,6 +48,12 @@ def _build_schema(con) -> None:
             ticker        VARCHAR,
             filer_name    VARCHAR,
             filing_date   DATE,
+            -- published_ts gates knowability as of the sovereign/pit/spec.py
+            -- repoint (institutions moved off the DATE-only filing_date onto
+            -- the EDGAR acceptance instant, same reasoning as insider below).
+            -- filing_date is kept alongside it for display/audit, matching
+            -- the real fund_institution_holding schema.
+            published_ts  TIMESTAMP,
             shares        DOUBLE,
             value_usd     DOUBLE,
             is_amendment  BOOLEAN,
@@ -66,6 +72,66 @@ def _build_schema(con) -> None:
             published_ts      TIMESTAMP
         )
     """)
+    # fund_insider_txn — the largest point-in-time fact (860 rows live) and,
+    # before this file, entirely uncovered by reader tests. Columns mirror
+    # sovereign/fundamentals/store.py exactly, including published_ts (the
+    # EDGAR acceptance instant the pit/spec.py repoint now gates knowability
+    # on — filing_date, a bare DATE, is kept only for display/audit).
+    con.execute("""
+        CREATE TABLE fund_insider_txn (
+            accession      VARCHAR,
+            line_no        INTEGER,
+            ticker         VARCHAR,
+            issuer_cik     INTEGER,
+            owner_name     VARCHAR,
+            owner_title    VARCHAR,
+            is_director    BOOLEAN,
+            is_officer     BOOLEAN,
+            is_ten_pct     BOOLEAN,
+            txn_date       DATE,
+            filing_date    DATE,
+            published_ts   TIMESTAMP,
+            code           VARCHAR,
+            shares         DOUBLE,
+            price          DOUBLE,
+            value_usd      DOUBLE,
+            shares_after   DOUBLE,
+            is_open_market BOOLEAN,
+            source         VARCHAR,
+            fetched_at     TIMESTAMP
+        )
+    """)
+    # Needed only for the leakage sweep (test_leakage_sweep_*), which
+    # parametrises over every point-in-time fact the fixtures can build.
+    con.execute("""
+        CREATE TABLE fund_short_interest (
+            settlement_date  DATE,
+            ticker           VARCHAR,
+            shares_short     DOUBLE,
+            avg_daily_volume DOUBLE,
+            days_to_cover    DOUBLE,
+            pct_float        DOUBLE,
+            source           VARCHAR,
+            published_ts     TIMESTAMP,
+            fetched_at       TIMESTAMP
+        )
+    """)
+    con.execute("""
+        CREATE TABLE fund_estimate_snapshot (
+            snapshot_date DATE,
+            ticker        VARCHAR,
+            period        VARCHAR,
+            period_end    DATE,
+            eps_avg       DOUBLE,
+            eps_low       DOUBLE,
+            eps_high      DOUBLE,
+            n_analysts    INTEGER,
+            up_30d        INTEGER,
+            down_30d      INTEGER,
+            source        VARCHAR,
+            fetched_at    TIMESTAMP
+        )
+    """)
 
 
 @pytest.fixture()
@@ -77,10 +143,17 @@ def seeded_db(db_path: Path) -> Path:
         # ── 13F trap: period_end in the past, filing_date in the future ────
         # At as_of 2026-04-15 (between period end and filing), this row must
         # be invisible — reading on period_end would leak ~6 weeks.
+        # published_ts is what actually gates knowability (see spec.py); it
+        # is set to the same instant as filing_date here since this fixture
+        # only needs day-level resolution, not the acceptance-time trap that
+        # the insider fixture below covers.
         con.execute(
-            "INSERT INTO fund_institution_holding VALUES "
+            "INSERT INTO fund_institution_holding "
+            "(period_end, filer_cik, cusip, ticker, filer_name, filing_date, "
+            " published_ts, shares, value_usd, is_amendment, source) VALUES "
             "(DATE '2026-03-31', 1234, 'CUSIP1', 'AAPL', 'Berkshire', "
-            "DATE '2026-05-15', 1000.0, 500000.0, false, 'sec_edgar')"
+            "DATE '2026-05-15', TIMESTAMP '2026-05-15 00:00:00', "
+            "1000.0, 500000.0, false, 'sec_edgar')"
         )
 
         # ── earnings AMC trap: published mid-evening, not at midnight ──────
@@ -320,6 +393,194 @@ def test_all_point_in_time_facts_are_declared_with_a_table():
     for f in pit_facts:
         assert f.published_col is not None
         assert f.table
+
+
+# ── Form 4 lag trap: fund_insider_txn (860 rows, the LARGEST point-in-time
+# fact, entirely uncovered by reader tests before this) ────────────────────
+
+_INSIDER_SPEC = FACTS["insider"]
+
+
+@pytest.fixture()
+def insider_db(db_path: Path) -> Path:
+    """Two Form 4 cases, both columns populated (filing_date DATE AND
+    published_ts TIMESTAMP) so this test is correct regardless of which one
+    sovereign.pit.spec.FACTS['insider'].published_col currently names — the
+    reader is driven by the spec, never a column literal in this file, and
+    every assertion below reads Observation.published_ts (the reader's own
+    generic abstraction over that column), never a raw dict key.
+    """
+    con = duckdb.connect(str(db_path))
+    try:
+        _build_schema(con)
+
+        # Case A — the spec's verbatim example: a transaction on 2024-02-01,
+        # filed/accepted 2024-02-05. Invisible on the 3rd, visible on the 6th.
+        con.execute(
+            "INSERT INTO fund_insider_txn "
+            "(accession, line_no, ticker, issuer_cik, owner_name, owner_title, "
+            " is_director, is_officer, is_ten_pct, txn_date, filing_date, "
+            " published_ts, code, shares, price, value_usd, shares_after, "
+            " is_open_market, source, fetched_at) VALUES "
+            "('0001-A', 1, 'AAPL', 320193, 'Insider A', 'CEO', true, true, false, "
+            " DATE '2024-02-01', DATE '2024-02-05', "
+            " TIMESTAMP '2024-02-05 00:00:00', 'S', 100.0, 50.0, 5000.0, 900.0, "
+            " true, 'sec_edgar', TIMESTAMP '2024-02-05 00:00:00')"
+        )
+
+        # Case B — the real-world ~22h leak: accepted 2024-02-05T23:30:00Z
+        # (18:30 ET, AFTER the close), but filing_date — a bare DATE — is only
+        # 2024-02-05. A date-only knowable_at would already consider this
+        # knowable at midnight that day, and therefore visible at noon; the
+        # acceptance instant must not.
+        con.execute(
+            "INSERT INTO fund_insider_txn "
+            "(accession, line_no, ticker, issuer_cik, owner_name, owner_title, "
+            " is_director, is_officer, is_ten_pct, txn_date, filing_date, "
+            " published_ts, code, shares, price, value_usd, shares_after, "
+            " is_open_market, source, fetched_at) VALUES "
+            "('0001-B', 1, 'MSFT', 789019, 'Insider B', 'CFO', false, true, false, "
+            " DATE '2024-02-01', DATE '2024-02-05', "
+            " TIMESTAMP '2024-02-05 23:30:00', 'S', 200.0, 300.0, 60000.0, "
+            " 1800.0, true, 'sec_edgar', TIMESTAMP '2024-02-05 23:30:00')"
+        )
+    finally:
+        con.close()
+    return db_path
+
+
+def test_insider_form4_invisible_before_filing(insider_db):
+    v = view(as_of("2024-02-03"), connect=_connect_factory(insider_db))
+    assert v.facts("insider", "AAPL") == []
+
+
+def test_insider_form4_visible_after_filing(insider_db):
+    v = view(as_of("2024-02-06"), connect=_connect_factory(insider_db))
+    rows = v.facts("insider", "AAPL")
+    assert len(rows) == 1
+    assert rows[0].data["accession"] == "0001-A"
+    assert rows[0].published_ts is not None
+
+
+def test_insider_form4_late_accept_invisible_midday_same_day(insider_db):
+    """The real ~22h leak a date-only knowable_at caused: a Form 4 accepted
+    at 23:30 UTC (18:30 ET, after the close) is not knowable at noon UTC the
+    same day, even though its filing_date (date-only) is that same day."""
+    v = view(as_of("2024-02-05T12:00:00Z"), connect=_connect_factory(insider_db))
+    rows = v.facts("insider", "MSFT")
+    assert rows == [], "Form 4 accepted after the close leaked ~22h early"
+
+
+def test_insider_form4_late_accept_visible_next_day(insider_db):
+    v = view(as_of("2024-02-06"), connect=_connect_factory(insider_db))
+    rows = v.facts("insider", "MSFT")
+    assert len(rows) == 1
+    assert rows[0].data["accession"] == "0001-B"
+
+
+# ── leakage sweep: every point-in-time fact, a uniform one-year gap ────────
+#
+# Not just earnings: every fact whose fixture we can build gets the same
+# trap — knowable_at is exactly one year after event_date, several tickers,
+# several as-of dates strictly inside the gap. The second half (visible AFTER
+# the gap) is essential: a reader that always returned [] would pass the
+# empty-inside-gap half vacuously.
+
+_LEAK_TICKERS = ("AAPL", "MSFT", "GOOG")
+_LEAK_EVENT = date(2020, 1, 15)
+_LEAK_PUBLISHED_DATE = _LEAK_EVENT + timedelta(days=365)  # 2021-01-14
+_LEAK_PUBLISHED_TS = datetime(
+    _LEAK_PUBLISHED_DATE.year, _LEAK_PUBLISHED_DATE.month, _LEAK_PUBLISHED_DATE.day,
+    tzinfo=timezone.utc,
+)
+
+_LEAK_FACTS = ("earnings", "insider", "institutions", "short_interest", "estimates")
+
+
+def _seed_leak_row(con, fact_name: str, ticker: str) -> None:
+    if fact_name == "earnings":
+        con.execute(
+            "INSERT INTO fund_earnings_event "
+            "(ticker, fiscal_end, report_date, report_time, eps_estimate, "
+            " eps_actual, source, published_ts) VALUES "
+            "(?, ?, ?, 'amc', 1.0, 1.0, 'sweep', ?)",
+            [ticker, _LEAK_EVENT, _LEAK_EVENT, _LEAK_PUBLISHED_TS],
+        )
+    elif fact_name == "insider":
+        con.execute(
+            "INSERT INTO fund_insider_txn "
+            "(accession, line_no, ticker, issuer_cik, owner_name, owner_title, "
+            " is_director, is_officer, is_ten_pct, txn_date, filing_date, "
+            " published_ts, code, shares, price, value_usd, shares_after, "
+            " is_open_market, source, fetched_at) VALUES "
+            "(?, 1, ?, 1, 'Sweep Insider', 'CEO', true, true, false, "
+            " ?, ?, ?, 'S', 1.0, 1.0, 1.0, 1.0, true, 'sweep', ?)",
+            [
+                f"ACC-{ticker}", ticker, _LEAK_EVENT, _LEAK_PUBLISHED_DATE,
+                _LEAK_PUBLISHED_TS, _LEAK_PUBLISHED_TS,
+            ],
+        )
+    elif fact_name == "institutions":
+        con.execute(
+            "INSERT INTO fund_institution_holding "
+            "(period_end, filer_cik, cusip, ticker, filer_name, filing_date, "
+            " published_ts, shares, value_usd, is_amendment, source) VALUES "
+            "(?, 1, ?, ?, 'Sweep Filer', ?, ?, 1.0, 1.0, false, 'sweep')",
+            [
+                _LEAK_EVENT, f"CUSIP-{ticker}", ticker, _LEAK_PUBLISHED_DATE,
+                _LEAK_PUBLISHED_TS,
+            ],
+        )
+    elif fact_name == "short_interest":
+        con.execute(
+            "INSERT INTO fund_short_interest "
+            "(settlement_date, ticker, shares_short, avg_daily_volume, "
+            " days_to_cover, pct_float, source, published_ts, fetched_at) "
+            "VALUES (?, ?, 1.0, 1.0, 1.0, 1.0, 'sweep', ?, ?)",
+            [_LEAK_EVENT, ticker, _LEAK_PUBLISHED_TS, _LEAK_PUBLISHED_TS],
+        )
+    elif fact_name == "estimates":
+        con.execute(
+            "INSERT INTO fund_estimate_snapshot "
+            "(snapshot_date, ticker, period, period_end, eps_avg, eps_low, "
+            " eps_high, n_analysts, up_30d, down_30d, source, fetched_at) "
+            "VALUES (?, ?, '0q', ?, 1.0, 1.0, 1.0, 1, 0, 0, 'sweep', ?)",
+            [_LEAK_PUBLISHED_DATE, ticker, _LEAK_EVENT, _LEAK_PUBLISHED_TS],
+        )
+    else:  # pragma: no cover - guard against silently skipping a new fact
+        raise ValueError(f"no leak-sweep row builder for fact {fact_name!r}")
+
+
+@pytest.fixture()
+def leak_db(db_path: Path) -> Path:
+    con = duckdb.connect(str(db_path))
+    try:
+        _build_schema(con)
+        for fact_name in _LEAK_FACTS:
+            for ticker in _LEAK_TICKERS:
+                _seed_leak_row(con, fact_name, ticker)
+    finally:
+        con.close()
+    return db_path
+
+
+@pytest.mark.parametrize("fact_name", _LEAK_FACTS)
+def test_leakage_sweep_empty_inside_one_year_gap(leak_db, fact_name):
+    for when in ("2020-02-01", "2020-06-15", "2020-12-31"):
+        v = view(as_of(when), connect=_connect_factory(leak_db))
+        for ticker in _LEAK_TICKERS:
+            rows = v.facts(fact_name, ticker)
+            assert rows == [], f"{fact_name}/{ticker} leaked at as_of={when}"
+
+
+@pytest.mark.parametrize("fact_name", _LEAK_FACTS)
+def test_leakage_sweep_visible_after_the_gap(leak_db, fact_name):
+    """Essential complement to the empty-inside-gap test above: without this,
+    a reader that always returns [] would pass that test vacuously."""
+    v = view(as_of("2021-06-01"), connect=_connect_factory(leak_db))
+    for ticker in _LEAK_TICKERS:
+        rows = v.facts(fact_name, ticker)
+        assert len(rows) == 1, f"{fact_name}/{ticker} never surfaced after its gap"
 
 
 # ── regression: the as-of cut must not depend on the session timezone ──────
