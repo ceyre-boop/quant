@@ -26,6 +26,12 @@ git add \
   data/oracle/reflections/ \
   2>/dev/null || true
 
+# Fundamentals artifacts (warm watchlist + the SEC ticker->CIK map). Written by
+# the nightly scripts/harvest_fundamentals.py into the working copy; they only
+# reach the live site when pushed to master, which is what this script does.
+# -f because data/fundamentals.db and the harvest lock are gitignored siblings.
+git add -f data/fundamentals/ 2>/dev/null || true
+
 git diff --staged --quiet && echo "Nothing to commit — data is up to date" && exit 0
 git commit -m "Dashboard data sync $(date -u +%Y-%m-%dT%H:%M)"
 git push origin HEAD:master
