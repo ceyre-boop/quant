@@ -153,6 +153,7 @@ llvmlite==0.48.0
     # via
     #   numba
     #   shap
+lxml==6.1.2               # yfinance.get_earnings_dates() html parsing; without it earnings raises
 markdown-it-py==4.2.0
     # via rich
 markupsafe==3.0.3

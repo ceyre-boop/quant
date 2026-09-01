@@ -328,3 +328,9 @@ platform:
     # Kill-switch HALT on consecutive drawdown-breaker hits. Ladder lives in RISK_CONSTITUTION.md
     # Art. 3 (3.5/5/6.5); this is the count of consecutive breaker trips that forces HALT.
     consecutive_breaker_halt_n: 2
+
+# ── Fundamentals layer (sovereign/fundamentals/) — separate DB from sentiment.db so a bad ────
+# fundamentals harvest (earnings/insider/institutional/short-interest) can never corrupt the
+# live sentiment pipeline. See sovereign/fundamentals/store.py.
+fundamentals:
+  db_path: data/fundamentals.db

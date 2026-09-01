@@ -1,0 +1,50 @@
+@import "tailwindcss";
+
+/* ── Design tokens ────────────────────────────────────────────────────────────
+   A terminal, not a dashboard. Dense, dark, monospace numerics, restrained
+   colour: hue is reserved for direction (long/short, beat/miss, buy/sell) so it
+   never becomes decoration. Two accents only — cyan for interactive, amber for
+   "stale or partial", which the fundamentals layer needs constantly. */
+@theme {
+  --color-bg:        #0a0c10;
+  --color-surface:   #11141a;
+  --color-raised:    #171b23;
+  --color-line:      #232833;
+  --color-line-soft: #1a1e27;
+
+  --color-ink:       #e6eaf2;
+  --color-muted:     #8b97ad;
+  --color-faint:     #5a6577;
+
+  --color-up:        #2ecc9a;
+  --color-down:      #ff5f6b;
+  --color-accent:    #4dd4e8;
+  --color-warn:      #f0b429;
+
+  --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
+}
+
+* { box-sizing: border-box; }
+
+html, body, #root { height: 100%; }
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 13px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Every number in this app is monospace and tabular. Columns of figures that
+   don't align are harder to scan, and scanning is the entire product. */
+.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--color-bg); }
+::-webkit-scrollbar-thumb { background: var(--color-line); border-radius: 5px; }
+::-webkit-scrollbar-thumb:hover { background: #2e3543; }
+
+@keyframes pulse-dot { 0%,100% { opacity: 1 } 50% { opacity: .35 } }
+.pulse { animation: pulse-dot 2s ease-in-out infinite; }

@@ -141,3 +141,8 @@ node_modules
 # Env backups — never commit (e.g. .env.bak.1784579534)
 .env.bak*
 .env.backup*
+
+# Vite build output for GitHub Pages (built in CI, never committed)
+_site/
+app/node_modules/
+app/dist/

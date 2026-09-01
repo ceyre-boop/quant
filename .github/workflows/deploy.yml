@@ -15,24 +15,44 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Build combined site
+
+      # The terminal is a real Vite app now (app/), not a hand-written index.html.
+      # It builds straight into _site/ with emptyOutDir:false so the data copies
+      # below can land alongside it in either order.
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: Build terminal
+        working-directory: app
+        run: |
+          bun install --frozen-lockfile
+          bun run build
+
+      - name: Copy data snapshots
         run: |
           mkdir -p _site/ict _site/data/agent _site/data/forensics
-          # Dashboard assets (css, js, data from legacy dashboard folder)
-          cp -r dashboard/. _site/
-          # Override root with new multi-tab SPA
-          cp index.html _site/index.html
-          # ICT oracle assets from ict-dashboard, then override with new oracle
-          cp -r ict-dashboard/. _site/ict/
-          cp ict/index.html _site/ict/index.html
-          # Copy committed data snapshots if present
+          mkdir -p _site/data/oracle/reflections _site/data/fundamentals/tickers
+
+          # ICT oracle page is a separate, unchanged surface at /ict/.
+          cp -r ict-dashboard/. _site/ict/ 2>/dev/null || true
+          cp ict/index.html _site/ict/index.html 2>/dev/null || true
+
+          # Committed JSON the static (warm) path reads.
           cp data/agent/*.json _site/data/agent/ 2>/dev/null || true
           cp data/forensics/cross_system_state.json _site/data/forensics/ 2>/dev/null || true
-          mkdir -p _site/data/oracle/reflections
+          cp data/icarus_status.json _site/data/ 2>/dev/null || true
           cp data/oracle/latest_reflection.json _site/data/oracle/ 2>/dev/null || true
           cp data/oracle/version_history.json _site/data/oracle/ 2>/dev/null || true
           cp data/oracle/lesson_velocity.json _site/data/oracle/ 2>/dev/null || true
           cp data/oracle/reflections/[0-9]*.json _site/data/oracle/reflections/ 2>/dev/null || true
+
+          # Fundamentals: the warm watchlist plus the SEC ticker->CIK map. The map
+          # is REQUIRED for on-demand lookup — www.sec.gov/files is not CORS-open,
+          # so without it the browser cannot resolve a ticker at all.
+          cp -r data/fundamentals/. _site/data/fundamentals/ 2>/dev/null || true
+
+          echo "--- _site ---"; ls -la _site; ls -la _site/data/fundamentals || true
+
       - uses: actions/upload-pages-artifact@v3
         with:
           path: './_site'

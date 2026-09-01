@@ -881,15 +881,22 @@ class Handler(BaseHTTPRequestHandler):
             except Exception:
                 self._send_json(500, {'error': traceback.format_exc()})
 
-        elif path == '/prop-challenge':
-            # Monte Carlo prop-challenge risk (bootstrap of the real v015 edge).
-            # Regenerate with: python3 -m sovereign.risk.monte_carlo_prop
+        elif path == '/fundamentals':
+            # Per-ticker fundamentals + filings. The whole body is a thin call into
+            # sovereign.fundamentals.panel so the SAME function backs this route, the
+            # CLI harvester, and a future Vercel function. That is the portability seam
+            # — do not grow panel logic in here.
+            #
+            # Tier A of the front end's three-tier load. Tier B (static, SEC-only) runs
+            # entirely in the browser and needs no route at all.
             try:
-                with open('data/risk/prop_monte_carlo.json') as f:
-                    self._send_json(200, json.load(f))
-            except FileNotFoundError:
-                self._send_json(200, {'error': 'no_data',
-                                      'hint': 'run: python3 -m sovereign.risk.monte_carlo_prop'})
+                _qs = dict(_up.parse_qsl(self.path.split('?')[1] if '?' in self.path else ''))
+                ticker = (_qs.get('ticker', '') or '').strip().upper()
+                if not ticker:
+                    self._send_json(400, {'error': 'ticker required'})
+                else:
+                    from sovereign.fundamentals.panel import build_panel
+                    self._send_json(200, build_panel(ticker))
             except Exception:
                 self._send_json(500, {'error': traceback.format_exc()})
 
