@@ -4182,3 +4182,56 @@ Bias explicitly reported `missing: calendar, gdelt` and floored confidence at 0.
 `decision_logs` YELLOW: 9 trades >7d old still missing `update_outcome()` backfill.
 `oracle_pulse` RED: 0 new entries, 2 anomalies. Not repaired here (RULE 9 — prior
 incidents, not this pass's work).
+
+---
+
+## 2026-09-01 · EOD PASS
+Fills: 1 filled / 1 skipped of 2 GO (18 NO-GO) | Session net: **+10.86%** on the single fill
+Challenge status: overall WAIT — G1 GREEN 74.4% (median 34d to pass) / G2a GREEN / G2b GREEN 30/8 /
+G3 YELLOW collecting / G4 GREEN 0.00 NORMAL / G5 YELLOW collecting
+Harness delta (vs backtest): **+0.31pp** (net +10.8571% vs expected +10.5456%, spread cost 0.60%)
+
+**The session.** `FLYE` (HYP-107 LONG) filled 09:31 ET at 1.75 ask, exited 10:30 ET at 1.94 bid —
+gross +11.46%, spread cost 0.60%, net **+10.86%**. `HUBCZ` (HYP-107 LONG, rank 1) was
+`SKIP_HALT`: no 09:31 minute bar, next print not until 12:00. HYP-093 produced zero GO for the
+day. Frozen-config hash verified clean before anything ran
+(`66907c7906d7212ebcf3b5ec6772bb30c380207a153be5b675deb965790612a3`, matches the hash stamped on
+both the signals file and both fill rows).
+
+**The morning scan ran off-schedule at 13:31 ET, but this fill is still a valid measurement.**
+The harness prices from tape, not from wall-clock: `entry_time` is 13:31 UTC = 09:31 ET and the
+quote timestamps are 13:30:39Z entry / 14:30:58Z exit. The window measured is the real one. What
+today does *not* establish is that the signal could have been acted on live — it could not, the
+window had closed before the scan produced it. Treat as shadow measurement, not as tradeable
+proof.
+
+**Reporting defect found (logged, not repaired — RULE 8/9, execution-path freeze).**
+`execution.eod` reported `attempted 0 / filled 1 / unfilled GO 2` for a day where 1 of 2 GO
+signals demonstrably filled. Cause: the harness writes `"signal_id": ""` on every fill row, so
+the reconciliation cannot join fills back to the GO list and counts both GO signals as unfilled
+while separately counting the fill. Every historical row in `data/execution/fill_log.jsonl` has
+the same empty `signal_id`, so the conversion table in every prior System-EOD note carries the
+same distortion. The *performance* numbers are unaffected (they read the fill rows directly);
+only the conversion/attribution block is wrong. `execution/harness.py` is inside the frozen
+execution path — this needs a plan file and a NEXT.md unlock before anyone touches it.
+
+**No weakness note written.** Directive Step 2b says self-interrogate the ledger on a losing day
+and do not invent weaknesses on flat or winning ones. Today was a winning day and the one
+non-fill was a market halt, not a behavioral error. Nothing behavioral to log.
+
+**Degraded sources (RULE 6 — carried from the morning pass, logged not propagated):**
+3/6 FRESH (50%). `calendar` UNAVAILABLE (ForexFactory 403), `gdelt` UNAVAILABLE (never
+ingested), `sentiment_board` STALE, `reddit` RETIRED. Bias recorded NEUTRAL at confidence
+0.000; realised SPY −0.74% (BEARISH) so the call scored `correct=None` inside the neutral band.
+Track record still 0 scored of 32 recorded.
+
+**Brain write-back:** `write_eod_summary` (3 lessons) + `write_regime_observation` on smallcap
+gappers, both returned True; `refresh_brain_index.py` rewrote BRAIN_INDEX.md (76 lines).
+Vault note written to `Trading/Ops/System-EOD-2026-09-01.md`.
+
+**Carried forward, unrepaired (RULE 9 — prior incidents, not this pass's work):**
+(1) `decision_logs` YELLOW — 9 trades >7d old still missing `update_outcome()` (NN#2 / RULE 7);
+(2) `oracle_pulse` RED — 0 new entries, 2 anomalies;
+(3) research queue empty; (4) `BLOCKED_NO_VALIDATOR` verdicts accumulating, open since 08-05;
+(5) installed `com.alta.research_agent` plist still needs operator `unload && load` + watchdog
+rebaseline; (6) NEW — empty `signal_id` conversion defect above.

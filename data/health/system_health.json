@@ -1,5 +1,5 @@
 {
-  "ts": "2026-09-01T17:33:40.394927+00:00",
+  "ts": "2026-09-01T20:06:23.793857+00:00",
   "overall": "GREEN",
   "red": [],
   "yellow": [],
@@ -12,7 +12,7 @@
     },
     "forex_scan": {
       "path": "data/agent/forex_proximity.json",
-      "age_minutes": 2.7,
+      "age_minutes": 155.5,
       "max_age_minutes": 1440,
       "optional": false,
       "status": "OK",
@@ -32,7 +32,7 @@
       "max_age_minutes": 1440,
       "optional": true,
       "status": "OK",
-      "detail": "components=18, red=['oracle_pulse']"
+      "detail": "components=18, red=['ict_scanner', 'oracle_pulse']"
     }
   }
 }

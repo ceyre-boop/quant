@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-01T13:33:24",
+  "timestamp": "2026-09-01T16:06:18",
   "overall": "RED",
   "components": {
     "duckdb": {
@@ -15,8 +15,8 @@
       "detail": "yfinance 1.3.0 installed"
     },
     "ict_scanner": {
-      "status": "YELLOW",
-      "detail": "in session but log is 188.7h old \u2014 scanner may be stuck"
+      "status": "RED",
+      "detail": "log is 191h old \u2014 scanner appears down"
     },
     "backtest_engine": {
       "status": "GREEN",
@@ -40,11 +40,11 @@
     },
     "news_api": {
       "status": "GREEN",
-      "detail": "69 business articles"
+      "detail": "68 business articles"
     },
     "oanda": {
       "status": "GREEN",
-      "detail": "NAV=$109,613 practice"
+      "detail": "NAV=$109,598 practice"
     },
     "firebase": {
       "status": "GREEN",
@@ -64,7 +64,7 @@
     },
     "reddit": {
       "status": "YELLOW",
-      "detail": "cache 61901m old \u2014 needs refresh"
+      "detail": "cache 62054m old \u2014 needs refresh"
     },
     "decision_logs": {
       "status": "YELLOW",
@@ -75,5 +75,5 @@
       "detail": "0 new entries, 2 anomalies"
     }
   },
-  "last_checked": "2026-09-01T13:33:24"
+  "last_checked": "2026-09-01T16:06:18"
 }
