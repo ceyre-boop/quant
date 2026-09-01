@@ -27,10 +27,13 @@ nothing of.
   the CLI, the HTTP route and any future Vercel function.
 - **`scripts/harvest_fundamentals.py`** + `com.alta.fundamentals.plist` (03:15,
   TRACKED-NOT-LOADED) and `scripts/harvest_13f_bulk.py`.
-- **UI-only prop removal.** `sovereign/intelligence/allocation_engine.py:170-182`
-  reads `prop_challenge_state.json` and cuts equity weight up to 50%, so the panel and
-  `GET /prop-challenge` went while the generator, its launchd job and
-  `/control/refresh-prop` all stayed. Isolation test still passes.
+- **UI-only prop removal.** `sovereign/intelligence/allocation_engine.py`
+  reads `data/propfirm/active_challenge.json` (`CHALLENGE_FILE`, line 53) and cuts
+  equity weight by up to 50% (lines 258-271), so the panel and `GET /prop-challenge`
+  went while every generator, launchd job and `/control/refresh-prop` stayed. Isolation
+  test still passes. NOTE: an earlier note in this entry's drafting named
+  `data/agent/prop_challenge_state.json` — that file is read only by the superseded
+  dashboard and `build_dashboard.sh`, not by the allocation engine.
 
 **Verified by running it, not reading it.** Ten real bugs, each caught by executing the
 thing rather than reviewing the diff:

@@ -13,8 +13,10 @@
     - Calendar (~2027-2143)          -> app/src/panels/Calendar.tsx
 
   Deliberately NOT carried over: the funded-challenge panel and the 13 Research
-  analysis cards. Note the prop DATA pipeline is still live and must stay --
-  sovereign/intelligence/allocation_engine.py reads prop_challenge_state.json.
+  analysis cards. The prop DATA pipeline stays live: allocation_engine.py reads
+  data/propfirm/active_challenge.json (CHALLENGE_FILE, line 53) and cuts equity
+  weight by up to 50%. This file's own prop_challenge_state.json reads are NOT
+  that dependency -- do not conflate them.
 -->
 <!DOCTYPE html>
 <html lang="en">
