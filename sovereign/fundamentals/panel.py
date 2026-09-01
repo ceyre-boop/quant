@@ -23,7 +23,7 @@ for anything that isn't.
 from __future__ import annotations
 
 import logging
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
 from typing import Any, Optional
 
 from sovereign.fundamentals.errors import SectionUnavailable, TickerUnresolved
@@ -73,7 +73,7 @@ HARVEST_INSIDER_MAX_FILINGS = 40
 
 
 def _now() -> datetime:
-    return datetime.utcnow()
+    return datetime.now(timezone.utc)
 
 
 def _staleness(as_of: Optional[date]) -> Optional[int]:
