@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import glob
 import json
+import duckdb
 import logging
 import re
 from datetime import date, datetime
@@ -126,7 +127,19 @@ class FreeProvider(FundamentalsProvider):
         if not DB_PATH.exists():
             raise SectionUnavailable("institutions", self.name, "no 13F dataset ingested yet")
 
-        with connect(read_only=True) as con:
+        # DuckDB is single-writer: a read-write handle in another process (the
+        # nightly harvester mid-ingest) blocks readers. That is a temporary
+        # "cannot answer right now", not "no data" — say so rather than letting
+        # an IOException escape as a 500.
+        try:
+            con = connect(read_only=True)
+        except duckdb.Error as e:
+            raise SectionUnavailable(
+                "institutions", self.name,
+                f"fundamentals DB is locked by another process, try again: {e}",
+            ) from e
+
+        with con:
             try:
                 any_rows = con.execute(
                     "SELECT count(*) FROM fund_institution_holding"

@@ -22,10 +22,12 @@ for anything that isn't.
 """
 from __future__ import annotations
 
+import duckdb
 import logging
 from datetime import date, datetime, timedelta, timezone
 from typing import Any, Optional
 
+from sovereign.fundamentals.instruments import files_with_sec, no_filings_reason
 from sovereign.fundamentals.errors import SectionUnavailable, TickerUnresolved
 from sovereign.fundamentals.reaction import compute_reactions
 from sovereign.fundamentals.registry import get_provider
@@ -35,12 +37,27 @@ from sovereign.fundamentals.types import EarningsEvent, InsiderTxn, Institutiona
 
 
 def _ro_connect():
-    """read-only connect() that degrades to None instead of raising when the
-    fundamentals DB hasn't been created yet (a fresh checkout before the first
-    harvest run) — DuckDB refuses to open a nonexistent file read-only."""
+    """read-only connect() that degrades to None instead of raising.
+
+    Two cases, both of which must NOT take down a request:
+
+    1. The DB does not exist yet — a fresh checkout before the first harvest.
+       DuckDB refuses to open a nonexistent file read-only.
+    2. The DB is locked. DuckDB is single-writer and a read-write handle in
+       another process blocks readers, so a request arriving while the nightly
+       harvester is mid-write would otherwise 500. Returning None makes the
+       caller fall through to a live fetch or an honest gap instead.
+
+    Returning None means "no cached answer available", never "no data exists" —
+    every caller treats it as the former.
+    """
     if not DB_PATH.exists():
         return None
-    return connect(read_only=True)
+    try:
+        return connect(read_only=True)
+    except duckdb.Error as e:
+        log.warning("fundamentals DB unavailable, falling back to live: %s", e)
+        return None
 
 log = logging.getLogger(__name__)
 
@@ -540,14 +557,32 @@ def build_panel(ticker: str, warm_only: bool = False) -> dict:
     cik = _resolve_cik(ticker)
     name = _ticker_name(ticker, cik, warm_only)
 
+    # An ETF or a futures symbol has no issuer filings and never will. Saying
+    # "no cached earnings data" there points the reader at a harvest problem that
+    # does not exist -- so state the real reason and skip the fetch entirely.
+    # Short interest and short volume DO exist for ETFs, so those still run.
+    never = no_filings_reason(ticker)
+
     sections: dict[str, Any] = {
-        "earnings": _build_earnings(ticker, provider, warm_only),
-        "insider": _build_insider(ticker, cik, provider, warm_only),
-        "institutions": _build_institutions(ticker, provider, warm_only),
+        "earnings": (_empty_section(never) if never
+                     else _build_earnings(ticker, provider, warm_only)),
+        "insider": ({**_empty_section(never), "summary": None} if never
+                    else _build_insider(ticker, cik, provider, warm_only)),
+        "institutions": (_empty_section(never) if never
+                         else _build_institutions(ticker, provider, warm_only)),
         "short": _build_short(ticker, provider, warm_only),
     }
 
     partial = any(s.get("gaps") for s in sections.values())
+
+    # capabilities() describes the PROVIDER. For an instrument that files
+    # nothing, advertising "earnings" and "insider" would be a claim the panel
+    # cannot honour whatever provider is configured.
+    caps = sorted(provider.capabilities())
+    if never:
+        caps = [c for c in caps
+                if c not in {"earnings", "estimates", "guidance", "revisions",
+                             "insider", "institutions"}]
 
     return {
         "schema_version": SCHEMA_VERSION,
@@ -555,7 +590,7 @@ def build_panel(ticker: str, warm_only: bool = False) -> dict:
         "cik": cik,
         "name": name,
         "generated_at": _now().isoformat() + "Z",
-        "capabilities": sorted(provider.capabilities()),
+        "capabilities": caps,
         "partial": partial,
         "sections": sections,
     }

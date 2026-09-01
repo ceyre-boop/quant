@@ -99,7 +99,19 @@ def short_interest(ticker: str) -> list[ShortInterestPoint]:
 
     data = payload.get("data") if isinstance(payload, dict) else None
     if not data:
-        return []
+        # Nasdaq returns HTTP 200 with data:null and an explanatory `message`
+        # for tickers it simply does not cover -- most importantly NYSE-listed
+        # names: "Short interest is only supported for Nasdaq Listed stocks".
+        # Returning [] here would render an empty short-interest panel for every
+        # NYSE ticker with no reason given, which is exactly the failure mode
+        # SectionUnavailable exists to prevent. CRM surfaced this.
+        message = ""
+        if isinstance(payload, dict):
+            message = str(payload.get("message") or "").strip()
+        raise SectionUnavailable(
+            "short_interest", "nasdaq",
+            message or f"Nasdaq returned no short-interest data for {ticker}",
+        )
     rows = (data.get("shortInterestTable") or {}).get("rows") or []
 
     out: list[ShortInterestPoint] = []

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.alta.fundamentals</string>
+  <key>ProgramArguments</key>
+  <array>
+    <!-- .venv313 explicitly, NOT /opt/homebrew/bin/python3: this needs duckdb,
+         pandas, yfinance and lxml, and only the lockfile env has all four. -->
+    <string>/Users/taboost/quant/.venv313/bin/python3</string>
+    <string>/Users/taboost/quant/scripts/harvest_fundamentals.py</string>
+    <string>--watchlist</string>
+    <string>--emit-json</string>
+  </array>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+  </dict>
+  <key>WorkingDirectory</key>
+  <string>/Users/taboost/quant</string>
+  <key>Nice</key>
+  <integer>5</integer>
+  <key>StandardOutPath</key>
+  <string>/Users/taboost/quant/logs/fundamentals.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/taboost/quant/logs/fundamentals.err</string>
+  <!-- Daily 03:15 local. After the session settles, and deliberately BEFORE the
+       07:00 com.alta.ib_shortable run so borrow is read as a day-old file rather
+       than racing the job that writes it.
+
+       Writes data/fundamentals/ but does NOT commit — repo commits stay
+       operator-controlled, as with every other job in scripts/.
+
+       TRACKED-NOT-LOADED: Colin loads manually (operator-promotes pattern):
+       launchctl load ~/Library/LaunchAgents/com.alta.fundamentals.plist -->
+  <key>StartCalendarInterval</key>
+  <dict>
+    <key>Hour</key><integer>3</integer>
+    <key>Minute</key><integer>15</integer>
+  </dict>
+</dict>
+</plist>
