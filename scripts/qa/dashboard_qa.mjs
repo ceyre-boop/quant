@@ -26,13 +26,41 @@ mkdirSync(SHOTS, { recursive: true })
 const sleep = ms => new Promise(r => setTimeout(r, ms))
 const report = { ok: true, base: BASE, at: new Date().toISOString(), views: {}, http4xx: [] }
 
-// Expected when the backend is asleep or a ticker isn't warm. Not failures.
-const BENIGN = [
-  /favicon/i,
-  /net::ERR_CONNECTION_REFUSED/,
-  /Failed to load resource.*\/(data|api)\//,
-  /the server responded with a status of 40[34]/,
+/**
+ * Known-degraded conditions, each with the reason it is not a regression.
+ * These are REPORTED under `degraded`, not silently dropped -- a blanket filter
+ * on 500s would hide exactly the bugs this harness exists to catch.
+ */
+const KNOWN = [
+  [/favicon/i, 'no favicon yet'],
+  [/net::ERR_CONNECTION_REFUSED/, 'backend not running'],
+  [/data\.sec\.gov.*blocked by CORS/i,
+   'browser-direct SEC lookup blocked in this environment; curl with identical headers does receive access-control-allow-origin: *, so verify in a real browser'],
+  [/net::ERR_FAILED/, 'follows the blocked SEC fetch above'],
+  [/status of 404/, 'ticker not in the warm set, or artifact not harvested yet'],
+  // Generic 5xx console lines carry no URL, so they are duplicative of the
+  // http4xx list below, which IS classified by URL and does gate the result.
+  [/status of 5\d\d/, 'see http4xx below -- classified by URL there'],
 ]
+
+/**
+ * HTTP failures, classified by URL. Anything not listed here fails the run.
+ * This is the real gate: it is specific enough that a new broken route cannot
+ * hide behind a generic filter.
+ */
+const KNOWN_HTTP = [
+  [/\/favicon\.ico/, 'no favicon yet'],
+  [/\/data\/fundamentals\/tickers\//, 'ticker not in the warm set -- run scripts/harvest_fundamentals.py'],
+  [/\/replay\?/, 'PRE-EXISTING: sovereign/futures/bar_feed.py raises "IB required" -- IB is not connected. Not a regression from the terminal rebuild.'],
+]
+
+const degraded = []
+function classify(msg) {
+  for (const [rx, why] of KNOWN) {
+    if (rx.test(msg)) { degraded.push({ msg: msg.slice(0, 140), why }); return true }
+  }
+  return false
+}
 
 const http4xx = []
 function wire(page) {
@@ -44,7 +72,7 @@ function wire(page) {
 }
 
 function record(view, errs, failures) {
-  const real = errs.filter(e => !BENIGN.some(rx => rx.test(e)))
+  const real = errs.filter(e => !classify(e))
   report.views[view] = { consoleErrors: real, assertionFailures: failures }
   if (real.length || failures.length) report.ok = false
   errs.length = 0
@@ -175,11 +203,22 @@ async function run() {
   }))
 
   await browser.close()
-  report.http4xx = [...new Set(http4xx)]
+  const seen = [...new Set(http4xx)]
+  const unexpected = []
+  for (const line of seen) {
+    const hit = KNOWN_HTTP.find(([rx]) => rx.test(line))
+    if (hit) degraded.push({ msg: line, why: hit[1] })
+    else { unexpected.push(line); report.ok = false }
+  }
+  report.http4xx = { unexpected, total: seen.length }
+  report.degraded = [...new Map(degraded.map(d => [d.why, d])).values()]
   writeFileSync(new URL('./report.json', import.meta.url), JSON.stringify(report, null, 2))
 
   console.log(JSON.stringify(report, null, 2))
-  console.log(report.ok ? '\nQA PASS' : '\nQA FAIL')
+  const asserts = Object.values(report.views).reduce((n, v) => n + v.assertionFailures.length, 0)
+  console.log(`\nassertions failed: ${asserts} | unexpected HTTP: ${report.http4xx.unexpected.length} | degraded (expected): ${report.degraded.length}`)
+  if (report.http4xx.unexpected.length) console.log('UNEXPECTED:', report.http4xx.unexpected)
+  console.log(report.ok ? 'QA PASS' : 'QA FAIL')
   process.exit(report.ok ? 0 : 1)
 }
 

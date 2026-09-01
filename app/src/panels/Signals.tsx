@@ -151,8 +151,16 @@ function ReplayCockpit({ initialDay }: { initialDay: string | null }) {
       onOrder: (t, kind) => setOrders(o => [...o, { t, kind }]),
       onOrdersReset: () => { setOrders([]); setSummary(null) },
       onComplete: d => setSummary(d),
-      fetchReplay: async (sym, d) =>
-        fetchJSON<ReplayData>(apiPath(`replay?symbol=${sym}${d ? `&date=${d}` : ''}`)),
+      // The replay route answers 500 with a JSON traceback body when the bar
+      // feed has nothing (e.g. IB not connected). fetchJSON would throw away
+      // that explanation, so read the body directly and hand the island a
+      // structured error it can display honestly.
+      fetchReplay: async (sym, d) => {
+        const r = await fetch(apiPath(`replay?symbol=${sym}${d ? `&date=${d}` : ''}`))
+        const body = await r.json().catch(() => null)
+        if (!r.ok) return { day: '', bars: [], trades: [], error: body?.error ?? `HTTP ${r.status}` }
+        return body as ReplayData
+      },
     })
     return () => { handle.current?.destroy(); handle.current = null }
   }, [])

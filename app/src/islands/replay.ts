@@ -30,6 +30,12 @@ export type ReplayData = {
 
 const toSec = (ms: number) => Math.floor(ms / 1000) as unknown as Time
 
+/** Backend errors arrive as full tracebacks; show the part that means something. */
+const firstLine = (s: string) => {
+  const lines = String(s).trim().split('\n').filter(Boolean)
+  return (lines[lines.length - 1] || String(s)).slice(0, 160)
+}
+
 export type ReplayHandle = {
   load: (symbol: string, day?: string) => Promise<ReplayData | null>
   play: (durationMin: number) => void
@@ -140,13 +146,28 @@ export function mountReplay(
     try {
       const d = await cb.fetchReplay(symbol, day)
       data = d
-      if (d.error) { cb.onStatus(`no data (${d.error})`); return d }
+      if (d.error) {
+        // The backend answered; it just has no session to replay (commonly the
+        // futures bar feed needs IB and IB is not connected). Say that, rather
+        // than blaming the connection.
+        cb.onStatus(`no data for ${symbol}: ${firstLine(d.error)}`)
+        return d
+      }
       renderFull()
       cb.onStatus(`${d.day} · ${d.bars.length} bars · ${d.trades.length} trades · ready`)
       cb.onOrdersReset()
       return d
-    } catch {
-      cb.onStatus('backend offline — the replay needs the server running')
+    } catch (e) {
+      // Distinguish "cannot reach the server" from "the server said no". The
+      // first is a connection problem; the second is a data problem, and
+      // telling the user to start a server that is already running is worse
+      // than saying nothing.
+      const msg = e instanceof Error ? e.message : String(e)
+      cb.onStatus(
+        /Failed to fetch|NetworkError|Timeout|abort/i.test(msg)
+          ? 'cannot reach the backend — start it with: python3 scripts/live_signals_server.py'
+          : `replay unavailable: ${firstLine(msg)}`,
+      )
       return null
     }
   }
