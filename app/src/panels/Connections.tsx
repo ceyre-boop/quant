@@ -103,7 +103,15 @@ export default function Connections() {
                         </td>
                         <td className="text-right">
                           <Pill tone={TIER_TONE[r.tier as keyof typeof TIER_TONE]}>{r.tier}</Pill>
-                          {h?.status && <span className="ml-1 text-[9px] text-faint">{h.status}</span>}
+                          {/* health.json only records whether an auth PING succeeded.
+                              A green ping on a dormant integration means the key is
+                              valid and nothing consumes it — label it so that reads
+                              as the fact it is, not as "working". */}
+                          {h?.status && (
+                            <span className="ml-1 text-[9px] text-faint" title="result of the credential ping in health.json, not a measure of use">
+                              ping {h.status.toLowerCase()}
+                            </span>
+                          )}
                         </td>
                       </tr>
                     )
