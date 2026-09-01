@@ -297,7 +297,13 @@ def _build_earnings(ticker: str, provider, warm_only: bool) -> dict:
             "source": e.source,
         })
 
-    as_of = max((e.report_date for e in events if e.report_date), default=None)
+    # as_of must be the most recent REPORTED print, not the scheduled next one.
+    # Including the future date produced 'as of 2026-10-29 -58d' -- negative
+    # staleness, which reads as nonsense. Freshness here means "how long since
+    # this company last told us something", and a date that has not happened yet
+    # cannot answer that.
+    as_of = max((e.report_date for e in events
+                 if e.report_date and e.eps_actual is not None), default=None)
     return {
         "as_of": as_of.isoformat() if as_of else None,
         "staleness_days": _staleness(as_of),
