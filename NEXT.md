@@ -4,6 +4,96 @@ Per-session ledger: what shipped, push status, verdicts, blockers, refusals. New
 The Obsidian brain (`~/Obsidian/Obsidian/00-BRAIN/NEXT.md`) is the cross-project rollup.
 Standing constraints live in `CLAUDE.md` — not restated here.
 
+## 2026-09-01 — Repo repurposed: research terminal + fundamentals/filings layer
+
+Direction change, not a feature. The front end stops being a strategy-discovery
+dashboard and becomes a **research terminal**: one place to look at everything, pulled
+from sources already wired up. Pull-only — it never alerts or recommends a trade. The
+new centre of gravity is fundamentals and filings, which the stack had essentially
+nothing of.
+
+**Shipped** (`sovereign-v2`, pushed, 10 commits `5206259`..`7c12fc2`):
+
+- **`app/`** — Vite + React + TS + Tailwind, builds to `_site/` (112 KB gzipped),
+  replacing the 3,900-line hand-written `index.html`. Panels: Terminal (chart +
+  fundamentals for the same ticker, side by side), Signals, Calendar, Oracle,
+  Connections. `deploy.yml` gains a bun build step.
+- **Ported, not rewritten**: TradingView embed + link-out; the replay cockpit moved
+  verbatim into `app/src/islands/replay.ts` as a framework-free island (timer-driven,
+  mutates trades as it walks bars, 38 DOM calls) with React only mounting it.
+- **`sovereign/fundamentals/`** — provider interface, DuckDB store (11 tables), HTTP
+  cache with IMMUTABLE/DAILY/QUARTERLY TTLs, transports for SEC / yfinance / Nasdaq /
+  FINRA / Alpha Vantage, `panel.build_panel()` as the single portability seam behind
+  the CLI, the HTTP route and any future Vercel function.
+- **`scripts/harvest_fundamentals.py`** + `com.alta.fundamentals.plist` (03:15,
+  TRACKED-NOT-LOADED) and `scripts/harvest_13f_bulk.py`.
+- **UI-only prop removal.** `sovereign/intelligence/allocation_engine.py:170-182`
+  reads `prop_challenge_state.json` and cuts equity weight up to 50%, so the panel and
+  `GET /prop-challenge` went while the generator, its launchd job and
+  `/control/refresh-prop` all stayed. Isolation test still passes.
+
+**Verified by running it, not reading it.** Ten real bugs, each caught by executing the
+thing rather than reviewing the diff:
+
+1. `/api` prefix 404'd every backend call when the Python server served the app.
+2. Signals called `.toUpperCase()` on a numeric `signal` field — the live `/data`
+   payload is `{signal: 0|±1, label, conviction, size_mult}`, not what was assumed.
+3. No error boundary, so (2) unmounted every other panel. Boundaries added per panel.
+4. `build_panel` did not finish inside **600s**. Two causes: `reaction.py` went through
+   `MarketDataAdapter`'s symbol-DAY cache (~2,200 sequential fetches for a multi-year
+   daily range — correct for its intended 1-min use, wrong here), and the request path
+   live-pulled 90 days of whole-market FINRA files. Now **3.1s**.
+5. `_store_insider` selected `published_ts` from a table with no such column.
+6. Earnings `as_of` used the *scheduled next* print → "as of 2026-10-29 · **-58d**".
+7. NYSE tickers had a silently blank short-interest panel — Nasdaq returns HTTP 200
+   with `data:null` and "only supported for Nasdaq Listed stocks". Surfaced by CRM.
+8. ETFs claimed capabilities they can never have and said "no cached data" instead of
+   "an ETF has no earnings". New `instruments.py` is now the single source of truth.
+9. DuckDB single-writer lock 500'd readers during a harvest write.
+10. Two concurrent harvesters corrupted a run — flock guard added.
+
+**Numbers, checked against reality.** `build_panel('AAPL')` reaction values hand-verified
+against daily bars: gap −8.5835% vs 304.81/333.43−1, d0 −7.3539%, d1 −9.0004%,
+d5 −6.0283% — all exact, confirming BMO/AMC session alignment. AAPL fell 8.6% on a
++6.7% EPS beat: a real fact, and the kind this panel exists to surface. Watchlist
+harvest 56/56 fetches OK. Front-end QA: **0 assertion failures across 7 views, 0
+unexpected HTTP**.
+
+**Honest gaps, stated in the UI as well as here:**
+- No free source for *forward* analyst consensus or management guidance. Those columns
+  render greyed rather than implying a number. A paid key (FMP/Finnhub) closes it via
+  `FUNDAMENTALS_PRIMARY` with nothing downstream changing.
+- Three categories are structurally lagged: 13F ~45d, official short interest ~8d,
+  Form 4 T+2. Every section carries its own `as_of`.
+- `SectionUnavailable` and an empty list are different things, enforced at the type
+  level, so "could not fetch" can never render as "no data".
+
+**Open for operator:**
+1. **Browser-direct SEC is UNVERIFIED.** Headless Chrome here cannot reach any fresh
+   external host, so the CORS failure in QA is inconclusive; `curl` with
+   browser-identical headers *does* get `access-control-allow-origin: *`. This is the
+   whole static on-demand tier — verify in real Chrome before relying on it. The UI
+   already degrades to an explained `partial` state. Note `www.sec.gov/Archives` and
+   `efts.sec.gov` are confirmed NOT CORS-open, so amounts always need the backend.
+2. `launchctl load ~/Library/LaunchAgents/com.alta.fundamentals.plist` to start the
+   nightly harvest (operator-promotes).
+3. Publishing to Pages still needs the `HEAD:master` push — `deploy.yml` fires on
+   master only.
+
+**Refused to shortcut:** did not delete `prop_challenge_state.json` despite removing its
+panel (live allocation depends on it); did not "fix" the 11 stale ICT session-classifier
+tests; did not filter QA's 5xx noise with a blanket regex that would have hidden the
+`/fundamentals` failure; did not claim the SEC browser path works on a sandboxed
+headless result.
+
+**Not mine, found while here:** full suite is 21 failed / 1677 passed against the
+recorded 19/1679 baseline. The 2 extra are `tests/unit/test_claim_check.py` correctly
+detecting that **`com.clawd.ny_am_scanner` has been dark since 2026-08-24** —
+`logs/ny_scanner.log` last written Aug 24, `launchctl list` shows no PID. Also
+`GET /replay` 500s with "IB required for MNQ" (`sovereign/futures/bar_feed.py:148`);
+both are recorded in the QA harness as known-degraded so they stay visible.
+
+
 ## 2026-07-28 — Ignition prep: HYP-071-v2 prereg + BH trust decision, DRAFTS ONLY
 
 Docs-only, no code/ledger/hash touched, no adjudication. Prepared so Colin can open the
