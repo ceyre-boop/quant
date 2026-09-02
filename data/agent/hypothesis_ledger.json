@@ -2289,5 +2289,41 @@
     "source": "operator_session_2026-09-02",
     "auto_generated": false,
     "result_file": "data/research/hyp110/result.json"
+  },
+  {
+    "id": "HYP-111a",
+    "name": "Post-shock intraday retrace-then-continuation (ten ETFs, 1-min, 2023-06 \u2192 2026-07 pilot)",
+    "status": "PREREGISTERED",
+    "date_tested": null,
+    "result": null,
+    "verdict": null,
+    "methodology_note": "Pre-registered 2026-09-02 before any event-session minute bar was read. Free-tier pilot of research/HYP-111_SCOPE.md; power cut stated in the doc.",
+    "hash_lock": "41b7b6a15a9f2f1e4bf8643e2f711725b15f30cfd8d8ee8753720ff43a008b28",
+    "prereg_file": "data/research/preregister/HYP-111a.json",
+    "p_value": null,
+    "bh_survives": null,
+    "oos_sharpe": null,
+    "is_sharpe": null,
+    "prior_expectation": "CONFIRMED",
+    "source": "operator_session_2026-09-02",
+    "auto_generated": false
+  },
+  {
+    "id": "HYP-112",
+    "name": "Post-shock ATM straddle (5-session hold) vs matched non-shock control, ten ETFs, 2020-2026",
+    "status": "PREREGISTERED",
+    "date_tested": null,
+    "result": null,
+    "verdict": null,
+    "methodology_note": "Pre-registered 2026-09-02 before any event option chain was read. The magnitude instrument, tested on real NBBO.",
+    "hash_lock": "f2d552448a236cc76e5ad9e04877362362832c8bfb89a085d678abc0e53fe6fd",
+    "prereg_file": "data/research/preregister/HYP-112.json",
+    "p_value": null,
+    "bh_survives": null,
+    "oos_sharpe": null,
+    "is_sharpe": null,
+    "prior_expectation": "NOT_SIGNIFICANT",
+    "source": "operator_session_2026-09-02",
+    "auto_generated": false
   }
 ]
