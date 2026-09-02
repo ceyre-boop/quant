@@ -4,6 +4,21 @@ Per-session ledger: what shipped, push status, verdicts, blockers, refusals. New
 The Obsidian brain (`~/Obsidian/Obsidian/00-BRAIN/NEXT.md`) is the cross-project rollup.
 Standing constraints live in `CLAUDE.md` — not restated here.
 
+## 2026-09-02 (cont) — HYP-111a VALID_BUT_BELOW_FLOOR; HYP-112 fetching; fade design PENDING
+
+- HYP-111a (`41b7b6a15a9f2f1e`, 798 events 2023-06→2026-07): every delta component passes
+  (Sharpe +1.59 CI [+0.49,+2.66], 12/15, **10/10**, ex-2025 +) but the pass is the incumbent
+  losing — naive next-day continuation −0.128%/event-day CI [−0.24,−0.03]; the path itself
+  +0.012%/event-day CI spans 0, triggers 12.8%. Confluence untestable (≤1 bucket n=3).
+  `data/research/hyp111/HYP-111a_VERDICT.md`.
+- HYP-112 (`f2d552448a236cc7`) sealed; option-chain fetch running (~13 chains/min, 2,876 needed).
+- **PENDING (operator direction, not sealed):** the finding is the next-day *fade* after a shock,
+  not the path. Next prereg candidates: fade directly; widen universe; per-deployed-capital
+  denominator. **Floor correction must be argued and re-sealed in writing before any run** —
+  not adjusted after seeing 0.012 vs 0.05. Not yet measured: size-conditioning ("fade harder
+  when bigger") and any regime outside 2023-06→2026-07 (needs stock VALUE tier, 2021-01).
+  Decision deferred until HYP-112 lands (magnitude vs reversal as the vehicle).
+
 ## 2026-09-02 (cont) — HYP-111 scoped + sealed data gate → STOPPED at the gate
 
 Scope frozen before any minute bar (`research/HYP-111_SCOPE.md`, `0925bd9`): post-shock
