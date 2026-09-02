@@ -7,7 +7,15 @@ but entered 09:31). HYP-107 is the honest, de-biased version — filter selected
 using ONLY 09:31-available info. Backtest holdout: gross median +5.4%, win 70%,
 tail 4.4, p=0.0005. At ~+5% gross the question is whether 09:31 microcap spread
 + halts leave anything. This tracker logs hypothetical 09:31→10:30 trades and
-compares realized spread/return to the backtest. Target: 40 events.
+compares realized return to the backtest. Target: 40 events.
+
+COST CAVEAT — READ BEFORE DRAWING A CONCLUSION FROM THIS FILE:
+this tracker does NOT measure bid-ask spread. It records the 09:31 bar's
+high-low RANGE (first_bar_range_pct). The real spread measurement lives in
+research/gapper/TICK-039-spread-recalibration.md: 313 NBBO observations at the
+frozen 09:31 instant, median 0.55%. Do not compare the two as if they were the
+same number — a 3-4% bar range and a 0.55% spread are both unremarkable and
+entirely consistent.
 
 FROZEN filter (commit 48303cd — do not re-fit):
   overnight_gap <= 0.577  AND  log10(first-minute volume) <= 5.854
@@ -15,7 +23,7 @@ first-minute range recorded descriptively (weak feature, not a gate).
 
 Passes (launchd scripts/com.alta.hyp107_shadow.plist — operator loads):
   --scan  (~10:50 ET): movers -> 1-min bars -> filter -> log 09:31 entry /
-          10:30 exit / realized first-bar spread. outcome=OPEN.
+          10:30 exit / first-bar range. outcome=OPEN.
   --close (~16:20 ET): finalize gross return, append daily, update tracking.
 """
 import json
@@ -145,7 +153,21 @@ def scan():
         if not passes:
             continue
         entry = b0931["o"]
-        realized_spread = (b0931["h"] - b0931["l"]) / entry if entry else 0.0
+        # NOT A BID-ASK SPREAD. This is the 09:31 bar's high-low RANGE over the
+        # entry price — intrabar volatility, which on a microcap gapper runs a
+        # few percent as a matter of course.
+        #
+        # It was previously emitted as "realized_spread_pct", and that name did
+        # real damage: the tracking file's median of 0.0378 was read as a 3.78%
+        # bid-ask spread, "six times" the 0.55% measured from 313 real NBBO
+        # observations (research/gapper/TICK-039-spread-recalibration.md), and
+        # taken as live evidence reinstating the friction objection that shelved
+        # HYP-107. The two numbers are not in conflict because they are not the
+        # same quantity. A bar range is not a spread.
+        #
+        # The old key is still written for continuity with the existing
+        # tracking series; prefer first_bar_range_pct.
+        first_bar_range = (b0931["h"] - b0931["l"]) / entry if entry else 0.0
         signals.append({
             "source": SOURCE_TAG, "date": str(today), "ticker": sym,
             "prev_close": round(pc, 4),
@@ -153,7 +175,10 @@ def scan():
             "first_min_vol": int(first_vol), "log_vol": round(log_vol, 4),
             "first_min_range": round(first_range, 4),
             "entry_0931": round(entry, 4),
-            "realized_spread_pct": round(realized_spread, 4),
+            "first_bar_range_pct": round(first_bar_range, 4),
+            # deprecated alias, same value — kept so the existing tracking
+            # series stays continuous. Do not read this as a spread.
+            "realized_spread_pct": round(first_bar_range, 4),
             "exit_1030_ref": round(b1030["c"], 4),   # provisional (finalized at close)
             "logged_at": datetime.now(UTC).isoformat(), "outcome": "OPEN",
         })
@@ -214,7 +239,8 @@ def _refresh_tracking():
             seen.add(k)
             rows.append(r)
     rets = [r["gross_ret"] for r in rows if "gross_ret" in r]
-    spreads = [r["realized_spread_pct"] for r in rows if "realized_spread_pct" in r]
+    ranges = [r.get("first_bar_range_pct", r.get("realized_spread_pct"))
+              for r in rows if ("first_bar_range_pct" in r or "realized_spread_pct" in r)]
     wins = [x for x in rets if x > 0]; losses = [x for x in rets if x < 0]
     tail = (sum(wins) / len(wins)) / (-sum(losses) / len(losses)) \
         if wins and losses else None
@@ -224,7 +250,10 @@ def _refresh_tracking():
         "median_return": round(median(rets), 5) if rets else None,
         "win_rate": round(len(wins) / len(rets), 3) if rets else None,
         "tail_ratio": round(tail, 2) if tail else None,
-        "median_realized_spread": round(median(spreads), 4) if spreads else None,
+        "median_first_bar_range": round(median(ranges), 4) if ranges else None,
+        # deprecated alias — this was NEVER a spread. See the comment at the
+        # computation site.
+        "median_realized_spread": round(median(ranges), 4) if ranges else None,
         "backtest_baseline": BASELINE,
         "note": ("Observational, no capital. At ~+5% gross vs realized spread, "
                  "this tells whether the de-biased edge survives real 09:31 fills."),
@@ -233,7 +262,7 @@ def _refresh_tracking():
     (OUT / "hyp107_tracking.json").write_text(json.dumps(track, indent=2))
     print(f"[hyp107] tracking: {track['n_events']}/40 events, "
           f"median {track['median_return']} vs backtest {BASELINE['median']}, "
-          f"median spread {track['median_realized_spread']}", flush=True)
+          f"median 09:31 bar range {track['median_first_bar_range']}", flush=True)
 
 
 if __name__ == "__main__":
