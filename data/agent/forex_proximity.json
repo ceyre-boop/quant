@@ -1,54 +1,54 @@
 {
-  "last_scan": "2026-08-28T22:55:34.224295+00:00",
+  "last_scan": "2026-09-01T17:30:56.678058+00:00",
   "pairs": [
-    {
-      "pair": "USDJPY=X",
-      "pct_to_trigger": 100.0,
-      "conviction": 0.319,
-      "direction": "NO_TRADE",
-      "trend": "OK",
-      "regime": "TRENDING",
-      "hurst": 0.66,
-      "rate_differential": 2.789,
-      "differential_trend": "NARROWING",
-      "est_days_to_trigger": null
-    },
     {
       "pair": "GBPUSD=X",
       "pct_to_trigger": 100.0,
-      "conviction": 0.15,
+      "conviction": 0.148,
       "direction": "LONG",
       "trend": "OK",
       "regime": "TRENDING",
       "hurst": 0.66,
-      "rate_differential": 0.101,
-      "differential_trend": "NARROWING",
-      "est_days_to_trigger": null
-    },
-    {
-      "pair": "AUDUSD=X",
-      "pct_to_trigger": 100.0,
-      "conviction": 0.138,
-      "direction": "LONG",
-      "trend": "OK",
-      "regime": "TRENDING",
-      "hurst": 0.65,
-      "rate_differential": 0.83,
+      "rate_differential": -0.599,
       "differential_trend": "WIDENING",
       "est_days_to_trigger": 1
     },
     {
-      "pair": "EURUSD=X",
-      "pct_to_trigger": 15.0,
-      "conviction": 0.015,
+      "pair": "AUDUSD=X",
+      "pct_to_trigger": 91.0,
+      "conviction": 0.091,
       "direction": "NO_TRADE",
       "trend": "OK",
       "regime": "TRENDING",
-      "hurst": 0.66,
+      "hurst": 0.65,
+      "rate_differential": 0.13,
+      "differential_trend": "NARROWING",
+      "est_days_to_trigger": null
+    },
+    {
+      "pair": "EURUSD=X",
+      "pct_to_trigger": 34.0,
+      "conviction": 0.034,
+      "direction": "NO_TRADE",
+      "trend": "OK",
+      "regime": "TRENDING",
+      "hurst": 0.65,
       "rate_differential": -1.38,
+      "differential_trend": "NARROWING",
+      "est_days_to_trigger": null
+    },
+    {
+      "pair": "USDJPY=X",
+      "pct_to_trigger": 0.0,
+      "conviction": 0.0,
+      "direction": "NO_TRADE",
+      "trend": "BLOCKED",
+      "regime": "RANGING",
+      "hurst": 0.5,
+      "rate_differential": 0.0,
       "differential_trend": "NARROWING",
       "est_days_to_trigger": null
     }
   ],
-  "verdict": "NO_TRADE_TODAY \u2014 USDJPY=X closest at 100%"
+  "verdict": "NO_TRADE_TODAY \u2014 GBPUSD=X closest at 100%, ~1d out"
 }

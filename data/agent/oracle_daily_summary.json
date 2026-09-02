@@ -1,14 +1,14 @@
 {
-  "last_updated": "2026-08-18T06:31:23.717870+00:00",
+  "last_updated": "2026-09-01T06:32:01.448941+00:00",
   "harvest": {
     "trades_closed": 0,
     "win_rate": null,
     "failure_taxonomy": {}
   },
   "reflection": {
-    "candidate_lesson": "When the 30-indicator consensus shows conv=100% but green_matches < 4 AND hist_hr is populated, the historical-memory analog is too thin to trust the live conviction \u2014 gate entries on green_matches >= 4 to require historical confirmation, not just live agreement.",
-    "mechanism": "Live indicator agreement measures present-tense crowding; green_matches counts how many times this exact multi-indicator fingerprint previously resolved profitably. A 100% live consensus with only 3 historical analogs (AUDUSD case) is a fresh, unvalidated configuration \u2014 institutions have not yet been observed reacting to this pattern, so the 68% hist_hr is a small-sample mirage that regresses toward base rate when traded at size.",
-    "testable_rule": "if consensus_conviction >= 1.00 and green_matches < 4: reduce_size_multiplier(0.5) or skip; only full-size when green_matches >= 5 AND hist_hr >= 0.65"
+    "candidate_lesson": "When the 30-indicator consensus shows high conviction (>90%) but green_matches=0 and hist_hr=0%, treat the signal as UNVALIDATED and freeze entries \u2014 high live conviction without any historical analog match is a novel unmemorized state, not an edge.",
+    "mechanism": "green_matches counts how many times the current live indicator configuration has appeared in historical memory with a positive outcome. Zero matches means the ensemble has never seen this exact bull-alignment succeed before; conviction% only measures cross-sectional agreement of indicators right now, not the forward payoff of that agreement. Institutionally, a broad indicator stack lining up long with no historical precedent usually reflects a late-cycle crowded positioning snapshot rather than a repeatable inefficiency \u2014 the crowd is aligned, which is precisely when mean-reversion risk is highest.",
+    "testable_rule": "if consensus_conviction > 0.90 and green_matches == 0 and hist_hr == 0.0: block_entry() # only trade conviction>0.90 when green_matches >= 3 (see GBPUSD hist_hr=68%, AUDUSD hist_hr=68%)"
   },
   "validation": {
     "verdict": "REJECTED",
@@ -21,8 +21,8 @@
     "codify_error": null
   },
   "cycle": {
-    "cost_usd": 0.13899,
+    "cost_usd": 0.142395,
     "status": "COMPLETE",
-    "date": "2026-08-18"
+    "date": "2026-09-01"
   }
 }
