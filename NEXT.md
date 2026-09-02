@@ -4,6 +4,28 @@ Per-session ledger: what shipped, push status, verdicts, blockers, refusals. New
 The Obsidian brain (`~/Obsidian/Obsidian/00-BRAIN/NEXT.md`) is the cross-project rollup.
 Standing constraints live in `CLAUDE.md` — not restated here.
 
+## 2026-09-02 (cont) — HYP-111 scoped + sealed data gate → STOPPED at the gate
+
+Scope frozen before any minute bar (`research/HYP-111_SCOPE.md`, `0925bd9`): post-shock
+intraday retrace-then-continuation, ten ETFs, 2020–2026 1-min, incumbent = naive
+post-shock continuation, five frozen confluence conditions, date-block bootstrap, both
+priors sealed (Colin: CONFIRMED / most-likely-failure "data gate fails"; Claude:
+NOT_SIGNIFICANT / dies ex-2020 & in TLT/GLD).
+
+**Data gate (`scripts/research/probe_thetadata_stock_1m.py` → `data/research/hyp111/probe.json`):**
+- ThetaTerminal was hung 26 days (no log since 08-07, all HTTP timed out); `/usr/bin/java`
+  is a stub — relaunched with `/opt/homebrew/opt/openjdk/bin/java`, CONNECTED. This jar
+  serves the **v2 API on :25510** (v3 on :25503 → 404); repo clients default to 25503/v3.
+- Stock 1-min: **HTTP 471 for every date before 2023-06-01** ("first access date of
+  20230601" — STOCK.FREE). 2024-01-03 and 2026-08-03: 200, 390 RTH bars, all ten ETFs.
+- Per the sealed decision rule: **STOP.** Not substituted with a 2-year sample. Colin's
+  named most-likely failure mode happened.
+- ThetaData stock first-access dates (docs): FREE 2023-06-01 · VALUE 2021-01-01 ·
+  STANDARD 2016-01-01 · PRO 2012-06-01. Prices not published on the docs page; option
+  tiers are $40/$80/$160/mo. Spending money = Colin's call.
+
+Not sealed: no prereg, no ledger entry, no minute bar beyond the 5+20 probe calls read.
+
 ## 2026-09-02 — Edge taxonomy; HYP-109 abstention adjudicated noise; regime = story; HYP-110 sealed
 
 Session goal was a map, not a hunt: where can an edge exist for a trader with no

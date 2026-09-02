@@ -1,0 +1,454 @@
+{
+  "probed_at": "2026-09-02T17:28:36.346464+00:00",
+  "base": "http://127.0.0.1:25510",
+  "endpoint": "/v2/hist/stock/ohlc ivl=60000 rth=true",
+  "spy_by_date": [
+    {
+      "symbol": "SPY",
+      "date": "2020-03-16",
+      "http": 471,
+      "latency_s": 0.05,
+      "error_text": ":End date cannot earlier than the your first access date of 20230601. Upgrading your Theta Data subscription for the security type you are trying to access will decrease your first access date."
+    },
+    {
+      "symbol": "SPY",
+      "date": "2021-06-15",
+      "http": 471,
+      "latency_s": 0.13,
+      "error_text": ":End date cannot earlier than the your first access date of 20230601. Upgrading your Theta Data subscription for the security type you are trying to access will decrease your first access date."
+    },
+    {
+      "symbol": "SPY",
+      "date": "2022-06-13",
+      "http": 471,
+      "latency_s": 0.04,
+      "error_text": ":End date cannot earlier than the your first access date of 20230601. Upgrading your Theta Data subscription for the security type you are trying to access will decrease your first access date."
+    },
+    {
+      "symbol": "SPY",
+      "date": "2024-01-03",
+      "http": 200,
+      "latency_s": 0.39,
+      "columns": [
+        "ms_of_day",
+        "open",
+        "high",
+        "low",
+        "close",
+        "volume",
+        "count",
+        "date"
+      ],
+      "rows": 390,
+      "first_bar": "09:30",
+      "last_bar": "15:59",
+      "sample_row": [
+        34200000,
+        470.43,
+        470.53,
+        470.19,
+        470.48,
+        895171,
+        6315,
+        20240103
+      ]
+    },
+    {
+      "symbol": "SPY",
+      "date": "2026-08-03",
+      "http": 200,
+      "latency_s": 0.47,
+      "columns": [
+        "ms_of_day",
+        "open",
+        "high",
+        "low",
+        "close",
+        "volume",
+        "count",
+        "date"
+      ],
+      "rows": 390,
+      "first_bar": "09:30",
+      "last_bar": "15:59",
+      "sample_row": [
+        34200000,
+        749.44,
+        750.3,
+        748.8,
+        749.75,
+        658397,
+        19288,
+        20260803
+      ]
+    }
+  ],
+  "all_symbols": {
+    "2022-06-13": [
+      {
+        "symbol": "SPY",
+        "date": "2022-06-13",
+        "http": 471,
+        "latency_s": 0.04,
+        "error_text": ":End date cannot earlier than the your first access date of 20230601. Upgrading your Theta Data subscription for the security type you are trying to access will decrease your first access date."
+      },
+      {
+        "symbol": "QQQ",
+        "date": "2022-06-13",
+        "http": 471,
+        "latency_s": 0.13,
+        "error_text": ":End date cannot earlier than the your first access date of 20230601. Upgrading your Theta Data subscription for the security type you are trying to access will decrease your first access date."
+      },
+      {
+        "symbol": "IWM",
+        "date": "2022-06-13",
+        "http": 471,
+        "latency_s": 0.04,
+        "error_text": ":End date cannot earlier than the your first access date of 20230601. Upgrading your Theta Data subscription for the security type you are trying to access will decrease your first access date."
+      },
+      {
+        "symbol": "DIA",
+        "date": "2022-06-13",
+        "http": 471,
+        "latency_s": 0.04,
+        "error_text": ":End date cannot earlier than the your first access date of 20230601. Upgrading your Theta Data subscription for the security type you are trying to access will decrease your first access date."
+      },
+      {
+        "symbol": "TLT",
+        "date": "2022-06-13",
+        "http": 471,
+        "latency_s": 0.1,
+        "error_text": ":End date cannot earlier than the your first access date of 20230601. Upgrading your Theta Data subscription for the security type you are trying to access will decrease your first access date."
+      },
+      {
+        "symbol": "GLD",
+        "date": "2022-06-13",
+        "http": 471,
+        "latency_s": 0.04,
+        "error_text": ":End date cannot earlier than the your first access date of 20230601. Upgrading your Theta Data subscription for the security type you are trying to access will decrease your first access date."
+      },
+      {
+        "symbol": "EFA",
+        "date": "2022-06-13",
+        "http": 471,
+        "latency_s": 0.04,
+        "error_text": ":End date cannot earlier than the your first access date of 20230601. Upgrading your Theta Data subscription for the security type you are trying to access will decrease your first access date."
+      },
+      {
+        "symbol": "EEM",
+        "date": "2022-06-13",
+        "http": 471,
+        "latency_s": 0.04,
+        "error_text": ":End date cannot earlier than the your first access date of 20230601. Upgrading your Theta Data subscription for the security type you are trying to access will decrease your first access date."
+      },
+      {
+        "symbol": "XLF",
+        "date": "2022-06-13",
+        "http": 471,
+        "latency_s": 0.05,
+        "error_text": ":End date cannot earlier than the your first access date of 20230601. Upgrading your Theta Data subscription for the security type you are trying to access will decrease your first access date."
+      },
+      {
+        "symbol": "XLE",
+        "date": "2022-06-13",
+        "http": 471,
+        "latency_s": 0.04,
+        "error_text": ":End date cannot earlier than the your first access date of 20230601. Upgrading your Theta Data subscription for the security type you are trying to access will decrease your first access date."
+      }
+    ],
+    "2024-01-03": [
+      {
+        "symbol": "SPY",
+        "date": "2024-01-03",
+        "http": 200,
+        "latency_s": 0.39,
+        "columns": [
+          "ms_of_day",
+          "open",
+          "high",
+          "low",
+          "close",
+          "volume",
+          "count",
+          "date"
+        ],
+        "rows": 390,
+        "first_bar": "09:30",
+        "last_bar": "15:59",
+        "sample_row": [
+          34200000,
+          470.43,
+          470.53,
+          470.19,
+          470.48,
+          895171,
+          6315,
+          20240103
+        ]
+      },
+      {
+        "symbol": "QQQ",
+        "date": "2024-01-03",
+        "http": 200,
+        "latency_s": 0.27,
+        "columns": [
+          "ms_of_day",
+          "open",
+          "high",
+          "low",
+          "close",
+          "volume",
+          "count",
+          "date"
+        ],
+        "rows": 390,
+        "first_bar": "09:30",
+        "last_bar": "15:59",
+        "sample_row": [
+          34200000,
+          399.93,
+          400.2,
+          399.38,
+          400.15,
+          808600,
+          7114,
+          20240103
+        ]
+      },
+      {
+        "symbol": "IWM",
+        "date": "2024-01-03",
+        "http": 200,
+        "latency_s": 0.32,
+        "columns": [
+          "ms_of_day",
+          "open",
+          "high",
+          "low",
+          "close",
+          "volume",
+          "count",
+          "date"
+        ],
+        "rows": 390,
+        "first_bar": "09:30",
+        "last_bar": "15:59",
+        "sample_row": [
+          34200000,
+          197.4,
+          197.48,
+          196.74,
+          196.9,
+          861623,
+          6458,
+          20240103
+        ]
+      },
+      {
+        "symbol": "DIA",
+        "date": "2024-01-03",
+        "http": 200,
+        "latency_s": 0.16,
+        "columns": [
+          "ms_of_day",
+          "open",
+          "high",
+          "low",
+          "close",
+          "volume",
+          "count",
+          "date"
+        ],
+        "rows": 390,
+        "first_bar": "09:30",
+        "last_bar": "15:59",
+        "sample_row": [
+          34200000,
+          375.57,
+          376.11,
+          375.57,
+          376.01,
+          187404,
+          2619,
+          20240103
+        ]
+      },
+      {
+        "symbol": "TLT",
+        "date": "2024-01-03",
+        "http": 200,
+        "latency_s": 0.25,
+        "columns": [
+          "ms_of_day",
+          "open",
+          "high",
+          "low",
+          "close",
+          "volume",
+          "count",
+          "date"
+        ],
+        "rows": 390,
+        "first_bar": "09:30",
+        "last_bar": "15:59",
+        "sample_row": [
+          34200000,
+          97.38,
+          97.3921,
+          97.33,
+          97.36,
+          599322,
+          2016,
+          20240103
+        ]
+      },
+      {
+        "symbol": "GLD",
+        "date": "2024-01-03",
+        "http": 200,
+        "latency_s": 0.14,
+        "columns": [
+          "ms_of_day",
+          "open",
+          "high",
+          "low",
+          "close",
+          "volume",
+          "count",
+          "date"
+        ],
+        "rows": 390,
+        "first_bar": "09:30",
+        "last_bar": "15:59",
+        "sample_row": [
+          34200000,
+          188.77,
+          188.7805,
+          188.66,
+          188.76,
+          119978,
+          2102,
+          20240103
+        ]
+      },
+      {
+        "symbol": "EFA",
+        "date": "2024-01-03",
+        "http": 200,
+        "latency_s": 0.18,
+        "columns": [
+          "ms_of_day",
+          "open",
+          "high",
+          "low",
+          "close",
+          "volume",
+          "count",
+          "date"
+        ],
+        "rows": 390,
+        "first_bar": "09:30",
+        "last_bar": "15:59",
+        "sample_row": [
+          34200000,
+          73.78,
+          73.845,
+          73.78,
+          73.845,
+          491692,
+          1199,
+          20240103
+        ]
+      },
+      {
+        "symbol": "EEM",
+        "date": "2024-01-03",
+        "http": 200,
+        "latency_s": 0.18,
+        "columns": [
+          "ms_of_day",
+          "open",
+          "high",
+          "low",
+          "close",
+          "volume",
+          "count",
+          "date"
+        ],
+        "rows": 390,
+        "first_bar": "09:30",
+        "last_bar": "15:59",
+        "sample_row": [
+          34200000,
+          39.33,
+          39.35,
+          39.32,
+          39.35,
+          257677,
+          336,
+          20240103
+        ]
+      },
+      {
+        "symbol": "XLF",
+        "date": "2024-01-03",
+        "http": 200,
+        "latency_s": 0.15,
+        "columns": [
+          "ms_of_day",
+          "open",
+          "high",
+          "low",
+          "close",
+          "volume",
+          "count",
+          "date"
+        ],
+        "rows": 390,
+        "first_bar": "09:30",
+        "last_bar": "15:59",
+        "sample_row": [
+          34200000,
+          37.59,
+          37.62,
+          37.57,
+          37.58,
+          317575,
+          956,
+          20240103
+        ]
+      },
+      {
+        "symbol": "XLE",
+        "date": "2024-01-03",
+        "http": 200,
+        "latency_s": 0.42,
+        "columns": [
+          "ms_of_day",
+          "open",
+          "high",
+          "low",
+          "close",
+          "volume",
+          "count",
+          "date"
+        ],
+        "rows": 390,
+        "first_bar": "09:30",
+        "last_bar": "15:59",
+        "sample_row": [
+          34200000,
+          84.87,
+          84.87,
+          84.69,
+          84.75,
+          228625,
+          1987,
+          20240103
+        ]
+      }
+    ]
+  },
+  "first_access_date": "20230601",
+  "verdict": "DEPTH_WALL first_access=20230601 served=['2024-01-03', '2026-08-03']"
+}
