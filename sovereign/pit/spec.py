@@ -121,7 +121,10 @@ FACTS: dict[str, FactSpec] = {
         notes=(
             "Already vintage-keyed on snapshot_date before this layer, and the "
             "one table that got point-in-time right by accident. This is the "
-            "revision path no free source will sell us. Identity excludes "
+            "revision path no FREE source will sell us -- though as of "
+            "2026-09-02 an FMP key is present and its /stable/ endpoints do "
+            "serve forward consensus, so this table is no longer the only "
+            "route to it. Identity excludes "
             "snapshot_date on purpose: successive snapshots of the same "
             "(ticker, period) ARE the vintages."
         ),

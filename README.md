@@ -131,10 +131,16 @@ their reason rather than suppressed.
 insider Form 4, institutional 13F, and short interest. All free sources, behind a provider
 interface so a paid key (FMP/Finnhub) drops in without a rewrite.
 
-**Stated honestly, because the panel does too:** there is no good free source for *forward*
-analyst consensus or management guidance. Those columns render greyed rather than implying a
-number. Three categories are structurally lagged — 13F ~45 days, official short interest
-~8 days, Form 4 T+2 — so every section carries its own `as_of` and staleness.
+**Stated honestly, because the panel does too:** there was no good free source for
+*forward* analyst consensus or management guidance, so those columns render greyed
+rather than implying a number. **As of 2026-09-02 that gap is closed by a paid key:**
+FMP's `/stable/` endpoints serve forward analyst estimates, analyst rating changes,
+and est-vs-actual including forward rows (a future date with `epsActual=null` is the
+current consensus). Verified live -- run `scripts/probe_new_keys.py`. Wiring it into
+the provider interface is the remaining work; the interface was built for exactly
+this drop-in. Three categories are still structurally lagged -- 13F ~45 days,
+official short interest ~8 days, Form 4 T+2 -- so every section carries its own
+`as_of` and staleness.
 
 A section that could not be fetched is never rendered as "no data": `SectionUnavailable` and
 an empty result are different things, enforced at the type level.
