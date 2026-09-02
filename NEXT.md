@@ -18,6 +18,9 @@ Standing constraints live in `CLAUDE.md` — not restated here.
   not adjusted after seeing 0.012 vs 0.05. Not yet measured: size-conditioning ("fade harder
   when bigger") and any regime outside 2023-06→2026-07 (needs stock VALUE tier, 2021-01).
   Decision deferred until HYP-112 lands (magnitude vs reversal as the vehicle).
+- **HYP-113 FLAT** (`f3cf34d66a29cdbe`): no dose-response in shock size, pooled or down-only; the
+  p99+ down-days carry NO fade (−0.02%, n=62) — the fade lives in ordinary top-decile drops.
+  "Fade harder when bigger" killed. `data/research/hyp111/HYP-113_VERDICT.md`.
 
 ## 2026-09-02 (cont) — HYP-111 scoped + sealed data gate → STOPPED at the gate
 
