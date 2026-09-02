@@ -51,7 +51,7 @@ def stock_1m(sym: str, date: str) -> pd.DataFrame:
     CACHE_1M.mkdir(parents=True, exist_ok=True)
     f = CACHE_1M / f"{sym}_{date}.parquet"
     if f.exists():
-        return pd.read_parquet(f)
+        return _clean_bars(pd.read_parquet(f))
     d = date.replace("-", "")
     code, body = _get("/v2/hist/stock/ohlc", {"root": sym, "start_date": d, "end_date": d,
                                               "ivl": 60000, "rth": "true"})
@@ -70,7 +70,16 @@ def stock_1m(sym: str, date: str) -> pd.DataFrame:
         })
         df = df[(df["time"] >= "09:30") & (df["time"] <= "15:59")].reset_index(drop=True)
     df.to_parquet(f, index=False)
-    return df
+    return _clean_bars(df)
+
+
+def _clean_bars(df: pd.DataFrame) -> pd.DataFrame:
+    """Drop zero-priced bars (ThetaData emits 0.0 OHLC for minutes with no prints). Data
+    hygiene, declared in the verdict; not a parameter."""
+    if df.empty:
+        return df
+    ok = (df[["open", "high", "low", "close"]] > 0).all(axis=1)
+    return df[ok].reset_index(drop=True)
 
 
 def expirations(root: str) -> list[str]:
@@ -93,10 +102,16 @@ def option_bulk_eod(root: str, exp: str, start: str, end: str) -> pd.DataFrame:
     f = CACHE_OPT / f"{root}_{exp}_{start}_{end}.parquet"
     if f.exists():
         return pd.read_parquet(f)
-    code, body = _get("/v2/bulk_hist/option/eod", {"root": root, "exp": exp,
-                                                   "start_date": start, "end_date": end}, timeout=180)
+    for attempt in range(4):
+        code, body = _get("/v2/bulk_hist/option/eod", {"root": root, "exp": exp,
+                                                       "start_date": start, "end_date": end}, timeout=180)
+        if code != 475:                                  # 475 = terminal-side exception; transient under load
+            break
+        time.sleep(2.0 * (attempt + 1))
     cols = ["date", "strike", "right", "bid", "ask", "close", "volume"]
-    if code in (471, 472):
+    if code in (471, 472, 475):
+        if code == 475:
+            (CACHE_OPT / "_errors.log").open("a").write(f"{root} {exp} {start} {end} 475 {body}\n")
         df = pd.DataFrame(columns=cols)
     elif code != 200:
         raise ThetaEntitlement(f"{root} {exp}: HTTP {code} {body}")
