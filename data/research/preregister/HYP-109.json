@@ -1,0 +1,148 @@
+{
+  "id": "HYP-109",
+  "slug": "postshock_abstention",
+  "name": "Post-shock abstention: flat for five sessions after a top-decile |return| day",
+  "status": "PREREGISTERED",
+  "frozen_at": "2026-09-02T00:00:00Z",
+  "family": "MAGNITUDE-NOT-DIRECTION-2026-09",
+  "family_note": "Single-member family. The three candidates proposed in this session (vol-managed sizing, post-shock abstention, ATR-scaled exits) were proposed, not tested; only this one is registered and run.",
+  "phase": "one_hypothesis_one_test",
+  "thesis": "After a top-decile absolute-return day in a liquid ETF, the following five sessions carry elevated realized volatility and zero directional drift. A long holder who goes flat for those five sessions therefore improves risk-adjusted return without sacrificing raw return.",
+  "mechanism": "Volatility clusters; sign does not. A shock day forecasts the SIZE of the next week's moves but carries no information about their direction. For a directionless long holder the days after a shock are pure variance with no compensating drift \u2014 abstaining removes variance and, if the drift is truly zero, costs no return.",
+  "surviving_finding_tested": "magnitude conditionable, direction null \u2014 confirmed across seven G10 forex directional nulls, the NQ discovery track (0 VALID_EDGE, cluster0_long was beta), MEGASCAN v2 (5,040 ORB configs, 0 FWER survivors), and on the exit side (HYP-059/060 CONFIRMED: time exits beat trailing stops). The two survivors, HYP-093 and HYP-095, are both magnitude-conditioned and both fail the golden rule as implementations (HTB microcap borrow; single instrument). This is the golden-rule-clean form.",
+  "golden_rule": {
+    "rule": "must hold for any trader at any level: no dependence on account size, leverage, execution speed, colocation, one instrument, one venue, one regime, or anything a $2k retail trader lacks",
+    "how_satisfied": "ten liquid retail ETFs, daily bars, no leverage, no options, no intraday timing, 12.5 years spanning 2018 / 2020 / 2022; the action is to hold cash"
+  },
+  "instrument_set": [
+    "SPY",
+    "QQQ",
+    "IWM",
+    "DIA",
+    "TLT",
+    "GLD",
+    "EFA",
+    "EEM",
+    "XLF",
+    "XLE"
+  ],
+  "companion_instrument": {
+    "symbol": "UVXY",
+    "role": "DESCRIPTIVE ONLY \u2014 a number and a 95% CI, no p-value, NO verdict weight",
+    "question": "after a SPY shock, does UVXY's next-5-session return exceed its unconditional (roll-decayed) baseline? i.e. does an instrument that pays for magnitude without direction actually pay after the signal?",
+    "precedent": "HYP-085 Test 1 \u2014 descriptive by design; a lead, not a result"
+  },
+  "data": {
+    "source": "data/cache/daily_universe/<SYM>.parquet",
+    "columns": [
+      "date",
+      "open",
+      "high",
+      "low",
+      "close",
+      "volume"
+    ],
+    "window": [
+      "2014-01-02",
+      "2026-07-16"
+    ],
+    "warmup_sessions": 252,
+    "effective_window": [
+      "2015-01-02",
+      "2026-07-16"
+    ],
+    "return_definition": "close-to-close log return"
+  },
+  "event_definition": {
+    "shock": "abs(r_t) >= p90 of the trailing 252-session distribution of abs(r)",
+    "percentile_window": "sessions t-252 .. t-1 ONLY \u2014 t itself excluded, no look-ahead",
+    "per_instrument": true,
+    "percentile": 0.9
+  },
+  "action": {
+    "rule": "flat for sessions t+1 .. t+k inclusive",
+    "k": 5,
+    "overlap": "union \u2014 an overlapping shock extends the flat window",
+    "reentry": "open of the first session after the flat window",
+    "baseline": "buy-and-hold, equal-weight across the ten instruments"
+  },
+  "costs": {
+    "round_trip_bp": 2.0,
+    "charged_on": "every flat episode (exit + re-entry)",
+    "note": "conservative; SPY-class quoted spreads are ~0.5bp"
+  },
+  "statistics": {
+    "bootstrap": {
+      "type": "stationary_block",
+      "L": 5,
+      "draws": 10000,
+      "seed": 42,
+      "note": "mirrors the HYP-093 prereg"
+    },
+    "cpcv": {
+      "n_groups": 6,
+      "test_groups": 2,
+      "n_splits": 15,
+      "embargo_sessions": 5,
+      "impl": "sovereign/discovery/cpcv.py::combinatorial_purged_splits"
+    },
+    "dsr": {
+      "impl": "sovereign/discovery/gate.py::deflated_sharpe_ratio",
+      "n_trials": 1544,
+      "n_trials_note": "mined_n._total 1543 + this test"
+    },
+    "a_magnitude": {
+      "stat": "median RV(t+1..t+5 | shock) / median RV(t+1..t+5 | non-shock), pooled",
+      "rv": "std of daily r over the five sessions",
+      "pass": "ratio > 1.0 AND one-sided bootstrap p < 0.05"
+    },
+    "b_direction_null": {
+      "stat": "mean cumr(t+1..t+5 | shock) - mean cumr(t+1..t+5 | non-shock), pooled",
+      "holds": "95% block-bootstrap CI contains zero",
+      "fails": "95% CI excludes zero -> KILL_DIRECTIONAL"
+    },
+    "c_tradeability": {
+      "stat": "dSharpe = Sharpe(abstain, net of costs) - Sharpe(buy-and-hold), annualised",
+      "per_fold": "computed on each of the 15 purged CPCV test folds",
+      "full_sample": "DSR prob at n_trials above",
+      "pass": "dSharpe > 0 in >= 12 of 15 folds AND full-sample DSR prob >= 0.95",
+      "null": "dSharpe > 0 in <= 7 of 15 folds",
+      "inconclusive": "8..11 of 15 folds"
+    },
+    "d_raw_return": {
+      "stat": "delta pct/day = abstain - buy-and-hold",
+      "floor": 0.0005,
+      "floor_note": "constitutional 0.05%/day"
+    }
+  },
+  "verdict_ladder": {
+    "CONFIRMED": "a passes AND b holds AND c passes AND d >= 0",
+    "VALID_BUT_BELOW_FLOOR": "a passes AND b holds AND c passes AND d < 0 (Sharpe bought by giving up return)",
+    "KILL_DIRECTIONAL": "b fails \u2014 drift exists after shocks; directional in disguise; record the sign as a lead for a SEPARATE prereg; NULL for this candidate",
+    "NULL": "a fails, OR c null",
+    "INCONCLUSIVE": "c inconclusive, OR any instrument with < 30 shock events, OR a fold error \u2014 not a pass, not a re-run trigger"
+  },
+  "success_criteria": "CONFIRMED per the ladder",
+  "failure_criteria": "anything else; the hypothesis is then dead and is not re-run",
+  "abort": {
+    "min_shock_events_per_instrument": 30,
+    "no_rerun": "one run, one verdict; no parameter is changed after the result is seen",
+    "no_scan": "no search across parameterisations for the one that passes"
+  },
+  "frozen_parameters": {
+    "percentile": 0.9,
+    "k": 5,
+    "trailing_sessions": 252,
+    "round_trip_bp": 2.0,
+    "block_L": 5,
+    "seed": 42,
+    "draws": 10000,
+    "cpcv": "6/2",
+    "n_trials": 1544
+  },
+  "prior_expectation": "NOT_SIGNIFICANT",
+  "most_likely_failure": "b fails: short-term reversal after large down days is a well-documented effect, in which case post-shock is directional in disguise -> KILL_DIRECTIONAL",
+  "verdict": null,
+  "hash_method": "sha256(json.dumps(doc, sort_keys=True, separators=(',',':')).encode()) where doc = this object MINUS the hash_lock field",
+  "hash_lock": "a7f32774c2ebb8b8a199c0cc03e12971f4fc3435ca2feb56ca46ee48352e1058"
+}

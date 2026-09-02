@@ -2252,5 +2252,23 @@
     "date_tested": "2026-08-30",
     "result": "single-core(90bar)=12,410/s \u00b7 12-core ceiling=24,491/s \u00b7 best bar-evals=3,782,434/s \u00b7 legacy claim 148,193 (NOT beaten; numba INACTIVE on py3.14.4 \u2192 pure-Python fallback)",
     "methodology_note": "arm, 12 physical cores, numba INACTIVE on py3.14.4 \u2192 pure-Python fallback. Time-boxed. FastBacktestEngine vs pure-Python forex kernel across 90bar/daily/5min/1min, single vs all-cores. See backtest_benchmark JSON."
+  },
+  {
+    "id": "HYP-109",
+    "name": "Post-shock abstention: flat for five sessions after a top-decile |return| day",
+    "status": "PREREGISTERED",
+    "date_tested": null,
+    "result": null,
+    "verdict": null,
+    "methodology_note": "Pre-registered 2026-09-02 before any data read. Golden-rule-clean form of 'magnitude conditionable, direction null'. One run, one verdict. n_trials declared at the honest mined count (1544).",
+    "hash_lock": "a7f32774c2ebb8b8a199c0cc03e12971f4fc3435ca2feb56ca46ee48352e1058",
+    "prereg_file": "data/research/preregister/HYP-109.json",
+    "p_value": null,
+    "bh_survives": null,
+    "oos_sharpe": null,
+    "is_sharpe": null,
+    "prior_expectation": "NOT_SIGNIFICANT",
+    "source": "operator_session_2026-09-02",
+    "auto_generated": false
   }
 ]
