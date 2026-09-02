@@ -222,3 +222,28 @@ regime to three decimals — the regime carries no directional information at al
 points the wrong way — demoted. (ii) structure, the overnight partition, is now
 the only thread with a prior standalone survivor and no contrary evidence. Trial
 count for the step-4 prereg: **1545**.
+
+---
+
+## Step 4 — the ONE prereg: HYP-110, overnight partition on the ten ETFs
+
+Picked by the operator from: overnight/ten ETFs · overnight/SPY-only ·
+earnings-catalyst momentum · declare the map exhausted.
+
+Sealed **`d981bf1d43170fe0`** before any open/close partition was computed
+(`data/research/preregister/HYP-110.json`, ledger `PREREGISTERED`,
+`scripts/research/preregister_hyp110_overnight.py --verify` OK).
+
+- **Thesis:** the premium accrues close→open; open→close carries no positive
+  drift. Own the ten ETFs overnight only.
+- **Incumbent:** the identical EW buy-and-hold series (+131.7%, 0.496).
+- **Frozen:** 1.0 bp round trip per instrument-day · warm 252 · L=5 · seed 42 ·
+  10k draws · CPCV 6/2 · embargo 1 · **n_trials 1545** · floor 0.05 %/day.
+- **All significance on the delta** — jointly-resampled ΔSharpe CI and DSR on
+  the delta series. Golden rule (≥7/10 instruments) and ex-2020 are verdict
+  components. Break-even cost is reported, never used.
+- **Ladder:** CONFIRMED / VALID_BUT_BELOW_FLOOR / KILL_STRUCTURE / NULL / INCONCLUSIVE.
+- **Prior:** NOT_SIGNIFICANT; most likely failure is the DSR hurdle at 1545
+  trials or the premium being equity-only (TLT/GLD fail the golden rule).
+- **Runs once:** `scripts/research/test_hyp110_overnight.py` (wiring verified
+  with `--gate-only`; NOT run). Then `--verify` again.

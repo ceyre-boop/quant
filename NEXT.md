@@ -4,6 +4,33 @@ Per-session ledger: what shipped, push status, verdicts, blockers, refusals. New
 The Obsidian brain (`~/Obsidian/Obsidian/00-BRAIN/NEXT.md`) is the cross-project rollup.
 Standing constraints live in `CLAUDE.md` — not restated here.
 
+## 2026-09-02 — Edge taxonomy; HYP-109 abstention adjudicated noise; regime = story; HYP-110 sealed
+
+Session goal was a map, not a hunt: where can an edge exist for a trader with no
+speed, size or information advantage — then ONE prereg in the best unexplored bucket.
+
+**Shipped** (`sovereign-v2`, pushed):
+- `research/TAXONOMY_2026-09-02_where_edges_can_exist.md` — four buckets, written
+  before any data. (i) information: exhausted for direction, magnitude survives.
+  (ii) structure: OVERNIGHT-QQQ VALID_EDGE never pursued standalone. (iii) sizing.
+  (iv) behaviour: null is the incumbent itself.
+- `scripts/research/diag_hyp109_abstention_regime.py` → `data/research/hyp109/diagnostic_2026-09-02.json`
+  (ledger untouched). **Abstention overlay is noise on the delta**: delta Sharpe −0.21,
+  CI [−0.82, +0.32], DSR 0.000; ΔSharpe +0.12 CI [−0.34, +0.59]; ex-2020 −0.04; 5/10
+  instruments, 5/12 years; 8/15 folds = signature of nothing. Withdrawn as a lead.
+- **Regime test (definition frozen in the doc BEFORE computing; counted as a trial):**
+  SPY RV21/median252 > 1. Incumbent Sharpe HIGH 0.66 vs LOW 0.27, CI [−0.75, +1.61]
+  → STORY_ONLY. Forward-21d return identical by regime. Point estimate runs against
+  Moreira–Muir, so continuous vol-targeting is demoted, not promoted.
+- **HYP-110 sealed `d981bf1d43170fe0`** — overnight partition, ten ETFs, close→open
+  only. Operator's pick. 1.0 bp RT/instrument-day, n_trials **1545**, all
+  significance on the delta (lesson from HYP-109's spec flaw), golden rule ≥7/10 and
+  ex-2020 as verdict components. `scripts/research/test_hyp110_overnight.py` is
+  written, wiring checked with `--gate-only`, **NOT run**.
+
+**Next:** run `test_hyp110_overnight.py` exactly once when instructed; `--verify`
+after. Multiplicity: `mined_n._total` still 1543; session spent 2 (HYP-109 + regime).
+
 ## 2026-09-01 — Repo repurposed: research terminal + fundamentals/filings layer
 
 Direction change, not a feature. The front end stops being a strategy-discovery

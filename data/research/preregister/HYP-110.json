@@ -1,0 +1,155 @@
+{
+  "id": "HYP-110",
+  "slug": "overnight_partition_etf10",
+  "name": "Overnight partition: own ten liquid ETFs close-to-open only, flat open-to-close",
+  "status": "PREREGISTERED",
+  "frozen_at": "2026-09-02T00:00:00Z",
+  "family": "STRUCTURE-OVERNIGHT-2026-09",
+  "family_note": "Single-member family. Lineage: OVERNIGHT-QQQ VALID_EDGE (2026-06-07), rejected only as a carry diversifier, never tested standalone. Candidates not registered today: SPY-only variant, earnings-catalyst momentum, continuous vol-targeting (prior weakened by the regime test).",
+  "phase": "one_hypothesis_one_test",
+  "taxonomy_bucket": "(ii) execution / structure \u2014 a timing partition, not a race",
+  "thesis": "In liquid ETFs the risk premium accrues overnight (close to next open); the intraday session (open to close) carries no positive drift. Owning the instruments only from close to open therefore keeps the return and sheds the variance of the intraday leg, improving risk-adjusted return relative to buy-and-hold, net of costs.",
+  "mechanism": "Known market structure, not a story: information arrives while the market is closed (earnings after the close, macro before the open, overseas sessions) and is priced at the open; intraday flow is dominated by liquidity provision and rebalancing with no net directional compensation. The overnight premium is compensation for holding gap risk \u2014 it is real AND it is where the crashes live, which is why the fold, ex-2020 and per-instrument components are part of the verdict.",
+  "golden_rule": {
+    "rule": "must hold for any trader at any level: no dependence on account size, leverage, execution speed, colocation, one instrument, one venue, one regime",
+    "how_satisfied": "ten retail ETFs, fractional shares, market-on-close entry and market-on-open exit (auction orders, available at every retail broker, no speed required), 11.5 years spanning 2018 / 2020 / 2022; per-instrument consistency is a pre-declared verdict component"
+  },
+  "instrument_set": [
+    "SPY",
+    "QQQ",
+    "IWM",
+    "DIA",
+    "TLT",
+    "GLD",
+    "EFA",
+    "EEM",
+    "XLF",
+    "XLE"
+  ],
+  "data": {
+    "source": "data/cache/daily_universe/<SYM>.parquet",
+    "columns": [
+      "date",
+      "open",
+      "high",
+      "low",
+      "close",
+      "volume"
+    ],
+    "window": [
+      "2014-01-02",
+      "2026-07-16"
+    ],
+    "warmup_sessions": 252,
+    "warmup_note": "no indicator needs warm-up; 252 sessions are dropped ONLY so the incumbent is numerically identical to HYP-109's (+131.7%, Sharpe 0.496, maxDD \u221233.2%, +0.0290 %/day)",
+    "effective_window": [
+      "2015-01-02",
+      "2026-07-16"
+    ],
+    "returns": {
+      "overnight": "ln(open_t / close_{t-1})",
+      "intraday": "ln(close_t / open_t)",
+      "close_to_close": "overnight + intraday (the incumbent's return)"
+    },
+    "data_quality_abort": "if any instrument has open == close on more than 1% of sessions in the effective window (stale-open artefact), verdict is INCONCLUSIVE \u2014 data, not hypothesis"
+  },
+  "strategy": {
+    "rule": "for every instrument, every session: buy at close_{t-1}, sell at open_t; flat open_t..close_t",
+    "portfolio": "equal-weight across the ten, rebalanced daily (same as the incumbent)",
+    "incumbent": "buy-and-hold, equal-weight, close-to-close \u2014 identical series to HYP-109",
+    "delta_series": "overnight_net \u2212 incumbent  (= \u2212intraday \u2212 cost, by construction)"
+  },
+  "costs": {
+    "round_trip_bp_per_instrument_day": 1.0,
+    "charged_on": "every session, every instrument (one round trip per instrument-day)",
+    "note": "SPY/QQQ quoted spread \u22480.2\u20130.5 bp, XLF/EEM \u22482 bp; opening/closing auction fills pay no spread. 1.0 bp round trip is the frozen figure. A break-even cost is REPORTED descriptively; it does not alter the verdict."
+  },
+  "statistics": {
+    "bootstrap": {
+      "type": "stationary_block",
+      "L": 5,
+      "draws": 10000,
+      "seed": 42,
+      "resampling": "joint \u2014 the same session indices are applied to every series"
+    },
+    "cpcv": {
+      "n_groups": 6,
+      "test_groups": 2,
+      "n_splits": 15,
+      "embargo_sessions": 1,
+      "impl": "sovereign/discovery/cpcv.py::combinatorial_purged_splits"
+    },
+    "dsr": {
+      "impl": "sovereign/discovery/gate.py::deflated_sharpe_ratio",
+      "n_trials": 1545,
+      "n_trials_note": "mined_n._total 1543 + HYP-109 + regime test",
+      "applied_to": "Sharpe of the DELTA series, n_obs = its length"
+    },
+    "a_partition": {
+      "stat": "mean(overnight EW) \u2212 mean(intraday EW), %/day, gross",
+      "pass": "95% joint block-bootstrap CI excludes zero from above",
+      "fail": "CI includes zero or lies below -> KILL_STRUCTURE"
+    },
+    "b_delta": {
+      "stat_1": "dSharpe = Sharpe(overnight_net) \u2212 Sharpe(incumbent), annualised, jointly resampled",
+      "pass_1": "95% CI excludes zero from above",
+      "stat_2": "DSR prob of Sharpe(delta series) at n_trials above",
+      "pass_2": ">= 0.95"
+    },
+    "c_folds": {
+      "stat": "dSharpe on each of the 15 purged CPCV test folds",
+      "pass": ">= 12 of 15 positive",
+      "null": "<= 7 of 15",
+      "inconclusive": "8..11"
+    },
+    "g_golden_rule": {
+      "stat": "per-instrument dSharpe = Sharpe(overnight_net_i) \u2212 Sharpe(hold_i)",
+      "pass": ">= 7 of 10 positive",
+      "null": "<= 5 of 10",
+      "inconclusive": "6 of 10"
+    },
+    "x_ex2020": {
+      "stat": "dSharpe with calendar 2020 removed",
+      "pass": "> 0"
+    },
+    "d_raw_return": {
+      "stat_1": "delta %/day = overnight_net \u2212 incumbent",
+      "stat_2": "overnight_net %/day vs constitutional floor 0.0005",
+      "note": "the incumbent itself (+0.0290 %/day) is below the floor"
+    },
+    "descriptive_only": [
+      "break-even round-trip cost (bp) at which dSharpe = 0",
+      "per-instrument and per-year tables",
+      "overnight vs intraday mean and Sharpe per instrument"
+    ]
+  },
+  "verdict_ladder": {
+    "CONFIRMED": "a AND b1 AND b2 AND c>=12 AND g>=7 AND x AND delta%/day >= 0 AND overnight_net >= floor",
+    "VALID_BUT_BELOW_FLOOR": "a AND b1 AND b2 AND c>=12 AND g>=7 AND x, but delta%/day < 0 OR overnight_net < floor",
+    "KILL_STRUCTURE": "a fails \u2014 the premium is not overnight; the mechanism is absent on this set",
+    "NULL": "a passes AND (b1 fails OR c<=7 OR g<=5)",
+    "INCONCLUSIVE": "anything else (c 8..11, g == 6, b2 fails alone, x fails alone, data abort, fold error) \u2014 not a pass, not a re-run trigger"
+  },
+  "success_criteria": "CONFIRMED per the ladder",
+  "failure_criteria": "anything else; dead; not re-run",
+  "abort": {
+    "no_rerun": "one run, one verdict; no parameter is changed after the result is seen",
+    "no_scan": "no search across costs, windows, instrument subsets or partitions for the one that passes"
+  },
+  "frozen_parameters": {
+    "round_trip_bp": 1.0,
+    "warmup_sessions": 252,
+    "block_L": 5,
+    "seed": 42,
+    "draws": 10000,
+    "cpcv": "6/2",
+    "embargo_sessions": 1,
+    "n_trials": 1545,
+    "floor_per_day": 0.0005
+  },
+  "prior_expectation": "NOT_SIGNIFICANT",
+  "most_likely_failure": "b2: the effect is real and positive but not large enough to clear a 1545-trial DSR hurdle on a 2,900-day delta series; or c/g: the premium is concentrated in the equity-index ETFs and absent in TLT/GLD, so it fails the golden-rule component even if it passes in aggregate",
+  "verdict": null,
+  "hash_method": "sha256(json.dumps(doc, sort_keys=True, separators=(',',':')).encode()) where doc = this object MINUS the hash_lock field",
+  "hash_lock": "d981bf1d43170fe01388165663649d3bd71f8ff2a2fe574b1f760a58033df1f7"
+}
