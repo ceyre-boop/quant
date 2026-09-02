@@ -4235,3 +4235,31 @@ Vault note written to `Trading/Ops/System-EOD-2026-09-01.md`.
 (3) research queue empty; (4) `BLOCKED_NO_VALIDATOR` verdicts accumulating, open since 08-05;
 (5) installed `com.alta.research_agent` plist still needs operator `unload && load` + watchdog
 rebaseline; (6) NEW — empty `signal_id` conversion defect above.
+
+## 2026-09-01 · RESEARCH PASS (21:00 ET)
+Brain: 25 graveyard / 17 confirmed / 15 recent verdicts — clean read, no sealed idea re-proposed.
+Movers: 50 pulled OK (27 common, 23 warrant/unit). HYP-093 band (common, >=40%): ISRL, SSM, HUBCZ, FLYE, BIAF, RDAC, GPRO (7). HYP-107 band adds NWGL, SWVL, CHARR. Snapshot only — no fade test run.
+Queue (`--max 5`): 0 QUEUED, exit 0. Nothing tested. Candidates flagged for operator: none.
+
+**Operator action 1 — reload the three agent plists.** Last night's directive-path fix is on disk
+but was never loaded: the installed plist (mtime Aug 31 21:02) carries the corrected
+`~/quant/archive/AGENT_DIRECTIVE.md`, yet this run received the old `~/quant/AGENT_DIRECTIVE.md`
+and failed its first command. launchd is still on the pre-08-31 in-memory definition.
+  launchctl unload ~/Library/LaunchAgents/com.alta.research_agent.plist && launchctl load ~/Library/LaunchAgents/com.alta.research_agent.plist
+  (same for com.alta.morning_agent, com.alta.eod_agent)
+Not done from inside the firing job: `unload` kills this session pre-commit, and a half-failed
+detached reload leaves the agent permanently dark — worse than a wrong prompt it recovers from.
+
+**Operator action 2 — refill the research queue.** Empty since 2026-08-16 (16 days, zero new tests).
+`research_queue.json` last_updated 2026-07-09. Findings by month: May 46 -> Jun 57 -> Jul 16 -> Aug 1.
+Meanwhile the hypothesis generator keeps emitting HYP-AUTO-* rows that come back
+BLOCKED_NO_VALIDATOR (latest batch 08-24). Queue starving + generator producing unscoreable
+candidates are the same supply failure. Needs an operator decision on what to queue, per STANDING
+RULE 4 (pre-registration and task supply are operator-gated).
+
+**Operator action 3 — re-status RQ-006.** Its ERROR is not a code fault: `extract_live_edge.py`
+correctly refused with "Only 1 trades found (need 20+)". It is blocked on ICT fill rate
+(~2 fills/90d, TICK-028), so a 30-day/20-trade window will never clear. RETIRE it or re-scope the
+window/min-trades — leaving it ERROR reads as a repairable failure it is not.
+
+No parameter changed. No prereg written. No holdout touched. Freeze intact.
