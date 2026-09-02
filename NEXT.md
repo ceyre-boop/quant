@@ -18,6 +18,11 @@ Standing constraints live in `CLAUDE.md` — not restated here.
   not adjusted after seeing 0.012 vs 0.05. Not yet measured: size-conditioning ("fade harder
   when bigger") and any regime outside 2023-06→2026-07 (needs stock VALUE tier, 2021-01).
   Decision deferred until HYP-112 lands (magnitude vs reversal as the vehicle).
+- **HYP-112 INCONCLUSIVE** by data abort (XLE 12 priced < 30); substantively the hardest null of the
+  day: shock straddle −22.1% on premium vs control −12.9%, delta CI [−1.86, −0.21], **0/15 folds**, 2/10,
+  negative every year. Implied move rises 28% after a shock, realized 16% — **magnitude is over-priced;
+  there is no retail instrument that pays for post-shock magnitude.** 74 chains 475'd terminal-side.
+  `data/research/hyp112/VERDICT.md`.
 - **HYP-113 FLAT** (`f3cf34d66a29cdbe`): no dose-response in shock size, pooled or down-only; the
   p99+ down-days carry NO fade (−0.02%, n=62) — the fade lives in ordinary top-decile drops.
   "Fade harder when bigger" killed. `data/research/hyp111/HYP-113_VERDICT.md`.

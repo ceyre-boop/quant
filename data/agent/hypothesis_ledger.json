@@ -2312,20 +2312,21 @@
   {
     "id": "HYP-112",
     "name": "Post-shock ATM straddle (5-session hold) vs matched non-shock control, ten ETFs, 2020-2026",
-    "status": "PREREGISTERED",
-    "date_tested": null,
-    "result": null,
-    "verdict": null,
+    "status": "ADJUDICATED",
+    "date_tested": "2026-09-02",
+    "result": "INCONCLUSIVE",
+    "verdict": "INCONCLUSIVE",
     "methodology_note": "Pre-registered 2026-09-02 before any event option chain was read. The magnitude instrument, tested on real NBBO.",
     "hash_lock": "f2d552448a236cc76e5ad9e04877362362832c8bfb89a085d678abc0e53fe6fd",
     "prereg_file": "data/research/preregister/HYP-112.json",
-    "p_value": null,
+    "p_value": 0.9931,
     "bh_survives": null,
-    "oos_sharpe": null,
+    "oos_sharpe": -1.0526533122051782,
     "is_sharpe": null,
     "prior_expectation": "NOT_SIGNIFICANT",
     "source": "operator_session_2026-09-02",
-    "auto_generated": false
+    "auto_generated": false,
+    "result_file": "data/research/hyp112/hyp112_result.json"
   },
   {
     "id": "HYP-113",

@@ -253,3 +253,20 @@ opens); substantively a kill on every component — partition CI includes 0,
 ΔSharpe −0.24, 3/10 instruments, 4/15 folds, break-even 0.02 bp. The premium on
 the ten ETFs is not overnight. Bucket (ii)'s overnight thread is closed. See
 `data/research/hyp110/VERDICT.md`.
+
+---
+
+## Addendum, end of day — three more preregs, the map after them
+
+| id | what | verdict | one line |
+|---|---|---|---|
+| HYP-111a | post-shock intraday retrace→reclaim, 2023-06→2026-07 | VALID_BUT_BELOW_FLOOR | path fires 13%; pass driven by naive continuation *losing* −0.128%/event-day, 10/10 |
+| HYP-113 | fade dose-response in shock size | FLAT | no slope; p99+ down-days carry no fade |
+| HYP-112 | post-shock ATM straddle vs control, 2020–2026 | INCONCLUSIVE (abort) / substantive hard null | IV over-prices the clustering; −22% vs −13% on premium, 0/15 |
+
+**Bucket (i) is now closed for magnitude as well as direction**: magnitude is real (HYP-109a),
+conditionable, and priced by the only market that would pay for it. **What stands is one
+thing**: the unconditional next-session fade after a p90+ shock — bucket (iv)/(ii), liquidity
+provision by a patient holder — measured on one regime (2023-06→2026-07), all ten instruments,
+not improvable by size, path or confluence. Its load-bearing test is 2020–2022 and that is a
+data purchase. Trial count after today: **1550**.
