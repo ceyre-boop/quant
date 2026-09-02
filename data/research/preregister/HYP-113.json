@@ -1,0 +1,105 @@
+{
+  "id": "HYP-113",
+  "slug": "postshock_fade_dose_response",
+  "name": "Post-shock next-session fade: dose-response in shock size within p90+ (ten ETFs, 2023-06 \u2192 2026-07)",
+  "status": "PREREGISTERED",
+  "frozen_at": "2026-09-02T00:00:00Z",
+  "family": "POSTSHOCK-INTRADAY-2026-09",
+  "lineage": "HYP-111a incumbent series (naive continuation, negated)",
+  "thesis": "Within top-decile shocks, the next-session intraday fade return increases with shock size.",
+  "instrument_set": [
+    "SPY",
+    "QQQ",
+    "IWM",
+    "DIA",
+    "TLT",
+    "GLD",
+    "EFA",
+    "EEM",
+    "XLF",
+    "XLE"
+  ],
+  "data": {
+    "events": "the 798 HYP-111a events (data/research/hyp111/hyp111a_trades.parquet: sym, t, t1, s, naive_net)",
+    "intraday": "cached data/cache/theta_1m \u2014 no new fetch",
+    "daily": "data/cache/daily_universe \u2014 for the size measure only",
+    "window_t1": [
+      "2023-06-02",
+      "2026-07-16"
+    ],
+    "regime_caveat": "one regime; says nothing about 2020-2022"
+  },
+  "size_measure": {
+    "x": "trailing-252 percentile rank of |r_t| among the prior 252 sessions' |r| (t excluded), in [0.90, 1.0]",
+    "bins": {
+      "B1": "[0.90, 0.95)",
+      "B2": "[0.95, 0.99)",
+      "B3": "[0.99, 1.0]"
+    },
+    "why_rank": "comparable across instruments and vol levels; the raw |r| is not"
+  },
+  "outcome": {
+    "fade": "\u2212s \u00d7 (close_15:55 \u2212 open_09:30)/open_09:30 on session t+1, minus 3.0 bp \u2014 i.e. exactly \u2212(HYP-111a naive_net)",
+    "unit": "% of notional per event"
+  },
+  "claims": {
+    "primary": {
+      "population": "all 798 events",
+      "pass": "bin means weakly increasing B1 \u2264 B2 \u2264 B3 AND OLS slope of fade on x has date-block 95% CI excluding 0 from above",
+      "n_trials": 1549
+    },
+    "secondary": {
+      "population": "down-shocks only (s = \u22121)",
+      "pass": "same rule",
+      "n_trials": 1550,
+      "note": "the operator's stated form \u2014 'after a sharp move down, fade harder when bigger'"
+    },
+    "descriptive": [
+      "per-bin mean, CI, n, per instrument",
+      "up-shocks-only bins",
+      "fade %/event-day per bin vs 0.05% (no gate)"
+    ]
+  },
+  "statistics": {
+    "bootstrap": "date-block stationary L=5, 10000 draws, seed 42 (research/hyp111/date_bootstrap.py)",
+    "abort": "any bin with < 40 events (primary) / < 25 (secondary) \u2192 INCONCLUSIVE for that claim"
+  },
+  "verdict_ladder": {
+    "DOSE_RESPONSE": "pass",
+    "FLAT": "slope CI includes 0 or bins not monotone",
+    "INCONCLUSIVE": "abort"
+  },
+  "floor_note_standing": "Written before any floor-gated fade prereg is run: a selective strategy that sits in cash is measured on deployed capital; an always-on overlay on calendar time. HYP-111a's 0.05%/event-day floor was the always-on form. Any fade prereg that adopts per-deployed-capital must cite this note and seal the denominator before its run. This hypothesis has no floor gate.",
+  "prior_expectation": "NOT_SIGNIFICANT",
+  "priors": {
+    "operator": {
+      "prior": "expects a dose-response (message 2026-09-02, not formally stated)",
+      "most_likely_failure": "not stated"
+    },
+    "claude": {
+      "prior": "NOT_SIGNIFICANT",
+      "most_likely_failure": "B3 (p99+) has ~60-80 events and its CI swallows the slope; B1 vs B2 flat"
+    }
+  },
+  "frozen_parameters": {
+    "cost_bp": 3.0,
+    "bins": [
+      0.9,
+      0.95,
+      0.99,
+      1.0
+    ],
+    "block_L": 5,
+    "draws": 10000,
+    "seed": 42,
+    "n_trials_primary": 1549,
+    "n_trials_secondary": 1550
+  },
+  "abort": {
+    "no_rerun": "one run, one verdict",
+    "no_scan": "no search across bin edges, size measures or outcomes"
+  },
+  "verdict": null,
+  "hash_method": "sha256(json.dumps(doc minus hash_lock, sort_keys=True, separators=(',',':')))",
+  "hash_lock": "f3cf34d66a29cdbedb8d1b9ce79eeb9a59c4e9c60acc8dd45619509b28b4f57d"
+}
