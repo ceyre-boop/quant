@@ -28,8 +28,13 @@ speed, size or information advantage — then ONE prereg in the best unexplored 
   ex-2020 as verdict components. `scripts/research/test_hyp110_overnight.py` is
   written, wiring checked with `--gate-only`, **NOT run**.
 
-**Next:** run `test_hyp110_overnight.py` exactly once when instructed; `--verify`
-after. Multiplicity: `mined_n._total` still 1543; session spent 2 (HYP-109 + regime).
+**HYP-110 RUN (operator: "run it") → INCONCLUSIVE** by the sealed data abort (EFA/EEM/XLF
+>1% stale opens). Substantively every component failed: partition CI includes 0
+(+0.0116%/day, [−0.0165, +0.0400]), ΔSharpe −0.24, DSR 0.000, 4/15 folds, 3/10
+instruments, ex-2020 −0.42, break-even cost 0.02 bp. The premium on this set is NOT
+overnight (70/30 split, overnight carries the gap variance); OVERNIGHT-QQQ did not
+generalise. Dead, not re-run. `data/research/hyp110/{VERDICT.md,result.json}`.
+Bucket (ii) structure is now closed for the overnight partition. Multiplicity: `mined_n._total` still 1543; session spent 2 (HYP-109 + regime).
 
 ## 2026-09-01 — Repo repurposed: research terminal + fundamentals/filings layer
 

@@ -2274,19 +2274,20 @@
   {
     "id": "HYP-110",
     "name": "Overnight partition: own ten liquid ETFs close-to-open only, flat open-to-close",
-    "status": "PREREGISTERED",
-    "date_tested": null,
-    "result": null,
-    "verdict": null,
+    "status": "ADJUDICATED",
+    "date_tested": "2026-09-02",
+    "result": "INCONCLUSIVE",
+    "verdict": "INCONCLUSIVE",
     "methodology_note": "Pre-registered 2026-09-02 before any open/close partition was computed. Bucket (ii) of the edge taxonomy; lineage OVERNIGHT-QQQ VALID_EDGE. All significance on the delta / jointly-resampled dSharpe. n_trials 1545.",
     "hash_lock": "d981bf1d43170fe01388165663649d3bd71f8ff2a2fe574b1f760a58033df1f7",
     "prereg_file": "data/research/preregister/HYP-110.json",
-    "p_value": null,
+    "p_value": 0.8907,
     "bh_survives": null,
-    "oos_sharpe": null,
+    "oos_sharpe": 0.2541138956996645,
     "is_sharpe": null,
     "prior_expectation": "NOT_SIGNIFICANT",
     "source": "operator_session_2026-09-02",
-    "auto_generated": false
+    "auto_generated": false,
+    "result_file": "data/research/hyp110/result.json"
   }
 ]

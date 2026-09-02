@@ -247,3 +247,9 @@ Sealed **`d981bf1d43170fe0`** before any open/close partition was computed
   trials or the premium being equity-only (TLT/GLD fail the golden rule).
 - **Runs once:** `scripts/research/test_hyp110_overnight.py` (wiring verified
   with `--gate-only`; NOT run). Then `--verify` again.
+
+**Result:** INCONCLUSIVE by the sealed data abort (three instruments >1% stale
+opens); substantively a kill on every component — partition CI includes 0,
+ΔSharpe −0.24, 3/10 instruments, 4/15 folds, break-even 0.02 bp. The premium on
+the ten ETFs is not overnight. Bucket (ii)'s overnight thread is closed. See
+`data/research/hyp110/VERDICT.md`.
