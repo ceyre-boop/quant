@@ -1,0 +1,62 @@
+{
+  "id": "HYP-116",
+  "slug": "shock_deferred_contribution_vs_dca",
+  "name": "Shock-deferred contributions vs dollar-cost averaging into the EW-10 basket, 2007-2026",
+  "status": "PREREGISTERED",
+  "frozen_at": "2026-09-03T00:00:00Z",
+  "family": "INCUMBENT-2026-09",
+  "lineage": "HYP-111/114 fade (null out of regime); HYP-115 basket (FRAGILE) as the vehicle \u2014 the vehicle's quality is not what is tested here",
+  "policies": {
+    "DCA": "1 unit invested into the EW-10 basket (daily-rebalanced, research/incumbent) at the close of the first session of every month",
+    "DEFERRED": "the same 1 unit per month accrues in cash at 0% and the whole cash balance is invested at the close of the session AFTER the first SPY down-shock (SPY close-to-close log return <= \u2212p90 of trailing 252 |r|, t excluded); if no down-shock for 126 sessions the balance is invested at the next month start (cap, declared)",
+    "why_next_session_close": "one-session lag is what a retail contributor can actually do after seeing the shock; conservative",
+    "cash_at_zero": "conservative against DEFERRED"
+  },
+  "window": [
+    "2007-06-01",
+    "2026-07-16"
+  ],
+  "data": "yfinance auto-adjusted closes (research/incumbent/data.py); SPY shock rule from the same series",
+  "statistics": {
+    "primary": "ratio of terminal wealth DEFERRED / DCA",
+    "significance": "stationary block bootstrap of the joint daily (basket return, SPY shock flag) sequence, L=20, 2000 draws, seed 42; both policies re-run on each resampled path; 95% CI of the ratio",
+    "secondary": "share of rolling 5-year windows (monthly start) in which DEFERRED terminal wealth > DCA",
+    "descriptive": [
+      "average months of cash drag",
+      "number of deployment events",
+      "IRR of both",
+      "same test with 60/40 as the vehicle"
+    ]
+  },
+  "verdict_ladder": {
+    "POLICY_HOLDS": "ratio CI excludes 1 from above AND rolling share >= 0.6",
+    "POLICY_FAILS": "ratio CI excludes 1 from below OR rolling share <= 0.4",
+    "NO_DIFFERENCE": "otherwise"
+  },
+  "prior_expectation": "NO_DIFFERENCE",
+  "priors": {
+    "operator": {
+      "prior": "not stated (forwarded proposal)"
+    },
+    "claude": {
+      "prior": "NO_DIFFERENCE to POLICY_FAILS \u2014 cash drag at 0% over months without a shock costs more than buying a \u22122% day gains; the 2016-2019 null says the dip has no extra return",
+      "most_likely_failure": "cash drag in 2013-2019 and 2023-2024"
+    }
+  },
+  "frozen_parameters": {
+    "percentile": 0.9,
+    "trailing": 252,
+    "cap_sessions": 126,
+    "block_L": 20,
+    "draws": 2000,
+    "seed": 42,
+    "n_trials": 1557
+  },
+  "abort": {
+    "no_rerun": "one run, one verdict",
+    "no_scan": "no search across percentiles, caps, lags or vehicles"
+  },
+  "verdict": null,
+  "hash_method": "sha256(json.dumps(doc minus hash_lock, sort_keys=True, separators=(',',':')))",
+  "hash_lock": "b76837ace4234dfb27e66ccb5d215563a8a13144a0574d81bbb91c949392754a"
+}
