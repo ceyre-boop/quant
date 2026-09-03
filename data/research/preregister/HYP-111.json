@@ -1,0 +1,144 @@
+{
+  "id": "HYP-111",
+  "slug": "postshock_intraday_retrace_continuation",
+  "name": "Post-shock intraday retrace-then-continuation + next-session fade (ten ETFs, 1-min, 2020-01 \u2192 2026-07, as scoped)",
+  "status": "PREREGISTERED",
+  "frozen_at": "2026-09-02T00:00:00Z",
+  "family": "POSTSHOCK-INTRADAY-2026-09",
+  "parent_scope": "research/HYP-111_SCOPE.md (commit 0925bd9)",
+  "provenance": "THE scoped test. Data gate re-opened 2026-09-02: Alpaca SIP (existing key) serves full RTH minute sessions from 2016 \u2014 verified live on 2016-03-01/2018-02-05/2020-03-16/2022-06-13 before sealing; the repo's 2-year-wall note was wrong. No purchase. HYP-111a (2023-06+) is a strict sub-window of this test and its result is known: the fade, not the path. That knowledge is declared here; it shaped the SECONDARY claim, not the primary, which is byte-for-byte the scope frozen in 0925bd9 before any minute bar.",
+  "thesis": "After a top-decile |return| day, session t+1 shows a retrace against the shock to 0.382 of the shock-day range followed by a reclaim of the shock-day close and continuation in the shock direction; trading that path beats naive continuation.",
+  "instrument_set": [
+    "SPY",
+    "QQQ",
+    "IWM",
+    "DIA",
+    "TLT",
+    "GLD",
+    "EFA",
+    "EEM",
+    "XLF",
+    "XLE"
+  ],
+  "data": {
+    "daily": "data/cache/daily_universe/<SYM>.parquet (shock rule, levels, C1, C5)",
+    "intraday": "Alpaca SIP 1-min, adjustment=all, RTH 09:30-15:59 ET (research/hyp111/alpaca_1m.py), cached data/cache/alpaca_1m_rth/",
+    "entitlement": "Alpaca SIP historical, verified to 2016-03-01",
+    "window_t1": [
+      "2020-01-02",
+      "2026-07-16"
+    ],
+    "probe_dates_excluded": [
+      "2020-03-16",
+      "2021-12-15"
+    ],
+    "abort": "any instrument with < 80% of event sessions having >= 370 RTH bars, or pooled triggered n < 100"
+  },
+  "power_statement": "~1,798 instrument-events on ~670 dates (scope \u00a71). HYP-111a measured a 12.8% trigger rate on its sub-window \u2192 expect ~230 path trades on ~200 dates for the primary: SE \u2248 0.05%/trade, 80% power at \u22480.14%/trade \u2014 the primary is thin by construction. The secondary (fade on ALL events) has ~670 dates: SE \u2248 0.04%/event-day, 80% power at \u22480.11%. 2020 is 22% of dates and the regime the fade has never seen.",
+  "shock": {
+    "rule": "abs(r_t) >= p90 of trailing 252 |r|, t excluded, per instrument; s = sign(r_t)"
+  },
+  "levels": {
+    "range": "high_t - low_t",
+    "C": "close_t",
+    "L": "C - s*0.382*range",
+    "T": "C + s*0.382*range",
+    "stop": "L"
+  },
+  "path": {
+    "retrace": "first bar reaching L against s (open beyond L counts at 09:30)",
+    "reclaim": "first later bar closing back on the shock side of C, at or before 14:30 ET",
+    "entry": "open of the next bar, direction s, one trade per instrument-event",
+    "exit": "stop at L (both in one bar -> stop) | target at T | time exit 15:55 bar close",
+    "no_entry": "return 0"
+  },
+  "costs": {
+    "round_trip_bp": 3.0,
+    "note": "2bp spread + 1bp slip, every executed trade, both series; break-even reported only"
+  },
+  "incumbent": {
+    "name": "naive post-shock continuation",
+    "rule": "direction s from the 09:30 open to the 15:55 close on every instrument-event, same costs",
+    "why": "what the momentum trader does without the path; the delta isolates the path"
+  },
+  "delta_series": "per event date: mean over shocked instruments of (structure_net - naive_net); annualised by sqrt(event dates per year)",
+  "confluence": {
+    "c1": "shock-day volume >= 1.5x median of trailing 20 sessions",
+    "c2": "session t+1 open on the shock side of C",
+    "c3": "close at tau2 on the shock side of session-to-date VWAP",
+    "c4": "proxy (SPY; QQQ for SPY) 09:30->tau2 return has sign s",
+    "c5": "close_t in the shock-side 25% of range_t",
+    "buckets": "<=1 / 2 / >=3; MONOTONIC iff bucket means weakly increase AND OLS slope on count has date-block CI > 0; any bucket < 30 trades -> INCONCLUSIVE"
+  },
+  "statistics": {
+    "bootstrap": "date-block stationary, L=5, 10000 draws, seed 42, all same-date rows co-resampled (research/hyp111/date_bootstrap.py)",
+    "cpcv": "sovereign/discovery/cpcv.py 6/2 over event dates, embargo 1 date",
+    "dsr": {
+      "n_trials": 1551,
+      "note": "mined 1543 + HYP-109 + regime + HYP-110 + this",
+      "on": "Sharpe of the delta series, n_obs = event dates"
+    },
+    "components": {
+      "b1": "Sharpe(delta) date-block 95% CI excludes 0 from above",
+      "b2": "DSR prob >= 0.95",
+      "c": ">=12/15 folds Sharpe(delta) > 0 (null <=7, inconclusive 8-11)",
+      "g": ">=7/10 instruments Sharpe(structure-naive) > 0 (null <=5, inconclusive 6)",
+      "x": "ex-2020 Sharpe(delta) > 0",
+      "d": "mean structure_net per event-day vs 0.0005"
+    }
+  },
+  "secondary_claim_fade": {
+    "what": "the unconditional next-session fade: \u2212naive_net on every instrument-event (the HYP-111a incumbent, negated)",
+    "n_trials": 1552,
+    "pass": "date-block 95% CI of mean fade per event-day excludes 0 from above AND >= 7/10 instruments mean > 0 AND 2020-only mean fade CI does not exclude 0 from BELOW (i.e. 2020 does not refute it) AND ex-2020 mean > 0",
+    "verdict_words": "FADE_HOLDS / FADE_FAILS / FADE_INCONCLUSIVE (any instrument < 30 events)",
+    "descriptive": [
+      "per-year mean and CI",
+      "up vs down shocks",
+      "expectancy W/avgWin/avgLoss/E",
+      "2020-03 alone",
+      "worst 5 trades"
+    ],
+    "floor": "none \u2014 this is a conditioning claim; the per-deployed-capital denominator is recorded in HYP-113 floor_note_standing and would be sealed by a later strategy prereg"
+  },
+  "verdict_ladder": {
+    "INCONCLUSIVE": "data abort OR fold error OR (c 8-11) OR (g == 6) OR b2 fails alone OR x fails alone",
+    "NULL": "b1 fails OR c <= 7 OR g <= 5",
+    "CONFIRMED": "b1 & b2 & c>=12 & g>=7 & x & d >= 0.0005",
+    "VALID_BUT_BELOW_FLOOR": "b1 & b2 & c>=12 & g>=7 & x & d < 0.0005",
+    "confluence": "separate line MONOTONIC / STORY / INCONCLUSIVE, no weight on the primary"
+  },
+  "prior_expectation": "CONFIRMED",
+  "priors": {
+    "operator": {
+      "prior": "CONFIRMED (stated for the scoped hypothesis 2026-09-02)",
+      "most_likely_failure": "data gate fails (it did on ThetaData; Alpaca re-opened it)"
+    },
+    "claude": {
+      "prior": "primary VALID_BUT_BELOW_FLOOR (as 111a); secondary FADE_FAILS on the 2020 component \u2014 the fade is liquidity provision and March 2020 is where it gets paid in drawdown",
+      "most_likely_failure": "2020-03 down-shock continuation"
+    }
+  },
+  "frozen_parameters": {
+    "percentile": 0.9,
+    "trailing": 252,
+    "retrace_frac": 0.382,
+    "reclaim_deadline_et": "14:30",
+    "time_exit_et": "15:55",
+    "round_trip_bp": 3.0,
+    "block_L": 5,
+    "draws": 10000,
+    "seed": 42,
+    "cpcv": "6/2",
+    "embargo_dates": 1,
+    "n_trials": 1551,
+    "floor_per_day": 0.0005
+  },
+  "abort": {
+    "no_rerun": "one run, one verdict",
+    "no_scan": "no search across fractions, deadlines, costs or subsets"
+  },
+  "verdict": null,
+  "hash_method": "sha256(json.dumps(doc minus hash_lock, sort_keys=True, separators=(',',':')))",
+  "hash_lock": "d3d5258285a74cf941940d3bac6aed44819d8c769e8e70d6d8e94b78325dd974"
+}
