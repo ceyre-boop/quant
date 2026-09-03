@@ -4,6 +4,15 @@ Per-session ledger: what shipped, push status, verdicts, blockers, refusals. New
 The Obsidian brain (`~/Obsidian/Obsidian/00-BRAIN/NEXT.md`) is the cross-project rollup.
 Standing constraints live in `CLAUDE.md` — not restated here.
 
+## 2026-09-03 (cont) — HYP-115 FRAGILE: the incumbent basket is unproven beta
+
+- Forwarded proposal: test the hurdle itself. **HYP-115** (`f1b66afc75d792d1`, yfinance total-return
+  closes 2005–2026): OOS 2007-06→2014-12 Sharpe **0.22 CI [−0.35, +0.88]**, maxDD −54% (SPY −60%, 60/40
+  −35%); not lucky (74th pct of 10k random baskets); beats SPY on DD in all 3 stress windows, loses to
+  60/40 on all. Beat SPY 4 of last 13 years. **FRAGILE.** `data/research/hyp115/VERDICT.md`.
+- EDGE_LEDGER updated: no validated equity construction at all. Trial count **1556**.
+- HYP-116 (shock-deferred contribution policy vs DCA) sealed, NOT run — operator's call.
+
 ## 2026-09-03 — HYP-114 FAIL: the fade does not generalise; EDGE_LEDGER.md created
 
 - **HYP-114** (`0efc2fdc9ed555f4`, 8,013 sessions): unseen 2016–2019 −0.027%/deployed-day (4/10);

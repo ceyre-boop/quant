@@ -6,7 +6,7 @@ The authoritative machine record is `data/agent/hypothesis_ledger.json`; this pa
 index of it. Rules: a claim gets on this page only with a sealed prereg and a single run; a null is
 recorded with the same care as a pass; corrections are appended, never overwritten.
 
-_Last updated 2026-09-03 after the 2026-09-02 session (HYP-109 → HYP-114, nine preregs)._
+_Last updated 2026-09-03 (HYP-109 → HYP-115, ten preregs)._
 
 ## Status line
 
@@ -16,6 +16,7 @@ _Last updated 2026-09-03 after the 2026-09-02 session (HYP-109 → HYP-114, nine
 | Time exits beat trailing stops (v015 FX) | CONFIRMED on the frozen config | ledger HYP-059/060 |
 | Post-shock **magnitude** (next-week RV 1.36×) | REAL, not monetisable — options over-price it | HYP-109(a), HYP-112 |
 | Post-shock **direction / fade** | **NOT AN EDGE** — one regime (2020–2026, +0.087%/event-day), absent 2016–2019 and on 20 other ETFs | HYP-109, HYP-111, **HYP-114** |
+| **The incumbent EW-10 basket itself** | **FRAGILE** — OOS 2007–14 Sharpe 0.22 CI [−0.35, +0.88], maxDD −54%, loses to 60/40 everywhere; not lucky (73rd pct) | **HYP-115** `f1b66afc` |
 | Everything else tried 2026-09-02 | null | table below |
 
 **There is currently no proven retail-clean equity/ETF edge in this repo.** The one that looked like
@@ -41,10 +42,12 @@ is not an edge. Do not describe it as one.
 | HYP-111 | scoped path + fade, 2020–26 (Alpaca SIP) | `d3d52582` | path INCONCLUSIVE (3.6% fires); fade HOLDS (corrected +0.087%, CI [+0.004, +0.174]) | one regime | `data/research/hyp111/HYP-111_VERDICT.md` |
 | **HYP-114** | **deploy the fade: unseen 2016–19, 20 new ETFs, exit** | `0efc2fdc` | **FAIL / FAIL / NO_DIFFERENCE** | −0.027% on unseen years (4/10); +0.001% on 20 ETFs (11/20); account CAGR +1.3% | `data/research/hyp114/VERDICT.md` |
 
+| HYP-115 | the incumbent EW-10 basket as hypothesis: OOS 2007–14, lucky-basket, stress | `f1b66afc` | **FRAGILE** | diversified beta; OOS Sharpe 0.22, −54% GFC; 60/40 beats it on every risk measure | `data/research/hyp115/` |
+
 Correction (2026-09-03): HYP-111/111a/113 fade figures were overstated by 0.06%/event-day (cost-sign
 error, found by HYP-114). Corrected numbers are in `data/research/hyp114/VERDICT.md`; sealed verdicts
-are annotated, not rewritten. Multiplicity after this program: **1555 trials** (`mined_n._total`
-1543 + 12 declared claims). Any new prereg starts at 1556.
+are annotated, not rewritten. Multiplicity after this program: **1556 trials** (`mined_n._total`
+1543 + 13 declared claims). Any new prereg starts at 1557.
 
 ## Where the map says an edge can still exist (for a trader with no speed, size, or information)
 
