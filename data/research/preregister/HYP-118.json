@@ -1,0 +1,73 @@
+{
+  "id": "HYP-118",
+  "slug": "em_carry_m6_unseen_universe",
+  "name": "M6 characteristic ranking + mechanical crash management, unseen EM universe 1997-2026",
+  "status": "PREREGISTERED",
+  "frozen_at": "2026-09-03T00:00:00Z",
+  "family": "CARRY-CROSSSECTION-2026-09",
+  "lineage": "HYP-117 IC_ONLY: parameter-free carry+mom+value ranking real on 1990-2005; every fitted model negative",
+  "universe": {
+    "assets": [
+      "MXN",
+      "ZAR",
+      "BRL",
+      "KRW",
+      "INR"
+    ],
+    "funding": [
+      "USD",
+      "JPY",
+      "EUR"
+    ],
+    "positions": 15,
+    "data": "FRED DEX*US spot, IRSTCI01/IR3TIB01 rates, OECD CPI (research/carry_model/em.py)",
+    "window": [
+      "1997-01-31",
+      "2026-06-30"
+    ],
+    "unseen": "no EM row read before sealing; guard EM_HOLDOUT_UNLOCK set only by the test after gate zero",
+    "return": "\u0394log spot + carry/12\u00b7(1\u22120.30) \u2212 12bp (6bp/leg, EM spreads)"
+  },
+  "model_frozen": "research/carry_model/m6.py as committed: score z(carry)+z(mom12)+z(value)\u22120.5\u00b7z(rvol3); top-5 of 15; risk-parity 1/rvol; vol-target 10% cap 1.5\u00d7; \u00d70.5 if VIX(t\u22121)>30. M6b adds \u00d71.5 when the universe's carry factor is >10% off peak. No fitting.",
+  "comparators": {
+    "plain_em_carry": "top-5 by carry, equal weight, same universe/costs",
+    "hyp117_g10": "M1 top-5 Sh 0.80, factor Sh 0.82, IC 0.15 on 1990-2005; G10 factor 2006-26 Sh 0.19 maxDD \u221233.5%"
+  },
+  "claims": {
+    "c1_ranking": "monthly IC of the M6 score across 15 positions: block-bootstrap CI (L=6) excludes 0 from above",
+    "c2_return": "Sharpe(M6 managed) \u2212 Sharpe(plain EM carry), jointly resampled: CI excludes 0 from above",
+    "c3_drawdown": "maxDD(M6 managed) \u2264 (2/3)\u00b7maxDD(plain EM carry)  [the crash-management claim]",
+    "c4_perm": "cross-sectional permutation (targets shuffled across positions within month), 2000 draws, p<0.05 for the M6 top-5 raw mean",
+    "descriptive": [
+      "1997-98 Asian/Russia, 2008, 2013 taper, 2015, 2020, 2022 month-by-month",
+      "M6b",
+      "per-currency",
+      "exposure path",
+      "IC by year"
+    ]
+  },
+  "verdict_ladder": {
+    "ADVANCED_HOLDS": "c1 & c2 & c3 & c4",
+    "RISK_ONLY": "c1 & c3 & c4 but not c2 \u2014 ranking + crash management cut the drawdown without beating plain carry's Sharpe",
+    "IC_ONLY": "c1 & c4 only",
+    "NULL": "c1 fails"
+  },
+  "n_trials": 1642,
+  "prior_expectation": "RISK_ONLY",
+  "priors": {
+    "operator": {
+      "prior": "wants 'stronger prediction'; not stated formally"
+    },
+    "claude": {
+      "prior": "RISK_ONLY \u2014 EM carry IC will be positive (well documented, larger differentials), vol targeting will cut the 1998/2008 drawdowns by more than a third mechanically, but the Sharpe will not be distinguishable from plain EM carry; there is no stronger prediction, only stronger risk management",
+      "most_likely_failure": "c2"
+    }
+  },
+  "abort": {
+    "no_rerun": "one run",
+    "no_scan": "no weight, k, vol target, cap, VIX threshold or universe change after the run"
+  },
+  "verdict": null,
+  "hash_method": "sha256(json.dumps(doc minus hash_lock, sort_keys=True, separators=(',',':')))",
+  "hash_lock": "b185b5890d2f512067e74a540083affdad327b84a73508e1e6555f023be7134b"
+}
