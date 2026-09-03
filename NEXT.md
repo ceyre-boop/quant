@@ -16,13 +16,13 @@ Standing constraints live in `CLAUDE.md` — not restated here.
   hash + files; linked from CLAUDE.md "Current live state". Future sessions start there.
 - Post-shock program closed at every resolution/expression. Trial count **1555**. Only proven edge: FX carry.
 
-## 2026-09-02 (late) — Alpaca has 2016+; HYP-111 scoped run: path INCONCLUSIVE, **FADE HOLDS incl. 2020**
+## 2026-09-02 (late) — Alpaca has 2016+; HYP-111 scoped run: path INCONCLUSIVE, fade passed its bar — **SUPERSEDED: HYP-114 FAIL next day; fade figures here overstated 0.06% (cost-sign bug)**
 
 - Another session claimed Alpaca SIP serves 2016+ minute bars free. **Verified live** (SPY 2016-03-01,
   2018-02-05, 2020-03-16; XLF/EEM 2020/2022 — full sessions). The 2026-07-17 "2-yr wall" note was wrong.
   No ThetaData purchase. Loader `research/hyp111/alpaca_1m.py`, cache `data/cache/alpaca_1m_rth/` (2,324 sessions).
 - **HYP-111** (`d3d5258285a74cf9`, 1,788 events / 669 dates, 2020-01→2026-07): primary path INCONCLUSIVE —
-  fires **3.6%** (65 trades < 100 abort). **Secondary fade HOLDS**: +0.147%/event-day CI [+0.06,+0.23],
+  fires **3.6%** (65 trades < 100 abort). **Secondary fade passed** (as printed +0.147%; corrected +0.087% CI [+0.004,+0.174], 8/10):
   10/10, ex-2020 +0.11, **2020 +0.37% (CI clears 0), 2020-03 +0.62%**; E=+0.158%/trade, W .54, payoff 1.18;
   worst −5.6% (Mar-2020 cluster). Claude's sealed prior (fails on 2020) was WRONG. Thin years 2022/2024.
   `data/research/hyp111/HYP-111_VERDICT.md`.

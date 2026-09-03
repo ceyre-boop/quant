@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-"""Forward log of the post-shock next-session fade — the one surviving finding of 2026-09-02.
+"""Forward log of the post-shock next-session fade — NOT an edge (HYP-114 FAIL, 2026-09-03: absent on
+2016-2019 and on 20 other ETFs). Kept running as a live NULL CHECK of the rule that looked best in
+2020-2026, so a future session can see whether the forward tape agrees with the out-of-sample null.
 
 Frozen rule (HYP-111a incumbent, negated; HYP-113 says do not condition on size):
   shock at t  : |close-to-close log return| >= p90 of the trailing 252 sessions' |r| (t excluded)

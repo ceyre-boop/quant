@@ -25,7 +25,7 @@ bigger" is killed cleanly. Sealed `f3cf34d66a29cdbe`; hash verified before and a
 - Per instrument the bins scatter with no pattern; the 10/10 in HYP-111a was the unconditional
   fade, and it stays unconditional.
 
-## What survives
+## What survived at the time (retracted by HYP-114 the next day — see CORRECTION below)
 
 The unconditional next-session fade after a p90+ shock (HYP-111a's incumbent, negated):
 +0.128%/event-day, CI excludes 0, all ten instruments, 2023-06 → 2026-07 — and it is **not

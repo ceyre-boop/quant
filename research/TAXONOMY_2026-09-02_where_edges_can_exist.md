@@ -1,3 +1,8 @@
+> **SUPERSEDED IN PART (2026-09-03).** The late addendum below claimed the post-shock fade as a
+> six-year survivor. HYP-114 (`0efc2fdc`) then showed it absent on 2016–2019 and on 20 other ETFs,
+> and a cost-sign bug had overstated its yield by 0.06%. **It is not an edge.** Current truth:
+> `research/EDGE_LEDGER.md`. This file is kept as the record of the reasoning, errors included.
+
 # Where a durable edge can exist for this trader
 
 **Written before any data was read this session.** The trader: $2k, retail
@@ -272,6 +277,7 @@ not improvable by size, path or confluence. Its load-bearing test is 2020–2022
 data purchase. Trial count after today: **1550**.
 
 **Late addendum — HYP-111 on the full window (Alpaca SIP, no purchase):** the path is too rare to
-adjudicate (3.6%); **the unconditional next-session fade holds across 2020–2026 including March
-2020** (+0.147%/event-day, CI [+0.06, +0.23], 10/10, 2020 alone +0.37%). Regime gap closed. One
-survivor, now six years wide. Trial count 1552.
+adjudicate (3.6%); the unconditional next-session fade passed its sealed bar on 2020–2026 (corrected
++0.087%/event-day, CI [+0.004, +0.174], 8/10 — the +0.147%/10/10 first printed was a cost-sign error).
+**Retracted 2026-09-03: HYP-114 found it absent on 2016–2019 (−0.027%, 4/10) and on 20 new ETFs
+(+0.001%, 11/20). Not a survivor; a regime.** Trial count after HYP-114: 1555.

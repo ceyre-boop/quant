@@ -21,6 +21,13 @@ _Last updated 2026-09-03 after the 2026-09-02 session (HYP-109 → HYP-114, nine
 **There is currently no proven retail-clean equity/ETF edge in this repo.** The one that looked like
 one (the fade) failed its out-of-regime and out-of-universe test the day after it was found.
 
+**Retracted, explicitly, at the operator's request (2026-09-03):** the statement *"after a sharp move
+down, the crowd's continuation is the wrong side — fade it, and fade it harder when the drop was bigger;
+10/10 instruments"* is **false** on the desk's own data. "Harder when bigger" was killed by HYP-113 (p99+
+down-days carry no fade); "10/10" was a cost-sign error (8/10 corrected); the fade itself is absent on
+2016–2019 and on 20 other ETFs (HYP-114). It is the best-looking *candidate* the desk has tested, and it
+is not an edge. Do not describe it as one.
+
 ## The 2026-09-02 program — nine sealed tests
 
 | id | hypothesis | hash | verdict | one-line read | files |
