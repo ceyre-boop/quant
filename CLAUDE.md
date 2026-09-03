@@ -231,6 +231,10 @@ python3 scripts/run_replay_validation.py
 
 ## Current live state
 
+**Edge status, one page:** `research/EDGE_LEDGER.md` — every proven/killed claim with hash, script and
+result file. Read it before asserting an edge exists or doesn't. (2026-09-03: FX carry is the only
+CONFIRMED live edge; the post-shock fade FAILED out-of-regime in HYP-114.)
+
 Current live version: Forex v015 — anchored as logs/research/v003 (tracked snapshot), HYP-045 4-pair portfolio (AUDNZD excluded).
 v007 per-pair hold overrides ROLLED BACK 2026-06-07 (NOT_SIGNIFICANT — fails walk-forward; ledger V007-HOLD-VALIDATION).
 Live config now 60d default for all pairs; re-measured OOS Sharpe **1.25** (decay 2.17 ROBUST, permutation p<0.001) on

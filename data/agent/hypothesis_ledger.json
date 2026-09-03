@@ -2307,7 +2307,8 @@
     "prior_expectation": "CONFIRMED",
     "source": "operator_session_2026-09-02",
     "auto_generated": false,
-    "result_file": "data/research/hyp111/hyp111a_result.json"
+    "result_file": "data/research/hyp111/hyp111a_result.json",
+    "correction_note": "CORRECTION 2026-09-03 (found by HYP-114): fade computed as -naive_net added the 3bp cost back as a gain; all fade figures overstated by 0.06%/event-day. Corrected HYP-111 fade +0.087%/event-day CI [+0.004,+0.174], 8/10; HYP-111a fade +0.068%; HYP-113 bins shift uniformly (verdict unaffected). Sealed verdicts not rewritten. See data/research/hyp114/VERDICT.md."
   },
   {
     "id": "HYP-112",
@@ -2345,7 +2346,8 @@
     "prior_expectation": "NOT_SIGNIFICANT",
     "source": "operator_session_2026-09-02",
     "auto_generated": false,
-    "result_file": "data/research/hyp111/hyp113_result.json"
+    "result_file": "data/research/hyp111/hyp113_result.json",
+    "correction_note": "CORRECTION 2026-09-03 (found by HYP-114): fade computed as -naive_net added the 3bp cost back as a gain; all fade figures overstated by 0.06%/event-day. Corrected HYP-111 fade +0.087%/event-day CI [+0.004,+0.174], 8/10; HYP-111a fade +0.068%; HYP-113 bins shift uniformly (verdict unaffected). Sealed verdicts not rewritten. See data/research/hyp114/VERDICT.md."
   },
   {
     "id": "HYP-111",
@@ -2364,15 +2366,16 @@
     "prior_expectation": "CONFIRMED",
     "source": "operator_session_2026-09-02",
     "auto_generated": false,
-    "result_file": "data/research/hyp111/hyp111_result.json"
+    "result_file": "data/research/hyp111/hyp111_result.json",
+    "correction_note": "CORRECTION 2026-09-03 (found by HYP-114): fade computed as -naive_net added the 3bp cost back as a gain; all fade figures overstated by 0.06%/event-day. Corrected HYP-111 fade +0.087%/event-day CI [+0.004,+0.174], 8/10; HYP-111a fade +0.068%; HYP-113 bins shift uniformly (verdict unaffected). Sealed verdicts not rewritten. See data/research/hyp114/VERDICT.md."
   },
   {
     "id": "HYP-114",
     "name": "Deploying the unconditional post-shock next-session fade: denominator, unseen years, wider universe, exit",
-    "status": "PREREGISTERED",
-    "date_tested": null,
-    "result": null,
-    "verdict": null,
+    "status": "ADJUDICATED",
+    "date_tested": "2026-09-03",
+    "result": "claim1 FAIL; claim2 FAIL; claim3 NO_DIFFERENCE",
+    "verdict": "FAIL",
     "methodology_note": "Pre-registered 2026-09-02 before any 2016-2019 or wider-universe session was read. Sizing denominator sealed in the doc.",
     "hash_lock": "0efc2fdc9ed555f4490dc96bdd67f025edd37336969a41b5da25e47b440e96f1",
     "prereg_file": "data/research/preregister/HYP-114.json",
@@ -2382,6 +2385,7 @@
     "is_sharpe": null,
     "prior_expectation": "CONFIRMED",
     "source": "operator_session_2026-09-02",
-    "auto_generated": false
+    "auto_generated": false,
+    "result_file": "data/research/hyp114/hyp114_result.json"
   }
 ]

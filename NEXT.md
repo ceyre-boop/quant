@@ -4,6 +4,18 @@ Per-session ledger: what shipped, push status, verdicts, blockers, refusals. New
 The Obsidian brain (`~/Obsidian/Obsidian/00-BRAIN/NEXT.md`) is the cross-project rollup.
 Standing constraints live in `CLAUDE.md` — not restated here.
 
+## 2026-09-03 — HYP-114 FAIL: the fade does not generalise; EDGE_LEDGER.md created
+
+- **HYP-114** (`0efc2fdc9ed555f4`, 8,013 sessions): unseen 2016–2019 −0.027%/deployed-day (4/10);
+  20 new ETFs +0.001% (11/20, ex-2020 −0.017%); full-decade +0.048% CI spans 0; 10%-per-instrument
+  account CAGR +1.3%; 12:00 vs 15:55 exit NO_DIFFERENCE. **The fade was 2020 and 2025.**
+- **Correction found by this run:** HYP-111/111a/113 computed fade = −naive_net, adding the 3bp cost back
+  as a gain (+0.06%/event-day overstated). Corrected HYP-111 fade +0.087% CI [+0.004,+0.174], 8/10.
+  Ledger entries annotated with `correction_note`; sealed verdicts not rewritten.
+- **`research/EDGE_LEDGER.md`** — the permanent, human-readable index of every proven/killed claim with
+  hash + files; linked from CLAUDE.md "Current live state". Future sessions start there.
+- Post-shock program closed at every resolution/expression. Trial count **1555**. Only proven edge: FX carry.
+
 ## 2026-09-02 (late) — Alpaca has 2016+; HYP-111 scoped run: path INCONCLUSIVE, **FADE HOLDS incl. 2020**
 
 - Another session claimed Alpaca SIP serves 2016+ minute bars free. **Verified live** (SPY 2016-03-01,

@@ -58,3 +58,7 @@ denominator sealed in writing first (HYP-113 `floor_note_standing`).
 One run. HYP-111a's sub-window result was declared known before sealing and shaped only the
 secondary claim. No parameter moved. The forward log (`fade_forward_log.py`) continues on the
 same rule.
+
+
+---
+**CORRECTION (2026-09-03, found by HYP-114):** every fade figure above was computed as `−naive_net`, which added the 3 bp cost back as a gain — overstated by 0.06%/event-day. Corrected HYP-111 fade: +0.087%/event-day, CI [+0.004, +0.174], 8/10, E = +0.098%/trade. HYP-114 then showed the fade absent on 2016–2019 and on 20 new ETFs. See `data/research/hyp114/VERDICT.md` and `research/EDGE_LEDGER.md`.
