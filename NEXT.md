@@ -4,6 +4,19 @@ Per-session ledger: what shipped, push status, verdicts, blockers, refusals. New
 The Obsidian brain (`~/Obsidian/Obsidian/00-BRAIN/NEXT.md`) is the cross-project rollup.
 Standing constraints live in `CLAUDE.md` — not restated here.
 
+## 2026-09-02 (late) — Alpaca has 2016+; HYP-111 scoped run: path INCONCLUSIVE, **FADE HOLDS incl. 2020**
+
+- Another session claimed Alpaca SIP serves 2016+ minute bars free. **Verified live** (SPY 2016-03-01,
+  2018-02-05, 2020-03-16; XLF/EEM 2020/2022 — full sessions). The 2026-07-17 "2-yr wall" note was wrong.
+  No ThetaData purchase. Loader `research/hyp111/alpaca_1m.py`, cache `data/cache/alpaca_1m_rth/` (2,324 sessions).
+- **HYP-111** (`d3d5258285a74cf9`, 1,788 events / 669 dates, 2020-01→2026-07): primary path INCONCLUSIVE —
+  fires **3.6%** (65 trades < 100 abort). **Secondary fade HOLDS**: +0.147%/event-day CI [+0.06,+0.23],
+  10/10, ex-2020 +0.11, **2020 +0.37% (CI clears 0), 2020-03 +0.62%**; E=+0.158%/trade, W .54, payoff 1.18;
+  worst −5.6% (Mar-2020 cluster). Claude's sealed prior (fails on 2020) was WRONG. Thin years 2022/2024.
+  `data/research/hyp111/HYP-111_VERDICT.md`.
+- Only open thread: deploy the unconditional fade (universe, per-deployed-capital sizing sealed first, exit).
+  Trial count **1552**.
+
 ## 2026-09-02 (cont) — HYP-111a VALID_BUT_BELOW_FLOOR; HYP-112 fetching; fade design PENDING
 
 - HYP-111a (`41b7b6a15a9f2f1e`, 798 events 2023-06→2026-07): every delta component passes

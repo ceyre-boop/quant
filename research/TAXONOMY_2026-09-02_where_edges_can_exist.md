@@ -270,3 +270,8 @@ thing**: the unconditional next-session fade after a p90+ shock — bucket (iv)/
 provision by a patient holder — measured on one regime (2023-06→2026-07), all ten instruments,
 not improvable by size, path or confluence. Its load-bearing test is 2020–2022 and that is a
 data purchase. Trial count after today: **1550**.
+
+**Late addendum — HYP-111 on the full window (Alpaca SIP, no purchase):** the path is too rare to
+adjudicate (3.6%); **the unconditional next-session fade holds across 2020–2026 including March
+2020** (+0.147%/event-day, CI [+0.06, +0.23], 10/10, 2020 alone +0.37%). Regime gap closed. One
+survivor, now six years wide. Trial count 1552.
