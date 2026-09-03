@@ -16,8 +16,10 @@ INSTRUMENTS = ["SPY", "QQQ", "IWM", "DIA", "TLT", "GLD", "EFA", "EEM", "XLF", "X
 
 # ── daily layer (identical shock rule to HYP-109) ────────────────────────────
 
-def daily(sym: str, window=("2014-01-02", "2026-07-16")) -> pd.DataFrame:
-    df = pd.read_parquet(DAILY / f"{sym}.parquet")
+def daily(sym: str, window=("2014-01-02", "2026-07-16"), frame: pd.DataFrame | None = None) -> pd.DataFrame:
+    """Daily layer. `frame` (date/open/high/low/close/volume) overrides the tracked cache — used for
+    instruments outside data/cache/daily_universe (HYP-114 wider universe, Alpaca daily bars)."""
+    df = frame.copy() if frame is not None else pd.read_parquet(DAILY / f"{sym}.parquet")
     df["date"] = pd.to_datetime(df["date"])
     df = df[(df["date"] >= window[0]) & (df["date"] <= window[1])].sort_values("date").set_index("date")
     df = df[["open", "high", "low", "close", "volume"]].astype(float)
@@ -107,12 +109,12 @@ def simulate(bars: pd.DataFrame, s: float, C: float, L: float, T: float) -> Trad
                  float(ret / (abs(C - L) / C)) if C != L else 0.0)
 
 
-def naive(bars: pd.DataFrame, s: float) -> float:
-    """Incumbent: direction s from the 09:30 open to the 15:55 close (or last bar)."""
+def naive(bars: pd.DataFrame, s: float, exit_time: str = "15:55") -> float:
+    """Incumbent: direction s from the 09:30 open to the `exit_time` bar close (or last bar)."""
     if bars.empty:
         return 0.0
     o = float(bars["open"].iloc[0])
-    late = bars[bars["time"] >= "15:55"]
+    late = bars[bars["time"] >= exit_time]
     c = float(late["close"].iloc[0]) if len(late) else float(bars["close"].iloc[-1])
     return s * (c - o) / o
 
