@@ -2429,10 +2429,10 @@
   {
     "id": "HYP-117",
     "name": "Cross-sectional G10 pair selection (carry/momentum/value \u00b1 derivatives \u00d7 vol) \u2014 sealed holdout 1990-2005",
-    "status": "PREREGISTERED",
-    "date_tested": null,
-    "result": null,
-    "verdict": null,
+    "status": "ADJUDICATED",
+    "date_tested": "2026-09-03",
+    "result": "{\"M1 baseline\": \"IC_ONLY\", \"M2 ridge\": \"NULL\", \"M3 ridge+interactions\": \"NULL\", \"M4 boosting\": \"NULL\", \"M5 SHOT\": \"NULL\", \"M5b SHOT-pure\": \"IC_ONLY\"}",
+    "verdict": "IC_ONLY",
     "methodology_note": "Pre-registered 2026-09-03 with dev-window results declared; holdout 1990-2005 unread (data guard).",
     "hash_lock": "8ce9df8d86f7da4b3cd9d388c70cbe65b546b46c1fd7c5fd0dbe1f42dea229fe",
     "prereg_file": "data/research/preregister/HYP-117.json",
@@ -2442,6 +2442,7 @@
     "is_sharpe": null,
     "prior_expectation": "NULL",
     "source": "operator_session_2026-09-02",
-    "auto_generated": false
+    "auto_generated": false,
+    "result_file": "data/research/hyp117/result.json"
   }
 ]

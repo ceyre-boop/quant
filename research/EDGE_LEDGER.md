@@ -6,7 +6,7 @@ The authoritative machine record is `data/agent/hypothesis_ledger.json`; this pa
 index of it. Rules: a claim gets on this page only with a sealed prereg and a single run; a null is
 recorded with the same care as a pass; corrections are appended, never overwritten.
 
-_Last updated 2026-09-03 (HYP-109 → HYP-116, eleven preregs)._
+_Last updated 2026-09-03 (HYP-109 → HYP-117, twelve preregs)._
 
 **Lessons, one per hypothesis, HYP-001 → HYP-116:** `research/HYPOTHESIS_LESSONS.md`.
 
@@ -20,6 +20,8 @@ _Last updated 2026-09-03 (HYP-109 → HYP-116, eleven preregs)._
 | Post-shock **direction / fade** | **NOT AN EDGE** — one regime (2020–2026, +0.087%/event-day), absent 2016–2019 and on 20 other ETFs | HYP-109, HYP-111, **HYP-114** |
 | **The incumbent EW-10 basket itself** | **FRAGILE** — OOS 2007–14 Sharpe 0.22 CI [−0.35, +0.88], maxDD −54%, loses to 60/40 everywhere; not lucky (73rd pct) | **HYP-115** `f1b66afc` |
 | Shock-deferred contributions vs DCA (the fade as a policy) | **POLICY_FAILS** — ratio 0.993, wins 12% of 5-yr windows | **HYP-116** `b76837ac` |
+| **G10 cross-section: carry+mom+value (no parameters)** | **IC_ONLY** — real ranking skill on a sealed 1990–2005 holdout (IC 0.15, 13/16 yrs, p<0.001) but does not beat plain carry; every fitted model (ridge/GBM/'statistics×calculus') NULL or negative | **HYP-117** `8ce9df8d` |
+| Carry premium level | +6%/yr (1990–2005) → +1.7%/yr (2006–2026), Sharpe 0.8 → 0.2; hindsight rules top out ~3%/yr | `research/carry_map/` |
 | Everything else tried 2026-09-02 | null | table below |
 
 **There is currently no proven retail-clean equity/ETF edge in this repo.** The one that looked like
@@ -47,11 +49,11 @@ is not an edge. Do not describe it as one.
 
 | HYP-115 | the incumbent EW-10 basket as hypothesis: OOS 2007–14, lucky-basket, stress | `f1b66afc` | **FRAGILE** | diversified beta; OOS Sharpe 0.22, −54% GFC; 60/40 beats it on every risk measure | `data/research/hyp115/` |
 | HYP-116 | shock-deferred contributions vs DCA, 2007–2026 | `b76837ac` | **POLICY_FAILS** | ratio 0.993; DEFERRED wins 12% of rolling 5-yr windows; closes the shock signal at every horizon | `data/research/hyp116/` |
+| HYP-117 | G10 cross-sectional selection, sealed holdout 1990–2005, six frozen models | `8ce9df8d` | **IC_ONLY** | baseline IC 0.15 real; fitted models negative; none beats plain carry | `data/research/hyp117/` |
 
 Correction (2026-09-03): HYP-111/111a/113 fade figures were overstated by 0.06%/event-day (cost-sign
 error, found by HYP-114). Corrected numbers are in `data/research/hyp114/VERDICT.md`; sealed verdicts
-are annotated, not rewritten. Multiplicity after this program: **1557 trials** (`mined_n._total`
-1543 + 14 declared claims). Any new prereg starts at 1558.
+are annotated, not rewritten. Multiplicity after this program: **1640 trials** (`mined_n._total` 1543 + 15 ledger claims + 76 carry-map cells + 6 models). Any new prereg starts at 1641.
 
 ## Where the map says an edge can still exist (for a trader with no speed, size, or information)
 

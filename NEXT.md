@@ -4,6 +4,18 @@ Per-session ledger: what shipped, push status, verdicts, blockers, refusals. New
 The Obsidian brain (`~/Obsidian/Obsidian/00-BRAIN/NEXT.md`) is the cross-project rollup.
 Standing constraints live in `CLAUDE.md` — not restated here.
 
+## 2026-09-03 (late) — 20-yr carry map, lookback ceiling, model design, HYP-117 holdout IC_ONLY
+
+- Colin: "carry is the only kind of trading I like." Built `research/carry_map/` (map: crash-and-recover
+  premium; ceiling: hindsight rules ~3%/yr Sh 0.6, oracle 69%/yr) and `MODEL_DESIGN.md` (IC framing).
+- `research/carry_model/`: FRED-only 36-year G10 panel (spot 1985+, OECD rates, CPI, EUR spliced from DEM),
+  holdout guard, 6 frozen models, walk-forward dev 2006–26 (no model beats the factor; ICs 0.02–0.04).
+- **HYP-117** (`8ce9df8d86f7da4b`) holdout 1990–2005: **IC_ONLY** — parameter-free carry+mom+value IC 0.15
+  CI [0.09,0.21], 13/16 yrs, p<0.001, top-5 Sh 0.80 vs factor 0.82; ALL fitted models incl. Colin's
+  statistics×calculus shot NULL/negative. Premium decayed 6%→1.7%/yr across eras. Trial count **1640**.
+- **Open, Colin's:** "find me the best way to carry trade live, $15k" — see reply; any live wiring is real
+  money → approval, param_change_log rationale, execution-freeze unlock recorded here first.
+
 ## 2026-09-03 (cont) — HYP-115 FRAGILE: the incumbent basket is unproven beta
 
 - Forwarded proposal: test the hurdle itself. **HYP-115** (`f1b66afc75d792d1`, yfinance total-return
