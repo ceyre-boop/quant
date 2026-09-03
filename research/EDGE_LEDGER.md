@@ -8,6 +8,8 @@ recorded with the same care as a pass; corrections are appended, never overwritt
 
 _Last updated 2026-09-03 (HYP-109 → HYP-116, eleven preregs)._
 
+**Lessons, one per hypothesis, HYP-001 → HYP-116:** `research/HYPOTHESIS_LESSONS.md`.
+
 ## Status line
 
 | what | status | evidence |
