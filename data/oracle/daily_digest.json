@@ -1,14 +1,12 @@
 {
-  "headline": "Research terminal shipped; gapper shadow dead 50 days; HYP-107 honest reconstruction shows real +5.4% median but execution unresolved at spread.",
+  "headline": "ICARUS shadow day 37: +0.000% \u2014 3/37 green so far",
   "what_happened": [
-    "Repo refactored from strategy-discovery dashboard to pull-only research terminal: Vite+React frontend (112 KB), DuckDB fundamentals layer (11 tables, SEC/yfinance/Nasdaq/FINRA/Alpha Vantage), TradingView + replay cockpit ported as framework-free island.",
-    "Shadow_gapper in production 50 days with 3 signals total (2026-07-13/14, 2026-07-27); constitutional daily returns negligible (max 0.456bps); no signals since 2026-07-27.",
-    "HYP-105/106 retracted for look-ahead leakage (intraday_push/overnight_gap measured through holding window); HYP-107 honest reconstruction on 09:31-only universe yields real median +5.4% gross but ~10x smaller than inflated versions.",
-    "TICK-024 (honest carry-cost model) applied & re-baselined: full-decade Sharpe 0.6886\u21920.6452, OOS 2023-24 Sharpe 1.1919 (decay 2.247, ROBUST); numbers match impact study.",
-    "HYP-071-v2 & BH trust-decision docs prepared (DRAFT_PENDING_OPERATOR_APPROVAL); gate still CLOSED; ignition requires Colin's call on symmetric resampling or \u03bb\u00b7DD drop before any run."
+    "2026-09-01 \u2014 Repo repurposed: research terminal + fundamentals/filings layer",
+    "2026-07-28 \u2014 Ignition prep: HYP-071-v2 prereg + BH trust decision, DRAFTS ONLY",
+    "2026-07-28 \u2014 TICK-024 unlock: honest carry-cost model landed, gate flag flipped, ignition still CLOSED"
   ],
-  "what_it_means": "The system is now a research tool (research terminal live, gapper shadow dead in production). The real edge is small (+5.4% median HYP-107), buried under execution friction (microcap spreads 1\u201315%, LULD halts). You have two paths: (1) live 09:31 shadow with realistic fill model to settle whether HYP-107 is tradeable, or (2) close the gapper trade and focus on pre-registration ignition (HYP-071-v2) once Colin adjudicates the BH scope question.",
-  "todays_one_thing": "Run live 09:31 shadow on HYP-107 filter (overnight_gap \u2264 0.577, log10 first-min vol \u2264 5.854) with real halts and 5\u201320% microcap spreads to measure net median\u2014that outcome kills or resurrects the gapper trade.",
+  "what_it_means": "Template digest (no LLM call) \u2014 see NEXT.md for detail. (LLM fallback: BadRequestError)",
+  "todays_one_thing": "Check the ICARUS calendar; the ladder does the rest.",
   "progression": [
     {
       "gate": "G1",
@@ -46,7 +44,7 @@
       "detail": "the actual goal"
     }
   ],
-  "source": "oracle-llm",
-  "model": "claude-haiku-4-5-20251001",
-  "generated_at": "2026-09-01T17:31:03.167018+00:00"
+  "source": "template-fallback",
+  "model": null,
+  "generated_at": "2026-09-02T13:58:14.235052+00:00"
 }
