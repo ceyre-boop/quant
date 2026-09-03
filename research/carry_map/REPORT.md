@@ -95,3 +95,24 @@ bootstrap, multiplicity declared at 1558 + 76; (b) a different universe — EM c
 one crash cycle carries it) — most likely failure is "one event."
 
 Nothing in this file is a result. It is the map Colin asked for, and the one place on it worth a seal.
+
+## 6. The lookback ceiling (`ceiling.py`, `data/research/carry_map/ceiling.log`)
+
+What the 20 years could have paid *with hindsight*, three tiers, all in-sample:
+
+| tier | best line | ann | CAGR | Sharpe | maxDD |
+|---|---|---|---|---|---|
+| T0 always-on factor | — | +1.9% | +1.6% | 0.23 | −33.5% |
+| T1 map rules as if known | rate spread narrowing (77 mo on) | +2.9% | +2.8% | **0.61** | −10.2% |
+| T1 | off when USD trending (88 mo on) | +2.5% | +2.5% | 0.61 | −8.4% |
+| T1 | COMBO (DD>10% or narrowing) & Fed not cutting, **2× notional when on** | **+5.4%** | +5.1% | 0.58 | −19.6% |
+| T2 static hindsight | best 5 pairs EW | +3.3% | +3.2% | 0.54 | −20.9% |
+| T2 | short JPY vs USD, 20 years | +3.4% | +3.0% | 0.37 | −37% |
+| T3 oracle | perfect sign on the factor every month | +21% | +23% | 3.7 | 0 |
+| T3 oracle | best single pair every month | +69% | +95% | 7.2 | 0 |
+
+**Read:** even with every rule the map found applied in hindsight, unlevered G10 carry tops out
+around **+3%/yr at Sharpe ~0.6**; 2× margin in the best state gets ~5%. The rules buy *drawdown*
+(−33% → −10%) far more than they buy return. The gap to the oracle (Sharpe 3.7 for the factor's sign
+alone) is the size of the prediction problem nobody here has solved. Stacking all five states
+(31 months on) drops the return back to +0.9% — over-conditioning kills the premium.
