@@ -11,7 +11,9 @@ Standing constraints live in `CLAUDE.md` — not restated here.
   −35%); not lucky (74th pct of 10k random baskets); beats SPY on DD in all 3 stress windows, loses to
   60/40 on all. Beat SPY 4 of last 13 years. **FRAGILE.** `data/research/hyp115/VERDICT.md`.
 - EDGE_LEDGER updated: no validated equity construction at all. Trial count **1556**.
-- HYP-116 (shock-deferred contribution policy vs DCA) sealed, NOT run — operator's call.
+- **HYP-116 POLICY_FAILS** (`b76837ace4234dfb`): deferring contributions to the session after a SPY down-shock
+  vs DCA, 2007–2026: ratio 0.993 CI [0.981, 1.001], wins 12% of 170 rolling 5-yr windows; same with 60/40.
+  Shock signal closed at every horizon. Trial count **1557**. `data/research/hyp116/VERDICT.md`.
 
 ## 2026-09-03 — HYP-114 FAIL: the fade does not generalise; EDGE_LEDGER.md created
 
