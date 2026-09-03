@@ -18,6 +18,10 @@ Standing constraints live in `CLAUDE.md` — not restated here.
   not adjusted after seeing 0.012 vs 0.05. Not yet measured: size-conditioning ("fade harder
   when bigger") and any regime outside 2023-06→2026-07 (needs stock VALUE tier, 2021-01).
   Decision deferred until HYP-112 lands (magnitude vs reversal as the vehicle).
+- **Forward log of the fade** built: `scripts/research/fade_forward_log.py` (+ `com.alta.fade_forward_log.plist`,
+  TRACKED-NOT-LOADED, 16:45 ET) → `data/research/hyp111/fade_forward_log.jsonl`. Rule frozen = HYP-111a
+  incumbent negated, 3bp, no sizing. Backfilled 2026-07-17→09-01: n=22, E=−0.04%/trade (noise at n=22;
+  backtest E=+0.150%, W=0.569, payoff 1.12). Operator promotes the plist.
 - **HYP-112 INCONCLUSIVE** by data abort (XLE 12 priced < 30); substantively the hardest null of the
   day: shock straddle −22.1% on premium vs control −12.9%, delta CI [−1.86, −0.21], **0/15 folds**, 2/10,
   negative every year. Implied move rises 28% after a shock, realized 16% — **magnitude is over-priced;
