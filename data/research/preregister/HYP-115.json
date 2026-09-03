@@ -1,0 +1,137 @@
+{
+  "id": "HYP-115",
+  "slug": "incumbent_ew10_validation",
+  "name": "The incumbent: equal-weight ten-ETF basket \u2014 construction, out-of-sample 2007-2014, lucky-basket test, stress",
+  "status": "PREREGISTERED",
+  "frozen_at": "2026-09-03T00:00:00Z",
+  "family": "INCUMBENT-2026-09",
+  "construction": {
+    "instruments": [
+      "SPY",
+      "QQQ",
+      "IWM",
+      "DIA",
+      "TLT",
+      "GLD",
+      "EFA",
+      "EEM",
+      "XLF",
+      "XLE"
+    ],
+    "weights": "equal, 10% each",
+    "rebalance_A": "daily to equal weight (the series every 2026-09-02 overlay was measured against)",
+    "rebalance_B": "monthly, first session, 3.0 bp on turnover (the retail-implementable version) \u2014 reported alongside",
+    "data": "yfinance auto-adjusted daily closes (research/incumbent/data.py), cached; close-to-close log returns",
+    "why_yfinance": "daily_universe (2014+) and Alpaca (2016+) cannot reach the out-of-sample window"
+  },
+  "windows": {
+    "in_sample": [
+      "2015-01-02",
+      "2026-07-16"
+    ],
+    "in_sample_note": "the window the basket was 'found' on (HYP-109 incumbent)",
+    "out_of_sample": [
+      "2007-06-01",
+      "2014-12-31"
+    ],
+    "oos_note": "all 30 pool ETFs exist from 2007-05 (UNG/HYG last); includes GFC",
+    "stress": {
+      "GFC": [
+        "2007-10-01",
+        "2009-03-31"
+      ],
+      "COVID": [
+        "2020-01-01",
+        "2020-12-31"
+      ],
+      "2022": [
+        "2022-01-01",
+        "2022-12-31"
+      ]
+    }
+  },
+  "random_basket_pool": [
+    "SPY",
+    "QQQ",
+    "IWM",
+    "DIA",
+    "TLT",
+    "GLD",
+    "EFA",
+    "EEM",
+    "XLF",
+    "XLE",
+    "XLK",
+    "XLV",
+    "XLY",
+    "XLP",
+    "XLI",
+    "XLU",
+    "XLB",
+    "HYG",
+    "LQD",
+    "USO",
+    "SLV",
+    "VNQ",
+    "XBI",
+    "SMH",
+    "KRE",
+    "FXI",
+    "EWZ",
+    "EWJ",
+    "GDX",
+    "UNG"
+  ],
+  "claims": {
+    "c1_oos_existence": {
+      "stat": "annualised Sharpe of rebalance_A on out_of_sample",
+      "pass": "stationary block bootstrap (L=20, 10000 draws, seed 42) 95% CI excludes 0 from above"
+    },
+    "c2_not_lucky": {
+      "stat": "percentile rank of the basket's Sharpe among 10,000 random equal-weight baskets of 10 drawn without replacement from the 30-ETF pool (seed 42), computed separately in_sample and out_of_sample",
+      "LUCKY": "in_sample pct >= 95 AND out_of_sample pct <= 50",
+      "not_lucky": "out_of_sample pct >= 50"
+    },
+    "c3_stress": {
+      "stat": "max drawdown of rebalance_A vs SPY and vs 60/40 SPY/TLT (daily rebalanced) in each stress window",
+      "pass": "basket maxDD less severe than SPY in all three windows"
+    },
+    "descriptive": [
+      "calendar-year returns 2007-2026, basket vs SPY vs 60/40",
+      "rebalance_B numbers",
+      "per-ETF contribution to OOS return"
+    ]
+  },
+  "verdict_ladder": {
+    "VALIDATED_CORE": "c1 pass AND not_lucky AND c3 pass",
+    "ORDINARY": "c1 pass AND not_lucky AND c3 fails \u2014 a real but unremarkable diversified basket",
+    "LUCKY": "c2 LUCKY (regardless of c1)",
+    "FRAGILE": "c1 fails"
+  },
+  "prior_expectation": "ORDINARY",
+  "priors": {
+    "operator": {
+      "prior": "not stated (forwarded a proposal: 'validated core or dodged a fitted basket')"
+    },
+    "claude": {
+      "prior": "ORDINARY \u2014 OOS Sharpe ~0.3-0.5 (GFC crushes EEM/XLF/XLE, TLT/GLD offset), percentile ~50-70; maxDD in GFC will NOT beat 60/40 and may not beat SPY by much",
+      "most_likely_failure": "c3 in the GFC window"
+    }
+  },
+  "frozen_parameters": {
+    "block_L": 20,
+    "draws": 10000,
+    "seed": 42,
+    "n_random_baskets": 10000,
+    "basket_size": 10,
+    "turnover_bp": 3.0,
+    "n_trials": 1556
+  },
+  "abort": {
+    "no_rerun": "one run, one verdict",
+    "no_scan": "no search across weights, pools, windows or rebalance rules"
+  },
+  "verdict": null,
+  "hash_method": "sha256(json.dumps(doc minus hash_lock, sort_keys=True, separators=(',',':')))",
+  "hash_lock": "f1b66afc75d792d1d338aa1cba65c97f6d494bdcd35819c81a8bfb86189b3af8"
+}
