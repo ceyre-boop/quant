@@ -13,6 +13,10 @@ Standing constraints live in `CLAUDE.md` — not restated here.
 - **HYP-117** (`8ce9df8d86f7da4b`) holdout 1990–2005: **IC_ONLY** — parameter-free carry+mom+value IC 0.15
   CI [0.09,0.21], 13/16 yrs, p<0.001, top-5 Sh 0.80 vs factor 0.82; ALL fitted models incl. Colin's
   statistics×calculus shot NULL/negative. Premium decayed 6%→1.7%/yr across eras. Trial count **1640**.
+- **HYP-118 IC_ONLY** (`b185b5890d2f5120`, unseen EM universe 1997–2026): ranking IC 0.10 CI [0.06,0.15] 25/30 yrs
+  p<0.001 (2nd unseen sample); ΔSharpe vs plain carry +0.18 CI spans 0; **vol-targeting levered into the
+  crashes** (managed DD −34.6% vs raw risk-parity −24.4%, Sh 0.63). Lesson: vol targeting in carry =
+  leverage into the calm before the crash. Trial count **1642**. `data/research/hyp118/VERDICT.md`.
 - **Open, Colin's:** "find me the best way to carry trade live, $15k" — see reply; any live wiring is real
   money → approval, param_change_log rationale, execution-freeze unlock recorded here first.
 
