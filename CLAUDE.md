@@ -232,7 +232,8 @@ python3 scripts/run_replay_validation.py
 ## Current live state
 
 **Edge status, one page:** `research/EDGE_LEDGER.md` — every proven/killed claim with hash, script and
-result file. Read it before asserting an edge exists or doesn't. (2026-09-03: FX carry is the only
+result file. Read it before asserting an edge exists or doesn't. **`research/HYPOTHESIS_LESSONS.md`** is the
+companion: every hypothesis HYP-001→116 with verdict and lesson — the full record of what failed and why. (2026-09-03: FX carry is the only
 CONFIRMED live edge; the post-shock fade FAILED out-of-regime in HYP-114.)
 
 Current live version: Forex v015 — anchored as logs/research/v003 (tracked snapshot), HYP-045 4-pair portfolio (AUDNZD excluded).
