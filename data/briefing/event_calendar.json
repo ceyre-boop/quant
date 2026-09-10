@@ -1,5 +1,5 @@
 {
-  "as_of": "2026-09-08T13:27:19.475877+00:00",
+  "as_of": "2026-09-09T13:40:40.567676+00:00",
   "horizon_days": 21,
   "events": [
     {
@@ -7,16 +7,24 @@
       "date": "2026-09-12",
       "source": "cadence_estimate",
       "action": "inflation print 8:30 ET \u2014 reduce size into window",
-      "days_until": 4,
-      "note": "in 4d \u2014 inflation print 8:30 ET \u2014 reduce size into window"
+      "days_until": 3,
+      "note": "in 3d \u2014 inflation print 8:30 ET \u2014 reduce size into window"
     },
     {
       "event": "FOMC meeting",
       "date": "2026-09-16",
       "source": "seed",
       "action": "reduce size / widen stops into the window",
-      "days_until": 8,
-      "note": "in 8d \u2014 reduce size / widen stops into the window"
+      "days_until": 7,
+      "note": "in 7d \u2014 reduce size / widen stops into the window"
+    },
+    {
+      "event": "PCE (Fed's preferred inflation)",
+      "date": "2026-09-30",
+      "source": "cadence_estimate",
+      "action": "8:30 ET \u2014 reduce size into window",
+      "days_until": 21,
+      "note": "in 21d \u2014 8:30 ET \u2014 reduce size into window"
     }
   ],
   "provenance_note": "FOMC dates are a maintained seed (verify vs Fed calendar); CPI/PCE/NFP/ISM are cadence ESTIMATES, not verified release dates."
