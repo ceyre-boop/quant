@@ -1,9 +1,9 @@
 {
-  "date": "2026-09-09",
-  "generated_at": "2026-09-09T14:41:49.402678+00:00",
+  "date": "2026-09-10",
+  "generated_at": "2026-09-10T12:30:33.905964+00:00",
   "meta_regime": "BREADTH",
   "regime_read": "ES & NQ moving together \u2014 broad agreement, more DURABLE directional signal. Trust the direction more.",
-  "narrative": "Macro backdrop \u2014\n[2026-09-09] US economic state (FRED):\n  Growth: real GDP 1.5% (q/q ann)\n  Inflation: CPI 2.64% YoY | core CPI 1.93% | core PCE 2.92% (Fed target 2%)\n  Labor: unemployment 4.1%\n  Rates: fed funds 3.63% | 10Y 4.78% | 10Y-2Y 0.41% (NORMAL)\n  Consumer: UMich sentiment 55.2 | VIX 15.3\n\n---\nRecent market action has seen both ES and NQ moving together, indicating a broad agreement in the current direction. The lead-lag regime is classified as 'Breadth,' suggesting that the market is currently showing strong directional momentum across both indices. This implies that traders should trust this direction more, given the durable nature of the signal. However, the recent divergence in volume profiles and the mixed news headlines suggest some caution. Notably, investors are buying Palantir for a story that isn't entirely true, which could indicate broader market sentiment or speculative behavior. Additionally, geopolitical tensions and rising oil prices have contributed to today's sell-off, particularly in NQ. The upcoming FOMC meeting on September 16th is a key event, and traders should consider reducing size and widening stops into the window of uncertainty. Given these factors, we maintain a long bias but with reduced confidence due to mixed signals. The current setup suggests that any pullback below 7650 for ES or 29300 for NQ could invalidate this bias.",
+  "narrative": "Macro backdrop \u2014\n[2026-09-10] US economic state (FRED):\n  Growth: real GDP 1.5% (q/q ann)\n  Inflation: CPI 2.64% YoY | core CPI 1.93% | core PCE 2.92% (Fed target 2%)\n  Labor: unemployment 4.1%\n  Rates: fed funds 3.63% | 10Y 4.8% | 10Y-2Y 0.4% (NORMAL)\n  Consumer: UMich sentiment 55.2 | VIX 15.72\n\n---\nRecent market action shows a strong move together between ES and NQ, with both indices trading near their session VWAPs. The lead-lag analysis indicates that the current regime is 'Breadth', suggesting broad agreement in the market sentiment rather than a concentrated directional signal. This implies we should trust the direction more but be cautious as the regime is not an edge itself. News highlights geopolitical tensions and rising oil prices, which could impact both indices, particularly NQ given its tech-heavy composition. The event calendar includes key releases like CPI on 12th September and FOMC on 16th September, suggesting we should reduce size into these windows to manage risk. Given the current market state and lead-lag regime, a long-the-dip bias is appropriate with a probability of ~75%, invalidated below 30,375 for NQ.",
   "big_move_headline": {
     "headline": "Today's likeliest institutional move: LONG EURUSD (P 66%, ~0.54% range, conf 31%).",
     "pair": "EURUSD",
@@ -35,57 +35,57 @@
   "synthesis_source": "ollama/qwen2.5",
   "lead_lag": {
     "regime": "BREADTH",
-    "spread_avg": 0.00022,
+    "spread_avg": -0.00011,
     "leader": "NONE",
-    "corr": 0.844,
-    "divergence": false
+    "corr": 0.83,
+    "divergence": true
   },
   "volume_profile": {
     "ES=F": {
       "symbol": "ES=F",
-      "as_of": "2026-09-09T13:40:37.301912+00:00",
+      "as_of": "2026-09-10T12:30:08.491547+00:00",
       "days": 5,
       "bins": 40,
-      "poc": 7721.34,
-      "value_area_low": 7680.07,
-      "value_area_high": 7762.61,
+      "poc": 7697.12,
+      "value_area_low": 7642.46,
+      "value_area_high": 7724.46,
       "high_volume_nodes": [
-        7721.34,
-        7756.71,
-        7697.76,
-        7712.49,
-        7718.39
+        7697.12,
+        7645.88,
+        7721.04,
+        7649.29,
+        7686.88
       ],
       "price_range": [
-        7646.17,
-        7764.08
+        7627.08,
+        7763.75
       ],
       "limitation": "Volume profile = WHERE volume traded (volume-at-price). NOT order-flow delta (buy/sell aggression). True delta needs a CME order-flow feed (Databento/CQG)."
     },
     "NQ=F": {
       "symbol": "NQ=F",
-      "as_of": "2026-09-09T13:40:39.898488+00:00",
+      "as_of": "2026-09-10T12:30:08.525889+00:00",
       "days": 5,
       "bins": 40,
-      "poc": 29517.34,
-      "value_area_low": 29285.15,
-      "value_area_high": 29616.86,
+      "poc": 29512.09,
+      "value_area_low": 29445.67,
+      "value_area_high": 29618.36,
       "high_volume_nodes": [
-        29517.34,
-        29533.93,
-        29567.1,
-        29500.76,
-        29616.86
+        29512.09,
+        29525.38,
+        29565.22,
+        29458.96,
+        29618.36
       ],
       "price_range": [
-        29094.42,
+        29226.5,
         29757.83
       ],
       "limitation": "Volume profile = WHERE volume traded (volume-at-price). NOT order-flow delta (buy/sell aggression). True delta needs a CME order-flow feed (Databento/CQG)."
     }
   },
   "macro_economic": {
-    "text": "[2026-09-09] US economic state (FRED):\n  Growth: real GDP 1.5% (q/q ann)\n  Inflation: CPI 2.64% YoY | core CPI 1.93% | core PCE 2.92% (Fed target 2%)\n  Labor: unemployment 4.1%\n  Rates: fed funds 3.63% | 10Y 4.78% | 10Y-2Y 0.41% (NORMAL)\n  Consumer: UMich sentiment 55.2 | VIX 15.3",
+    "text": "[2026-09-10] US economic state (FRED):\n  Growth: real GDP 1.5% (q/q ann)\n  Inflation: CPI 2.64% YoY | core CPI 1.93% | core PCE 2.92% (Fed target 2%)\n  Labor: unemployment 4.1%\n  Rates: fed funds 3.63% | 10Y 4.8% | 10Y-2Y 0.4% (NORMAL)\n  Consumer: UMich sentiment 55.2 | VIX 15.72",
     "summary": {
       "gdp_growth_pct": 1.5,
       "cpi_yoy_pct": 2.64,
@@ -93,41 +93,49 @@
       "core_pce_yoy_pct": 2.92,
       "unemployment_pct": 4.1,
       "fed_funds_pct": 3.63,
-      "ten_year_pct": 4.78,
-      "yield_curve_10y2y": 0.41,
+      "ten_year_pct": 4.8,
+      "yield_curve_10y2y": 0.4,
       "yield_curve_state": "NORMAL",
       "consumer_sentiment": 55.2,
-      "vix": 15.3
+      "vix": 15.72
     }
   },
-  "news_count": 15,
+  "news_count": 16,
   "event_calendar": [
     {
       "event": "CPI",
       "date": "2026-09-12",
       "source": "cadence_estimate",
       "action": "inflation print 8:30 ET \u2014 reduce size into window",
-      "days_until": 3,
-      "note": "in 3d \u2014 inflation print 8:30 ET \u2014 reduce size into window"
+      "days_until": 2,
+      "note": "in 2d \u2014 inflation print 8:30 ET \u2014 reduce size into window"
     },
     {
       "event": "FOMC meeting",
       "date": "2026-09-16",
       "source": "seed",
       "action": "reduce size / widen stops into the window",
-      "days_until": 7,
-      "note": "in 7d \u2014 reduce size / widen stops into the window"
+      "days_until": 6,
+      "note": "in 6d \u2014 reduce size / widen stops into the window"
     },
     {
       "event": "PCE (Fed's preferred inflation)",
       "date": "2026-09-30",
       "source": "cadence_estimate",
       "action": "8:30 ET \u2014 reduce size into window",
+      "days_until": 20,
+      "note": "in 20d \u2014 8:30 ET \u2014 reduce size into window"
+    },
+    {
+      "event": "ISM Manufacturing PMI",
+      "date": "2026-10-01",
+      "source": "cadence_estimate",
+      "action": "reduce size into the 10:00 ET print",
       "days_until": 21,
-      "note": "in 21d \u2014 8:30 ET \u2014 reduce size into window"
+      "note": "in 21d \u2014 reduce size into the 10:00 ET print"
     }
   ],
-  "scorecard_summary": "Briefing scorecard: n=42 dir-calls, hit 0.643, regime acc 0.377 \u2014 MATURE \u2014 calibration is now interpretable",
+  "scorecard_summary": "Briefing scorecard: n=43 dir-calls, hit 0.628, regime acc 0.386 \u2014 MATURE \u2014 calibration is now interpretable",
   "bias": "size to regime: trust direction more in BREADTH, less in CONCENTRATION; ROTATION_WARN = treat tech-led longs as suspect",
   "provenance": {
     "source": "oracle_morning_briefing",
