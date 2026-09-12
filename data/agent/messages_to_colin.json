@@ -1,6 +1,60 @@
 {
   "messages": [
     {
+      "id": "audit-2026-09-11-price_source_drift",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "[AUDIT] PRICE_SOURCE_DRIFT: AUD_USD median |\u0394close|/close 0.00493 (2026-09-11)",
+      "timestamp": "2026-09-11T14:02:02.224947+00:00",
+      "read": false,
+      "source": "shadow_audit"
+    },
+    {
+      "id": "audit-2026-09-11-price_source_drift",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "[AUDIT] PRICE_SOURCE_DRIFT: AUD_NZD median |\u0394close|/close 0.00227 (2026-09-11)",
+      "timestamp": "2026-09-11T14:02:02.224912+00:00",
+      "read": false,
+      "source": "shadow_audit"
+    },
+    {
+      "id": "audit-2026-09-11-unexplained_divergence",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[AUDIT] UNEXPLAINED_DIVERGENCE: C5 count 6 (2026-09-11)",
+      "timestamp": "2026-09-11T14:02:02.224844+00:00",
+      "read": false,
+      "source": "shadow_audit"
+    },
+    {
+      "id": "audit-2026-09-11-l1_determinism_fail",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[AUDIT] L1_DETERMINISM_FAIL: 2 record(s) not reproducible (2026-09-11)",
+      "timestamp": "2026-09-11T14:02:02.224756+00:00",
+      "read": false,
+      "source": "shadow_audit"
+    },
+    {
+      "id": "audit-2026-09-11-shadow_stale",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[AUDIT] SHADOW_STALE: exit-manager state file not updated by 08:30+30m (2026-09-11)",
+      "timestamp": "2026-09-11T14:02:02.224585+00:00",
+      "read": false,
+      "source": "shadow_audit"
+    },
+    {
+      "id": "invariant-2026-09-11-fills_stale",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "[INVARIANT] FILLS_STALE: all fills ledgers stale (data/ledger/oanda_fills.jsonl, data/execution/fills.jsonl) \u2014 recent writes unverifiable (2026-09-11)",
+      "timestamp": "2026-09-11T13:30:09.107425+00:00",
+      "read": false,
+      "source": "invariant_guard"
+    },
+    {
       "id": "invariant-2026-09-10-fills_stale",
       "priority": "IMPORTANT",
       "emoji": "\ud83d\udfe1",
@@ -393,61 +447,7 @@
       "timestamp": "2026-08-31T13:07:01.997622+00:00",
       "read": false,
       "source": "shadow_audit"
-    },
-    {
-      "id": "audit-2026-08-31-shadow_stale",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[AUDIT] SHADOW_STALE: exit-manager state file not updated by 08:30+30m (2026-08-31)",
-      "timestamp": "2026-08-31T13:07:01.997383+00:00",
-      "read": false,
-      "source": "shadow_audit"
-    },
-    {
-      "id": "invariant-2026-08-30-fills_stale",
-      "priority": "IMPORTANT",
-      "emoji": "\ud83d\udfe1",
-      "text": "[INVARIANT] FILLS_STALE: all fills ledgers stale (data/ledger/oanda_fills.jsonl, data/execution/fills.jsonl) \u2014 recent writes unverifiable (2026-08-30)",
-      "timestamp": "2026-08-30T13:20:12.538455+00:00",
-      "read": false,
-      "source": "invariant_guard"
-    },
-    {
-      "id": "invariant-2026-08-29-fills_stale",
-      "priority": "IMPORTANT",
-      "emoji": "\ud83d\udfe1",
-      "text": "[INVARIANT] FILLS_STALE: all fills ledgers stale (data/ledger/oanda_fills.jsonl, data/execution/fills.jsonl) \u2014 recent writes unverifiable (2026-08-29)",
-      "timestamp": "2026-08-29T13:20:03.770903+00:00",
-      "read": false,
-      "source": "invariant_guard"
-    },
-    {
-      "id": "audit-2026-08-28-price_source_drift",
-      "priority": "IMPORTANT",
-      "emoji": "\ud83d\udfe1",
-      "text": "[AUDIT] PRICE_SOURCE_DRIFT: AUD_NZD median |\u0394close|/close 0.00227 (2026-08-28)",
-      "timestamp": "2026-08-28T13:20:09.606512+00:00",
-      "read": false,
-      "source": "shadow_audit"
-    },
-    {
-      "id": "audit-2026-08-28-unexplained_divergence",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[AUDIT] UNEXPLAINED_DIVERGENCE: C5 count 4 (2026-08-28)",
-      "timestamp": "2026-08-28T13:20:09.606505+00:00",
-      "read": false,
-      "source": "shadow_audit"
-    },
-    {
-      "id": "audit-2026-08-28-l1_determinism_fail",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[AUDIT] L1_DETERMINISM_FAIL: 2 record(s) not reproducible (2026-08-28)",
-      "timestamp": "2026-08-28T13:20:09.606480+00:00",
-      "read": false,
-      "source": "shadow_audit"
     }
   ],
-  "last_updated": "2026-09-10T13:20:02.188197+00:00"
+  "last_updated": "2026-09-11T14:02:02.224970+00:00"
 }
