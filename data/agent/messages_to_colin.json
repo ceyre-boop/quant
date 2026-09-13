@@ -1,6 +1,15 @@
 {
   "messages": [
     {
+      "id": "invariant-2026-09-12-fills_stale",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "[INVARIANT] FILLS_STALE: all fills ledgers stale (data/ledger/oanda_fills.jsonl, data/execution/fills.jsonl) \u2014 recent writes unverifiable (2026-09-12)",
+      "timestamp": "2026-09-12T13:25:14.396979+00:00",
+      "read": false,
+      "source": "invariant_guard"
+    },
+    {
       "id": "audit-2026-09-11-price_source_drift",
       "priority": "IMPORTANT",
       "emoji": "\ud83d\udfe1",
@@ -438,16 +447,7 @@
       "timestamp": "2026-08-31T13:07:01.997640+00:00",
       "read": false,
       "source": "shadow_audit"
-    },
-    {
-      "id": "audit-2026-08-31-l1_determinism_fail",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[AUDIT] L1_DETERMINISM_FAIL: 2 record(s) not reproducible (2026-08-31)",
-      "timestamp": "2026-08-31T13:07:01.997622+00:00",
-      "read": false,
-      "source": "shadow_audit"
     }
   ],
-  "last_updated": "2026-09-11T14:02:02.224970+00:00"
+  "last_updated": "2026-09-12T13:25:14.397004+00:00"
 }
