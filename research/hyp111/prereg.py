@@ -43,9 +43,17 @@ def write(doc: dict, note: str, source: str = "operator_session_2026-09-02") -> 
     ledger = json.loads(LEDGER.read_text())
     if any(e.get("id") == doc["id"] for e in ledger):
         print(f"refusing: {doc['id']} already in the ledger"); return 1
+    ar = doc.get("attack_report")
+    if not (isinstance(ar, dict) and ar.get("causal") is True):
+        print(f"refusing to seal {doc['id']}: no passing formal attack report (research/formal). "
+              f"Attach doc['attack_report'] = research.formal.report.to_dict(attack(rule, doc, ...)) with causal=True.")
+        return 1
+    if not ar.get("multiplicity_ok", False):
+        print(f"refusing to seal {doc['id']}: declared n_trials {ar.get('n_trials_declared')} below the static floor {ar.get('n_trials_floor')}")
+        return 1
     doc["hash_lock"] = canonical_hash(doc)
     path.write_text(json.dumps(doc, indent=2))
-    print(f"signed {path.name}  {doc['hash_lock'][:16]}")
+    print(f"signed {path.name}  {doc['hash_lock'][:16]}   [attack: causal, {ar.get('n_leaves')} leaves; n_trials {ar.get('n_trials_declared')} ≥ floor {ar.get('n_trials_floor')}]")
     ledger.append({
         "id": doc["id"], "name": doc["name"], "status": "PREREGISTERED",
         "date_tested": None, "result": None, "verdict": None, "methodology_note": note,
