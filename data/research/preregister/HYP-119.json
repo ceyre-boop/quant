@@ -1,0 +1,97 @@
+{
+  "id": "HYP-119",
+  "slug": "liquidity_cascade_state",
+  "name": "Liquidity-cascade state (|kinetic|/dampening z>3): magnitude, continuation with realistic fills, proven halt bound",
+  "status": "PREREGISTERED",
+  "frozen_at": "2026-09-13T00:00:00Z",
+  "family": "CASCADE-2026-09",
+  "plan": "Plans/quant-repo-floofy-swan.md (The Blowup Loop)",
+  "lessons_consulted": "research/lessons.jsonl (128 entries; HYP-093/107/109/112 directly relevant)",
+  "state": {
+    "K": "RVOL(t\u22125..t\u22121, vs same-clock median of prior 60 sessions) \u00d7 signed 5-min log return (close t\u22121 / close t\u22125)",
+    "D": "\u03a3 dollar volume(t\u22125..t\u22121) / mean((high\u2212low)/close, t\u22125..t\u22121)",
+    "z": "log(|K|/D) standardised on a causal baseline",
+    "baseline_liquid": "same name, prior 60 sessions",
+    "baseline_microcap": "pooled minutes of all prior event-days (expanding)",
+    "STATE": "z > 3.0",
+    "one_event_per": "30 minutes",
+    "direction": "sign(5-min return)"
+  },
+  "universes": [
+    {
+      "name": "liquid",
+      "what": "23 continuous names, data/cache/minute_bars, 2024-07 \u2192 2026-09 (eval from session 61)"
+    },
+    {
+      "name": "microcap",
+      "what": "single-event-day names in the same cache (HYP-107 harvest), ~230 symbol-days 2025\u20132026; LONG-side cascades only (no borrow model)"
+    }
+  ],
+  "claims": {
+    "a_magnitude": "median forward-30-min log range (high/low) after STATE \u00f7 median over non-STATE minutes of the same sessions; date-block bootstrap (L=5 dates) 95% CI > 1",
+    "b_continuation": "enter in direction at open of m+1 paying the measured half-spread (TICK-039 model at the event's price/range/$vol); exit at min(30 min, first LULD halt-resume bar open \u2212 2% slip, 15:55) receiving the half-spread; mean net return date-block CI > 0 AND > the mean of 1000 random-direction placebos on the same events (p<0.05) AND cross-event permutation p<0.05; BH across the two universes",
+    "c_bound": "for every entry, the Z3 max_loss_before_halt(entry, clock, tier 2, trailing 5 closes) is the declared worst case; realized worst trade reported against the proven bound; any realized loss beyond it = model failure (data or mechanics), reported as such"
+  },
+  "verdict_ladder": {
+    "CASCADE_TRADEABLE": "a \u2227 b \u2227 c on a universe (per universe)",
+    "MAGNITUDE_ONLY": "a only",
+    "NULL": "a fails"
+  },
+  "priors": {
+    "operator": {
+      "prior": "MAGNITUDE_ONLY (2026-09-13)"
+    },
+    "claude": {
+      "prior": "MAGNITUDE_ONLY on liquid; microcap possibly tradeable-but-below-floor; fills decide",
+      "most_likely_failure": "b on liquid: direction null at every resolution tried"
+    }
+  },
+  "frozen_parameters": {
+    "W": 5,
+    "z_threshold": 3.0,
+    "horizon_min": 30,
+    "baseline_sessions": 60,
+    "halt_slip": 0.02,
+    "min_events_per_universe": 40,
+    "placebo_draws": 1000,
+    "block_L": 5,
+    "draws": 5000,
+    "seed": 42
+  },
+  "abort": {
+    "no_rerun": "one run",
+    "no_scan": "no z threshold, window, horizon or universe change after the run",
+    "data": "< 40 events in a universe \u2192 INCONCLUSIVE for that universe"
+  },
+  "n_trials": 1645,
+  "n_trials_note": "1642 after HYP-118 + this doc's 3 claims (counted once per universe pair by BH)",
+  "prior_expectation": "MAGNITUDE_ONLY",
+  "verdict": null,
+  "hash_method": "sha256(json.dumps(doc minus hash_lock, sort_keys=True, separators=(',',':')))",
+  "attack_report": {
+    "rule": "HYP-119 liquidity cascade",
+    "causal": true,
+    "leaks": [],
+    "n_leaves": 14,
+    "causality_proof": "UNSAT: no leaf of 14 can reach t_decision; every dependency is \u2264 t\u22121 (or before the decision clock).",
+    "halt_bound": {
+      "entry": 5.0,
+      "band": 0.1,
+      "max_adverse_frac": 0.1000000000003638,
+      "doubled": false,
+      "tier": 2,
+      "proof": "Z3: sup of (entry\u2212p)/entry subject to p > ref\u00b7(1\u2212band(ref)), ref \u2208 [min,max] of trailing 5 closes \u2192 0.1000"
+    },
+    "cost_lemma": {
+      "half_spread": 0.0041413120370968745,
+      "round_trips": 1.0,
+      "slip": 0.0,
+      "min_gross_per_trade": 0.008282624074193749,
+      "statement": "net = gross \u2212 2\u00b71.0\u00b7s \u2212 0.0; s = clip(exp(0.324468 + 0.193418\u00b7ln P + -0.383361\u00b7ln $V + 0.368907\u00b7ln range), 9e-05, 0.02707) = 0.00414 at P=5.0, range=0.02, $V=200000 \u2192 gross must exceed 0.828% per trade"
+    },
+    "n_trials_declared": 1645,
+    "n_trials_floor": 1559,
+    "multiplicity_ok": true
+  },
+  "hash_lock": "16ecff37d46aadddcd4ed3b59e37b22d13e31e4ab508ec4662d557962d995d9d"
+}
