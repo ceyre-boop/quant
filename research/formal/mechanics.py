@@ -50,8 +50,8 @@ def max_loss_before_halt(entry: float, t: dtime, tier: int = 2, prior_closes: li
     p = z3.Real("p"); ref = z3.Real("ref"); e = z3.RealVal(entry)
     band = _z3_band(ref, doubled, tier)
     # a long is halted (limit-down) when p <= ref*(1-band); before that, p > ref*(1-band)
-    if prior_closes:
-        lo, hi = min(prior_closes + [entry]), max(prior_closes + [entry])
+    if prior_closes is not None and len(prior_closes):
+        pcs = [float(x) for x in prior_closes] + [entry]; lo, hi = min(pcs), max(pcs)
         s.add(ref >= lo, ref <= hi)
     else:
         s.add(ref == e)
