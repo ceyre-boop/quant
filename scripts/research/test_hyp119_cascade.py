@@ -22,19 +22,30 @@ from backtester.luld import halt_flags  # noqa: E402
 HYP = "HYP-119"; OUT = ROOT / "data" / "research" / "hyp119"
 
 
-def trade(ev: dict, direction: float, slip: float) -> tuple[float, float]:
-    """Net return of a 30-minute position in `direction` with measured spread and halt handling.
-    Returns (net, worst_adverse_frac_seen)."""
-    f = pd.DataFrame(ev["bars_fwd"]); s = _half_spread_measured(ev["entry_open"], max(ev["spread_proxy"], 1e-4), max(ev["minute_dollar_vol"], 1e3))
-    entry = ev["entry_open"] * (1 + s * direction)
-    halts = halt_flags(f) if len(f) else np.zeros(0, bool)
-    hi = np.flatnonzero(halts)
-    if len(hi) and hi[0] > 0:
-        exit_px = float(f["open"].iloc[hi[0]]) * (1 - slip * direction); path = f.iloc[: hi[0]]
-    else:
-        exit_px = float(f["close"].iloc[-1]) * (1 - s * direction); path = f
-    adverse = (entry - path["low"].min()) / entry if direction > 0 else (path["high"].max() - entry) / entry
-    return float(direction * (exit_px - entry) / entry), float(adverse)
+def precompute(e: pd.DataFrame, slip: float) -> dict:
+    """Per-event quantities computed ONCE (the slow part); a position's net in either direction is then closed-form:
+    net(d) = d·(exit_d − entry_d)/entry_d with entry_d = o·(1+s·d), exit_d = X·(1 − c·d), c = spread s or halt slip."""
+    o = np.empty(len(e)); s = np.empty(len(e)); X = np.empty(len(e)); c = np.empty(len(e)); lo = np.empty(len(e)); hi = np.empty(len(e)); halted = np.zeros(len(e), bool)
+    for i, ev in enumerate(e.to_dict("records")):
+        f = pd.DataFrame(ev["bars_fwd"]); o[i] = ev["entry_open"]
+        s[i] = _half_spread_measured(o[i], max(ev["spread_proxy"], 1e-4), max(ev["minute_dollar_vol"], 1e3))
+        hf = halt_flags(f) if len(f) else np.zeros(0, bool); h = np.flatnonzero(hf)
+        if len(h) and h[0] > 0:
+            X[i] = float(f["open"].iloc[h[0]]); c[i] = slip; path = f.iloc[: h[0]]; halted[i] = True
+        else:
+            X[i] = float(f["close"].iloc[-1]); c[i] = s[i]; path = f
+        lo[i] = float(path["low"].min()); hi[i] = float(path["high"].max())
+    return {"o": o, "s": s, "X": X, "c": c, "lo": lo, "hi": hi, "halted": halted}
+
+
+def nets(pc: dict, d: np.ndarray) -> np.ndarray:
+    entry = pc["o"] * (1 + pc["s"] * d); exit_px = pc["X"] * (1 - pc["c"] * d)
+    return d * (exit_px - entry) / entry
+
+
+def adverse(pc: dict, d: np.ndarray) -> np.ndarray:
+    entry = pc["o"] * (1 + pc["s"] * d)
+    return np.where(d > 0, (entry - pc["lo"]) / entry, (pc["hi"] - entry) / entry)
 
 
 def main(argv) -> int:
@@ -65,12 +76,11 @@ def main(argv) -> int:
         b = date_block_bootstrap(e["date"].values, lambda ix: float(np.median(fr.values[ix]) / np.median(ns_med["range"])), L=P["block_L"], draws=P["draws"], rng=rng)
         alo, ahi = ci95(b); a_pass = alo > 1
         # (b) continuation
-        tr = [trade(r, r["direction"], P["halt_slip"]) for r in e.to_dict("records")]
-        net = np.array([t[0] for t in tr]); adv = np.array([t[1] for t in tr])
+        pc = precompute(e, P["halt_slip"]); d0 = e["direction"].values.astype(float)
+        net = nets(pc, d0); adv = adverse(pc, d0)
         bb = date_block_bootstrap(e["date"].values, lambda ix: float(net[ix].mean()), L=P["block_L"], draws=P["draws"], rng=rng); blo, bhi = ci95(bb)
-        plac = np.array([np.mean([trade(r, d, P["halt_slip"])[0] for r, d in zip(e.to_dict("records"), rng.choice([-1.0, 1.0], len(e)))]) for _ in range(P["placebo_draws"])])
+        plac = np.array([nets(pc, rng.choice([-1.0, 1.0], len(e))).mean() for _ in range(P["placebo_draws"])])
         p_plac = float((plac >= net.mean()).mean())
-        perm = np.array([net[rng.permutation(len(net))].mean() for _ in range(2000)])   # sign-flip null
         signs = rng.choice([-1, 1], size=(2000, len(net))); perm = (signs * net).mean(axis=1); p_perm = float((perm >= net.mean()).mean())
         b_pass = blo > 0 and p_plac < 0.05 and p_perm < 0.05
         # (c) bound
@@ -78,7 +88,7 @@ def main(argv) -> int:
         breach = int((adv > bounds + 1e-9).sum()); c_pass = breach == 0
         print(f"\n{uni}: n={len(e)}  (a) range ratio {ratio:.2f} CI [{alo:.2f}, {ahi:.2f}] {'PASS' if a_pass else 'FAIL'}   (b) net {net.mean()*100:+.3f}%/trade CI [{blo*100:+.3f}, {bhi*100:+.3f}] placebo p {p_plac:.3f} perm p {p_perm:.3f} {'PASS' if b_pass else 'FAIL'}   "
               f"(c) worst adverse {adv.max()*100:.1f}% vs proven bound median {np.median(bounds)*100:.1f}%, breaches {breach} {'PASS' if c_pass else 'FAIL'}")
-        print(f"   hit {(net>0).mean():.2f}  by direction: up {net[e['direction']>0].mean()*100:+.3f}% (n={int((e['direction']>0).sum())})  down {net[e['direction']<0].mean()*100:+.3f}% (n={int((e['direction']<0).sum())})   halts hit {int(sum(1 for r in e.to_dict('records') if halt_flags(pd.DataFrame(r['bars_fwd'])).any()))}")
+        print(f"   hit {(net>0).mean():.2f}  by direction: up {net[e['direction']>0].mean()*100:+.3f}% (n={int((e['direction']>0).sum())})  down {net[e['direction']<0].mean()*100:+.3f}% (n={int((e['direction']<0).sum())})   halts hit {int(pc['halted'].sum())}")
         verdicts[uni] = "CASCADE_TRADEABLE" if (a_pass and b_pass and c_pass) else ("MAGNITUDE_ONLY" if a_pass else "NULL")
         res["universes"][uni] = {"n": int(len(e)), "a": {"ratio": ratio, "ci": [alo, ahi], "pass": a_pass}, "b": {"net": float(net.mean()), "ci": [blo, bhi], "p_placebo": p_plac, "p_perm": p_perm, "pass": b_pass},
                                  "c": {"worst_adverse": float(adv.max()), "bound_median": float(np.median(bounds)), "breaches": breach, "pass": c_pass}, "verdict": verdicts[uni]}
