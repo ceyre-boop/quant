@@ -1,17 +1,15 @@
 {
-  "date": "2026-09-12",
+  "date": "2026-09-13",
   "phase": 2,
-  "completed_at": "2026-09-12T19:55:10.982436+00:00",
+  "completed_at": "2026-09-13T13:06:58.378620+00:00",
   "training_gate_open": true,
   "retrain": {
     "ran": false,
     "note": "skipped (pass --with-retrain to run harvest+retrain)"
   },
   "synthesis": {
-    "ok": true,
-    "synthesis_source": "ollama/qwen2.5",
-    "directional_bias": "LONG",
-    "confidence": 75
+    "ok": false,
+    "error": "No module named 'sovereign.oracle.reflect_cycle'"
   },
   "hypotheses_run": 5,
   "oracle_cycles": 0,
