@@ -4,6 +4,21 @@ Per-session ledger: what shipped, push status, verdicts, blockers, refusals. New
 The Obsidian brain (`~/Obsidian/Obsidian/00-BRAIN/NEXT.md`) is the cross-project rollup.
 Standing constraints live in `CLAUDE.md` — not restated here.
 
+## 2026-09-14 — The Blowup Loop: formal attack stage built; HYP-119 MAGNITUDE_ONLY; MAGNUM_OPUS written
+
+- `research/formal/` (Z3): look-ahead prover over a declared feature DSL (catches HYP-105's universe leak
+  in tests), LULD halt bounds as theorems, cost lemma from the TICK-039 model, static multiplicity.
+  `prereg.write` now refuses to seal without a passing attack report. `research/lessons.jsonl` (128).
+- **HYP-119** (`16ecff37d46aaddd`, first through all four stages): liquid 7,640 cascade events — forward
+  30-min range **2.71×** CI [2.57,2.87]; continuation **−0.28%/trade** CI [−0.33,−0.22], both directions,
+  placebo p 0.64; **3 breaches of the proven halt bound → model failure reported** (Tier-1 bands, official
+  halt list needed). Microcap 32 < 40 → INCONCLUSIVE. Both priors were MAGNITUDE_ONLY. Trials **1645**.
+- `research/MAGNUM_OPUS.md` — the synthesis Colin asked for (three full-corpus readers); mirrored to the
+  brain; linked from CLAUDE.md. Two background runs of HYP-119 were host-killed before any statistic;
+  fills vectorised (same arithmetic) so the run fits 44 s foreground.
+- Open: AI-memory SSD project (tiered corpus; needs the mount path); cascade fade as a new prereg only
+  if asked; microcap panel too thin for LULD-bound questions.
+
 ## 2026-09-03 (late) — 20-yr carry map, lookback ceiling, model design, HYP-117 holdout IC_ONLY
 
 - Colin: "carry is the only kind of trading I like." Built `research/carry_map/` (map: crash-and-recover

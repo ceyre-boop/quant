@@ -1,0 +1,39 @@
+{
+  "universes": {
+    "liquid": {
+      "n": 7640,
+      "a": {
+        "ratio": 2.712331224012623,
+        "ci": [
+          2.565468016724827,
+          2.869733118786107
+        ],
+        "pass": true
+      },
+      "b": {
+        "net": -0.0027572675323365146,
+        "ci": [
+          -0.0032672217090323925,
+          -0.0022109775799790767
+        ],
+        "p_placebo": 0.639,
+        "p_perm": 1.0,
+        "pass": false
+      },
+      "c": {
+        "worst_adverse": 0.22661673598490711,
+        "bound_median": 0.10569770548818269,
+        "breaches": 3,
+        "pass": false
+      },
+      "verdict": "MAGNITUDE_ONLY"
+    },
+    "microcap": {
+      "n": 32
+    }
+  },
+  "id": "HYP-119",
+  "hash_lock": "16ecff37d46aadddcd4ed3b59e37b22d13e31e4ab508ec4662d557962d995d9d",
+  "run_at": "2026-09-14T06:11:42.112425+00:00",
+  "verdict": "MAGNITUDE_ONLY"
+}
