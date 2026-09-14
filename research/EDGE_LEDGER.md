@@ -8,6 +8,9 @@ recorded with the same care as a pass; corrections are appended, never overwritt
 
 _Last updated 2026-09-03 (HYP-109 → HYP-118, thirteen preregs)._
 
+**The one page that says what it all means:** `research/MAGNUM_OPUS.md` — where Colin has been, what is
+proven, the laws and what each cost, the ten most expensive mistakes, the human layer, where he has to go.
+
 **Named strategy spec:** `research/strategies/FX_CARRY_V1_ADV.md` — FX Carry Trade v1 (adv), the construction that
 survived HYP-115→118 (research spec, not live; HYP-119 pending).
 
