@@ -6,7 +6,7 @@ The authoritative machine record is `data/agent/hypothesis_ledger.json`; this pa
 index of it. Rules: a claim gets on this page only with a sealed prereg and a single run; a null is
 recorded with the same care as a pass; corrections are appended, never overwritten.
 
-_Last updated 2026-09-14 (HYP-109 → HYP-119, fourteen preregs)._
+_Last updated 2026-09-16 (HYP-109 → HYP-120, fifteen preregs)._
 
 **The one page that says what it all means:** `research/MAGNUM_OPUS.md` — where Colin has been, what is
 proven, the laws and what each cost, the ten most expensive mistakes, the human layer, where he has to go.
@@ -29,6 +29,7 @@ survived HYP-115→118 (research spec, not live; HYP-119 pending).
 | **G10 cross-section: carry+mom+value (no parameters)** | **IC_ONLY** — real ranking skill on a sealed 1990–2005 holdout (IC 0.15, 13/16 yrs, p<0.001) but does not beat plain carry; every fitted model (ridge/GBM/'statistics×calculus') NULL or negative | **HYP-117** `8ce9df8d` |
 | **EM carry, M6 ranking + crash mgmt (unseen universe)** | **IC_ONLY** — IC 0.10 (25/30 yrs) real; Sharpe not > plain carry; vol-targeting levered INTO the crashes (DD −34.6% vs raw −24.4%) | **HYP-118** `b185b589` |
 | **Liquidity-cascade state (Navier–Stokes ratio), liquid names** | **MAGNITUDE_ONLY** — next 30 min move 2.7× (CI [2.57,2.87]); riding it loses −0.28%/trade both directions; first hypothesis through the formal attack stage | **HYP-119** `16ecff37` |
+| **TimesFM 3.0 zero-shot** (foundation model) | **CASCADE** by seal; in substance = EWMA on daily vol, = trailing RV on minute range, **no direction** (hit 51.5% = drift, rank corr −0.009) | **HYP-120** `894aafbf` |
 | Carry premium level | +6%/yr (1990–2005) → +1.7%/yr (2006–2026), Sharpe 0.8 → 0.2; hindsight rules top out ~3%/yr | `research/carry_map/` |
 | Everything else tried 2026-09-02 | null | table below |
 
@@ -60,10 +61,11 @@ is not an edge. Do not describe it as one.
 | HYP-117 | G10 cross-sectional selection, sealed holdout 1990–2005, six frozen models | `8ce9df8d` | **IC_ONLY** | baseline IC 0.15 real; fitted models negative; none beats plain carry | `data/research/hyp117/` |
 | HYP-118 | M6 on unseen EM universe 1997–2026 | `b185b589` | **IC_ONLY** | ranking real (2nd unseen sample); no Sharpe edge over carry; vol-targeting failed | `data/research/hyp118/` |
 | HYP-119 | liquidity-cascade state, liquid + microcap, formal-attack sealed | `16ecff37` | **MAGNITUDE_ONLY** | 2.7× range; continuation −0.28%/trade; 3 halt-bound breaches = model failure; microcap thin | `data/research/hyp119/` |
+| HYP-120 | TimesFM 3.0 zero-shot: RV vs persistence, direction, cascade magnitude | `894aafbf` | **CASCADE** (c1/c2 FAIL) | ties EWMA/trailing RV; direction null; frontier model adds nothing | `data/research/hyp120/` |
 
 Correction (2026-09-03): HYP-111/111a/113 fade figures were overstated by 0.06%/event-day (cost-sign
 error, found by HYP-114). Corrected numbers are in `data/research/hyp114/VERDICT.md`; sealed verdicts
-are annotated, not rewritten. Multiplicity after this program: **1645 trials** (`mined_n._total` 1543 + 20 ledger claims + 76 carry-map cells + 6 models). Any new prereg starts at 1646.
+are annotated, not rewritten. Multiplicity after this program: **1648 trials** (`mined_n._total` 1543 + 23 ledger claims + 76 carry-map cells + 6 models). Any new prereg starts at 1649.
 
 ## Where the map says an edge can still exist (for a trader with no speed, size, or information)
 

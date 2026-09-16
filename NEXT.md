@@ -4,6 +4,16 @@ Per-session ledger: what shipped, push status, verdicts, blockers, refusals. New
 The Obsidian brain (`~/Obsidian/Obsidian/00-BRAIN/NEXT.md`) is the cross-project rollup.
 Standing constraints live in `CLAUDE.md` — not restated here.
 
+## 2026-09-16 — HYP-120: TimesFM 3.0 zero-shot = EWMA for vol, null for direction
+
+- Installed google/timesfm 3.0 (MLX, ~400 forecasts/s on M4 Pro; weights non-commercial). Sealed through
+  the formal stage (`894aafbfbb41c9a2`), 50,182 daily + 15,280 minute windows, one run.
+- (1) magnitude: beats RV21, **ties EWMA(0.94)** (Spearman 0.681 = 0.681), over-forecasts 18% → FAIL (needed both).
+  (2) direction: hit 51.45% (= equity drift), per-series rank corr **−0.009** CI<0 → FAIL. (3) cascade: PASS vs
+  the cascade z (0.685 vs 0.001) — but post-hoc descriptive: trailing-30m RV does 0.71–0.73, i.e. a tie.
+  Verdict **CASCADE** by the seal; substance: a good vol-persistence estimator, nothing the desk didn't have.
+  Trials **1648**. `data/research/hyp120/VERDICT.md`.
+
 ## 2026-09-14 — The Blowup Loop: formal attack stage built; HYP-119 MAGNITUDE_ONLY; MAGNUM_OPUS written
 
 - `research/formal/` (Z3): look-ahead prover over a declared feature DSL (catches HYP-105's universe leak
