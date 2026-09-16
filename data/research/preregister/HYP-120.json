@@ -1,0 +1,83 @@
+{
+  "id": "HYP-120",
+  "slug": "timesfm3_zero_shot_magnitude_direction_cascade",
+  "name": "TimesFM 3.0 zero-shot: realized-vol forecast vs persistence, next-day direction, cascade magnitude vs the bar ratio",
+  "status": "PREREGISTERED",
+  "frozen_at": "2026-09-16T00:00:00Z",
+  "family": "FOUNDATION-MODEL-2026-09",
+  "model": {
+    "checkpoint": "google/timesfm-3.0-pytorch (MLX backend, numerically matched)",
+    "license": "weights non-commercial \u2014 research only; nothing here ships",
+    "context": 512,
+    "horizons": {
+      "daily": 5,
+      "minute": 30
+    },
+    "sigma": "(q0.9 \u2212 q0.1)/(2\u00b71.2816) from the model's quantile head",
+    "no_finetune": "zero-shot only; no fitting anywhere"
+  },
+  "data": {
+    "daily_panel": "10 ETFs (daily_universe, 2014+) + 9 G10 vs USD (FRED DEX*), log returns; windows t \u2265 512, every session, 50,182 windows 2016-01 \u2192 2026-08",
+    "cascade": "HYP-119 liquid events (7,640) + one matched non-state minute per event (seed 42), 512-minute causal context from the minute cache"
+  },
+  "claims": {
+    "c1_magnitude": {
+      "target": "std of the next 5 daily log returns",
+      "stat": "\u0394QLIKE = QLIKE(TimesFM \u03c3) \u2212 QLIKE(baseline), QLIKE = ln \u03c3\u00b2 + RV\u00b2/\u03c3\u00b2, pooled by date",
+      "baselines": [
+        "trailing-21 RV",
+        "EWMA \u03bb=0.94"
+      ],
+      "pass": "date-block 95% CI of \u0394QLIKE < 0 against BOTH baselines",
+      "descriptive": "Spearman(\u03c3\u0302, RV) for each"
+    },
+    "c2_direction": {
+      "target": "sign of next-day log return",
+      "stat": "hit rate of sign(step-1 point forecast), pooled by date; Spearman(forecast, realized) per series",
+      "pass": "hit-rate date-block CI > 0.50 AND mean per-series Spearman CI > 0"
+    },
+    "c3_cascade": {
+      "target": "realized 30-min log range after the minute",
+      "stat": "Spearman(TimesFM 30-min \u03c3, range) \u2212 Spearman(cascade z, range) on state \u222a non-state minutes (z for non-state = its raw ratio z)",
+      "pass": "date-block CI of the difference > 0",
+      "descriptive": "each Spearman alone; range ratio state/non-state as the model sees it"
+    }
+  },
+  "verdict_ladder": {
+    "per claim": "PASS / FAIL",
+    "ledger": "MAGNITUDE if c1 passes; DIRECTION if c2 passes; CASCADE if c3 passes; NULL if none \u2014 combined as a list"
+  },
+  "n_trials": 1648,
+  "n_trials_note": "1645 after HYP-119 + 3 claims",
+  "prior_expectation": "MAGNITUDE_ONLY",
+  "priors": {
+    "operator": {
+      "prior": "try all three, see which performs best"
+    },
+    "claude": {
+      "c1": "modest PASS vs RV21, closer vs EWMA",
+      "c2": "FAIL \u2014 hit \u2248 0.50, IC \u2248 0 (118 verdicts)",
+      "c3": "FAIL \u2014 the bar ratio uses volume and range the return series cannot see",
+      "most_likely_failure": "c2 and c3"
+    }
+  },
+  "abort": {
+    "no_rerun": "one run",
+    "no_scan": "no context, horizon, quantile, baseline or panel change after the run"
+  },
+  "verdict": null,
+  "hash_method": "sha256(json.dumps(doc minus hash_lock, sort_keys=True, separators=(',',':')))",
+  "attack_report": {
+    "rule": "TimesFM zero-shot",
+    "causal": true,
+    "leaks": [],
+    "n_leaves": 2,
+    "causality_proof": "UNSAT: no leaf of 2 can reach t_decision; every dependency is \u2264 t\u22121 (or before the decision clock).",
+    "halt_bound": null,
+    "cost_lemma": null,
+    "n_trials_declared": 1648,
+    "n_trials_floor": 1558,
+    "multiplicity_ok": true
+  },
+  "hash_lock": "894aafbfbb41c9a2aeef640876ae6ab47763f2bc1f5b8af85d31899cb68f49e2"
+}
