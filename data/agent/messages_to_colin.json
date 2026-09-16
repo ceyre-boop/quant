@@ -1,6 +1,42 @@
 {
   "messages": [
     {
+      "id": "audit-2026-09-15-price_source_drift",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "[AUDIT] PRICE_SOURCE_DRIFT: AUD_NZD median |\u0394close|/close 0.00227 (2026-09-15)",
+      "timestamp": "2026-09-15T13:53:51.009311+00:00",
+      "read": false,
+      "source": "shadow_audit"
+    },
+    {
+      "id": "audit-2026-09-15-unexplained_divergence",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[AUDIT] UNEXPLAINED_DIVERGENCE: C5 count 6 (2026-09-15)",
+      "timestamp": "2026-09-15T13:53:51.009245+00:00",
+      "read": false,
+      "source": "shadow_audit"
+    },
+    {
+      "id": "audit-2026-09-15-l1_determinism_fail",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[AUDIT] L1_DETERMINISM_FAIL: 2 record(s) not reproducible (2026-09-15)",
+      "timestamp": "2026-09-15T13:53:51.007340+00:00",
+      "read": false,
+      "source": "shadow_audit"
+    },
+    {
+      "id": "invariant-2026-09-15-fills_stale",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "[INVARIANT] FILLS_STALE: all fills ledgers stale (data/ledger/oanda_fills.jsonl, data/execution/fills.jsonl) \u2014 recent writes unverifiable (2026-09-15)",
+      "timestamp": "2026-09-15T13:21:46.986331+00:00",
+      "read": false,
+      "source": "invariant_guard"
+    },
+    {
       "id": "audit-2026-09-14-price_source_drift",
       "priority": "IMPORTANT",
       "emoji": "\ud83d\udfe1",
@@ -413,41 +449,7 @@
       "timestamp": "2026-09-02T13:58:55.430319+00:00",
       "read": false,
       "source": "shadow_audit"
-    },
-    {
-      "id": "msg-20260901160623",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "Health check FAILED: ict_scanner, oracle_pulse are RED. Check logs.",
-      "timestamp": "2026-09-01T16:06:23",
-      "read": false
-    },
-    {
-      "id": "msg-20260901133340",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "Health check FAILED: oracle_pulse are RED. Check logs.",
-      "timestamp": "2026-09-01T13:33:40",
-      "read": false
-    },
-    {
-      "id": "audit-2026-09-01-price_source_drift",
-      "priority": "IMPORTANT",
-      "emoji": "\ud83d\udfe1",
-      "text": "[AUDIT] PRICE_SOURCE_DRIFT: AUD_NZD median |\u0394close|/close 0.00227 (2026-09-01)",
-      "timestamp": "2026-09-01T17:30:56.102907+00:00",
-      "read": false,
-      "source": "shadow_audit"
-    },
-    {
-      "id": "audit-2026-09-01-unexplained_divergence",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[AUDIT] UNEXPLAINED_DIVERGENCE: C5 count 4 (2026-09-01)",
-      "timestamp": "2026-09-01T17:30:56.102888+00:00",
-      "read": false,
-      "source": "shadow_audit"
     }
   ],
-  "last_updated": "2026-09-14T16:24:43.748388+00:00"
+  "last_updated": "2026-09-15T13:53:51.009321+00:00"
 }
