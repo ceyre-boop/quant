@@ -4,6 +4,49 @@ Per-session ledger: what shipped, push status, verdicts, blockers, refusals. New
 The Obsidian brain (`~/Obsidian/Obsidian/00-BRAIN/NEXT.md`) is the cross-project rollup.
 Standing constraints live in `CLAUDE.md` — not restated here.
 
+## 2026-09-20 (d) — SWAP HARNESS: gate (b) is now measurable, and day one already says something (`20a0d00`, pushed)
+
+**`sovereign/financing/swap_probe.py`** — MAGNUM_OPUS §VI.5 gate (b) built. Measures OANDA's real
+per-pair financing instead of modelling it. `snapshot` / `report` / `realized`, plus `alta term SWAP`.
+
+**First reading (2026-09-20, practice) — independently reproduces TICK-024 from a different source:**
+
+| pair | side | financing %/yr | broker take | model | off by |
+|---|---|---|---|---|---|
+| EUR_USD | SHORT | **+0.460** | −2.020 | −0.100 | 4.6× **SIGN FLIP** |
+| GBP_USD | SHORT | −0.810 | −2.030 | −0.080 | 10.1× |
+| AUD_USD | LONG | −0.660 | −2.060 | −0.080 | 8.2× |
+| GBP_JPY | — | **NOT QUOTED** | — | — | — |
+
+- **The broker's take is a flat ~2.03%/yr on all three quoted pairs** — ~40% of the 5%/yr the strategy
+  plans on, before spread and slippage. Provisional at n=1; the verdict needs 10 readings.
+- **On GBP_USD and AUD_USD there is no paying side** — both directions cost. The carry premise (be paid
+  to hold the high-yielder) does not hold on half the book at this broker right now.
+- `SWAP_RATES_ANNUAL` is **4.6–10.1× too small** and **sign-flipped on EURUSD SHORT**. Every backtest
+  using it is mis-costed. **NOT fixed here** — that re-baselines every result and needs its own logged
+  param change (NN#4). TICK-024 remains the gate.
+- **Silent-zero guarded:** a pair quoting exactly 0.0000 both sides is `NOT_QUOTED` and excluded from the
+  book average, never averaged in as 0%/yr. GBP_JPY did exactly this on day one — counting it would have
+  pulled the measured cost toward zero and made the broker look cheaper than it is ("green can be empty").
+- **Read-only, freeze-safe:** all GETs, no order path (asserted), and the modelled table is COPIED with its
+  source named rather than imported — no execution-path module in this tool's import graph (asserted on the
+  AST, not on text). REALIZED mode needs an open position and **refuses to open one**; it says what to open.
+- **plist `scripts/com.alta.swap_snapshot.plist` is TRACKED, NOT LOADED** — operator promotes. 16:00 local,
+  deliberately before OANDA's 17:00 ET rollover.
+- Evidence: 27 new tests; 125 passed across swap + terminal + context + ICT, with the same documented 4 ICT
+  failures and no others.
+
+**⏳ Colin — the two-week clock starts when you promote the plist:**
+`cp scripts/com.alta.swap_snapshot.plist ~/Library/LaunchAgents/ && launchctl load ~/Library/LaunchAgents/com.alta.swap_snapshot.plist`
+Then `alta term SWAP` any day for progress. At 10 readings the headline stops saying PROVISIONAL.
+
+**⚠ Also found while answering "can this make money":** the live paper-carry loop in
+`~/passing-funded-account-1-` has produced **zero trades** — `data/trade_logs/paper_carry_trades.jsonl`
+is 0 lines and its launchd log is nothing but `can't open input file: scripts/paper_carry_daily_tick.sh`.
+Neither that script nor `scripts/paper_carry_daily.py` exists on disk **or in HEAD**. And the honest A/B
+(`data/cb_ab/stats.json`, in a worktree): cb_on avgR 0.311 / Sharpe 1.209 / p=0.000 vs **cb_off avgR 0.098 /
+Sharpe 0.490 / p=0.0605** — with the fabricated CB layer off, the live carry edge does not clear 5%.
+
 ## 2026-09-20 (c) — ROOT CAUSE: nine files were deleted from the working tree; the loops have been crashing on it
 
 **`alta term HEALTH` asked "why", and the answer was not a design problem — it was nine missing files.**
