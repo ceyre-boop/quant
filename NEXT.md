@@ -4,6 +4,37 @@ Per-session ledger: what shipped, push status, verdicts, blockers, refusals. New
 The Obsidian brain (`~/Obsidian/Obsidian/00-BRAIN/NEXT.md`) is the cross-project rollup.
 Standing constraints live in `CLAUDE.md` — not restated here.
 
+## 2026-09-20 (b) — ALTA TERM: the one screen (`ef90123`, pushed)
+
+- **Colin's read, taken as the spec:** "the real edge was turning it into a tool for traders so all my
+  information was in one place, a budget Bloomberg terminal — but now it just looks at a lot of things,
+  pulls data and doesn't do much of anything." Built the terminal.
+- **`alta term`** — interactive, or one-shot: `alta term EURUSD`, `alta term HEALTH`, `alta term HYP carry`.
+  Type a symbol → live bid/ask + spread, your actual position, **max risk in dollars**, the CLOSED DOORS,
+  the Library's precedents with what followed each, and the lessons that apply. Home screen = NAV, the
+  constitution's caps *converted to this account's money*, the drawdown ladder as price levels, kill-switch
+  state, live board for the v015 universe, and what is actually CONFIRMED.
+- **The rule it is built on: no number without its age.** LIVE = fetched this call · FRESH <24h ·
+  STALE = history · DEAD = the writer stopped. `sovereign/terminal/sources.py` returns every reading
+  inside one `Source` shape carrying its own mtime, and the renderers are required to print it.
+- **⚠ What that immediately exposed — 5 of 6 writers are DEAD:** market briefing 8d, forex proximity 19d,
+  proof of life 27d, FRED macro 9d, loop_health_status 27d. Only the hypothesis ledger is current (16h).
+  `loop_health()` deliberately recomputes from each loop's *output* mtime instead of reading
+  `loop_health_status.json`, because that file is itself one of the dead loops and cannot be trusted about
+  its own staleness. **This is the top open item — the terminal is honest about it, it does not fix it.**
+- **Read-only, structurally.** Not a disabled flag — there is no order path in the process. Only `/summary`,
+  `/openPositions`, `/openTrades`, `/pricing`, all GET. A test asserts no request body exists in the broker
+  readers and that no order endpoint / writer / execution-path symbol appears in any of the three modules.
+- **Env trap handled:** `alta` is aliased to system python3 (cannot run this codebase), so `alta term`
+  re-execs `.venv313` whatever invoked the CLI.
+- **Evidence:** 53 new tests (`tests/unit/test_terminal.py`), 81 green with the context suite;
+  `test_pipeline_does_not_import_sovereign` passes; `-k "ict and pipeline"` = **4F/23P**, baseline unchanged.
+  Caught pre-commit: `_rel()` crashed on paths outside the repo — in the missing-file branch, the one that
+  must never fail; and the bare-symbol fallback swallowed mistyped commands as tickers.
+- `rich==15.0.0` already in `requirements.lock.txt` — no new dependency.
+- Live reading at build time: practice NAV **$109,512.90**, flat, per-trade cap **$821.35**, carry heat
+  **$2,737.82**, Library sim 0.342 on the cached tape / **0.190 → ABSTAIN** on live tape.
+
 ## 2026-09-20 — The research record reaches trade time: trade-context packet + MCP tool (`ef7ddfa`, pushed)
 
 - **The gap, stated:** the Alexandrian Library (63 sealed episodes, 10 volumes, `models/alexandrian_library.json`)
