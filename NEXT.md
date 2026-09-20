@@ -4,6 +4,35 @@ Per-session ledger: what shipped, push status, verdicts, blockers, refusals. New
 The Obsidian brain (`~/Obsidian/Obsidian/00-BRAIN/NEXT.md`) is the cross-project rollup.
 Standing constraints live in `CLAUDE.md` — not restated here.
 
+## 2026-09-20 (c) — ROOT CAUSE: nine files were deleted from the working tree; the loops have been crashing on it
+
+**`alta term HEALTH` asked "why", and the answer was not a design problem — it was nine missing files.**
+
+- `git status` showed **9 deletions present in HEAD but absent from the working tree**, uncommitted and
+  unrecorded by anyone: `sovereign/oracle/reflect_cycle.py`, `execute_daily.py`, `execution/alpaca.py`,
+  `execution/paper_trading.py`, `execution/risk.py`, `dashboard/index.html`, `frontend/live_signals.html`,
+  `ict-dashboard/index.html`, `research/yield_frontier/live_shadow.py`.
+- **The launchd jobs were loaded and firing the whole time** — `com.alta.oracle.market_briefing` exit **1**,
+  `com.alta.system_health` exit **1**. `logs/oracle_cycle.err` is the same traceback over and over:
+  `ModuleNotFoundError: No module named 'sovereign.oracle.reflect_cycle'` (from `oracle_cycle.py:49`).
+  The Oracle has been crashing nightly rather than reflecting. That is why the writers went DEAD — not a
+  stopped scheduler, a crashing job.
+- **Restored all nine from HEAD** (`git checkout --`). Non-destructive: the files were in the committed
+  tree, so the working tree now simply matches HEAD again. Nothing to commit for the restore itself.
+- **Verified:** `sovereign.oracle.reflect_cycle` and `oracle_cycle` both import; test collection went
+  **14 errors → 4** (the 4 are the documented `ctrader-open-api` modules); the nine previously
+  *uncollectable* execution suites now run **132 passed**; `tests/unit/test_ict_pipeline.py` is still
+  exactly the documented **4F** (TestScoreAndGrade ×2, TestRiskEngineGate ×2); terminal + context suites
+  81/81. The loops should recover on their next scheduled fire — **not yet observed, do not claim it until
+  a fresh write lands**; re-check with `alta term HEALTH`.
+- **⚠ Open for Colin:** nobody recorded intent to delete these. If a refactor meant to remove them, it
+  needs a commit; if not, find what deleted them — the same hand took out an execution entry point, an
+  Oracle stage and three dashboards without a trace.
+- **⚠ Defect found in the terminal itself while reading EURUSD:** the instrument screen calls the context
+  assembler with `offline=True`, so the Library panel renders `sim 0.342` off a SPY/GLD cache whose last
+  bar is 2024-12-30 while live tape is **0.190 → ABSTAIN**. The degradation box says so; the panel header
+  does not. Fix = live fetch by default on the instrument screen + gray the panel below floor. NOT DONE.
+
 ## 2026-09-20 (b) — ALTA TERM: the one screen (`ef90123`, pushed)
 
 - **Colin's read, taken as the spec:** "the real edge was turning it into a tool for traders so all my
