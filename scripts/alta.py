@@ -222,9 +222,27 @@ def cmd_bench(args) -> None:
     raise SystemExit(subprocess.run(cmd, check=False).returncode)
 
 
+def cmd_term(args) -> None:
+    """ALTA TERM — the read-only terminal.
+
+    Re-execs on .venv313 rather than sys.executable. `alta` is normally aliased
+    to system python3, which cannot run this codebase (3.9 venv can't parse it,
+    3.14 is missing nine declared deps). The terminal therefore always runs on
+    the env built from requirements.lock.txt, whatever invoked the CLI.
+    """
+    venv = ROOT / ".venv313" / "bin" / "python"
+    interp = str(venv) if venv.exists() else sys.executable
+    cmd = [interp, "-m", "sovereign.terminal"] + list(args.command or [])
+    if args.no_color:
+        cmd.append("--no-color")
+    if args.width:
+        cmd += ["--width", str(args.width)]
+    raise SystemExit(subprocess.run(cmd, cwd=str(ROOT), check=False).returncode)
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(
-        prog="alta", description="Alta operator CLI — proof, money, health, discover, validate, bench, kill switch.")
+        prog="alta", description="Alta operator CLI — terminal, proof, money, health, discover, validate, bench, kill switch.")
     sub = ap.add_subparsers(dest="cmd", required=True)
 
     pv = sub.add_parser("prove", help="run the backtest proof engine (equity curve + verdict)")
@@ -284,6 +302,13 @@ def main() -> None:
     bn.add_argument("--tiers", default="90bar,daily,5min,1min")
     bn.add_argument("--cores", type=int, default=None)
     bn.set_defaults(fn=cmd_bench)
+
+    tm = sub.add_parser("term", help="ALTA TERM — read-only terminal: account, risk budget, live board, "
+                                     "instrument context, loop health (interactive, or one-shot)")
+    tm.add_argument("command", nargs="*", help="one-shot command (EURUSD, HEALTH, POS, HYP carry, ...)")
+    tm.add_argument("--no-color", action="store_true")
+    tm.add_argument("--width", type=int, default=None)
+    tm.set_defaults(fn=cmd_term)
 
     args = ap.parse_args()
     args.fn(args)
