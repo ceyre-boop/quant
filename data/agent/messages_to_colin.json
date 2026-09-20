@@ -1,6 +1,15 @@
 {
   "messages": [
     {
+      "id": "invariant-2026-09-19-fills_stale",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "[INVARIANT] FILLS_STALE: all fills ledgers stale (data/ledger/oanda_fills.jsonl, data/execution/fills.jsonl) \u2014 recent writes unverifiable (2026-09-19)",
+      "timestamp": "2026-09-19T19:24:45.408200+00:00",
+      "read": false,
+      "source": "invariant_guard"
+    },
+    {
       "id": "invariant-2026-09-18-fills_stale",
       "priority": "IMPORTANT",
       "emoji": "\ud83d\udfe1",
@@ -440,16 +449,7 @@
       "timestamp": "2026-09-05T13:36:24.270178+00:00",
       "read": false,
       "source": "invariant_guard"
-    },
-    {
-      "id": "invariant-2026-09-04-fills_stale",
-      "priority": "IMPORTANT",
-      "emoji": "\ud83d\udfe1",
-      "text": "[INVARIANT] FILLS_STALE: all fills ledgers stale (data/ledger/oanda_fills.jsonl, data/execution/fills.jsonl) \u2014 recent writes unverifiable (2026-09-04)",
-      "timestamp": "2026-09-04T13:20:02.517690+00:00",
-      "read": false,
-      "source": "invariant_guard"
     }
   ],
-  "last_updated": "2026-09-18T13:35:10.773283+00:00"
+  "last_updated": "2026-09-19T19:24:45.408218+00:00"
 }
