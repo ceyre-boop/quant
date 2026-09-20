@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  com.alta.swap_snapshot — daily quoted-financing reading for the swap measurement.
+
+  TRACKED, NOT LOADED. The operator promotes it deliberately:
+      cp scripts/com.alta.swap_snapshot.plist ~/Library/LaunchAgents/
+      launchctl load ~/Library/LaunchAgents/com.alta.swap_snapshot.plist
+
+  Read-only: the job performs GETs against OANDA and appends one line to
+  data/financing/swap_snapshots.jsonl. It cannot place, modify or close a trade.
+  Re-running the same day replaces that day's row rather than inflating n.
+
+  16:00 local is deliberately BEFORE OANDA's 17:00 ET rollover, so each reading
+  is the rate quoted for that trading day rather than the one that just reset.
+
+  Verdict needs 10 readings (two weeks of business days). Check progress with:
+      alta term SWAP
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.alta.swap_snapshot</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/Users/taboost/quant/.venv313/bin/python</string>
+    <string>-m</string>
+    <string>sovereign.financing.swap_probe</string>
+    <string>snapshot</string>
+  </array>
+
+  <key>WorkingDirectory</key>
+  <string>/Users/taboost/quant</string>
+
+  <key>StartCalendarInterval</key>
+  <dict>
+    <key>Hour</key><integer>16</integer>
+    <key>Minute</key><integer>0</integer>
+  </dict>
+
+  <key>StandardOutPath</key>
+  <string>/Users/taboost/quant/logs/swap_snapshot.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/taboost/quant/logs/swap_snapshot.err</string>
+
+  <key>RunAtLoad</key>
+  <false/>
+</dict>
+</plist>

@@ -379,6 +379,57 @@ def macro(src: S.Source) -> RenderableType:
                  border_style="red" if not src.trustworthy else "blue")
 
 
+def swap(rep, render_text: str) -> RenderableType:
+    """The financing verdict — is the broker leaving anything of the premium."""
+    head_style = ("bold red" if "NO TRADE" in rep.headline
+                  else "yellow" if rep.headline.startswith("PROVISIONAL")
+                  else "bold green")
+    lines: list[RenderableType] = [
+        Text(rep.headline, style=head_style),
+        Text(""),
+    ]
+    t = Table(box=None, expand=True)
+    t.add_column("pair", style="bold", ratio=1)
+    t.add_column("side", ratio=1)
+    t.add_column("financing %/yr", justify="right", ratio=1)
+    t.add_column("broker take", justify="right", ratio=1)
+    t.add_column("model", justify="right", ratio=1)
+    t.add_column("off by", justify="right", ratio=1)
+    for v in rep.pairs:
+        if v.verdict == "NOT_QUOTED":
+            t.add_row(v.pair, Text("—", style="dim"),
+                      Text("NOT QUOTED", style="bold yellow"),
+                      Text("—", style="dim"), Text("—", style="dim"),
+                      Text("—", style="dim"))
+            continue
+        carry_style = ("green" if v.carry_rate_mean_pct > 0
+                       else "red" if v.carry_rate_mean_pct < 0 else "dim")
+        off = "—" if v.model_ratio is None else f"{v.model_ratio:.1f}x"
+        t.add_row(v.pair, v.carry_side,
+                  Text(f"{v.carry_rate_mean_pct:+.3f}", style=carry_style),
+                  Text(f"{v.broker_take_mean_pct:+.3f}", style="red"),
+                  Text("—" if v.modelled_pct is None else f"{v.modelled_pct:+.3f}",
+                       style="dim"),
+                  Text(off, style="bold red" if (v.model_ratio or 0) > 3 else "dim"))
+    lines.append(t)
+    notes = [(v.pair, v.note) for v in rep.pairs if v.note]
+    if notes:
+        lines.append(Text(""))
+        for pair, n in notes:
+            lines.append(Text(f"  ! {pair}: {n}", style="yellow"))
+    if rep.warnings:
+        lines.append(Text(""))
+        for w in rep.warnings:
+            lines.append(Text(f"  · {w}", style="dim yellow"))
+    progress = f"{rep.n_days}/{10} readings"
+    sub = Text(f"{rep.mode} · {progress}"
+               + (f" · {rep.first_day} → {rep.last_day}" if rep.first_day else ""),
+               style="green" if rep.enough_data else "yellow")
+    return Panel(Group(*lines), title="SWAP — what the broker actually takes",
+                 subtitle=sub,
+                 border_style="red" if "NO TRADE" in rep.headline else "yellow")
+
+
 HELP_TEXT = """
 [bold]ALTA TERM[/bold] — read-only. Nothing here can place, modify or close an order.
 
@@ -392,6 +443,7 @@ HELP_TEXT = """
   [bold cyan]EDGE[/bold cyan]            the edge ledger
   [bold cyan]HYP[/bold cyan] [<query>]   the hypothesis record, optionally filtered
   [bold cyan]MACRO[/bold cyan]           FRED backdrop
+  [bold cyan]SWAP[/bold cyan]            what the broker's financing takes from the premium
   [bold cyan]R[/bold cyan]               refresh live data
   [bold cyan]HELP[/bold cyan] / [bold cyan]?[/bold cyan]       this
   [bold cyan]Q[/bold cyan]               quit

@@ -123,6 +123,8 @@ def render(sess: Session, raw: str) -> RenderableType:
         return screens.hypotheses(S.read_json("hyp_ledger"), " ".join(args))
     if cmd == "MACRO":
         return screens.macro(S.read_json("fred"))
+    if cmd == "SWAP":
+        return _swap()
     if cmd == "LIB":
         return _library(sess, args[0] if args else "EURUSD")
     if cmd == "DES":
@@ -149,6 +151,17 @@ def _instrument(sess: Session, symbol: str) -> RenderableType:
     sym = symbol.upper()
     return screens.instrument(sym, S.quote(sym), sess.context(sym),
                               sess.risk(), sess.account())
+
+
+def _swap() -> RenderableType:
+    """The financing verdict. Reads the collected snapshots — never the broker's
+    order surface, and never takes a fresh reading as a side effect of looking."""
+    try:
+        from sovereign.financing import swap_probe as sp
+        return screens.swap(sp.build_report(), "")
+    except Exception as exc:
+        return Panel(Text(f"{type(exc).__name__}: {exc}", style="red"),
+                     title="SWAP", border_style="red")
 
 
 def _library(sess: Session, symbol: str) -> RenderableType:
