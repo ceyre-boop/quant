@@ -4,6 +4,37 @@ Per-session ledger: what shipped, push status, verdicts, blockers, refusals. New
 The Obsidian brain (`~/Obsidian/Obsidian/00-BRAIN/NEXT.md`) is the cross-project rollup.
 Standing constraints live in `CLAUDE.md` — not restated here.
 
+## 2026-09-20 — The research record reaches trade time: trade-context packet + MCP tool (`ef7ddfa`, pushed)
+
+- **The gap, stated:** the Alexandrian Library (63 sealed episodes, 10 volumes, `models/alexandrian_library.json`)
+  had exactly one consumer — `ict/library_bridge.py` — and the ICT path is unproven (permutation p=0.52) and
+  is not where the money is. `research/EDGE_LEDGER.md` + `research/HYPOTHESIS_LESSONS.md` (120 hypotheses,
+  every closed door) were read by humans and by nothing else. A trade got taken with none of it attached.
+- **Shipped:** `sovereign/context/trade_context.py` — read-only packet assembler for one instrument, six
+  sources: Library analogues (similarity/threat/size-modifier/what-followed), edge ledger split
+  confirmed/closed/open, **CLOSED DOORS** (already-refuted ideas, so nothing re-proposes what has been paid
+  for), per-hypothesis lessons, risk caps *quoted from `RISK_CONSTITUTION.md` at call time* (never hardcoded),
+  and the instrument's own logged decisions. Three surfaces: CLI markdown, `--json`, and **`alta_trade_context`
+  on the existing alta-status MCP server** — the agent handoff.
+- **Freeze-safe:** all-new files. Writes nothing, imports nothing from the execution path, imported by nothing
+  in it. Lives in `sovereign/`, so the ICT isolation law is untouched. No source is ever silently mocked —
+  an unreadable source states its reason in `warnings` and drops `completeness` to PARTIAL/DEGRADED.
+- **Honesty gates that fire:** the Library's 0.30 similarity floor is honoured (below it the packet returns
+  `UNKNOWN` + neutral sizing rather than naming a regime — on 2026-09-20 live tape sim was **0.190 → ABSTAIN**);
+  the stale local price cache (last bar 2024-12-30) is labelled STALE per series; the EDGE_LEDGER retraction
+  paragraph (the fade is not an edge) travels with every packet.
+- **Evidence:** 28 new tests green (`tests/unit/test_trade_context.py`);
+  `tests/unit/test_ict_pipeline.py::test_pipeline_does_not_import_sovereign` passes;
+  `-k "ict and pipeline"` = **4F/23P**, the documented baseline, unchanged. The suite caught a real defect
+  pre-commit: `_declassify` stripped underscores as markdown emphasis → `NOT_SIGNIFICANT` became
+  `NOTSIGNIFICANT` and **every closed door classified as OPEN**. Fixed with a comment naming the trap.
+- **⚠ Pre-existing, NOT mine, left alone:** 9 `execution/` files are deleted in the working tree but present
+  in HEAD (`alpaca.py`, `paper_trading.py`, `risk.py`, ...; last touched `36b3902` 2026-07-18). They break
+  collection for **14 test modules**, which is why a full-suite run interrupts. Restore or commit the
+  deletion — one owner needs to decide.
+- **Colin's call, one thing:** the MCP server's `dist/` is gitignored and was rebuilt locally, so
+  `alta_trade_context` only appears after this session's MCP client reconnects. Nothing else is pending.
+
 ## 2026-09-16 — HYP-120: TimesFM 3.0 zero-shot = EWMA for vol, null for direction
 
 - Installed google/timesfm 3.0 (MLX, ~400 forecasts/s on M4 Pro; weights non-commercial). Sealed through
