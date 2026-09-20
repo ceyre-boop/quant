@@ -2,8 +2,9 @@
 /**
  * Alta Status MCP server — read-only window into the Alta Investments operation.
  *
- * Six tools expose the live state Colin keeps asking for by hand: account/positions (live OANDA),
- * morning brief, forex signals, oracle reflections, loop health, and the daily research panel.
+ * Eight tools expose the live state Colin keeps asking for by hand: account/positions (live OANDA),
+ * morning brief, forex signals, oracle reflections, loop health, the daily research panel, proof of
+ * life, and the pre-trade context packet (Alexandrian Library + the whole written research record).
  * Everything is read-only; the only external call is a live OANDA GET (account summary/positions).
  * No tool can place, modify, or close a trade.
  *
@@ -21,6 +22,7 @@ import {
   loopHealth,
   researchPanel,
   proofOfLife,
+  tradeContext,
 } from "./alta.js";
 
 const READONLY = {
@@ -157,6 +159,48 @@ server.registerTool(
     annotations: READONLY,
   },
   async () => ok(proofOfLife()),
+);
+
+server.registerTool(
+  "alta_trade_context",
+  {
+    title: "Alta trade context packet",
+    description:
+      "EVERYTHING this desk already knows about one instrument, assembled for the moment a trade is " +
+      "being considered. Six sources in one packet: (1) the Alexandrian Library — the nearest " +
+      "historical analogues to today's tape across 63 sealed episodes in 10 volumes, with similarity, " +
+      "threat level, size modifier and what actually followed each precedent; (2) the edge ledger — " +
+      "what is CONFIRMED vs FRAGILE vs null, filtered to this instrument; (3) CLOSED DOORS — every " +
+      "hypothesis already refuted here, so nothing re-proposes an idea the desk has already paid for; " +
+      "(4) the one-line lesson from each relevant hypothesis; (5) the ratified risk caps, quoted from " +
+      "RISK_CONSTITUTION.md at call time rather than hardcoded; (6) this instrument's own logged " +
+      "decisions. READ THE CLOSED DOORS FIRST. Read-only: writes nothing, places nothing, recommends " +
+      "nothing, and never returns a position size. A degraded packet always says so in `warnings` and " +
+      "`completeness`; an unavailable source states its reason. Absence of a closed door is not " +
+      "evidence of an edge.",
+    inputSchema: {
+      instrument: z
+        .string()
+        .describe("EURUSD, GBP_JPY, USDJPY, SPY, QQQ — FX pairs in any separator style."),
+      offline: z
+        .boolean()
+        .optional()
+        .describe(
+          "Skip the live price fetch and use the local cache for the Library query. Much faster, " +
+            "but the cache is stale — the packet labels every series it serves as STALE.",
+        ),
+      include_library: z
+        .boolean()
+        .optional()
+        .describe(
+          "Set false to skip the Alexandrian Library entirely and return only the written record " +
+            "(instant). Default true.",
+        ),
+    },
+    annotations: READONLY,
+  },
+  async ({ instrument, offline, include_library }) =>
+    ok(await tradeContext({ instrument, offline, include_library })),
 );
 
 const transport = new StdioServerTransport();

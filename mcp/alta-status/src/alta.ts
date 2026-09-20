@@ -3,9 +3,13 @@
  * Every reader degrades gracefully (returns a `{ available: false, note }` shape) so a missing
  * file or a dead source never throws across the MCP boundary.
  */
-import { readFileSync, readdirSync, statSync } from "node:fs";
+import { execFile } from "node:child_process";
+import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
-import { PATHS, loadOandaCreds } from "./config.js";
+import { promisify } from "node:util";
+import { ALTA_ROOT, PATHS, loadOandaCreds } from "./config.js";
+
+const execFileAsync = promisify(execFile);
 
 function readJson(path: string): any | null {
   try {
@@ -208,4 +212,62 @@ export function researchPanel(opts: { date?: string; source?: string } = {}): an
     sources,
     provenance_note: d.provenance?.note,
   };
+}
+
+
+// ── trade context (Alexandrian Library + the written research record) ─────────
+
+/**
+ * Pick the interpreter that can actually run this repo.
+ *
+ * The repo has no working default: .venv/ is Python 3.9.6 and cannot parse the
+ * codebase, system python3 is missing declared dependencies. .venv313 is the
+ * env built from requirements.lock.txt. Override with ALTA_PYTHON.
+ */
+function altaPython(): string {
+  if (process.env.ALTA_PYTHON) return process.env.ALTA_PYTHON;
+  const venv313 = join(ALTA_ROOT, ".venv313", "bin", "python");
+  return existsSync(venv313) ? venv313 : "python3";
+}
+
+export interface TradeContextOpts {
+  instrument: string;
+  offline?: boolean;
+  include_library?: boolean;
+}
+
+/**
+ * Assemble the full local research record for one instrument.
+ *
+ * Shells `python -m sovereign.context.trade_context <instrument> --json`, which is
+ * read-only by construction: it queries the Alexandrian Library, the edge ledger,
+ * the hypothesis lessons, the risk constitution and the live decision logs, and
+ * writes nothing anywhere.
+ */
+export async function tradeContext(opts: TradeContextOpts): Promise<any> {
+  const instrument = String(opts.instrument ?? "").trim();
+  // Instruments only. The value is passed as an argv element (never a shell
+  // string), and this keeps it a symbol even so.
+  if (!/^[A-Za-z0-9_/.^=-]{1,24}$/.test(instrument)) {
+    return { available: false, note: `invalid instrument symbol: ${JSON.stringify(instrument)}` };
+  }
+
+  const args = ["-m", "sovereign.context.trade_context", instrument, "--json"];
+  if (opts.offline) args.push("--offline");
+  if (opts.include_library === false) args.push("--no-library");
+
+  try {
+    const { stdout } = await execFileAsync(altaPython(), args, {
+      cwd: ALTA_ROOT,
+      timeout: 90_000,
+      maxBuffer: 8 * 1024 * 1024,
+      env: { ...process.env, PYTHONPATH: ALTA_ROOT },
+    });
+    return JSON.parse(stdout);
+  } catch (err: any) {
+    const detail = err?.killed
+      ? "timed out after 90s (live price fetch is the usual cause — retry with offline=true)"
+      : (err?.stderr || err?.message || String(err)).toString().slice(0, 600);
+    return { available: false, note: `trade_context failed: ${detail}` };
+  }
 }
