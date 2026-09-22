@@ -1,0 +1,30 @@
+{
+  "date": "2026-09-21",
+  "direction": "NEUTRAL",
+  "confidence": 0.0,
+  "reasoning": [
+    "briefing STALE \u2014 not used for direction",
+    "macro context present (2026-09-21)"
+  ],
+  "inputs_used": [
+    "daily_panel",
+    "fred_macro"
+  ],
+  "inputs_missing": [
+    "calendar",
+    "gdelt",
+    "sentiment_board"
+  ],
+  "context_fraction_fresh": 0.333,
+  "generated_at": "2026-09-21T12:01:13+00:00",
+  "realised": {
+    "direction": "BULLISH",
+    "correct": null,
+    "scored_at": "2026-09-21T20:37:15+00:00",
+    "proxy": "SPY",
+    "return": 0.0154,
+    "neutral_band": 0.0025,
+    "close": 773.42,
+    "prev_close": 761.69
+  }
+}
