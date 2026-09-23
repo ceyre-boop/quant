@@ -1,0 +1,32 @@
+{
+  "date": "2026-09-22",
+  "direction": "NEUTRAL",
+  "confidence": 43.355,
+  "reasoning": [
+    "briefing directional_bias=NEUTRAL conf=65.0",
+    "regime: NQ leading / pulling away from ES \u2014 narrow, tech/AI-driven, FRAGILE. Trust directional moves less; watch for reversal when AI names cool.",
+    "macro context present (2026-09-22)"
+  ],
+  "inputs_used": [
+    "briefing",
+    "daily_panel",
+    "fred_macro",
+    "sentiment_board"
+  ],
+  "inputs_missing": [
+    "calendar",
+    "gdelt"
+  ],
+  "context_fraction_fresh": 0.667,
+  "generated_at": "2026-09-22T12:00:05+00:00",
+  "realised": {
+    "direction": "NEUTRAL",
+    "correct": null,
+    "scored_at": "2026-09-22T20:30:03+00:00",
+    "proxy": "SPY",
+    "return": 0.000194,
+    "neutral_band": 0.0025,
+    "close": 773.65,
+    "prev_close": 773.5
+  }
+}
