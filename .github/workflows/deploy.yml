@@ -28,6 +28,14 @@ jobs:
           bun install --frozen-lockfile
           bun run build
 
+      - name: Install DESK as landing page, terminal moves to /terminal/
+        run: |
+          mkdir -p _site/terminal
+          ls -A _site | while read -r f; do
+            [ "$f" = "terminal" ] || mv "_site/$f" _site/terminal/
+          done
+          cp desk/index.html _site/index.html
+
       - name: Copy data snapshots
         run: |
           mkdir -p _site/ict _site/data/agent _site/data/forensics
@@ -50,6 +58,9 @@ jobs:
           # is REQUIRED for on-demand lookup — www.sec.gov/files is not CORS-open,
           # so without it the browser cannot resolve a ticker at all.
           cp -r data/fundamentals/. _site/data/fundamentals/ 2>/dev/null || true
+
+          # Terminal now lives at /terminal/; mirror the warm-path data it reads.
+          cp -r _site/data _site/terminal/data 2>/dev/null || true
 
           echo "--- _site ---"; ls -la _site; ls -la _site/data/fundamentals || true
 
