@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>THE DESK — trade like a good trader</title>
+<style>
+:root{
+  --bg:#0a0c10; --panel:#11141b; --line:#232833; --txt:#e8eaf0; --dim:#8b93a7;
+  --green:#3ddc84; --red:#ff5d5d; --amber:#ffb224; --blue:#4da3ff; --mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--txt);font-family:var(--mono);margin:0;padding:0 0 80px;font-size:14px;line-height:1.5}
+header{position:sticky;top:0;z-index:10;background:#0d1016;border-bottom:1px solid var(--line);padding:10px 16px;display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+header .brand{font-weight:700;letter-spacing:2px;font-size:16px}
+header .brand small{display:block;letter-spacing:0;font-weight:400;color:var(--dim);font-size:11px}
+.hstat{margin-left:auto;display:flex;gap:14px;align-items:center;font-size:12px;color:var(--dim)}
+.hstat b{color:var(--txt)}
+.pill{padding:3px 12px;border-radius:20px;font-weight:700;font-size:12px;letter-spacing:1px}
+.pill.live{background:#0f2e1d;color:var(--green);border:1px solid var(--green)}
+.pill.cool{background:#2e240f;color:var(--amber);border:1px solid var(--amber)}
+.pill.lock{background:#2e0f0f;color:var(--red);border:1px solid var(--red)}
+main{max-width:1060px;margin:0 auto;padding:18px 16px}
+section{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px;margin:16px 0}
+h2{margin:0 0 4px;font-size:15px;letter-spacing:2px}
+.sub{color:var(--dim);font-size:12px;margin:0 0 14px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+@media(max-width:700px){.grid2,.grid3{grid-template-columns:1fr}}
+label{display:block;font-size:11px;letter-spacing:1px;color:var(--dim);margin:10px 0 4px;text-transform:uppercase}
+input[type=text],input[type=number],select,textarea{width:100%;background:#0b0e14;border:1px solid var(--line);color:var(--txt);border-radius:6px;padding:9px 10px;font-family:var(--mono);font-size:14px}
+textarea{min-height:56px;resize:vertical}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue)}
+.seg{display:flex;gap:8px}
+.seg button{flex:1;padding:10px;background:#0b0e14;border:1px solid var(--line);color:var(--dim);border-radius:6px;font-family:var(--mono);font-size:14px;cursor:pointer}
+.seg button.on{border-color:var(--green);color:var(--green);font-weight:700}
+.seg button.on.short{border-color:var(--red);color:var(--red)}
+input[type=range]{width:100%;accent-color:var(--green)}
+.rval{font-size:20px;font-weight:700}
+.calc{background:#0b0e14;border:1px solid var(--line);border-radius:8px;padding:12px;margin-top:12px;font-size:13px}
+.calc .row{display:flex;justify-content:space-between;padding:3px 0}
+.calc .row b{font-size:15px}
+.warn{background:#2e240f;border:1px solid var(--amber);color:var(--amber);border-radius:6px;padding:8px 12px;margin-top:10px;font-size:12px}
+.err{background:#2e0f0f;border:1px solid var(--red);color:var(--red);border-radius:6px;padding:8px 12px;margin-top:10px;font-size:12px}
+.okk{background:#0f2e1d;border:1px solid var(--green);color:var(--green);border-radius:6px;padding:8px 12px;margin-top:10px;font-size:12px}
+button.big{width:100%;margin-top:14px;padding:14px;font-size:16px;font-weight:700;letter-spacing:2px;background:var(--green);color:#04120a;border:none;border-radius:8px;cursor:pointer;font-family:var(--mono)}
+button.big:disabled{background:#2a2f3a;color:#6b7280;cursor:not-allowed}
+button.ghost{background:transparent;border:1px solid var(--line);color:var(--dim);border-radius:6px;padding:8px 12px;font-family:var(--mono);font-size:12px;cursor:pointer}
+button.ghost:hover{border-color:var(--red);color:var(--red)}
+button.ghost.go:hover{border-color:var(--green);color:var(--green)}
+.pos{border:1px solid var(--line);border-radius:8px;padding:12px;margin:10px 0;background:#0d1118}
+.pos .top{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.pos .tick{font-size:18px;font-weight:700}
+.pos .dirL{color:var(--green)} .pos .dirS{color:var(--red)}
+.pos .meta{color:var(--dim);font-size:12px;margin-top:6px}
+.pos .r{font-size:22px;font-weight:700}
+.pos .r.positive{color:var(--green)} .pos .r.negative{color:var(--red)}
+.meter{height:10px;background:#0b0e14;border:1px solid var(--line);border-radius:6px;overflow:hidden;margin:6px 0}
+.meter > div{height:100%;background:var(--green)}
+.meter.danger > div{background:var(--red)}
+table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}
+th{color:var(--dim);text-align:left;padding:6px;border-bottom:1px solid var(--line);font-weight:400;letter-spacing:1px}
+td{padding:6px;border-bottom:1px solid #171c26}
+.lesson{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid #171c26}
+.lesson:last-child{border-bottom:none}
+.lesson input{margin-top:4px;transform:scale(1.3);accent-color:var(--green)}
+.lesson .lt{font-weight:700;font-size:13px}
+.lesson .ld{color:var(--dim);font-size:12px}
+.lesson.done .lt{color:var(--green)}
+details{margin-top:10px}
+summary{cursor:pointer;color:var(--dim);font-size:12px;letter-spacing:1px}
+canvas{width:100%;height:120px;background:#0b0e14;border:1px solid var(--line);border-radius:6px;margin-top:8px}
+footer{max-width:1060px;margin:30px auto 0;padding:0 16px;color:var(--dim);font-size:12px;text-align:center}
+.kv{display:flex;justify-content:space-between;font-size:13px;padding:4px 0;border-bottom:1px solid #171c26}
+.kv b{font-size:14px}
+.flag{color:var(--amber);font-size:11px;border:1px solid var(--amber);border-radius:4px;padding:1px 6px;margin-left:6px}
+.rev{font-size:11px;color:var(--dim);margin-top:6px}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">THE DESK<small>trade like a good trader, even when you don't feel like it</small></div>
+  <div class="hstat">
+    <span>Equity <b id="hEquity">—</b></span>
+    <span>Day P&amp;L <b id="hDay">—</b></span>
+    <span id="hPill" class="pill live">LIVE</span>
+  </div>
+</header>
+<main>
+
+<section id="gate">
+  <h2>01 · NEW POSITION — THE GATE</h2>
+  <p class="sub">The machine sizes the trade. You supply the thesis. No stop, no trade. No thesis, no trade.</p>
+  <div class="grid3">
+    <div><label>Ticker</label><input type="text" id="fTick" placeholder="AAPL" autocapitalize="characters"></div>
+    <div><label>Direction</label><div class="seg" id="fDir"><button data-v="long" class="on">LONG</button><button data-v="short">SHORT</button></div></div>
+    <div><label>Time window</label><select id="fWin"><option>Intraday</option><option>1–3 days</option><option>1–2 weeks</option><option>1–3 months</option></select></div>
+  </div>
+  <div class="grid3">
+    <div><label>Entry price (your fill)</label><input type="number" id="fEntry" step="any" placeholder="0.00"></div>
+    <div><label>Stop price (required)</label><input type="number" id="fStop" step="any" placeholder="0.00"></div>
+    <div><label>Target price</label><input type="number" id="fTarget" step="any" placeholder="0.00"></div>
+  </div>
+  <div>
+    <label>Risk per trade: <span class="rval" id="riskLbl">1.00%</span></label>
+    <input type="range" id="fRisk" min="0.25" max="2" step="0.25" value="1">
+  </div>
+  <div class="calc" id="calcBox">
+    <div class="row"><span>Risk $</span><b id="cRisk$">—</b></div>
+    <div class="row"><span>Risk / share</span><b id="cRps">—</b></div>
+    <div class="row"><span>Size (machine)</span><b id="cSize">—</b></div>
+    <div class="row"><span>Position value</span><b id="cVal">—</b></div>
+    <div class="row"><span>Reward : Risk</span><b id="cRR">—</b></div>
+  </div>
+  <div id="gateMsg"></div>
+  <div class="grid2">
+    <div><label>Known knowns</label><textarea id="fKK" placeholder="What do you actually know? Facts only."></textarea></div>
+    <div><label>Known unknowns</label><textarea id="fKU" placeholder="What don't you know that matters?"></textarea></div>
+  </div>
+  <div>
+    <label>Probability this works: <span class="rval" id="probLbl">55%</span></label>
+    <input type="range" id="fProb" min="10" max="90" step="5" value="55">
+    <div class="sub" style="margin:4px 0 0">No 0%. No 100%. Unknown unknowns exist.</div>
+  </div>
+  <div><label>Falsification — what proves this wrong?</label><input type="text" id="fFals" placeholder="e.g. closes below $X, thesis breaks if..."></div>
+  <div>
+    <label>Regime check — is this setup appropriate RIGHT NOW?</label>
+    <div class="seg" id="fReg"><button data-v="yes">YES</button><button data-v="no">NO</button></div>
+    <div><label>Why? (one line)</label><input type="text" id="fRegWhy" placeholder="Market regime, session, volatility..."></div>
+  </div>
+  <div id="overrideBox" style="display:none">
+    <label>Override reason (logged forever, flagged in calibration)</label>
+    <input type="text" id="fOvr" placeholder="Why are you overriding the machine's size?">
+  </div>
+  <div class="seg" style="margin-top:12px;max-width:340px">
+    <button id="btnOvr" class="ghost">Override machine size</button>
+  </div>
+  <button class="big" id="btnLog">LOG POSITION</button>
+</section>
+<section id="positions">
+  <h2>02 · OPEN POSITIONS</h2>
+  <p class="sub">Mark with your broker's price. Close with your actual fill. The R is computed, not felt.</p>
+  <div id="openList"><p class="sub">No open positions. The best trade is often no trade.</p></div>
+</section>
+
+<section id="guard">
+  <h2>03 · GUARDRAILS</h2>
+  <p class="sub">Tenet 3: a mature system can say "I am currently unreliable" — then it freezes itself. This is the freeze.</p>
+  <div class="kv"><span>Daily loss limit</span><b id="gLim">—</b></div>
+  <div class="kv"><span>Realized today</span><b id="gDay">—</b></div>
+  <div class="meter" id="gMeterWrap"><div id="gMeter" style="width:0%"></div></div>
+  <div class="kv"><span>Consecutive full-stop losses</span><b id="gCons">0</b></div>
+  <div class="kv"><span>Cooldown</span><b id="gCool">—</b></div>
+  <div class="kv"><span>Machine overrides (all time)</span><b id="gOvr">0</b></div>
+  <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+    <button class="ghost" id="btnFreeze">LOCK THE DESK (I'm tilting)</button>
+    <button class="ghost go" id="btnUnlock" style="display:none">Unlock for tomorrow</button>
+  </div>
+  <div id="guardMsg"></div>
+</section>
+
+<section id="calib">
+  <h2>04 · CALIBRATION — THE MIRROR</h2>
+  <p class="sub">Scored against your original call, as stated. Right direction at the wrong time is still wrong.</p>
+  <div class="grid3">
+    <div class="kv"><span>Closed trades</span><b id="cN">0</b></div>
+    <div class="kv"><span>Win rate</span><b id="cW">—</b></div>
+    <div class="kv"><span>Avg R</span><b id="cR">—</b></div>
+  </div>
+  <div class="grid3" style="margin-top:8px">
+    <div class="kv"><span>Expectancy (R)</span><b id="cE">—</b></div>
+    <div class="kv"><span>Total R</span><b id="cT">—</b></div>
+    <div class="kv"><span>Total $</span><b id="c$">—</b></div>
+  </div>
+  <label>Predicted probability vs actual hit rate</label>
+  <table><thead><tr><th>You said</th><th>n</th><th>You were right</th><th>Verdict</th></tr></thead><tbody id="calTable"></tbody></table>
+  <label>Cumulative R</label>
+  <canvas id="eqCurve" width="1000" height="120"></canvas>
+  <label>Blunder log — overrides and what they cost</label>
+  <div id="blunderList"><p class="sub">No overrides. The machine thanks you.</p></div>
+</section>
+
+<section id="lessons">
+  <h2>05 · LESSONS — KNOWING IS NOT DOING</h2>
+  <p class="sub">From thousands of backtested trades. A validated rule you won't obey is a wish. Check the ones you obeyed today.</p>
+  <div id="lessonList"></div>
+</section>
+
+<section id="settings">
+  <h2>06 · DESK SETTINGS</h2>
+  <div class="grid3">
+    <div><label>Account equity $</label><input type="number" id="sEq" step="any"></div>
+    <div><label>Daily loss lock %</label><input type="number" id="sDaily" step="any"></div>
+    <div><label>Cooldown (min) after 2 stop-outs</label><input type="number" id="sCool" step="1"></div>
+  </div>
+  <div class="grid3" style="margin-top:8px">
+    <div><label>Max open positions</label><input type="number" id="sMax" step="1"></div>
+    <div><label>Default risk %</label><input type="number" id="sRisk" step="0.25"></div>
+    <div style="display:flex;align-items:flex-end"><button class="ghost go" id="btnSaveS">Save settings</button></div>
+  </div>
+  <details><summary>DATA — EXPORT / IMPORT / WIPE</summary>
+    <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+      <button class="ghost go" id="btnExport">Export JSON</button>
+      <button class="ghost go" id="btnImport">Import JSON</button>
+      <input type="file" id="fileImport" accept=".json" style="display:none">
+      <button class="ghost" id="btnWipe">Wipe everything</button>
+    </div>
+    <p class="sub">Everything lives in this browser's localStorage. Export regularly — a wiped browser is a wiped memory.</p>
+  </details>
+</section>
+
+</main>
+<footer>
+  <p>"You miss 100% of the shots you don't take." — Colin</p>
+  <p class="sub">THE DESK · v1 · the machine enforces, you decide, the log remembers</p>
+</footer>
+<script>
+'use strict';
+/* ============ STATE ============ */
+const KEY='thedesk.v1';
+const DEF={settings:{equity:1500,dailyLossPct:3,cooldownMin:30,maxPos:3,defRisk:1},
+  trades:[], lessons:{}, meta:{coolUntil:0, lockDate:null, manualLock:false, seq:1}};
+let S;
+function load(){ try{ const r=localStorage.getItem(KEY); S=r?Object.assign({},DEF,JSON.parse(r)):JSON.parse(JSON.stringify(DEF)); }
+  catch(e){ S=JSON.parse(JSON.stringify(DEF)); } S.settings=Object.assign({},DEF.settings,S.settings); S.meta=Object.assign({},DEF.meta,S.meta); }
+function save(){ localStorage.setItem(KEY,JSON.stringify(S)); }
+const $=id=>document.getElementById(id);
+const todayStr=()=>new Date().toISOString().slice(0,10);
+const fmt$=n=>(n<0?'-$':'$')+Math.abs(n).toFixed(2);
+const fmtR=n=>(n>0?'+':'')+n.toFixed(2)+'R';
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ============ LESSONS (from the quant research ledger) ============ */
+const LESSONS=[
+ ['L1','The Exact Setup Exists. Trade Only That.','Every condition present or it is a veto, not a trade. Outside your proven configuration you are noise-trading.'],
+ ['L2','Know Your Anti-Edge Hours.','Some sessions are not harder — they are systematically wrong. Name yours. No new positions there. No exceptions.'],
+ ['L3','Grade Labels Lie.','A+ setups are often late entries wearing confirmation. Treat A+ as A. The market awards gold stars to late entries.'],
+ ['L4','Retail Zones Are Traps.','Discount/premium labels describe where retail waits. Institutions do not wait where retail waits.'],
+ ['L5','Every Edge Has a Half-Life.','Exits expire. Define the hold window before entry — then honor it instead of giving gains back.'],
+ ['L6','Buy Pullbacks, Not Breakouts.','Same win rate, 3x the R. Be right about direction, then be early about timing.'],
+ ['L7','Read the Fear Curve.','Backwardation means something is already breaking. Do not add risk into a breaking regime.'],
+ ['L8','Conflicting Signals = No Signal.','When two signals compete, tighten the gate or veto. Confusion is information.'],
+ ['L9','Knowing Is Not Doing.','A validated rule you will not obey is a wish. This page is the implementation layer. Obey it.']
+];
+
+/* ============ GATE ============ */
+let dir='long', regime=null, overriding=false;
+function segWire(id,fn){ const box=$(id); box.querySelectorAll('button').forEach(b=>b.onclick=()=>{ box.querySelectorAll('button').forEach(x=>x.classList.remove('on','short')); b.classList.add('on'); if(b.dataset.v==='short')b.classList.add('short'); fn(b.dataset.v); updateCalc(); }); }
+function num(id){ const v=parseFloat($(id).value); return isFinite(v)?v:NaN; }
+function readForm(){ return { tick:$('fTick').value.trim().toUpperCase(), entry:num('fEntry'), stop:num('fStop'), target:num('fTarget'),
+  riskPct:parseFloat($('fRisk').value), kk:$('fKK').value.trim(), ku:$('fKU').value.trim(), prob:parseInt($('fProb').value),
+  win:$('fWin').value, fals:$('fFals').value.trim(), regWhy:$('fRegWhy').value.trim(), ovr:$('fOvr').value.trim() }; }
+function updateCalc(){
+  const f=readForm(), eq=S.settings.equity, box=$('gateMsg'); box.innerHTML='';
+  $('riskLbl').textContent=f.riskPct.toFixed(2)+'%'; $('probLbl').textContent=f.prob+'%';
+  if(!isFinite(f.entry)||!isFinite(f.stop)||f.entry===f.stop){ $('cRisk$').textContent='—';$('cRps').textContent='—';$('cSize').textContent='—';$('cVal').textContent='—';$('cRR').textContent='—'; return null; }
+  const d=dir==='long'?1:-1, rps=Math.abs(f.entry-f.stop);
+  if((dir==='long'&&f.stop>=f.entry)||(dir==='short'&&f.stop<=f.entry)){ box.innerHTML='<div class="err">Stop is on the wrong side for a '+dir.toUpperCase()+'. The machine refuses.</div>'; return null; }
+  const risk$=eq*f.riskPct/100, size=Math.max(1,Math.floor(risk$/rps)), val=size*f.entry;
+  $('cRisk$').textContent=fmt$(risk$); $('cRps').textContent='$'+rps.toFixed(2);
+  $('cSize').textContent=size+' shares'+(overriding?' <span class="flag">OVERRIDE</span>':'');
+  $('cVal').textContent=fmt$(val);
+  let rr='—';
+  if(isFinite(f.target)&&f.target!==f.entry){ const rw=Math.abs(f.target-f.entry)/rps; rr=rw.toFixed(2)+' : 1';
+    if(rw<1) box.innerHTML='<div class="warn">Reward:risk is below 1. At a coin-flip win rate this trade has negative expectancy. The machine will log it, but it is telling you no.</div>'; }
+  $('cRR').textContent=rr;
+  return {d,rps,risk$,size,val};
+}
+function guardState(){
+  const now=Date.now(), t=todayStr();
+  const locked = S.meta.manualLock || S.meta.lockDate===t;
+  const cool = S.meta.coolUntil>now;
+  return {locked, cool, coolMs:Math.max(0,S.meta.coolUntil-now)};
+}
+function dayRealized(){
+  const t=todayStr(); let s=0;
+  S.trades.forEach(tr=>{ if(tr.status==='closed'&&tr.closeDate===t) s+=tr.r*tr.risk$; });
+  return s;
+}
+function consecLosses(){
+  const c=S.trades.filter(t=>t.status==='closed').slice(-2);
+  return c.length===2 && c.every(t=>t.r<=-0.99) ? 2 : 0;
+}
+function validateGate(f,c){
+  const errs=[];
+  if(!f.tick) errs.push('ticker');
+  if(!isFinite(f.entry)) errs.push('entry price');
+  if(!isFinite(f.stop)) errs.push('STOP PRICE — no stop, no trade');
+  if(c===null) errs.push('fix the price fields (stop must be on the correct side)');
+  if(!f.kk) errs.push('known knowns');
+  if(!f.ku) errs.push('known unknowns');
+  if(!f.fals) errs.push('falsification condition');
+  if(!regime) errs.push('regime check (yes/no)');
+  else if(!f.regWhy) errs.push('regime reason');
+  if(overriding&&!f.ovr) errs.push('override reason — if you overrule the machine, you write down why');
+  const open=S.trades.filter(t=>t.status==='open').length;
+  if(open>=S.settings.maxPos) errs.push('max '+S.settings.maxPos+' open positions — close one first');
+  return errs;
+}
+function logPosition(){
+  const g=guardState(), f=readForm(), c=updateCalc(), box=$('gateMsg');
+  if(g.locked){ box.innerHTML='<div class="err">THE DESK IS LOCKED. '+(S.meta.manualLock?'You locked it yourself. Unlock it when you are honest, not when you are bored.':'Daily loss limit hit. Come back tomorrow.')+'</div>'; return; }
+  if(g.cool){ const m=Math.ceil(g.coolMs/60000); box.innerHTML='<div class="err">COOLDOWN: '+m+' min left. Two full stop-outs in a row means you are trading your feelings. Wait.</div>'; return; }
+  const errs=validateGate(f,c);
+  if(errs.length){ box.innerHTML='<div class="err">The gate refuses: '+errs.map(esc).join(' · ')+'</div>'; return; }
+  const tr={ id:'T'+(S.meta.seq++), date:todayStr(), ts:Date.now(), tick:f.tick, dir:dir, entry:f.entry, stop:f.stop,
+    target:isFinite(f.target)?f.target:null, riskPct:f.riskPct, risk$:c.risk$, size:c.size, val:c.val,
+    kk:f.kk, ku:f.ku, prob:f.prob, win:f.win, fals:f.fals, regime:regime, regWhy:f.regWhy,
+    override:overriding?f.ovr:null, status:'open', revisions:[] };
+  S.trades.push(tr); save();
+  ['fTick','fEntry','fStop','fTarget','fKK','fKU','fFals','fRegWhy','fOvr'].forEach(id=>$(id).value='');
+  overriding=false; $('overrideBox').style.display='none'; $('btnOvr').textContent='Override machine size';
+  box.innerHTML='<div class="okk">Logged '+esc(tr.id)+' — '+esc(tr.tick)+' '+dir.toUpperCase()+' '+tr.size+' @ '+tr.entry+'. The log remembers. Now manage the risk, not the outcome.</div>';
+  renderAll();
+}
+
+/* ============ OPEN POSITIONS ============ */
+function rOf(tr,px){ const d=tr.dir==='long'?1:-1; return d*(px-tr.entry)/Math.abs(tr.entry-tr.stop); }
+function renderOpen(){
+  const box=$('openList'), open=S.trades.filter(t=>t.status==='open');
+  if(!open.length){ box.innerHTML='<p class="sub">No open positions. The best trade is often no trade.</p>'; return; }
+  box.innerHTML=open.map(tr=>{
+    const closeUI=tr._closing?'<div style="margin-top:8px;display:flex;gap:8px"><input type="number" step="any" id="cx-'+tr.id+'" placeholder="exit fill"><button class="ghost go" onclick="confirmClose(\''+tr.id+'\')">Confirm close</button></div>':'';
+    return '<div class="pos"><div class="top"><span class="tick">'+esc(tr.tick)+'</span>'+
+    '<span class="'+(tr.dir==='long'?'dirL':'dirS')+'">'+tr.dir.toUpperCase()+'</span>'+
+    '<span class="r" id="r-'+tr.id+'">—</span>'+
+    '<span style="margin-left:auto"></span><button class="ghost" onclick="toggleClose(\''+tr.id+'\')">Close</button></div>'+
+    '<div class="meta">'+tr.size+' shares @ '+tr.entry+' · stop '+tr.stop+' · target '+(tr.target==null?'—':tr.target)+
+    ' · risk '+fmt$(tr.risk$)+' ('+tr.riskPct+'%) · P '+tr.prob+'% · '+esc(tr.win)+
+    (tr.override?'<span class="flag">OVERRIDE</span>':'')+'</div>'+
+    '<div class="meta">Falsification: '+esc(tr.fals)+'</div>'+
+    '<div style="margin-top:8px;display:flex;gap:8px;align-items:center"><input type="number" step="any" id="mk-'+tr.id+'" placeholder="mark price" style="max-width:160px"><button class="ghost go" onclick="mark(\''+tr.id+'\')">Mark</button></div>'+
+    closeUI+'</div>';
+  }).join('');
+}
+function mark(id){ const tr=S.trades.find(t=>t.id===id); const px=parseFloat($('mk-'+id).value); if(!isFinite(px))return;
+  const r=rOf(tr,px), e=$('r-'+id); e.textContent=fmtR(r); e.className='r '+(r>=0?'positive':'negative'); }
+function toggleClose(id){ const tr=S.trades.find(t=>t.id===id); tr._closing=!tr._closing; renderOpen(); }
+function confirmClose(id){ const tr=S.trades.find(t=>t.id===id); const px=parseFloat($('cx-'+id).value); if(!isFinite(px)){return;}
+  tr.exit=px; tr.r=rOf(tr,px); tr.status='closed'; tr.closeDate=todayStr(); tr.closeTs=Date.now(); tr.pnl$=tr.r*tr.risk$; tr._closing=false;
+  // cooldown: two consecutive full stop-outs
+  const closed=S.trades.filter(t=>t.status==='closed').slice(-2);
+  if(closed.length===2&&closed.every(t=>t.r<=-0.99)) S.meta.coolUntil=Date.now()+S.settings.cooldownMin*60000;
+  save(); renderAll(); }
+
+/* ============ GUARDRAILS ============ */
+function renderGuard(){
+  const eq=S.settings.equity, lim=eq*S.settings.dailyLossPct/100, day=dayRealized(), g=guardState();
+  $('gLim').textContent='-'+S.settings.dailyLossPct+'% ('+fmt$(lim)+')';
+  const gd=$('gDay'); gd.textContent=fmt$(day); gd.style.color=day<0?'var(--red)':'var(--green)';
+  const pct=Math.min(100,Math.abs(Math.min(0,day))/lim*100);
+  $('gMeter').style.width=pct+'%'; $('gMeterWrap').className='meter'+(pct>=80?' danger':'');
+  $('gCons').textContent=consecLosses();
+  $('gCool').textContent=g.cool?('ACTIVE — '+Math.ceil(g.coolMs/60000)+' min left'):'—';
+  $('gCool').style.color=g.cool?'var(--amber)':'var(--txt)';
+  $('gOvr').textContent=S.trades.filter(t=>t.override).length;
+  $('btnFreeze').style.display=S.meta.manualLock?'none':'';
+  $('btnUnlock').style.display=S.meta.manualLock?'':'none';
+  const gm=$('guardMsg'); gm.innerHTML='';
+  if(g.locked) gm.innerHTML='<div class="err">DESK LOCKED. '+(S.meta.manualLock?'Manual freeze — Tenet 3: you declared yourself unreliable. Good. That is the system working.':'Daily loss limit reached. The machine froze itself so you do not have to trust yourself.')+'</div>';
+  else if(g.cool) gm.innerHTML='<div class="warn">Cooldown active. New positions blocked. Go for a walk.</div>';
+  // header
+  $('hEquity').textContent=fmt$(eq);
+  const hd=$('hDay'); hd.textContent=fmt$(day); hd.style.color=day<0?'var(--red)':'var(--green)';
+  const pill=$('hPill');
+  if(g.locked){pill.textContent='LOCKED';pill.className='pill lock';}
+  else if(g.cool){pill.textContent='COOLDOWN';pill.className='pill cool';}
+  else{pill.textContent='LIVE';pill.className='pill live';}
+}
+
+/* ============ CALIBRATION ============ */
+function renderCal(){
+  const closed=S.trades.filter(t=>t.status==='closed');
+  const n=closed.length, w=closed.filter(t=>t.r>0).length;
+  const avgR=n?closed.reduce((a,t)=>a+t.r,0)/n:0, tot$=n?closed.reduce((a,t)=>a+t.pnl$,0):0;
+  $('cN').textContent=n; $('cW').textContent=n?Math.round(w/n*100)+'%':'—';
+  $('cR').textContent=n?fmtR(avgR):'—'; $('cE').textContent=n?fmtR(avgR):'—';
+  $('cT').textContent=n?fmtR(closed.reduce((a,t)=>a+t.r,0)):'—';
+  $('c$').textContent=n?fmt$(tot$):'—';
+  const buckets=[['<55',0,55],['55–65',55,65],['65–75',65,75],['75%+',75,101]];
+  $('calTable').innerHTML=buckets.map(b=>{
+    const inB=closed.filter(t=>t.prob>=b[1]&&t.prob<b[2]), bn=inB.length, hit=bn?inB.filter(t=>t.r>0).length/bn*100:0;
+    let v='—'; if(bn>=5) v=hit>=b[1]?'<span style="color:var(--green)">CALIBRATED</span>':'<span style="color:var(--amber)">OVERCONFIDENT</span>';
+    return '<tr><td>'+b[0]+'</td><td>'+bn+'</td><td>'+(bn?Math.round(hit)+'%':'—')+'</td><td>'+v+'</td></tr>';
+  }).join('');
+  // equity curve
+  const cv=$('eqCurve'), ctx=cv.getContext('2d'); ctx.clearRect(0,0,1000,120);
+  if(n){ let cum=0; const pts=closed.map(t=>cum+=t.r);
+    const mn=Math.min(0,...pts), mx=Math.max(0,...pts), rg=(mx-mn)||1;
+    ctx.strokeStyle='#3ddc84'; ctx.lineWidth=2; ctx.beginPath();
+    pts.forEach((p,i)=>{ const x=i/(pts.length-1||1)*980+10, y=110-((p-mn)/rg)*100; i?ctx.lineTo(x,y):ctx.moveTo(x,y); });
+    ctx.stroke(); ctx.strokeStyle='#232833'; ctx.beginPath(); const zy=110-((0-mn)/rg)*100; ctx.moveTo(0,zy); ctx.lineTo(1000,zy); ctx.stroke(); }
+  // blunders
+  const ov=closed.filter(t=>t.override);
+  $('blunderList').innerHTML=ov.length?ov.map(t=>'<div class="pos"><b>'+esc(t.tick)+'</b> '+t.dir.toUpperCase()+
+    ' — overrode size because: "'+esc(t.override)+'" → <b style="color:'+(t.r>=0?'var(--green)':'var(--red)')+'">'+fmtR(t.r)+'</b> <span class="flag">OVERRIDE</span></div>').join('')
+    :'<p class="sub">No overrides. The machine thanks you.</p>';
+}
+
+/* ============ LESSONS ============ */
+function renderLessons(){
+  const t=todayStr();
+  $('lessonList').innerHTML=LESSONS.map((L,i)=>{
+    const done=S.lessons[L[0]]===t;
+    return '<div class="lesson'+(done?' done':'')+'"><input type="checkbox" '+(done?'checked':'')+' onchange="toggleLesson(\''+L[0]+'\',this.checked)">'+
+    '<div><div class="lt">'+esc(L[1])+'</div><div class="ld">'+esc(L[2])+'</div></div></div>';
+  }).join('');
+}
+function toggleLesson(id,on){ S.lessons[id]=on?todayStr():null; save(); renderLessons(); }
+
+/* ============ SETTINGS / DATA ============ */
+function renderSettings(){ $('sEq').value=S.settings.equity; $('sDaily').value=S.settings.dailyLossPct; $('sCool').value=S.settings.cooldownMin; $('sMax').value=S.settings.maxPos; $('sRisk').value=S.settings.defRisk; $('fRisk').value=S.settings.defRisk; }
+
+/* ============ INIT ============ */
+function renderAll(){ renderOpen(); renderGuard(); renderCal(); renderLessons(); updateCalc(); }
+window.mark=mark; window.toggleClose=toggleClose; window.confirmClose=confirmClose; window.toggleLesson=toggleLesson;
+load();
+segWire('fDir',v=>dir=v); segWire('fReg',v=>regime=v);
+['fEntry','fStop','fTarget','fTick'].forEach(id=>$(id).addEventListener('input',updateCalc));
+$('fRisk').addEventListener('input',updateCalc); $('fProb').addEventListener('input',updateCalc);
+$('btnLog').onclick=logPosition;
+$('btnOvr').onclick=()=>{ overriding=!overriding; $('overrideBox').style.display=overriding?'':'none'; $('btnOvr').textContent=overriding?'Cancel override':'Override machine size'; updateCalc(); };
+$('btnFreeze').onclick=()=>{ if(confirm('Lock the desk? No new positions until you unlock. This is you being a good trader.')){ S.meta.manualLock=true; save(); renderAll(); } };
+$('btnUnlock').onclick=()=>{ S.meta.manualLock=false; S.meta.lockDate=null; S.meta.coolUntil=0; save(); renderAll(); };
+$('btnSaveS').onclick=()=>{ S.settings.equity=parseFloat($('sEq').value)||1500; S.settings.dailyLossPct=parseFloat($('sDaily').value)||3;
+  S.settings.cooldownMin=parseInt($('sCool').value)||30; S.settings.maxPos=parseInt($('sMax').value)||3; S.settings.defRisk=parseFloat($('sRisk').value)||1;
+  $('fRisk').value=S.settings.defRisk; save(); renderAll(); };
+$('btnExport').onclick=()=>{ const b=new Blob([JSON.stringify(S,null,2)],{type:'application/json'}); const a=document.createElement('a');
+  a.href=URL.createObjectURL(b); a.download='thedesk-'+todayStr()+'.json'; a.click(); };
+$('btnImport').onclick=()=>$('fileImport').click();
+$('fileImport').onchange=e=>{ const f=e.target.files[0]; if(!f)return; const r=new FileReader();
+  r.onload=()=>{ try{ S=Object.assign({},DEF,JSON.parse(r.result)); save(); renderSettings(); renderAll(); }catch(err){ alert('Bad file.'); } }; r.readAsText(f); };
+$('btnWipe').onclick=()=>{ if(confirm('Wipe ALL desk data? Export first if you care.')&&confirm('Really? The log remembers nothing after this.')){ localStorage.removeItem(KEY); load(); renderSettings(); renderAll(); } };
+// live countdown for cooldown / gate button state
+setInterval(()=>{ const g=guardState();
+  if(g.cool){ $('btnLog').disabled=true; $('btnLog').textContent='COOLDOWN — '+Math.ceil(g.coolMs/60000)+' MIN'; }
+  else if(g.locked){ $('btnLog').disabled=true; $('btnLog').textContent='DESK LOCKED'; }
+  else{ $('btnLog').disabled=false; $('btnLog').textContent='LOG POSITION'; }
+  renderGuard();
+},1000);
+renderSettings(); renderAll();
+</script>
+</body>
+</html>
