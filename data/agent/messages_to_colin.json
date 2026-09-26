@@ -1,6 +1,42 @@
 {
   "messages": [
     {
+      "id": "invariant-2026-09-25-fills_stale",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "[INVARIANT] FILLS_STALE: all fills ledgers stale (data/ledger/oanda_fills.jsonl, data/execution/fills.jsonl) \u2014 recent writes unverifiable (2026-09-25)",
+      "timestamp": "2026-09-25T13:20:04.646185+00:00",
+      "read": false,
+      "source": "invariant_guard"
+    },
+    {
+      "id": "audit-2026-09-25-price_source_drift",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "[AUDIT] PRICE_SOURCE_DRIFT: AUD_NZD median |\u0394close|/close 0.00227 (2026-09-25)",
+      "timestamp": "2026-09-25T13:05:06.364860+00:00",
+      "read": false,
+      "source": "shadow_audit"
+    },
+    {
+      "id": "audit-2026-09-25-unexplained_divergence",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[AUDIT] UNEXPLAINED_DIVERGENCE: C5 count 6 (2026-09-25)",
+      "timestamp": "2026-09-25T13:05:06.364850+00:00",
+      "read": false,
+      "source": "shadow_audit"
+    },
+    {
+      "id": "audit-2026-09-25-l1_determinism_fail",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[AUDIT] L1_DETERMINISM_FAIL: 2 record(s) not reproducible (2026-09-25)",
+      "timestamp": "2026-09-25T13:05:06.364825+00:00",
+      "read": false,
+      "source": "shadow_audit"
+    },
+    {
       "id": "audit-2026-09-24-price_source_drift",
       "priority": "IMPORTANT",
       "emoji": "\ud83d\udfe1",
@@ -413,43 +449,7 @@
       "timestamp": "2026-09-11T13:30:09.107425+00:00",
       "read": false,
       "source": "invariant_guard"
-    },
-    {
-      "id": "invariant-2026-09-10-fills_stale",
-      "priority": "IMPORTANT",
-      "emoji": "\ud83d\udfe1",
-      "text": "[INVARIANT] FILLS_STALE: all fills ledgers stale (data/ledger/oanda_fills.jsonl, data/execution/fills.jsonl) \u2014 recent writes unverifiable (2026-09-10)",
-      "timestamp": "2026-09-10T13:20:02.188175+00:00",
-      "read": false,
-      "source": "invariant_guard"
-    },
-    {
-      "id": "audit-2026-09-10-price_source_drift",
-      "priority": "IMPORTANT",
-      "emoji": "\ud83d\udfe1",
-      "text": "[AUDIT] PRICE_SOURCE_DRIFT: AUD_USD median |\u0394close|/close 0.00493 (2026-09-10)",
-      "timestamp": "2026-09-10T13:05:07.479687+00:00",
-      "read": false,
-      "source": "shadow_audit"
-    },
-    {
-      "id": "audit-2026-09-10-price_source_drift",
-      "priority": "IMPORTANT",
-      "emoji": "\ud83d\udfe1",
-      "text": "[AUDIT] PRICE_SOURCE_DRIFT: AUD_NZD median |\u0394close|/close 0.00227 (2026-09-10)",
-      "timestamp": "2026-09-10T13:05:07.479678+00:00",
-      "read": false,
-      "source": "shadow_audit"
-    },
-    {
-      "id": "audit-2026-09-10-unexplained_divergence",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[AUDIT] UNEXPLAINED_DIVERGENCE: C5 count 6 (2026-09-10)",
-      "timestamp": "2026-09-10T13:05:07.479668+00:00",
-      "read": false,
-      "source": "shadow_audit"
     }
   ],
-  "last_updated": "2026-09-24T13:26:05.870149+00:00"
+  "last_updated": "2026-09-25T13:20:04.646194+00:00"
 }

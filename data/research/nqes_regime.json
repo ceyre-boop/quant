@@ -1,6 +1,30 @@
 {
-  "as_of": "2026-09-24T14:24:23.509465+00:00",
-  "regime": "NO_DATA",
-  "read": "ES=F/NQ=F fetch failed",
-  "note": "regime input, not an edge"
+  "as_of": "2026-09-25T12:30:03.628794+00:00",
+  "lookback_days": 20,
+  "nq_last": 30923.2,
+  "es_last": 7789.8,
+  "nq_es_return_spread_avg": 0.00176,
+  "spread_1d": 0.00216,
+  "spread_5d": 0.00534,
+  "spread_20d": 0.00176,
+  "nq_es_cumulative_spread": 0.0352,
+  "contemporaneous_corr": 0.938,
+  "lead_lag": {
+    "by_lag": {
+      "-3": -0.08,
+      "-2": 0.076,
+      "-1": -0.052,
+      "0": 0.871,
+      "1": -0.062,
+      "2": 0.061,
+      "3": -0.027
+    },
+    "best_lag": -3,
+    "best_corr": -0.08,
+    "leader": "NONE"
+  },
+  "divergence": false,
+  "regime": "CONCENTRATION",
+  "read": "NQ leading / pulling away from ES \u2014 narrow, tech/AI-driven, FRAGILE. Trust directional moves less; watch for reversal when AI names cool.",
+  "note": "Regime INPUT, not an edge. ES/NQ research only \u2014 no execution path (CME futures; OANDA is forex-only)."
 }
