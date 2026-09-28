@@ -4598,3 +4598,36 @@ correctly refused with "Only 1 trades found (need 20+)". It is blocked on ICT fi
 window/min-trades — leaving it ERROR reads as a repairable failure it is not.
 
 No parameter changed. No prereg written. No holdout touched. Freeze intact.
+
+## 2026-09-28 — HYP-121 source intake (Malhotra SSRN 3306817)
+
+**Shipped:** `research/HYP-121/` — SOURCE_INTAKE scope folder for Malhotra (2018),
+"Guidance to a Goldman Sachs alumnus Hedge Fund..." (SSRN 3306817, DOI 10.2139/ssrn.3306817).
+Logged to both ledgers as `IN_RESEARCH / source_intake`.
+
+**Explicitly NOT done — and not to be assumed done:**
+- No prereg, no hash lock, no run. This is not a claim that an edge exists.
+- **The 8-page body was never read.** SSRN returned 429 to automated fetch and a Cloudflare
+  interstitial to the browser. The folder was scoped from the abstract and reference list
+  only. The operator asked for this to be added "if we read and follow the WHOLE paper" —
+  that precondition is **not met**. Recorded rather than papered over (CLAUDE.md, no silent
+  mocking).
+- Nothing added to `EDGE_LEDGER.md` — that page takes claims with a sealed prereg and a run.
+
+**Prior recorded as LOW / MAGNITUDE_ONLY.** HYP-119 (`16ecff37`) found liquidity-cascade
+state gives 2.7× magnitude and −0.28%/trade riding it, both directions. HYP-120 (`894aafbf`)
+reduced to EWMA with no direction. Malhotra's paper is in the same territory, so the burden
+is on the extraction to beat that prior, not on the reader to disprove it.
+
+**Gate to close the folder:** does the body contain one falsifiable claim with a named
+universe, horizon and decision rule? No → `GRAVEYARD / NOT_TESTABLE`. Yes → prereg that
+claim, seal, run once.
+
+**Separable lead worth more than the paper:** Dufour & Engle (2000), "Time and the Price
+Impact of a Trade," *J. Finance* 55(6) — price impact as a function of inter-trade duration.
+Real, cited, testable, and independent of Malhotra. If HYP-121 closes NOT_TESTABLE, this
+survives it as its own hypothesis.
+
+**Incidental fix:** `data/hypotheses_ledger.jsonl` had no trailing newline, so the append
+concatenated onto the HYP-093 record and broke line-wise parsing. Repaired by re-decoding the
+stream and rewriting one object per line — 9 records, all valid, no data lost.
