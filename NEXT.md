@@ -4,6 +4,49 @@ Per-session ledger: what shipped, push status, verdicts, blockers, refusals. New
 The Obsidian brain (`~/Obsidian/Obsidian/00-BRAIN/NEXT.md`) is the cross-project rollup.
 Standing constraints live in `CLAUDE.md` — not restated here.
 
+## 2026-09-28 — CI: both weekly workflows green again after 10+ weeks of silent red; failures now open issues (`97eb7bc` master, `7e53ecb` sovereign-v2, pushed)
+
+**Root cause of the silence:** scheduled workflows run from the **default branch `master`**. The 2026-07-01
+cron-disable of the legacy weekly report only ever landed on sovereign-v2, so master kept firing it,
+and neither workflow had any failure notification. The workflow YAML must live on master.
+
+- **data-snapshot.yml**: added `mkdir -p data_snapshot`. **Dropped the commit-to-master step.** The
+  snapshot is a hardcoded placeholder row (NAS100 21905.0), and the repo token is read-only, so the push
+  would have 403'd anyway. It is now an artifact only, marked `placeholder: true`. The fetch is still
+  fake: wire a real source, or delete the workflow.
+- **weekly-report.yml: rebuilt, not path-fixed.** `performance_monitor.py` imports
+  `integration.firebase_client` and `data.signal_archive`, and neither exists on any branch, so a path fix
+  could never go green (TABOOST chose the rebuild). How it works now:
+  - It checks out `ref: sovereign-v2` and runs the new stdlib-only `scripts/weekly_report.py`, which
+    reads NAV from `equity_curve_live.jsonl` via `build_from_nav`, FOREX outcomes from
+    `decisions_*.jsonl`, and the drawdown cap from RISK_CONSTITUTION Art. 3.
+  - Every number carries its age.
+  - It **exits 1 when NAV is more than 7 days old**. If the evening sync isn't pushed for a week, CI goes red.
+  - A drawdown-breach issue opens at the 3.5% breaker.
+  - 20 tests in `tests/unit/test_weekly_report.py`. The since-inception numbers match `alta money`
+    (−0.132%, maxDD −0.234%).
+- **Failure alert on both workflows**: an `if: failure()` github-script step opens `CI failure: <workflow>`
+  (label `bug`), or comments on the one that's already open. Both jobs carry `permissions: issues: write`.
+- **Verified:**
+  - Dispatch runs 36445104510 (snapshot) and 36445108013 (report) finished `success` on master, and the
+    report read NAV 109,512.90 at 0.08 days old.
+  - Alert smoke test on the throwaway branch `ci/alert-smoke`: forced failure run 36445225360 opened #34,
+    and rerun 36445294738 commented on #34 instead of opening a duplicate. #34 is closed and the branch
+    deleted.
+- **Surfaced by the report:**
+  - The equity writer was dead from 2026-08-24 to 2026-09-28 (a 34-day gap). It is now listed in the
+    report.
+  - The decision logs contain AUDNZD rows (the pair is excluded) and USDCAD backfill rows. Three rows
+    have their exit before their entry (cross-matched backfill); these are now excluded and counted.
+  - Several decision rows share one OANDA close; these are now de-duped by close.
+- **Full suite:** 21 failed / 1876 passed / 16 skipped with `--continue-on-collection-errors`.
+  - Relative to the recorded 19-failure baseline, the additions are `test_claim_check::test_corpus_verdict_counts`
+    (5 REFUTED vs 4 expected) and `test_system_inventory::test_ondemand_tool_not_mislabelled_testonly`.
+  - Both also fail at the pre-change commit, so they are not from this work.
+  - `test_ict_session_classifier` is now 10 failures, not 11.
+- **Open:** `scripts/evening_prep.sh` commits `data/` but never pushes it. How fresh the CI data is
+  depends on manual pushes, and the stale-exit now makes that visible.
+
 ## 2026-09-20 (d) — SWAP HARNESS: gate (b) is now measurable, and day one already says something (`20a0d00`, pushed)
 
 **`sovereign/financing/swap_probe.py`** — MAGNUM_OPUS §VI.5 gate (b) built. Measures OANDA's real
