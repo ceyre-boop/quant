@@ -1,8 +1,20 @@
+# Weekly Performance Report — live Forex v015, from committed live data.
+#
+# Rebuilt 2026-09-28. The previous version targeted the archived ML subsystem
+# (clawd_trading/meta_evaluator/performance_monitor.py, Firebase push) whose
+# imports no longer exist; it failed silently every Monday for 10+ weeks.
+#
+# This file must live on the default branch (master) for the cron to fire, but
+# the job checks out sovereign-v2: that is where the live data and the report
+# code live. scripts/weekly_report.py is stdlib-only, so there is no pip install.
+#
+# Exits red (and opens an issue) if the newest NAV snapshot is older than 7 days:
+# a dead equity writer or an unpushed data sync must be loud, not silent.
 name: Weekly Performance Report
 
 on:
   schedule:
-    # Run every Monday at 9:00 AM EST (2:00 PM UTC)
+    # Every Monday 14:00 UTC (9:00 AM EST)
     - cron: '0 14 * * 1'
   workflow_dispatch:
 
@@ -12,96 +24,67 @@ env:
 jobs:
   generate-report:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./quant/clawd_trading
-    
+    permissions:
+      contents: read
+      issues: write
+
     steps:
-      - name: Checkout repository
+      - name: Checkout live branch
         uses: actions/checkout@v4
-      
+        with:
+          ref: sovereign-v2
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
-          cache: 'pip'
-      
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-      
-      - name: Calculate weekly metrics
-        id: metrics
-        run: |
-          python meta_evaluator/performance_monitor.py --period weekly --output weekly_report.json
-          
-          # Format for GitHub summary
-          echo "## 📊 Weekly Performance Report" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
-          echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Sharpe Ratio | $(jq -r '.sharpe_ratio' weekly_report.json) |" >> $GITHUB_STEP_SUMMARY
-          echo "| Win Rate | $(jq -r '.win_rate' weekly_report.json)% |" >> $GITHUB_STEP_SUMMARY
-          echo "| Max Drawdown | $(jq -r '.max_drawdown' weekly_report.json)% |" >> $GITHUB_STEP_SUMMARY
-          echo "| Total Trades | $(jq -r '.total_trades' weekly_report.json) |" >> $GITHUB_STEP_SUMMARY
-          echo "| Avg Trade | $(jq -r '.avg_trade_pnl' weekly_report.json) |" >> $GITHUB_STEP_SUMMARY
-          
-          # Check for model drift
-          DRIFT=$(jq -r '.model_drift_detected' weekly_report.json)
-          if [ "$DRIFT" = "true" ]; then
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "⚠️ **Model drift detected!** Consider retraining." >> $GITHUB_STEP_SUMMARY
-          fi
-      
-      - name: Push metrics to Firebase
-        run: |
-          python -c "
-          import json
-          import os
-          from integration.firebase_client import FirebaseClient
-          
-          with open('weekly_report.json', 'r') as f:
-              metrics = json.load(f)
-          
-          client = FirebaseClient()
-          week_id = metrics['week_ending']
-          client.rtdb_update(f'/performance/weekly_metrics/{week_id}', metrics)
-          print(f'Pushed metrics for week ending {week_id}')
-          "
-        env:
-          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-      
+
+      - name: Build weekly report
+        id: report
+        run: python scripts/weekly_report.py --days 7 --stale-days 7 --out weekly_report.json
+
       - name: Archive report
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: weekly-report-${{ github.run_id }}
           path: weekly_report.json
           retention-days: 90
-      
-      - name: Create GitHub Issue for significant events
-        if: ${{ steps.metrics.outputs.sharpe < 1.0 || steps.metrics.outputs.max_drawdown > -10 }}
+          if-no-files-found: warn
+
+      - name: Open issue on drawdown breach
+        if: ${{ steps.report.outputs.dd_breach == 'true' }}
+        uses: actions/github-script@v7
+        env:
+          CUR_DD: ${{ steps.report.outputs.current_drawdown_pct }}
+          DD_CAP: ${{ steps.report.outputs.dd_cap_pct }}
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const title = 'Performance alert: drawdown past RISK_CONSTITUTION Art. 3 breaker';
+            const runUrl = `${context.serverUrl}/${owner}/${repo}/actions/runs/${context.runId}`;
+            const body = `Current drawdown from peak: **${process.env.CUR_DD}%** (breaker -${process.env.DD_CAP}%: new sizes halve).\n\nReport: ${runUrl}`;
+            const { data: open } = await github.rest.issues.listForRepo({ owner, repo, state: 'open', labels: 'bug', per_page: 100 });
+            const existing = open.find(i => i.title === title);
+            if (existing) {
+              await github.rest.issues.createComment({ owner, repo, issue_number: existing.number, body });
+            } else {
+              await github.rest.issues.create({ owner, repo, title, body, labels: ['bug'] });
+            }
+
+      - name: Open issue on failure
+        if: failure()
         uses: actions/github-script@v7
         with:
           script: |
-            const title = `📉 Performance Alert - Week of ${new Date().toISOString().split('T')[0]}`;
-            const body = `## Weekly Performance Below Thresholds
-            
-            - Sharpe Ratio: ${{ steps.metrics.outputs.sharpe }} (target: > 1.0)
-            - Max Drawdown: ${{ steps.metrics.outputs.max_drawdown }}% (limit: < -10%)
-            
-            ### Recommended Actions
-            - [ ] Review recent trades for anomalies
-            - [ ] Check market regime changes
-            - [ ] Consider model retraining
-            - [ ] Verify risk parameters
-            
-            See full report: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}`;
-            
-            github.rest.issues.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              title: title,
-              body: body,
-              labels: ['performance', 'automated']
-            });
+            const { owner, repo } = context.repo;
+            const title = `CI failure: ${context.workflow}`;
+            const runUrl = `${context.serverUrl}/${owner}/${repo}/actions/runs/${context.runId}`;
+            const { data: open } = await github.rest.issues.listForRepo({ owner, repo, state: 'open', labels: 'bug', per_page: 100 });
+            const existing = open.find(i => i.title === title);
+            if (existing) {
+              await github.rest.issues.createComment({ owner, repo, issue_number: existing.number, body: `Failed again: ${runUrl}` });
+            } else {
+              await github.rest.issues.create({ owner, repo, title, labels: ['bug'],
+                body: `Workflow **${context.workflow}** failed on \`${context.ref}\`.\n\nRun: ${runUrl}` });
+            }
