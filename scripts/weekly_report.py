@@ -109,6 +109,8 @@ def nav_section(rows: list[dict], as_of: datetime, days: int) -> dict:
         "window_start_t": start_t.isoformat(),
         "window_start_nav": start_nav,
         "week_change_pct": round((latest_nav / start_nav - 1) * 100, 3) if start_nav else None,
+        # > days when the anchor sits before a writer gap: the "week" change is really longer
+        "window_span_days": round((latest_t - start_t).total_seconds() / 86400, 2),
         "peak_nav": peak,
         "current_drawdown_pct": round((latest_nav / peak - 1) * 100, 3) if peak else None,
         "inception": inception,
@@ -117,31 +119,47 @@ def nav_section(rows: list[dict], as_of: datetime, days: int) -> dict:
 
 
 def trades_section(rows: list[dict], as_of: datetime, days: int) -> dict:
+    """FOREX outcomes closed in (as_of - days, as_of], windowed by exit_timestamp.
+
+    Resolved rows are de-duped on (pair, direction, exit time): the fills backfill can
+    match several decision rows to one OANDA close, which would otherwise count one
+    trade N times. Rows whose exit precedes their entry are cross-matched backfill
+    artefacts, excluded and counted in `invalid_rows` so they stay visible.
+    """
     start = as_of - timedelta(days=days)
     seen: set[tuple] = set()
-    wins = losses = expired = open_ = 0
+    wins = losses = expired = open_ = invalid = 0
     r_vals: list[float] = []
+    by_pair: dict[str, dict[str, int]] = {}
     for r in rows:
         if r.get("system") != "FOREX":
             continue
-        key = (_norm_pair(r.get("pair")), r.get("direction"), r.get("entry_timestamp"))
-        if key in seen:
-            continue
-        seen.add(key)
+        pair, direction = _norm_pair(r.get("pair")), r.get("direction")
         outcome = r.get("outcome")
+        entry_t = parse_ts(r.get("entry_timestamp"))
         if outcome is None:
-            entry = parse_ts(r.get("entry_timestamp"))
-            if entry is None or entry <= as_of:
+            key = ("open", pair, direction, entry_t)
+            if key not in seen and (entry_t is None or entry_t <= as_of):
+                seen.add(key)
                 open_ += 1
             continue
         exit_t = parse_ts(r.get("exit_timestamp"))
         if exit_t is None or not (start < exit_t <= as_of):
+            continue
+        key = ("closed", pair, direction, exit_t)
+        if key in seen:
+            continue
+        seen.add(key)
+        if entry_t is not None and exit_t < entry_t:
+            invalid += 1
             continue
         if outcome == "EXPIRED":
             expired += 1
         elif outcome in ("WIN", "LOSS"):
             wins += outcome == "WIN"
             losses += outcome == "LOSS"
+            slot = by_pair.setdefault(pair, {"W": 0, "L": 0})
+            slot["W" if outcome == "WIN" else "L"] += 1
             if r.get("r_realized") is not None:
                 r_vals.append(float(r["r_realized"]))
     closed = wins + losses
@@ -152,6 +170,8 @@ def trades_section(rows: list[dict], as_of: datetime, days: int) -> dict:
         "n_r": len(r_vals),
         "expired_in_window": expired,
         "open": open_,
+        "invalid_rows": invalid,
+        "by_pair": dict(sorted(by_pair.items())),
     }
 
 
@@ -200,7 +220,9 @@ def render_markdown(rep: dict) -> str:
             "| Metric | Value | As of |", "|---|---|---|",
             f"| NAV | {nav['latest_nav']:,.2f} | {nav['latest_t'][:16]} ({nav['age_days']}d old) |",
             f"| {rep['window_days']}d NAV change | {_fmt(nav['week_change_pct'], '%')} "
-            f"| from {nav['window_start_t'][:16]} |",
+            f"| from {nav['window_start_t'][:16]}"
+            + (f" — **spans {nav['window_span_days']}d** (no snapshot at window start)"
+               if nav["window_span_days"] > rep["window_days"] + 1 else "") + " |",
             f"| Current drawdown from peak | {_fmt(nav['current_drawdown_pct'], '%')} "
             f"| cap -{rep['dd_cap_pct']}% |",
             f"| Since-inception return | {_fmt(inc.get('total_return_pct'), '%')} "
@@ -215,8 +237,13 @@ def render_markdown(rep: dict) -> str:
         f"| Avg R | {_fmt(t['avg_r'])} | n={t['n_r']} with r_realized |",
         f"| Expired in window / unresolved (outcome null) | {t['expired_in_window']} / {t['open']} "
         f"| unresolved ≠ open positions; see NAV open_trade_count |",
-        "",
     ]
+    if t["by_pair"]:
+        lines.append("| By pair | " + ", ".join(f"{p} {c['W']}W/{c['L']}L" for p, c in t["by_pair"].items())
+                     + " | closed in window |")
+    if t["invalid_rows"]:
+        lines.append(f"| Excluded rows (exit before entry) | {t['invalid_rows']} | backfill artefacts |")
+    lines.append("")
     if nav.get("gaps"):
         lines += [f"**NAV snapshot gaps > {GAP_DAYS:g} days** (writer outages):", ""]
         lines += [f"- {g['from'][:10]} → {g['to'][:10]}: {g['days']}d" for g in nav["gaps"]]

@@ -207,3 +207,29 @@ def test_github_outputs_written(tmp_path, monkeypatch):
     assert kv["dd_breach"] == "false"
     assert set(kv) >= {"nav_age_days", "week_nav_change_pct", "max_drawdown_pct", "current_drawdown_pct"}
     assert "Weekly Performance Report" in summary.read_text()
+
+
+# ── review follow-ups (2026-09-28) ─────────────────────────────────────────
+
+def test_rows_sharing_one_close_counted_once(tmp_path):
+    # backfill matched several decisions (different entries) to one OANDA close
+    shared_exit = "2026-09-25T13:00:29.406403580Z"
+    decisions = [_dec(entry_ts=f"2026-09-2{i}T0{i}:00:00+00:00", exit_ts=shared_exit, outcome="LOSS")
+                 for i in range(1, 4)]
+    report = wr.build_report(_repo(tmp_path, FRESH_NAV, decisions), AS_OF, days=7, stale_days=7)
+    assert report["trades"]["closed"] == 1
+    assert report["trades"]["by_pair"] == {"GBPUSD": {"W": 0, "L": 1}}
+
+
+def test_exit_before_entry_excluded_and_counted(tmp_path):
+    decisions = [_dec(entry_ts="2026-09-25T13:33:11+00:00", exit_ts="2026-09-25T13:08:08Z", pair="USD_CAD")]
+    report = wr.build_report(_repo(tmp_path, FRESH_NAV, decisions), AS_OF, days=7, stale_days=7)
+    assert report["trades"]["closed"] == 0
+    assert report["trades"]["invalid_rows"] == 1
+
+
+def test_window_span_exposes_gap_anchor(tmp_path):
+    rows = [_nav("2026-08-24T13:00:00+00:00", 100000.0), _nav("2026-09-28T13:00:00+00:00", 100500.0)]
+    report = wr.build_report(_repo(tmp_path, rows), AS_OF, days=7, stale_days=7)
+    assert report["nav"]["window_span_days"] == pytest.approx(35.0, abs=0.01)
+    assert "spans 35.0d" in wr.render_markdown(report)
