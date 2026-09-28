@@ -11,7 +11,10 @@ env:
 jobs:
   snapshot:
     runs-on: ubuntu-latest
-    
+    permissions:
+      contents: read
+      issues: write
+
     steps:
     - uses: actions/checkout@v4
     
@@ -26,6 +29,9 @@ jobs:
         python -m pip install --upgrade pip
         pip install pandas numpy pyarrow
     
+    - name: Create snapshot directory
+      run: mkdir -p data_snapshot
+
     - name: Fetch market data snapshot
       env:
         POLYGON_API_KEY: ${{ secrets.POLYGON_API_KEY }}
@@ -58,6 +64,7 @@ jobs:
             'snapshot_date': snapshot_date,
             'symbols': ['NAS100', 'US30', 'SPX500'],
             'features_count': 43,
+            'placeholder': True,  # hardcoded sample row, not fetched market data
             'created_at': datetime.now().isoformat()
         }
         
@@ -66,6 +73,7 @@ jobs:
         
         print(f'Created snapshot for {snapshot_date}')
         "
+        echo "> **Placeholder snapshot** — hardcoded sample row, not fetched market data. Artifact only; not committed." >> $GITHUB_STEP_SUMMARY
     
     - name: Upload snapshot artifact
       uses: actions/upload-artifact@v4
@@ -74,15 +82,22 @@ jobs:
         path: data_snapshot/
         retention-days: 365
     
-    - name: Commit snapshot to repo
-      run: |
-        SNAPSHOT_DATE=$(date +%Y-%m-%d)
-        
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        
-        git add data_snapshot/
-        git diff --staged --quiet || git commit -m "data: weekly snapshot $SNAPSHOT_DATE"
-        git push
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    # Snapshot is placeholder data, so it is kept as an artifact only and never
+    # committed to master (a weekly commit of fake data would also redeploy Pages).
+
+    - name: Open issue on failure
+      if: failure()
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const { owner, repo } = context.repo;
+          const title = `CI failure: ${context.workflow}`;
+          const runUrl = `${context.serverUrl}/${owner}/${repo}/actions/runs/${context.runId}`;
+          const { data: open } = await github.rest.issues.listForRepo({ owner, repo, state: 'open', labels: 'bug', per_page: 100 });
+          const existing = open.find(i => i.title === title);
+          if (existing) {
+            await github.rest.issues.createComment({ owner, repo, issue_number: existing.number, body: `Failed again: ${runUrl}` });
+          } else {
+            await github.rest.issues.create({ owner, repo, title, labels: ['bug'],
+              body: `Workflow **${context.workflow}** failed on \`${context.ref}\`.\n\nRun: ${runUrl}` });
+          }
