@@ -2520,5 +2520,24 @@
     "source": "operator_session_2026-09-28",
     "auto_generated": false,
     "result_file": null
+  },
+  {
+    "id": "HYP-122",
+    "name": "Dufour & Engle (2000) price impact vs inter-trade duration: replication on SIP tape + retail tradability kill-test",
+    "status": "IN_RESEARCH",
+    "date_tested": null,
+    "result": null,
+    "verdict": null,
+    "methodology_note": "SCOPED 2026-09-29. Paper read in full (47pp working-paper version, hash in research/HYP-122/references/README.md). Data verified: Alpaca SIP trades+NBBO quotes, tick level, 2016->today, $0. Stage A replication: sum(delta)<0, p<0.05 for >=12/20 stocks in each of 3 windows AND >=10/20 with size+spread controls, BH q=0.05. Stage B (if A passes): fast-decile signed events, entry +1s, full spread both ways, h in {10,60,300}s, net>0 CI excl. 0 & perm p<0.01 in all windows. Trials: A1-A2 on seal, B1-B3 only if A passes; count starts at 1649. Prereg NOT sealed; operator seals.",
+    "hash_lock": null,
+    "prereg_file": null,
+    "p_value": null,
+    "bh_survives": null,
+    "oos_sharpe": null,
+    "is_sharpe": null,
+    "prior_expectation": "A: REPLICATES_IN_SIGN; B: NOT_TRADABLE (MAGNITUDE_ONLY territory, HYP-119/120)",
+    "source": "operator_session_2026-09-29",
+    "auto_generated": false,
+    "result_file": null
   }
 ]

@@ -4599,6 +4599,27 @@ window/min-trades — leaving it ERROR reads as a repairable failure it is not.
 
 No parameter changed. No prereg written. No holdout touched. Freeze intact.
 
+## 2026-09-29 — HYP-122 scoped: Dufour & Engle (2000) read in full; replication + tradability kill-test specified, prereg NOT sealed
+
+**Shipped:** `research/HYP-122/` — CONTEXT.md (scope), `output/extraction.md` (the paper, every headline
+number with its location), `references/README.md` (open URL + sha256; PDF not committed, public repo).
+Logged in both ledgers as `IN_RESEARCH / scoped`. HYP-121 now points here for the lead it surfaced.
+
+**What the paper actually says (47 pp., all tables and footnotes read):** on 18 NYSE stocks, Nov 1990–Jan
+1991, a signed trade moves the mid-quote more, prices adjust faster (~4 min vs >23 min for FNM), and
+trade signs autocorrelate more, when the time since the previous trade is short. δ<0 for 13/18 stocks.
+**Its own robustness check guts it:** with trade size and spread in the impact equation, duration survives
+in 8/18 and keeps its sign in 6 — the authors call the net effect "only marginal". No trading rule, no
+costs, no out-of-sample period, direction comes from the trade that already happened.
+
+**Scope:** Stage A replicates δ<0 on SIP tape (20 NYSE names × 3 windows: 2016, Mar-2020, 2024), pass =
+≥12/20 stocks each window and ≥10/20 with size+spread controls. Stage B (only if A passes) is a
+kill-test: fast-decile signed events, +1 s retail latency, full spread both ways, h = 10/60/300 s.
+Prior stated before data: A replicates in sign, B NOT_TRADABLE (HYP-119/120 territory). Trials 2–5 from
+1649. Data verified on the existing Alpaca key: SIP tick trades + NBBO quotes, 2016 → today, $0.
+
+**Not done, by design:** prereg drafted in CONTEXT.md, not sealed — operator seals. No pull, no run.
+
 ## 2026-09-28 — HYP-121 source intake (Malhotra SSRN 3306817)
 
 **Shipped:** `research/HYP-121/` — SOURCE_INTAKE scope folder for Malhotra (2018),

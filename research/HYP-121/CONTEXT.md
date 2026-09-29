@@ -82,6 +82,8 @@ repo." Nothing here changes that line.
 
 ## Where the real content is
 
+> **2026-09-29:** the Dufour–Engle lead below was picked up as its own folder, `research/HYP-122/` (paper read in full, scoped, prereg drafted). Malhotra's body is still unread; this folder's Open Question is unchanged.
+
 The paper's substantive value is its reference list, not its recommendations. Of the 14
 references, the one that carries actual testable machinery:
 
