@@ -1,0 +1,145 @@
+{
+  "date": "2026-09-28",
+  "generated_at": "2026-09-28T12:15:37.097906+00:00",
+  "meta_regime": "CONCENTRATION",
+  "regime_read": "NQ leading / pulling away from ES \u2014 narrow, tech/AI-driven, FRAGILE. Trust directional moves less; watch for reversal when AI names cool.",
+  "narrative": "Macro backdrop \u2014\n[2026-09-28] US economic state (FRED):\n  Growth: real GDP 1.5% (q/q ann)\n  Inflation: CPI 3.05% YoY | core CPI 2.22% | core PCE 2.92% (Fed target 2%)\n  Labor: unemployment 4.1%\n  Rates: fed funds 3.63% | 10Y 5.18% | 10Y-2Y 0.36% (NORMAL)\n  Consumer: UMich sentiment 51.7 | VIX 14.21\n\n---\nRecent market action has seen the NQ leading ES, with a narrow and tech/AI-driven focus. The lead-lag regime is currently classified as 'CONCENTRATION', indicating that the market is focused on specific sectors rather than broad-based movements. This suggests that directional moves should be treated cautiously due to the fragile nature of the current environment. The volume profile shows accumulation zones around 7760-7805 for ES and 30536-30921 for NQ, with key points of concentration at 7770 for ES and 30764 for NQ. These levels represent areas where significant buying or selling pressure has occurred in the recent past. The lead-lag regime is currently showing a divergence, with NQ leading and pulling away from ES. This implies that any directional move should be watched closely, as it may not hold if AI-related stocks cool down. The upcoming events include PCE (Fed's preferred inflation) on 2026-09-30, ISM Manufacturing PMI on 2026-10-01, Nonfarm Payrolls on 2026-10-02, and CPI on 2026-10-12. Given the current regime and the upcoming events, it is advisable to size positions carefully, reducing exposure as we approach key data releases. The overall bias leans towards a 'LONG-THE-DIP' strategy with a probability of ~65%, which could be invalidated if NQ falls below 30,375.",
+  "big_move_headline": {
+    "headline": "Today's likeliest institutional move: SHORT EURUSD (P 67%, ~0.50% range, conf 37%).",
+    "pair": "EURUSD",
+    "direction": "SHORT",
+    "p_big": 0.6697,
+    "confidence": 0.374,
+    "expected_magnitude_pct": 0.5005,
+    "session": "LONDON",
+    "drivers": [
+      [
+        "event_risk",
+        0.9
+      ],
+      [
+        "momentum",
+        -0.3062
+      ],
+      [
+        "displacement",
+        -0.1334
+      ]
+    ],
+    "validation_status": "UNVALIDATED \u2014 display only (run scripts/validate_big_move.py)"
+  },
+  "directional_bias": "NEUTRAL",
+  "confidence": 65,
+  "regime_call": "CONCENTRATION",
+  "key_level": null,
+  "synthesis_source": "ollama/qwen2.5",
+  "lead_lag": {
+    "regime": "CONCENTRATION",
+    "spread_avg": 0.00167,
+    "leader": "NONE",
+    "corr": 0.937,
+    "divergence": false
+  },
+  "volume_profile": {
+    "ES=F": {
+      "symbol": "ES=F",
+      "as_of": "2026-09-28T12:15:06.107672+00:00",
+      "days": 5,
+      "bins": 40,
+      "poc": 7770.27,
+      "value_area_low": 7760.63,
+      "value_area_high": 7805.58,
+      "high_volume_nodes": [
+        7770.27,
+        7776.69,
+        7763.84,
+        7767.06,
+        7773.48
+      ],
+      "price_range": [
+        7714.08,
+        7842.5
+      ],
+      "limitation": "Volume profile = WHERE volume traded (volume-at-price). NOT order-flow delta (buy/sell aggression). True delta needs a CME order-flow feed (Databento/CQG)."
+    },
+    "NQ=F": {
+      "symbol": "NQ=F",
+      "as_of": "2026-09-28T12:15:06.153691+00:00",
+      "days": 5,
+      "bins": 40,
+      "poc": 30764.1,
+      "value_area_low": 30536.49,
+      "value_area_high": 30921.67,
+      "high_volume_nodes": [
+        30764.1,
+        30746.59,
+        30729.08,
+        30694.06,
+        30886.65
+      ],
+      "price_range": [
+        30387.67,
+        31088.0
+      ],
+      "limitation": "Volume profile = WHERE volume traded (volume-at-price). NOT order-flow delta (buy/sell aggression). True delta needs a CME order-flow feed (Databento/CQG)."
+    }
+  },
+  "macro_economic": {
+    "text": "[2026-09-28] US economic state (FRED):\n  Growth: real GDP 1.5% (q/q ann)\n  Inflation: CPI 3.05% YoY | core CPI 2.22% | core PCE 2.92% (Fed target 2%)\n  Labor: unemployment 4.1%\n  Rates: fed funds 3.63% | 10Y 5.18% | 10Y-2Y 0.36% (NORMAL)\n  Consumer: UMich sentiment 51.7 | VIX 14.21",
+    "summary": {
+      "gdp_growth_pct": 1.5,
+      "cpi_yoy_pct": 3.05,
+      "core_cpi_yoy_pct": 2.22,
+      "core_pce_yoy_pct": 2.92,
+      "unemployment_pct": 4.1,
+      "fed_funds_pct": 3.63,
+      "ten_year_pct": 5.18,
+      "yield_curve_10y2y": 0.36,
+      "yield_curve_state": "NORMAL",
+      "consumer_sentiment": 51.7,
+      "vix": 14.21
+    }
+  },
+  "news_count": 15,
+  "event_calendar": [
+    {
+      "event": "PCE (Fed's preferred inflation)",
+      "date": "2026-09-30",
+      "source": "cadence_estimate",
+      "action": "8:30 ET \u2014 reduce size into window",
+      "days_until": 2,
+      "note": "in 2d \u2014 8:30 ET \u2014 reduce size into window"
+    },
+    {
+      "event": "ISM Manufacturing PMI",
+      "date": "2026-10-01",
+      "source": "cadence_estimate",
+      "action": "reduce size into the 10:00 ET print",
+      "days_until": 3,
+      "note": "in 3d \u2014 reduce size into the 10:00 ET print"
+    },
+    {
+      "event": "Nonfarm Payrolls",
+      "date": "2026-10-02",
+      "source": "cadence_estimate",
+      "action": "high-impact 8:30 ET \u2014 widen stops / size down",
+      "days_until": 4,
+      "note": "in 4d \u2014 high-impact 8:30 ET \u2014 widen stops / size down"
+    },
+    {
+      "event": "CPI",
+      "date": "2026-10-12",
+      "source": "cadence_estimate",
+      "action": "inflation print 8:30 ET \u2014 reduce size into window",
+      "days_until": 14,
+      "note": "in 14d \u2014 inflation print 8:30 ET \u2014 reduce size into window"
+    }
+  ],
+  "scorecard_summary": "Briefing scorecard: n=47 dir-calls, hit 0.638, regime acc 0.403 \u2014 MATURE \u2014 calibration is now interpretable",
+  "bias": "size to regime: trust direction more in BREADTH, less in CONCENTRATION; ROTATION_WARN = treat tech-led longs as suspect",
+  "provenance": {
+    "source": "oracle_morning_briefing",
+    "verified": false,
+    "note": "Analyst/Oracle journal \u2014 qualitative regime context + a self-scored directional call, NOT a verified data feed or validated edge. Numbers here are never ingested as trading inputs."
+  }
+}

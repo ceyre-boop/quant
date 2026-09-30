@@ -1,62 +1,62 @@
 {
-  "generated_at": "2026-08-24T23:44:21.179824+00:00",
+  "generated_at": "2026-09-29T23:17:52.912406+00:00",
   "alive": true,
-  "fired_today": true,
+  "fired_today": false,
   "frozen": null,
-  "scan_age_hours": 11.7,
+  "scan_age_hours": 677.8,
   "n_pairs_scanned": 4,
-  "n_would_fire_today": 2,
+  "n_would_fire_today": 1,
   "strongest_signal": {
-    "pair": "USDJPY=X",
-    "conviction": 0.432,
-    "direction": "NO_TRADE",
+    "pair": "GBPUSD=X",
+    "conviction": 0.148,
+    "direction": "LONG",
     "pct_to_trigger": 100.0,
     "regime": "TRENDING",
-    "rate_differential": 3.489
+    "rate_differential": -0.599
   },
   "pairs": [
     {
-      "pair": "USDJPY=X",
-      "conviction": 0.432,
-      "direction": "NO_TRADE",
-      "pct_to_trigger": 100.0,
-      "regime": "TRENDING",
-      "rate_differential": 3.489
-    },
-    {
-      "pair": "AUDUSD=X",
-      "conviction": 0.282,
-      "direction": "LONG",
-      "pct_to_trigger": 100.0,
-      "regime": "TRENDING",
-      "rate_differential": 0.13
-    },
-    {
       "pair": "GBPUSD=X",
-      "conviction": 0.269,
+      "conviction": 0.148,
       "direction": "LONG",
       "pct_to_trigger": 100.0,
       "regime": "TRENDING",
       "rate_differential": -0.599
     },
     {
-      "pair": "EURUSD=X",
-      "conviction": 0.147,
+      "pair": "AUDUSD=X",
+      "conviction": 0.091,
       "direction": "NO_TRADE",
-      "pct_to_trigger": 100.0,
+      "pct_to_trigger": 91.0,
       "regime": "TRENDING",
-      "rate_differential": -1.83
+      "rate_differential": 0.13
+    },
+    {
+      "pair": "EURUSD=X",
+      "conviction": 0.034,
+      "direction": "NO_TRADE",
+      "pct_to_trigger": 34.0,
+      "regime": "TRENDING",
+      "rate_differential": -1.38
+    },
+    {
+      "pair": "USDJPY=X",
+      "conviction": 0.0,
+      "direction": "NO_TRADE",
+      "pct_to_trigger": 0.0,
+      "regime": "RANGING",
+      "rate_differential": 0.0
     }
   ],
   "last_fill": {
-    "pair": "AUD_USD",
+    "pair": "GBP_USD",
     "direction": "LONG",
-    "fill_price": 0.71639,
-    "date": "2026-08-24",
-    "days_ago": 0.5
+    "fill_price": 1.35213,
+    "date": "2026-09-01",
+    "days_ago": 28.2
   },
   "loops_alive": 7,
   "loops_down": [],
-  "summary_line": "\ud83d\udfe2 TRADE FIRED today: AUD_USD LONG @ 0.71639. 4 pairs scanned 11.7h ago \u2014 2 signalling (AUDUSD=X LONG, GBPUSD=X LONG). Highest conviction: USDJPY=X 0.432. ",
+  "summary_line": "System alive. 4 pairs scanned 677.8h ago \u2014 1 signalling (GBPUSD=X LONG). Highest conviction: GBPUSD=X 0.148. Last fill: GBP_USD LONG, 28.2d ago.",
   "note": "Honest proof-of-life: would-be signals + proximity, never a forced trade. Read-only."
 }

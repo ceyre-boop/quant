@@ -1,16 +1,16 @@
 {
   "date": "2026-09-27",
-  "generated_at": "2026-09-27T13:13:19.833444+00:00",
+  "generated_at": "2026-09-28T03:47:16.513058+00:00",
   "meta_regime": "CONCENTRATION",
   "regime_read": "NQ leading / pulling away from ES \u2014 narrow, tech/AI-driven, FRAGILE. Trust directional moves less; watch for reversal when AI names cool.",
-  "narrative": "Macro backdrop \u2014\n[2026-09-27] US economic state (FRED):\n  Growth: real GDP 1.5% (q/q ann)\n  Inflation: CPI 3.05% YoY | core CPI n/a | core PCE 2.92% (Fed target 2%)\n  Labor: unemployment 4.1%\n  Rates: fed funds 3.63% | 10Y 5.18% | 10Y-2Y 0.36% (NORMAL)\n  Consumer: UMich sentiment 51.7 | VIX 14.21\n\n---\nRecent market action has seen the S&P 500 (ES) and Nasdaq-100 (NQ) move higher, with both indices trading above their respective 200-day moving averages. The ES index is currently at 7803.75, up 0.47% for the day and 1.91% for the week, while NQ stands at 30889.25, up 0.4% daily and 4.31% weekly. The lead-lag regime analysis indicates a concentration pattern where NQ is leading ES, suggesting tech-driven moves are currently in focus. However, this lead-lag relationship appears fragile, as indicated by the note that directional moves should be trusted less and to watch for reversals when AI names cool off. Volume profiles show accumulation zones around 7758-7841 for ES and 30676-30956 for NQ, with price of control (POC) at 7771.83 for ES and 30764.1 for NQ. The event calendar highlights upcoming key events such as the PCE report on September 30th, the ISM Manufacturing PMI on October 1st, Nonfarm Payrolls on October 2nd, and the CPI report on October 12th. Given these factors, we are maintaining a long-the-dip bias with a probability of ~65%, which could be invalidated if NQ falls below 30,375.",
+  "narrative": "Macro backdrop \u2014\n[2026-09-27] US economic state (FRED):\n  Growth: real GDP 1.5% (q/q ann)\n  Inflation: CPI 3.05% YoY | core CPI n/a | core PCE 2.92% (Fed target 2%)\n  Labor: unemployment 4.1%\n  Rates: fed funds 3.63% | 10Y 5.18% | 10Y-2Y 0.36% (NORMAL)\n  Consumer: UMich sentiment 51.7 | VIX 14.21\n\n---\nRecent market action has seen the NQ leading ES, with a narrow and tech/AI-driven focus. The lead-lag regime is classified as 'Concentration,' indicating that the market is currently in a fragile state, driven by specific sectors rather than broader economic factors. This suggests that directional moves should be treated cautiously, and traders should watch for potential reversals when AI-related stocks cool down. The volume profile shows accumulation zones around 7758-7841 for ES and 30676-30956 for NQ, with the point of convergence (POC) at 7771.83 and 30764.1 respectively. These levels represent areas where significant buying interest is likely to be found or resistance could form. The lead-lag regime's best lag (-3 days) shows a spread of -0.078, indicating that NQ has been leading ES by a narrow margin. Given the upcoming FOMC event and other economic indicators, traders should consider reducing their position sizes as these events approach to manage risk effectively. Overall, the current meta-regime suggests a long-the-dip bias with a probability of ~65%, which could be invalidated if NQ falls below 30,729.",
   "big_move_headline": {
-    "headline": "Today's likeliest institutional move: LONG EURUSD (P 66%, ~0.54% range, conf 31%).",
-    "pair": "EURUSD",
-    "direction": "LONG",
-    "p_big": 0.6577,
-    "confidence": 0.314,
-    "expected_magnitude_pct": 0.5356,
+    "headline": "Today's likeliest institutional move: SHORT GBPUSD (P 67%, ~0.54% range, conf 35%).",
+    "pair": "GBPUSD",
+    "direction": "SHORT",
+    "p_big": 0.6734,
+    "confidence": 0.348,
+    "expected_magnitude_pct": 0.5376,
     "session": "OFF_HOURS",
     "drivers": [
       [
@@ -19,31 +19,31 @@
       ],
       [
         "momentum",
-        0.2269
+        -0.3312
       ],
       [
-        "compression",
-        0.0
+        "displacement",
+        -0.0184
       ]
     ],
     "validation_status": "UNVALIDATED \u2014 display only (run scripts/validate_big_move.py)"
   },
-  "directional_bias": "NEUTRAL",
-  "confidence": 65,
+  "directional_bias": "LONG",
+  "confidence": 75,
   "regime_call": "CONCENTRATION",
   "key_level": null,
   "synthesis_source": "ollama/qwen2.5",
   "lead_lag": {
     "regime": "CONCENTRATION",
-    "spread_avg": 0.00161,
+    "spread_avg": 0.00164,
     "leader": "NONE",
-    "corr": 0.934,
+    "corr": 0.936,
     "divergence": false
   },
   "volume_profile": {
     "ES=F": {
       "symbol": "ES=F",
-      "as_of": "2026-09-27T12:33:54.968492+00:00",
+      "as_of": "2026-09-28T03:46:25.110869+00:00",
       "days": 5,
       "bins": 40,
       "poc": 7771.83,
@@ -64,7 +64,7 @@
     },
     "NQ=F": {
       "symbol": "NQ=F",
-      "as_of": "2026-09-27T12:33:55.019067+00:00",
+      "as_of": "2026-09-28T03:46:25.162035+00:00",
       "days": 5,
       "bins": 40,
       "poc": 30764.1,
@@ -100,7 +100,7 @@
       "vix": 14.21
     }
   },
-  "news_count": 0,
+  "news_count": 10,
   "event_calendar": [
     {
       "event": "PCE (Fed's preferred inflation)",
