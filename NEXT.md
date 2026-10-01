@@ -4663,3 +4663,9 @@ Context: 4 FRESH / 2 UNAVAILABLE (gdelt never ingested, calendar ForexFactory 40
 Dashboard: prop_challenge overall=WAIT (G3/G5 collecting, no closed trades)
 Ran archive/AGENT_DIRECTIVE.md 08:00 routine via .venv313, all steps exit 0. First context run hit a sentiment.db DuckDB lock held by the scheduled scripts/update_sentiment.py (PID 9991); re-ran after it finished.
 0 candidates is a timing artifact, not an outage: movers returned 50 rows (NXL +93% etc.) but at 08:12 ET no session bars exist yet, so scan_universe builds nothing. The scan as written cannot produce GO rows before 09:30/10:25 — the 08:00 slot is too early for this step; a post-10:25 re-run is needed for real signals.
+
+## 2026-10-01 · EOD PASS
+Fills: 1 (GO: 0, NO-GO: 0; harness SKIP_NO_BORROW ×3 — NXL/VEEA/SDEV, HYP-093 tier_NOT_LISTED) | Session P&L: HYP-107 shadow VEEA +10.17% net
+Challenge status: prop dashboard overall WAIT (G1/G2a/G2b GREEN, G3 collecting)
+Harness delta (vs backtest): +2.38pp (n=1 — a counter, not a result)
+Notes: morning scan 08:21 ET found 0 HYP-093 candidates (real zero, scan ran; 4/6 sources fresh, gdelt+calendar UNAVAILABLE). Bias NEUTRAL, unscored. EOD run from archive/AGENT_DIRECTIVE.md (root copy archived in 7ed778d — com.alta.eod_agent last exit status 1, check whether it still points at the old path).
