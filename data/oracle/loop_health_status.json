@@ -1,59 +1,59 @@
 {
-  "checked_at": "2026-09-29T23:17:52.906724+00:00",
+  "checked_at": "2026-10-01T00:22:01.736412+00:00",
   "market_hours": true,
   "frozen": null,
   "down": [],
   "loops": {
     "ict_scanner": {
       "status": "ALIVE",
-      "last": "2026-09-29T23:13:21.173233+00:00",
-      "silence_hours": 0.1,
+      "last": "2026-10-01T00:19:31.581384+00:00",
+      "silence_hours": 0.0,
       "threshold": 0.5,
       "kind": "periodic"
     },
     "forex_scan": {
       "status": "ALIVE",
-      "last": "2026-09-29T12:11:15.605796+00:00",
-      "silence_hours": 11.1,
+      "last": "2026-09-30T12:22:20.492281+00:00",
+      "silence_hours": 12.0,
       "threshold": 30,
       "kind": "periodic",
-      "effective_silence_hours": 11.1
+      "effective_silence_hours": 12.0
     },
     "pulse_check": {
       "status": "ALIVE",
-      "last": "2026-09-29T23:17:52+00:00",
+      "last": "2026-10-01T00:22:01+00:00",
       "silence_hours": 0.0,
       "threshold": 3,
       "kind": "periodic"
     },
     "decision_backfill": {
       "status": "ALIVE",
-      "last": "2026-09-29T23:17:51.662287+00:00",
+      "last": "2026-10-01T00:21:59.157120+00:00",
       "silence_hours": 0.0,
       "threshold": 3,
       "kind": "periodic"
     },
     "big_move": {
       "status": "ALIVE",
-      "last": "2026-09-29T23:17:52+00:00",
+      "last": "2026-10-01T00:22:01+00:00",
       "silence_hours": 0.0,
       "threshold": 3,
       "kind": "periodic"
     },
     "oracle_reflection": {
       "status": "ALIVE",
-      "last": "2026-09-29T06:37:14.306372+00:00",
-      "silence_hours": 16.7,
+      "last": "2026-09-30T06:49:23.134602+00:00",
+      "silence_hours": 17.5,
       "threshold": 26,
       "kind": "periodic"
     },
     "morning_briefing": {
       "status": "ALIVE",
-      "last": "2026-09-29T14:16:26.900347+00:00",
-      "silence_hours": 9.0,
+      "last": "2026-09-30T13:12:16.096601+00:00",
+      "silence_hours": 11.2,
       "threshold": 26,
       "kind": "periodic",
-      "effective_silence_hours": 9.0
+      "effective_silence_hours": 11.2
     },
     "edge_pipeline": {
       "status": "EVENT_DRIVEN",

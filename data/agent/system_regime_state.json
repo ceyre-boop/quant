@@ -1,27 +1,32 @@
 {
-  "generated_at": "2026-09-30T01:30:08.382831+00:00",
+  "generated_at": "2026-10-01T00:18:20.093431+00:00",
   "status": "DEGRADED",
-  "status_reason": "carry:STALE; es_nq:STALE; macro:OK; portfolio:UNAVAILABLE",
+  "status_reason": "carry:STALE; es_nq:OK; macro:OK; portfolio:UNAVAILABLE",
   "strategies": {
     "carry": {
       "status": "STALE",
       "verdict": "STAND_ASIDE",
       "favorable": false,
       "size_multiplier": 0.0,
-      "reason": "forex_proximity.json 680.0h old > 12.0h freshness limit",
+      "reason": "forex_proximity.json 702.8h old > 12.0h freshness limit",
       "source": "data/agent/forex_proximity.json",
-      "source_age_hours": 679.987,
+      "source_age_hours": 702.79,
       "detail": {}
     },
     "es_nq": {
-      "status": "STALE",
-      "verdict": "STAND_ASIDE",
+      "status": "OK",
+      "verdict": "INFO",
       "favorable": false,
       "size_multiplier": 0.0,
-      "reason": "nqes_regime.json 12.7h old > 12.0h freshness limit",
+      "reason": "research INFO only \u2014 regime 'CONCENTRATION'",
       "source": "data/research/nqes_regime.json",
-      "source_age_hours": 12.734,
-      "detail": {}
+      "source_age_hours": 11.789,
+      "detail": {
+        "regime": "CONCENTRATION",
+        "read": "NQ leading / pulling away from ES \u2014 narrow, tech/AI-driven, FRAGILE. Trust directional moves less; watch for reversal when AI names cool.",
+        "divergence": false,
+        "contemporaneous_corr": 0.937
+      }
     },
     "macro": {
       "status": "OK",
@@ -30,13 +35,13 @@
       "size_multiplier": 0.0,
       "reason": "macro backdrop INFO (VIX / curve / credit) \u2014 shared input",
       "source": "data/macro/macro_snapshot.json",
-      "source_age_hours": 0.456,
+      "source_age_hours": 0.928,
       "detail": {
-        "vix": 16.04,
-        "curve_10y2y": 0.755,
-        "curve_10y3m": 1.19,
-        "credit_hyg": 77.54,
-        "dgs10": 5.255
+        "vix": 16.34,
+        "curve_10y2y": 0.745,
+        "curve_10y3m": 1.263,
+        "credit_hyg": 77.21,
+        "dgs10": 5.293
       }
     }
   },
