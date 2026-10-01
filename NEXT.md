@@ -4657,3 +4657,9 @@ stream and rewriting one object per line — 9 records, all valid, no data lost.
 Ran archive/AGENT_DIRECTIVE.md 21:00 routine, all steps exit 0. Movers 50 (fade band ≥40% common ≥$1: TGE, GOW, CMCT, TNON). Queue 0 QUEUED (empty 45 days; findings.jsonl unchanged since 08-16). Candidates flagged: none.
 **Blocker — second silent blackout:** 20 nightly runs 09-02→09-29 died on an account API usage limit (`regain access 2026-10-01 00:00 UTC`) before any tool call, leaving no trace except the log. Same as 08-31, 4× longer. Operator: raise/monitor the API limit, and build the non-Claude missed-night watchdog. Detail in research/weekly_pattern_update.md.
 Observed, not acted on: research graveyard omits HYP-085/090/109–114; brain context uses UTC date.
+
+## 2026-10-01 · MORNING PASS
+Context: 4 FRESH / 2 UNAVAILABLE (gdelt never ingested, calendar ForexFactory 403) | Bias: NEUTRAL 0.00 | Candidates GO: 0 NO-GO: 0
+Dashboard: prop_challenge overall=WAIT (G3/G5 collecting, no closed trades)
+Ran archive/AGENT_DIRECTIVE.md 08:00 routine via .venv313, all steps exit 0. First context run hit a sentiment.db DuckDB lock held by the scheduled scripts/update_sentiment.py (PID 9991); re-ran after it finished.
+0 candidates is a timing artifact, not an outage: movers returned 50 rows (NXL +93% etc.) but at 08:12 ET no session bars exist yet, so scan_universe builds nothing. The scan as written cannot produce GO rows before 09:30/10:25 — the 08:00 slot is too early for this step; a post-10:25 re-run is needed for real signals.

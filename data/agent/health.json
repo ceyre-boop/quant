@@ -1,10 +1,10 @@
 {
-  "timestamp": "2026-09-01T16:06:18",
+  "timestamp": "2026-10-01T08:12:31",
   "overall": "RED",
   "components": {
     "duckdb": {
       "status": "GREEN",
-      "detail": "v1.5.2 ready (in-memory)"
+      "detail": "v1.5.5 ready (in-memory)"
     },
     "ollama": {
       "status": "GREEN",
@@ -12,11 +12,11 @@
     },
     "yfinance": {
       "status": "GREEN",
-      "detail": "yfinance 1.3.0 installed"
+      "detail": "yfinance 1.5.2 installed"
     },
     "ict_scanner": {
-      "status": "RED",
-      "detail": "log is 191h old \u2014 scanner appears down"
+      "status": "GREEN",
+      "detail": "outside session hours \u2014 last run 3.5h ago"
     },
     "backtest_engine": {
       "status": "GREEN",
@@ -24,7 +24,7 @@
     },
     "alpaca": {
       "status": "GREEN",
-      "detail": "paper account equity=$103,530"
+      "detail": "paper account equity=$105,052"
     },
     "fred": {
       "status": "GREEN",
@@ -32,7 +32,7 @@
     },
     "alpha_vantage": {
       "status": "GREEN",
-      "detail": "latest bar 2026-08-31"
+      "detail": "latest bar 2026-09-30"
     },
     "tiingo": {
       "status": "GREEN",
@@ -40,11 +40,11 @@
     },
     "news_api": {
       "status": "GREEN",
-      "detail": "68 business articles"
+      "detail": "63 business articles"
     },
     "oanda": {
       "status": "GREEN",
-      "detail": "NAV=$109,598 practice"
+      "detail": "NAV=$109,513 practice"
     },
     "firebase": {
       "status": "GREEN",
@@ -64,17 +64,16 @@
     },
     "reddit": {
       "status": "YELLOW",
-      "detail": "cache 62054m old \u2014 needs refresh"
+      "detail": "cache 104781m old \u2014 needs refresh"
     },
     "decision_logs": {
       "status": "YELLOW",
-      "detail": "WARNING: 9 trades >7d old missing outcome backfill (GBPUSD=X, GBPUSD=X, AUDUSD=X...)"
+      "detail": "WARNING: decisions_2026_10.jsonl missing \u2014 no decisions logged this month yet"
     },
     "oracle_pulse": {
       "status": "RED",
-      "detail": "0 new entries, 2 anomalies",
-      "last_pulse": "2026-10-01T00:22:01+00:00"
+      "detail": "0 new entries, 2 anomalies"
     }
   },
-  "last_checked": "2026-09-01T16:06:18"
+  "last_checked": "2026-10-01T08:12:31"
 }
