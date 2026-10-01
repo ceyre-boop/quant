@@ -4652,3 +4652,8 @@ survives it as its own hypothesis.
 **Incidental fix:** `data/hypotheses_ledger.jsonl` had no trailing newline, so the append
 concatenated onto the HYP-093 record and broke line-wise parsing. Repaired by re-decoding the
 stream and rewriting one object per line — 9 records, all valid, no data lost.
+
+## 2026-09-30 · RESEARCH (21:00 ET nightly)
+Ran archive/AGENT_DIRECTIVE.md 21:00 routine, all steps exit 0. Movers 50 (fade band ≥40% common ≥$1: TGE, GOW, CMCT, TNON). Queue 0 QUEUED (empty 45 days; findings.jsonl unchanged since 08-16). Candidates flagged: none.
+**Blocker — second silent blackout:** 20 nightly runs 09-02→09-29 died on an account API usage limit (`regain access 2026-10-01 00:00 UTC`) before any tool call, leaving no trace except the log. Same as 08-31, 4× longer. Operator: raise/monitor the API limit, and build the non-Claude missed-night watchdog. Detail in research/weekly_pattern_update.md.
+Observed, not acted on: research graveyard omits HYP-085/090/109–114; brain context uses UTC date.
