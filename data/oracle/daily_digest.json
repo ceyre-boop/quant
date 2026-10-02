@@ -1,19 +1,21 @@
 {
-  "headline": "ICARUS shadow day 52: +0.000% \u2014 3/52 green so far",
+  "headline": "Oracle back online after crashing on missing files; CI workflows green; swap financing audit shows carry premise broken on half the book.",
   "what_happened": [
-    "2026-09-28 \u2014 CI: both weekly workflows green again after 10+ weeks of silent red; failures now open issues (`97eb7bc` master, `7e53ecb` sovereign-v2, pushed)",
-    "2026-09-20 (d) \u2014 SWAP HARNESS: gate (b) is now measurable, and day one already says something (`20a0d00`, pushed)",
-    "2026-09-20 (c) \u2014 ROOT CAUSE: nine files were deleted from the working tree; the loops have been crashing on it"
+    "Nine deleted files (reflect_cycle.py, execution modules, dashboards) were crashing nightly jobs since unknown date; restored from HEAD, test errors dropped 14\u21924.",
+    "Weekly CI workflows (data-snapshot, weekly-report) rebuilt and now green after 10+ weeks silent red; root cause was cron-disable only on sovereign-v2 while master kept firing legacy report.",
+    "SWAP gate (b) live: OANDA financing audit on EUR_USD SHORT, GBP_USD SHORT, AUD_USD LONG shows broker take ~2.03%/yr flat, but SWAP_RATES_ANNUAL model is 4.6\u201310.1\u00d7 too small and sign-flipped on EUR_USD SHORT; every backtest mis-costed (n=1, needs 10 readings).",
+    "Shadow_gapper Icarus signals dried up after 2026-07-27 (3 signal days in Jul, zero since); latest constitutional day return 0.0 on 2026-09-30.",
+    "Throughput bench: single-core 4,739/s, 12-core ceiling 12,571/s; legacy claim not beaten; numba inactive on py3.14.4 fallback."
   ],
-  "what_it_means": "Template digest (no LLM call) \u2014 see NEXT.md for detail. (LLM fallback: BadRequestError)",
-  "todays_one_thing": "Check the ICARUS calendar; the ladder does the rest.",
+  "what_it_means": "The system was operationally dead (Oracle crashing nightly, writers DEAD) but is now restored. Workflows are auditable again. However, your carry trades are systematically mis-costed: the financing model underpays risk by 5\u201310\u00d7, and GBP_USD and AUD_USD have no paying side at this broker\u2014half your book pays to hold, not gets paid. This invalidates backtests and needs immediate re-baselining (NN#4) before you scale into carry. Shadow gap signals have gone silent for over two months; that strategy is not generating.",
+  "todays_one_thing": "Lock in the SWAP_RATES_ANNUAL correction (NN#4) and re-baseline every backtest result that depends on financing costs; do not trade carry until you verify the revised hurdle rate against live broker rates. Parallel: collect 9 more SWAP probe readings (target n=10) to validate the 2.03%/yr broker take and whether any pair has a paying side.",
   "progression": [
     {
       "gate": "G1",
       "label": "30 clean shadow days (ICARUS)",
       "state": "IN_PROGRESS",
       "pct": 100,
-      "detail": "52/30 days recorded \u00b7 3 green"
+      "detail": "53/30 days recorded \u00b7 3 green"
     },
     {
       "gate": "G2",
@@ -44,7 +46,7 @@
       "detail": "the actual goal"
     }
   ],
-  "source": "template-fallback",
-  "model": null,
-  "generated_at": "2026-09-30T10:55:05.314272+00:00"
+  "source": "oracle-llm",
+  "model": "claude-haiku-4-5-20251001",
+  "generated_at": "2026-10-01T10:38:08.048557+00:00"
 }

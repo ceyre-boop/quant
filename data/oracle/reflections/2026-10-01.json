@@ -1,0 +1,26 @@
+{
+  "date": "2026-10-01",
+  "generated_at": "2026-10-01T07:16:02.989383+00:00",
+  "input_tokens": 4625,
+  "output_tokens": 931,
+  "estimated_cost_usd": 0.1392,
+  "harvest_days_read": 7,
+  "reflection": {
+    "candidate_lesson": {
+      "lesson_text": "When the 30-indicator consensus shows conv=100% SHORT with hist_hr>65% on a pair (EURUSD 66%, AUDUSD 72%), only size up if TradingView external confirmation is non-null \u2014 pure internal-only consensus at 75% sizing is where the current regime (CONCENTRATION, verified=False) silently degrades edge.",
+      "mechanism": "CONCENTRATION regime means moves are narrow/fragile and driven by a single theme (AI/tech); broad FX consensus signals get corrupted by cross-asset safe-haven and USD flows that the indicator stack reads as directional conviction but which reverse when the concentrated theme cools \u2014 external TV confirmation acts as an orthogonal cross-check that internal indicators cannot provide to themselves.",
+      "testable_rule": "if consensus_conv == 1.0 and consensus_hist_hr > 0.65 and tradingview_signals == 0: cap sizing_multiplier at 0.5 instead of 0.75",
+      "expected_impact": "Reduces drawdown contribution from false-conviction FX shorts in fragile regimes; expected Sharpe +0.02 to +0.04 via variance reduction on the highest-conviction (and thus largest-sized) trades.",
+      "evidence_from_harvest": "EURUSD conv=100% SHORT hist_hr=66% and AUDUSD conv=100% SHORT hist_hr=72% both fire simultaneously while TradingView returns 0 signals and internal regime is CONCENTRATION (verified=False) \u2014 two max-conviction signals with zero external corroboration is the exact clustering that inflates position size right before theme reversals.",
+      "evidence_from_reasoning": null,
+      "reasoning_component_targeted": "consensus_conv + tradingview_signals (sizing_multiplier gate)",
+      "sample_needed": 40
+    },
+    "retirement_flag": {
+      "lesson_to_review": "L-L-008",
+      "reason": "VIX is currently 16.04 (above the tightened 13 gate) but we are in a CONCENTRATION regime not a clean bull-market carry regime \u2014 the VIX>13 safe-haven corruption logic may need a regime qualifier, since VIX level alone no longer cleanly separates carry-safe from carry-corrupt states."
+    },
+    "system_health_note": "Zero trades in 7 days with regime=UNKNOWN internally but CONCENTRATION externally (verified=False) and internal-only MOMENTUM at 75% sizing \u2014 the system is correctly cautious but flying partially blind without TV confirmation, so any lesson must gate on conviction-without-corroboration rather than conviction alone."
+  },
+  "auto_validation": null
+}

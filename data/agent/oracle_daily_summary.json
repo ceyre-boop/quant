@@ -1,14 +1,14 @@
 {
-  "last_updated": "2026-09-01T06:32:01.448941+00:00",
+  "last_updated": "2026-10-01T07:16:10.337846+00:00",
   "harvest": {
     "trades_closed": 0,
     "win_rate": null,
     "failure_taxonomy": {}
   },
   "reflection": {
-    "candidate_lesson": "When the 30-indicator consensus shows high conviction (>90%) but green_matches=0 and hist_hr=0%, treat the signal as UNVALIDATED and freeze entries \u2014 high live conviction without any historical analog match is a novel unmemorized state, not an edge.",
-    "mechanism": "green_matches counts how many times the current live indicator configuration has appeared in historical memory with a positive outcome. Zero matches means the ensemble has never seen this exact bull-alignment succeed before; conviction% only measures cross-sectional agreement of indicators right now, not the forward payoff of that agreement. Institutionally, a broad indicator stack lining up long with no historical precedent usually reflects a late-cycle crowded positioning snapshot rather than a repeatable inefficiency \u2014 the crowd is aligned, which is precisely when mean-reversion risk is highest.",
-    "testable_rule": "if consensus_conviction > 0.90 and green_matches == 0 and hist_hr == 0.0: block_entry() # only trade conviction>0.90 when green_matches >= 3 (see GBPUSD hist_hr=68%, AUDUSD hist_hr=68%)"
+    "candidate_lesson": "When the 30-indicator consensus shows conv=100% SHORT with hist_hr>65% on a pair (EURUSD 66%, AUDUSD 72%), only size up if TradingView external confirmation is non-null \u2014 pure internal-only consensus at 75% sizing is where the current regime (CONCENTRATION, verified=False) silently degrades edge.",
+    "mechanism": "CONCENTRATION regime means moves are narrow/fragile and driven by a single theme (AI/tech); broad FX consensus signals get corrupted by cross-asset safe-haven and USD flows that the indicator stack reads as directional conviction but which reverse when the concentrated theme cools \u2014 external TV confirmation acts as an orthogonal cross-check that internal indicators cannot provide to themselves.",
+    "testable_rule": "if consensus_conv == 1.0 and consensus_hist_hr > 0.65 and tradingview_signals == 0: cap sizing_multiplier at 0.5 instead of 0.75"
   },
   "validation": {
     "verdict": "REJECTED",
@@ -21,8 +21,8 @@
     "codify_error": null
   },
   "cycle": {
-    "cost_usd": 0.142395,
+    "cost_usd": 0.1392,
     "status": "COMPLETE",
-    "date": "2026-09-01"
+    "date": "2026-10-01"
   }
 }

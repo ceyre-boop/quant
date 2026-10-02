@@ -1,9 +1,8 @@
 {
-  "ts": "2026-10-01T00:17:47.212015+00:00",
+  "ts": "2026-10-01T20:15:52.720937+00:00",
   "overall": "YELLOW",
   "red": [],
   "yellow": [
-    "forex_data",
     "forex_scan"
   ],
   "jobs": {
@@ -15,7 +14,7 @@
     },
     "forex_scan": {
       "path": "data/agent/forex_proximity.json",
-      "age_minutes": 42166.8,
+      "age_minutes": 43364.9,
       "max_age_minutes": 1440,
       "optional": false,
       "status": "STALE",
@@ -23,19 +22,19 @@
     },
     "forex_data": {
       "path": "data/health/forex_data_status.json",
-      "age_minutes": 42011.4,
+      "age_minutes": 0.0,
       "max_age_minutes": 1440,
       "optional": false,
-      "status": "STALE",
-      "detail": "overall=GREEN, degraded=[], fake_data=[]; job may have stopped firing"
+      "status": "OK",
+      "detail": "overall=GREEN, degraded=[], fake_data=[]"
     },
     "api_health": {
       "path": "data/agent/health.json",
-      "age_minutes": 133.3,
+      "age_minutes": 0.0,
       "max_age_minutes": 1440,
       "optional": true,
       "status": "OK",
-      "detail": "components=18, red=['ict_scanner', 'oracle_pulse']"
+      "detail": "components=18, red=['oanda', 'oracle_pulse']"
     }
   }
 }
