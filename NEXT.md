@@ -4669,3 +4669,6 @@ Fills: 1 (GO: 0, NO-GO: 0; harness SKIP_NO_BORROW ×3 — NXL/VEEA/SDEV, HYP-093
 Challenge status: prop dashboard overall WAIT (G1/G2a/G2b GREEN, G3 collecting)
 Harness delta (vs backtest): +2.38pp (n=1 — a counter, not a result)
 Notes: morning scan 08:21 ET found 0 HYP-093 candidates (real zero, scan ran; 4/6 sources fresh, gdelt+calendar UNAVAILABLE). Bias NEUTRAL, unscored. EOD run from archive/AGENT_DIRECTIVE.md (root copy archived in 7ed778d — com.alta.eod_agent last exit status 1, check whether it still points at the old path).
+
+## 2026-10-01 · RESEARCH (21:00 nightly)
+Brain read OK · movers 50 (6 common in HYP-093 band: SSM, NXL, VEEA, RPGL, XRPN, SDEV) · queue 0 QUEUED (46 days empty) · no candidates flagged · findings.jsonl unchanged (132).

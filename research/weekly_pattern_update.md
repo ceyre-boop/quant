@@ -85,3 +85,12 @@ Written by `com.alta.research_agent` (launchd) per AGENT_DIRECTIVE.md § Researc
 - `recent_verdicts`: 13/15 are `BLOCKED_NO_VALIDATOR` HYP-AUTO-* (latest batch 2026-09-30 17:43 UTC) + the ohlc_quartile manual hyp re-scoring NOT_SIGNIFICANT three times in 2 days. Generator is producing unscoreable rows while the queue starves — unchanged from 09-01.
 - New patterns flagged: none.
 - Candidates queued for operator review: none — nothing tested, so nothing could clear p < 0.10 / n ≥ 20.
+
+## 2026-10-01 — nightly pattern update
+- Sessions reviewed: 1 (21:00 ET research routine, Thu). Second consecutive clean night after the 09-02→09-29 API-limit blackout.
+- Step 0 brain read: clean, exit 0. `get_research_context()` again stamps `date: 2026-10-02` (UTC date) — known, not acted on.
+- Step 1 movers: 50 gainers, clean. 25 derivative-like (W/R/U/.RT), 25 common. Common ≥40% & ≥$1 (HYP-093 fade band): **SSM +97.3% ($2.21), NXL +76.4% ($7.55), VEEA +59.9% ($3.47), RPGL +59.9% ($26.20), XRPN +42.9% ($23.43), SDEV +41.3% ($3.66)**. HYP-107 band (30–40%, ≥$1): NAMM +35.7%, BIRD +33.7%, QSI +33.6%; SES +36.1% sub-$1. Snapshot only; no fade test run.
+- Step 2 queue (`--max 5`): 0 QUEUED, IDLE. Queue empty since 2026-08-16 — now 46 days. `findings.jsonl` unchanged at 132 rows.
+- New patterns flagged: none.
+- Candidates queued for operator review: none — nothing tested.
+- Notes: the research pipeline is still structurally idle (empty queue + generator emitting BLOCKED_NO_VALIDATOR rows). The nightly routine is a movers snapshot and nothing more until something refills the queue.
