@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-01T19:48:48.559023+00:00",
+  "generated_at": "2026-10-03T00:46:05.398728+00:00",
   "status": "DEGRADED",
   "status_reason": "carry:STALE; es_nq:OK; macro:OK; portfolio:UNAVAILABLE",
   "strategies": {
@@ -8,9 +8,9 @@
       "verdict": "STAND_ASIDE",
       "favorable": false,
       "size_multiplier": 0.0,
-      "reason": "forex_proximity.json 722.3h old > 12.0h freshness limit",
+      "reason": "forex_proximity.json 751.3h old > 12.0h freshness limit",
       "source": "data/agent/forex_proximity.json",
-      "source_age_hours": 722.298,
+      "source_age_hours": 751.252,
       "detail": {}
     },
     "es_nq": {
@@ -18,14 +18,14 @@
       "verdict": "INFO",
       "favorable": false,
       "size_multiplier": 0.0,
-      "reason": "research INFO only \u2014 regime 'CONCENTRATION'",
+      "reason": "research INFO only \u2014 regime 'ROTATION_WARN'",
       "source": "data/research/nqes_regime.json",
-      "source_age_hours": 6.129,
+      "source_age_hours": 11.869,
       "detail": {
-        "regime": "CONCENTRATION",
-        "read": "NQ leading / pulling away from ES \u2014 narrow, tech/AI-driven, FRAGILE. Trust directional moves less; watch for reversal when AI names cool.",
-        "divergence": false,
-        "contemporaneous_corr": 0.944
+        "regime": "ROTATION_WARN",
+        "read": "NQ and ES diverging (one up, one down/flat) \u2014 rotation underway, regime shifting. Tech-led longs are suspect.",
+        "divergence": true,
+        "contemporaneous_corr": 0.948
       }
     },
     "macro": {
@@ -35,13 +35,13 @@
       "size_multiplier": 0.0,
       "reason": "macro backdrop INFO (VIX / curve / credit) \u2014 shared input",
       "source": "data/macro/macro_snapshot.json",
-      "source_age_hours": 3.017,
+      "source_age_hours": 3.955,
       "detail": {
-        "vix": null,
-        "curve_10y2y": 0.352,
-        "curve_10y3m": 1.244,
-        "credit_hyg": 76.71,
-        "dgs10": 5.237
+        "vix": 15.31,
+        "curve_10y2y": 0.667,
+        "curve_10y3m": 1.284,
+        "credit_hyg": 76.91,
+        "dgs10": 5.277
       }
     }
   },
