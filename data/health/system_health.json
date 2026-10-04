@@ -1,8 +1,10 @@
 {
-  "ts": "2026-10-02T20:01:21.463904+00:00",
+  "ts": "2026-10-03T23:27:03.946665+00:00",
   "overall": "YELLOW",
   "red": [],
   "yellow": [
+    "api_health",
+    "forex_data",
     "forex_scan"
   ],
   "jobs": {
@@ -14,7 +16,7 @@
     },
     "forex_scan": {
       "path": "data/agent/forex_proximity.json",
-      "age_minutes": 44790.4,
+      "age_minutes": 46436.1,
       "max_age_minutes": 1440,
       "optional": false,
       "status": "STALE",
@@ -22,19 +24,19 @@
     },
     "forex_data": {
       "path": "data/health/forex_data_status.json",
-      "age_minutes": 1425.5,
+      "age_minutes": 3071.2,
       "max_age_minutes": 1440,
       "optional": false,
-      "status": "OK",
-      "detail": "overall=GREEN, degraded=[], fake_data=[]"
+      "status": "STALE",
+      "detail": "overall=GREEN, degraded=[], fake_data=[]; job may have stopped firing"
     },
     "api_health": {
       "path": "data/agent/health.json",
-      "age_minutes": 1425.5,
+      "age_minutes": 1599.7,
       "max_age_minutes": 1440,
       "optional": true,
-      "status": "OK",
-      "detail": "components=18, red=['oanda', 'oracle_pulse']"
+      "status": "STALE",
+      "detail": "components=18, red=['oanda', 'oracle_pulse']; job may have stopped firing"
     }
   }
 }

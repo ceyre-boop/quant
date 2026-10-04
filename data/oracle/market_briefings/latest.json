@@ -1,16 +1,16 @@
 {
-  "date": "2026-10-02",
-  "generated_at": "2026-10-02T14:00:54.933610+00:00",
+  "date": "2026-10-03",
+  "generated_at": "2026-10-03T14:36:26.105098+00:00",
   "meta_regime": "ROTATION_WARN",
   "regime_read": "NQ and ES diverging (one up, one down/flat) \u2014 rotation underway, regime shifting. Tech-led longs are suspect.",
-  "narrative": "Macro backdrop \u2014\n[2026-10-02] US economic state (FRED):\n  Growth: real GDP 2.2% (q/q ann)\n  Inflation: CPI n/a YoY | core CPI n/a | core PCE 2.59% (Fed target 2%)\n  Labor: unemployment 4.1%\n  Rates: fed funds 3.75% | 10Y 5.29% | 10Y-2Y 0.46% (NORMAL)\n  Consumer: UMich sentiment 51.7 | VIX 16.34\n\n---\nRecent market action shows a divergence between NQ and ES, with the Nasdaq-100 (NQ) leading higher while the S&P 500 (ES) is slightly lower. This suggests a rotation in favor of tech-heavy sectors, which could imply that long positions in NQ may be favorable. However, the lead-lag regime indicates a warning signal, with no clear leader and a contemporaneous correlation of 0.948, suggesting that this divergence might not persist. The volume profile for both ES and NQ shows accumulation zones around their points of control (POC), indicating buying interest at these levels. However, the key level is not clearly defined due to the mixed signals in the lead-lag regime. Event-wise, today's Nonfarm Payrolls report will be high-impact, likely causing volatility, so traders should consider widening stops and reducing position size. Overall, while there are bullish signs, the rotation warning suggests a cautious approach with a long-the-dip bias of ~75%, invalidated below 30,625 for NQ.",
+  "narrative": "Macro backdrop \u2014\n[2026-10-03] US economic state (FRED):\n  Growth: real GDP 2.2% (q/q ann)\n  Inflation: CPI n/a YoY | core CPI n/a | core PCE 2.59% (Fed target 2%)\n  Labor: unemployment 4.2%\n  Rates: fed funds 3.75% | 10Y 5.24% | 10Y-2Y 0.45% (NORMAL)\n  Consumer: UMich sentiment 51.7 | VIX 16.39\n\n---\nRecent market action in the ES/NQ futures pair has been characterized by a divergence, with NQ leading and ES lagging. This suggests that we are likely witnessing a rotation in market focus, possibly from tech-heavy sectors to broader market concerns. The lead-lag regime is currently classified as 'ROTATION_WARN', indicating caution due to divergent price action. The daily return for both indices has been positive, with NQ showing a stronger upward bias compared to ES, which has seen a slight increase in the session volume around 7731.30, suggesting potential accumulation at this level. The value area for ES is between 7693.32 and 7778.77, while for NQ, it is between 30554.43 and 31082.48, indicating that these levels could act as support or resistance points. The event calendar highlights the upcoming CPI release on October 12th, which may influence market sentiment significantly. Given the current lead-lag regime and the potential impact of inflation data, we should be prepared to adjust our positions accordingly. Our directional bias is towards a long-the-dip strategy with a probability of approximately 65%, but this could be invalidated if NQ falls below key support levels.",
   "big_move_headline": {
-    "headline": "Today's likeliest institutional move: SHORT EURUSD (P 69%, ~0.52% range, conf 53%).",
+    "headline": "Today's likeliest institutional move: SHORT EURUSD (P 67%, ~0.57% range, conf 32%).",
     "pair": "EURUSD",
     "direction": "SHORT",
-    "p_big": 0.6863,
-    "confidence": 0.528,
-    "expected_magnitude_pct": 0.5247,
+    "p_big": 0.6706,
+    "confidence": 0.321,
+    "expected_magnitude_pct": 0.5655,
     "session": "NY_PM",
     "drivers": [
       [
@@ -18,12 +18,12 @@
         0.9
       ],
       [
-        "displacement",
-        -0.5709
+        "momentum",
+        -0.3127
       ],
       [
-        "momentum",
-        -0.4189
+        "displacement",
+        0.0598
       ]
     ],
     "validation_status": "UNVALIDATED \u2014 display only (run scripts/validate_big_move.py)"
@@ -43,83 +43,75 @@
   "volume_profile": {
     "ES=F": {
       "symbol": "ES=F",
-      "as_of": "2026-10-02T12:53:55.317941+00:00",
+      "as_of": "2026-10-03T12:34:57.811710+00:00",
       "days": 5,
       "bins": 40,
-      "poc": 7731.73,
-      "value_area_low": 7717.5,
-      "value_area_high": 7774.42,
+      "poc": 7731.3,
+      "value_area_low": 7693.32,
+      "value_area_high": 7778.77,
       "high_volume_nodes": [
-        7731.73,
-        7717.5,
-        7763.04,
-        7734.58,
-        7743.11
+        7731.3,
+        7772.44,
+        7740.79,
+        7775.6,
+        7769.27
       ],
       "price_range": [
         7679.08,
-        7792.92
+        7805.67
       ],
       "limitation": "Volume profile = WHERE volume traded (volume-at-price). NOT order-flow delta (buy/sell aggression). True delta needs a CME order-flow feed (Databento/CQG)."
     },
     "NQ=F": {
       "symbol": "NQ=F",
-      "as_of": "2026-10-02T12:53:55.355563+00:00",
+      "as_of": "2026-10-03T12:34:58.194940+00:00",
       "days": 5,
       "bins": 40,
-      "poc": 30623.69,
-      "value_area_low": 30567.46,
-      "value_area_high": 30867.33,
+      "poc": 30620.44,
+      "value_area_low": 30554.43,
+      "value_area_high": 31082.48,
       "high_volume_nodes": [
-        30623.69,
-        30642.43,
-        30604.95,
-        30829.85,
-        30586.2
+        30620.44,
+        30642.44,
+        30576.43,
+        30598.44,
+        30840.46
       ],
       "price_range": [
         30389.42,
-        31139.08
+        31269.5
       ],
       "limitation": "Volume profile = WHERE volume traded (volume-at-price). NOT order-flow delta (buy/sell aggression). True delta needs a CME order-flow feed (Databento/CQG)."
     }
   },
   "macro_economic": {
-    "text": "[2026-10-02] US economic state (FRED):\n  Growth: real GDP 2.2% (q/q ann)\n  Inflation: CPI n/a YoY | core CPI n/a | core PCE 2.59% (Fed target 2%)\n  Labor: unemployment 4.1%\n  Rates: fed funds 3.75% | 10Y 5.29% | 10Y-2Y 0.46% (NORMAL)\n  Consumer: UMich sentiment 51.7 | VIX 16.34",
+    "text": "[2026-10-03] US economic state (FRED):\n  Growth: real GDP 2.2% (q/q ann)\n  Inflation: CPI n/a YoY | core CPI n/a | core PCE 2.59% (Fed target 2%)\n  Labor: unemployment 4.2%\n  Rates: fed funds 3.75% | 10Y 5.24% | 10Y-2Y 0.45% (NORMAL)\n  Consumer: UMich sentiment 51.7 | VIX 16.39",
     "summary": {
       "gdp_growth_pct": 2.2,
       "cpi_yoy_pct": null,
       "core_cpi_yoy_pct": null,
       "core_pce_yoy_pct": 2.59,
-      "unemployment_pct": 4.1,
+      "unemployment_pct": 4.2,
       "fed_funds_pct": 3.75,
-      "ten_year_pct": 5.29,
-      "yield_curve_10y2y": 0.46,
+      "ten_year_pct": 5.24,
+      "yield_curve_10y2y": 0.45,
       "yield_curve_state": "NORMAL",
       "consumer_sentiment": 51.7,
-      "vix": 16.34
+      "vix": 16.39
     }
   },
-  "news_count": 0,
+  "news_count": 14,
   "event_calendar": [
-    {
-      "event": "Nonfarm Payrolls",
-      "date": "2026-10-02",
-      "source": "cadence_estimate",
-      "action": "high-impact 8:30 ET \u2014 widen stops / size down",
-      "days_until": 0,
-      "note": "TODAY \u2014 high-impact 8:30 ET \u2014 widen stops / size down"
-    },
     {
       "event": "CPI",
       "date": "2026-10-12",
       "source": "cadence_estimate",
       "action": "inflation print 8:30 ET \u2014 reduce size into window",
-      "days_until": 10,
-      "note": "in 10d \u2014 inflation print 8:30 ET \u2014 reduce size into window"
+      "days_until": 9,
+      "note": "in 9d \u2014 inflation print 8:30 ET \u2014 reduce size into window"
     }
   ],
-  "scorecard_summary": "Briefing scorecard: n=48 dir-calls, hit 0.646, regime acc 0.42 \u2014 MATURE \u2014 calibration is now interpretable",
+  "scorecard_summary": "Briefing scorecard: n=49 dir-calls, hit 0.653, regime acc 0.415 \u2014 MATURE \u2014 calibration is now interpretable",
   "bias": "size to regime: trust direction more in BREADTH, less in CONCENTRATION; ROTATION_WARN = treat tech-led longs as suspect",
   "provenance": {
     "source": "oracle_morning_briefing",

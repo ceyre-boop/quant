@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-02T23:55:05.072157+00:00",
+  "generated_at": "2026-10-03T23:20:35.765023+00:00",
   "status": "DEGRADED",
   "status_reason": "portfolio:FAIL/HALT; undertow_gapper:HALT; ict_equities:HALT; carry:HALT",
   "strategies": {
@@ -46,12 +46,12 @@
       "process_adherence": {
         "decisions_matched_rules_pct": null,
         "status": "INSUFFICIENT_DATA",
-        "reason": "0 entered setups with determinable bias alignment < 20 needed \u2014 INSUFFICIENT_DATA. Journal has 259766 total records ({'VETOED': 252002, 'DISCARDED': 7764}); process score not fabricated from a thin sample.",
-        "n_total": 259766,
+        "reason": "0 entered setups with determinable bias alignment < 20 needed \u2014 INSUFFICIENT_DATA. Journal has 259790 total records ({'VETOED': 252026, 'DISCARDED': 7764}); process score not fabricated from a thin sample.",
+        "n_total": 259790,
         "n_entered": 0,
         "n_evaluable": 0,
         "by_action": {
-          "VETOED": 252002,
+          "VETOED": 252026,
           "DISCARDED": 7764
         },
         "source": "data/agent/ict_causal_chain.jsonl"
@@ -103,9 +103,9 @@
     "drawdown_breaker_tripped": null,
     "drawdown_breaker_status": "UNAVAILABLE",
     "regime_contract_status": "DEGRADED",
-    "regime_contract_age_hours": 3.659,
+    "regime_contract_age_hours": 2.747,
     "kill_switch": "HALT",
-    "reason": "regime contract 3.7h old > 1.5h \u2014 stale shared regime read is a data-integrity FAIL",
+    "reason": "regime contract 2.7h old > 1.5h \u2014 stale shared regime read is a data-integrity FAIL",
     "sources": [
       "data/agent/system_regime_state.json"
     ]

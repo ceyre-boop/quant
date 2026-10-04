@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-03T00:46:05.398728+00:00",
+  "generated_at": "2026-10-03T23:29:26.917477+00:00",
   "status": "DEGRADED",
   "status_reason": "carry:STALE; es_nq:OK; macro:OK; portfolio:UNAVAILABLE",
   "strategies": {
@@ -8,9 +8,9 @@
       "verdict": "STAND_ASIDE",
       "favorable": false,
       "size_multiplier": 0.0,
-      "reason": "forex_proximity.json 751.3h old > 12.0h freshness limit",
+      "reason": "forex_proximity.json 774.0h old > 12.0h freshness limit",
       "source": "data/agent/forex_proximity.json",
-      "source_age_hours": 751.252,
+      "source_age_hours": 773.975,
       "detail": {}
     },
     "es_nq": {
@@ -20,7 +20,7 @@
       "size_multiplier": 0.0,
       "reason": "research INFO only \u2014 regime 'ROTATION_WARN'",
       "source": "data/research/nqes_regime.json",
-      "source_age_hours": 11.869,
+      "source_age_hours": 10.908,
       "detail": {
         "regime": "ROTATION_WARN",
         "read": "NQ and ES diverging (one up, one down/flat) \u2014 rotation underway, regime shifting. Tech-led longs are suspect.",
@@ -35,10 +35,10 @@
       "size_multiplier": 0.0,
       "reason": "macro backdrop INFO (VIX / curve / credit) \u2014 shared input",
       "source": "data/macro/macro_snapshot.json",
-      "source_age_hours": 3.955,
+      "source_age_hours": 7.86,
       "detail": {
         "vix": 15.31,
-        "curve_10y2y": 0.667,
+        "curve_10y2y": 0.642,
         "curve_10y3m": 1.284,
         "credit_hyg": 76.91,
         "dgs10": 5.277
