@@ -1,30 +1,6 @@
 {
-  "as_of": "2026-10-04T12:34:52.976771+00:00",
-  "lookback_days": 20,
-  "nq_last": 31061.8,
-  "es_last": 7777.2,
-  "nq_es_return_spread_avg": 0.00243,
-  "spread_1d": 0.0029,
-  "spread_5d": 0.00181,
-  "spread_20d": 0.00243,
-  "nq_es_cumulative_spread": 0.0486,
-  "contemporaneous_corr": 0.948,
-  "lead_lag": {
-    "by_lag": {
-      "-3": -0.004,
-      "-2": 0.026,
-      "-1": -0.106,
-      "0": 0.926,
-      "1": -0.045,
-      "2": 0.034,
-      "3": 0.006
-    },
-    "best_lag": -1,
-    "best_corr": -0.106,
-    "leader": "NONE"
-  },
-  "divergence": true,
-  "regime": "ROTATION_WARN",
-  "read": "NQ and ES diverging (one up, one down/flat) \u2014 rotation underway, regime shifting. Tech-led longs are suspect.",
-  "note": "Regime INPUT, not an edge. ES/NQ research only \u2014 no execution path (CME futures; OANDA is forex-only)."
+  "as_of": "2026-10-05T13:43:07.875023+00:00",
+  "regime": "NO_DATA",
+  "read": "ES=F/NQ=F fetch failed",
+  "note": "regime input, not an edge"
 }

@@ -1,9 +1,9 @@
 {
-  "date": "2026-10-04",
-  "generated_at": "2026-10-04T13:55:30.409247+00:00",
-  "meta_regime": "ROTATION_WARN",
-  "regime_read": "NQ and ES diverging (one up, one down/flat) \u2014 rotation underway, regime shifting. Tech-led longs are suspect.",
-  "narrative": "Macro backdrop \u2014\n[2026-10-04] US economic state (FRED):\n  Growth: real GDP 2.2% (q/q ann)\n  Inflation: CPI n/a YoY | core CPI n/a | core PCE 2.59% (Fed target 2%)\n  Labor: unemployment 4.2%\n  Rates: fed funds 3.75% | 10Y 5.24% | 10Y-2Y 0.45% (NORMAL)\n  Consumer: UMich sentiment 51.7 | VIX 16.39\n\n---\nRecent market action shows a divergence between NQ and ES, with the Nasdaq-100 (NQ) up by 0.98% while the S&P 500 (ES) is down by 0.69%. This divergence suggests that rotation may be underway, particularly in tech-led sectors. The lead-lag analysis indicates a best lag of -1 day with a correlation coefficient of -0.106, which implies that NQ and ES are diverging, one up while the other is down or flat. This regime shift from concentration to rotation carries significant implications for trading strategies, as tech-led longs may be suspect in this environment. The volume profile shows accumulation zones around 7731.3 for ES and 30823.37 for NQ, with key nodes indicating areas of high volume. These levels represent potential support or resistance points that traders should monitor closely. The upcoming FOMC inflation print on October 12th at 8:30 ET will be a critical event to watch, as it could influence market sentiment and trading decisions. Given the mixed signals from lead-lag analysis and the upcoming macroeconomic events, we maintain a long-the-dip bias with a probability of approximately 65%, which would invalidate below 30,375 for NQ.",
+  "date": "2026-10-05",
+  "generated_at": "2026-10-05T14:34:19.584014+00:00",
+  "meta_regime": "NO_DATA",
+  "regime_read": "ES=F/NQ=F fetch failed",
+  "narrative": "Macro backdrop \u2014\n[2026-10-05] US economic state (FRED):\n  Growth: real GDP 2.2% (q/q ann)\n  Inflation: CPI n/a YoY | core CPI n/a | core PCE 2.59% (Fed target 2%)\n  Labor: unemployment 4.2%\n  Rates: fed funds n/a | 10Y 5.24% | 10Y-2Y 0.45% (NORMAL)\n  Consumer: UMich sentiment 51.7 | VIX 16.39\n\n---\nRecent market action has been characterized by a lack of clear directional bias, with both ES and NQ futures showing no daily data. The lead-lag regime between the two indices is currently undefined due to insufficient data, which introduces some uncertainty into our ability to predict their relative movements. Volume profiles for both indices are also lacking intraday data, making it difficult to identify accumulation zones or points of control (POC).\n\nThe event calendar suggests that a key economic release\u2014CPI\u2014is approaching on October 12th. Given the current state of the market and the upcoming inflation print, traders should be prepared for potential volatility as markets adjust their expectations. The FOMC dates are maintained but not verified, so we should remain cautious about overreacting to any single data point.\n\nIn summary, while there is a slight bias towards a long-the-dip strategy due to historical performance metrics, the current market conditions\u2014lack of daily data and intraday volume\u2014are too ambiguous to confidently adopt a directional stance. Traders should maintain a neutral position with a focus on managing risk around key levels such as 30,375 for NQ, but without a clear signal, this is more of an educated guess than a validated edge.",
   "big_move_headline": {
     "headline": "Today's likeliest institutional move: SHORT EURUSD (P 67%, ~0.57% range, conf 32%).",
     "pair": "EURUSD",
@@ -28,71 +28,39 @@
     ],
     "validation_status": "UNVALIDATED \u2014 display only (run scripts/validate_big_move.py)"
   },
-  "directional_bias": "LONG",
-  "confidence": 75,
+  "directional_bias": "NEUTRAL",
+  "confidence": 50,
   "regime_call": "ROTATION_WARN",
   "key_level": null,
   "synthesis_source": "ollama/qwen2.5",
   "lead_lag": {
-    "regime": "ROTATION_WARN",
-    "spread_avg": 0.00243,
-    "leader": "NONE",
-    "corr": 0.948,
-    "divergence": true
+    "regime": "NO_DATA",
+    "spread_avg": null,
+    "leader": null,
+    "corr": null,
+    "divergence": null
   },
   "volume_profile": {
     "ES=F": {
       "symbol": "ES=F",
-      "as_of": "2026-10-04T12:34:57.268759+00:00",
-      "days": 5,
-      "bins": 40,
-      "poc": 7731.3,
-      "value_area_low": 7693.32,
-      "value_area_high": 7778.77,
-      "high_volume_nodes": [
-        7731.3,
-        7718.64,
-        7772.44,
-        7775.6,
-        7740.79
-      ],
-      "price_range": [
-        7679.08,
-        7805.67
-      ],
-      "limitation": "Volume profile = WHERE volume traded (volume-at-price). NOT order-flow delta (buy/sell aggression). True delta needs a CME order-flow feed (Databento/CQG)."
+      "poc": null,
+      "error": "insufficient intraday data"
     },
     "NQ=F": {
       "symbol": "NQ=F",
-      "as_of": "2026-10-04T12:34:58.985812+00:00",
-      "days": 5,
-      "bins": 40,
-      "poc": 30823.37,
-      "value_area_low": 30562.22,
-      "value_area_high": 31084.52,
-      "high_volume_nodes": [
-        30823.37,
-        30649.27,
-        30801.61,
-        30845.13,
-        30583.98
-      ],
-      "price_range": [
-        30399.0,
-        31269.5
-      ],
-      "limitation": "Volume profile = WHERE volume traded (volume-at-price). NOT order-flow delta (buy/sell aggression). True delta needs a CME order-flow feed (Databento/CQG)."
+      "poc": null,
+      "error": "insufficient intraday data"
     }
   },
   "macro_economic": {
-    "text": "[2026-10-04] US economic state (FRED):\n  Growth: real GDP 2.2% (q/q ann)\n  Inflation: CPI n/a YoY | core CPI n/a | core PCE 2.59% (Fed target 2%)\n  Labor: unemployment 4.2%\n  Rates: fed funds 3.75% | 10Y 5.24% | 10Y-2Y 0.45% (NORMAL)\n  Consumer: UMich sentiment 51.7 | VIX 16.39",
+    "text": "[2026-10-05] US economic state (FRED):\n  Growth: real GDP 2.2% (q/q ann)\n  Inflation: CPI n/a YoY | core CPI n/a | core PCE 2.59% (Fed target 2%)\n  Labor: unemployment 4.2%\n  Rates: fed funds n/a | 10Y 5.24% | 10Y-2Y 0.45% (NORMAL)\n  Consumer: UMich sentiment 51.7 | VIX 16.39",
     "summary": {
       "gdp_growth_pct": 2.2,
       "cpi_yoy_pct": null,
       "core_cpi_yoy_pct": null,
       "core_pce_yoy_pct": 2.59,
       "unemployment_pct": 4.2,
-      "fed_funds_pct": 3.75,
+      "fed_funds_pct": null,
       "ten_year_pct": 5.24,
       "yield_curve_10y2y": 0.45,
       "yield_curve_state": "NORMAL",
@@ -100,15 +68,15 @@
       "vix": 16.39
     }
   },
-  "news_count": 11,
+  "news_count": 0,
   "event_calendar": [
     {
       "event": "CPI",
       "date": "2026-10-12",
       "source": "cadence_estimate",
       "action": "inflation print 8:30 ET \u2014 reduce size into window",
-      "days_until": 8,
-      "note": "in 8d \u2014 inflation print 8:30 ET \u2014 reduce size into window"
+      "days_until": 7,
+      "note": "in 7d \u2014 inflation print 8:30 ET \u2014 reduce size into window"
     }
   ],
   "scorecard_summary": "Briefing scorecard: n=49 dir-calls, hit 0.653, regime acc 0.415 \u2014 MATURE \u2014 calibration is now interpretable",
