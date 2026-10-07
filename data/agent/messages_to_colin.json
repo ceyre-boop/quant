@@ -1,6 +1,240 @@
 {
   "messages": [
     {
+      "id": "pulse-20261007T0011",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] REST_MODE_EXPIRED: HYP-063 () validated and unimplemented for 107 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
+      "timestamp": "2026-10-07T00:11:05+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20261007T0011",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] REST_MODE_EXPIRED: HYP-046 (Displacement Gate >= 1.5 improves London trade qua) validated and unimplemented for 134 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
+      "timestamp": "2026-10-07T00:11:05+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20261006T2132",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] REST_MODE_EXPIRED: HYP-063 () validated and unimplemented for 106 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
+      "timestamp": "2026-10-06T21:32:03+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20261006T2132",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] REST_MODE_EXPIRED: HYP-046 (Displacement Gate >= 1.5 improves London trade qua) validated and unimplemented for 133 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
+      "timestamp": "2026-10-06T21:32:03+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20261006T1922",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] REST_MODE_EXPIRED: HYP-063 () validated and unimplemented for 106 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
+      "timestamp": "2026-10-06T19:22:52+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20261006T1922",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] REST_MODE_EXPIRED: HYP-046 (Displacement Gate >= 1.5 improves London trade qua) validated and unimplemented for 133 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
+      "timestamp": "2026-10-06T19:22:52+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20261006T1702",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] REST_MODE_EXPIRED: HYP-063 () validated and unimplemented for 106 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
+      "timestamp": "2026-10-06T17:02:55+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20261006T1702",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] REST_MODE_EXPIRED: HYP-046 (Displacement Gate >= 1.5 improves London trade qua) validated and unimplemented for 133 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
+      "timestamp": "2026-10-06T17:02:55+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20261006T1427",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] REST_MODE_EXPIRED: HYP-063 () validated and unimplemented for 106 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
+      "timestamp": "2026-10-06T14:27:15+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20261006T1427",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] REST_MODE_EXPIRED: HYP-046 (Displacement Gate >= 1.5 improves London trade qua) validated and unimplemented for 133 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
+      "timestamp": "2026-10-06T14:27:15+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "invariant-2026-10-06-fills_stale",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "[INVARIANT] FILLS_STALE: all fills ledgers stale (data/ledger/oanda_fills.jsonl, data/execution/fills.jsonl) \u2014 recent writes unverifiable (2026-10-06)",
+      "timestamp": "2026-10-06T13:20:04.075108+00:00",
+      "read": false,
+      "source": "invariant_guard"
+    },
+    {
+      "id": "audit-2026-10-06-price_source_drift",
+      "priority": "IMPORTANT",
+      "emoji": "\ud83d\udfe1",
+      "text": "[AUDIT] PRICE_SOURCE_DRIFT: AUD_NZD median |\u0394close|/close 0.00227 (2026-10-06)",
+      "timestamp": "2026-10-06T13:05:02.857254+00:00",
+      "read": false,
+      "source": "shadow_audit"
+    },
+    {
+      "id": "audit-2026-10-06-unexplained_divergence",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[AUDIT] UNEXPLAINED_DIVERGENCE: C5 count 6 (2026-10-06)",
+      "timestamp": "2026-10-06T13:05:02.857247+00:00",
+      "read": false,
+      "source": "shadow_audit"
+    },
+    {
+      "id": "audit-2026-10-06-l1_determinism_fail",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[AUDIT] L1_DETERMINISM_FAIL: 2 record(s) not reproducible (2026-10-06)",
+      "timestamp": "2026-10-06T13:05:02.857215+00:00",
+      "read": false,
+      "source": "shadow_audit"
+    },
+    {
+      "id": "pulse-20261006T1227",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] REST_MODE_EXPIRED: HYP-063 () validated and unimplemented for 106 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
+      "timestamp": "2026-10-06T12:27:08+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20261006T1227",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] REST_MODE_EXPIRED: HYP-046 (Displacement Gate >= 1.5 improves London trade qua) validated and unimplemented for 133 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
+      "timestamp": "2026-10-06T12:27:08+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20261006T1027",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] REST_MODE_EXPIRED: HYP-063 () validated and unimplemented for 106 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
+      "timestamp": "2026-10-06T10:27:03+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20261006T1027",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] REST_MODE_EXPIRED: HYP-046 (Displacement Gate >= 1.5 improves London trade qua) validated and unimplemented for 133 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
+      "timestamp": "2026-10-06T10:27:03+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20261006T0826",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] REST_MODE_EXPIRED: HYP-063 () validated and unimplemented for 106 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
+      "timestamp": "2026-10-06T08:26:57+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20261006T0826",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] REST_MODE_EXPIRED: HYP-046 (Displacement Gate >= 1.5 improves London trade qua) validated and unimplemented for 133 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
+      "timestamp": "2026-10-06T08:26:57+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20261006T0626",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] REST_MODE_EXPIRED: HYP-063 () validated and unimplemented for 106 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
+      "timestamp": "2026-10-06T06:26:51+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20261006T0626",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] REST_MODE_EXPIRED: HYP-046 (Displacement Gate >= 1.5 improves London trade qua) validated and unimplemented for 133 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
+      "timestamp": "2026-10-06T06:26:51+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20261006T0426",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] REST_MODE_EXPIRED: HYP-063 () validated and unimplemented for 106 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
+      "timestamp": "2026-10-06T04:26:46+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20261006T0426",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] REST_MODE_EXPIRED: HYP-046 (Displacement Gate >= 1.5 improves London trade qua) validated and unimplemented for 133 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
+      "timestamp": "2026-10-06T04:26:46+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20261006T0226",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] REST_MODE_EXPIRED: HYP-063 () validated and unimplemented for 106 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
+      "timestamp": "2026-10-06T02:26:40+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
+      "id": "pulse-20261006T0226",
+      "priority": "URGENT",
+      "emoji": "\ud83d\udd34",
+      "text": "[PULSE] REST_MODE_EXPIRED: HYP-046 (Displacement Gate >= 1.5 improves London trade qua) validated and unimplemented for 133 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
+      "timestamp": "2026-10-06T02:26:40+00:00",
+      "read": false,
+      "source": "oracle_pulse"
+    },
+    {
       "id": "pulse-20261005T2315",
       "priority": "URGENT",
       "emoji": "\ud83d\udd34",
@@ -215,239 +449,7 @@
       "timestamp": "2026-10-02T13:23:12.475091+00:00",
       "read": false,
       "source": "invariant_guard"
-    },
-    {
-      "id": "msg-20261001161552",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "Health check FAILED: oanda, oracle_pulse are RED. Check logs.",
-      "timestamp": "2026-10-01T16:15:52",
-      "read": false
-    },
-    {
-      "id": "pulse-20261001T1643",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[PULSE] REST_MODE_EXPIRED: HYP-063 () validated and unimplemented for 101 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
-      "timestamp": "2026-10-01T16:43:52+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "pulse-20261001T1643",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[PULSE] REST_MODE_EXPIRED: HYP-046 (Displacement Gate >= 1.5 improves London trade qua) validated and unimplemented for 128 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
-      "timestamp": "2026-10-01T16:43:52+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "invariant-2026-10-01-fills_stale",
-      "priority": "IMPORTANT",
-      "emoji": "\ud83d\udfe1",
-      "text": "[INVARIANT] FILLS_STALE: all fills ledgers stale (data/ledger/oanda_fills.jsonl, data/execution/fills.jsonl) \u2014 recent writes unverifiable (2026-10-01)",
-      "timestamp": "2026-10-01T13:22:28.955330+00:00",
-      "read": false,
-      "source": "invariant_guard"
-    },
-    {
-      "id": "audit-2026-10-01-price_source_drift",
-      "priority": "IMPORTANT",
-      "emoji": "\ud83d\udfe1",
-      "text": "[AUDIT] PRICE_SOURCE_DRIFT: AUD_NZD median |\u0394close|/close 0.00227 (2026-10-01)",
-      "timestamp": "2026-10-01T13:14:06.619796+00:00",
-      "read": false,
-      "source": "shadow_audit"
-    },
-    {
-      "id": "audit-2026-10-01-unexplained_divergence",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[AUDIT] UNEXPLAINED_DIVERGENCE: C5 count 6 (2026-10-01)",
-      "timestamp": "2026-10-01T13:14:06.619770+00:00",
-      "read": false,
-      "source": "shadow_audit"
-    },
-    {
-      "id": "audit-2026-10-01-l1_determinism_fail",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[AUDIT] L1_DETERMINISM_FAIL: 2 record(s) not reproducible (2026-10-01)",
-      "timestamp": "2026-10-01T13:14:06.619241+00:00",
-      "read": false,
-      "source": "shadow_audit"
-    },
-    {
-      "id": "msg-20261001081252",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "Health check FAILED: oracle_pulse are RED. Check logs.",
-      "timestamp": "2026-10-01T08:12:52",
-      "read": false
-    },
-    {
-      "id": "pulse-20261001T0022",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[PULSE] REST_MODE_EXPIRED: HYP-063 () validated and unimplemented for 101 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
-      "timestamp": "2026-10-01T00:22:01+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "pulse-20261001T0022",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[PULSE] REST_MODE_EXPIRED: HYP-046 (Displacement Gate >= 1.5 improves London trade qua) validated and unimplemented for 128 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
-      "timestamp": "2026-10-01T00:22:01+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "pulse-20260930T2204",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[PULSE] REST_MODE_EXPIRED: HYP-063 () validated and unimplemented for 100 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
-      "timestamp": "2026-09-30T22:04:27+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "pulse-20260930T2204",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[PULSE] REST_MODE_EXPIRED: HYP-046 (Displacement Gate >= 1.5 improves London trade qua) validated and unimplemented for 127 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
-      "timestamp": "2026-09-30T22:04:27+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "pulse-20260930T1935",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[PULSE] REST_MODE_EXPIRED: HYP-063 () validated and unimplemented for 100 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
-      "timestamp": "2026-09-30T19:35:36+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "pulse-20260930T1935",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[PULSE] REST_MODE_EXPIRED: HYP-046 (Displacement Gate >= 1.5 improves London trade qua) validated and unimplemented for 127 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
-      "timestamp": "2026-09-30T19:35:36+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "pulse-20260930T1735",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[PULSE] REST_MODE_EXPIRED: HYP-063 () validated and unimplemented for 100 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
-      "timestamp": "2026-09-30T17:35:18+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "pulse-20260930T1735",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[PULSE] REST_MODE_EXPIRED: HYP-046 (Displacement Gate >= 1.5 improves London trade qua) validated and unimplemented for 127 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
-      "timestamp": "2026-09-30T17:35:18+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "pulse-20260930T1333",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[PULSE] REST_MODE_EXPIRED: HYP-063 () validated and unimplemented for 100 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
-      "timestamp": "2026-09-30T13:33:10+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "pulse-20260930T1333",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[PULSE] REST_MODE_EXPIRED: HYP-046 (Displacement Gate >= 1.5 improves London trade qua) validated and unimplemented for 127 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
-      "timestamp": "2026-09-30T13:33:10+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "invariant-2026-09-30-fills_stale",
-      "priority": "IMPORTANT",
-      "emoji": "\ud83d\udfe1",
-      "text": "[INVARIANT] FILLS_STALE: all fills ledgers stale (data/ledger/oanda_fills.jsonl, data/execution/fills.jsonl) \u2014 recent writes unverifiable (2026-09-30)",
-      "timestamp": "2026-09-30T13:25:59.798214+00:00",
-      "read": false,
-      "source": "invariant_guard"
-    },
-    {
-      "id": "audit-2026-09-30-price_source_drift",
-      "priority": "IMPORTANT",
-      "emoji": "\ud83d\udfe1",
-      "text": "[AUDIT] PRICE_SOURCE_DRIFT: AUD_NZD median |\u0394close|/close 0.00227 (2026-09-30)",
-      "timestamp": "2026-09-30T13:11:35.042691+00:00",
-      "read": false,
-      "source": "shadow_audit"
-    },
-    {
-      "id": "audit-2026-09-30-unexplained_divergence",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[AUDIT] UNEXPLAINED_DIVERGENCE: C5 count 6 (2026-09-30)",
-      "timestamp": "2026-09-30T13:11:35.042672+00:00",
-      "read": false,
-      "source": "shadow_audit"
-    },
-    {
-      "id": "audit-2026-09-30-l1_determinism_fail",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[AUDIT] L1_DETERMINISM_FAIL: 2 record(s) not reproducible (2026-09-30)",
-      "timestamp": "2026-09-30T13:11:35.042557+00:00",
-      "read": false,
-      "source": "shadow_audit"
-    },
-    {
-      "id": "pulse-20260930T0202",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[PULSE] REST_MODE_EXPIRED: HYP-063 () validated and unimplemented for 100 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
-      "timestamp": "2026-09-30T02:02:37+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "pulse-20260930T0202",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[PULSE] REST_MODE_EXPIRED: HYP-046 (Displacement Gate >= 1.5 improves London trade qua) validated and unimplemented for 127 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
-      "timestamp": "2026-09-30T02:02:37+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "pulse-20260929T2317",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[PULSE] REST_MODE_EXPIRED: HYP-063 () validated and unimplemented for 99 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
-      "timestamp": "2026-09-29T23:17:52+00:00",
-      "read": false,
-      "source": "oracle_pulse"
-    },
-    {
-      "id": "pulse-20260929T2317",
-      "priority": "URGENT",
-      "emoji": "\ud83d\udd34",
-      "text": "[PULSE] REST_MODE_EXPIRED: HYP-046 (Displacement Gate >= 1.5 improves London trade qua) validated and unimplemented for 126 days. Implement it or explicitly reject it. Validated knowledge has an expiry date.",
-      "timestamp": "2026-09-29T23:17:52+00:00",
-      "read": false,
-      "source": "oracle_pulse"
     }
   ],
-  "last_updated": "2026-10-05T23:15:06+00:00"
+  "last_updated": "2026-10-07T00:11:05+00:00"
 }

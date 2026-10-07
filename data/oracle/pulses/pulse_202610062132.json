@@ -1,18 +1,67 @@
 {
-  "timestamp": "2026-10-07T00:11:00+00:00",
-  "pairs": {
+  "timestamp": "2026-10-06T21:32:03+00:00",
+  "new_entries_since_last": 0,
+  "new_outcomes_since_last": 0,
+  "outcomes_backfilled": 0,
+  "decisions_expired": 0,
+  "loops_down": [],
+  "anomalies": [
+    {
+      "type": "REST_MODE_EXPIRED",
+      "priority": "URGENT",
+      "message": "HYP-046 (Displacement Gate >= 1.5 improves London trade qua) validated and unimplemented for 133 days. Implement it or explicitly reject it. Validated knowledge has an expiry date."
+    },
+    {
+      "type": "REST_MODE_EXPIRED",
+      "priority": "URGENT",
+      "message": "HYP-063 () validated and unimplemented for 106 days. Implement it or explicitly reject it. Validated knowledge has an expiry date."
+    }
+  ],
+  "running_stats": {},
+  "live_prices": {
     "GBPUSD": {
-      "bullish": 3,
-      "bearish": 9,
+      "current": 1.32691,
+      "high_today": 1.32852,
+      "low_today": 1.32024,
+      "bars_today": 271
+    },
+    "EURUSD": {
+      "current": 1.12625,
+      "high_today": 1.1279,
+      "low_today": 1.1207,
+      "bars_today": 271
+    },
+    "USDJPY": {
+      "current": 158.09399,
+      "high_today": 158.24699,
+      "low_today": 157.76199,
+      "bars_today": 271
+    },
+    "AUDUSD": {
+      "current": 0.69842,
+      "high_today": 0.6992,
+      "low_today": 0.69648,
+      "bars_today": 271
+    },
+    "AUDNZD": {
+      "current": 1.24024,
+      "high_today": 1.24583,
+      "low_today": 1.24011,
+      "bars_today": 271
+    }
+  },
+  "indicator_consensus": {
+    "GBPUSD": {
+      "bullish": 2,
+      "bearish": 10,
       "neutral": 18,
       "direction": "SHORT",
-      "conviction": 0.5,
-      "hit_rate": 0.0,
+      "conviction": 0.667,
+      "hit_rate": 0.6943,
       "matching_green": 0,
-      "matching_green_short": 0,
+      "matching_green_short": 2,
       "top_bullish": [
         "aroon",
-        "fvg",
         "liq_sweep"
       ],
       "top_bearish": [
@@ -47,7 +96,7 @@
         "vwap_ratio": 0,
         "acc_dist": 0,
         "cmf": 0,
-        "fvg": 1,
+        "fvg": -1,
         "bos": 0,
         "session_hl": 0,
         "displacement": 0,
@@ -57,8 +106,8 @@
     },
     "EURUSD": {
       "bullish": 1,
-      "bearish": 16,
-      "neutral": 13,
+      "bearish": 15,
+      "neutral": 14,
       "direction": "SHORT",
       "conviction": 1.0,
       "hit_rate": 0.6628,
@@ -104,15 +153,15 @@
         "session_hl": -1,
         "displacement": 0,
         "liq_sweep": 0,
-        "order_block": -1
+        "order_block": 0
       }
     },
     "USDJPY": {
-      "bullish": 6,
+      "bullish": 7,
       "bearish": 3,
-      "neutral": 21,
+      "neutral": 20,
       "direction": "NEUTRAL",
-      "conviction": 0.25,
+      "conviction": 0.333,
       "hit_rate": 0.0,
       "matching_green": 0,
       "matching_green_short": 0,
@@ -120,8 +169,8 @@
         "adx",
         "parabolic_sar",
         "rsi",
-        "donchian",
-        "hist_vol"
+        "stochastic",
+        "donchian"
       ],
       "top_bearish": [
         "ema_cross",
@@ -138,7 +187,7 @@
         "vwap_dev": 0,
         "rsi": 1,
         "macd": 0,
-        "stochastic": 0,
+        "stochastic": 1,
         "cci": 0,
         "williams_r": 0,
         "roc": 0,
@@ -162,17 +211,16 @@
       }
     },
     "AUDUSD": {
-      "bullish": 3,
-      "bearish": 9,
+      "bullish": 2,
+      "bearish": 10,
       "neutral": 18,
       "direction": "SHORT",
-      "conviction": 0.5,
-      "hit_rate": 0.0,
+      "conviction": 0.667,
+      "hit_rate": 0.6995,
       "matching_green": 0,
-      "matching_green_short": 0,
+      "matching_green_short": 3,
       "top_bullish": [
         "aroon",
-        "fvg",
         "liq_sweep"
       ],
       "top_bearish": [
@@ -207,7 +255,7 @@
         "vwap_ratio": 0,
         "acc_dist": 0,
         "cmf": 0,
-        "fvg": 1,
+        "fvg": -1,
         "bos": 0,
         "session_hl": 0,
         "displacement": 0,
@@ -216,11 +264,11 @@
       }
     },
     "AUDNZD": {
-      "bullish": 10,
-      "bearish": 1,
+      "bullish": 9,
+      "bearish": 2,
       "neutral": 19,
       "direction": "LONG",
-      "conviction": 0.75,
+      "conviction": 0.583,
       "hit_rate": 0.0,
       "matching_green": 0,
       "matching_green_short": 0,
@@ -232,7 +280,8 @@
         "parabolic_sar"
       ],
       "top_bearish": [
-        "aroon"
+        "aroon",
+        "roc"
       ],
       "snapshot": {
         "adx": 1,
@@ -244,10 +293,10 @@
         "vwap_dev": 0,
         "rsi": 0,
         "macd": 0,
-        "stochastic": 1,
+        "stochastic": 0,
         "cci": 0,
         "williams_r": 0,
-        "roc": 0,
+        "roc": -1,
         "mfi": 0,
         "bollinger_bands": 0,
         "atr_ratio": 0,
@@ -267,5 +316,142 @@
         "order_block": 0
       }
     }
-  }
+  },
+  "g2_progress": {
+    "ict_fills": 1,
+    "forex_fills": 0,
+    "total": 30,
+    "target": 8,
+    "g2a_status": "PASS",
+    "g2a_signals": 20,
+    "g2a_win_rate": 0.6364,
+    "latest_fill": "2026-05-26 GBPUSD LONG COMMITMENT_FAILURE -0.94R",
+    "total_closed": 30,
+    "pct_complete": 3.75,
+    "win_rate": 0.167,
+    "avg_r": null,
+    "first_trade_date": "2026-05-28",
+    "latest_trade_date": "2026-09-16",
+    "estimated_g2_completion": "2026-07-02",
+    "last_updated": "2026-10-06T21:31:58+00:00"
+  },
+  "big_move": {
+    "GBPUSD": {
+      "pair": "GBPUSD",
+      "p_big": 0.6273,
+      "direction": "LONG",
+      "expected_magnitude_pct": 0.5844,
+      "expected_vs_adr": 1.365,
+      "session": "OFF_HOURS",
+      "confidence": 0.314,
+      "drivers": [
+        [
+          "event_risk",
+          0.9
+        ],
+        [
+          "displacement",
+          0.1966
+        ],
+        [
+          "momentum",
+          0.0303
+        ],
+        [
+          "compression",
+          0.0
+        ]
+      ],
+      "timestamp": "2026-10-06T21:32:01.583631+00:00",
+      "notes": []
+    },
+    "EURUSD": {
+      "pair": "EURUSD",
+      "p_big": 0.6629,
+      "direction": "NEUTRAL",
+      "expected_magnitude_pct": 0.6144,
+      "expected_vs_adr": 1.397,
+      "session": "OFF_HOURS",
+      "confidence": 0.273,
+      "drivers": [
+        [
+          "event_risk",
+          0.9
+        ],
+        [
+          "momentum",
+          -0.2614
+        ],
+        [
+          "displacement",
+          0.1811
+        ],
+        [
+          "compression",
+          0.0
+        ]
+      ],
+      "timestamp": "2026-10-06T21:32:01.583631+00:00",
+      "notes": []
+    },
+    "USDJPY": {
+      "pair": "USDJPY",
+      "p_big": 0.7091,
+      "direction": "NEUTRAL",
+      "expected_magnitude_pct": 1.0358,
+      "expected_vs_adr": 1.438,
+      "session": "OFF_HOURS",
+      "confidence": 0.29,
+      "drivers": [
+        [
+          "event_risk",
+          0.9
+        ],
+        [
+          "compression",
+          0.3328
+        ],
+        [
+          "momentum",
+          0.0862
+        ],
+        [
+          "displacement",
+          0.0556
+        ]
+      ],
+      "timestamp": "2026-10-06T21:32:01.583631+00:00",
+      "notes": []
+    },
+    "AUDUSD": {
+      "pair": "AUDUSD",
+      "p_big": 0.6373,
+      "direction": "NEUTRAL",
+      "expected_magnitude_pct": 0.7915,
+      "expected_vs_adr": 1.374,
+      "session": "OFF_HOURS",
+      "confidence": 0.258,
+      "drivers": [
+        [
+          "event_risk",
+          0.9
+        ],
+        [
+          "momentum",
+          -0.0945
+        ],
+        [
+          "displacement",
+          0.0662
+        ],
+        [
+          "compression",
+          0.0
+        ]
+      ],
+      "timestamp": "2026-10-06T21:32:01.583631+00:00",
+      "notes": []
+    }
+  },
+  "big_move_outcomes_backfilled": 0
 }
