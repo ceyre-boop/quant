@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-07T00:11:04+00:00",
+  "timestamp": "2026-10-08T00:54:57+00:00",
   "session": "OFF_HOURS",
   "context_keys": [
     "high_impact_event_today"
@@ -8,12 +8,12 @@
   "estimates": {
     "GBPUSD": {
       "pair": "GBPUSD",
-      "p_big": 0.6343,
+      "p_big": 0.6538,
       "direction": "NEUTRAL",
-      "expected_magnitude_pct": 0.6108,
-      "expected_vs_adr": 1.371,
+      "expected_magnitude_pct": 0.6405,
+      "expected_vs_adr": 1.388,
       "session": "OFF_HOURS",
-      "confidence": 0.257,
+      "confidence": 0.286,
       "drivers": [
         [
           "event_risk",
@@ -21,28 +21,28 @@
         ],
         [
           "momentum",
-          0.065
-        ],
-        [
-          "displacement",
-          -0.0387
+          -0.1095
         ],
         [
           "compression",
-          0.0069
+          0.0618
+        ],
+        [
+          "displacement",
+          -0.0184
         ]
       ],
-      "timestamp": "2026-10-07T00:11:03.349129+00:00",
+      "timestamp": "2026-10-08T00:54:56.031184+00:00",
       "notes": []
     },
     "EURUSD": {
       "pair": "EURUSD",
-      "p_big": 0.6538,
+      "p_big": 0.6662,
       "direction": "SHORT",
-      "expected_magnitude_pct": 0.6394,
-      "expected_vs_adr": 1.388,
+      "expected_magnitude_pct": 0.6839,
+      "expected_vs_adr": 1.4,
       "session": "OFF_HOURS",
-      "confidence": 0.318,
+      "confidence": 0.328,
       "drivers": [
         [
           "event_risk",
@@ -50,28 +50,28 @@
         ],
         [
           "momentum",
-          -0.201
+          -0.2828
         ],
         [
           "displacement",
-          -0.0418
+          0.0057
         ],
         [
           "compression",
           0.0
         ]
       ],
-      "timestamp": "2026-10-07T00:11:03.349129+00:00",
+      "timestamp": "2026-10-08T00:54:56.031184+00:00",
       "notes": []
     },
     "USDJPY": {
       "pair": "USDJPY",
-      "p_big": 0.7342,
-      "direction": "LONG",
-      "expected_magnitude_pct": 1.002,
-      "expected_vs_adr": 1.461,
+      "p_big": 0.7301,
+      "direction": "NEUTRAL",
+      "expected_magnitude_pct": 0.9932,
+      "expected_vs_adr": 1.457,
       "session": "OFF_HOURS",
-      "confidence": 0.306,
+      "confidence": 0.252,
       "drivers": [
         [
           "event_risk",
@@ -79,28 +79,28 @@
         ],
         [
           "compression",
-          0.4342
-        ],
-        [
-          "momentum",
-          0.1211
+          0.4706
         ],
         [
           "displacement",
-          0.0775
+          -0.0448
+        ],
+        [
+          "momentum",
+          0.0364
         ]
       ],
-      "timestamp": "2026-10-07T00:11:03.349129+00:00",
+      "timestamp": "2026-10-08T00:54:56.031184+00:00",
       "notes": []
     },
     "AUDUSD": {
       "pair": "AUDUSD",
-      "p_big": 0.6301,
+      "p_big": 0.671,
       "direction": "NEUTRAL",
-      "expected_magnitude_pct": 0.7902,
-      "expected_vs_adr": 1.367,
+      "expected_magnitude_pct": 0.8274,
+      "expected_vs_adr": 1.404,
       "session": "OFF_HOURS",
-      "confidence": 0.256,
+      "confidence": 0.26,
       "drivers": [
         [
           "event_risk",
@@ -108,18 +108,18 @@
         ],
         [
           "compression",
-          0.0212
+          0.1838
         ],
         [
           "momentum",
-          -0.0171
+          0.0431
         ],
         [
           "displacement",
-          -0.0058
+          -0.0089
         ]
       ],
-      "timestamp": "2026-10-07T00:11:03.349129+00:00",
+      "timestamp": "2026-10-08T00:54:56.031184+00:00",
       "notes": []
     }
   }

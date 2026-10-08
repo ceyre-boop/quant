@@ -1,14 +1,16 @@
 {
-  "generated_at": "2026-10-06T12:15:33.555053+00:00",
-  "briefing": "Session open 2026-10-06T12:15Z. Scanner SIT \u2014 oanda degraded (RED): fix before trading. No open positions. All monitored loops alive. NQ/ES regime: CONCENTRATION (NQ leading / pulling away from ES \u2014 narrow, tech/AI-driven, FRAGILE. Trust direc). Forex macro is a swing edge (~1 trade/pair/month) \u2014 a no-signal day is the strategy working, not failing. Watching for rate-differential divergence to widen past threshold.",
+  "generated_at": "2026-10-07T15:09:52.633149+00:00",
+  "briefing": "Session open 2026-10-07T15:09Z. Scanner SIT \u2014 oanda degraded (RED): fix before trading. No open positions. \u26a0\ufe0f loops down: ict_scanner. NQ/ES regime: NO_DATA (ES=F/NQ=F fetch failed). Forex macro is a swing edge (~1 trade/pair/month) \u2014 a no-signal day is the strategy working, not failing. Watching for rate-differential divergence to widen past threshold.",
   "scan_verdicts": [
     "SIT"
   ],
   "open_positions": 0,
-  "loops_down": [],
+  "loops_down": [
+    "ict_scanner"
+  ],
   "nqes_regime": {
-    "regime": "CONCENTRATION",
-    "nq_last": 31523.8,
-    "es_last": 7865.8
+    "regime": "NO_DATA",
+    "nq_last": null,
+    "es_last": null
   }
 }
