@@ -4,6 +4,34 @@ Per-session ledger: what shipped, push status, verdicts, blockers, refusals. New
 The Obsidian brain (`~/Obsidian/Obsidian/00-BRAIN/NEXT.md`) is the cross-project rollup.
 Standing constraints live in `CLAUDE.md` — not restated here.
 
+## 2026-10-08 — "Connect the pieces": joint-attention (FOMO) proxy wired into the discovery gate; factory flip blocked by permission
+
+**Colin's direction:** stop designing, find where the research loop already exists, connect it, run it.
+
+**What already exists (verified, not built):** `hypothesis_generator` (launchd, live) → `data/research/auto_hypothesis_queue.jsonl`
+(966 queued) → `research_factory` (launchd every 4h, DRY-RUN) → 1567 shadow verdicts: 187 tested, all NOT_SIGNIFICANT;
+**1380 BLOCKED_NO_VALIDATOR** because the factory only knows 2 validators (`big_move`, `ohlc_quartile`). The 579
+`ledger_retest_gap` candidates point at ledger entries that carry **no `config`**, so they cannot be routed to the canonical
+runner without inventing parameters — left blocked, honestly.
+
+**Shipped:** Colin's "joint attentional value" as a measurable proxy — `range_accel_z` in `sovereign/discovery/features.py`
+(second difference of 5-bar smoothed candle range, z-scored over 100 bars) + three rules in `candidates.py`
+(`attention_accel_trend`, `attention_accel_fade`, `attention_decay_trend`). Ran `scripts/discover.py --track forex-daily --perms 1000`
+(.venv313). **All three screened out below the in-sample floor** (train Sharpe −0.11 / −0.39 / −0.20, n 506–639).
+Consistent with HYP-119/120 MAGNITUDE_ONLY: attention bursts size the move, not its direction. Not a prereg; discovery-bench
+screen only. Log: `logs/discover_attention_20261008.log`.
+
+**Side output of the same run (not mine, needs a human eye):** `cluster2_short` returned VALID_EDGE (hold +0.31, perm_p 0.011,
+BH pass, **n=92**). June run had 0 survivors. Treat as a candidate for review, not an edge — cluster families are the
+factor-zoo trap the gate was built to catch; n=92 is thin.
+
+**Blocked (operator action):** flipping `config/autonomous.yml::live` to `true` so the factory writes real verdicts was
+denied twice by the session permission classifier (shared-resource / security). Rule #4 rationale is drafted in the session;
+the two commands to run are in the handoff message. Pre-existing: `discover.py --selfcheck` FAILs identically before my
+change (planted real edge p=0.054–0.078, data drift) — not caused here.
+
+**Push:** see commit.
+
 ## 2026-09-28 — CI: both weekly workflows green again after 10+ weeks of silent red; failures now open issues (`97eb7bc` master, `7e53ecb` sovereign-v2, pushed)
 
 **Root cause of the silence:** scheduled workflows run from the **default branch `master`**. The 2026-07-01

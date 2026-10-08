@@ -80,6 +80,11 @@ def compute_features(price_df: pd.DataFrame) -> pd.DataFrame:
     f["atr_pct"] = (atr / close).fillna(0.0)
     f["range_pct"] = ((high - low) / close).fillna(0.0)
     f["vol_z"] = (f["atr_pct"] - f["atr_pct"].rolling(100).mean()) / f["atr_pct"].rolling(100).std()
+    # joint-attention proxy (Colin 2026-10-08): second difference of smoothed candle size.
+    # range accelerating = attention arriving; z-scored so the rule is scale-free per pair.
+    r5 = f["range_pct"].rolling(5).mean()
+    accel = r5.diff(5) - r5.shift(5).diff(5)
+    f["range_accel_z"] = ((accel - accel.rolling(100).mean()) / accel.rolling(100).std()).fillna(0.0)
     # oscillators
     f["rsi14"] = _rsi(close, 14)
     ema12, ema26 = close.ewm(span=12, adjust=False).mean(), close.ewm(span=26, adjust=False).mean()
@@ -108,7 +113,7 @@ def compute_features(price_df: pd.DataFrame) -> pd.DataFrame:
 
 
 FEATURE_COLUMNS = [
-    "ret1", "ret5", "ret20", "mom_sign20", "atr_pct", "range_pct", "vol_z",
+    "ret1", "ret5", "ret20", "mom_sign20", "atr_pct", "range_pct", "vol_z", "range_accel_z",
     "rsi14", "macd_hist", "adx14", "bb_width", "bb_pos", "dist_sma50",
     "above_sma200", "mtf_align", "hurst", "dow", "month", "is_quarter_end",
 ]
