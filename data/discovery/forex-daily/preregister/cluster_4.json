@@ -1,9 +1,9 @@
 {
   "id": "cluster_4",
-  "name": "cluster4_short",
-  "description": "KMeans cluster 4 (train fwd-return -), k=6",
+  "name": "cluster4_long",
+  "description": "KMeans cluster 4 (train fwd-return +), k=6",
   "family": "cluster",
-  "spec": "kmeans k=6 cluster 4 dir=-1",
+  "spec": "kmeans k=6 cluster 4 dir=1",
   "train_window": [
     "2015-01-01",
     "2022-12-31"
@@ -12,5 +12,5 @@
     "2023-01-01",
     "2024-12-31"
   ],
-  "preregistered_at": "2026-06-23T19:25:59.736591+00:00"
+  "preregistered_at": "2026-10-08T18:44:53.273752+00:00"
 }

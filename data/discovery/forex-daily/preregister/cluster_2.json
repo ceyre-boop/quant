@@ -1,9 +1,9 @@
 {
-  "id": "rule_rsi_meanrevert",
-  "name": "rsi_meanrevert",
-  "description": "Mean-revert RSI extremes",
-  "family": "rule",
-  "spec": "Mean-revert RSI extremes",
+  "id": "cluster_2",
+  "name": "cluster2_short",
+  "description": "KMeans cluster 2 (train fwd-return -), k=6",
+  "family": "cluster",
+  "spec": "kmeans k=6 cluster 2 dir=-1",
   "train_window": [
     "2015-01-01",
     "2022-12-31"
