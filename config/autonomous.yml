@@ -11,7 +11,7 @@
 # CLAUDE.md rule #4: changing this is a live behavior change — log a rationale
 # in data/agent/param_change_log.jsonl before flipping `live` to true.
 
-live: false
+live: true
 
 budget:
   # Hard daily ceiling across ALL autonomous components (constraint #6).
