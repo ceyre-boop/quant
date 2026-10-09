@@ -1,0 +1,269 @@
+{
+  "date": "2026-10-08",
+  "generated_at": "2026-10-08T12:10:33+00:00",
+  "fields": {
+    "fred_macro": {
+      "name": "fred_macro",
+      "value": {
+        "metrics": {
+          "A191RL1Q225SBEA": {
+            "date": "2026-04-01",
+            "value": 2.2,
+            "y1": 0.2,
+            "y2": 2.4,
+            "y5": 6.8,
+            "y10": 2.2
+          },
+          "CPIAUCSL": {
+            "date": "2026-08-01",
+            "value": 334.131,
+            "y1": null,
+            "y2": 315.631,
+            "y5": 276.55,
+            "y10": 241.741
+          },
+          "CPILFESL": {
+            "date": "2026-08-01",
+            "value": 337.765,
+            "y1": null,
+            "y2": 321.731,
+            "y5": 281.668,
+            "y10": 249.142
+          },
+          "PCEPILFE": {
+            "date": "2026-08-01",
+            "value": 130.455,
+            "y1": 127.165,
+            "y2": 123.816,
+            "y5": 110.119,
+            "y10": 98.961,
+            "yoy_pct": 2.59
+          },
+          "UNRATE": {
+            "date": "2026-09-01",
+            "value": 4.2,
+            "y1": null,
+            "y2": 4.1,
+            "y5": 4.5,
+            "y10": 4.9
+          },
+          "PAYEMS": {
+            "date": "2026-09-01",
+            "value": 159044.0,
+            "y1": 158408.0,
+            "y2": 157945.0,
+            "y5": 148572.0,
+            "y10": 145065.0
+          },
+          "ICSA": {
+            "date": "2026-09-26",
+            "value": 197000.0,
+            "y1": 233000.0,
+            "y2": 258000.0,
+            "y5": 312000.0,
+            "y10": 250000.0
+          },
+          "FEDFUNDS": {
+            "date": "2026-09-01",
+            "value": 3.75,
+            "y1": 4.09,
+            "y2": 4.83,
+            "y5": 0.08,
+            "y10": 0.4
+          },
+          "DGS10": {
+            "date": "2026-10-06",
+            "value": 5.27,
+            "y1": 4.13,
+            "y2": 4.04,
+            "y5": 1.61,
+            "y10": 1.73
+          },
+          "DGS2": {
+            "date": "2026-10-06",
+            "value": 4.79,
+            "y1": 3.58,
+            "y2": 3.98,
+            "y5": 0.32,
+            "y10": 0.83
+          },
+          "T10Y2Y": {
+            "date": "2026-10-07",
+            "value": 0.51,
+            "y1": 0.55,
+            "y2": 0.06,
+            "y5": 1.29,
+            "y10": 0.9
+          },
+          "MORTGAGE30US": {
+            "date": "2026-10-01",
+            "value": 7.28,
+            "y1": 6.34,
+            "y2": 6.12,
+            "y5": null,
+            "y10": 3.42
+          },
+          "RSAFS": {
+            "date": "2026-08-01",
+            "value": 737763.0,
+            "y1": 700790.0,
+            "y2": 681808.0,
+            "y5": 619018.0,
+            "y10": 453910.0
+          },
+          "UMCSENT": {
+            "date": "2026-08-01",
+            "value": 51.7,
+            "y1": 53.6,
+            "y2": 70.5,
+            "y5": 71.7,
+            "y10": 87.2
+          },
+          "DTWEXBGS": {
+            "date": "2026-10-02",
+            "value": 121.3848,
+            "y1": 120.7766,
+            "y2": 122.6625,
+            "y5": 114.5986,
+            "y10": 113.2915
+          },
+          "VIXCLS": {
+            "date": "2026-10-06",
+            "value": 15.01,
+            "y1": 16.3,
+            "y2": 21.42,
+            "y5": 18.77,
+            "y10": 13.48
+          }
+        },
+        "summary": {
+          "gdp_growth_pct": 2.2,
+          "cpi_yoy_pct": null,
+          "core_cpi_yoy_pct": null,
+          "core_pce_yoy_pct": 2.59,
+          "unemployment_pct": 4.2,
+          "fed_funds_pct": 3.75,
+          "ten_year_pct": 5.27,
+          "yield_curve_10y2y": 0.51,
+          "yield_curve_state": "NORMAL",
+          "consumer_sentiment": 51.7,
+          "vix": 15.01
+        },
+        "date": "2026-10-08"
+      },
+      "status": "FRESH",
+      "source": "/Users/taboost/quant/data/macro/fred_economic_latest.json",
+      "age_seconds": 18772.098387,
+      "detail": "16 series"
+    },
+    "sentiment_board": {
+      "name": "sentiment_board",
+      "value": null,
+      "status": "ERROR",
+      "source": "/Users/taboost/quant/data/sentiment.db",
+      "age_seconds": null,
+      "detail": "IOException: IO Error: Could not set lock on file \"/Users/taboost/quant/data/sentiment.db\": Conflicting lock is held in /opt/homebrew/Cellar/python@3.14/3.14.4_1/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python (PID 88645) by user taboost. See also https://duckdb.org/docs/stable/connect/concurrency"
+    },
+    "gdelt": {
+      "name": "gdelt",
+      "value": null,
+      "status": "ERROR",
+      "source": "/Users/taboost/quant/data/sentiment.db",
+      "age_seconds": null,
+      "detail": "IOException: IO Error: Could not set lock on file \"/Users/taboost/quant/data/sentiment.db\": Conflicting lock is held in /opt/homebrew/Cellar/python@3.14/3.14.4_1/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python (PID 88645) by user taboost. See also https://duckdb.org/docs/stable/connect/concurrency"
+    },
+    "reddit": {
+      "name": "reddit",
+      "value": null,
+      "status": "RETIRED",
+      "source": "/Users/taboost/quant/data/cache/reddit_sentiment.json",
+      "age_seconds": 6891491.701389,
+      "detail": "RETIRED 2026-07-20. Reddit blocks unauthenticated JSON: old.reddit.com 403 and www.reddit.com 403, tested live with a browser User-Agent. No REDDIT_CLIENT_ID exists anywhere in the repo, so no request this system can make will succeed. The endpoint fix in 9bc2849 (old.reddit + raw_json=1) was correct code against a door that is shut. Reviving this source requires a registered OAuth app and oauth.reddit.com \u2014 not a code change here."
+    },
+    "briefing": {
+      "name": "briefing",
+      "value": {
+        "date": "2026-10-08",
+        "regime_read": "NQ leading / pulling away from ES \u2014 narrow, tech/AI-driven, FRAGILE. Trust directional moves less; watch for reversal when AI names cool.",
+        "narrative": "Macro backdrop \u2014\n[2026-10-08] US economic state (FRED):\n  Growth: real GDP 2.2% (q/q ann)\n  Inflation: CPI n/a YoY | core CPI n/a | core PCE 2.59% (Fed target 2%)\n  Labor: unemployment 4.2%\n  Rates: fed funds 3.75% | 10Y 5.27% | 10Y-2Y 0.51% (NORMAL)\n  Consumer: UMich sentiment 51.7 | VIX 15.01\n\n---\nRecent market action in the ES/NQ futures pair has been characterized by a narrow, tech/AI-driven focus. The NQ leading and pulling away from ES suggests a fragile directional move, particularly as geopolitical tensions continue to simmer. Key catalysts include ongoing discussions around urban warfare and geopolitical conflicts, which may influence investor sentiment towards technology stocks. Additionally, the FOMC meeting on October 28th is a significant event that could shift market dynamics, prompting traders to reduce size and widen stops into the window of uncertainty. The volume profile indicates an accumulation zone with key levels at 7853.44 for ES and 31231.28 for NQ, suggesting potential support areas. Given the current concentration regime, we should be cautious about trusting directional moves and watch for a reversal when AI-related stocks cool off. The bias is towards long-the-dip with a probability of ~65%, invalidated below 30,375.",
+        "directional_bias": "LONG",
+        "confidence": 75,
+        "news_count": 9,
+        "event_calendar": [
+          {
+            "event": "CPI",
+            "date": "2026-10-12",
+            "source": "cadence_estimate",
+            "action": "inflation print 8:30 ET \u2014 reduce size into window",
+            "days_until": 4,
+            "note": "in 4d \u2014 inflation print 8:30 ET \u2014 reduce size into window"
+          },
+          {
+            "event": "FOMC meeting",
+            "date": "2026-10-28",
+            "source": "seed",
+            "action": "reduce size / widen stops into the window",
+            "days_until": 20,
+            "note": "in 20d \u2014 reduce size / widen stops into the window"
+          }
+        ]
+      },
+      "status": "FRESH",
+      "source": "/Users/taboost/quant/data/oracle/market_briefings/latest.json",
+      "age_seconds": 7169.547443,
+      "detail": "briefing for 2026-10-08"
+    },
+    "daily_panel": {
+      "name": "daily_panel",
+      "value": {
+        "keys": [
+          "date",
+          "generated_at",
+          "provenance",
+          "sources",
+          "sources_null",
+          "sources_ok"
+        ]
+      },
+      "status": "FRESH",
+      "source": "/Users/taboost/quant/data/research/panel/2026-10-08.json",
+      "age_seconds": 18766.659367,
+      "detail": "6 sections"
+    },
+    "calendar": {
+      "name": "calendar",
+      "value": null,
+      "status": "UNAVAILABLE",
+      "source": "/Users/taboost/quant/data/cache/forex_factory_calendar.json",
+      "age_seconds": null,
+      "detail": "ForexFactory 403 Forbidden \u2014 no cached calendar"
+    }
+  },
+  "health": {
+    "n_sources": 6,
+    "n_fresh": 3,
+    "fraction_fresh": 0.5,
+    "by_status": {
+      "FRESH": [
+        "fred_macro",
+        "briefing",
+        "daily_panel"
+      ],
+      "ERROR": [
+        "sentiment_board",
+        "gdelt"
+      ],
+      "RETIRED": [
+        "reddit"
+      ],
+      "UNAVAILABLE": [
+        "calendar"
+      ]
+    },
+    "n_retired": 1,
+    "retired": [
+      "reddit"
+    ]
+  },
+  "note": "Every field carries an explicit status. SILENT_NULL means the source succeeded but returned nothing \u2014 treat it as absent data, never as a zero reading."
+}

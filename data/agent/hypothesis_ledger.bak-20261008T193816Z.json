@@ -2539,21 +2539,5 @@
     "date_tested": "2026-10-04",
     "result": "single-core(90bar)=7,477/s \u00b7 12-core ceiling=1,616/s \u00b7 best bar-evals=1,870,335/s \u00b7 legacy claim 148,193 (NOT beaten; numba INACTIVE on py3.14.4 \u2192 pure-Python fallback)",
     "methodology_note": "arm, 12 physical cores, numba INACTIVE on py3.14.4 \u2192 pure-Python fallback. Time-boxed. FastBacktestEngine vs pure-Python forex kernel across 90bar/daily/5min/1min, single vs all-cores. See backtest_benchmark JSON."
-  },
-  {
-    "id": "HYP-MANUAL-20260615T134946526867",
-    "name": "OHLC candle quartile structure predicts direction: intrabar quartile levels (25/50/75/100% of constituent sub-bars) on 4",
-    "status": "NOT_SIGNIFICANT",
-    "date_tested": "2026-10-08",
-    "source": "auto_factory",
-    "validator": "ohlc_quartile",
-    "mechanism": "NONE STATED \u2014 exploratory. No identified reason these quartile levels carry information the market hasn't already priced. Tested precisely because intuition is not evidence; this is the same class as the killed ES/NQ bias engine.",
-    "result": {
-      "perm_p": null,
-      "oos_sharpe": 0.0,
-      "walkforward": "FRAGILE",
-      "nperm": 10000
-    },
-    "auto_generated": true
   }
 ]
