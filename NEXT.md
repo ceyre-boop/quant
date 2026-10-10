@@ -4700,3 +4700,7 @@ Notes: morning scan 08:21 ET found 0 HYP-093 candidates (real zero, scan ran; 4/
 
 ## 2026-10-01 · RESEARCH (21:00 nightly)
 Brain read OK · movers 50 (6 common in HYP-093 band: SSM, NXL, VEEA, RPGL, XRPN, SDEV) · queue 0 QUEUED (46 days empty) · no candidates flagged · findings.jsonl unchanged (132).
+
+## 2026-10-10 · THE EQUATION
+Shipped `research/EQUATION.md`: the P&L identity `E[G] ≈ f·(w·W−(1−w)·L−c)·q̄` s.t. survive(sequence), every symbol defined, pointed at the file that measures it, with current v015 values. Reproduces the backtest in all three windows (2015–24 / OOS 2023–24 / fresh 2025–26) with one consistent sizing term (implied notional q̄ 0.74–0.89). Linked from EDGE_LEDGER.md and CLAUDE.md.
+Findings surfaced by writing it: (1) `f` is 41/yr for the book, not the "4–14/yr" in CLAUDE.md (that is per-pair); (2) backtest `MAX_RISK_PER_TRADE_PCT=0.01` vs Art. 1 0.75% — unreconciled; (3) the financing leg of `c` is the only *wrong* term (TICK-024, 9× under, sign flip) and must be fixed before any other term is trusted. Open items in EQUATION.md §7. No live file touched.

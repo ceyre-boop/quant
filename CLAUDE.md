@@ -231,6 +231,7 @@ python3 scripts/run_replay_validation.py
 
 ## Current live state
 
+**The equation:** `research/EQUATION.md` — the P&L identity with every term defined, measured, and pointed at its file. Start here for any "how do we make more" question.
 **Edge status, one page:** `research/EDGE_LEDGER.md` — every proven/killed claim with hash, script and
 result file. Read it before asserting an edge exists or doesn't. **`research/HYPOTHESIS_LESSONS.md`** is the
 companion: every hypothesis HYP-001→116 with verdict and lesson — the full record of what failed and why.
