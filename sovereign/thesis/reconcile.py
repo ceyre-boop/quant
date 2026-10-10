@@ -128,10 +128,11 @@ def reconcile(account: str, loader: Loader, asof: str, baskets: dict[str, set[st
         if nz.empty:
             continue
         sub = sub.loc[nz.index[0]:]
-        # A sub-portfolio that was liquidated to ~zero mid-window has no meaningful TWR
-        # (the chain restarts from a near-zero base). Report MWR only in that case.
+        # Sub-basket TWR is ill-posed: its "flows" are the trades themselves, whose intraday
+        # timing we don't have, and the chain restarts from a near-zero base after a trim or
+        # liquidation. Report money-weighted only; TWR is an account-level number.
         liquidated = bool((sub["value"].iloc[1:-1] < 0.02 * sub["value"].max()).any())
-        st = None if liquidated else twr(sub)[0]
+        st = None
         sp = spy.loc[sub.index]
         out["baskets"][name] = {
             "tickers": sorted(tk), "start": str(sub.index[0].date()),
@@ -156,6 +157,6 @@ def format_reconciliation(r: dict[str, Any]) -> str:
     for n, b in r["baskets"].items():
         L.append(f"  BASKET {n}: {', '.join(b['tickers'])}  from {b['start']}")
         L.append(f"    in ${b['money_in']:,.2f} out ${b['money_out']:,.2f} ending ${b['ending_value']:,.2f} gain ${b['net_gain']:,.2f}")
-        tw = f"TWR {b['twr']:+.1%}" if b["twr"] is not None else "TWR n/a (liquidated mid-window)"
-        L.append(f"    {tw}  MWR {b['mwr_modified_dietz']:+.1%}  SPY {b['spy_same_window']:+.1%}")
+        L.append(f"    MWR {b['mwr_modified_dietz']:+.1%}  SPY {b['spy_same_window']:+.1%}"
+                 + ("  (liquidated mid-window)" if b.get("liquidated_midway") else ""))
     return "\n".join(L)
