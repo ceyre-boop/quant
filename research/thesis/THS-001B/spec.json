@@ -1,0 +1,72 @@
+{
+  "id": "THS-001B",
+  "title": "AI infrastructure + AI-health sleeve (managed RIA account)",
+  "thesis": "Frontier-model demand is compute-bound; the money is paid to whoever sells the compute, power, and memory the hyperscalers must buy regardless of which model wins. Hold the sellers of the bottleneck, not the users of it. Managed sleeve adds AI-in-healthcare names (TEM GEHC REGN RVMD) as a second expression of the same bottleneck.",
+  "horizon_months": 12,
+  "basket": [
+    {
+      "ticker": "AMD",
+      "weight": 0.120012
+    },
+    {
+      "ticker": "NBIS",
+      "weight": 0.140064
+    },
+    {
+      "ticker": "TEM",
+      "weight": 0.079928
+    },
+    {
+      "ticker": "PLTR",
+      "weight": 0.220273
+    },
+    {
+      "ticker": "GEHC",
+      "weight": 0.079928
+    },
+    {
+      "ticker": "REGN",
+      "weight": 0.029797
+    },
+    {
+      "ticker": "CRWV",
+      "weight": 0.180168
+    },
+    {
+      "ticker": "SMH",
+      "weight": 0.04985
+    },
+    {
+      "ticker": "RVMD",
+      "weight": 0.09998
+    }
+  ],
+  "entry_date": "2026-03-31",
+  "entry_prices": {
+    "AMD": 198.97,
+    "NBIS": 96.84,
+    "TEM": 43.09,
+    "PLTR": 141.57,
+    "GEHC": 68.92,
+    "REGN": 769.12,
+    "CRWV": 73.345,
+    "SMH": 370.9534,
+    "RVMD": 96.005
+  },
+  "invalidation": {
+    "rule": "Basket drawdown >= 30% from its running peak (mechanical), OR two consecutive quarters in which at least two of MSFT/GOOGL/AMZN cut forward capex guidance (manual check at each scoring run).",
+    "metric": "basket_drawdown",
+    "threshold": 0.3,
+    "manual_check": "Did >=2 of MSFT/GOOGL/AMZN cut forward capex guidance in each of the last two quarters?"
+  },
+  "benchmark": "SPY",
+  "sizing": {
+    "account": "Public 3CQ09610 (RIA_ASSET, managed)",
+    "dollars": 997.4,
+    "note": "weights = first-day fill dollars 2026-03-31; later adds/trims were the manager's"
+  },
+  "source": "retro-registered",
+  "notes": [
+    "Retro-registered 2026-10-10. The manager rebalanced ~monthly and the account was largely liquidated 2026-08-18 ($4,300 withdrawn to the margin account) then re-entered 2026-08-28. Scoring = the 03-31 basket held; reconcile = what actually happened."
+  ]
+}

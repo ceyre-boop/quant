@@ -240,6 +240,12 @@ def cmd_term(args) -> None:
     raise SystemExit(subprocess.run(cmd, cwd=str(ROOT), check=False).returncode)
 
 
+def cmd_thesis(args) -> None:
+    """Thesis engine (scripts/thesis.py): new | seal | live | score | list | verify | reconcile."""
+    cmd = [sys.executable, str(ROOT / "scripts" / "thesis.py"), *args.rest]
+    raise SystemExit(subprocess.run(cmd, check=False).returncode)
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(
         prog="alta", description="Alta operator CLI — terminal, proof, money, health, discover, validate, bench, kill switch.")
@@ -309,6 +315,10 @@ def main() -> None:
     tm.add_argument("--no-color", action="store_true")
     tm.add_argument("--width", type=int, default=None)
     tm.set_defaults(fn=cmd_term)
+
+    th = sub.add_parser("thesis", help="thesis engine — sealed thematic baskets scored vs SPY")
+    th.add_argument("rest", nargs=argparse.REMAINDER)
+    th.set_defaults(fn=cmd_thesis)
 
     args = ap.parse_args()
     args.fn(args)

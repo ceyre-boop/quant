@@ -1,0 +1,83 @@
+{
+  "asof": "2026-10-09",
+  "entry_date": "2026-03-31",
+  "days_held": 192,
+  "basket_return": 0.6645142044848102,
+  "benchmark": "SPY",
+  "benchmark_return": 0.20323851467698106,
+  "excess_return": 0.4612756898078292,
+  "basket_max_drawdown": -0.2533904661805815,
+  "benchmark_max_drawdown": -0.044946523481130374,
+  "marks": {
+    "1m": {
+      "basket": 0.27247296435761514,
+      "benchmark": 0.10505274506872397
+    },
+    "3m": {
+      "basket": 0.598886179949927,
+      "benchmark": 0.15123456993915463
+    },
+    "6m": {
+      "basket": 0.7013580604786986,
+      "benchmark": 0.17860408915182946
+    },
+    "12m": {
+      "basket": null,
+      "benchmark": null
+    }
+  },
+  "invalidation": {
+    "manual_check": "Did >=2 of MSFT/GOOGL/AMZN cut forward capex guidance in each of the last two quarters?",
+    "metric": "basket_drawdown",
+    "rule": "Basket drawdown >= 30% from its running peak (mechanical), OR two consecutive quarters in which at least two of MSFT/GOOGL/AMZN cut forward capex guidance (manual check at each scoring run).",
+    "threshold": 0.3
+  },
+  "invalidated": false,
+  "legs": [
+    {
+      "ticker": "AMD",
+      "weight": 0.120012,
+      "return": 1.9892346137725299
+    },
+    {
+      "ticker": "NBIS",
+      "weight": 0.140064,
+      "return": 1.1305898493907844
+    },
+    {
+      "ticker": "TEM",
+      "weight": 0.079928,
+      "return": 0.5685537016903444
+    },
+    {
+      "ticker": "PLTR",
+      "weight": 0.220273,
+      "return": 0.42910859171640103
+    },
+    {
+      "ticker": "GEHC",
+      "weight": 0.079928,
+      "return": -0.07545464797219459
+    },
+    {
+      "ticker": "REGN",
+      "weight": 0.029797,
+      "return": -0.03120722877977189
+    },
+    {
+      "ticker": "CRWV",
+      "weight": 0.180168,
+      "return": 0.05950691283995457
+    },
+    {
+      "ticker": "SMH",
+      "weight": 0.04985,
+      "return": 0.5736307425522262
+    },
+    {
+      "ticker": "RVMD",
+      "weight": 0.09998,
+      "return": 0.9512595836178503
+    }
+  ]
+}

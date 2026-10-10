@@ -1,0 +1,68 @@
+{
+  "asof": "2026-10-09",
+  "entry_date": "2026-08-28",
+  "days_held": 42,
+  "basket_return": 0.07288722934269876,
+  "benchmark": "SPY",
+  "benchmark_return": 0.014497120879937153,
+  "excess_return": 0.0583901084627616,
+  "basket_max_drawdown": -0.09171760406289309,
+  "benchmark_max_drawdown": -0.024729351826916268,
+  "marks": {
+    "1m": {
+      "basket": 0.07205832619505448,
+      "benchmark": -0.002390127349656268
+    },
+    "3m": {
+      "basket": null,
+      "benchmark": null
+    },
+    "6m": {
+      "basket": null,
+      "benchmark": null
+    },
+    "12m": {
+      "basket": null,
+      "benchmark": null
+    }
+  },
+  "invalidation": {
+    "manual_check": "Did >=2 of MSFT/GOOGL/AMZN cut forward capex guidance in each of the last two quarters?",
+    "metric": "basket_drawdown",
+    "rule": "Basket drawdown >= 30% from its running peak (mechanical), OR two consecutive quarters in which at least two of MSFT/GOOGL/AMZN cut forward capex guidance (manual check at each scoring run).",
+    "threshold": 0.3
+  },
+  "invalidated": false,
+  "legs": [
+    {
+      "ticker": "NVDA",
+      "weight": 0.301352,
+      "return": 0.05509794282466607
+    },
+    {
+      "ticker": "NBIS",
+      "weight": 0.214769,
+      "return": 0.05684107020151985
+    },
+    {
+      "ticker": "VRT",
+      "weight": 0.161669,
+      "return": -0.055393109324558765
+    },
+    {
+      "ticker": "PLTR",
+      "weight": 0.129312,
+      "return": 0.12217516015831653
+    },
+    {
+      "ticker": "MU",
+      "weight": 0.107441,
+      "return": 0.10305942602115747
+    },
+    {
+      "ticker": "AMD",
+      "weight": 0.085457,
+      "return": 0.30611279076436504
+    }
+  ]
+}

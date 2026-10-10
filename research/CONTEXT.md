@@ -178,3 +178,7 @@ cat data/hypotheses_ledger.jsonl | jq 'select(.modified_date > "2026-08-05" and 
 
 - **2026-08-12** — Layer 1 formalized for ICM integration. Workflow map added.
 - **2026-07-13** — Initial version (research directory organized).
+
+## Thesis engine (added 2026-10-10)
+
+Thematic baskets are not hypotheses: they are sealed theses with an invalidation, scored vs SPY at 1/3/6/12 months. Router: `research/thesis/CONTEXT.md`. CLI `alta thesis`.

@@ -8,6 +8,8 @@ recorded with the same care as a pass; corrections are appended, never overwritt
 
 _Last updated 2026-09-16 (HYP-109 → HYP-120, fifteen preregs)._
 
+**Thesis ledger (thematic baskets, sealed before entry, scored vs SPY):** `research/thesis/CONTEXT.md` — THS-001/001B the AI-infrastructure basket; the "+140%" measured as TWR **+74.5% vs SPY +23.8%** (6 months, managed sleeve). Not a hypothesis-ledger claim; a separate ledger with its own rules.
+
 **The equation, every symbol defined and measured:** `research/EQUATION.md` — `E[G] ≈ f·(w·W−(1−w)·L−c)·q̄` subject to survival; each term points at the file and value that measures it. Read it before asking "which lever."
 
 **The one page that says what it all means:** `research/MAGNUM_OPUS.md` — where Colin has been, what is

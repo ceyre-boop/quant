@@ -1,0 +1,56 @@
+{
+  "basket": [
+    {
+      "ticker": "NVDA",
+      "weight": 0.301352
+    },
+    {
+      "ticker": "NBIS",
+      "weight": 0.214769
+    },
+    {
+      "ticker": "VRT",
+      "weight": 0.161669
+    },
+    {
+      "ticker": "PLTR",
+      "weight": 0.129312
+    },
+    {
+      "ticker": "MU",
+      "weight": 0.107441
+    },
+    {
+      "ticker": "AMD",
+      "weight": 0.085457
+    }
+  ],
+  "benchmark": "SPY",
+  "entry_date": "2026-08-28",
+  "entry_prices": {
+    "AMD": 471.46,
+    "MU": 925.33,
+    "NBIS": 207.07,
+    "NVDA": 218.9497,
+    "PLTR": 185.9501,
+    "VRT": 259.195
+  },
+  "hash_lock": "868d510bff59a1621c21ddf728273ddaa7b40ab285e1aa4cf55d733e6ef2f03a",
+  "horizon_months": 12,
+  "id": "THS-001",
+  "invalidation": {
+    "manual_check": "Did >=2 of MSFT/GOOGL/AMZN cut forward capex guidance in each of the last two quarters?",
+    "metric": "basket_drawdown",
+    "rule": "Basket drawdown >= 30% from its running peak (mechanical), OR two consecutive quarters in which at least two of MSFT/GOOGL/AMZN cut forward capex guidance (manual check at each scoring run).",
+    "threshold": 0.3
+  },
+  "sealed_at": "2026-10-10T23:45:53+00:00",
+  "sizing": {
+    "account": "Public 5OR41765 (margin)",
+    "dollars": 8870.0,
+    "note": "weights = fill dollars / total on 2026-08-28"
+  },
+  "source": "retro-registered",
+  "thesis": "Frontier-model demand is compute-bound; the money is paid to whoever sells the compute, power, and memory the hyperscalers must buy regardless of which model wins. Hold the sellers of the bottleneck, not the users of it.",
+  "title": "AI infrastructure \u2014 sellers of the compute bottleneck (margin account)"
+}

@@ -1,0 +1,71 @@
+{
+  "basket": [
+    {
+      "ticker": "AMD",
+      "weight": 0.120012
+    },
+    {
+      "ticker": "NBIS",
+      "weight": 0.140064
+    },
+    {
+      "ticker": "TEM",
+      "weight": 0.079928
+    },
+    {
+      "ticker": "PLTR",
+      "weight": 0.220273
+    },
+    {
+      "ticker": "GEHC",
+      "weight": 0.079928
+    },
+    {
+      "ticker": "REGN",
+      "weight": 0.029797
+    },
+    {
+      "ticker": "CRWV",
+      "weight": 0.180168
+    },
+    {
+      "ticker": "SMH",
+      "weight": 0.04985
+    },
+    {
+      "ticker": "RVMD",
+      "weight": 0.09998
+    }
+  ],
+  "benchmark": "SPY",
+  "entry_date": "2026-03-31",
+  "entry_prices": {
+    "AMD": 198.97,
+    "CRWV": 73.345,
+    "GEHC": 68.92,
+    "NBIS": 96.84,
+    "PLTR": 141.57,
+    "REGN": 769.12,
+    "RVMD": 96.005,
+    "SMH": 370.9534,
+    "TEM": 43.09
+  },
+  "hash_lock": "d7923706719585f09f39919de96b71c31306c5ed919a0e85686a85dbfe119fe0",
+  "horizon_months": 12,
+  "id": "THS-001B",
+  "invalidation": {
+    "manual_check": "Did >=2 of MSFT/GOOGL/AMZN cut forward capex guidance in each of the last two quarters?",
+    "metric": "basket_drawdown",
+    "rule": "Basket drawdown >= 30% from its running peak (mechanical), OR two consecutive quarters in which at least two of MSFT/GOOGL/AMZN cut forward capex guidance (manual check at each scoring run).",
+    "threshold": 0.3
+  },
+  "sealed_at": "2026-10-10T23:45:54+00:00",
+  "sizing": {
+    "account": "Public 3CQ09610 (RIA_ASSET, managed)",
+    "dollars": 997.4,
+    "note": "weights = first-day fill dollars 2026-03-31; later adds/trims were the manager's"
+  },
+  "source": "retro-registered",
+  "thesis": "Frontier-model demand is compute-bound; the money is paid to whoever sells the compute, power, and memory the hyperscalers must buy regardless of which model wins. Hold the sellers of the bottleneck, not the users of it. Managed sleeve adds AI-in-healthcare names (TEM GEHC REGN RVMD) as a second expression of the same bottleneck.",
+  "title": "AI infrastructure + AI-health sleeve (managed RIA account)"
+}
