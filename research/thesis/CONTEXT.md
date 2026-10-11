@@ -29,6 +29,7 @@ CLI `alta thesis …` (`scripts/thesis.py`). Ledger `data/thesis/thesis_ledger.j
 |---|---|---|---|---|
 | THS-001 | AI infrastructure — sellers of the compute bottleneck (margin) | 2026-08-28 | LIVE (retro) | see `THS-001/CONTEXT.md` |
 | THS-001B | same thesis, managed RIA sleeve incl. AI-health | 2026-03-31 | LIVE (retro) | see `THS-001B/CONTEXT.md` |
+| THS-002 | AI infrastructure — sellers of the power bottleneck (margin) | 2026-10-13 (planned) | SEALED, ai-proposed | see `THS-002/CONTEXT.md` |
 
 ## Rules (not restated elsewhere)
 
@@ -38,4 +39,5 @@ CLI `alta thesis …` (`scripts/thesis.py`). Ledger `data/thesis/thesis_ledger.j
 - Scoring measures the sealed basket. Reconcile measures the account. Both numbers are kept;
   neither is hidden behind the other.
 - A thesis is judged at its horizon against SPY, not against the best day it had.
-- Next thesis (THS-002) must be AI-proposed and sealed before any fill.
+- THS-002 was AI-proposed and sealed 2026-10-11 before any fill. All later theses follow the same order.
+- Fund with settled cash before sealing: a bounced deposit force-liquidates the thesis (THS-001B, twice).

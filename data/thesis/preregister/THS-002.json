@@ -1,0 +1,56 @@
+{
+  "basket": [
+    {
+      "ticker": "GEV",
+      "weight": 0.25
+    },
+    {
+      "ticker": "ETN",
+      "weight": 0.2
+    },
+    {
+      "ticker": "CEG",
+      "weight": 0.15
+    },
+    {
+      "ticker": "VST",
+      "weight": 0.15
+    },
+    {
+      "ticker": "PWR",
+      "weight": 0.15
+    },
+    {
+      "ticker": "FIX",
+      "weight": 0.1
+    }
+  ],
+  "benchmark": "SPY",
+  "entry_date": "2026-10-13",
+  "entry_prices": {
+    "CEG": 298.21,
+    "ETN": 430.84,
+    "FIX": 1712.0,
+    "GEV": 1003.09,
+    "PWR": 706.0,
+    "VST": 161.0
+  },
+  "hash_lock": "e391cb7a228a9e28bb1de07bd44f3360edb40335f399170fc2183a1557471d36",
+  "horizon_months": 12,
+  "id": "THS-002",
+  "invalidation": {
+    "manual_check": "Did >=2 of MSFT/GOOGL/AMZN/META cut forward capex guidance in each of the last two quarters?",
+    "metric": "basket_drawdown",
+    "rule": "Basket drawdown >= 30% from its running peak (mechanical), OR two consecutive quarters in which at least two of MSFT/GOOGL/AMZN/META cut forward capex guidance (manual check at each scoring run).",
+    "threshold": 0.3
+  },
+  "sealed_at": "2026-10-11T23:08:03+00:00",
+  "sizing": {
+    "account": "Public 5OR41765 (margin)",
+    "dollars": 2000.0,
+    "note": "entry_prices are reference closes of 2026-10-09 recorded at seal; actual fills are reconciled from the account. Fund with settled cash only (THS-001B lesson)."
+  },
+  "source": "ai-proposed",
+  "thesis": "Hyperscaler capex for 2026 is ~$700B and rising while chip supply is sold out through 2027, so the binding constraint on the buildout has moved from compute to electricity: turbines, switchgear, grid construction and firm power. Whoever owns gas-turbine, electrical-equipment, grid-build and nuclear/IPP capacity is paid by every data center regardless of which chip or model wins, and that capacity cannot be expanded in under 24-36 months. Hold the sellers of electrons, not the users.",
+  "title": "AI infrastructure \u2014 sellers of the power bottleneck"
+}

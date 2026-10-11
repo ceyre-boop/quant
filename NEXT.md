@@ -4711,3 +4711,8 @@ THS-001 (margin, 2026-08-28 six names) and THS-001B (managed sleeve, 2026-03-31)
 **The 140% measured:** it is ending ÷ net-contributed on the managed account (+140.7%), inflated by $4,300 of gains withdrawn. Real TWR **+74.5% vs SPY +23.8%** in six months; margin account TWR +54.0% vs +30.1% since 2025-02. Both beat the index by a lot; both are one theme in one year — n=1 until THS-002.
 Data caveats in the CONTEXT files: +$2,004 unidentified inflow on margin; one ~$3.8k buy batch missing from the API on the RIA account, reconstructed from positions. Sub-basket TWR undefined across liquidations (MWR reported).
 Next: THS-002 must be AI-proposed and sealed before any fill. Colin to confirm or replace the THS-001 invalidation sentence (drawdown 30% / hyperscaler capex). Score THS-001 at 2026-11-28 (3m).
+
+## 2026-10-11 — THS-002 sealed (first ai-proposed thesis)
+Power-bottleneck basket GEV/ETN/CEG/VST/PWR/FIX, $2,000 margin, planned entry 2026-10-13, hash e391cb7a.
+Colin confirmed THS-001 invalidation as sealed. THS-001B sell-downs 05-07/09-30 traced to bounced $5k deposits.
+Next: Colin fills THS-002 by hand → `alta thesis live THS-002 --note "..."`; 1m mark 2026-11-13; THS-001 3m mark 2026-11-28.
