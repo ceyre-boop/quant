@@ -1,17 +1,18 @@
 {
-  "timestamp": "2026-10-10T01:49:01+00:00",
+  "timestamp": "2026-10-11T00:19:01+00:00",
   "pairs": {
     "GBPUSD": {
-      "bullish": 1,
-      "bearish": 8,
+      "bullish": 2,
+      "bearish": 7,
       "neutral": 21,
       "direction": "SHORT",
-      "conviction": 0.583,
+      "conviction": 0.417,
       "hit_rate": 0.0,
       "matching_green": 0,
       "matching_green_short": 0,
       "top_bullish": [
-        "aroon"
+        "aroon",
+        "macd"
       ],
       "top_bearish": [
         "adx",
@@ -29,8 +30,8 @@
         "aroon": 1,
         "vwap_dev": 0,
         "rsi": -1,
-        "macd": 0,
-        "stochastic": -1,
+        "macd": 1,
+        "stochastic": 0,
         "cci": 0,
         "williams_r": 0,
         "roc": 0,

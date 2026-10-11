@@ -1,59 +1,59 @@
 {
-  "checked_at": "2026-10-10T01:49:06.753167+00:00",
+  "checked_at": "2026-10-11T00:19:03.859109+00:00",
   "market_hours": false,
   "frozen": null,
   "down": [],
   "loops": {
     "ict_scanner": {
       "status": "ALIVE",
-      "last": "2026-10-10T01:29:21.374292+00:00",
-      "silence_hours": 0.3,
+      "last": "2026-10-11T00:14:43.933014+00:00",
+      "silence_hours": 0.1,
       "threshold": 0.5,
       "kind": "periodic"
     },
     "forex_scan": {
       "status": "ALIVE",
       "last": "2026-10-09T12:00:04.403768+00:00",
-      "silence_hours": 13.8,
+      "silence_hours": 36.3,
       "threshold": 30,
       "kind": "periodic",
       "effective_silence_hours": 12.0
     },
     "pulse_check": {
       "status": "ALIVE",
-      "last": "2026-10-10T01:49:06+00:00",
+      "last": "2026-10-11T00:19:03+00:00",
       "silence_hours": 0.0,
       "threshold": 3,
       "kind": "periodic"
     },
     "decision_backfill": {
       "status": "ALIVE",
-      "last": "2026-10-10T01:49:03.880354+00:00",
+      "last": "2026-10-11T00:19:02.350971+00:00",
       "silence_hours": 0.0,
       "threshold": 3,
       "kind": "periodic"
     },
     "big_move": {
       "status": "ALIVE",
-      "last": "2026-10-10T01:49:06+00:00",
+      "last": "2026-10-11T00:19:03+00:00",
       "silence_hours": 0.0,
       "threshold": 3,
       "kind": "periodic"
     },
     "oracle_reflection": {
       "status": "ALIVE",
-      "last": "2026-10-09T06:30:05.377820+00:00",
-      "silence_hours": 19.3,
+      "last": "2026-10-10T06:35:58.483553+00:00",
+      "silence_hours": 17.7,
       "threshold": 26,
       "kind": "periodic"
     },
     "morning_briefing": {
       "status": "ALIVE",
-      "last": "2026-10-09T12:30:40.501762+00:00",
-      "silence_hours": 13.3,
+      "last": "2026-10-10T12:33:47.455983+00:00",
+      "silence_hours": 11.8,
       "threshold": 26,
       "kind": "periodic",
-      "effective_silence_hours": 11.5
+      "effective_silence_hours": 0.0
     },
     "edge_pipeline": {
       "status": "EVENT_DRIVEN",
