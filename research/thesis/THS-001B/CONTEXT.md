@@ -34,3 +34,9 @@ modelled ending value $3,370 vs broker $3,365.
 
 ## What closes this folder
 Same as THS-001. Next mark: 12 months (2027-03-31).
+
+Caveat recorded 2026-10-11: the two large sell-downs (2026-05-07 and 2026-09-30) were not manager
+decisions. Each followed a $5,000 deposit that was returned (DEPOSIT_RETURNED 05-07 and 09-30 in
+`data/thesis/fills/public_3CQ09610.jsonl`, plus a −$30 MISC fee on 09-30), i.e. forced sales to cover
+the bounce. The "touched it once or twice" cost in the record is therefore funding friction, not
+discretion. Lesson for THS-002+: fund the account before sealing; a bounce liquidates the thesis.
