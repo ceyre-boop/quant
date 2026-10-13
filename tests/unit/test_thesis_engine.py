@@ -105,3 +105,27 @@ def test_daily_frame_from_fills():
     assert df["value"].iloc[-1] == pytest.approx(1003.35)
     sub = daily_frame(rows, fake_loader, "2024-01-05", tickers={"AAA"})
     assert sub["flow"].iloc[0] == 500.0 and sub["flow"].loc["2024-01-04"] == pytest.approx(-503.35)
+
+
+def test_sim_control_fills_match_weights_at_open(tmp_path):
+    from sovereign.thesis.sim import sim_fills, write_sim_fills
+    from sovereign.thesis.reconcile import load_fills
+    import pandas as pd
+    rec = {"id": "THS-X", "hash_lock": "abc",
+           "basket": [{"ticker": "AAA", "weight": 0.6}, {"ticker": "BBB", "weight": 0.4}]}
+    idx = pd.bdate_range("2026-01-05", periods=3)
+    opens = {"AAA": pd.Series([10.0, 11.0, 12.0], index=idx, name="AAA"),
+             "BBB": pd.Series([20.0, 21.0, 22.0], index=idx, name="BBB")}
+    rows = sim_fills(rec, 3000.0, "2026-01-06", lambda t: opens[t])
+    assert rows[0]["subtype"] == "DEPOSIT" and rows[0]["net"] == 3000.0
+    buys = {r["symbol"]: r for r in rows[1:]}
+    assert buys["AAA"]["qty"] == round(1800 / 11.0, 6) and buys["AAA"]["net"] == -1800.0
+    assert buys["BBB"]["qty"] == round(1200 / 21.0, 6)
+    import pytest
+    with pytest.raises(LookupError):
+        sim_fills(rec, 3000.0, "2026-02-01", lambda t: opens[t])
+    f = write_sim_fills(rec, 3000.0, "2026-01-06", lambda t: opens[t], fills_dir=tmp_path)
+    assert f.name == "SIM-THS-X.jsonl"
+    assert len(load_fills("SIM-THS-X", tmp_path)) == 3
+    with pytest.raises(FileExistsError):
+        write_sim_fills(rec, 3000.0, "2026-01-06", lambda t: opens[t], fills_dir=tmp_path)

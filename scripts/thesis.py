@@ -8,6 +8,8 @@
   thesis list                      one line per thesis
   thesis verify THS-001            recompute the hash
   thesis reconcile --account A     measured TWR/MWR vs SPY from data/thesis/fills
+  thesis sim THS-002 --dollars D   write a simulated control account (buys the sealed basket
+                                   at the open of entry_date, never touched) → SIM-THS-002
 """
 from __future__ import annotations
 
@@ -23,6 +25,7 @@ from sovereign.thesis import ledger  # noqa: E402
 from sovereign.thesis.prices import load_daily  # noqa: E402
 from sovereign.thesis.score import format_scorecard, score  # noqa: E402
 from sovereign.thesis.reconcile import format_reconciliation, reconcile  # noqa: E402
+from sovereign.thesis.sim import load_open, sim_account_id, write_sim_fills  # noqa: E402
 
 OUT = ROOT / "research" / "thesis"
 
@@ -88,6 +91,21 @@ def cmd_reconcile(a):
         print(f"  → {p}")
 
 
+def cmd_sim(a):
+    rec = ledger.get(a.id)
+    if rec.get("status") not in ("SEALED", "LIVE"):
+        sys.exit(f"{a.id} is {rec.get('status')}; a control needs a sealed thesis")
+    date = a.date or rec["entry_date"]
+    f = write_sim_fills(rec, a.dollars, date, load_open, force=a.force)
+    ledger.add_note(a.id, f"control {sim_account_id(a.id)}: ${a.dollars:.2f} at open {date} → {f.relative_to(ROOT)}")
+    print(f"{sim_account_id(a.id)} written → {f.relative_to(ROOT)}")
+    for line in f.read_text().splitlines()[1:]:
+        r = json.loads(line)
+        if r["type"] == "TRADE":
+            print(f"  BUY {r['symbol']:5} {r['qty']:>10.6f} @ {r['price']:.2f}  ${-r['net']:.2f}")
+    print(f"Next: thesis reconcile --account {sim_account_id(a.id)}")
+
+
 def main():
     ap = argparse.ArgumentParser(prog="thesis")
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -100,6 +118,8 @@ def main():
     p = sub.add_parser("reconcile"); p.add_argument("--account", required=True); p.add_argument("--asof", default=None)
     p.add_argument("--basket", action="append", help="NAME=T1,T2,...")
     p.add_argument("--out"); p.set_defaults(fn=cmd_reconcile)
+    p = sub.add_parser("sim"); p.add_argument("id"); p.add_argument("--dollars", type=float, required=True)
+    p.add_argument("--date"); p.add_argument("--force", action="store_true"); p.set_defaults(fn=cmd_sim)
     a = ap.parse_args()
     if getattr(a, "asof", None) is None and a.cmd in ("score", "reconcile"):
         import datetime as _dt

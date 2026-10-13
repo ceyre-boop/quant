@@ -133,3 +133,10 @@ def add_scorecard(thesis_id: str, card: dict[str, Any], path: Path = LEDGER) -> 
     if card.get("invalidated") and r.get("status") in ("SEALED", "LIVE"):
         r["status"] = "INVALIDATED"
     return update(r, path)
+
+
+def add_note(thesis_id: str, note: str, path: Path = LEDGER) -> dict[str, Any]:
+    """Append a dated note without touching status or sealed fields."""
+    rec = get(thesis_id, path)
+    rec.setdefault("notes", []).append(f"{_now()} {note}")
+    return update(rec, path)

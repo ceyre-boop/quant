@@ -29,3 +29,10 @@ leg. Power names price the same demand with a slower, contract-backed revenue pa
 Sources used at proposal (2026-10-11): WEF May-2026 grid-connectivity note; Gartner 133 GW 2026
 demand; Gelsinger a16z 2026-10-09; SK hynix/Micron Oct-2026 sold-out statements; Seoul Economic
 Daily 2026-10-01 HBM4 pricing; BofA/Goldman breadth and bubble-risk notes.
+
+## Control
+Real: Colin's market-on-open orders 2026-10-13 09:30 ET, $2,000, margin 5OR41765.
+Control: `SIM-THS-002`, $3,000 at the official 10-13 open, sealed weights, never touched
+(`alta thesis sim THS-002 --dollars 3000`, writes `data/thesis/fills/SIM-THS-002.jsonl`).
+Both reconcile with `alta thesis reconcile --account <id>`; the gap between them is execution
+plus any touching. The control can only be written after 10-13 has traded.

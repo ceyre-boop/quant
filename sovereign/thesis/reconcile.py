@@ -18,7 +18,8 @@ EXTERNAL = {"DEPOSIT", "DEPOSIT_RETURNED", "WITHDRAWAL", "UNIDENTIFIED"}
 
 def load_fills(account: str, fills_dir: Path = FILLS) -> list[dict[str, Any]]:
     rows = []
-    for line in (fills_dir / f"public_{account}.jsonl").read_text().splitlines():
+    f = fills_dir / (f"{account}.jsonl" if account.startswith("SIM-") else f"public_{account}.jsonl")
+    for line in f.read_text().splitlines():
         if line.strip():
             d = json.loads(line)
             if not d.get("_meta"):
