@@ -4717,3 +4717,9 @@ Power-bottleneck basket GEV/ETN/CEG/VST/PWR/FIX, $2,000 margin, planned entry 20
 Colin confirmed THS-001 invalidation as sealed. THS-001B sell-downs 05-07/09-30 traced to bounced $5k deposits.
 2026-10-12: `alta thesis sim` added (simulated control account, SIM-<id>, fills at official open). Colin's THS-002 orders go market-on-open 10-13.
 Next (after 10-13 close): `alta thesis sim THS-002 --dollars 3000` then verify fills in 5OR41765 → `alta thesis live THS-002 --note "filled MOO 2026-10-13"`; 1m mark 2026-11-13; THS-001 3m mark 2026-11-28.
+
+## 2026-10-15 — THS-002 LIVE (filled 10-14, $9,000 on margin, not $2,000); Oracle API restored
+- Fills 2026-10-14 09:31 ET, weights match seal, size 4.5× the sealed $2,000; account cash −$6,907 vs stock $13,742 (~2× leverage). Recorded as deviation in ledger notes.
+- Control SIM-THS-002 rewritten to the 10-14 open ($3,000). reconcile tz bug fixed (tz-aware fill timestamps).
+- $100 API credits arrived from the Max plan (no charge). `python3 -m sovereign.oracle.reflect_cycle --days 7` ran on claude-opus-4-8 and returned a lesson; its own health note: 0 trades/6 days, regime UNKNOWN → harvest-only mode. All loops ALIVE per loop_health.
+- OPEN: 30% basket invalidation sits near/below the margin-call line at 2× leverage — Colin to decide (deleverage to sealed size, or accept forced exit precedes the rule).

@@ -27,11 +27,18 @@ def load_fills(account: str, fills_dir: Path = FILLS) -> list[dict[str, Any]]:
     return sorted(rows, key=lambda r: r["ts"])
 
 
+def _day(ts: str) -> pd.Timestamp:
+    t = pd.Timestamp(ts)
+    if t.tzinfo is not None:
+        t = t.tz_convert("UTC").tz_localize(None)
+    return t.normalize()
+
+
 def daily_frame(rows: list[dict[str, Any]], loader: Loader, asof: str,
                 tickers: set[str] | None = None, cash: bool = True) -> pd.DataFrame:
     """Daily holdings value, cash, external flows. If `tickers` is given, restrict to that
     basket and treat its trades as the external flows (sub-portfolio view)."""
-    start = pd.Timestamp(rows[0]["ts"]).normalize()
+    start = _day(rows[0]["ts"])
     end = pd.Timestamp(asof).normalize()
     days = pd.bdate_range(start, end)
     px = {}
@@ -46,7 +53,7 @@ def daily_frame(rows: list[dict[str, Any]], loader: Loader, asof: str,
     value = pd.Series(0.0, index=days)
     by_day: dict[pd.Timestamp, list] = {}
     for r in rows:
-        d = pd.Timestamp(r["ts"]).normalize()
+        d = _day(r["ts"])
         if d not in flow.index:
             d = days[days >= d][0] if (days >= d).any() else days[-1]
         by_day.setdefault(d, []).append(r)
