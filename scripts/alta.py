@@ -316,6 +316,9 @@ def main() -> None:
     tm.add_argument("--width", type=int, default=None)
     tm.set_defaults(fn=cmd_term)
 
+    oa = sub.add_parser("oracle-agent", help="Oracle v2 (Claude Agent SDK): daily read-only reflection with repo tools")
+    oa.add_argument("rest", nargs=argparse.REMAINDER)
+    oa.set_defaults(fn=lambda a: subprocess.call([sys.executable, str(ROOT / "scripts" / "oracle_sdk.py"), *(a.rest or ["run"])]))
     th = sub.add_parser("thesis", help="thesis engine — sealed thematic baskets scored vs SPY")
     th.add_argument("rest", nargs=argparse.REMAINDER)
     th.set_defaults(fn=cmd_thesis)

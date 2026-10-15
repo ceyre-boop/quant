@@ -4723,3 +4723,10 @@ Next (after 10-13 close): `alta thesis sim THS-002 --dollars 3000` then verify f
 - Control SIM-THS-002 rewritten to the 10-14 open ($3,000). reconcile tz bug fixed (tz-aware fill timestamps).
 - $100 API credits arrived from the Max plan (no charge). `python3 -m sovereign.oracle.reflect_cycle --days 7` ran on claude-opus-4-8 and returned a lesson; its own health note: 0 trades/6 days, regime UNKNOWN → harvest-only mode. All loops ALIVE per loop_health.
 - OPEN: 30% basket invalidation sits near/below the margin-call line at 2× leverage — Colin to decide (deleverage to sealed size, or accept forced exit precedes the rule).
+
+## 2026-10-15 — Oracle v2 on the Claude Agent SDK (alta oracle-agent)
+- `sovereign/oracle/sdk_agent.py` + `scripts/oracle_sdk.py`: read-only tools (thesis_list/score, loop_health, recent_decisions, price, Read/Grep/Glob/WebSearch) + one write: thesis DRAFT to research/thesis/drafts/. Write/Edit/Bash disallowed at the SDK level. `max_budget_usd` 2.0/run.
+- Two real runs on claude-opus-5-5: $0.39 (found my scorecard bug) and $0.27 (clean). Reports in oracle/03-agent/output/. Ledger data/agent/oracle_sdk_ledger.jsonl.
+- launchd `com.alta.oracle_sdk_agent` loaded, 07:00 local daily. Stage doc oracle/03-agent/CONTEXT.md.
+- Agent's own findings: THS-001B maxDD −25.3% (<5 pts from stop); capex manual check = not invalidated (Q3 reports late Oct); 0 decisions in 7 days but at 41/yr a zero-week is ~45% likely; CLAUDE.md names data/agent/decision_logs/live/ while decision_logger writes data/decision_logs/ (doc is stale).
+- Tests: tests/unit/test_oracle_sdk_agent.py 3 + thesis 7 = 10 passed.

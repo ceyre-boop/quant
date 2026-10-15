@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.alta.oracle_sdk_agent</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/Users/taboost/quant/.venv313/bin/python</string>
+    <string>/Users/taboost/quant/scripts/oracle_sdk.py</string>
+    <string>run</string><string>--budget</string><string>2.0</string>
+  </array>
+  <key>WorkingDirectory</key><string>/Users/taboost/quant</string>
+  <key>EnvironmentVariables</key><dict><key>PATH</key><string>/Users/taboost/.local/bin:/opt/homebrew/bin:/usr/bin:/bin</string></dict>
+  <key>StartCalendarInterval</key><dict><key>Hour</key><integer>7</integer><key>Minute</key><integer>0</integer></dict>
+  <key>StandardOutPath</key><string>/Users/taboost/quant/logs/oracle_sdk_agent.log</string>
+  <key>StandardErrorPath</key><string>/Users/taboost/quant/logs/oracle_sdk_agent.err</string>
+</dict>
+</plist>

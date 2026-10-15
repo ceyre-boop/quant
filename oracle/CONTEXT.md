@@ -220,3 +220,8 @@ Location: `data/agent/oracle_ledger.jsonl` (append-only)
 - **Stage 01 giving wrong lessons?** → Probably n too small (need 10+ trades for statistical confidence)
 - **Stage 02 rejecting good ideas?** → Holdout test may be too strict; review gate criteria
 - **Cycle timing off?** → Check launchd plist timing and log paths
+
+
+## Stage 03 — SDK agent (added 2026-10-15)
+
+A fourth, independent stage: `oracle/03-agent/CONTEXT.md`. Read-only reflection with repo tools via the Claude Agent SDK; produces a daily report and optional thesis DRAFT. Does not feed stages 00–02.
