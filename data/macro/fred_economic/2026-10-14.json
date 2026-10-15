@@ -1,0 +1,155 @@
+{
+  "date": "2026-10-14",
+  "generated_at": "2026-10-14T06:30:15.444382+00:00",
+  "labels": {
+    "A191RL1Q225SBEA": {
+      "label": "Real GDP growth (q/q ann)",
+      "unit": "%"
+    },
+    "CPIAUCSL": {
+      "label": "CPI",
+      "unit": "idx"
+    },
+    "CPILFESL": {
+      "label": "Core CPI",
+      "unit": "idx"
+    },
+    "PCEPILFE": {
+      "label": "Core PCE",
+      "unit": "idx"
+    },
+    "UNRATE": {
+      "label": "Unemployment rate",
+      "unit": "%"
+    },
+    "PAYEMS": {
+      "label": "Nonfarm payrolls",
+      "unit": "k"
+    },
+    "ICSA": {
+      "label": "Initial jobless claims",
+      "unit": "#"
+    },
+    "FEDFUNDS": {
+      "label": "Fed funds rate",
+      "unit": "%"
+    },
+    "DGS10": {
+      "label": "10Y Treasury",
+      "unit": "%"
+    },
+    "DGS2": {
+      "label": "2Y Treasury",
+      "unit": "%"
+    },
+    "T10Y2Y": {
+      "label": "10Y-2Y spread",
+      "unit": "%"
+    },
+    "MORTGAGE30US": {
+      "label": "30Y mortgage",
+      "unit": "%"
+    },
+    "RSAFS": {
+      "label": "Retail sales",
+      "unit": "$M"
+    },
+    "UMCSENT": {
+      "label": "Consumer sentiment (UMich)",
+      "unit": "idx"
+    },
+    "DTWEXBGS": {
+      "label": "USD broad index",
+      "unit": "idx"
+    },
+    "VIXCLS": {
+      "label": "VIX",
+      "unit": "idx"
+    }
+  },
+  "metrics": {
+    "A191RL1Q225SBEA": {
+      "value": null,
+      "err": "URLError"
+    },
+    "CPIAUCSL": {
+      "value": null,
+      "err": "URLError"
+    },
+    "CPILFESL": {
+      "value": null,
+      "err": "URLError"
+    },
+    "PCEPILFE": {
+      "value": null,
+      "err": "URLError"
+    },
+    "UNRATE": {
+      "value": null,
+      "err": "URLError"
+    },
+    "PAYEMS": {
+      "value": null,
+      "err": "URLError"
+    },
+    "ICSA": {
+      "value": null,
+      "err": "URLError"
+    },
+    "FEDFUNDS": {
+      "value": null,
+      "err": "URLError"
+    },
+    "DGS10": {
+      "value": null,
+      "err": "URLError"
+    },
+    "DGS2": {
+      "value": null,
+      "err": "URLError"
+    },
+    "T10Y2Y": {
+      "value": null,
+      "err": "URLError"
+    },
+    "MORTGAGE30US": {
+      "value": null,
+      "err": "URLError"
+    },
+    "RSAFS": {
+      "value": null,
+      "err": "URLError"
+    },
+    "UMCSENT": {
+      "value": null,
+      "err": "URLError"
+    },
+    "DTWEXBGS": {
+      "value": null,
+      "err": "URLError"
+    },
+    "VIXCLS": {
+      "value": null,
+      "err": "URLError"
+    }
+  },
+  "summary": {
+    "gdp_growth_pct": null,
+    "cpi_yoy_pct": null,
+    "core_cpi_yoy_pct": null,
+    "core_pce_yoy_pct": null,
+    "unemployment_pct": null,
+    "fed_funds_pct": null,
+    "ten_year_pct": null,
+    "yield_curve_10y2y": null,
+    "yield_curve_state": "NORMAL",
+    "consumer_sentiment": null,
+    "vix": null
+  },
+  "provenance": {
+    "source": "fred_economic",
+    "verified": true,
+    "note": "Daily US economic-state context for Oracle cognition. NOT a trading input \u2014 never wired to sizing, signals, or any gate.",
+    "key_present": true
+  }
+}

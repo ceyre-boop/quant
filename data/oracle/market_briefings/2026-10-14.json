@@ -1,0 +1,137 @@
+{
+  "date": "2026-10-14",
+  "generated_at": "2026-10-14T12:35:10.552237+00:00",
+  "meta_regime": "BREADTH",
+  "regime_read": "ES & NQ moving together \u2014 broad agreement, more DURABLE directional signal. Trust the direction more.",
+  "narrative": "Macro backdrop \u2014\n[2026-10-14] US economic state (FRED):\n  Growth: real GDP n/a (q/q ann)\n  Inflation: CPI n/a YoY | core CPI n/a | core PCE n/a (Fed target 2%)\n  Labor: unemployment n/a\n  Rates: fed funds n/a | 10Y n/a | 10Y-2Y n/a (NORMAL)\n  Consumer: UMich sentiment n/a | VIX n/a\n\n---\nRecent market action has seen both ES and NQ moving in tandem, with the lead-lag regime indicating a broad agreement on direction. The contemporaneous correlation of 0.933 suggests that traders are aligned, making this a more durable directional signal. However, there is divergence noted, which could be a sign of potential rotation or profit-taking. The volume profile shows accumulation in both ES and NQ around their respective points of control (POC), with key levels at 7855.29 for ES and 30790.08 for NQ. These levels represent areas where significant buying interest is present, acting as support zones. The event calendar highlights upcoming FOMC meeting on October 28th, which could introduce volatility into the market. Given the current regime of breadth and the recent move-by-move read suggesting a continuation of the uptrend, we maintain a long-the-dip bias with a confidence level of 75%. This bias is valid as long as the key levels in NQ (30790.08) are not breached, which would invalidate our current view.",
+  "big_move_headline": {
+    "headline": "Today's likeliest institutional move: LONG AUDUSD (P 68%, ~0.79% range, conf 32%).",
+    "pair": "AUDUSD",
+    "direction": "LONG",
+    "p_big": 0.6813,
+    "confidence": 0.32,
+    "expected_magnitude_pct": 0.7945,
+    "session": "LONDON",
+    "drivers": [
+      [
+        "event_risk",
+        0.9
+      ],
+      [
+        "compression",
+        0.2016
+      ],
+      [
+        "displacement",
+        0.162
+      ]
+    ],
+    "validation_status": "UNVALIDATED \u2014 display only (run scripts/validate_big_move.py)"
+  },
+  "directional_bias": "LONG",
+  "confidence": 75,
+  "regime_call": "BREADTH",
+  "key_level": null,
+  "synthesis_source": "ollama/qwen2.5",
+  "lead_lag": {
+    "regime": "BREADTH",
+    "spread_avg": 0.00106,
+    "leader": "NONE",
+    "corr": 0.933,
+    "divergence": true
+  },
+  "volume_profile": {
+    "ES=F": {
+      "symbol": "ES=F",
+      "as_of": "2026-10-14T12:30:30.153666+00:00",
+      "days": 5,
+      "bins": 40,
+      "poc": 7855.29,
+      "value_area_low": 7840.23,
+      "value_area_high": 7864.87,
+      "high_volume_nodes": [
+        7855.29,
+        7856.66,
+        7851.18,
+        7860.76,
+        7848.44
+      ],
+      "price_range": [
+        7831.33,
+        7886.08
+      ],
+      "limitation": "Volume profile = WHERE volume traded (volume-at-price). NOT order-flow delta (buy/sell aggression). True delta needs a CME order-flow feed (Databento/CQG)."
+    },
+    "NQ=F": {
+      "symbol": "NQ=F",
+      "as_of": "2026-10-14T12:30:30.209580+00:00",
+      "days": 5,
+      "bins": 40,
+      "poc": 30790.08,
+      "value_area_low": 30640.51,
+      "value_area_high": 31122.46,
+      "high_volume_nodes": [
+        30790.08,
+        30889.79,
+        30773.46,
+        30756.84,
+        30706.99
+      ],
+      "price_range": [
+        30615.58,
+        31280.33
+      ],
+      "limitation": "Volume profile = WHERE volume traded (volume-at-price). NOT order-flow delta (buy/sell aggression). True delta needs a CME order-flow feed (Databento/CQG)."
+    }
+  },
+  "macro_economic": {
+    "text": "[2026-10-14] US economic state (FRED):\n  Growth: real GDP n/a (q/q ann)\n  Inflation: CPI n/a YoY | core CPI n/a | core PCE n/a (Fed target 2%)\n  Labor: unemployment n/a\n  Rates: fed funds n/a | 10Y n/a | 10Y-2Y n/a (NORMAL)\n  Consumer: UMich sentiment n/a | VIX n/a",
+    "summary": {
+      "gdp_growth_pct": null,
+      "cpi_yoy_pct": null,
+      "core_cpi_yoy_pct": null,
+      "core_pce_yoy_pct": null,
+      "unemployment_pct": null,
+      "fed_funds_pct": null,
+      "ten_year_pct": null,
+      "yield_curve_10y2y": null,
+      "yield_curve_state": "NORMAL",
+      "consumer_sentiment": null,
+      "vix": null
+    }
+  },
+  "news_count": 8,
+  "event_calendar": [
+    {
+      "event": "FOMC meeting",
+      "date": "2026-10-28",
+      "source": "seed",
+      "action": "reduce size / widen stops into the window",
+      "days_until": 14,
+      "note": "in 14d \u2014 reduce size / widen stops into the window"
+    },
+    {
+      "event": "PCE (Fed's preferred inflation)",
+      "date": "2026-10-30",
+      "source": "cadence_estimate",
+      "action": "8:30 ET \u2014 reduce size into window",
+      "days_until": 16,
+      "note": "in 16d \u2014 8:30 ET \u2014 reduce size into window"
+    },
+    {
+      "event": "ISM Manufacturing PMI",
+      "date": "2026-11-02",
+      "source": "cadence_estimate",
+      "action": "reduce size into the 10:00 ET print",
+      "days_until": 19,
+      "note": "in 19d \u2014 reduce size into the 10:00 ET print"
+    }
+  ],
+  "scorecard_summary": "Briefing scorecard: n=52 dir-calls, hit 0.635, regime acc 0.404 \u2014 MATURE \u2014 calibration is now interpretable",
+  "bias": "size to regime: trust direction more in BREADTH, less in CONCENTRATION; ROTATION_WARN = treat tech-led longs as suspect",
+  "provenance": {
+    "source": "oracle_morning_briefing",
+    "verified": false,
+    "note": "Analyst/Oracle journal \u2014 qualitative regime context + a self-scored directional call, NOT a verified data feed or validated edge. Numbers here are never ingested as trading inputs."
+  }
+}
